@@ -22,6 +22,7 @@ import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.cids.utils.ClassCacheMultiple;
+import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
 import de.cismet.tools.gui.WrappedComponent;
@@ -96,7 +97,7 @@ public class CidsObjectEditorFactory {
 
 
         try {
-            Class wrapperClass = Class.forName("de.cismet.cids.custom.objecteditors.EditorWrapper");
+            Class wrapperClass = BlacklistClassloading.forName("de.cismet.cids.custom.objecteditors.EditorWrapper");
             componentWrapper = (ComponentWrapper) wrapperClass.getConstructor().newInstance();
         } catch (Exception skip) {
             log.debug("Fehler beim lAden des EditorWrappers", skip);
@@ -217,22 +218,28 @@ public class CidsObjectEditorFactory {
 
     private JComponent getObjectEditor(MetaClass metaClass) {
         JComponent ret = null;
-
         String domain = metaClass.getDomain().toLowerCase();
+        String overrideObjectEditorClassName=System.getProperty(domain+"."+metaClass.getTableName().toLowerCase()+".objecteditor");
         String className = metaClass.getTableName().toLowerCase();
+        if (overrideObjectEditorClassName!=null){
         className = className.substring(0, 1).toUpperCase() + className.substring(1);
         className = editorPrefix + domain + "." + className + editorPostfix;
+        }
+        else {
+            className=overrideObjectEditorClassName;
+        }
         Class editorClass = null;
         try {
-            editorClass = Class.forName(className);
+            editorClass = BlacklistClassloading.forName(className);
+            if (editorClass==null) {
+                return null;
+            }
             Constructor c = editorClass.getConstructor();
             JComponent ed = (JComponent) c.newInstance();
             if (ed instanceof MetaClassStore) {
                 ((MetaClassStore) ed).setMetaClass(metaClass);
             }
             ret = ed;
-        } catch (ClassNotFoundException e) {
-            log.debug("Keine Editorklasse " + className + " gefunden.", e);
         } catch (Exception e) {
             log.error("Error beim erzeugen der Editorklasse " + className, e);
         }
@@ -479,6 +486,7 @@ public class CidsObjectEditorFactory {
     }
 
     private JComponent getCustomAttributeEditor(MetaClass metaClass, MemberAttributeInfo mai) {
+        // TODO
         //Hier müssen auch noch die Einstellungen inder DB (ComplexEditor, Editor) berücksichtigt werden
 
         //MetaClass contains the MemberAttributeInfo
@@ -489,10 +497,15 @@ public class CidsObjectEditorFactory {
         String fieldname = mai.getFieldName().toLowerCase();
         fieldname = fieldname.substring(0, 1).toUpperCase() + fieldname.substring(1);
         className = editorPrefix + domain + "." + className + "." + fieldname + attributeEditorPostfix;
-
-
+        String overrideAttributeEditorClassName=System.getProperty(domain+"."+metaClass.getTableName().toLowerCase()+".attributeeditor");
+        if (overrideAttributeEditorClassName!=null){
+            className=overrideAttributeEditorClassName;
+        }
         try {
-            Class edClass = Class.forName(className);
+            Class edClass = BlacklistClassloading.forName(className);
+            if (edClass==null){
+                return null;
+            }
             Bindable editor = (Bindable) edClass.newInstance();
             if (editor instanceof MetaClassStore && mai.isForeignKey()) {
                 MetaClass foreignClass = getMetaClass(metaClass.getDomain(), mai.getForeignKeyClassId());
@@ -500,8 +513,6 @@ public class CidsObjectEditorFactory {
 
             }
             ret = (JComponent) editor;
-        } catch (ClassNotFoundException cnfe) {
-            log.debug("Konnte Klasse " + className + " nicht finden", cnfe);
         } catch (Exception e) {
             log.error("Error when creating a SimpleAttributeEditor", e);
         }

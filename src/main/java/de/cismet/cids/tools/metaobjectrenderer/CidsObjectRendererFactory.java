@@ -8,6 +8,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
+import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
 import java.lang.reflect.Constructor;
@@ -64,24 +65,24 @@ public class CidsObjectRendererFactory {
 
         rendererInfo = mo.getMetaClass().getRenderer();
 
-        //Erstmal ausschließlich lazy class loading
+
         Class rendererClass = null;
 
         try {
 
             //Transform due to JavaCodeConventions
+            String overrideRendererClassName = System.getProperty(mo.getDomain().toLowerCase() + "." + mo.getMetaClass().getTableName().toLowerCase() + ".renderer");
             String className = mo.getMetaClass().getTableName().toLowerCase();
             className = className.substring(0, 1).toUpperCase() + className.substring(1);
             className = rendererPrefix + mo.getDomain().toLowerCase() + "." + className + singleRendererPostfix;
-
-            try {
-                rendererClass = Class.forName(className);
-            } catch (ClassNotFoundException cnfe) {
-                log.debug("Kein Renderer gefunden.", cnfe);
+            if (overrideRendererClassName != null) {
+                className = overrideRendererClassName;
             }
+            rendererClass = BlacklistClassloading.forName(className);
+
 
             if (rendererClass == null && rendererInfo != null) {
-                rendererClass = Class.forName(rendererInfo);
+                rendererClass = BlacklistClassloading.forName(rendererInfo); //Klasse laden die in der DB zugeordnet ist
             }
 
             if (rendererClass != null) {
@@ -108,8 +109,6 @@ public class CidsObjectRendererFactory {
                 }
 
             }
-        } catch (ClassNotFoundException e) {
-            log.debug("Kein Renderer gefunden.", e);
         } catch (Throwable e) {
             log.error("Fehler beim Erzeugen des Renderers.", e);
         }
@@ -144,8 +143,10 @@ public class CidsObjectRendererFactory {
                 renderer = mc.getTableName().toLowerCase();
                 renderer = renderer.substring(0, 1).toUpperCase() + renderer.substring(1);
                 renderer = rendererPrefix + mc.getDomain().toLowerCase() + "." + renderer + aggregationRendererPostfix;
-
-
+                String overrideRendererClassName = System.getProperty(mc.getDomain().toLowerCase() + "." + mc.getTableName().toLowerCase() + ".aggregationrenderer");
+                if (overrideRendererClassName != null) {
+                    renderer = overrideRendererClassName;
+                }
             } catch (Throwable e) {
                 log.warn("Fehler beim Zuweisen des Renderers", e);
             }
@@ -153,11 +154,11 @@ public class CidsObjectRendererFactory {
             if (renderer != null) {
                 Class rendererClass = null;
                 try {
-                    try {
-                        rendererClass = Class.forName(renderer);
-                    } catch (Exception e) {
-                        log.debug("LazyClass " + renderer + " nicht gefunden. Versuche jetzt Datenbank.");
-                        rendererClass = Class.forName(mc.getRenderer());
+
+                    rendererClass = BlacklistClassloading.forName(renderer);
+                    if (rendererClass == null) {
+                        //   log.debug("LazyClass " + renderer + " nicht gefunden. Versuche jetzt Datenbank.");
+                        rendererClass = BlacklistClassloading.forName(mc.getRenderer());
                     }
 
                     Constructor constructor = rendererClass.getConstructor();
@@ -187,9 +188,6 @@ public class CidsObjectRendererFactory {
                         }
 
                     }
-
-                } catch (ClassNotFoundException e) {
-                    log.debug("Kein Renderer gefunden.", e);
                 } catch (Exception e) {
                     log.error("Fehler beim Erzeugen des Renderers.", e);
                 }
