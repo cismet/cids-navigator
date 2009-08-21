@@ -133,7 +133,6 @@ public class CidsObjectRendererFactory {
     }
 
     public JComponent getAggregationRenderer(Collection<MetaObject> moCollection, String title) {
-        log.fatal("getAggregationRenderer");
         if (moCollection.size() == 1) {
             return getSingleRenderer((MetaObject) moCollection.toArray()[0], title);
         } else {
