@@ -221,7 +221,7 @@ public class CidsObjectEditorFactory {
         String domain = metaClass.getDomain().toLowerCase();
         String overrideObjectEditorClassName=System.getProperty(domain+"."+metaClass.getTableName().toLowerCase()+".objecteditor");
         String className = metaClass.getTableName().toLowerCase();
-        if (overrideObjectEditorClassName!=null){
+        if (overrideObjectEditorClassName==null){
         className = className.substring(0, 1).toUpperCase() + className.substring(1);
         className = editorPrefix + domain + "." + className + editorPostfix;
         }
@@ -234,8 +234,7 @@ public class CidsObjectEditorFactory {
             if (editorClass==null) {
                 return null;
             }
-            Constructor c = editorClass.getConstructor();
-            JComponent ed = (JComponent) c.newInstance();
+            JComponent ed = (JComponent) editorClass.newInstance();
             if (ed instanceof MetaClassStore) {
                 ((MetaClassStore) ed).setMetaClass(metaClass);
             }
