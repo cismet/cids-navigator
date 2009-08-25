@@ -48,7 +48,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     private String[] representationFields;
     private CidsBean cidsBean = null;
     private MetaClass metaClass = null;
-    private String nullValueRepresentation = "null";
+    private String nullValueRepresentation = "-";
 
     public FastBindableReferenceCombo(String representation, String[] representationFields) {
         this("", representation, representationFields);
@@ -139,17 +139,19 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
      */
     @Override
     public void setSelectedItem(Object anObject) {
-        if (anObject instanceof CidsBean) {
-            cidsBean = (CidsBean) anObject;
-        } else if (anObject instanceof MetaObject) {
-            try {
-                cidsBean = ((MetaObject) anObject).getBean();
-            } catch (Exception ex) {
-                cidsBean = null;
-                log.error(ex, ex);
+        if (anObject != null) {
+            if (anObject instanceof CidsBean) {
+                cidsBean = (CidsBean) anObject;
+            } else if (anObject instanceof MetaObject) {
+                try {
+                    cidsBean = ((MetaObject) anObject).getBean();
+                } catch (Exception ex) {
+                    cidsBean = null;
+                    log.error(ex, ex);
+                }
             }
         } else {
-//            cidsBean = null;
+            cidsBean = null;
         }
         //just to notify listeners
         super.setSelectedItem(anObject);
@@ -224,7 +226,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
         }
         if (nullable) {
             final MetaObject[] withNull = new MetaObject[lwmos.length + 1];
-            System.arraycopy(lwmos, 0, withNull, 0, lwmos.length);
+            System.arraycopy(lwmos, 0, withNull, 1, lwmos.length);
             lwmos = withNull;
         }
         return lwmos;
