@@ -20,7 +20,7 @@ public final class SessionManager {
     private final static Object blocker = new Object();
 
     public final static void init(ConnectionProxy proxy) {
-        logger.fatal("init SessionManager " + nonce, new CurrentStackTrace());
+        logger.debug("init SessionManager " + nonce, new CurrentStackTrace());
         synchronized (blocker) {
             if (manager == null) {
                 manager = new SessionManager(proxy);
@@ -65,9 +65,6 @@ public final class SessionManager {
 
     public final static Connection getConnection() {
         try {
-            if (manager == null) {
-                logger.fatal("BUMM " + nonce + manager);
-            }
             return getManager().proxy.getSession().getConnection();
         } catch (Exception e) {
             logger.error("Error in getConnection()\nmaybe the manager is null" + getManager(), e);
