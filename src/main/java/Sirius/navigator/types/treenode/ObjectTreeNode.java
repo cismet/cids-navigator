@@ -10,7 +10,6 @@ import javax.swing.*;
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
 import Sirius.navigator.resource.*;
 
 public class ObjectTreeNode extends DefaultMetaTreeNode {
@@ -32,6 +31,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         } catch(Exception exp) {
             this.nodeIcon = ResourceManager.getManager().getIcon("ObjectNodeIcon.gif");
         }
+        
     }
     
     public MetaObjectNode getMetaObjectNode() {
@@ -76,7 +76,8 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     // ---------------------------------------------------------------------------
     
     public final String toString() {
-        return this.getMetaObjectNode().getName();}
+        return this.getMetaObjectNode().getName();
+    }
     
     public final String getDescription() {
         // dann eben doch nicht
@@ -122,10 +123,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         if(this.getMetaObjectNode().getObject() == null) {
             try {
                 if(logger.isDebugEnabled())logger.debug("caching object node");
-                MetaObject MetaObject = SessionManager.getProxy().getMetaObject(this.getMetaObjectNode().getObjectId(), this.getMetaObjectNode().getClassId(), this.getMetaObjectNode().getDomain());
-                this.getMetaObjectNode().setObject(MetaObject);
-                if (getNode().getName().equals("NameWirdGeladen")) {
-                    getNode().setName(MetaObject.toString());
+                MetaObject metaObject = SessionManager.getProxy().getMetaObject(this.getMetaObjectNode().getObjectId(), this.getMetaObjectNode().getClassId(), this.getMetaObjectNode().getDomain());
+                this.getMetaObjectNode().setObject(metaObject);
+                if (getNode().getName()==null  || getNode().getName().equals("NameWirdGeladen")) {
+                    getNode().setName(metaObject.toString());
                 }
             } catch(Throwable t) {
                 logger.error("could not retrieve meta object of node '" + this + "'",t);
