@@ -503,12 +503,13 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                                         if (logger.isDebugEnabled()) {
                                             logger.debug("caching object node");
                                         }
-                                        final MetaObject MetaObject = SessionManager.getProxy().getMetaObject(on.getMetaObjectNode().getObjectId(), on.getMetaObjectNode().getClassId(), on.getMetaObjectNode().getDomain());
-                                        on.getMetaObjectNode().setObject(MetaObject);
+                                        final MetaObject metaObject = SessionManager.getProxy().getMetaObject(on.getMetaObjectNode().getObjectId(), on.getMetaObjectNode().getClassId(), on.getMetaObjectNode().getDomain());
+                                        on.getMetaObjectNode().setObject(metaObject);
                                         EventQueue.invokeLater(new Runnable() {
 
                                             public void run() {
-                                                n.getNode().setName(MetaObject.toString());
+                                                logger.debug("setze den namen des knotens mit null als name auf:"+metaObject.toString());
+                                                n.getNode().setName(metaObject.toString());
                                                 defaultTreeModel.nodeChanged(on);
                                             }
                                         });
