@@ -23,7 +23,6 @@ package Sirius.navigator.ui.tree;
  * History			: 30.10.2001 changes by M. Derschang (vgl. MANU_NAV)
  *
  *******************************************************************************/
-import Sirius.navigator.connection.SessionManager;
 import java.util.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -37,12 +36,9 @@ import Sirius.navigator.ui.status.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
-import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
-import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.permission.PermissionHolder;
 import de.cismet.cids.utils.MetaTreeNodeVisualization;
-import java.awt.EventQueue;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -166,7 +162,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         }
     }
 
-    public void exploreSubtree(TreePath treePath) {
+    public void exploreSubtree(final TreePath treePath) {
         Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
 
@@ -300,7 +296,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         if (logger.isDebugEnabled()) {
             logger.info("setSelectedNodes(): selecting " + selectedNodes.size() + " nodes, expanding tree: " + expandTree);
         }
-
         ArrayList treePaths = new ArrayList();
         this.setExpandsSelectedPaths(expandTree);
 
@@ -590,8 +585,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
             public void run() {
                 MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
-                MetaCatalogueTree.this.expandPath(this.selectionPath);
                 MetaCatalogueTree.this.setSelectionPath(this.selectionPath);
+                MetaCatalogueTree.this.scrollPathToVisible(selectionPath);
 
                 if (logger.isDebugEnabled()) {
                     logger.debug("SubTreeExploreThread: GUI Update fertig");

@@ -59,7 +59,7 @@ public class MutablePopupMenu extends JPopupMenu {
     private final PluginMenuesMap pluginMenues = new PluginMenuesMap();
     protected PopupMenuItemsActionListener itemActionListener;
     // statische Men\u00FCeintr\u00E4ge
-    protected JMenuItem searchItem,  passwordItem,  specialTreeItem,  newNode,  editNode,  editObject,  deleteNode,  deleteObject,  newObject;
+    protected JMenuItem searchItem, passwordItem, specialTreeItem, newNode, editNode, editObject, deleteNode, deleteObject, newObject;
     private TreeEditorMenu treeEditorMenu = null;
 
     public MutablePopupMenu() {
@@ -347,8 +347,8 @@ public class MutablePopupMenu extends JPopupMenu {
                         }
                         try {
                             metaCatalogueTree.expandPath(new TreePath(selectedNode.getPath()));
-                        //selectedNode.explore();
-                        //((DefaultTreeModel)metaCatalogueTree.getModel()).nodeStructureChanged(selectedNode);
+                            //selectedNode.explore();
+                            //((DefaultTreeModel)metaCatalogueTree.getModel()).nodeStructureChanged(selectedNode);
                         } catch (Exception exp) {
                             logger.error("could not explore node: " + selectedNode, exp);
                         }
@@ -413,8 +413,8 @@ public class MutablePopupMenu extends JPopupMenu {
 
             this.setText(ResourceManager.getManager().getString("tree.editor.menu.newobject.name"));
             this.setIcon(ResourceManager.getManager().getIcon(ResourceManager.getManager().getString("tree.editor.menu.newobject.icon")));
-        //funzt eh nicht
-        //this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
+            //funzt eh nicht
+            //this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
         }
 
         public String getId() {
@@ -467,7 +467,7 @@ public class MutablePopupMenu extends JPopupMenu {
                     }
                 } else {
                     logger.warn("can not rename top node " + selectedNode);
-                // XXX dialog ...
+                    // XXX dialog ...
                 }
             } else if (logger.isDebugEnabled()) {
                 logger.warn("insufficient permission to edit node " + selectedNode);
@@ -525,7 +525,7 @@ public class MutablePopupMenu extends JPopupMenu {
             DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
             if (selectedNode != null && selectedNode.isLeaf()) {
                 if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
-                    boolean deleted=MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
+                    boolean deleted = MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
                     if (deleted) {
                         try {
                             MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
@@ -567,13 +567,13 @@ public class MutablePopupMenu extends JPopupMenu {
             if (selectedNode != null && selectedNode.isLeaf()) {
                 if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
 
-                    boolean deleted=MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
+                    boolean deleted = MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
 
                     if (deleted) {
                         try {
 //                            CidsFeature cf = new CidsFeature((MetaObjectNode) selectedNode.getNode());
 //                            CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
-                             MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
+                            MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
                         } catch (Exception e) {
                             logger.debug("Could not remove Node from map.", e);
                         }
@@ -612,7 +612,6 @@ public class MutablePopupMenu extends JPopupMenu {
 
             ((DefaultTreeModel) metaCatalogueTree.getModel()).setRoot(rootTreeNode);
             ((DefaultTreeModel) metaCatalogueTree.getModel()).reload();
-
             metaCatalogueTree.exploreSubtree(selectionPath);
         }
     }
