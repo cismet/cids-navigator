@@ -608,12 +608,13 @@ public class MutablePopupMenu extends JPopupMenu {
         public void invoke() throws Exception {
 
             final TreePath selectionPath = metaCatalogueTree.getSelectionPath();
-            if(se)
-            RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
+            if (selectionPath != null && selectionPath.getPath().length > 0) {
+                RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
 
-            ((DefaultTreeModel) metaCatalogueTree.getModel()).setRoot(rootTreeNode);
-            ((DefaultTreeModel) metaCatalogueTree.getModel()).reload();
-            metaCatalogueTree.exploreSubtree(selectionPath);
+                ((DefaultTreeModel) metaCatalogueTree.getModel()).setRoot(rootTreeNode);
+                ((DefaultTreeModel) metaCatalogueTree.getModel()).reload();
+                metaCatalogueTree.exploreSubtree(selectionPath);
+            }
         }
     }
     private MetaCatalogueTree metaCatalogueTree = null;
