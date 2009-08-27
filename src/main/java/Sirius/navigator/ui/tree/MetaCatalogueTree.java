@@ -39,6 +39,7 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.permission.PermissionHolder;
 import de.cismet.cids.utils.MetaTreeNodeVisualization;
 import java.awt.EventQueue;
@@ -53,14 +54,14 @@ import java.awt.image.BufferedImage;
  */
 public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll {
 
-    protected Logger logger = Logger.getLogger(MetaCatalogueTree.class);
+    protected final Logger logger = Logger.getLogger(MetaCatalogueTree.class);
     protected final DefaultStatusChangeSupport statusChangeSupport;
-    protected ResourceManager resources;
-    protected DefaultTreeModel defaultTreeModel;
+    protected final ResourceManager resources;
+    protected final DefaultTreeModel defaultTreeModel;
+    protected final boolean useThread;
+    protected final int maxThreadCount;
     protected TreeExploreThread treeExploreThread;
-    protected boolean useThread = true;
-    protected int threadCount = 0;
-    protected int maxThreadCount = 3;
+    protected volatile int threadCount = 0;
     private BufferedImage dragImage = null;
 
     public MetaCatalogueTree(RootTreeNode rootTreeNode, boolean editable) {
@@ -137,8 +138,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             }
         });
     }
-
-
 
     /*public void update(TreeNode node)
     {
@@ -244,7 +243,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      *
      * @return Die Anzahl der selektierten Knoten oder 0.
      */
-    private Object selectionBlocker = new Object();
+    private final Object selectionBlocker = new Object();
 
     public int getSelectedNodeCount() {
         synchronized (selectionBlocker) {
@@ -424,7 +423,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 }
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("treeExpanded() " + selectedNode.getNode() + "'s children loaed from cache");
+                    logger.debug("treeExpanded() " + selectedNode.getNode() + "'s children loaded from cache");
                 }
                 statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.cache"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             }
@@ -449,7 +448,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     private class TreeExploreThread extends Thread {
 
         private Runnable treeUpdateThread = null;
-        private DefaultMetaTreeNode node;
+        private final DefaultMetaTreeNode node;
 
         public TreeExploreThread(final DefaultMetaTreeNode selectedNode, DefaultTreeModel defaultTreeModel) {
             if (logger.isDebugEnabled()) {
@@ -475,7 +474,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 node.explore();
 
 
-
                 //logger.fatal("/////////////HELL Hier gehts weiter");
                 Thread t = new Thread(new Runnable() {
 
@@ -489,37 +487,37 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                             try {
                                 final DefaultMetaTreeNode n = (DefaultMetaTreeNode) defaultTreeModel.getChild(node, i);
                                 //logger.fatal("HELL: "+n);
-                                if (n != null && n.getNode().getName() == null && n.isObjectNode()) {
-                                    //logger.fatal("HELL: in if");
-                                    try {
-                                        final ObjectTreeNode on = ((ObjectTreeNode) n);
-                                        EventQueue.invokeLater(new Runnable() {
-
-                                            public void run() {
-                                                n.getNode().setName("Name wird geladen .....");
-                                                defaultTreeModel.nodeChanged(on);
-                                            }
-                                        });
-                                        if (logger.isDebugEnabled()) {
-                                            logger.debug("caching object node");
-                                        }
-                                        final MetaObject metaObject = SessionManager.getProxy().getMetaObject(on.getMetaObjectNode().getObjectId(), on.getMetaObjectNode().getClassId(), on.getMetaObjectNode().getDomain());
-                                        on.getMetaObjectNode().setObject(metaObject);
-                                        EventQueue.invokeLater(new Runnable() {
-
-                                            public void run() {
-                                                logger.debug("setze den namen des knotens mit null als name auf:"+metaObject.toString());
-                                                n.getNode().setName(metaObject.toString());
-                                                defaultTreeModel.nodeChanged(on);
-                                            }
-                                        });
-
-                                    } catch (Throwable t) {
-                                        logger.error("could not retrieve meta object of node '" + this + "'", t);
-                                    }
-                                } else {
-                                    logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":");
-                                }
+//                                if (n != null && n.getNode() != null && n.getNode().getName() == null && n.isObjectNode()) {
+//                                    //logger.fatal("HELL: in if");
+//                                    try {
+//                                        final ObjectTreeNode on = ((ObjectTreeNode) n);
+//                                        EventQueue.invokeLater(new Runnable() {
+//
+//                                            public void run() {
+//                                                n.getNode().setName("Name wird geladen .....");
+//                                                defaultTreeModel.nodeChanged(on);
+//                                            }
+//                                        });
+//                                        if (logger.isDebugEnabled()) {
+//                                            logger.debug("caching object node");
+//                                        }
+//                                        final MetaObject metaObject = SessionManager.getProxy().getMetaObject(on.getMetaObjectNode().getObjectId(), on.getMetaObjectNode().getClassId(), on.getMetaObjectNode().getDomain());
+//                                        on.getMetaObjectNode().setObject(metaObject);
+//                                        EventQueue.invokeLater(new Runnable() {
+//
+//                                            public void run() {
+//                                                logger.debug("setze den namen des "+n+" mit null als name auf:" + metaObject.toString());
+//                                                n.getNode().setName(metaObject.toString());
+//                                                defaultTreeModel.nodeChanged(on);
+//                                            }
+//                                        });
+//
+//                                    } catch (Throwable t) {
+//                                        logger.error("could not retrieve meta object of node '" + this + "'", t);
+//                                    }
+//                                } else {
+//                                    logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":");
+//                                }
                             } catch (Exception e) {
                                 logger.error("Fehler beim Laden des Namen", e);
                             }

@@ -52,7 +52,6 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
             boolean expanded, boolean leaf, int row, boolean hasFocus) {
         DefaultMetaTreeNode treeNode = (DefaultMetaTreeNode) value;
 
-
         Node metaNode = null;
         if (treeNode != null) {
             metaNode = treeNode.getNode();
