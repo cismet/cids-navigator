@@ -16,7 +16,7 @@ import java.util.Hashtable;
 public class NavigatorMetaClassService implements MetaClassCacheService{
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     public NavigatorMetaClassService(){
-        log.fatal("inited");
+        log.debug("inited");
     }
 
     public Hashtable getAllClasses(String domain) {
