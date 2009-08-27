@@ -608,6 +608,7 @@ public class MutablePopupMenu extends JPopupMenu {
         public void invoke() throws Exception {
 
             final TreePath selectionPath = metaCatalogueTree.getSelectionPath();
+            if(se)
             RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
 
             ((DefaultTreeModel) metaCatalogueTree.getModel()).setRoot(rootTreeNode);
