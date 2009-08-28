@@ -163,14 +163,20 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     }
 
     public void exploreSubtree(final TreePath treePath) {
-        Object[] nodes = treePath.getPath();
+        final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
-
         if (rootNode != null && nodes != null && nodes.length > 1) {
             if (logger.isDebugEnabled()) {
                 logger.debug("exploring subtree: " + nodes.length);
             }
-            Iterator childrenIterator = Arrays.asList(nodes).iterator();
+            final List<?> nodeList = Arrays.asList(nodes);
+            for (final Object o : nodeList) {
+                if (!(o instanceof DefaultMetaTreeNode)) {
+                    nodeList.remove(o);
+                    logger.error("Node " + o + " is not instance of DefaultMetaTreeNode and hast been removed from the Collection.");
+                }
+            }
+            final Iterator<DefaultMetaTreeNode> childrenIterator = (Iterator<DefaultMetaTreeNode>) nodeList.iterator();
 
             // Root Node entfernen
             childrenIterator.next();
@@ -544,9 +550,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     private class SubTreeExploreThread extends Thread {
 
         private final DefaultMetaTreeNode node;
-        private final Iterator childrenNodes;
+        private final Iterator<DefaultMetaTreeNode> childrenNodes;
 
-        public SubTreeExploreThread(final DefaultMetaTreeNode rootNode, final Iterator childrenNodes) {
+        public SubTreeExploreThread(final DefaultMetaTreeNode rootNode, final Iterator<DefaultMetaTreeNode> childrenNodes) {
             this.node = rootNode;
             this.childrenNodes = childrenNodes;
         }
@@ -586,6 +592,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             public void run() {
                 MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
                 MetaCatalogueTree.this.setSelectionPath(this.selectionPath);
+//                Object o = selectionPath.getLastPathComponent();
+//                MetaCatalogueTree.this.expandPath(selectionPath);
                 MetaCatalogueTree.this.scrollPathToVisible(selectionPath);
 
                 if (logger.isDebugEnabled()) {

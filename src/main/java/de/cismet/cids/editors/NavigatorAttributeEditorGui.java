@@ -128,7 +128,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     }
 
     private void refreshTree() {
-        log.fatal("refreshTree(EDT: "+EventQueue.isDispatchThread()+"): " + treePath );
         if (treePath != null) {
             try {
                 MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();

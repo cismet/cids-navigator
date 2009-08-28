@@ -234,17 +234,16 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode //imple
         }
     }
 
-    public TreePath explore(final Iterator childrenIterator) throws Exception {
+    public TreePath explore(final Iterator<DefaultMetaTreeNode> childrenIterator) throws Exception {
         if (childrenIterator.hasNext()) {
             if (!this.isLeaf()) {
                 if (!this.isExplored()) {
                     this.explore();
                 }
-
-                Enumeration childrenEnumeration = this.children();
-                DefaultMetaTreeNode childNode = (DefaultMetaTreeNode) childrenIterator.next();
+                final Enumeration<DefaultMetaTreeNode> childrenEnumeration = children();
+                final DefaultMetaTreeNode childNode = childrenIterator.next();
                 while (childrenEnumeration.hasMoreElements()) {
-                    DefaultMetaTreeNode thisChildNode = (DefaultMetaTreeNode) childrenEnumeration.nextElement();
+                    final DefaultMetaTreeNode thisChildNode = childrenEnumeration.nextElement();
                     if (thisChildNode.getID() > -1) {
                         if (thisChildNode.getID() == childNode.getID()) {
                             return thisChildNode.explore(childrenIterator);
@@ -256,11 +255,25 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode //imple
                     }
                 }
 
-                logger.warn("explore(): child node '" + childNode + "' not found");
+                if (logger.isDebugEnabled()) {
+                    logger.debug("explore(): child node '" + childNode + "' not found");
+                }
+                final TreePath fallback = handleNotMatchingNodeFound();
+                if (fallback != null) {
+                    return fallback;
+                }
             }
         }
+        return new TreePath(getPath());
+    }
 
-        return new TreePath(this.getPath());
+    private final TreePath handleNotMatchingNodeFound() {
+        final Enumeration<DefaultMetaTreeNode> childrenEnum = children();
+        if (childrenEnum.hasMoreElements()) {
+            final DefaultMetaTreeNode fallbackCandidate = childrenEnum.nextElement();
+            return new TreePath(fallbackCandidate.getPath());
+        }
+        return null;
     }
 
     /**
