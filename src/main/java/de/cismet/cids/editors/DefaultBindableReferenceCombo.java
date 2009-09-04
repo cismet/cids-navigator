@@ -172,8 +172,10 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         for (MetaObject mo : MetaObjects) {
             cbv.add(mo.getBean());
         }
-        //Sorts the model using String comparison on the bean's toString()
-        Collections.sort(cbv, beanToStringComparator);
+        if (ca == null) {
+            //Sorts the model using String comparison on the bean's toString()
+            Collections.sort(cbv, beanToStringComparator);
+        }
         return new DefaultComboBoxModel(cbv);
     }
 }
