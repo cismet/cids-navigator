@@ -38,6 +38,7 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.permission.PermissionHolder;
+import de.cismet.tools.CismetThreadPool;
 import de.cismet.cids.utils.MetaTreeNodeVisualization;
 import java.awt.Insets;
 import java.awt.Point;
@@ -182,7 +183,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             childrenIterator.next();
 
             SubTreeExploreThread subTreeExploreThread = new SubTreeExploreThread((DefaultMetaTreeNode) rootNode, childrenIterator);
-            subTreeExploreThread.start();
+            CismetThreadPool.execute(subTreeExploreThread);
 
 
             //Versuch den den refresh Bug bei dyn Knoten rauszumachen
@@ -409,7 +410,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     defaultTreeModel.nodeStructureChanged(selectedNode);
 
                     treeExploreThread = new TreeExploreThread(selectedNode, defaultTreeModel);
-                    treeExploreThread.start();
+                    CismetThreadPool.execute(treeExploreThread);
                 } else {
                     try {
                         statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_IGNORE, Status.ICON_BLINKING);
@@ -525,7 +526,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                         }
                     }
                 });
-                t.start();
+                CismetThreadPool.execute(t);
 
 
                 // GUI Update asynchron zum EventDispatchThread

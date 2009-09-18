@@ -17,6 +17,7 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import org.apache.log4j.Logger;
 import Sirius.server.newuser.permission.PermissionHolder;
+import java.util.List;
 import java.util.Vector;
 import javax.swing.AbstractButton;
 
@@ -43,9 +44,18 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         this.attributeTree.setIgnoreInvisibleAttributes(true);
         AttributeNodeDnDHandler attributeNodeDnDHandler = new AttributeNodeDnDHandler(this.attributeTree);
 
-    // XXX test ...
-    // this.attributeTree.setIgnoreSubsitute(false);
-    // this.attributeTree.setIgnoreArrayHelperObjects(false);
+        // XXX test ...
+        // this.attributeTree.setIgnoreSubsitute(false);
+        // this.attributeTree.setIgnoreArrayHelperObjects(false);
+    }
+
+    public void setTreeNodes(List<Object> treeNode) {
+        if (treeNode != null && treeNode.size() == 1) {
+            setTreeNode(treeNode.get(0));
+        } else {
+            clear();
+        }
+
     }
 
     public void setTreeNode(Object treeNode) {
@@ -55,16 +65,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
 
         if (treeNode != null && treeNode instanceof ObjectTreeNode && PropertyManager.getManager().isEditable()) {
             this.editButton.setEnabled(true);
-
             MetaObject mo = ((ObjectTreeNode) treeNode).getMetaObject();
-//            HashMap hm=new HashMap();
-//            try {
-//                hm.put(mo.getClassKey(),((ObjectTreeNode)treeNode).getMetaClass());
-//            }
-//            catch (Throwable t) {
-//                logger.fatal(t,t);
-//            }
-        //logger.fatal(MetaObjectXMLSerializer.getInstance().MetaObjectToXML(mo,hm));
         } else {
             this.editButton.setEnabled(false);
         }

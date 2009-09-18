@@ -13,6 +13,7 @@ import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MultithreadedMethod;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.ui.progress.ProgressObserver;
+import de.cismet.tools.CismetThreadPool;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -188,7 +189,7 @@ public class NavigatorSplashScreen extends JWindow {
                     }
                 }
             };
-            t.start();
+            CismetThreadPool.execute(t);
         }
     }
 

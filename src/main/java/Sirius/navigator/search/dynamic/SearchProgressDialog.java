@@ -21,6 +21,7 @@ import Sirius.navigator.ui.tree.*;
 import Sirius.navigator.ui.status.*;
 import Sirius.navigator.ui.widget.*;
 import Sirius.navigator.connection.*;
+import de.cismet.tools.CismetThreadPool;
 
 /**
  *
@@ -94,7 +95,8 @@ public class SearchProgressDialog extends javax.swing.JDialog
         this.setCanceld(false);
 
         searchThread = new SearchThread(classNodeKeys, searchOptions);
-        searchThread.start();
+//        searchThread.start();
+        CismetThreadPool.execute(searchThread);
         
         if(logger.isDebugEnabled())logger.debug("waiting for search thread to finish");
         //this.pack();

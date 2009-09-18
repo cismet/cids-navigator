@@ -34,6 +34,7 @@ import Sirius.server.newuser.permission.*;
 import Sirius.server.middleware.types.*;
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 import de.cismet.cids.tools.StaticCidsUtilities;
+import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
@@ -310,7 +311,7 @@ public class Navigator extends JFrame {
             progressObserver.setProgress(275, resourceManager.getString("navigator.progress.widgets.attributeeditor"));
             //HELL
 //            if (StaticDebuggingTools.checkHomeForFile("cidsExperimentalBeanEditorsEnabled")) {
-                attributeEditor = new NavigatorAttributeEditorGui();
+            attributeEditor = new NavigatorAttributeEditorGui();
 //            } else {
 //                attributeEditor = new AttributeEditor();
 //            }
@@ -370,7 +371,7 @@ public class Navigator extends JFrame {
         searchDialog = new SearchDialog(this, SessionManager.getProxy().getSearchOptions(), SessionManager.getProxy().getClassTreeNodes());
 
         progressObserver.setProgress(550, resourceManager.getString("navigator.progress.widgets.register"));
-        ComponentRegistry.registerComponents(this, container, menuBar, toolBar, popupMenu, metaCatalogueTree, searchResultsTree, attributeViewer, attributeEditor, searchDialog,descriptionPane);
+        ComponentRegistry.registerComponents(this, container, menuBar, toolBar, popupMenu, metaCatalogueTree, searchResultsTree, attributeViewer, attributeEditor, searchDialog, descriptionPane);
     }
     // #########################################################################
 
@@ -405,7 +406,7 @@ public class Navigator extends JFrame {
         metaCatalogueTree.addMouseListener(cataloguePopupMenuListener);
         searchResultsTree.addMouseListener(cataloguePopupMenuListener);
 
-    //Runtime.getRuntime().addShutdownHook(new ShutdownListener());
+        //Runtime.getRuntime().addShutdownHook(new ShutdownListener());
     }
     // #########################################################################
 
@@ -443,11 +444,11 @@ public class Navigator extends JFrame {
                     return true;
                 }
 
-            //                if(classes[i].getPermissions().hasPermission(permission)) //xxxxxxxxxxxxxxxxxxxxxx user????
-            //                {
-            //                    if(logger.isDebugEnabled())logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'");
-            //                    return true;
-            //                }
+                //                if(classes[i].getPermissions().hasPermission(permission)) //xxxxxxxxxxxxxxxxxxxxxx user????
+                //                {
+                //                    if(logger.isDebugEnabled())logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'");
+                //                    return true;
+                //                }
             } catch (Exception exp) {
                 logger.error("hasPermission(): could not check permissions", exp);
             }
@@ -474,23 +475,23 @@ public class Navigator extends JFrame {
 
 
 
-    /*if(SwingUtilities.isEventDispatchThread())
-    {
-    PluginRegistry.getRegistry().setPluginsVisible(visible);
-    }
-    else
-    {
-    logger.debug("setPluginsVisible(): synchronizing method");
-    SwingUtilities.invokeLater(new Runnable()
-    {
-    public void run()
-    {
-    PluginRegistry               PluginRegistry.getRegistry().setPluginsVisible(visible);
-    }
-    });
-    }*/
+        /*if(SwingUtilities.isEventDispatchThread())
+        {
+        PluginRegistry.getRegistry().setPluginsVisible(visible);
+        }
+        else
+        {
+        logger.debug("setPluginsVisible(): synchronizing method");
+        SwingUtilities.invokeLater(new Runnable()
+        {
+        public void run()
+        {
+        PluginRegistry               PluginRegistry.getRegistry().setPluginsVisible(visible);
+        }
+        });
+        }*/
 
-    //PluginRegistry.getRegistry().setPluginsVisible(visible);
+        //PluginRegistry.getRegistry().setPluginsVisible(visible);
     }
 
     private void doSetVisible(final boolean visible) {
@@ -714,14 +715,14 @@ public class Navigator extends JFrame {
             navigatorSplashScreen.toFront();
             navigatorSplashScreen.show();
 
-        // run .............................................................
+            // run .............................................................
         } catch (Throwable t) {
             // error .............................................................
             Logger.getLogger(Navigator.class).fatal("could not create navigator instance", t);
             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, ResourceManager.getManager().getExceptionName("nx01"), ResourceManager.getManager().getExceptionMessage("nx01"), t);
 
             System.exit(1);
-        // error .............................................................
+            // error .............................................................
         }
     }
 
@@ -826,7 +827,7 @@ public class Navigator extends JFrame {
                 }
             }
         });
-        t.start();
+        CismetThreadPool.execute(t);
     }
 }
 

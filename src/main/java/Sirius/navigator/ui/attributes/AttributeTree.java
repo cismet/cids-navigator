@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import Sirius.navigator.types.treenode.ClassTreeNode;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
+import de.cismet.tools.CismetThreadPool;
 
 
 /**
@@ -62,7 +63,7 @@ public class AttributeTree extends JTree
             if(logger.isDebugEnabled())logger.debug("creating new AttributeTreeThread");
             this.clear();
             
-            new Thread("AttributeTreeThread")
+            CismetThreadPool.execute(new Thread("AttributeTreeThread")
             {
                 public void run()
                 {
@@ -130,7 +131,7 @@ public class AttributeTree extends JTree
                     }
                     if(logger.isDebugEnabled())logger.debug("AttributeTreeThread finished");
                 }
-            }.start();
+            });
         }
         else
         {

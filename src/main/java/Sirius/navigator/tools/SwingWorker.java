@@ -1,6 +1,7 @@
 package Sirius.navigator.tools;
 
 
+import de.cismet.tools.CismetThreadPool;
 import javax.swing.SwingUtilities;
 
 /**
@@ -127,7 +128,7 @@ public abstract class SwingWorker {
     public void start() {
         Thread t = threadVar.get();
         if (t != null) {
-            t.start();
+            CismetThreadPool.execute(t);
         }
     }
 }

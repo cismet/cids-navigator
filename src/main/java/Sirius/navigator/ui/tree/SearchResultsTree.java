@@ -10,6 +10,7 @@ import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
+import de.cismet.tools.CismetThreadPool;
 import de.cismet.cids.utils.MetaTreeNodeVisualization;
 import java.awt.EventQueue;
 
@@ -410,7 +411,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             }
         };
 
-        t.start();
+        CismetThreadPool.execute(t);
     }
 
     public Node[] getResultNodes() {

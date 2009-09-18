@@ -2,6 +2,7 @@ package de.cismet.cids.tools.metaobjectrenderer;
 
 import de.cismet.tools.gui.FuseLoader;
 import com.vividsolutions.jts.geom.Geometry;
+import de.cismet.tools.CismetThreadPool;
 import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
@@ -413,7 +414,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
                     });
                 }
             });
-            t.start();
+            CismetThreadPool.execute(t);
         }
     }
 

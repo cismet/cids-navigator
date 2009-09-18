@@ -23,6 +23,7 @@ package Sirius.navigator.tools;
  *
  *******************************************************************************/
 
+import de.cismet.tools.CismetThreadPool;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.SwingUtilities;
@@ -41,7 +42,8 @@ public final class WaitCursorEventQueue extends EventQueue
         this.delay = delay;
         waitTimer = new WaitCursorTimer();
         waitTimer.setDaemon(true);
-        waitTimer.start();
+
+        CismetThreadPool.execute(waitTimer);
     }
     
     protected void dispatchEvent(AWTEvent event)

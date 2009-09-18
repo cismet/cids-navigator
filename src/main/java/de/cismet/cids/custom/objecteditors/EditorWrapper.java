@@ -14,7 +14,6 @@ import de.cismet.tools.gui.WrappedComponent;
 import java.awt.BorderLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import org.apache.log4j.Logger;
 
@@ -27,7 +26,6 @@ public class EditorWrapper implements ComponentWrapper {
     private static final Logger log = Logger.getLogger(EditorWrapper.class);
 
     public WrappedComponent wrapComponent(JComponent component) {
-        System.out.println(component);
         component.setBorder(new EmptyBorder(10, 10, 10, 10));
         final CoolEditor ced = new CoolEditor();
         if (component instanceof BorderProvider) {

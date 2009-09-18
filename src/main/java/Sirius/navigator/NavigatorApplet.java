@@ -44,6 +44,7 @@ import Sirius.navigator.method.*;
 import Sirius.navigator.ui.progress.*;
 import Sirius.navigator.ui.LAFManager;
 import Sirius.navigator.exception.*;
+import de.cismet.tools.CismetThreadPool;
 import org.apache.log4j.lf5.util.Resource;
 
 public class NavigatorApplet extends javax.swing.JApplet

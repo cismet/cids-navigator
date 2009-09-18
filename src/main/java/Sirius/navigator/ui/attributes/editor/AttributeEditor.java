@@ -34,6 +34,7 @@ import Sirius.navigator.ui.attributes.editor.metaobject.*;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
+import de.cismet.tools.CismetThreadPool;
 
 /**
  *
@@ -185,7 +186,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
             final ObjectTreeNode objectTreeNode = (ObjectTreeNode)this.getTreeNode();
             
             ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            new Thread(new Runnable() {
+            CismetThreadPool.execute(new Thread(new Runnable() {
                 public void run() {
                     MetaObject uneditedMetaObject = objectTreeNode.getMetaObject();
                     MetaObject editedMetaObject = (MetaObject)AttributeEditor.this.editor.getValue();
@@ -255,7 +256,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                             ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorMessage2"),
                                             ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorTitle"), JOptionPane.INFORMATION_MESSAGE);
                                     
-                                    //AttributeEditor.this.setTreeNode(objectTreeNode);
+                                    //AttributeEditor.this.setTreeNodes(objectTreeNode);
                                     AttributeEditor.this.clear();
                                     
                                     ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -283,7 +284,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                         ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     }
                 }
-            }, "commitEditThread").start();
+            }, "commitEditThread"));
         }
     }
     
@@ -494,7 +495,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
             {
                 confirmEdit();
                 DefaultMetaTreeNode node = ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNode();
-                AttributeEditor.this.setTreeNode(node);
+                AttributeEditor.this.setTreeNodes(node);
             }
             else if(e.getActionCommand().equals("pin"))
             {

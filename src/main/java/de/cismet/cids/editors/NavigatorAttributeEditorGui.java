@@ -16,6 +16,7 @@ import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
+import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.ComponentWrapper;
 import java.awt.EventQueue;
@@ -245,21 +246,21 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         });
         treeNode = node;
         if (treeNode instanceof ObjectTreeNode) {
-            final DescriptionPane desc=ComponentRegistry.getRegistry().getDescriptionPane();
-            new SwingWorker<JComponent, Void>() {
+            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
+            CismetThreadPool.execute(new SwingWorker<JComponent, Void>() {
 
                 @Override
                 protected JComponent doInBackground() throws Exception {
                     ObjectTreeNode otn = (ObjectTreeNode) treeNode;
                     editorObject = otn.getMetaObject();
                     createBackup(editorObject);
-               
+
                     editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
                         public void propertyChange(PropertyChangeEvent evt) {
                             viewer.repaint();
                             tree.repaint();
-                        //commitButton.setEnabled(!backupObject.propertyEquals(mo)); //vielleicht einfach zuviel des guten
+                            //commitButton.setEnabled(!backupObject.propertyEquals(mo)); //vielleicht einfach zuviel des guten
 
                         }
                     });
@@ -285,7 +286,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         clear();
                     }
                 }
-            }.execute();
+            });
 
         } else {
             log.warn("Uebergebener Treenode ist keine ObjectTreeMode, sondern: " + node.getClass());
@@ -449,14 +450,12 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             log.fatal("Current Bean" + mo.getBean());
             try {
                 log.fatal("Describe Bean" + BeanUtils.describe(mo.getBean()));
-            }
-            catch (Exception e) {
-                log.fatal("BUMM",e);
+            } catch (Exception e) {
+                log.fatal("BUMM", e);
             }
         }
 
     }//GEN-LAST:event_jButton2ActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;

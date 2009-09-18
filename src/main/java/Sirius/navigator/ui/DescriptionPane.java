@@ -21,8 +21,9 @@ import calpa.html.DefaultCalHTMLObserver;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
-import de.cismet.tools.CurrentStackTrace;
+import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
+import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -44,6 +45,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+
 import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -57,13 +59,16 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final DefaultStatusChangeSupport statusChangeSupport;
+    private final CalHTMLPreferences htmlPrefs = new CalHTMLPreferences();
+    private final JPanel panRenderer = new JPanel();
+    private final JComponent wrappedWaitingPanel;
+//    private final Timer cadenceTimer;
+//    private final TimerAction timerAction;
+    private SwingWorker worker = null;
+    private GridBagConstraints gridBagConstraints;
     private String welcomePage;
-    private PrintableJPanel rendererPanel;
-    private JComponent wrappedWaitingPanel;
-    CalHTMLPreferences htmlPrefs = new CalHTMLPreferences();
-    JPanel panRenderer = new JPanel();
-    GridBagConstraints gridBagConstraints;
-    SwingWorker worker=null;
+    private boolean showsWaitScreen = false;
+//    private final EnqueueingListener enqueuingListener = new EnqueueingListener();
     DefaultCalHTMLObserver htmlObserver = new DefaultCalHTMLObserver() {
 
         public void statusUpdate(CalHTMLPane calHTMLPane, int status, URL uRL, int i0, String string) {
@@ -94,6 +99,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         htmlPrefs.setOptimizeDisplay(CalCons.OPTIMIZE_ALL);
         htmlPrefs.setDisplayErrorDialogs(false);
         htmlPrefs.setLoadImages(true);
+//        timerAction = new TimerAction();
+//        cadenceTimer = new Timer(300, timerAction);
+//        cadenceTimer.setRepeats(false);
 
         //htmlPrefs.setDisplayErrorDialogs(true);
         initComponents();
@@ -119,6 +127,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
         if (cw != null) {
             wrappedWaitingPanel = (JComponent) cw.wrapComponent(lblRendererCreationWaitingLabel);
+        } else {
+            wrappedWaitingPanel = null;
         }
 
     }
@@ -150,7 +160,6 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         htmlPane.setDoubleBuffered(true);
         add(htmlPane, "html");
     }// </editor-fold>//GEN-END:initComponents
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private calpa.html.CalHTMLPane htmlPane;
     private javax.swing.JButton jButton1;
@@ -159,28 +168,38 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     // End of variables declaration//GEN-END:variables
 
     private void showHTML() {
-        EventQueue.invokeLater(new Runnable() {
+        final Runnable htmlRunnable = new Runnable() {
 
+            @Override
             public void run() {
                 ((CardLayout) getLayout()).show(DescriptionPane.this, "html");
             }
-        });
+        };
+        if (EventQueue.isDispatchThread()) {
+            htmlRunnable.run();
+        } else {
+            EventQueue.invokeLater(htmlRunnable);
+        }
     }
 
     private void showObjects() {
-        EventQueue.invokeLater(new Runnable() {
+        final Runnable showObjRunnable = new Runnable() {
 
             public void run() {
                 ((CardLayout) getLayout()).show(DescriptionPane.this, "objects");
             }
-        });
+        };
+        if (EventQueue.isDispatchThread()) {
+            showObjRunnable.run();
+        } else {
+            EventQueue.invokeLater(showObjRunnable);
+        }
     }
 
     public void clear() {
-        Runnable r = new Runnable() {
+        Runnable clearRunnable = new Runnable() {
 
             public void run() {
-                log.fatal("clear",new CurrentStackTrace());
                 htmlPane.showHTMLDocument("");
                 panRenderer.removeAll();
                 repaint();
@@ -188,9 +207,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         };
 
         if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(r);
+            EventQueue.invokeLater(clearRunnable);
         } else {
-            r.run();
+            clearRunnable.run();
         }
     }
 
@@ -215,125 +234,121 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         }
     }
 
-
     //Multiple Objects
-    public void setNodesDescription(final Vector objects) {
+    public void setNodesDescriptions(final List<?> objects) {
+        if (objects.size() == 1) {
+            setNodeDescription(objects.get(0));
+        } else {
+            showObjects();
+            clear();
+            if (worker != null) {
+                worker.cancel(true);
+            }
+            worker = new SwingWorker<JComponent, JComponent>() {
+
+                final List<JComponent> all = TypeSafeCollections.newArrayList();
+
+                @Override
+                protected JComponent doInBackground() throws Exception {
+                    Vector filteredObjects = new Vector(objects);
+                    MultiMap objectsByClass = new MultiMap();
+                    for (Object object : objects) {
+                        if (object != null && !((DefaultMetaTreeNode) object).isWaitNode() && !((DefaultMetaTreeNode) object).isRootNode() && !((DefaultMetaTreeNode) object).isPureNode() && ((DefaultMetaTreeNode) object).isObjectNode()) {
+                            try {
+                                ObjectTreeNode n = (ObjectTreeNode) object;
+                                objectsByClass.put(n.getMetaClass(), n);
+                            } catch (Throwable t) {
+                                log.warn("Fehler beim Vorbereiten der Darstellung der Objekte", t);
+                            }
+                        }
+                    }
+                    int y = 0;
+                    Iterator it = objectsByClass.keySet().iterator();
 
 
-        showObjects();
-        clear();
+                    //splMain.setDividerLocation(1.0d);
+                    while (it.hasNext()) {
+                        // JSeparator sep=new JSeparator(JSeparator.HORIZONTAL);
+                        Object key = it.next();
+                        List l = (List) objectsByClass.get(key);
 
-        if (worker!=null){
-            worker.cancel(true);
-        }
-        worker=new SwingWorker<JComponent, JComponent>() {
+                        Vector<MetaObject> v = new Vector<MetaObject>();
+                        for (Object o : l) {
+                            v.add(((ObjectTreeNode) o).getMetaObject());
+                        }
+                        MetaClass mc = ((MetaObject) v.toArray()[0]).getMetaClass();
 
-            List<JComponent> all = new Vector<JComponent>();
 
-            @Override
-            protected JComponent doInBackground() throws Exception {
-                Vector filteredObjects = new Vector(objects);
-                MultiMap objectsByClass = new MultiMap();
-                for (Object object : objects) {
-                    if (object != null && !((DefaultMetaTreeNode) object).isWaitNode() && !((DefaultMetaTreeNode) object).isRootNode() && !((DefaultMetaTreeNode) object).isPureNode() && ((DefaultMetaTreeNode) object).isObjectNode()) {
+                        //Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden fall getAggregationrenderer null lifert (keiner da, oder Fehler)
+                        JComponent aggrRendererTester = null;
+
+                        if (l.size() > 1) {
+                            //aggrRendererTester = MetaObjectrendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");
+                            aggrRendererTester = CidsObjectRendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");
+                        }
+                        if (aggrRendererTester == null) {
+                            log.warn("AggregationRenderer was null. Will use SingleRenderer");
+                            for (Object object : l) {
+                                ObjectTreeNode otn = (ObjectTreeNode) object;
+                                //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
+                                final JComponent comp = CidsObjectRendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
+                                otn.getMetaObject().getBean().addPropertyChangeListener(new PropertyChangeListener() {
+
+                                    public void propertyChange(PropertyChangeEvent evt) {
+                                        comp.repaint();
+                                    }
+                                });
+                                publish(comp);
+                            }
+                        } else {
+                            publish(aggrRendererTester);
+                        }
+                    }
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    all.clear();
+                    worker = null;
+                }
+
+                @Override
+                protected void process(List<JComponent> chunks) {
+                    int y = all.size();
+                    for (JComponent comp : chunks) {
                         try {
-                            ObjectTreeNode n = (ObjectTreeNode) object;
-                            objectsByClass.put(n.getMetaClass(), n);
+                            GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                            gridBagConstraints.gridx = 0;
+                            gridBagConstraints.gridy = y;
+                            gridBagConstraints.weightx = 1;
+                            gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
+                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                            panRenderer.add(comp, gridBagConstraints);
+                            panRenderer.revalidate();
+                            panRenderer.repaint();
+
+                            y++;
                         } catch (Throwable t) {
-                            log.warn("Fehler beim Vorbereiten der Darstellung der Objekte", t);
+                            log.error("Fehler beim Rendern des MetaObjectrenderer", t);
                         }
                     }
+                    all.addAll(chunks);
                 }
-                int y = 0;
-                Iterator it = objectsByClass.keySet().iterator();
-
-
-                //splMain.setDividerLocation(1.0d);
-                while (it.hasNext()) {
-                    // JSeparator sep=new JSeparator(JSeparator.HORIZONTAL);
-                    Object key = it.next();
-                    List l = (List) objectsByClass.get(key);
-
-                    Vector<MetaObject> v = new Vector<MetaObject>();
-                    for (Object o : l) {
-                        v.add(((ObjectTreeNode) o).getMetaObject());
-                    }
-                    MetaClass mc = ((MetaObject) v.toArray()[0]).getMetaClass();
-
-
-                    //Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden fall getAggregationrenderer null lifert (keiner da, oder Fehler)
-                    JComponent aggrRendererTester = null;
-
-                    if (l.size() > 1) {
-                        //aggrRendererTester = MetaObjectrendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");
-                        aggrRendererTester = CidsObjectRendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");
-                    }
-                    if (aggrRendererTester == null) {
-                        log.warn("AggregationRenderer was null. Will use SingleRenderer");
-                        for (Object object : l) {
-                            ObjectTreeNode otn = (ObjectTreeNode) object;
-                            //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
-                            final JComponent comp = CidsObjectRendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
-                            otn.getMetaObject().getBean().addPropertyChangeListener(new PropertyChangeListener() {
-
-                                public void propertyChange(PropertyChangeEvent evt) {
-                                    comp.repaint();
-                                }
-                            });
-                            publish(comp);
-                        }
-                    } else {
-                        publish(aggrRendererTester);
-                    }
-                }
-                return null;
+            };
+            if (worker != null) {
+                CismetThreadPool.execute(worker);
             }
 
-            @Override
-            protected void done() {
-                all.clear();
-                worker=null;
-            }
-
-            @Override
-            protected void process(List<JComponent> chunks) {
-                int y = all.size();
-                for (JComponent comp : chunks) {
-                    try {
-
-                        GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-                        gridBagConstraints.gridx = 0;
-                        gridBagConstraints.gridy = y;
-                        gridBagConstraints.weightx = 1;
-                        gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
-                        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                        panRenderer.add(comp, gridBagConstraints);
-                        panRenderer.revalidate();
-                        panRenderer.repaint();
-
-                        y++;
-                    } catch (Throwable t) {
-                        log.error("Fehler beim Rendern des MetaObjectrenderer", t);
-                    }
-                }
-                all.addAll(chunks);
-            }
-        };
-        if (worker!=null){
-            worker.execute();
         }
-        
-
     }
 
-    //Single Object
-    public void setNodeDescription(final Object object) {
-        if (object != null && !((DefaultMetaTreeNode) object).isWaitNode() && !((DefaultMetaTreeNode) object).isRootNode()) {
-            //colPane.setCollapsed(true);
-            showObjects();
+    private final void showWaitScreen() {
+        if (!showsWaitScreen) {
+            showsWaitScreen = true;
+            final Runnable run = new Runnable() {
 
-            EventQueue.invokeLater(new Runnable() {
-
+                @Override
                 public void run() {
                     panRenderer.removeAll();
                     GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
@@ -342,81 +357,94 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     gridBagConstraints.weightx = 1;
                     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                    panRenderer.add(wrappedWaitingPanel, gridBagConstraints);
+                    if (wrappedWaitingPanel != null) {
+                        panRenderer.add(wrappedWaitingPanel, gridBagConstraints);
+                    }
                     repaint();
                 }
-            });
+            };
+            if (EventQueue.isDispatchThread()) {
+                run.run();
+            } else {
+                EventQueue.invokeLater(run);
+            }
+        }
+    }
+
+    private final void startSingleRendererWorker(final DefaultMetaTreeNode node) {
+        worker = new javax.swing.SwingWorker<JComponent, Void>() {
+
+            @Override
+            protected JComponent doInBackground() throws Exception {
+
+                MetaObject o = null;
+                MetaClass c = null;
+
+                o = ((ObjectTreeNode) node).getMetaObject();
 
 
-            final DefaultMetaTreeNode n = (DefaultMetaTreeNode) object;
-
-            final String descriptionURL = n.getDescription();
-
-
-            // besorge MO zum parametrisieren der URL
-            if (n.isObjectNode()) {
-                if (worker!=null){
-                    worker.cancel(true);
+                log.debug("setNodeDescription");
+                try {
+                    c = ((ObjectTreeNode) node).getMetaClass();
+                } catch (Throwable t) {
+                    log.error("kein Klasse f\u00FCr Objectreenode", t);
                 }
-                worker=new javax.swing.SwingWorker<JComponent, Void>() {
+
+                //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
+                final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, node.toString());
+                o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
-                    protected JComponent doInBackground() throws Exception {
-                        MetaObject o = null;
-                        MetaClass c = null;
-
-                        o = ((ObjectTreeNode) n).getMetaObject();
-
-
-                        log.debug("setNodeDescription");
-                        try {
-                            c = ((ObjectTreeNode) n).getMetaClass();
-                        } catch (Throwable t) {
-                            log.error("kein Klasse f\u00FCr Objectreenode", t);
-                        }
-                        
-                        //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
-                        final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, n.toString());
-                        o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
-
-                            public void propertyChange(PropertyChangeEvent evt) {
-                                jComp.repaint();
-                            }
-                        });
-
-                        return jComp;
-
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        jComp.repaint();
                     }
+                });
+                return jComp;
+            }
 
-                    @Override
-                    protected void done() {
-                        try {
-                            JComponent comp = get();
-                            //splMain.setDividerLocation(finalWidthRatio);
-                            panRenderer.removeAll();//log.fatal("All removed");
-                            gridBagConstraints = new java.awt.GridBagConstraints();
-                            gridBagConstraints.gridx = 0;
-                            gridBagConstraints.gridy = 0;
-                            gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                            panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
-                            panRenderer.revalidate();
-                            revalidate();
-                            repaint();
-                            worker=null;
-                        } catch (Exception e) {
-                            log.error("Exception occurred during renderercreation", e);
+            @Override
+            protected void done() {
+                try {
+                    if (!isCancelled()) {
+                        showsWaitScreen = false;
+                        final JComponent comp = get();
+                        //splMain.setDividerLocation(finalWidthRatio);
+                        panRenderer.removeAll();//log.fatal("All removed");
+                        gridBagConstraints = new java.awt.GridBagConstraints();
+                        gridBagConstraints.gridx = 0;
+                        gridBagConstraints.gridy = 0;
+                        gridBagConstraints.weightx = 1;
+                        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+                        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                        panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
+                        panRenderer.revalidate();
+                        revalidate();
+                        repaint();
+                    } else {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Worker canceled!");
                         }
                     }
-                };
-                if (worker!=null) {
-                    worker.execute();
+                } catch (InterruptedException iex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Worker canceled!");
+                    }
+                } catch (Exception e) {
+                    log.error("Error during Renderer creation", e);
                 }
-                
+            }
+        };
+        CismetThreadPool.execute(worker);
 
+    }
 
-            } else if (n.isClassNode()) {
+    private final void performSetNode(final DefaultMetaTreeNode n) {
+        final String descriptionURL = n.getDescription();
+        // besorge MO zum parametrisieren der URL
+        if (n.isObjectNode()) {
+            startSingleRendererWorker(n);
+        } else {
+            if (n.isClassNode()) {
 //                try {
 //                    c = ((ClassTreeNode) n).getMetaClass();
 //                } catch (Throwable t) {
@@ -424,8 +452,10 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 //                }
             } else if (n.isPureNode()) {
                 showHTML();
-            //splMain.setDividerLocation(0d);
+                //splMain.setDividerLocation(0d);
             }
+            showsWaitScreen = false;
+        }
 
 
 //            try {
@@ -434,19 +464,30 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 //                log.info("keine Parametrisierung m\u00F6glich url wie unparametrisiert verwendet", t);
 //            }
 
-            if (log.isDebugEnabled()) {
-                log.debug("loading description from url '" + descriptionURL + "'");
+        if (log.isDebugEnabled()) {
+            log.debug("loading description from url '" + descriptionURL + "'");
+        }
+
+        this.setPage(descriptionURL);
+    }
+
+    //Single Object
+    public void setNodeDescription(final Object object) {
+        if (object != null && !((DefaultMetaTreeNode) object).isWaitNode() && !((DefaultMetaTreeNode) object).isRootNode()) {
+            final DefaultMetaTreeNode n = (DefaultMetaTreeNode) object;
+            if (worker != null && !worker.isDone()) {
+                worker.cancel(true);
+            } else {
+                showObjects();
+                showWaitScreen();
             }
-
-
-            this.setPage(descriptionURL);
+            performSetNode(n);
         } else {
             //if(logger.isDebugEnabled())logger.debug("no description url available");
             statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.nodescription"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
 
             //this.setText("<html><body><h3>" + ResourceManager.getManager().getString("descriptionpane.welcome") + "</h3></body></html>");
             htmlPane.showHTMLDocument(welcomePage);
-
         }
     }
 
@@ -456,7 +497,14 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         GradientPaint gp = new GradientPaint(0, 0, getBackground(), getWidth(), getHeight(), Color.WHITE, false);
         g2d.setPaint(gp);
         g2d.fillRect(0, 0, getWidth(), getHeight());
-    //super.paintComponent(g2d);
+        //super.paintComponent(g2d);
+    }
+
+    public void prepareValueChanged() {
+        if (worker != null) {
+            worker.cancel(true);
+        }
+        showWaitScreen();
     }
 
     class PrintableJPanel extends ScrollableFlowPanel implements Printable {
@@ -475,4 +523,31 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             }
         }
     }
+//    final class TimerAction extends AbstractAction {
+//
+//        public TimerAction() {
+//        }
+//        private DefaultMetaTreeNode node;
+//
+//        @Override
+//        public void actionPerformed(ActionEvent e) {
+//            performSetNode(node);
+//        }
+//
+//        /**
+//         * @return the object
+//         */
+//        public DefaultMetaTreeNode getNode() {
+//            return node;
+//        }
+//
+//        /**
+//         * @param object the object to set
+//         */
+//        public void setNode(DefaultMetaTreeNode object) {
+//            this.node = object;
+//        }
+//    }
 }
+
+

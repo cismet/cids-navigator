@@ -10,6 +10,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.tools.CismetThreadPool;
 import java.awt.Component;
 import java.io.Serializable;
 import java.util.Arrays;
@@ -76,7 +77,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
     private void init(final MetaClass mc) {
         if (!isFakeModel()) {
-            new SwingWorker<DefaultComboBoxModel, Void>() {
+            CismetThreadPool.execute(new SwingWorker<DefaultComboBoxModel, Void>() {
 
                 @Override
                 protected DefaultComboBoxModel doInBackground() throws Exception {
@@ -96,7 +97,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
 
                 }
-            }.execute();
+            });
         } else {
         }
     }
