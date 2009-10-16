@@ -29,6 +29,7 @@ import javax.swing.tree.*;
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.types.treenode.*;
+import de.cismet.tools.BlacklistClassloading;
 import java.util.HashMap;
 
 public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
@@ -55,7 +56,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
         Node metaNode = null;
         if (treeNode != null) {
             metaNode = treeNode.getNode();
-        //log.fatal(treeNode + "--> "+metaNode.getIconString());
+            //log.fatal(treeNode + "--> "+metaNode.getIconString());
         } else {
             //log.fatal("treeNode==null");
         }
@@ -87,9 +88,11 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                 String tablename = mc.getTableName();
                 tablename = tablename.substring(0, 1).toUpperCase() + tablename.substring(1).toLowerCase();
                 String className = CLASS_PREFIX + domain.toLowerCase() + "." + tablename + CLASS_POSTFIX;
-                Class iconFactoryClass = Class.forName(className);
-                iconFactory = (CidsTreeObjectIconFactory) iconFactoryClass.getConstructor().newInstance();
-                iconFactories.put(cid + "@" + domain, iconFactory);
+                Class iconFactoryClass = BlacklistClassloading.forName(className);
+                if (iconFactoryClass != null) {
+                    iconFactory = (CidsTreeObjectIconFactory) iconFactoryClass.getConstructor().newInstance();
+                    iconFactories.put(cid + "@" + domain, iconFactory);
+                }
             } catch (Exception e) {
                 log.debug("Could not load IconFactory for " + cid + "@" + domain, e);
             }
