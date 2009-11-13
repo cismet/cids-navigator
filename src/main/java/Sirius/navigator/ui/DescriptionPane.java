@@ -5,6 +5,7 @@
  */
 package Sirius.navigator.ui;
 
+import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
@@ -404,23 +405,24 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     }
 
     public void gotoMetaObject(final MetaClass mc, final int toObjectId, final String optionalTitle) {
-//        showWaitScreen();
-//        new SwingWorker<Void, Void>() {
-//
-//            @Override
-//            protected Void doInBackground() throws Exception {
-//                return null;
-//            }
-//
-//            @Override
-//            protected void done() {
-//                try {
-//                    Void result = get();
-//                } catch (Exception e) {
-//                    log.error("Exception in Background Thread", e);
-//                }
-//            }
-//        }.execute();
+        showWaitScreen();
+        new SwingWorker<MetaObject, Void>() {
+
+            @Override
+            protected MetaObject doInBackground() throws Exception {
+                return SessionManager.getProxy().getMetaObject(toObjectId,  mc.getId(), mc.getDomain());
+            }
+
+            @Override
+            protected void done() {
+                try {
+                    MetaObject result = get();
+                    gotoMetaObject(result, optionalTitle);
+                } catch (Exception e) {
+                    log.error("Exception in Background Thread", e);
+                }
+            }
+        }.execute();
     }
 
     private final void startSingleRendererWorker(final DefaultMetaTreeNode node) {
