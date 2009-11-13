@@ -25,6 +25,10 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
 import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.breadcrumb.BreadCrumb;
+import de.cismet.tools.gui.breadcrumb.DefaultBreadCrumbModel;
+import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -34,6 +38,7 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Paint;
+import java.awt.event.ActionEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -62,13 +67,13 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     private final CalHTMLPreferences htmlPrefs = new CalHTMLPreferences();
     private final JPanel panRenderer = new JPanel();
     private final JComponent wrappedWaitingPanel;
-//    private final Timer cadenceTimer;
-//    private final TimerAction timerAction;
     private SwingWorker worker = null;
     private GridBagConstraints gridBagConstraints;
     private String welcomePage;
     private boolean showsWaitScreen = false;
-//    private final EnqueueingListener enqueuingListener = new EnqueueingListener();
+    private DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
+    private LinkStyleBreadCrumbGui breadCrumbGui;
+    //private SimplestBreadCrumbGui breadCrumbGui ;
     DefaultCalHTMLObserver htmlObserver = new DefaultCalHTMLObserver() {
 
         public void statusUpdate(CalHTMLPane calHTMLPane, int status, URL uRL, int i0, String string) {
@@ -107,7 +112,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         initComponents();
 
         showHTML();
-
+        breadCrumbGui = new LinkStyleBreadCrumbGui(breadCrumbModel);
+        //breadCrumbGui= new SimplestBreadCrumbGui(breadCrumbModel);
+        panBreadCrump.add(breadCrumbGui, BorderLayout.CENTER);
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
         try {
             StringBuffer buffer = new StringBuffer();
@@ -143,8 +150,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        scpRenderer = new javax.swing.JScrollPane();
         htmlPane = new CalHTMLPane(htmlPrefs,htmlObserver,"cismap");
+        panObjects = new javax.swing.JPanel();
+        scpRenderer = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+        panBreadCrump = new javax.swing.JPanel();
 
         lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
@@ -154,16 +164,28 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
         setLayout(new java.awt.CardLayout());
 
-        scpRenderer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        add(scpRenderer, "objects");
-
         htmlPane.setDoubleBuffered(true);
         add(htmlPane, "html");
+
+        panObjects.setLayout(new java.awt.BorderLayout());
+
+        scpRenderer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        scpRenderer.setViewportView(jPanel1);
+
+        panObjects.add(scpRenderer, java.awt.BorderLayout.CENTER);
+
+        panBreadCrump.setLayout(new java.awt.BorderLayout());
+        panObjects.add(panBreadCrump, java.awt.BorderLayout.PAGE_START);
+
+        add(panObjects, "objects");
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private calpa.html.CalHTMLPane htmlPane;
     private javax.swing.JButton jButton1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblRendererCreationWaitingLabel;
+    private javax.swing.JPanel panBreadCrump;
+    private javax.swing.JPanel panObjects;
     private javax.swing.JScrollPane scpRenderer;
     // End of variables declaration//GEN-END:variables
 
@@ -236,6 +258,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     //Multiple Objects
     public void setNodesDescriptions(final List<?> objects) {
+        breadCrumbModel.clear();
         if (objects.size() == 1) {
             setNodeDescription(objects.get(0));
         } else {
@@ -371,27 +394,52 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         }
     }
 
+    public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
+        breadCrumbModel.appendCrumb(new CidsMetaObjectBreadCrumb(to) {
+            @Override
+            public void crumbActionPerformed(ActionEvent e) {
+                startSingleRendererWorker(to,optionalTitle);
+            }
+        });
+        startSingleRendererWorker(to, optionalTitle);
+    }
+
+    public void gotoMetaObject(final MetaClass mc, final int toObjectId, final String optionalTitle) {
+//        showWaitScreen();
+//        new SwingWorker<Void, Void>() {
+//
+//            @Override
+//            protected Void doInBackground() throws Exception {
+//                return null;
+//            }
+//
+//            @Override
+//            protected void done() {
+//                try {
+//                    Void result = get();
+//                } catch (Exception e) {
+//                    log.error("Exception in Background Thread", e);
+//                }
+//            }
+//        }.execute();
+    }
+
     private final void startSingleRendererWorker(final DefaultMetaTreeNode node) {
+        final MetaObject o = ((ObjectTreeNode) node).getMetaObject();
+        
+        startSingleRendererWorker(o, node.toString());
+    }
+
+    private final void startSingleRendererWorker(final MetaObject o, final String title) {
+
         worker = new javax.swing.SwingWorker<JComponent, Void>() {
 
             @Override
             protected JComponent doInBackground() throws Exception {
 
-                MetaObject o = null;
-                MetaClass c = null;
-
-                o = ((ObjectTreeNode) node).getMetaObject();
-
-
-                log.debug("setNodeDescription");
-                try {
-                    c = ((ObjectTreeNode) node).getMetaClass();
-                } catch (Throwable t) {
-                    log.error("kein Klasse f\u00FCr Objectreenode", t);
-                }
 
                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
-                final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, node.toString());
+                final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
                 o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
@@ -399,6 +447,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         jComp.repaint();
                     }
                 });
+
+
                 return jComp;
             }
 
@@ -442,6 +492,18 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         final String descriptionURL = n.getDescription();
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
+           
+            final MetaObject o = ((ObjectTreeNode) n).getMetaObject();
+            breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
+
+                @Override
+                public void crumbActionPerformed(ActionEvent e) {
+                    startSingleRendererWorker(o, n.toString());
+                }
+            });
+
+
+            
             startSingleRendererWorker(n);
         } else {
             if (n.isClassNode()) {

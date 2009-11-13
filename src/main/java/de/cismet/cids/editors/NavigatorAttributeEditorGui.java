@@ -329,13 +329,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         editorScrollPane = new javax.swing.JScrollPane();
         lblEditorCreation = new javax.swing.JLabel();
         controlBar = new javax.swing.JPanel();
-        titleBar = new Sirius.navigator.ui.widget.TitleBar();
         commitButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         switchPanel = new javax.swing.JPanel();
         scpEditor = new javax.swing.JScrollPane();
         panDebug = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
 
         pinButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon")));
@@ -369,16 +367,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
-        controlBar.setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.BorderLayout());
 
-        titleBar.setIcon(resources.getIcon("floatingframe.gif"));
-        titleBar.setTitle(resources.getString("attribute.editor.title"));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        controlBar.add(titleBar, gridBagConstraints);
+        controlBar.setLayout(new java.awt.GridBagLayout());
 
         commitButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon")));
         commitButton.setToolTipText(resources.getString("attribute.viewer.commit.tooltip"));
@@ -415,14 +406,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         panDebug.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton2.setText("log Bean");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-        panDebug.add(jButton2);
-
         jButton1.setText("log MetaObject");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -431,7 +414,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         });
         panDebug.add(jButton1);
 
-        switchPanel.add(panDebug, java.awt.BorderLayout.PAGE_START);
+        switchPanel.add(panDebug, java.awt.BorderLayout.NORTH);
 
         add(switchPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -444,30 +427,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (getTreeNode() != null && getTreeNode() instanceof ObjectTreeNode) {
-            MetaObject mo = ((ObjectTreeNode) getTreeNode()).getMetaObject();
-            log.fatal("Current Bean" + mo.getBean());
-            try {
-                log.fatal("Describe Bean" + BeanUtils.describe(mo.getBean()));
-            } catch (Exception e) {
-                log.fatal("BUMM", e);
-            }
-        }
-
-    }//GEN-LAST:event_jButton2ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;
     private javax.swing.JPanel controlBar;
     private javax.swing.JScrollPane editorScrollPane;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel lblEditorCreation;
     private javax.swing.JPanel panDebug;
     private javax.swing.JScrollPane scpEditor;
     private javax.swing.JPanel switchPanel;
-    private Sirius.navigator.ui.widget.TitleBar titleBar;
     // End of variables declaration//GEN-END:variables
 }
 

@@ -506,7 +506,7 @@ public class CidsObjectEditorFactory {
                                 cmpEditor = getSimpleAttributeEditor(metaClass, mai);
                             }
 
-                            log.debug("ATTRIBUTE_CLASS_NAME:" + mai.getJavaclassname() + " --> " + cmpEditor);
+                            log.debug("ATTRIBUTE_CLASS_NAME:" + mai.getJavaclassname() + " --> " + cmpEditor.getClass().toString() );
                             cidsEditor.addControlInformation(mai.getFieldName().toLowerCase(), (Bindable) cmpEditor);
                             gbc = getCommonConstraints();
                             modifyForEditor(gbc);
@@ -553,9 +553,15 @@ public class CidsObjectEditorFactory {
 
         //MetaClass contains the MemberAttributeInfo
         final String className = getAttributeEditorClassnameByConvention(metaClass, mai);
+        
         final FinalReference<JComponent> result = new FinalReference<JComponent>();
         try {
-            final Class<?> attrEditorClass = BlacklistClassloading.forName(className);
+            Class<?> attrEditorClass = BlacklistClassloading.forName(className);
+            
+            if (attrEditorClass==null&& mai.getEditor()!=null) {
+                attrEditorClass=BlacklistClassloading.forName(mai.getEditor());
+            }
+
             if (attrEditorClass != null) {
                 final MetaClass foreignClass;
                 if (MetaClassStore.class.isAssignableFrom(attrEditorClass) && mai.isForeignKey()) {
@@ -587,7 +593,8 @@ public class CidsObjectEditorFactory {
         } catch (Exception e) {
             log.error("Error when creating a SimpleAttributeEditor", e);
         }
-        return result.getObject();
+        JComponent ret= result.getObject();
+        return ret;
     }
 
     private final void bindCidsEditor(final AutoBindableCidsEditor ed) {
