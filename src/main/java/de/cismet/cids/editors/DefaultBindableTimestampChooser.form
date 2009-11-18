@@ -21,7 +21,7 @@
   <SubComponents>
     <Component class="org.jdesktop.swingx.JXDatePicker" name="jXDatePicker1">
       <BindingProperties>
-        <BindingProperty name="date" source="Form" sourcePath="${timestamp}" target="jXDatePicker1" targetPath="date" updateStrategy="0" immediately="false"/>
+        <BindingProperty name="date" source="Form" sourcePath="${date}" target="jXDatePicker1" targetPath="date" updateStrategy="0" immediately="false"/>
       </BindingProperties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -42,7 +42,7 @@
         </Property>
       </Properties>
       <BindingProperties>
-        <BindingProperty name="value" source="Form" sourcePath="${timestamp}" target="jFormattedTextField1" targetPath="value" updateStrategy="0" immediately="false"/>
+        <BindingProperty name="value" source="Form" sourcePath="${time}" target="jFormattedTextField1" targetPath="value" updateStrategy="0" immediately="false"/>
       </BindingProperties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jFormattedTextField1ActionPerformed"/>

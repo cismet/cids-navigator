@@ -10,13 +10,21 @@
  */
 package de.cismet.cids.editors;
 
-import de.cismet.cids.editors.converters.SqlDateToUtilDateConverter;
 import de.cismet.cids.editors.converters.SqlTimestampToUtilDateConverter;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.Calendar;
 import java.util.Date;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import net.sf.jasperreports.engine.design.events.PropagationChangeListener;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
+import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
 
 /**
  *
@@ -24,7 +32,10 @@ import org.jdesktop.beansbinding.Validator;
  */
 public class DefaultBindableTimestampChooser extends javax.swing.JPanel implements Bindable {
 
-    private Date timestamp;
+//    private Date timestamp;
+    private Date date;
+    private Date time;
+    Calendar mainC = Calendar.getInstance();
     public static final String PROP_TIMESTAMP = "timestamp";
 
     /**
@@ -33,7 +44,18 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @return the value of timestamp
      */
     public Date getTimestamp() {
-        return timestamp;
+        Calendar dateC = Calendar.getInstance();
+        dateC.setTime(date);
+        int day = dateC.get(Calendar.DAY_OF_MONTH);
+        int month = dateC.get(Calendar.MONTH);
+        int year = dateC.get(Calendar.YEAR);
+        Calendar timeC = Calendar.getInstance();
+        timeC.setTime(time);
+        int hour = timeC.get(Calendar.HOUR_OF_DAY);
+        int minute = timeC.get(Calendar.MINUTE);
+
+        mainC.set(year, month, day, hour, minute);
+        return mainC.getTime();
     }
 
     /**
@@ -42,9 +64,33 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @param timestamp new value of timestamp
      */
     public void setTimestamp(Date timestamp) {
-        Date oldTimestamp = this.timestamp;
-        this.timestamp = timestamp;
-        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, oldTimestamp, timestamp);
+        Date oldTimestamp = mainC.getTime();
+        if (timestamp!=null){
+            mainC.setTime(timestamp);
+        }
+
+
+        int day = mainC.get(Calendar.DAY_OF_MONTH);
+        int month = mainC.get(Calendar.MONTH);
+        int year = mainC.get(Calendar.YEAR);
+
+        Calendar dateCal = Calendar.getInstance();
+        dateCal.setTimeInMillis(0);
+        dateCal.set(year, month, day);
+
+        int hour = mainC.get(Calendar.HOUR_OF_DAY);
+        int minute = mainC.get(Calendar.MINUTE);
+
+        Calendar timeCal = Calendar.getInstance();
+        timeCal.setTimeInMillis(0);
+        timeCal.set(0, 0, 0, hour, minute);
+
+
+        date = dateCal.getTime();
+        time = timeCal.getTime();
+
+
+        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
         bindingGroup.unbind();
         bindingGroup.bind();
     }
@@ -71,6 +117,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     /** Creates new form DefaultBindableTimestampChooser */
     public DefaultBindableTimestampChooser() {
         initComponents();
+        jXDatePicker1.getMonthView().setSelectionModel(new SingleDaySelectionModel());
     }
 
     /** This method is called from within the constructor to
@@ -90,7 +137,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${timestamp}"), jXDatePicker1, org.jdesktop.beansbinding.BeanProperty.create("date"));
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${date}"), jXDatePicker1, org.jdesktop.beansbinding.BeanProperty.create("date"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -102,7 +149,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         jFormattedTextField1.setMinimumSize(new java.awt.Dimension(80, 28));
         jFormattedTextField1.setPreferredSize(new java.awt.Dimension(80, 28));
 
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${timestamp}"), jFormattedTextField1, org.jdesktop.beansbinding.BeanProperty.create("value"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${time}"), jFormattedTextField1, org.jdesktop.beansbinding.BeanProperty.create("value"));
         bindingGroup.addBinding(binding);
 
         jFormattedTextField1.addActionListener(new java.awt.event.ActionListener() {
@@ -136,5 +183,48 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
 
     public Validator getValidator() {
         return null;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
+    }
+
+    public Date getTime() {
+        return time;
+    }
+
+    public void setTime(Date time) {
+        this.time = time;
+        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
+    }
+
+    public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+            public void run() {
+                JFrame jf = new JFrame();
+                jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                jf.getContentPane().setLayout(new BorderLayout());
+                jf.setSize(400, 200);
+                final DefaultBindableTimestampChooser dc = new DefaultBindableTimestampChooser();
+                dc.setTimestamp(Calendar.getInstance().getTime());
+                JButton cmd = new JButton("TEST");
+                cmd.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println(dc.getTimestamp());
+                    }
+                });
+                jf.getContentPane().add(dc, BorderLayout.NORTH);
+                jf.getContentPane().add(cmd, BorderLayout.SOUTH);
+                jf.setVisible(true);
+            }
+        });
     }
 }
