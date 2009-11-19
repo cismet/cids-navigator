@@ -11,7 +11,9 @@
 package de.cismet.cids.editors;
 
 import de.cismet.cids.editors.converters.SqlTimestampToUtilDateConverter;
+import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -38,6 +40,8 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     private Date time;
     Calendar mainC = Calendar.getInstance();
     public static final String PROP_TIMESTAMP = "timestamp";
+    public static final String CARDS_CHOOSE = "chooseTimestamp";
+    public static final String CARDS_CREATE = "createTimestamp";
     private PropertyChangeSupport propertyChangeSupport;
 
     /** Creates new form DefaultBindableTimestampChooser */
@@ -45,7 +49,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         mainC.setTimeInMillis(0);
         initComponents();
         jXDatePicker1.getMonthView().setSelectionModel(new SingleDaySelectionModel());
-        log.debug("set Input verifier");
+        setTimestamp(null);
     }
 
     public PropertyChangeSupport getPropertyChangeSupport() {
@@ -93,6 +97,12 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      */
     public void setTimestamp(Date timestamp) {
         log.debug("setTimestamp: " + timestamp);
+        if (timestamp == null) {
+            ((CardLayout)getLayout()).show(this, CARDS_CREATE);
+        } else {
+            ((CardLayout)getLayout()).show(this, CARDS_CHOOSE);
+        }
+
         try {
             Date oldTimestamp = mainC.getTime();
             if (timestamp != null) {
@@ -159,11 +169,30 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         java.awt.GridBagConstraints gridBagConstraints;
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
+        panCreateTimestamp = new javax.swing.JPanel();
+        btnCreateTimestamp = new javax.swing.JButton();
+        panChooseTimestamp = new javax.swing.JPanel();
         jXDatePicker1 = new org.jdesktop.swingx.JXDatePicker();
         jFormattedTextField1 = new javax.swing.JFormattedTextField();
 
         setOpaque(false);
-        setLayout(new java.awt.GridBagLayout());
+        setLayout(new java.awt.CardLayout());
+
+        panCreateTimestamp.setLayout(new java.awt.BorderLayout());
+
+        btnCreateTimestamp.setText("kein Datum angelegt");
+        btnCreateTimestamp.setToolTipText("Hier klicken um ein Datum auszuwählen.");
+        btnCreateTimestamp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCreateTimestampActionPerformed(evt);
+            }
+        });
+        panCreateTimestamp.add(btnCreateTimestamp, java.awt.BorderLayout.CENTER);
+
+        add(panCreateTimestamp, "createTimestamp");
+
+        panChooseTimestamp.setOpaque(false);
+        panChooseTimestamp.setLayout(new java.awt.GridBagLayout());
 
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${date}"), jXDatePicker1, org.jdesktop.beansbinding.BeanProperty.create("date"));
         bindingGroup.addBinding(binding);
@@ -172,7 +201,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        add(jXDatePicker1, gridBagConstraints);
+        panChooseTimestamp.add(jXDatePicker1, gridBagConstraints);
 
         jFormattedTextField1.setFormatterFactory(new javax.swing.text.DefaultFormatterFactory(new javax.swing.text.DateFormatter(java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT))));
         jFormattedTextField1.setMinimumSize(new java.awt.Dimension(80, 28));
@@ -181,25 +210,26 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${time}"), jFormattedTextField1, org.jdesktop.beansbinding.BeanProperty.create("value"));
         bindingGroup.addBinding(binding);
 
-        jFormattedTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jFormattedTextField1ActionPerformed(evt);
-            }
-        });
         binding.setValidator(new TimeValidator());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        add(jFormattedTextField1, gridBagConstraints);
+        panChooseTimestamp.add(jFormattedTextField1, gridBagConstraints);
+
+        add(panChooseTimestamp, "chooseTimestamp");
 
         bindingGroup.bind();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jFormattedTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jFormattedTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jFormattedTextField1ActionPerformed
+    private void btnCreateTimestampActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateTimestampActionPerformed
+        setTimestamp(Calendar.getInstance().getTime());
+    }//GEN-LAST:event_btnCreateTimestampActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCreateTimestamp;
     private javax.swing.JFormattedTextField jFormattedTextField1;
     private org.jdesktop.swingx.JXDatePicker jXDatePicker1;
+    private javax.swing.JPanel panChooseTimestamp;
+    private javax.swing.JPanel panCreateTimestamp;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -244,13 +274,13 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
                 jf.getContentPane().setLayout(new BorderLayout());
                 jf.setSize(400, 200);
                 final DefaultBindableTimestampChooser dc = new DefaultBindableTimestampChooser();
-                dc.setTimestamp(Calendar.getInstance().getTime());
-                JButton cmd = new JButton("TEST");
+                //dc.setTimestamp(Calendar.getInstance().getTime());
+                JButton cmd = new JButton("TEST (Datum löschen)");
                 cmd.addActionListener(new ActionListener() {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        System.out.println(dc.getTimestamp());
+                        dc.setTimestamp(null);
                     }
                 });
                 jf.getContentPane().add(dc, BorderLayout.NORTH);
