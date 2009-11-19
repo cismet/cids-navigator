@@ -42,6 +42,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
 
     /** Creates new form DefaultBindableTimestampChooser */
     public DefaultBindableTimestampChooser() {
+        mainC.setTimeInMillis(0);
         initComponents();
         jXDatePicker1.getMonthView().setSelectionModel(new SingleDaySelectionModel());
         log.debug("set Input verifier");
@@ -62,6 +63,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     public Date getTimestamp() {
         try {
             Calendar dateC = Calendar.getInstance();
+            dateC.setTimeInMillis(0);
             if (date != null) {
                 dateC.setTime(date);
             }
@@ -69,6 +71,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
             int month = dateC.get(Calendar.MONTH);
             int year = dateC.get(Calendar.YEAR);
             Calendar timeC = Calendar.getInstance();
+            timeC.setTimeInMillis(0);
             if (time != null) {
                 timeC.setTime(time);
             }
