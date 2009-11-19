@@ -32,11 +32,27 @@ import org.jdesktop.swingx.calendar.SingleDaySelectionModel;
  */
 public class DefaultBindableTimestampChooser extends javax.swing.JPanel implements Bindable {
 
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 //    private Date timestamp;
     private Date date;
     private Date time;
     Calendar mainC = Calendar.getInstance();
     public static final String PROP_TIMESTAMP = "timestamp";
+    private PropertyChangeSupport propertyChangeSupport;
+
+    /** Creates new form DefaultBindableTimestampChooser */
+    public DefaultBindableTimestampChooser() {
+        initComponents();
+        jXDatePicker1.getMonthView().setSelectionModel(new SingleDaySelectionModel());
+        log.debug("set Input verifier");
+    }
+
+    public PropertyChangeSupport getPropertyChangeSupport() {
+        if (propertyChangeSupport == null) {
+            propertyChangeSupport = new PropertyChangeSupport(this);
+        }
+        return propertyChangeSupport;
+    }
 
     /**
      * Get the value of timestamp
@@ -44,18 +60,27 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @return the value of timestamp
      */
     public Date getTimestamp() {
-        Calendar dateC = Calendar.getInstance();
-        dateC.setTime(date);
-        int day = dateC.get(Calendar.DAY_OF_MONTH);
-        int month = dateC.get(Calendar.MONTH);
-        int year = dateC.get(Calendar.YEAR);
-        Calendar timeC = Calendar.getInstance();
-        timeC.setTime(time);
-        int hour = timeC.get(Calendar.HOUR_OF_DAY);
-        int minute = timeC.get(Calendar.MINUTE);
+        try {
+            Calendar dateC = Calendar.getInstance();
+            if (date != null) {
+                dateC.setTime(date);
+            }
+            int day = dateC.get(Calendar.DAY_OF_MONTH);
+            int month = dateC.get(Calendar.MONTH);
+            int year = dateC.get(Calendar.YEAR);
+            Calendar timeC = Calendar.getInstance();
+            if (time != null) {
+                timeC.setTime(time);
+            }
+            int hour = timeC.get(Calendar.HOUR_OF_DAY);
+            int minute = timeC.get(Calendar.MINUTE);
 
-        mainC.set(year, month, day, hour, minute);
-        return mainC.getTime();
+            mainC.set(year, month, day, hour, minute);
+            return mainC.getTime();
+        } catch (Exception e) {
+            log.debug("Fehler beim Abrufen von Timestamp" + e);
+            return null;
+        }
     }
 
     /**
@@ -64,37 +89,41 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @param timestamp new value of timestamp
      */
     public void setTimestamp(Date timestamp) {
-        Date oldTimestamp = mainC.getTime();
-        if (timestamp!=null){
-            mainC.setTime(timestamp);
+        log.debug("setTimestamp: " + timestamp);
+        try {
+            Date oldTimestamp = mainC.getTime();
+            if (timestamp != null) {
+                mainC.setTime(timestamp);
+            }
+
+
+            int day = mainC.get(Calendar.DAY_OF_MONTH);
+            int month = mainC.get(Calendar.MONTH);
+            int year = mainC.get(Calendar.YEAR);
+
+            Calendar dateCal = Calendar.getInstance();
+            dateCal.setTimeInMillis(0);
+            dateCal.set(year, month, day);
+
+            int hour = mainC.get(Calendar.HOUR_OF_DAY);
+            int minute = mainC.get(Calendar.MINUTE);
+
+            Calendar timeCal = Calendar.getInstance();
+            timeCal.setTimeInMillis(0);
+            timeCal.set(0, 0, 0, hour, minute);
+
+
+            date = dateCal.getTime();
+            time = timeCal.getTime();
+
+
+            getPropertyChangeSupport().firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
+            bindingGroup.unbind();
+            bindingGroup.bind();
+        } catch (Throwable t) {
+            log.debug("setTimestamp failed", t);
         }
-
-
-        int day = mainC.get(Calendar.DAY_OF_MONTH);
-        int month = mainC.get(Calendar.MONTH);
-        int year = mainC.get(Calendar.YEAR);
-
-        Calendar dateCal = Calendar.getInstance();
-        dateCal.setTimeInMillis(0);
-        dateCal.set(year, month, day);
-
-        int hour = mainC.get(Calendar.HOUR_OF_DAY);
-        int minute = mainC.get(Calendar.MINUTE);
-
-        Calendar timeCal = Calendar.getInstance();
-        timeCal.setTimeInMillis(0);
-        timeCal.set(0, 0, 0, hour, minute);
-
-
-        date = dateCal.getTime();
-        time = timeCal.getTime();
-
-
-        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
-        bindingGroup.unbind();
-        bindingGroup.bind();
     }
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     /**
      * Add PropertyChangeListener.
@@ -102,7 +131,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @param listener
      */
     public void addPropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
+        if (listener != null) {
+            getPropertyChangeSupport().addPropertyChangeListener(listener);
+        }
     }
 
     /**
@@ -111,13 +142,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @param listener
      */
     public void removePropertyChangeListener(PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
-    }
-
-    /** Creates new form DefaultBindableTimestampChooser */
-    public DefaultBindableTimestampChooser() {
-        initComponents();
-        jXDatePicker1.getMonthView().setSelectionModel(new SingleDaySelectionModel());
+        getPropertyChangeSupport().removePropertyChangeListener(listener);
     }
 
     /** This method is called from within the constructor to
@@ -140,6 +165,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
         org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${date}"), jXDatePicker1, org.jdesktop.beansbinding.BeanProperty.create("date"));
         bindingGroup.addBinding(binding);
 
+        binding.setValidator(new DateValidator());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
@@ -157,6 +183,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
                 jFormattedTextField1ActionPerformed(evt);
             }
         });
+        binding.setValidator(new TimeValidator());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         add(jFormattedTextField1, gridBagConstraints);
@@ -190,8 +217,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     }
 
     public void setDate(Date date) {
+        log.debug("setDate: " + date);
         this.date = date;
-        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
+        getPropertyChangeSupport().firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
     }
 
     public Date getTime() {
@@ -199,8 +227,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     }
 
     public void setTime(Date time) {
+        log.debug("setTime: " + time);
         this.time = time;
-        propertyChangeSupport.firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
+        getPropertyChangeSupport().firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
     }
 
     public static void main(String[] args) {
@@ -226,5 +255,30 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
                 jf.setVisible(true);
             }
         });
+    }
+
+    class DateValidator extends Validator<Date> {
+
+        @Override
+        public Result validate(Date value) {
+            log.debug("DateValidator validate: " + value);
+            if (value == null) {
+                jXDatePicker1.setDate(date);
+                return new Result(null, "Date is null");
+            }
+            return null;
+        }
+    }
+
+    class TimeValidator extends Validator<Date> {
+
+        @Override
+        public Result validate(Date value) {
+            log.debug("TimeValidator validate: " + value);
+            if (value == null) {
+                return new Result(null, "Time is null");
+            }
+            return null;
+        }
     }
 }
