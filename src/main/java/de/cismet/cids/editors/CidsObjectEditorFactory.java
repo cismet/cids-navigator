@@ -580,6 +580,7 @@ public class CidsObjectEditorFactory {
                             }
                             result.setObject((JComponent) editor);
                         } catch (Throwable t) {
+                            log.error("getCustomAttributeEditor von "+metaClass.getTableName()+"."+mai.getFieldName()+" liefert einen Fehler",t);
                             throw new RuntimeException(t);
                         }
 //                    }
