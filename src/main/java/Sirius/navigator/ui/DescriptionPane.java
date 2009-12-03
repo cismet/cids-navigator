@@ -22,10 +22,12 @@ import calpa.html.DefaultCalHTMLObserver;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
+import de.cismet.cids.utils.MetaTreeNodeStore;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
 import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.WrappedComponent;
 import de.cismet.tools.gui.breadcrumb.DefaultBreadCrumbModel;
 import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
 import java.awt.BorderLayout;
@@ -428,10 +430,13 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     private final void startSingleRendererWorker(final DefaultMetaTreeNode node) {
         final MetaObject o = ((ObjectTreeNode) node).getMetaObject();
         
-        startSingleRendererWorker(o, node.toString());
+        startSingleRendererWorker(o, node, node.toString());
     }
 
     private final void startSingleRendererWorker(final MetaObject o, final String title) {
+        startSingleRendererWorker(o, null, title);
+    }
+    private final void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node,final String title) {
 
         worker = new javax.swing.SwingWorker<JComponent, Void>() {
 
@@ -441,6 +446,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
                 final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
+                if (jComp instanceof MetaTreeNodeStore && node!=null ){
+                   ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
+                }
+                else if (jComp instanceof WrappedComponent && ((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore && node!=null){
+                    ((MetaTreeNodeStore)((WrappedComponent)jComp).getOriginalComponent()).setMetaTreeNode(node);
+                }
                 o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
