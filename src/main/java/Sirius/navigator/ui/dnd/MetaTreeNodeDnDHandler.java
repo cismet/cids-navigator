@@ -122,7 +122,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             TreePath treePath = this.metaTree.getPathForLocation(dragOrigin.x, dragOrigin.y);
             //
             dragPaths=metaTree.getSelectionPaths();
-            logger.fatal(dragPaths);
             Rectangle pathBounds = this.metaTree.getPathBounds(treePath);
             this.dragPoint.setLocation(dragOrigin.x - pathBounds.x, dragOrigin.y - pathBounds.y);
             
