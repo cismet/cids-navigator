@@ -24,6 +24,7 @@ import Sirius.server.newuser.permission.PermissionHolder;
  */
 public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor //javax.swing.JPanel
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     /** Creates new form DefaultComplexMetaAttributeEditor */
     public DefaultComplexMetaAttributeEditor()
@@ -270,7 +271,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         else
         {
             logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");
-            editorComponent = new JLabel("addEditorUI(" + this + "): no editor available");
+            editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText2"));
         }
         
         gridBagConstraints.gridy++;

@@ -35,15 +35,17 @@ import Sirius.navigator.connection.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
 import de.cismet.tools.CismetThreadPool;
+import java.beans.Beans;
 
 /**
  *
  * @author  pascal
  */
 public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar {
-    private final Logger logger;
+    private final Logger logger = Logger.getLogger(this.getClass());
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
-    private final ResourceManager resources;
+    private final ResourceManager resources = ResourceManager.getManager();;
     private Object treeNode = null;
     
     private ComplexEditor editor = null;
@@ -52,19 +54,20 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
 
     /** Creates new form AttributeEditor */
     public AttributeEditor() {
-        this.logger = Logger.getLogger(this.getClass());
-        this.resources = ResourceManager.getManager();
         
         initComponents();
-        
-        ActionListener buttonListener = new ButtonListener();
-        this.cancelButton.addActionListener(buttonListener);
-        this.commitButton.addActionListener(buttonListener);
-        //this.editButton.addActionListener(buttonListener);
-        //this.pinButton.addActionListener(buttonListener);
-        
-        this.attributeTree.addTreeSelectionListener(new MetaObjectListener());
-        this.attributeTree.setIgnoreInvisibleAttributes(false);
+
+        if(!Beans.isDesignTime()) {
+
+            ActionListener buttonListener = new ButtonListener();
+            this.cancelButton.addActionListener(buttonListener);
+            this.commitButton.addActionListener(buttonListener);
+            //this.editButton.addActionListener(buttonListener);
+            //this.pinButton.addActionListener(buttonListener);
+
+            this.attributeTree.addTreeSelectionListener(new MetaObjectListener());
+            this.attributeTree.setIgnoreInvisibleAttributes(false);
+        }
         
     }
 
@@ -131,7 +134,8 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
             this.commitButton.setEnabled(true);
             this.cancelButton.setEnabled(true);
             
-            this.titleBar.setTitle(resources.getString("attribute.editor.title") + " (" + rootNode + ")");
+            this.titleBar.setTitle(I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.titleBar.title")
+                    + " (" + rootNode + ")");
         } else if(logger.isDebugEnabled()) {
             logger.warn("setTreeNode(): node is null or not of type ObjectAttributeNode");
             this.clear();
@@ -148,7 +152,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         this.commitButton.setEnabled(false);
         this.cancelButton.setEnabled(false);
         
-        this.titleBar.setTitle(resources.getString("attribute.editor.title"));
+        this.titleBar.setTitle(I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.titleBar.title"));
     }
     
     public Object getTreeNode() {
@@ -252,9 +256,11 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                     
                                     //XXX i18n
                                     JOptionPane.showMessageDialog(AttributeEditor.this,
-                                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorMessage1") + objectTreeNode +
-                                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorMessage2"),
-                                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorTitle"), JOptionPane.INFORMATION_MESSAGE);
+                                            I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater().InfoMessage1") +
+                                            objectTreeNode +
+                                            I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater().InfoMessage2"),
+                                            I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater().InfoTitle"),
+                                            JOptionPane.INFORMATION_MESSAGE);
                                     
                                     //AttributeEditor.this.setTreeNodes(objectTreeNode);
                                     AttributeEditor.this.clear();
@@ -272,15 +278,18 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                             });
                         } catch(Throwable t) {
                             logger.error("add / insert of meta object '" + objectTreeNode.getMetaObject() + "' failed", t);
-                            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("attribute.editor.insert.error.title"), resources.getString("attribute.editor.insert.error.message"), t);
+                            ExceptionManager.getManager().showExceptionDialog(
+                                    ExceptionManager.WARNING,
+                                    I18N.getString("attribute.editor.insert.error.title"),
+                                    I18N.getString("attribute.editor.insert.error.message"), t);
                             ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                         }
                     } else {
                         //XXX i18n
                         JOptionPane.showMessageDialog(AttributeEditor.this,
-                                ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage1") + emptyAttributeName +
-                                ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage2"),
-                                ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage1") + emptyAttributeName +
+                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage2"),
+                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
                         ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     }
                 }
@@ -293,8 +302,15 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
      */
     private void confirmEdit() {
         if(this.isChanged()) {
-            if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(AttributeEditor.this, resources.getString("attribute.viewer.edit.message"), resources.getString("attribute.viewer.edit.tooltip"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-            {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit"))) {
+            if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                    AttributeEditor.this,
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.confirmEdit().JOptionPane.message"),
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.confirmEdit().JOptionPane.title"),
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, new String[]
+            {I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.confirmEdit().JOptionPane.option1"),
+             I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.confirmEdit().JOptionPane.option2")},
+             I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.confirmEdit().JOptionPane.option1"))) {
                 this.commit();
             } else {
                 this.cancel();
@@ -477,7 +493,12 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                 editor.stopEditing();
                 
                 if(isChanged() &&
-                        JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(AttributeEditor.this, resources.getString("attribute.viewer.commit.message"), resources.getString("attribute.viewer.commit.tooltip"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+                        JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                        AttributeEditor.this,
+                        I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.ButtonListener.JOptionPane.commit.message"),
+                        I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.ButtonListener.JOptionPane.commit.title"),
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, null, null)) {
                     
                     commit();
                 } else {
@@ -485,7 +506,12 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                 }
                 
             } else if(e.getActionCommand().equals("cancel") &&
-                    JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(AttributeEditor.this, resources.getString("attribute.viewer.cancel.message"), resources.getString("attribute.viewer.cancel.tooltip"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+                    JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                    AttributeEditor.this,
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.ButtonListener.JOptionPane.cancel.message"),
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.ButtonListener.JOptionPane.cancel.title"),
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, null, null)) {
                 logger.error("unknown action command '" + e.getActionCommand() + "'");
                 cancel();
             } else {

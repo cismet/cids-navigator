@@ -24,6 +24,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractButton;
@@ -42,6 +43,7 @@ import org.jdesktop.swingx.error.ErrorInfo;
  * @author  pascal
  */
 public class NavigatorAttributeEditorGui extends AttributeEditor {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Object treeNode = null;
@@ -76,7 +78,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, "Wollen Sie die gemachten Änderungen speichern?", "Speichern", JOptionPane.YES_NO_CANCEL_OPTION);
+                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButtonActionListener.JOptionPane.message"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButtonActionListener.JOptionPane.title"), JOptionPane.YES_NO_CANCEL_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
                         saveIt();
 
@@ -96,7 +98,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, "Sind Sie sicher dass Sie den Editor beenden wollen?", "Editor beenden ?", JOptionPane.YES_NO_OPTION);
+                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButtonActionListener.JOptionPane.message"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButtonActionListener.JOptionPane.title"), JOptionPane.YES_NO_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
                         reloadFromDB();
                         clear();
@@ -179,8 +181,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             refreshAttributeTable();
         } catch (Exception e) {
             log.error("Error durig reload from DB.", e);
-            ErrorInfo ei = new ErrorInfo("Fehler beim Refresh.",
-                    "Das Objekt konnte nicht wieder vom Server geladen werden. Die aktuelle Objektversion ist nicht gültig!",
+            ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.title"),
+                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.message"),
                     null,
                     null,
                     e,
@@ -196,9 +198,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         try {
             mo.getBean().persist();
             refreshTree();
-            JOptionPane jop = new JOptionPane("Objekt wurde gespeichert.", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane jop = new JOptionPane(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.message"), JOptionPane.INFORMATION_MESSAGE);
 
-            final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this, "Speichern erfolgreich");
+            final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.title"));
 
             Timer t = new Timer(900, new ActionListener() {
 
@@ -214,7 +216,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             clear();
         } catch (Exception ex) {
             log.error("Fehler beim Speichern", ex);
-            ErrorInfo ei = new ErrorInfo("Fehler", "Beim Speichern des Objektes ist ein Fehler aufgetreten.", null, null, ex, Level.SEVERE, null);
+            ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"), null, null, ex, Level.SEVERE, null);
             JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
         }
         clear();
@@ -224,7 +226,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     public void setTreeNode(Object node) {
         if (treeNode != null && editorObject != null && backupObject != null) {
             if (!editorObject.propertyEquals(backupObject)) {
-                int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, "Wollen Sie die gemachten Änderungen speichern, bevor Sie ein neues Objekt editieren?", "Objekt ist noch nicht gespeichert.", JOptionPane.YES_NO_CANCEL_OPTION);
+                int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"), JOptionPane.YES_NO_CANCEL_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     saveIt();
                 } else if (answer == JOptionPane.NO_OPTION) {
@@ -280,7 +282,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         cancelButton.setEnabled(true);
                         commitButton.setEnabled(true);
                     } catch (Exception e) {
-                        ErrorInfo ei = new ErrorInfo("Fehler", "Beim Erzeugen des Editors ist ein Fehler aufgetreten.", null, null, e, Level.SEVERE, null);
+                        ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.title"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.message"), null, null, e, Level.SEVERE, null);
                         log.error("Fehler beim Darstellen des Editors" + ei.getState() + editorObject.getDebugString() + "\n", e);
                         JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
                         clear();
@@ -406,7 +408,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         panDebug.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton1.setText("log MetaObject");
+        jButton1.setText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.jButon1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);

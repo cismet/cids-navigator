@@ -49,6 +49,7 @@ import javax.swing.tree.DefaultTreeModel;
  * Ergebnissmenge zu navigieren stellt der SearchTree spezielle Methoden bereit.
  */
 public class SearchResultsTree extends MetaCatalogueTree {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private boolean empty = true;
     private boolean browseBack = false;
@@ -377,7 +378,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                                     public void run() {
 
-                                        n.getNode().setName("Name wird geladen .....");
+                                        n.getNode().setName(I18N.getString("Sirius.navigator.ui.tree.SerachResultsTree.checkForDynamicNodes().loadName"));
                                         defaultTreeModel.nodeChanged(on);
 
                                     }

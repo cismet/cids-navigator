@@ -26,20 +26,20 @@ package Sirius.navigator.search.dynamic.profile;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.tree.*;
 import javax.swing.border.*;
 
 import org.apache.log4j.Logger;
 
-import Sirius.server.newuser.*;
 import Sirius.server.search.store.QueryInfo;
 import Sirius.navigator.resource.*;
+import java.util.ResourceBundle;
 
 public abstract class ProfileManager extends JDialog implements ActionListener
 {
     protected Logger logger;
-    
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
     public final static int PROFILE = 0;
     public final static int QUERY_PROFILE = 1;
     public final static int QUERY_RESULT_PROFILE = 2;
@@ -78,14 +78,14 @@ public abstract class ProfileManager extends JDialog implements ActionListener
     
     protected void initProfileManager ()
     {
-        String profileTypeName = ResourceManager.getManager ().getString ("dialog.profile.title");
+        String profileTypeName = I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.initProfileManager().profileTypeName.profile");
         
         switch (profileType)
         {
-            case 1:     profileTypeName = ResourceManager.getManager ().getString ("dialog.profile.search.title");
+            case 1:     profileTypeName = I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.initProfileManager().profileTypeName.search");
             break;
             
-            case 2:     profileTypeName = ResourceManager.getManager ().getString ("dialog.profile.search.results.title");
+            case 2:     profileTypeName = I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.initProfileManager().profileTypeName.searchresult");
             break;
         }
         
@@ -109,7 +109,9 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
         //_TA_JLabel infoLabel = new JLabel("Verwaltung der " + profileTypeName);
-        JLabel infoLabel = new JLabel (ResourceManager.getManager ().getString ("dialog.profile.admin") + ' ' + profileTypeName + '.');
+        JLabel infoLabel = new JLabel (
+                I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.initProfileManager().infoLabel.text") +
+                ' ' + profileTypeName + '.');
         infoLabel.setVerticalAlignment (JLabel.CENTER);
         infoLabel.setHorizontalAlignment (JLabel.CENTER);
         infoLabel.setBorder (new EmptyBorder (5, 5, 5, 5));
@@ -126,8 +128,10 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         {
             rootNode = new DefaultMutableTreeNode (profileTypeName);
             
-            rootNode.add (userGroupNode = new DefaultMutableTreeNode (ResourceManager.getManager ().getString ("dialog.profile.usergroup")));
-            rootNode.add (userNode = new DefaultMutableTreeNode (ResourceManager.getManager ().getString ("dialog.profile.user")));
+            rootNode.add (userGroupNode = new DefaultMutableTreeNode (
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.initProfileManager().userGroupNode.userObject")));
+            rootNode.add (userNode = new DefaultMutableTreeNode (
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.initProfileManager().userNode.userObject")));
             
             profileTree = new JTree (rootNode, false);
         }
@@ -154,22 +158,22 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
         
-        buttonLoad = new JButton (ResourceManager.getManager ().getButtonText ("load"));
-        buttonLoad.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("load"));
+        buttonLoad = new JButton (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonLoad.text"));
+        buttonLoad.setMnemonic (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonLoad.mnemonic").charAt(0));
         buttonLoad.setActionCommand ("load");
         buttonLoad.addActionListener (this);
         contentPane.add (buttonLoad, gbc);
         
         gbc.gridy++;
-        buttonSave = new JButton (ResourceManager.getManager ().getButtonText ("save"));
-        buttonSave.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("save"));
+        buttonSave = new JButton (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonSave.text"));
+        buttonSave.setMnemonic (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonSave.mnemonic").charAt(0));
         buttonSave.setActionCommand ("save");
         buttonSave.addActionListener (this);
         contentPane.add (buttonSave, gbc);
         
         gbc.gridy++;
-        buttonDelete = new JButton (ResourceManager.getManager ().getButtonText ("delete"));
-        buttonDelete.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("delete"));
+        buttonDelete = new JButton (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonDelete.text"));
+        buttonDelete.setMnemonic (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonDelete.mnemonic").charAt(0));
         buttonDelete.setActionCommand ("delete");
         buttonDelete.addActionListener (this);
         contentPane.add (buttonDelete, gbc);
@@ -178,8 +182,8 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.gridy++;
         gbc.weighty = 1.0;
         
-        buttonClose = new JButton (ResourceManager.getManager ().getButtonText ("close"));
-        buttonClose.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("close"));
+        buttonClose = new JButton (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonClose.text"));
+        buttonClose.setMnemonic (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.buttonClose.mnemonic").charAt(0));
         buttonClose.setActionCommand ("close");
         buttonClose.addActionListener (this);
         contentPane.add (buttonClose, gbc);
@@ -275,7 +279,9 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         
         public ProfileSaveDialog (String profileTypeName)
         {
-            super (ProfileManager.this, profileTypeName + ' ' + ResourceManager.getManager ().getString ("dialog.profile.save.title") + '.', true);
+            super (ProfileManager.this, profileTypeName + ' ' +
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.title")
+                    + '.', true);
             
             this.profileTypeName = profileTypeName;
             
@@ -300,7 +306,10 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
             //_TA_JLabel infoLabel = new JLabel("<html><p>Bitte geben Sie einen Namen ein, </p><p>unter dem Sie die "+profileTypeName+" speichern wollen.");
-            JLabel infoLabel = new JLabel (ResourceManager.getManager ().getString ("dialog.profile.save.name.1") + ' ' + profileTypeName + ' ' + ResourceManager.getManager ().getString ("dialog.profile.save.name.2"));
+            JLabel infoLabel = new JLabel (
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.initProfileSaveDialog().infoLabel.text1") +
+                    ' ' + profileTypeName + ' ' +
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.initProfileSaveDialog().infoLabel.text2"));
             infoLabel.setVerticalAlignment (JLabel.CENTER);
             infoLabel.setHorizontalAlignment (JLabel.CENTER);
             infoLabel.setBorder (new EmptyBorder (5, 5, 5, 5));
@@ -309,17 +318,21 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             // RADIO BUTTONS =======================================================
             ButtonGroup buttonGroup = new ButtonGroup ();
             JPanel optionsPanel = new JPanel (new GridLayout (2,1));
-            optionsPanel.setBorder (new CompoundBorder (new TitledBorder (null, ResourceManager.getManager ().getString ("dialog.profile.save.message"), TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder (5,5,5,5)));
+            optionsPanel.setBorder (new CompoundBorder (new TitledBorder (null,
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.initProfileSaveDialog().optionsPanel.border.title"),
+                    TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder (5,5,5,5)));
             
             
             
-            optionUserGroup = new JRadioButton (ResourceManager.getManager ().getString ("dialog.profile.usergroup"));
+            optionUserGroup = new JRadioButton (
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.initProfileSaveDialog().optionUserGroup.text"));
             optionUserGroup.setActionCommand ("userGroupProfile");
             buttonGroup.add (optionUserGroup);
             optionsPanel.add (optionUserGroup);
             
             gbc.gridy++;
-            optionUser = new JRadioButton (ResourceManager.getManager ().getString ("dialog.profile.user"));
+            optionUser = new JRadioButton (
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.initProfileSaveDialog().optionUser.text"));
             optionUser.setSelected (true);
             buttonGroup.add (optionUser);
             optionsPanel.add (optionUser);
@@ -341,16 +354,16 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             gbc.insets = new Insets (0, 0, 0, 20);
             gbc.gridwidth = 1;
             gbc.gridy++;
-            buttonSave = new JButton (ResourceManager.getManager ().getButtonText ("save"));
-            buttonSave.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("save"));
+            buttonSave = new JButton (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.buttonSave.text"));
+            buttonSave.setMnemonic (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.buttonSave.mnemonic").charAt(0));
             buttonSave.setActionCommand ("save");
             buttonSave.addActionListener (this);
             contentPane.add (buttonSave, gbc);
             
             gbc.insets = new Insets (0, 0, 0, 0);
             gbc.gridx++;
-            buttonCancel = new JButton (ResourceManager.getManager ().getButtonText ("cancel"));
-            buttonCancel.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("cancel"));
+            buttonCancel = new JButton (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.buttonCancel.text"));
+            buttonCancel.setMnemonic (I18N.getString("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.buttonCancel.mnemonic").charAt(0));
             buttonCancel.setActionCommand ("cancel");
             buttonCancel.addActionListener (this);
             contentPane.add (buttonCancel, gbc);
@@ -361,8 +374,12 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         
         protected boolean confirmOverwrite (String entry)
         {
-            String message = ResourceManager.getManager ().getString ("dialog.profile.save.overwrite.1") + "' " +  entry +  "' " + ResourceManager.getManager ().getString ("dialog.profile.save.overwrite.1");
-            int result = JOptionPane.showConfirmDialog (this, message, ResourceManager.getManager ().getString ("dialog.profile.save.overwrite"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            String message = I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.confirmOverwrite().confirmOptionPane.message1") +
+                    "' " +  entry +  "' " +
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.confirmOverwrite().confirmOptionPane.message1");
+            int result = JOptionPane.showConfirmDialog (this, message,
+                    I18N.getString ("dialog.profile.save.overwrite"), 
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             
             if(result == JOptionPane.YES_OPTION)
             {
@@ -480,7 +497,10 @@ public abstract class ProfileManager extends JDialog implements ActionListener
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog (this, ResourceManager.getManager ().getString ("dialog.profile.save.error.message"), ResourceManager.getManager ().getString ("dialog.profile.save.error"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog (this,
+                    I18N.getString ("dialog.profile.save.error.message"),
+                    I18N.getString ("dialog.profile.save.error"),
+                    JOptionPane.WARNING_MESSAGE);
                 }
             }
             else if(e.getActionCommand ().equals ("cancel"))

@@ -28,6 +28,7 @@ import org.apache.log4j.lf5.util.Resource;
  */
 public class DefaultSimpleMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor //javax.swing.JPanel
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     protected ValueChangeListener valueChangeListener;
     
     /** Creates new form DefaultSimpleMetaAttributeEditor */
@@ -196,8 +197,9 @@ public class DefaultSimpleMetaAttributeEditor extends AbstractSimpleMetaAttribut
                     
                     // XXX i18n
                     JOptionPane.showMessageDialog(DefaultSimpleMetaAttributeEditor.this,
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleMetaAttributeEditor.importData.ErrorMessage"),
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleMetaAttributeEditor.importData.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleMetaAttributeEditor.DefaultDropTargetListener.importData().errorOptionPane.ErrorMessage"),
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleMetaAttributeEditor.DefaultDropTargetListener.importData().errorOptionPane.ErrorTitle"),
+                            JOptionPane.WARNING_MESSAGE);
                 }
             }
             catch (Throwable th)

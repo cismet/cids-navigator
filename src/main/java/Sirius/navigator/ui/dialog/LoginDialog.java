@@ -33,9 +33,9 @@ import org.apache.log4j.Logger;
 
 import Sirius.server.newuser.UserException;
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.exception.*;
+import java.util.ResourceBundle;
 
 
 //import Sirius.server.user.UserException;
@@ -51,6 +51,7 @@ import Sirius.navigator.exception.*;
  */
 public class LoginDialog extends JDialog {
 
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private final static String PREF_NAME = "username";
     private final static String PREF_DOMAIN = "domain";
     private final static String PREF_USERGROUP = "usergroup";
@@ -72,7 +73,7 @@ public class LoginDialog extends JDialog {
      * @param iCom Die InitialisationConnection (fuer User, LocalServer + LoginIcon)
      */
     public LoginDialog(JFrame owner) {
-        super(owner, ResourceManager.getManager().getString("login.title"), true);
+        super(owner, I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.title"), true);
         this.resources = ResourceManager.getManager();
         this.preferences = Preferences.userNodeForPackage(this.getClass());
         this.setAlwaysOnTop(true);
@@ -99,17 +100,19 @@ public class LoginDialog extends JDialog {
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.getContentPane().setLayout(new GridBagLayout());
 
-        userGroupChooser = new UserGroupChooser(this, resources.getString("login.usergroup.title"), resources.getString("login.usergroup.message"));
+        userGroupChooser = new UserGroupChooser(this,
+                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.title"),
+                I18N.getString("Bitte wählen Sie Ihre Benutzergruppe"));
         userGroupChooser.setLocationRelativeTo(this);
 
         JLabel lbl_img = new JLabel(resources.getIcon("login_icon.gif"));
         lbl_img.setBorder(new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(20, 20, 20, 20)));
 
-        JLabel lbl_info = new JLabel(resources.getString("login.message"));
-        JLabel lbl_name = new JLabel(resources.getString("login.username"));
-        JLabel lbl_pass = new JLabel(resources.getString("login.password"));
-        JLabel lbl_usr = new JLabel(resources.getString("login.usergroup"));
-        JLabel lbl_srv = new JLabel(resources.getString("login.domain"));
+        JLabel lbl_info = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_info.text"));
+        JLabel lbl_name = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_name.text"));
+        JLabel lbl_pass = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_pass.text"));
+        JLabel lbl_usr = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_usr.text"));
+        JLabel lbl_srv = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_srv.text"));
 
         tf_name = new JTextField(12);
         tf_name.setActionCommand("ok");
@@ -127,15 +130,15 @@ public class LoginDialog extends JDialog {
         cb_userGroup = new JComboBox();
         cb_userGroup.setLightWeightPopupEnabled(false);
 
-        btn_ok = new JButton(resources.getButtonText("ok"));
-        btn_ok.setMnemonic(resources.getButtonMnemonic("ok"));
-        btn_ok.setToolTipText(resources.getButtonTooltip("ok"));
+        btn_ok = new JButton(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_ok.text"));
+        btn_ok.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_ok.mnemonic").charAt(0));
+        btn_ok.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_ok.tooltip"));
         btn_ok.setActionCommand("ok");
         btn_ok.addActionListener(loginListener);
 
-        btn_cancel = new JButton(resources.getButtonText("cancel"));
-        btn_cancel.setMnemonic(resources.getButtonMnemonic("cancel"));
-        btn_cancel.setToolTipText(resources.getButtonTooltip("cancel"));
+        btn_cancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_cancel.text"));
+        btn_cancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_cancel.mnemonic").charAt(0));
+        btn_cancel.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_cancel.tooltip"));
         btn_cancel.setActionCommand("cancel");
         btn_cancel.addActionListener(loginListener);
 
@@ -331,7 +334,10 @@ public class LoginDialog extends JDialog {
                 Vector tmpVector = SessionManager.getProxy().getUserGroupNames(user, domain);
                 userGroupLSNames = (String[][]) tmpVector.toArray(new String[tmpVector.size()][2]);
             } catch (UserException ue) {
-                JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.wrong.username"), resources.getString("login.wrong.input"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(LoginDialog.this,
+                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.updateUserGroups().errorOptionPane.message"),
+                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.updateUserGroups().errorOptionPane.title"),
+                        JOptionPane.ERROR_MESSAGE);
                 tf_name.setText("");
             }
         }
@@ -416,13 +422,25 @@ public class LoginDialog extends JDialog {
                 else*/
                 if (e.getActionCommand().equals("ok")) {
                     if (tf_name.getText().length() <= 0) {
-                        JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.missing.username"), resources.getString("login.missing.input"), JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(LoginDialog.this,
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsernameOptionPane.message"),
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsernameOptionPane.title"),
+                                JOptionPane.WARNING_MESSAGE);
                     } else if (pf_pass.getPassword().length <= 0) {
-                        JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.missing.password"), resources.getString("login.missing.input"), JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(LoginDialog.this,
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingPasswordOptionPane.message"),
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingPasswordOptionPane.title"),
+                                JOptionPane.WARNING_MESSAGE);
                     } else if (cb_userGroup.getSelectedIndex() < 0) {
-                        JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.missing.usergroup"), resources.getString("login.missing.input"), JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(LoginDialog.this,
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsergroupOptionPane.message"),
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsergroupOptionPane.title"),
+                                JOptionPane.WARNING_MESSAGE);
                     } else if (cb_srv.getSelectedIndex() < 0) {
-                        JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.missing.domain"), resources.getString("login.missing.input"), JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(LoginDialog.this,
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingDomainOptionPane.message"),
+                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingDomainOptionPane.title"),
+                                JOptionPane.WARNING_MESSAGE);
                     } else {
                         try {
                             SessionManager.getSession().login(userGroupLSNames[cb_userGroup.getSelectedIndex()][1], userGroupLSNames[cb_userGroup.getSelectedIndex()][0], cb_srv.getSelectedItem().toString(), tf_name.getText(), new String(pf_pass.getPassword()));
@@ -434,19 +452,34 @@ public class LoginDialog extends JDialog {
                             dispose();
                         } catch (UserException u) {
                             if (u.wrongUserName()) {
-                                JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.wrong.username"), resources.getString("login.wrong.input"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(LoginDialog.this,
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.message"),
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.title"),
+                                        JOptionPane.ERROR_MESSAGE);
                                 tf_name.setText("");
                             } else if (u.wrongPassword()) {
-                                JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.wrong.password"), resources.getString("login.wrong.input"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(LoginDialog.this,
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.message"),
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.title"),
+                                        JOptionPane.ERROR_MESSAGE);
                                 pf_pass.setText("");
                             } else if (u.wrongUserGroup()) {
-                                JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.wrong.usergroup"), resources.getString("login.wrong.input"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(LoginDialog.this,
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.message"),
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.title"),
+                                        JOptionPane.ERROR_MESSAGE);
                                 cb_userGroup.setSelectedIndex(0);
                             } else if (u.wrongLocalServer()) {
-                                JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.wrong.domain"), resources.getString("login.wrong.input"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(LoginDialog.this,
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.message"),
+                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.title"),
+                                        JOptionPane.ERROR_MESSAGE);
                                 cb_srv.setSelectedIndex(0);
                             } else {
-                                JOptionPane.showMessageDialog(LoginDialog.this, resources.getString("login.failed"), resources.getString("login.wrong.input"), JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(LoginDialog.this,
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().loginFailedOptionPane.message"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().loginFailedOptionPane.title"),
+                                        JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     }

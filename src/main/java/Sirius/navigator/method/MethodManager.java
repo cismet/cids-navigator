@@ -58,7 +58,8 @@ public class MethodManager
     public final static long CLASS_MULTIPLE = 16;
     // public final static long OBJECT_NODE_MULTIPLE = 32;
     // public final static long DOMAIN_MULTIPLE = 64;
-    
+
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private final static Logger logger = Logger.getLogger(MethodManager.class);
     
     private static MethodManager manager = null;
@@ -423,7 +424,10 @@ public class MethodManager
         {
             if(!((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeResultNodes(ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNodes()))
             {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.special.command.onerootnodeselected"), ResourceManager.getManager().getString("tree.special.command.couldnotdeletenode"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                        I18N.getString("Sirius.navigator.method.MethodManager.callSpecialTreeCommand().CouldNotDeleteTreeNodeOptionPane.message"),
+                        I18N.getString("Sirius.navigator.method.MethodManager.callSpecialTreeCommand().CouldNotDeleteTreeNodeOptionPane.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
                 //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Bitte stellen Sie sicher, dass sie mindestens einen Knoten selektiert haben,</p><p>und dass es sicht dabei um einen Root-Knoten handelt.</p></html>", "Knoten konnten nicht geloescht werden", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -444,7 +448,10 @@ public class MethodManager
             }
             else
             {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.special.command.onenodeselected"), ResourceManager.getManager().getString("tree.special.command.couldnottransfernode"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                        I18N.getString("Sirius.navigator.method.MethodManager.callSpecialTreeCommand().CouldNotTransferNodeOptionPane.message"),
+                        I18N.getString("Sirius.navigator.method.MethodManager.callSpecialTreeCommand().CouldNotTransferNodeOptionPane.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
                 //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Bitte stellen Sie sicher, dass sie mindestens einen Knoten selektiert haben.</p></html>", "Knoten konnten nicht uebertragen werden", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -795,7 +802,10 @@ public class MethodManager
     {
         if(resultNodes == null || resultNodes.length < 1)
         {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(), ResourceManager.getManager().getString("search.dialog.noresults"), ResourceManager.getManager().getString("search.dialog.noresults.title"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
+                    I18N.getString("Sirius.navigator.method.MethodManager.showSearchResults().OptionPane.message"),
+                    I18N.getString("Sirius.navigator.method.MethodManager.showSearchResults().OptionPane.title"),
+                    JOptionPane.WARNING_MESSAGE);
         }
         else
         {
@@ -827,9 +837,9 @@ public class MethodManager
             logger.error("deleteNode() could not update node " + sourceNode, exp);
             // XXX i18n
             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.updateNode.updateError"),
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.updateNode.updateErrorText1") + sourceNode +
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.updateNode.updateErrorText2"), exp);
+                    I18N.getString("Sirius.navigator.method.MethodManager.updateNode().updateError.title"),
+                    I18N.getString("Sirius.navigator.method.MethodManager.updateNode().updateError.message1") + sourceNode +
+                    I18N.getString("Sirius.navigator.method.MethodManager.updateNode().updateError.message2"), exp);
         }
         
         return false;
@@ -1083,7 +1093,7 @@ public class MethodManager
             String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
             hasPermission = node.getPermissions().hasPermission(key, permission);
             
-            logger.debug("Permissins f\u00FCr node"+node+"   "+node.getPermissions()+ "  mit key"+key);
+            logger.debug("Permissions for node"+node+"   "+node.getPermissions()+ "  with key"+key);
         }
         catch(Exception exp)
         {
@@ -1093,7 +1103,10 @@ public class MethodManager
         
         if(!hasPermission)
         {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.method.node.nopermission"), ResourceManager.getManager().getString("tree.method.node.nopermission.title"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                    I18N.getString("Sirius.navigator.method.MethodManager.checkPermission().NoPermissionOptionPane.message"),
+                    I18N.getString("Sirius.navigator.method.MethodManager.checkPermission().NoPermissionOptionPane.title"),
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         
         return hasPermission;
@@ -1114,7 +1127,7 @@ public class MethodManager
             hasPermission &= node.getPermissions().hasPermission(key, permission);
             
             
-            logger.debug("Check ClassPermissions f\u00FCr node"+node+"   "+c.getPermissions()+ "  mit key"+key);
+            logger.debug("Check ClassPermissions for node"+node+"   "+c.getPermissions()+ "  with key"+key);
         }
         catch(Exception exp)
         {
@@ -1124,7 +1137,10 @@ public class MethodManager
         
         if(!hasPermission)
         {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.method.object.nopermission"), ResourceManager.getManager().getString("tree.method.node.nopermission.title"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.checkPermission()2.NoPermissionOptionPane.message"),
+                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.checkPermission()2.NoPermissionOptionPane.title"),
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         
         return hasPermission;

@@ -115,6 +115,7 @@ public class Navigator extends JFrame {
         this.init();
 
     }
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     public Navigator() throws Exception {
         this(new ProgressObserver());

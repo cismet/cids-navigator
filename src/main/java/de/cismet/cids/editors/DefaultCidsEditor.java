@@ -9,6 +9,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.tools.metaobjectrenderer.Titled;
 import java.awt.LayoutManager;
 import java.util.HashMap;
+import java.util.ResourceBundle;
 import javax.swing.JPanel;
 import org.jdesktop.beansbinding.BindingGroup;
 
@@ -17,6 +18,7 @@ import org.jdesktop.beansbinding.BindingGroup;
  * @author thorsten
  */
 public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,Titled {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private HashMap<String, Bindable> controls = new HashMap<String, Bindable>();
     private CidsBean cidsBean = null;
@@ -79,7 +81,7 @@ public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,
             return cidsBean.getMetaObject().getMetaClass().getName();
         }
         else {
-            return "Editor";
+            return I18N.getString("de.cismet.cids.editors.DefaultCidsEditor.defaultTitle");
         }
     }
 

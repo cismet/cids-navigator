@@ -3,6 +3,7 @@ package Sirius.navigator;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ResourceBundle;
 import javax.swing.Icon;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
@@ -30,6 +31,7 @@ import javax.swing.Timer;
  * @author  pascal
  */
 public class NavigatorSplashScreen extends JWindow {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private final ProgressObserver progressObserver;
     private final NavigatorLoader navigatorLoader;
@@ -116,7 +118,7 @@ public class NavigatorSplashScreen extends JWindow {
         progressBarPlugin.setBorderPainted(false);
         progressBarPlugin.setDoubleBuffered(true);
         progressBarPlugin.setFocusable(false);
-        progressBarPlugin.setString("Plugins");
+        progressBarPlugin.setString(I18N.getString("Sirius.navigator.NavigatorSplashSceen.progressBarPlugin.progressText")); // NOI18N
         progressBarPlugin.setStringPainted(true);
         progressBarPlugin.setVerifyInputWhenFocusTarget(false);
         jPanel1.add(progressBarPlugin, java.awt.BorderLayout.SOUTH);

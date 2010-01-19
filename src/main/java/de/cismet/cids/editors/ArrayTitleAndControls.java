@@ -13,6 +13,7 @@ package de.cismet.cids.editors;
 import Sirius.server.middleware.types.MetaClass;
 import de.cismet.cids.dynamics.CidsBean;
 import java.util.List;
+import java.util.ResourceBundle;
 import javax.swing.JList;
 import org.jdesktop.observablecollections.ObservableList;
 
@@ -21,6 +22,7 @@ import org.jdesktop.observablecollections.ObservableList;
  * @author thorsten
  */
 public class ArrayTitleAndControls extends javax.swing.JPanel {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private MetaClass detailClass;
     private CidsBean cidsBean;
@@ -72,7 +74,6 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
 
         cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_add_mini.png"))); // NOI18N
         cmdAdd.setBorderPainted(false);
-        cmdAdd.setMargin(new java.awt.Insets(0, 0, 0, 0));
         cmdAdd.setMinimumSize(new java.awt.Dimension(16, 16));
         cmdAdd.setPreferredSize(new java.awt.Dimension(16, 16));
         cmdAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -84,7 +85,6 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
 
         cmdRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_remove_mini.png"))); // NOI18N
         cmdRemove.setBorderPainted(false);
-        cmdRemove.setMargin(new java.awt.Insets(0, 0, 0, 0));
         cmdRemove.setMinimumSize(new java.awt.Dimension(16, 16));
         cmdRemove.setPreferredSize(new java.awt.Dimension(16, 16));
         cmdRemove.addActionListener(new java.awt.event.ActionListener() {
@@ -99,7 +99,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
         jPanel3.setOpaque(false);
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        lblTitle.setText(" Beschreibung");
+        lblTitle.setText(I18N.getString("de.cismet.cids.editors.ArrayTitleAndControls.lblTitle.text")); // NOI18N
         jPanel3.add(lblTitle, java.awt.BorderLayout.EAST);
 
         jLabel1.setText("           ");

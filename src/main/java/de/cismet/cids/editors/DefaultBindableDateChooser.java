@@ -6,6 +6,7 @@ package de.cismet.cids.editors;
 
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.ResourceBundle;
 import javax.swing.border.EmptyBorder;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
@@ -18,6 +19,7 @@ import org.jdesktop.swingx.JXDatePicker;
 public class DefaultBindableDateChooser extends JXDatePicker implements Bindable {
 
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultBindableDateChooser.class);
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     public DefaultBindableDateChooser() {
         super();
@@ -27,8 +29,8 @@ public class DefaultBindableDateChooser extends JXDatePicker implements Bindable
     public void inint() {
         setBorder(new EmptyBorder(1, 1, 1, 1));
         setEditable(true);
-        setFormats(new String[]{"dd.MM.yyyy"});
-        setLinkFormat(new MessageFormat("Heute ist der {0,date}"));
+        setFormats(new String[]{I18N.getString("de.cismet.cids,editors.DefaultBindableDateChooser.inint().Formatstring")});
+        setLinkFormat(new MessageFormat(I18N.getString("de.cismet.cids.editors.DefaultBindableDateChooser.inint().Messageformat")));
     }
 
     public String getBindingProperty() {

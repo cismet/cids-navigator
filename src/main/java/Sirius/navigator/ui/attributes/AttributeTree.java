@@ -25,6 +25,7 @@ import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import de.cismet.tools.CismetThreadPool;
 
+import java.beans.Beans;
 
 /**
  *
@@ -32,7 +33,7 @@ import de.cismet.tools.CismetThreadPool;
  */
 public class AttributeTree extends JTree
 {
-    private final Logger logger;
+    private final Logger logger = Logger.getLogger(this.getClass());;
     
     private AttributeNode rootNode = null;
     
@@ -50,9 +51,10 @@ public class AttributeTree extends JTree
     public AttributeTree()
     {
         super(new DefaultTreeModel(null));
-        
-        this.logger = Logger.getLogger(this.getClass());
-        this.setCellRenderer(new IconRenderer());
+
+        if(!Beans.isDesignTime()) {
+            this.setCellRenderer(new IconRenderer());
+        }
     }
     
     public void setTreeNode(final Object node)

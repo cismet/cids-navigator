@@ -27,6 +27,7 @@ import Sirius.server.newuser.permission.Policy;
  */
 public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaAttributeEditor
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     protected ActionListener addListener;
     protected ActionListener removeListener;
     
@@ -236,7 +237,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                 this.addEditorUI(key, metaAttributes.get(key), gridBagConstraints);
             }
             
-            JButton addButton = new JButton("+");
+            JButton addButton = new JButton(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.initUI.addButton.text"));
             addButton.addActionListener(this.addListener);
             
             gridBagConstraints.gridy++;
@@ -297,10 +298,10 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             else
             {
                 logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");
-                editorComponent = new JLabel("addEditorUI(" + this + "): no editor available");
+                editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText2"));
             }
             
-            JButton removeButton = new JButton("-");
+            JButton removeButton = new JButton(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.addEditorUI.removeButton.text"));
             removeButton.setActionCommand(id.toString());
             removeButton.addActionListener(this.removeListener);
             

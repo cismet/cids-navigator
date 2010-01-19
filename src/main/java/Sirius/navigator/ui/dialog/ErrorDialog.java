@@ -210,7 +210,12 @@ public class ErrorDialog extends JDialog implements ActionListener
 				 _TA_JOptionPane optionPane = new JOptionPane("<html><center><p>Moechten Sie den</p><p>Navigator wirklich schliessen?</p></center></html>", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, new String[]{"Ja", "Nein"}, null);
 				 _TA_JDialog dialog = optionPane.createDialog(this, "Programm beenden");	
 				*/
-				JOptionPane optionPane = new JOptionPane(ResourceManager.getManager().getString("dialog.error.closeNavigator"), JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, new String[]{"Ja", "Nein"}, null);
+				JOptionPane optionPane = new JOptionPane(
+                                        ResourceManager.getManager().getString("dialog.error.closeNavigator"),
+                                        JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION,
+                                        null, new String[]{ResourceManager.getManager().getString("dialog.error.yes"),
+                                        ResourceManager.getManager().getString("dialog.error.no")}, null);
+
 				JDialog dialog = optionPane.createDialog(this, ResourceManager.getManager().getString("dialog.error.exitProgram"));
 				dialog.show();
 				

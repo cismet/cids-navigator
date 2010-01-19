@@ -44,6 +44,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.Vector;
 import javax.swing.DefaultListCellRenderer;
@@ -66,15 +67,17 @@ import org.jdesktop.beansbinding.Validator;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
 
+
 /**
  *
  * @author thorsten
  */
 public class CidsObjectEditorFactory {
 
+        private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private static CidsObjectEditorFactory editorFactory;
     private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CidsObjectEditorFactory.class);
-    public static final String NO_VALUE = "kein Wert gesetzt";
+    public static final String NO_VALUE = I18N.getString("de.cismet.cids.editors.CidsObjectEditorFactory.NO_VALUE");
     public static final String PARENT_CIDS_EDITOR = "parentCidsEditor";
     private static final String CMD_ADD_OBJECT = "cmdAddObject";
     private static final String CMD_REMOVE_OBJECT = "cmdRemoveObject";
@@ -375,7 +378,7 @@ public class CidsObjectEditorFactory {
                                         if (l.getText() == null || l.getText().trim().equals("") || l.getText().equals("null")) { //TODO Der check auf den String "null" muss wieder raus
                                             CidsBean cb = (CidsBean) value;
                                             if (cb.getMetaObject().getStatus() == MetaObject.NEW) {
-                                                l.setText("neues Element");
+                                                l.setText(I18N.getString("de.cismet.cids.editors.CidsObjectEditorFactory.getDefaultEditor().listCellRendererComponent.newElementText"));
                                                 if (isSelected) {
                                                     l.setBackground(Color.GREEN);
                                                 }
@@ -967,7 +970,6 @@ public class CidsObjectEditorFactory {
 
     }
 }
-
 class ObservableListListenerAdapter implements ObservableListListener {
 
     public void listElementPropertyChanged(ObservableList list, int index) {

@@ -51,6 +51,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.ResourceBundle;
 import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -61,6 +62,7 @@ import javax.swing.SwingWorker;
  * @author  thorsten.hell@cismet.de
  */
 public class DescriptionPane extends JPanel implements StatusChangeSupport {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final DefaultStatusChangeSupport statusChangeSupport;
@@ -160,7 +162,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
         jButton1.setForeground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
-        jButton1.setText("jButton1");
+        jButton1.setText(I18N.getString("Sirius.navigator.ui.DescriptionPane.JButton1")); // NOI18N
 
         setLayout(new java.awt.CardLayout());
 

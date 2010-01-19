@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractSimpleEditor extends JPanel implements SimpleEditor
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     /**
      * Der Logger des Editors
      */
@@ -849,7 +850,7 @@ public abstract class AbstractSimpleEditor extends JPanel implements SimpleEdito
     public java.awt.Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column)
     {
         logger.error("getTableCellEditorComponent(" + this.getId() + "): getTableCellEditorComponent should never be called");
-        return new JLabel("editing not supported");
+        return new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.AbstractSimpleEditor.getTableCellEditorComponent.JLabel.text"));
     }
     
     public boolean stopCellEditing()

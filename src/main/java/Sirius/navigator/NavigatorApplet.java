@@ -24,6 +24,7 @@ package Sirius.navigator;
 import java.applet.AppletContext;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.basic.*;
@@ -54,7 +55,9 @@ public class NavigatorApplet extends javax.swing.JApplet
     //private ISFloatingFrameModel isFloatingFrameModel;
     
     private JPanel firstContentPane, secondContentPane;
-    private JProgressBar progressBar, pluginProgressBar;
+    private JProgressBar progressBar;
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private JProgressBar pluginProgressBar;
     private JLabel infoLabel, statusLabel, pluginInfoLabel, pluginStatusLabel;
     private JButton startButton, optionsButton, cancelButton, restartButton;
     private TitledBorder pluginBorder;
@@ -164,7 +167,7 @@ public class NavigatorApplet extends javax.swing.JApplet
         catch(SecurityException sexp)
         {
             sexp.printStackTrace();
-            JLabel accessDenied = new JLabel("<html><center><p><h1>Zugriff verweigert</h1></p><p><b>" + sexp.getMessage() + "</b></p></center></html>");
+            JLabel accessDenied = new JLabel(I18N.getString("Sirius.navigator.NavigatorApplet.accessDenied.text1") + sexp.getMessage() + I18N.getString("Sirius.navigator.NavigatorApplet.accessDenied.text2"));
             accessDenied.setHorizontalTextPosition(JLabel.CENTER);
             JPanel content = new JPanel(new GridLayout(1,1));
             content.add(accessDenied);
@@ -332,7 +335,7 @@ public class NavigatorApplet extends javax.swing.JApplet
         // plugin progress panel
         JPanel pluginProgressPanel = new JPanel();
         pluginProgressPanel.setLayout(new GridLayout(2,1,5,5));
-        pluginBorder = new TitledBorder("Plugin Fortschritt");
+        pluginBorder = new TitledBorder(I18N.getString("Sirius.navigator.NavigatorApplet.pluginBorder.text"));
         pluginBorder.setTitleJustification(TitledBorder.CENTER);
         
         pluginProgressPanel.setBorder(new CompoundBorder(pluginBorder, new EmptyBorder(10,10,10,10)));

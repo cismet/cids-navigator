@@ -3,6 +3,7 @@ package Sirius.navigator.ui.tree;
 import java.beans.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -22,6 +23,7 @@ import org.apache.log4j.Logger;
  */
 public class SearchResultsTreePanel extends JPanel
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private final Logger logger;
     
     private final SearchResultsTree searchResultsTree;
@@ -43,7 +45,8 @@ public class SearchResultsTreePanel extends JPanel
     {
         super(new BorderLayout());
         this.searchResultsTree = searchResultsTree;
-        this.toolBar = new JToolBar(ResourceManager.getManager().getString("searchresultstreepanel.toolbar.name"), JToolBar.HORIZONTAL) ;
+        this.toolBar = new JToolBar(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.toolbar.name"),
+                JToolBar.HORIZONTAL) ;
         this.toolBar.setRollover(advancedLayout);
         this.toolBar.setFloatable(advancedLayout);
         
@@ -71,7 +74,7 @@ public class SearchResultsTreePanel extends JPanel
         ActionListener toolBarListener = new ToolBarListener();
         
         browseBackButton = new JButton(resources.getIcon("back24.gif"));
-        browseBackButton.setToolTipText(resources.getButtonTooltip("back"));
+        browseBackButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.backButton.tooltip"));
         browseBackButton.setActionCommand("back");
         browseBackButton.setMargin(new Insets(4,4,4,4));
         browseBackButton.addActionListener(toolBarListener);
@@ -79,7 +82,7 @@ public class SearchResultsTreePanel extends JPanel
         //toolBar.addSeparator();
         
         browseForwardButton = new JButton(resources.getIcon("forward24.gif"));
-        browseForwardButton.setToolTipText(resources.getButtonTooltip("forward"));
+        browseForwardButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.browseForwardButton.tooltip"));
         browseForwardButton.setActionCommand("forward");
         browseForwardButton.setMargin(new Insets(4,4,4,4));
         browseForwardButton.addActionListener(toolBarListener);
@@ -87,7 +90,7 @@ public class SearchResultsTreePanel extends JPanel
         toolBar.addSeparator();
         
         removeButton = new JButton(resources.getIcon("remove24.gif"));
-        removeButton.setToolTipText(resources.getButtonTooltip("remove"));
+        removeButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.removeButton.tooltip"));
         removeButton.setActionCommand("remove");
         removeButton.setMargin(new Insets(4,4,4,4));
         removeButton.addActionListener(toolBarListener);
@@ -95,7 +98,7 @@ public class SearchResultsTreePanel extends JPanel
         //toolBar.addSeparator();
         
         clearButton = new JButton(resources.getIcon("delete24.gif"));
-        clearButton.setToolTipText(resources.getButtonTooltip("clear"));
+        clearButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.clearButton.tooltip"));
         clearButton.setActionCommand("clear");
         clearButton.setMargin(new Insets(4,4,4,4));
         clearButton.addActionListener(toolBarListener);
@@ -106,7 +109,7 @@ public class SearchResultsTreePanel extends JPanel
         saveAllButton = new JPopupMenuButton();
         saveAllButton.setPopupMenu(new HistoryPopupMenu());
         saveAllButton.setIcon(resources.getIcon("saveall24.gif"));
-        saveAllButton.setToolTipText(resources.getButtonTooltip("saveall"));
+        saveAllButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.saveAllButton.tooltip"));
         saveAllButton.setActionCommand("saveall");
         saveAllButton.setMargin(new Insets(4,4,4,4));
         saveAllButton.addActionListener(toolBarListener);
@@ -132,7 +135,7 @@ public class SearchResultsTreePanel extends JPanel
 
         });
         
-        showDirectlyInMapLabel.setToolTipText("Suchergebnisse direkt in die Karte \u00FCbernehmen");
+        showDirectlyInMapLabel.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.showDirectInMapLabel.tooltipText"));
         toolBar.add(showDirectlyInMapLabel);
     }
     

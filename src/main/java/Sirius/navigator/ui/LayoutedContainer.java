@@ -565,7 +565,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                 java.awt.EventQueue.invokeLater(new Runnable() {
 
                     public void run() {
-                        DeveloperUtil.createWindowLayoutFrame("Momentanes Layout", rootWindow).setVisible(true);
+                        DeveloperUtil.createWindowLayoutFrame(java.util.ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources").getString("Sirius.navigator.ui.LayoutedContainer.doConfigKeystrokes.rootWindow.title"), rootWindow).setVisible(true);
                     }
                 });
             }

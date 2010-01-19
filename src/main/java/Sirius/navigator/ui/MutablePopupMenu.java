@@ -59,7 +59,10 @@ public class MutablePopupMenu extends JPopupMenu {
     private final PluginMenuesMap pluginMenues = new PluginMenuesMap();
     protected PopupMenuItemsActionListener itemActionListener;
     // statische Men\u00FCeintr\u00E4ge
-    protected JMenuItem searchItem, passwordItem, specialTreeItem, newNode, editNode, editObject, deleteNode, deleteObject, newObject;
+    protected JMenuItem searchItem, passwordItem, specialTreeItem, newNode, editNode, editObject, deleteNode, deleteObject;
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    // statische Men\u00FCeintr\u00E4ge
+    protected JMenuItem newObject;
     private TreeEditorMenu treeEditorMenu = null;
 
     public MutablePopupMenu() {
@@ -73,12 +76,12 @@ public class MutablePopupMenu extends JPopupMenu {
     protected void createDefaultMenues() {
         itemActionListener = new PopupMenuItemsActionListener();
 
-        searchItem = new JMenuItem("Suche");
+        searchItem = new JMenuItem(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.searchItem.text"));
         searchItem.setActionCommand("search");
         searchItem.addActionListener(itemActionListener);
         this.add(searchItem);
 
-        specialTreeItem = new JMenuItem("");
+        specialTreeItem = new JMenuItem(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.specialTreeItem.text"));
         specialTreeItem.setActionCommand("treecommand");
         specialTreeItem.addActionListener(itemActionListener);
         this.add(specialTreeItem);
@@ -372,7 +375,7 @@ public class MutablePopupMenu extends JPopupMenu {
                                 ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), metaTreeNode);
                             } else {
                                 logger.warn("could not create new object node: edited object still unsaved");
-                                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), "<html><p>Es kann kein neues Objekt erstellt werden, da z.Z. ein anderes Objekt bearbeitet wird.</p><p>Speichern sie das bearbeitete Objekt und versuchen sie es erneut.</p></html>", "Neues Objekt", JOptionPane.INFORMATION_MESSAGE);
+                                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.NewObjectInfoMessage.message"), I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.NewObjectInfoMessage.title"), JOptionPane.INFORMATION_MESSAGE);
                             }
                         } else {
                             if (MethodManager.getManager().addNode(metaCatalogueTree, selectedNode, metaTreeNode)) {
@@ -541,7 +544,7 @@ public class MutablePopupMenu extends JPopupMenu {
                 }
             } else {
                 logger.warn("can not delete node, node is no leaf: " + selectedNode);
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), "Dieser Knoten kann nicht gel\u00F6scht werden, da er noch Kindknoten enth\u00E4lt", "Dieser Knoten kann nicht gel\u00F6scht werden", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.DeleteNodeInfoMessage.message"), I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.DeleteNodeInfoMessage.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
@@ -584,7 +587,7 @@ public class MutablePopupMenu extends JPopupMenu {
                 }
             } else {
                 logger.warn("can not delete node, node is no leaf: " + selectedNode);
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), "Dieser Knoten kann nicht gel\u00F6scht werden, da er noch Kindknoten enth\u00E4lt", "Dieser Knoten kann nicht gel\u00F6scht werden", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.DeleteNodeInfoMessage.message"), I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.DeleteNodeInfoMessage.title"), JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }

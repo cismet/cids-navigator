@@ -69,7 +69,9 @@
             <Property name="borderPainted" type="boolean" value="false"/>
             <Property name="doubleBuffered" type="boolean" value="true"/>
             <Property name="focusable" type="boolean" value="false"/>
-            <Property name="string" type="java.lang.String" value="Plugins"/>
+            <Property name="string" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.NavigatorSplashSceen.progressBarPlugin.progressText" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+            </Property>
             <Property name="stringPainted" type="boolean" value="true"/>
             <Property name="verifyInputWhenFocusTarget" type="boolean" value="false"/>
           </Properties>

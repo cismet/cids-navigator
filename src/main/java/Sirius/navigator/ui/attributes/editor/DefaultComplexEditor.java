@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
  */
 public class DefaultComplexEditor extends AbstractComplexEditor
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     /** Creates new form DefalutComplexEditor */
     public DefaultComplexEditor()
     {
@@ -182,7 +183,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                 else
                 {
                     logger.error("addEditorUI(" + this + "): synchronization error: editor '" + id + "'not in editor map!");
-                    editorComponent = new JLabel("addEditorUI(" + this + "): internal error");
+                    editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.internalErrorText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.internalErrorText2"));
                 }
             }
             else if(SimpleEditor.class.isAssignableFrom(editor.getClass()))
@@ -219,13 +220,13 @@ public class DefaultComplexEditor extends AbstractComplexEditor
             else
             {
                 logger.error("addEditorUI(" + this + "): unknown editor type'" + editor.getClass() + "'");
-                editorComponent = new JLabel("addEditorUI(" + this + "): wrong editor type");
+                editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.wrongEditorTypeText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.wrongEditorTypeText2"));
             }
         }
         else
         {
             logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");
-            editorComponent = new JLabel("addEditorUI(" + this + "): not editor available");
+            editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.EditorNotFoundText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.EditorNotFoundText2"));
         }        
         
         gridBagConstraints.gridy++;
