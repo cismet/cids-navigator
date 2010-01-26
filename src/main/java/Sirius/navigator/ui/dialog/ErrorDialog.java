@@ -31,21 +31,21 @@ import Sirius.navigator.NavigatorLogger;
 import Sirius.navigator.resource.*;
 import org.apache.log4j.lf5.util.Resource;
 //import Sirius.navigator.connection.ConnectionHandler;
+import java.util.ResourceBundle;
 
 
 public class ErrorDialog extends JDialog implements ActionListener
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
 	//_TA_public final static String WARNING = "Warnung";
-	public final static String WARNING = ResourceManager.getManager().getString("dialog.error.warning");
+	public final static String WARNING = I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.WARNING");
 	
 	//_TA_public final static String ERROR = "Kritischer Fehler";
-	public final static String ERROR = ResourceManager.getManager().getString("dialog.error.criticalError");
-        
-        //charposition f\u00FCr mnemonic
-        public final static int	FIRSTPOS = 0;
+	public final static String ERROR = I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.ERROR");
 	
 	//_TA_protected String errorMessage = "Es ist ein kritischer Fehler aufgetreten";
-	protected String errorMessage = ResourceManager.getManager().getString("dialog.error.criticalErrorOccured");
+	protected String errorMessage = I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.errorMessage");
 	protected String stackTrace = null;
 	protected String errorType = ERROR;
 
@@ -123,15 +123,15 @@ public class ErrorDialog extends JDialog implements ActionListener
 		JPanel buttonPanel = new JPanel(new GridLayout(1,3,10,10));	
 		
 		//_TA_buttonIgnore = new JButton("Ignorieren");
-		buttonIgnore = new JButton(ResourceManager.getManager().getString("dialog.error.ignore"));
+		buttonIgnore = new JButton(I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.buttonIgnore.title"));
 		//_TA_buttonIgnore.setMnemonic('I');
-		buttonIgnore.setMnemonic(ResourceManager.getManager().getString("dialog.error.IMnemonic").charAt(FIRSTPOS));
+		buttonIgnore.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.buttonIgnore.mnemonic").charAt(0));
 		buttonPanel.add(buttonIgnore);
 		
 		//_TA_buttonExit = new JButton("Beenden");
-		buttonExit = new JButton(ResourceManager.getManager().getString("dialog.error.end"));
+		buttonExit = new JButton(I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.buttonExit.title"));
 		//_TA_buttonExit.setMnemonic('B');
-		buttonExit.setMnemonic(ResourceManager.getManager().getString("dialog.error.BMnemonic").charAt(FIRSTPOS));
+		buttonExit.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.buttonExit.mnemonic").charAt(0));
 		buttonExit.setActionCommand("exit");
 		buttonExit.addActionListener(this);	
 		buttonPanel.add(buttonExit);
@@ -147,9 +147,9 @@ public class ErrorDialog extends JDialog implements ActionListener
 		}
 		
 		//_TA_buttonDetails = new JButton("Details");
-		buttonDetails = new JButton(ResourceManager.getManager().getString("dialog.error.details"));
+		buttonDetails = new JButton(I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.buttonDetails.title"));
 		//_TA_buttonDetails.setMnemonic('D');	
-		buttonDetails.setMnemonic(ResourceManager.getManager().getString("dialog.error.DMnemonic").charAt(FIRSTPOS));	
+		buttonDetails.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.buttonDetails.mnemonic").charAt(0));
 		buttonPanel.add(buttonDetails);
 		
 		contentPane.add(buttonPanel, constraints);
@@ -211,16 +211,21 @@ public class ErrorDialog extends JDialog implements ActionListener
 				 _TA_JDialog dialog = optionPane.createDialog(this, "Programm beenden");	
 				*/
 				JOptionPane optionPane = new JOptionPane(
-                                        ResourceManager.getManager().getString("dialog.error.closeNavigator"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.actionPerformed().optionPane.message"),
                                         JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION,
-                                        null, new String[]{ResourceManager.getManager().getString("dialog.error.yes"),
-                                        ResourceManager.getManager().getString("dialog.error.no")}, null);
+                                        null,
+                                        new String[]{
+                                            I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.actionPerformed().optionPane.yes"),
+                                            I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.actionPerformed().optionPane.no")},
+                                        null);
 
-				JDialog dialog = optionPane.createDialog(this, ResourceManager.getManager().getString("dialog.error.exitProgram"));
+				JDialog dialog = optionPane.createDialog(this,
+                                        I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.actionPerformed().dialog.title"));
 				dialog.show();
 				
 				//_TA_if(optionPane.getValue().equals("Ja"))
-				if(optionPane.getValue().equals(ResourceManager.getManager().getString("dialog.error.yes")))
+				if(optionPane.getValue().equals(
+                                        I18N.getString("Sirius.navigator.ui.dialog.ErrorDialog.actionPerformed().optionPane.yes")))
 				{
 					if(NavigatorLogger.VERBOSE)NavigatorLogger.printMessage("<NAV> Navigator closed()");
 					System.exit(1);

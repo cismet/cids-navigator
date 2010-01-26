@@ -10,6 +10,7 @@ import Sirius.navigator.resource.ResourceManager;
 import Sirius.server.localserver.attribute.Attribute;
 import java.awt.image.RescaleOp;
 import org.apache.log4j.lf5.util.Resource;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -17,6 +18,7 @@ import org.apache.log4j.lf5.util.Resource;
  */
 public class SimpleFromStringMetaAttributeEditor extends SimpleStringMetaAttributeEditor
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     /** Creates a new instance of SimpleFromStringMetaAttributeEditor */
     public SimpleFromStringMetaAttributeEditor()
@@ -71,9 +73,9 @@ public class SimpleFromStringMetaAttributeEditor extends SimpleStringMetaAttribu
                     
                     // XXX i18n
                     javax.swing.JOptionPane.showMessageDialog(SimpleFromStringMetaAttributeEditor.this,
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage1") + t.getMessage() + 
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage2"),
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorTitle"), javax.swing.JOptionPane.ERROR_MESSAGE);
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage1") + t.getMessage() +
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage2"),
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorTitle"), javax.swing.JOptionPane.ERROR_MESSAGE);
                     
                     // reset
                     setComponentValue(getValue());

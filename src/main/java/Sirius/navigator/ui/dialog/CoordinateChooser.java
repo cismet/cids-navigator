@@ -27,13 +27,15 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-
+import java.util.ResourceBundle;
 import Sirius.navigator.tools.InputValidator;
 import Sirius.navigator.resource.*;
 
 
 public class CoordinateChooser extends JDialog implements ActionListener
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
     protected int coordinates[] = new int[]
     {0,0,0,0};
     //_TA_protected String infoString = "<html><center><p>Bitte geben Sie die Koordinaten des Interessensbereichs an,</p><p>auf den Sie die Karte beschraenken wollen.</p></center></html>";
@@ -55,7 +57,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     public CoordinateChooser(JFrame parent)
     {
         //_TA_super(new JFrame(), "Interessensbereich angeben", true);
-        super(parent, ResourceManager.getManager().getString("dialog.coordinate.title"), true);
+        super(parent, I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.title"), true);
         
         initCoordinateChooser();
     }
@@ -63,7 +65,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     public CoordinateChooser(JDialog parent)
     {
         //_TA_super(new JFrame(), "Interessensbereich angeben", true);
-        super(parent, ResourceManager.getManager().getString("dialog.coordinate.title"), true);
+        super(parent, I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.title"), true);
         
         initCoordinateChooser();
     }
@@ -99,7 +101,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridx = 0;
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
-        JLabel infoLabel = new JLabel(ResourceManager.getManager().getString("dialog.coordinate.info"));
+        JLabel infoLabel = new JLabel(I18N.getString("dialog.coordinate.info"));
         infoLabel.setVerticalAlignment(JLabel.CENTER);
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -126,7 +128,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.weightx = 0.0;
         constraints.weighty = 0.0;
         //_TA_koordinatenPanel.add(new JLabel("Rechtswert linksunten:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.rwlu")), constraints);
+        koordinatenPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.rwluLabel.text")),
+                constraints);
         
         // Rechtswert 1 Textfield
         constraints.insets = new Insets(5, 0, 8, 5);
@@ -142,7 +146,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridx = 0;
         constraints.gridy = 1;
         //_TA_koordinatenPanel.add(new JLabel("Hochwert linksunten:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.hwlu")), constraints);
+        koordinatenPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.hwluLabel.text")),
+                constraints);
         // Hochwert 1 Textfield
         constraints.insets = new Insets(0, 0, 8, 5);
         constraints.anchor = GridBagConstraints.WEST;
@@ -157,7 +163,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridx = 0;
         constraints.gridy = 2;
         //_TA_koordinatenPanel.add(new JLabel("Rechtswert rechtsoben:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.rwro")), constraints);
+        koordinatenPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.rwroLabel.text")),
+                constraints);
         //  Rechtswert 2 Textfield
         constraints.insets = new Insets(0, 0, 8, 5);
         constraints.anchor = GridBagConstraints.WEST;
@@ -171,7 +179,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridx = 0;
         constraints.gridy = 3;
         //_TA_koordinatenPanel.add(new JLabel("Hochwert rechtsoben:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.hwro")), constraints);
+        koordinatenPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.hwroLabel.text")),
+                constraints);
         // Hochwert 1 Textfield
         constraints.insets = new Insets(0, 0, 5, 5);
         constraints.anchor = GridBagConstraints.WEST;
@@ -189,9 +199,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridy++;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
-        buttonAccept = new JButton(ResourceManager.getManager().getButtonText("accept"));
+        buttonAccept = new JButton(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonAccept.text"));
         //_TA_buttonAccept.setMnemonic('U');
-        buttonAccept.setMnemonic(ResourceManager.getManager().getButtonMnemonic("accept"));
+        buttonAccept.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonAccept.mnemonic").charAt(0));
         buttonAccept.setActionCommand("accept");
         buttonAccept.addActionListener(this);
         contentPane.add(buttonAccept, gbc);
@@ -199,9 +209,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridx++;
         //_TA_buttonCancel = new JButton("Ignorieren");
-        buttonCancel = new JButton(ResourceManager.getManager().getButtonText("cancel"));
+        buttonCancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonCancel.text"));
         //_TA_buttonCancel.setMnemonic('I');
-        buttonCancel.setMnemonic(ResourceManager.getManager().getButtonMnemonic("cancel"));
+        buttonCancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonCancel.mnemonic").charAt(0));
         buttonCancel.setActionCommand("cancel");
         buttonCancel.addActionListener(this);
         contentPane.add(buttonCancel, gbc);
@@ -253,7 +263,10 @@ public class CoordinateChooser extends JDialog implements ActionListener
             if(koordinatenRW1TextField.getText() == null || koordinatenRW1TextField.getText().length() < 1 || koordinatenRW2TextField.getText() == null || koordinatenRW2TextField.getText().length() < 1)
             {
                 //_TA_JOptionPane.showMessageDialog(this, "Bitte geben Sie alle Rechtswerte an.", "Fehlerhafte Eingabe", JOptionPane.WARNING_MESSAGE);
-                JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.coordinate.missing.rw") ,ResourceManager.getManager().getString("dialog.coordinate.missing"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingRWOptionPane.message"),
+                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingRWOptionPane.title"),
+                        JOptionPane.WARNING_MESSAGE);
                 accepted = false;
             }
             
@@ -261,7 +274,10 @@ public class CoordinateChooser extends JDialog implements ActionListener
             {
                 //_TA_JOptionPane.showMessageDialog(this, "Bitte geben Sie alle Hochwerte an.", "Fehlerhafte Eingabe", JOptionPane.WARNING_MESSAGE);
 
-                JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.coordinate.missing.hw"), ResourceManager.getManager().getString("dialog.coordinate.missing"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingHWOptionPane.message"),
+                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingHWOptionPane.title"),
+                        JOptionPane.WARNING_MESSAGE);
                 accepted = false;
             }
             

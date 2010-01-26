@@ -23,7 +23,9 @@ import Sirius.navigator.exception.ExceptionManager;
 public class PluginRegistry
 {
     private final static Logger logger = Logger.getLogger(PluginRegistry.class);
-    
+
+    private final ResourceManager resource = ResourceManager.getManager();
+
     private static PluginRegistry registry = null;
     
     private final PluginFactory pluginFactory;
@@ -88,7 +90,9 @@ public class PluginRegistry
                 catch(Throwable t)
                 {
                     logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);
-                    ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("px01"), ResourceManager.getManager().getExceptionMessage("px01"), t);
+                    ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                            resource.getExceptionName("px01"),
+                            resource.getExceptionMessage("px01"), t);
                     pluginDescriptor.setLoaded(false);
                 }
                 
@@ -155,7 +159,9 @@ public class PluginRegistry
                         catch(Throwable t)
                         {
                             logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);
-                            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("px01"), ResourceManager.getManager().getExceptionMessage("px01"), t);
+                            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                                    resource.getExceptionName("px01"),
+                                    resource.getExceptionMessage("px01"), t);
                             pluginDescriptor.setLoaded(false);
                         }
                     }

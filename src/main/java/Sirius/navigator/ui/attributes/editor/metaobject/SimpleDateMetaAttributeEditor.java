@@ -5,7 +5,6 @@
  */
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import Sirius.navigator.resource.ResourceManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -165,7 +164,7 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
                 try {
                     d = shortDF.parse(textValue);
                 } catch (ParseException ex) {
-                    logger.warn("Fehler beo, Parsen des Datums:", ex);
+                    logger.warn("Error while parsing date:", ex);
                     setValue(null);
                     setComponentValue(null);
                     setValueChanged(true);

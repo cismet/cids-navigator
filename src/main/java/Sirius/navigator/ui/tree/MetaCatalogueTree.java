@@ -129,7 +129,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                         }
 
                     } catch (Throwable t) {
-                        logger.warn("Fehler beim Anzeigen mit der Karte", t);
+                        logger.warn("Error of displaying map", t);
                     }
                 }
             }
@@ -521,7 +521,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 //                                    logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":");
 //                                }
                             } catch (Exception e) {
-                                logger.error("Fehler beim Laden des Namen", e);
+                                logger.error("Error while loading name", e);
                             }
                         }
                     }
@@ -543,7 +543,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("<THREAD> TreeExploreThread fertig");
+                logger.debug("<THREAD> TreeExploreThread done");
             }
         }
     }
@@ -578,7 +578,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("SubTreeExploreThread: fertig");
+                logger.debug("SubTreeExploreThread: done");
             }
         }
 
@@ -598,7 +598,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 MetaCatalogueTree.this.scrollPathToVisible(selectionPath);
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("SubTreeExploreThread: GUI Update fertig");
+                    logger.debug("SubTreeExploreThread: GUI Update done");
                 }
             }
         }

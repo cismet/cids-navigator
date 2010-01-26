@@ -34,7 +34,9 @@ public final class PluginFactory
 {
     /** singleton shared instance*/
     //private static PluginFactory factory = null;
-    
+
+    private static final ResourceManager resource = ResourceManager.getManager();
+
     private final Logger logger;
     private final Log log;
     
@@ -57,7 +59,7 @@ public final class PluginFactory
         preloadRuleSet = new PreloadPluginRuleSet();
         loadRuleSet = new LoadPluginRuleSet();
         
-        schemaLocation = ResourceManager.getManager().pathToIURIString(PropertyManager.getManager().getPluginPath() + "plugin.xsd");
+        schemaLocation = resource.pathToIURIString(PropertyManager.getManager().getPluginPath() + "plugin.xsd");
         
     }
     
@@ -137,7 +139,7 @@ public final class PluginFactory
         String pluginDescriptorPath = pluginPath + PluginDescriptor.XML_DESCRIPTOR;
         if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor from remote URL '" + pluginDescriptorPath + "'");
         
-        return new BufferedInputStream(ResourceManager.getManager().getResourceAsStream(pluginDescriptorPath), 16384);
+        return new BufferedInputStream(resource.getResourceAsStream(pluginDescriptorPath), 16384);
         
         /*if(pluginPath.indexOf("http://") == 0 || pluginPath.indexOf("https://") == 0)
         {
@@ -525,10 +527,10 @@ public final class PluginFactory
             
             // load jar files
             URL[] urls = new URL[libraries.size()+1];
-            String jarBase = ResourceManager.getManager().pathToIURIString(descriptor.getPluginPath() + "lib/");
+            String jarBase = resource.pathToIURIString(descriptor.getPluginPath() + "lib/");
             
             // /res implements classpath ...
-            urls[0] = new URL(ResourceManager.getManager().pathToIURIString(descriptor.getPluginPath() + "res/"));
+            urls[0] = new URL(resource.pathToIURIString(descriptor.getPluginPath() + "res/"));
             
   
             for (int i = 0; i < libraries.size(); i++)

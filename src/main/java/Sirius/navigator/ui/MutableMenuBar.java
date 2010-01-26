@@ -53,6 +53,7 @@ import javax.swing.tree.TreePath;
 
 public class MutableMenuBar extends JMenuBar {
 
+    ResourceManager resources = ResourceManager.getManager();
     private final static Logger logger = Logger.getLogger(MutableMenuBar.class);
     private final PluginMenuesMap pluginMenues;
     private final EmbeddedContainersMap moveableMenues;
@@ -165,130 +166,132 @@ public class MutableMenuBar extends JMenuBar {
         JMenu menu = null;
         JMenuItem item = null;
         MenuItemActionListener itemListener = new MenuItemActionListener();
-        ResourceManager resources = ResourceManager.getManager();
+        
 
         // NAVIGATOR MENU ======================================================
-        menu = new JMenu(resources.getMenuText("navigator"));
-        menu.setMnemonic(resources.getMenuMnemonic("navigator"));
+        menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.title"));
+        menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.mnemonic").charAt(0));
         this.add(menu);
 
         //LayoutControls
         //Gegenwärtiges Layout Speichern
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.save.current.layout")));
-        item.setIcon(resources.getMenuIcon("navigator.save.current.layout"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.save.current.layout"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.saveCurrentLayout.title")));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.saveCurrentLayout.icon"));
+        item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.saveCurrentLayout.accelerator"));
+//        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.saveCurrentLayout.mnemonic").charAt(0));
         item.setActionCommand("navigator.save.current.layout");
         item.addActionListener(itemListener);
         //Layout öffnen
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.open.layout")));
-        item.setIcon(resources.getMenuIcon("navigator.open.layout"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.open.layout"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.openLayout.title")));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.openLayout.icon"));
+        item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.openLayout.accelerator"));
+//        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.openLayout.mnemonic").charAt(0));
         item.setActionCommand("navigator.open.layout");
         item.addActionListener(itemListener);
         //Layout reseten
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.reset.layout")));
-        item.setIcon(resources.getMenuIcon("navigator.reset.layout"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.reset.layout"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.resetLayout.title")));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.resetLayout.icon"));
+        item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.resetLayout.accelerator"));
+//        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.resetLayout.mnemonic").charAt(0));
         item.setActionCommand("navigator.reset.layout");
         item.addActionListener(itemListener);
         menu.add(new JSeparator());
         //Hell
-        menu.add(item = new JMenuItem("Katalog neu laden"));
-        item.setMnemonic('K');
-        //item.setIcon();
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.reloadCatalogue.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.reloadCatalogue.mnemonic").charAt(0));
+        //item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.reloadCatalogue.icon")); // not set yet
+        item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.reloadCatalogue.accelerator"));
         item.setActionCommand("tree.refresh");
         item.addActionListener(itemListener);
         menu.add(new JSeparator());
         // Beenden .............................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.exit")));
-        item.setMnemonic(resources.getMenuMnemonic("navigator.exit"));
-        item.setIcon(resources.getMenuIcon("navigator.exit"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.exit"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.exit.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.exit.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.exit.icon"));
+        item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.exit.accelerator"));
         item.setActionCommand("navigator.exit");
         item.addActionListener(itemListener);
 
         // SEARCH MENU =========================================================
-        menu = new JMenu(resources.getMenuText("search"));
-        menu.setMnemonic(resources.getMenuMnemonic("search"));
+        menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.title"));
+        menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.mnemonic").charAt(0));
         this.add(menu);
         // Suche ...............................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("search.search")));
-        item.setMnemonic(resources.getMenuMnemonic("search.search"));
-        item.setIcon(resources.getMenuIcon("search.search"));
-        item.setAccelerator(resources.getMenuAccelerator("search.search"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.search.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.search.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.searchMenu.search.icon"));
+        item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.searchMenu.search.accelerator"));
         item.setActionCommand("search.search");
         item.addActionListener(itemListener);
         menu.addSeparator();
         // show search results .................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("search.show")));
-        item.setMnemonic(resources.getMenuMnemonic("search.show"));
-        item.setIcon(resources.getMenuIcon("search.show"));
-        ;
-        //item.setAccelerator(resources.getMenuAccelerator("search.show"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.showResults.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.showResults.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.searchMenu.showResults.icon"));
+        //item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.searchMenu.showResults.accelerator")); // not set yet
         item.setActionCommand("search.show");
         item.addActionListener(itemListener);
         // search result profiles .....................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("search.profiles.result")));
-        item.setMnemonic(resources.getMenuMnemonic("search.profiles.result"));
-        item.setIcon(resources.getMenuIcon("search.profiles.result"));
-        //item.setAccelerator(resources.getMenuAccelerator("search.profiles.result"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchResultProfiles.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchResultProfiles.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchResultProfiles.icon"));
+        //item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchResultProfiles.accelerator")); // not set yet
         item.setActionCommand("search.profiles.result");
         item.addActionListener(itemListener);
         // search profiles .....................................................
         menu.addSeparator();
-        menu.add(item = new JMenuItem(resources.getMenuText("search.profiles")));
-        item.setMnemonic(resources.getMenuMnemonic("search.profiles"));
-        item.setIcon(resources.getMenuIcon("search.profiles"));
-        //item.setAccelerator(resources.getMenuAccelerator("search.profiles"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchProfiles.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchProfiles.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchProfiles.icon"));
+        //item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.searchMenu.searchProfiles.accelerator")); // not set yet
         item.setActionCommand("search.profiles");
         item.addActionListener(itemListener);
 
         // TOOLS MENU ==========================================================
-        menu = new JMenu(resources.getMenuText("tools"));
-        menu.setMnemonic(resources.getMenuMnemonic("tools"));
+        menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.toolsMenu.title"));
+        menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.toolsMenu.mnemonic").charAt(0));
         this.add(menu);
         // password  ...............................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("tools.password")));
-        item.setMnemonic(resources.getMenuMnemonic("tools.password"));
-        //item.setIcon(resources.getMenuIcon("tools.password"));
-        //item.setAccelerator(resources.getMenuAccelerator("tools.password"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.toolsMenu.password.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.toolsMenu.password.mnemonic").charAt(0));
+        //item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.toolsMenu.password.icon")); // not set yet
+        //item.setAccelerator(resources.getMenuAccelerator("tSirius.navigator.ui.MutableMenuBar.toolsMenu.password.accelerator")); // not set yet
         item.setActionCommand("tools.password");
         item.addActionListener(itemListener);
 
         //this.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         // Plugin Menu =========================================================
-        menu = new JMenu(resources.getMenuText("plugin"));
-        menu.setMnemonic(resources.getMenuMnemonic("plugin"));
+        menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.pluginMenu.title"));
+        menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.pluginMenu.mnemonic").charAt(0));
         menu.setEnabled(false); //HELL
         this.add(menu);
         this.pluginMenu = menu;
         // plugin manager ......................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("plugin.manager")));
-        item.setMnemonic(resources.getMenuMnemonic("plugin.manager"));
-        item.setIcon(resources.getMenuIcon("plugin.manager"));
-        //item.setAccelerator(resources.getMenuAccelerator("plugin.manager"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.pluginMenu.pluginManager.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.pluginMenu.pluginManager.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.pluginMenu.pluginManager.icon"));
+        //item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.pluginMenu.pluginManager.accelerator")); // not set yet
         item.setActionCommand("plugin.manager");
         item.addActionListener(itemListener);
         menu.addSeparator();
 
         // Fenster Menu ======================================================
-        menu = new JMenu(resources.getMenuText("window"));
-        menu.setMnemonic(resources.getMenuMnemonic("window"));
+        menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.windowMenu.title"));
+        menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.windowMenu.mnemonic").charAt(0));
         this.add(menu);
         viewMenu = menu;
 
 
         // Help Menu ===========================================================
-        menu = new JMenu(resources.getMenuText("help"));
-        menu.setMnemonic(resources.getMenuMnemonic("help"));
+        menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.helpMenu.title"));
+        menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.helpMenu.mnemonic").charAt(0));
         this.add(menu);
         // plugin manager ......................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("help.info")));
-        item.setMnemonic(resources.getMenuMnemonic("help.info"));
-        item.setIcon(resources.getMenuIcon("help.info"));
-        //item.setAccelerator(resources.getMenuAccelerator("help.info"));
+        menu.add(item = new JMenuItem(resources.getString("Sirius.navigator.ui.MutableMenuBar.helpMenu.info.title")));
+        item.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.helpMenu.info.mnemonic").charAt(0));
+        item.setIcon(resources.getIcon("Sirius.navigator.ui.MutableMenuBar.helpMenu.info.icon"));
+        //item.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutableMenuBar.helpMenu.info.accelerator")); // not set yet
         item.setActionCommand("help.info");
         item.addActionListener(itemListener);
     }
@@ -307,9 +310,11 @@ public class MutableMenuBar extends JMenuBar {
                 try {
                     MethodManager.getManager().showSearchDialog();
                 } catch (Throwable t) {
-                    logger.fatal("Fehler bei der Verarbeitung der Suchmethode", t);
+                    logger.fatal("Error while processing search method", t);
 
-                    ErrorDialog errorDialog = new ErrorDialog("Fehler bei der Verarbeitung der Suchmethode", t.toString(), ErrorDialog.WARNING);
+                    ErrorDialog errorDialog = new ErrorDialog(
+                            resources.getString("Sirius.navigator.ui.MutableMenuBar.MenuItemActionListener.actionPerformed().searchMenu.search.ErrorDialog.message"),
+                            t.toString(), ErrorDialog.WARNING);
                     errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
                     errorDialog.show();
                 }
@@ -348,26 +353,26 @@ public class MutableMenuBar extends JMenuBar {
                         ComponentRegistry.getRegistry().getCatalogueTree().exploreSubtree(selectionPath);
                     }
                 } catch (ConnectionException ex) {
-                    logger.error("Fehler beim Baumrefresh", ex);
+                    logger.error("Error while refreshing the tree", ex);
                 } catch (RuntimeException ex) {
-                    logger.error("Fehler beim Baumrefresh", ex);
+                    logger.error("Error while refreshing the tree", ex);
                 }
             } else if (e.getActionCommand().equals("navigator.reset.layout")) {
-                logger.debug("reseten des Layouts");
+                logger.debug("reset layout");
                 if (layoutManager != null) {
                     layoutManager.resetLayout();
                 } else {
                     //TODO Meldung Benutzer
                 }
             } else if (e.getActionCommand().equals("navigator.open.layout")) {
-                logger.debug("öffnen eines Layouts");
+                logger.debug("open layout");
                 if (layoutManager != null) {
                     layoutManager.loadLayout((java.awt.Component) StaticSwingTools.getParentFrame(MutableMenuBar.this));
                 } else {
                     //TODO Meldung Benutzer
                 }
             } else if (e.getActionCommand().equals("navigator.save.current.layout")) {
-                logger.debug("Speichern eines Layouts");
+                logger.debug("save layout");
                 if (layoutManager != null) {
                     layoutManager.saveCurrentLayout((java.awt.Component) StaticSwingTools.getParentFrame(MutableMenuBar.this));
                 } else {

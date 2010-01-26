@@ -20,6 +20,7 @@ import Sirius.navigator.resource.ResourceManager;
  */
 public class ExceptionManager
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private final static Logger logger = Logger.getLogger(ExceptionManager.class);
     private static ExceptionManager manager = null;
     
@@ -38,7 +39,15 @@ public class ExceptionManager
     private ExceptionManager()
     {
         logger.info("creating singleton exception manager instance");
-        exitOption = new JOptionPane(ResourceManager.getManager().getString("exit.message"), JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, new String[] {ResourceManager.getManager().getButtonText("yes"), ResourceManager.getManager().getButtonText("no")}, ResourceManager.getManager().getButtonText("no"));
+        exitOption = new JOptionPane(
+                I18N.getString("Sirius.navigator.exception.ExceptionManager.exitMessage"),
+                JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.YES_NO_OPTION,
+                null,
+                new String[] {
+                    I18N.getString("Sirius.navigator.exception.ExceptionManager.confirmButton.text"),
+                    I18N.getString("Sirius.navigator.exception.ExceptionManager.cancelButton.text")},
+                I18N.getString("Sirius.navigator.exception.ExceptionManager.cancelButton.text"));
     }
     
     public final static ExceptionManager getManager()
@@ -137,7 +146,8 @@ public class ExceptionManager
             return true;
         }
         else {
-        JDialog exitDialog = exitOption.createDialog(owner, ResourceManager.getManager().getString("exit.title"));
+        JDialog exitDialog = exitOption.createDialog(owner,
+                I18N.getString("Sirius.navigator.exception.ExceptionManager.title"));
         return doShowExitDialog(exitDialog);
         }
     }
@@ -148,7 +158,8 @@ public class ExceptionManager
             return true;
         }
         else {
-        JDialog exitDialog = exitOption.createDialog(owner, ResourceManager.getManager().getString("exit.title"));
+        JDialog exitDialog = exitOption.createDialog(owner,
+                I18N.getString("Sirius.navigator.exception.ExceptionManager.title"));
         return doShowExitDialog(exitDialog);
         }
 
@@ -160,7 +171,8 @@ public class ExceptionManager
             return true;
         }
         else {
-        JDialog exitDialog = exitOption.createDialog(null, ResourceManager.getManager().getString("exit.title"));
+        JDialog exitDialog = exitOption.createDialog(null,
+                I18N.getString("Sirius.navigator.exception.ExceptionManager.title"));
         return doShowExitDialog(exitDialog);
         }
     }
@@ -173,7 +185,8 @@ public class ExceptionManager
         exitDialog.setLocationRelativeTo(exitDialog.getOwner());
         exitDialog.show();
         
-        if(exitOption.getValue().equals(ResourceManager.getManager().getButtonText("yes")))
+        if(exitOption.getValue().equals(
+                I18N.getString("Sirius.navigator.exception.ExceptionManager.confirmButton.text")))
         {
             logger.debug("user wants to close program");
             //System.exit(0);
@@ -234,8 +247,6 @@ public class ExceptionManager
     
     private class ExceptionPane extends JPanel
     {
-        private ResourceManager resources;
-        
         private JDialog parent = null;
         
         private JLabel messageLabel, exceptionIconLabel;
@@ -252,7 +263,6 @@ public class ExceptionManager
         
         private void init()
         {
-            resources = ResourceManager.getManager();
             ActionListener buttonListener = new ButtonListener();
            
             
@@ -289,23 +299,23 @@ public class ExceptionManager
             constraints.gridx = 0;
             JPanel buttonPanel = new JPanel(new GridLayout(1,3,10,10));
             
-            ignoreButton = new JButton(resources.getButtonText("ignore"));
-            ignoreButton.setMnemonic(resources.getButtonMnemonic("ignore"));
-            ignoreButton.setToolTipText(resources.getButtonTooltip("ignore"));
+            ignoreButton = new JButton(I18N.getString("Sirius.navigator.exception.ExceptionManager.ignoreButton.text"));
+            ignoreButton.setMnemonic(I18N.getString("Sirius.navigator.exception.ExceptionManager.ignoreButton.mnemonic").charAt(0));
+            ignoreButton.setToolTipText(I18N.getString("Sirius.navigator.exception.ExceptionManager.ignoreButton.tooltip"));
             ignoreButton.setActionCommand("ignore");
             ignoreButton.addActionListener(buttonListener);
             buttonPanel.add(ignoreButton);
             
-            exitButton = new JButton(resources.getButtonText("exit"));
-            exitButton.setMnemonic(resources.getButtonMnemonic("exit"));
-            exitButton.setToolTipText(resources.getButtonTooltip("exit"));
+            exitButton = new JButton(I18N.getString("Sirius.navigator.exception.ExceptionManager.exitButton.text"));
+            exitButton.setMnemonic(I18N.getString("Sirius.navigator.exception.ExceptionManager.exitButton.mnemonic").charAt(0));
+            exitButton.setToolTipText(I18N.getString("Sirius.navigator.exception.ExceptionManager.exitButton.tooltip"));
             exitButton.setActionCommand("exit");
             exitButton.addActionListener(buttonListener);
             buttonPanel.add(exitButton);
             
-            detailsButton = new JToggleButton(resources.getButtonText("details"));
-            detailsButton.setMnemonic(resources.getButtonMnemonic("details"));
-            detailsButton.setToolTipText(resources.getButtonTooltip("details"));
+            detailsButton = new JToggleButton(I18N.getString("Sirius.navigator.exception.ExceptionManager.detailsButton.text"));
+            detailsButton.setMnemonic(I18N.getString("Sirius.navigator.exception.ExceptionManager.detailsButton.mnemonic").charAt(0));
+            detailsButton.setToolTipText(I18N.getString("Sirius.navigator.exception.ExceptionManager.detailsButton.tooltip"));
             detailsButton.setActionCommand("details");
             detailsButton.addActionListener(buttonListener);
             buttonPanel.add(detailsButton);
@@ -335,7 +345,7 @@ public class ExceptionManager
                 exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(resources.getString("exception.title.fatal"));
+                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.fatal"));
                 }
             }
             else if(level == ERROR)
@@ -344,7 +354,7 @@ public class ExceptionManager
                 exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(resources.getString("exception.title.error"));
+                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.error"));
                 }
             
             }
@@ -354,7 +364,7 @@ public class ExceptionManager
                 exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(resources.getString("exception.title.warning"));
+                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.warning"));
                 }
             }
             else if(level == PLUGIN_ERROR)
@@ -364,7 +374,7 @@ public class ExceptionManager
                 exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(resources.getString("exception.title.error"));
+                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.error"));
                 }
             
             }
@@ -375,7 +385,7 @@ public class ExceptionManager
                 exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(resources.getString("exception.title.warning"));
+                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.warning"));
                 }
             }
             

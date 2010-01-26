@@ -15,7 +15,7 @@ public class NavigatorException extends Exception
     protected final int level;
     protected final String name;
     
-    
+    private static final ResourceManager resource = ResourceManager.getManager();
     
     public NavigatorException(String message)
     {
@@ -41,22 +41,22 @@ public class NavigatorException extends Exception
     
     public NavigatorException(int level, String errorcode)
     {
-        super(ResourceManager.getManager().getExceptionMessage(errorcode));
-        this.name = ResourceManager.getManager().getExceptionName(errorcode);
+        super(resource.getExceptionMessage(errorcode));
+        this.name = resource.getExceptionName(errorcode);
         this.level = level;
     }
     
     public NavigatorException(int level, String errorcode, Throwable cause)
     {
-        super(ResourceManager.getManager().getExceptionMessage(errorcode), cause);
-        this.name = ResourceManager.getManager().getExceptionName(errorcode);
+        super(resource.getExceptionMessage(errorcode), cause);
+        this.name = resource.getExceptionName(errorcode);
         this.level = level;
     }
     
     public NavigatorException(int level, String errorcode, String[] values, Throwable cause)
     {
-        super(ResourceManager.getManager().getExceptionMessage(errorcode, values), cause);
-        this.name = ResourceManager.getManager().getExceptionName(errorcode);
+        super(resource.getExceptionMessage(errorcode, values), cause);
+        this.name = resource.getExceptionName(errorcode);
         this.level = level;
     }
         

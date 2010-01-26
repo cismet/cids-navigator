@@ -183,11 +183,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             log.error("Error durig reload from DB.", e);
             ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.title"),
                     I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.message"),
-                    null,
-                    null,
-                    e,
-                    Level.SEVERE,
-                    null);
+                    null, null, e, Level.SEVERE, null);
             JXErrorPane.showDialog(this, ei);
         }
     }
@@ -198,9 +194,12 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         try {
             mo.getBean().persist();
             refreshTree();
-            JOptionPane jop = new JOptionPane(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.message"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane jop = new JOptionPane(
+                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.message"),
+                    JOptionPane.INFORMATION_MESSAGE);
 
-            final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.title"));
+            final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this,
+                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.title"));
 
             Timer t = new Timer(900, new ActionListener() {
 
@@ -215,8 +214,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             dialog.setVisible(true);
             clear();
         } catch (Exception ex) {
-            log.error("Fehler beim Speichern", ex);
-            ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"), null, null, ex, Level.SEVERE, null);
+            log.error("Error while saving", ex);
+            ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),
+                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),
+                    null, null, ex, Level.SEVERE, null);
             JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
         }
         clear();
@@ -226,7 +227,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     public void setTreeNode(Object node) {
         if (treeNode != null && editorObject != null && backupObject != null) {
             if (!editorObject.propertyEquals(backupObject)) {
-                int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"), JOptionPane.YES_NO_CANCEL_OPTION);
+                int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this,
+                        I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"),
+                        I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"),
+                        JOptionPane.YES_NO_CANCEL_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     saveIt();
                 } else if (answer == JOptionPane.NO_OPTION) {
@@ -282,8 +286,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         cancelButton.setEnabled(true);
                         commitButton.setEnabled(true);
                     } catch (Exception e) {
-                        ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.title"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.message"), null, null, e, Level.SEVERE, null);
-                        log.error("Fehler beim Darstellen des Editors" + ei.getState() + editorObject.getDebugString() + "\n", e);
+                        ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.title"),
+                                I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.message"),
+                                null, null, e, Level.SEVERE, null);
+                        log.error("Error while displaying Editor" + ei.getState() + editorObject.getDebugString() + "\n", e);
                         JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
                         clear();
                     }
@@ -291,7 +297,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             });
 
         } else {
-            log.warn("Uebergebener Treenode ist keine ObjectTreeMode, sondern: " + node.getClass());
+            log.warn("Given Treenode is not instance of ObjectTreeMode, but: " + node.getClass());
         }
     }
 
@@ -338,8 +344,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         panDebug = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
 
-        pinButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon")));
-        pinButton.setToolTipText(resources.getString("attribute.viewer.pin.tooltip"));
+        pinButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.icon")));
+        pinButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.tooltip"));
         pinButton.setActionCommand("pin");
         pinButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pinButton.setContentAreaFilled(false);
@@ -347,12 +353,12 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         pinButton.setMaximumSize(new java.awt.Dimension(16, 16));
         pinButton.setMinimumSize(new java.awt.Dimension(16, 16));
         pinButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        pinButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.rollover")));
-        pinButton.setRolloverSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.selected.rollover")));
-        pinButton.setSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.selected")));
+        pinButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.rolloverIcon")));
+        pinButton.setRolloverSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.rolloverSelectedIcon")));
+        pinButton.setSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.selectedIcon")));
 
-        editButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon")));
-        editButton.setToolTipText(resources.getString("attribute.viewer.edit.tooltip"));
+        editButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.icon")));
+        editButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.tooltip"));
         editButton.setActionCommand("edit");
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
@@ -360,9 +366,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         editButton.setMaximumSize(new java.awt.Dimension(16, 16));
         editButton.setMinimumSize(new java.awt.Dimension(16, 16));
         editButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        editButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.rollover")));
-        editButton.setRolloverSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.selected.rollover")));
-        editButton.setSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.selected")));
+        editButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.rolloverIcon")));
+        editButton.setRolloverSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.rolloverSelectedIcon")));
+        editButton.setSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.selectedIcon")));
 
         editorScrollPane.setPreferredSize(new java.awt.Dimension(250, 150));
 
@@ -373,8 +379,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
-        commitButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon")));
-        commitButton.setToolTipText(resources.getString("attribute.viewer.commit.tooltip"));
+        commitButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.icon")));
+        commitButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.tooltip"));
         commitButton.setActionCommand("commit");
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
@@ -383,13 +389,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         commitButton.setMaximumSize(new java.awt.Dimension(16, 16));
         commitButton.setMinimumSize(new java.awt.Dimension(16, 16));
         commitButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        commitButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon.rollover")));
+        commitButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.rolloverIcon")));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         controlBar.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon")));
-        cancelButton.setToolTipText(resources.getString("attribute.viewer.cancel.tooltip"));
+        cancelButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.icon")));
+        cancelButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.tooltip"));
         cancelButton.setActionCommand("cancel");
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
@@ -398,7 +404,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         cancelButton.setMaximumSize(new java.awt.Dimension(16, 16));
         cancelButton.setMinimumSize(new java.awt.Dimension(16, 16));
         cancelButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        cancelButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon.rollover")));
+        cancelButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.rolloverIcon")));
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
         add(controlBar, java.awt.BorderLayout.NORTH);
@@ -408,7 +414,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         panDebug.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton1.setText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.jButon1.text")); // NOI18N
+        jButton1.setText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);

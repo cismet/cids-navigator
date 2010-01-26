@@ -44,6 +44,7 @@ import Sirius.navigator.method.*;
 import Sirius.navigator.exception.*;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
+import java.util.ResourceBundle;
 
 
 /**
@@ -53,6 +54,7 @@ import com.jgoodies.looks.Options;
 public class MutableToolBar extends JToolBar //implements ActionListener
 {
     private final static Logger logger = Logger.getLogger(MutableToolBar.class);
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     private final ResourceManager resources;
     
@@ -110,7 +112,9 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         moveableToolBars = new MoveableToolBarsMap();
         pluginToolBars = new PluginToolBarsMap();
         
-        this.defaultToolBar = new JToolBar(resources.getString("toolbar.name"), HORIZONTAL);
+        this.defaultToolBar = new JToolBar(
+                I18N.getString("Sirius.navigator.ui.MutableToolBar.defaultToolBar.name"),
+                HORIZONTAL);
         this.defaultToolBar.setFloatable(false);
         this.defaultToolBar.setRollover(advancedLayout);
         defaultToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);
@@ -156,7 +160,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         defaultToolBar.add(button);*/
         
         button = new JButton(resources.getButtonIcon("toolbar.search"));
-        button.setToolTipText(resources.getButtonTooltip("toolbar.search"));
+        button.setToolTipText(I18N.getString("Sirius.navigator.ui.MutableToolBar.createDefaultButtons().defaultButton1.tooltip"));
         button.setActionCommand("search");
         //button.setMargin(new Insets(0,0,0,0));
         button.setMargin(new Insets(4,4,4,4));
@@ -171,7 +175,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         defaultToolBar.add(button);*/
         
         button = new JButton(resources.getButtonIcon("toolbar.plugin"));
-        button.setToolTipText(resources.getButtonTooltip("toolbar.plugin"));
+        button.setToolTipText(I18N.getString("Sirius.navigator.ui.MutableToolBar.createDefaultButtons().defaultButton2.tooltip"));
         button.setActionCommand("plugin");
         button.setEnabled(false);//HELL
         //button.setMargin(new Insets(0,0,0,0));

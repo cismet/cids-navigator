@@ -120,7 +120,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                     editor=(ComplexEditor)mael.getEditor(metaObject);
                     logger.debug("Editor :"+((ObjectTreeNode)treeNode).getMetaClass().getComplexEditor());
                 } else {
-                    logger.warn("MetaAttributeEditorLocator hat null geliefert f\u00FCr Object:"+metaObject);
+                    logger.warn("MetaAttributeEditorLocator returned null for object:"+metaObject);
                 }
                 
             } catch (Exception e) {
@@ -163,7 +163,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         if(editor != null) {
             editor.cancelEditing();
             
-            if(logger.isDebugEnabled())logger.debug("cancel() Verwerfe \u00C4nderungen in Node " + this.treeNode);
+            if(logger.isDebugEnabled())logger.debug("cancel() rejecting changes in node " + this.treeNode);
             //this.clear();
             
             ObjectTreeNode objectTreeNode = (ObjectTreeNode)this.treeNode;
@@ -184,7 +184,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         synchronized(commitBlocker) {
             editor.stopEditing();
             
-            logger.info("commit() Speichere \u00E4nderungen in Node " + this.treeNode);
+            logger.info("commit() saving changes in node " + this.treeNode);
             this.editor.setValueChanged(false);
             
             final ObjectTreeNode objectTreeNode = (ObjectTreeNode)this.getTreeNode();
@@ -271,7 +271,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                         ComponentRegistry.getRegistry().getCatalogueTree().scrollPathToVisible(ComponentRegistry.getRegistry().getCatalogueTree().getSelectionPath());
                                         //hier k\u00F6nnte jetzt noch zu dem TAB gewechselt werden das vom User gew\u00FCnscht ist
                                     } catch (Exception e) {
-                                        logger.warn("kann nicht zu selektiertem Objekt scrollen.",e);
+                                        logger.warn("can not scroll to selected object.",e);
                                     }
                                     //((MutableTreeNode)AttributeEditor.this.getTreeNode())
                                 }
@@ -280,16 +280,16 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                             logger.error("add / insert of meta object '" + objectTreeNode.getMetaObject() + "' failed", t);
                             ExceptionManager.getManager().showExceptionDialog(
                                     ExceptionManager.WARNING,
-                                    I18N.getString("attribute.editor.insert.error.title"),
-                                    I18N.getString("attribute.editor.insert.error.message"), t);
+                                    I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit().insertError.title"),
+                                    I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit().insertError.message"), t);
                             ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                         }
                     } else {
                         //XXX i18n
                         JOptionPane.showMessageDialog(AttributeEditor.this,
-                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage1") + emptyAttributeName +
-                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage2"),
-                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit().ErrorMessage1") + emptyAttributeName +
+                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit().ErrorMessage2"),
+                                I18N.getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit().ErrorTitle"), JOptionPane.WARNING_MESSAGE);
                         ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     }
                 }

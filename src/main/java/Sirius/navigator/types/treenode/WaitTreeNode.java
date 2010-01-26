@@ -4,8 +4,11 @@ import javax.swing.ImageIcon;
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.resource.*;
+import java.util.ResourceBundle;
 
 public class WaitTreeNode extends DefaultMetaTreeNode {
+
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     /**
      * Dieser Konstruktor erzeugt einen neue Wait Node. Diese Node wird angezeigt,
@@ -58,11 +61,11 @@ public class WaitTreeNode extends DefaultMetaTreeNode {
 
     //----------------------------------------------------------------------------
     public String toString() {
-        return ResourceManager.getManager().getString("node.wait.name");
+        return I18N.getString("Sirius.navigator.types.treenode.WaitTreeNode.toString().returnValue");
     }
 
     public String getDescription() {
-        return ResourceManager.getManager().getString("node.wait.description");
+        return I18N.getString("Sirius.navigator.types.treenode.WaitTreeNode.getDescription().returnValue");
     }
 
     public String[][] getAttributes() {

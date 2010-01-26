@@ -1138,8 +1138,8 @@ public class MethodManager
         if(!hasPermission)
         {
             JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.checkPermission()2.NoPermissionOptionPane.message"),
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.checkPermission()2.NoPermissionOptionPane.title"),
+                    I18N.getString("Sirius.navigator.method.MethodManager.checkPermission()2.NoPermissionOptionPane.message"),
+                    I18N.getString("Sirius.navigator.method.MethodManager.checkPermission()2.NoPermissionOptionPane.title"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
         

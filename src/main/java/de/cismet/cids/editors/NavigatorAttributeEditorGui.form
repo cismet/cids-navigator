@@ -5,10 +5,10 @@
     <Component class="javax.swing.JToggleButton" name="pinButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.pin.icon&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.icon&quot;))" type="code"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getString(&quot;attribute.viewer.pin.tooltip&quot;)" type="code"/>
+          <Connection code="I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.tooltip&quot;)" type="code"/>
         </Property>
         <Property name="actionCommand" type="java.lang.String" value="pin"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -28,13 +28,13 @@
           <Dimension value="[16, 16]"/>
         </Property>
         <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.pin.icon.rollover&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.rolloverIcon&quot;))" type="code"/>
         </Property>
         <Property name="rolloverSelectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.pin.icon.selected.rollover&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.rolloverSelectedIcon&quot;))" type="code"/>
         </Property>
         <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.pin.icon.selected&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.selectedIcon&quot;))" type="code"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -45,10 +45,10 @@
     <Component class="javax.swing.JToggleButton" name="editButton">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.edit.icon&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.icon&quot;))" type="code"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getString(&quot;attribute.viewer.edit.tooltip&quot;)" type="code"/>
+          <Connection code="I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.tooltip&quot;)" type="code"/>
         </Property>
         <Property name="actionCommand" type="java.lang.String" value="edit"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -68,13 +68,13 @@
           <Dimension value="[16, 16]"/>
         </Property>
         <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.edit.icon.rollover&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.rolloverIcon&quot;))" type="code"/>
         </Property>
         <Property name="rolloverSelectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.edit.icon.selected.rollover&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.rolloverSelectedIcon&quot;))" type="code"/>
         </Property>
         <Property name="selectedIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-          <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.edit.icon.selected&quot;))" type="code"/>
+          <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.selectedIcon&quot;))" type="code"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -126,10 +126,10 @@
         <Component class="javax.swing.JButton" name="commitButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.commit.icon&quot;))" type="code"/>
+              <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.icon&quot;))" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;attribute.viewer.commit.tooltip&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.tooltip&quot;)" type="code"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="commit"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -150,7 +150,7 @@
               <Dimension value="[16, 16]"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.commit.icon.rollover&quot;))" type="code"/>
+              <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.rolloverIcon&quot;))" type="code"/>
             </Property>
           </Properties>
           <Constraints>
@@ -162,10 +162,10 @@
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.cancel.icon&quot;))" type="code"/>
+              <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.icon&quot;))" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;attribute.viewer.cancel.tooltip&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.tooltip&quot;)" type="code"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="cancel"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -186,7 +186,7 @@
               <Dimension value="[16, 16]"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.cancel.icon.rollover&quot;))" type="code"/>
+              <Connection code="resources.getIcon(I18N.getString(&quot;de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.rolloverIcon&quot;))" type="code"/>
             </Property>
           </Properties>
           <Constraints>
@@ -229,7 +229,7 @@
             <Component class="javax.swing.JButton" name="jButton1">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="de.cismet.cids.editors.NavigatorAttributeEditorGui.jButon1.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="de.cismet.cids.editors.NavigatorAttributeEditorGui.jButton1.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>

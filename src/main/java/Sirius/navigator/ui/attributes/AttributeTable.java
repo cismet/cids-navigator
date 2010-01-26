@@ -26,6 +26,8 @@ import org.jdesktop.swingx.JXTable;
  */
 public class AttributeTable extends JXTable //implements ComplexContainer
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
     private final Logger logger;
     private final HashMap cellEditors;
     
@@ -35,7 +37,8 @@ public class AttributeTable extends JXTable //implements ComplexContainer
     
     public AttributeTable()
     {
-        this(ResourceManager.getManager().getString("attribute.table.name"), ResourceManager.getManager().getString("attribute.table.value"));
+        this(I18N.getString("Sirius.navigator.ui.attributes.AttributeTable.AttributeTable().nameColumnName"),
+                I18N.getString("Sirius.navigator.ui.attributes.AttributeTable.AttributeTable().valueColumnName"));
     }
     
     

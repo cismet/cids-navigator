@@ -100,7 +100,7 @@
         <Component class="javax.swing.JButton" name="closeButton">
           <Properties>
             <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="ResourceManager.getManager().getMnemonic(&quot;Sirius.navigator.ui.dialog.AboutDialog.closeButton.mnemonic&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.ui.dialog.AboutDialog.closeButton.mnemonic&quot;).charAt(0)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.dialog.AboutDialog.closeButton.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>

@@ -51,10 +51,7 @@ public class AttributeTree extends JTree
     public AttributeTree()
     {
         super(new DefaultTreeModel(null));
-
-        if(!Beans.isDesignTime()) {
-            this.setCellRenderer(new IconRenderer());
-        }
+        this.setCellRenderer(new IconRenderer());
     }
     
     public void setTreeNode(final Object node)

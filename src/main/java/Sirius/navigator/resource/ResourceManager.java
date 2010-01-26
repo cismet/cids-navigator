@@ -162,10 +162,11 @@ public class ResourceManager
     {
         return this.getIcon(this.getString("menu." + key + ".icon"));
     }
-    
+
+    // Edit mbrill : Key Format Annahmen wurden entfernt um die Konsistenz der I18N Keys zu wahren
     public KeyStroke getMenuAccelerator(String key)
     {
-        return KeyStroke.getKeyStroke(this.getString("menu." + key + ".accelerator"));
+        return KeyStroke.getKeyStroke(this.getString(key));
     }
     
     // exceptions ==============================================================

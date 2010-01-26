@@ -23,7 +23,9 @@ public class AboutDialog extends javax.swing.JDialog
         {
             StringBuffer buffer = new StringBuffer();
             String string = null;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceManager.getManager().getNavigatorResourceAsStream(ResourceManager.getManager().getString("about.html"))));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    ResourceManager.getManager().getNavigatorResourceAsStream(
+                    I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.AboutDialog().aboutHTMLFile"))));
         
             while((string = reader.readLine()) != null)
             {
@@ -79,7 +81,7 @@ public class AboutDialog extends javax.swing.JDialog
         closePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 5, 5));
         closePanel.setLayout(new java.awt.GridLayout(1, 0));
 
-        closeButton.setMnemonic(ResourceManager.getManager().getMnemonic("Sirius.navigator.ui.dialog.AboutDialog.closeButton.mnemonic"));
+        closeButton.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.closeButton.mnemonic").charAt(0));
         closeButton.setText(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.closeButton.text")); // NOI18N
         closeButton.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.closeButton.tooltip")); // NOI18N
         closeButton.addActionListener(new java.awt.event.ActionListener() {
