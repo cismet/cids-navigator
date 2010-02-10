@@ -53,6 +53,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -260,7 +261,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     //Multiple Objects
     public void setNodesDescriptions(final List<?> objects) {
-        breadCrumbModel.clear();
+//        breadCrumbModel.clear();
         if (objects.size() == 1) {
             setNodeDescription(objects.get(0));
         } else {
@@ -398,9 +399,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
         breadCrumbModel.appendCrumb(new CidsMetaObjectBreadCrumb(to) {
+
             @Override
             public void crumbActionPerformed(ActionEvent e) {
-                startSingleRendererWorker(to,optionalTitle);
+
+                startSingleRendererWorker(to, optionalTitle);
+
             }
         });
         startSingleRendererWorker(to, optionalTitle);
@@ -412,7 +416,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             @Override
             protected MetaObject doInBackground() throws Exception {
-                return SessionManager.getProxy().getMetaObject(toObjectId,  mc.getId(), mc.getDomain());
+                return SessionManager.getProxy().getMetaObject(toObjectId, mc.getId(), mc.getDomain());
             }
 
             @Override
@@ -429,7 +433,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     private final void startSingleRendererWorker(final DefaultMetaTreeNode node) {
         final MetaObject o = ((ObjectTreeNode) node).getMetaObject();
-        
+
         startSingleRendererWorker(o, node, node.toString());
     }
 
@@ -504,7 +508,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         final String descriptionURL = n.getDescription();
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
-           
+
             final MetaObject o = ((ObjectTreeNode) n).getMetaObject();
             breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
 
@@ -515,7 +519,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             });
 
 
-            
+
             startSingleRendererWorker(n);
         } else {
             if (n.isClassNode()) {
