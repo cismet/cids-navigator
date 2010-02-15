@@ -383,6 +383,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     gridBagConstraints.weightx = 1;
                     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                    if (!(panRenderer.getLayout() instanceof GridBagLayout)) {
+                        panRenderer.setLayout(new GridBagLayout());
+                    }
                     if (wrappedWaitingPanel != null) {
                         panRenderer.add(wrappedWaitingPanel, gridBagConstraints);
                     }
@@ -440,7 +443,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     private final void startSingleRendererWorker(final MetaObject o, final String title) {
         startSingleRendererWorker(o, null, title);
     }
-    private final void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node,final String title) {
+
+    private final void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node, final String title) {
 
         worker = new javax.swing.SwingWorker<JComponent, Void>() {
 
@@ -450,11 +454,10 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
                 final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
-                if (jComp instanceof MetaTreeNodeStore && node!=null ){
-                   ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
-                }
-                else if (jComp instanceof WrappedComponent && ((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore && node!=null){
-                    ((MetaTreeNodeStore)((WrappedComponent)jComp).getOriginalComponent()).setMetaTreeNode(node);
+                if (jComp instanceof MetaTreeNodeStore && node != null) {
+                    ((MetaTreeNodeStore) jComp).setMetaTreeNode(node);
+                } else if (jComp instanceof WrappedComponent && ((WrappedComponent) jComp).getOriginalComponent() instanceof MetaTreeNodeStore && node != null) {
+                    ((MetaTreeNodeStore) ((WrappedComponent) jComp).getOriginalComponent()).setMetaTreeNode(node);
                 }
                 o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
@@ -482,7 +485,14 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         gridBagConstraints.weightx = 1;
                         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                        panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
+                        if (comp instanceof RequestsFullSizeComponent) {
+                            log.info("Renderer is FullSize Component!");
+                            panRenderer.setLayout(new BorderLayout());
+                            panRenderer.add(comp, BorderLayout.CENTER);
+
+                        } else {
+                            panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
+                        }
                         panRenderer.revalidate();
                         revalidate();
                         repaint();

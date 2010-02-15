@@ -103,10 +103,6 @@ public class CidsObjectRendererFactory {
                 } else {
                     bean = null;
                 }
-//                final Runnable rendererCreator = new Runnable() {
-//
-//                    @Override
-//                    public void run() {
                 try {
                     final Object o = rendererClass.newInstance();
                     JComponent rendererComp = null;
@@ -131,15 +127,6 @@ public class CidsObjectRendererFactory {
                 } catch (Throwable t) {
                     throw new RuntimeException(t);
                 }
-//                    }
-//                };
-//                if (isEDT) {
-//                    rendererCreator.run();
-//                } else {
-//                    EventQueue.invokeAndWait(rendererCreator);
-//                }
-
-
             }
         } catch (Throwable e) {
             log.error("Fehler beim Erzeugen des Renderers.", e);
@@ -180,6 +167,7 @@ public class CidsObjectRendererFactory {
 
     public JComponent getAggregationRenderer(final Collection<MetaObject> moCollection, final String title) {
         if (moCollection.size() == 1) {
+
             return getSingleRenderer(moCollection.iterator().next(), title);
         } else {
 //            final boolean isEDT = EventQueue.isDispatchThread();
