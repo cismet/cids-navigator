@@ -453,26 +453,26 @@ public class LoginDialog extends JDialog {
                         } catch (UserException u) {
                             if (u.wrongUserName()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.message"),
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.title"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.message"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.title"),
                                         JOptionPane.ERROR_MESSAGE);
                                 tf_name.setText("");
                             } else if (u.wrongPassword()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.message"),
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.title"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.message"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.title"),
                                         JOptionPane.ERROR_MESSAGE);
                                 pf_pass.setText("");
                             } else if (u.wrongUserGroup()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.message"),
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.title"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.message"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.title"),
                                         JOptionPane.ERROR_MESSAGE);
                                 cb_userGroup.setSelectedIndex(0);
                             } else if (u.wrongLocalServer()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.message"),
-                                        resources.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.title"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.message"),
+                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.title"),
                                         JOptionPane.ERROR_MESSAGE);
                                 cb_srv.setSelectedIndex(0);
                             } else {

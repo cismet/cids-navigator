@@ -65,8 +65,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
         
         initComponents();
         
-        this.animationLabel = new MutableImageLabel(resources.getIcon("SearchIcon01.gif"),
-                resources.getIcon("SearchIcon02.gif"));
+        this.animationLabel = new MutableImageLabel(
+                resources.getIcon(I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.animationLabel.imageOff")),
+                resources.getIcon(I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.animationLabel.imageOn")));
         this.iconPanel.add(this.animationLabel, BorderLayout.CENTER);        
         this.cancelButton.addActionListener(new ButtonListener());
         
@@ -93,7 +94,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
             }
         }
         
-        this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.running"), Status.MESSAGE_POSITION_2, Status.ICON_IGNORE, Status.ICON_BLINKING);
+        this.statusChangeSupport.fireStatusChange(
+                I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.show().status.running"),
+                Status.MESSAGE_POSITION_2, Status.ICON_IGNORE, Status.ICON_BLINKING);
         this.animationLabel.switchOn(true);
         //this.setResultNodes(null);
         this.setSearchResult(null);
@@ -153,7 +156,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
     {
         public void actionPerformed(ActionEvent e)
         {
-            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.canceld"), Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
+            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+                    I18N.getString("search.dialog.progress.status.canceld"),
+                    Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
             SearchProgressDialog.this.animationLabel.switchOff(true);
             SearchProgressDialog.this.setCanceld(true);
             //SearchProgressDialog.this.setResultNodes(null);
@@ -216,7 +221,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
                         if(this.searchResult.isNode() && this.searchResult.getNodes() != null && this.searchResult.getNodes().length > 0)
                         {
                             logger.info(this.searchResult.getNodes().length + " nodes found");
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(this.searchResult.getNodes().length + SearchProgressDialog.this.resources.getString("search.dialog.progress.status.results"), Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(this.searchResult.getNodes().length +
+                                    I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.SearchThread.run().status.results"),
+                                    Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                         }
                         else if(this.searchResult.isObject())
                         {
@@ -230,7 +237,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
                         else if(logger.isDebugEnabled())
                         {
                             logger.warn("no search results found: " + this.searchResult.getResult() + "(" + this.searchResult.getResult().getClass() + ")");                            
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.noresults"), Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+                                    I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.SearchThread.run().status.noresults"),
+                                    Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                         }
                         
                         SearchProgressDialog.this.dispose();
@@ -244,8 +253,10 @@ public class SearchProgressDialog extends javax.swing.JDialog
 
                     if(!SearchProgressDialog.this.isCanceld())
                     {
-                        SearchProgressDialog.this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.error"), Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
-                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("sx02"), ResourceManager.getManager().getExceptionMessage("sx02"), t);
+                        SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+                                I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.SearchThread.run().status.error"),
+                                Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resources.getExceptionName("sx02"), resources.getExceptionMessage("sx02"), t);
                         SearchProgressDialog.this.dispose();
                     }    
                 }

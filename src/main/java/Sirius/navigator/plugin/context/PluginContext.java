@@ -399,7 +399,7 @@ public class PluginContext
          */
         public Locale getNavigatorLocale()
         {
-            return ResourceManager.getManager().getLocale();
+            return resources.getLocale();
         }
         
         public PluginProgressObserver getProgressObserver()
@@ -488,7 +488,7 @@ public class PluginContext
         public InputStream getResourceAsStream(String resource) throws IOException
         {
             if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading resource '" + resource + "'");
-            return ResourceManager.getManager().getResourceAsStream(resource);
+            return resources.getResourceAsStream(resource);
             
             
             /*if(resource.startsWith("http://") || resource.startsWith("https://") || resource.startsWith("file://"))
@@ -649,7 +649,7 @@ public class PluginContext
         
         public Search()
         {
-            logger.debug("initilizing search form data beans");
+            logger.debug("initializing search form data beans");
             
             this.dataBeans = ComponentRegistry.getRegistry().getSearchDialog().getSearchFormManager().getFormDataBeans();
             

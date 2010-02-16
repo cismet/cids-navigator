@@ -37,6 +37,7 @@ import Sirius.navigator.resource.*;
 public class StringChooser extends JDialog //implements ActionListener
 {
     protected final static Logger logger = Logger.getLogger(StringChooser.class);
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     protected JList stringList;
     protected JButton buttonAccept, buttonCancel;
@@ -120,9 +121,9 @@ public class StringChooser extends JDialog //implements ActionListener
         gbc.weighty = 0.1;
         //_TA_buttonAccept = new JButton("Uebernehmen");
         //buttonAccept = new JButton(StringLoader.getString("STL@takeOn"));
-        buttonAccept = new JButton(resources.getButtonText("accept"));
-        buttonAccept.setMnemonic(resources.getButtonMnemonic("accept"));
-        buttonAccept.setToolTipText(resources.getButtonTooltip("accept"));
+        buttonAccept = new JButton(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonAccept.text"));
+        buttonAccept.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonAccept.mnemonic").charAt(0));
+        buttonAccept.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonAccept.tooltip"));
         buttonAccept.setActionCommand("accept");
         buttonAccept.addActionListener(actionListener);
         contentPane.add(buttonAccept, gbc);
@@ -131,9 +132,9 @@ public class StringChooser extends JDialog //implements ActionListener
         gbc.gridx++;
         //_TA_buttonCancel = new JButton("Abbrechen");
         //buttonCancel = new JButton(StringLoader.getString("STL@cancel"));
-        buttonCancel = new JButton(resources.getButtonText("cancel"));
-        buttonCancel.setMnemonic(resources.getButtonMnemonic("cancel"));
-        buttonCancel.setToolTipText(resources.getButtonTooltip("cancel"));
+        buttonCancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonCancel.text"));
+        buttonCancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonCancel.mnemonic").charAt(0));
+        buttonCancel.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonCancel.tooltip"));
         buttonCancel.setActionCommand("cancel");
         buttonCancel.addActionListener(actionListener);
         contentPane.add(buttonCancel, gbc);

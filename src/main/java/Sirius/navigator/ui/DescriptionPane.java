@@ -63,7 +63,7 @@ import javax.swing.SwingWorker;
  */
 public class DescriptionPane extends JPanel implements StatusChangeSupport {
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-
+    private static final ResourceManager resource = ResourceManager.getManager();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final DefaultStatusChangeSupport statusChangeSupport;
     private final CalHTMLPreferences htmlPrefs = new CalHTMLPreferences();
@@ -83,11 +83,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             // log.debug("DescriptionPane.log.StatusUpdate: Status:"+status+"  Url:"+uRL);
             if (status == 1) {
                 htmlPane.showHTMLDocument("");
-                statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.error"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                statusChangeSupport.fireStatusChange(I18N.getString("Sirius.navigator.ui.DescriptionPane.statusUpdate().status.error"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
             } else if (status == 10 || status == 11) {
-                statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.loading"), Status.MESSAGE_POSITION_3, Status.ICON_BLINKING, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(I18N.getString("Sirius.navigator.ui.DescriptionPane.statusUpdate().status.loading"), Status.MESSAGE_POSITION_3, Status.ICON_BLINKING, Status.ICON_DEACTIVATED);
             } else if (status == 14) {
-                statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.loaded"), Status.MESSAGE_POSITION_3, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(I18N.getString("Sirius.navigator.ui.DescriptionPane.statusUpdate().status.loaded"), Status.MESSAGE_POSITION_3, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             }
         }
 
@@ -121,7 +121,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         try {
             StringBuffer buffer = new StringBuffer();
             String string = null;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceManager.getManager().getNavigatorResourceAsStream(ResourceManager.getManager().getString("descriptionpane.html.welcome"))));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    resource.getNavigatorResourceAsStream(
+                    I18N.getString("Sirius.navigator.ui.DescriptionPane.html.welcome"))));
 
             while ((string = reader.readLine()) != null) {
                 buffer.append(string);
@@ -251,9 +253,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             htmlPane.stopAll();
             htmlPane.showHTMLDocument(new URL(page));
         } catch (Exception e) {
-            log.info("Fehler bei setPage", e);
+            log.info("Error in setPage()", e);
             htmlPane.showHTMLDocument("");
-            statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.error"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+            statusChangeSupport.fireStatusChange(
+                    I18N.getString("Sirius.navigator.ui.DescriptionPane.setPage().status.error"),
+                    Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
 
         }
     }
@@ -283,7 +287,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                                 ObjectTreeNode n = (ObjectTreeNode) object;
                                 objectsByClass.put(n.getMetaClass(), n);
                             } catch (Throwable t) {
-                                log.warn("Fehler beim Vorbereiten der Darstellung der Objekte", t);
+                                log.warn("Error while preparing object representation", t);
                             }
                         }
                     }
@@ -355,7 +359,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                             y++;
                         } catch (Throwable t) {
-                            log.error("Fehler beim Rendern des MetaObjectrenderer", t);
+                            log.error("Error while rendering MetaObjectrenderer", t);
                         }
                     }
                     all.addAll(chunks);
@@ -549,7 +553,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             performSetNode(n);
         } else {
             //if(logger.isDebugEnabled())logger.debug("no description url available");
-            statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.nodescription"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
+            statusChangeSupport.fireStatusChange(
+                    I18N.getString("Sirius.navigator.ui.DescriptionPane.setNodeDescription().status.nodescription"),
+                    Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
 
             //this.setText("<html><body><h3>" + ResourceManager.getManager().getString("descriptionpane.welcome") + "</h3></body></html>");
             htmlPane.showHTMLDocument(welcomePage);

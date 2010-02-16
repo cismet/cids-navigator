@@ -67,6 +67,7 @@ import Sirius.navigator.ui.embedded.*;
 public class FloatingFrame extends JToolBar
 {
     private final static Logger logger = Logger.getLogger(FloatingFrame.class);
+    private static final ResourceManager resource = ResourceManager.getManager();
     
     // Moegliche Positionen der ToolBar
     public static final String NORTH = BorderLayout.NORTH;
@@ -141,7 +142,8 @@ public class FloatingFrame extends JToolBar
         
         if(configurator.isTitleBarEnabled())
         {
-            titleBar= new TitleBar(configurator.getName(), ResourceManager.getManager().getIcon("floatingframe.gif"));
+            titleBar= new TitleBar(configurator.getName(), 
+                    resource.getIcon(resource.getString("Sirius.navigator.ui.widget.FloatingFrame.titleBar.icon")));
             this.add(titleBar, BorderLayout.NORTH);
         
         }

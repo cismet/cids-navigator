@@ -28,6 +28,7 @@ import Sirius.server.middleware.types.*;
  */
 public class ObjectAttributeNode extends AttributeNode
 {
+    private static final ResourceManager resource = ResourceManager.getManager();
     private final MetaObject MetaObject;
     private final Icon icon;
     
@@ -68,7 +69,7 @@ public class ObjectAttributeNode extends AttributeNode
         }
         else
         {
-            this.icon = ResourceManager.getManager().getIcon("ClassNodeIcon.gif");
+            this.icon = resource.getIcon(resource.getString("Sirius.navigator.ui.attributes.ObjectAttributeNode.icon"));
         }
         
         // ignore array attribute nodes

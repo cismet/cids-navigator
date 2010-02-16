@@ -28,13 +28,14 @@ public class PluginManager extends javax.swing.JDialog
 {
     protected final Logger logger;
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private static final ResourceManager resource = ResourceManager.getManager();
     private final PluginMetaInfoPanel metaInfoPanel;
     private final PluginTree pluginTree;
     
     /** Creates new form PluginManager */
     public PluginManager(java.awt.Frame parent) 
     {
-        super(parent, ResourceManager.getManager().getString("plugin.manager.title"), true);
+        super(parent, I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.title"), true);
         
         this.logger = Logger.getLogger(this.getClass());
         this.pluginTree = new PluginTree();
@@ -131,37 +132,37 @@ public class PluginManager extends javax.swing.JDialog
         buttonPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 3)));
         buttonPanel.setLayout(new java.awt.GridLayout(1, 5, 5, 0));
 
-        loadButton.setMnemonic(ResourceManager.getManager().getButtonMnemonic("load"));
-        loadButton.setText(ResourceManager.getManager().getButtonText("load"));
-        loadButton.setToolTipText(ResourceManager.getManager().getButtonTooltip("load"));
+        loadButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.loadButton.mnemonic").charAt(0));
+        loadButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.loadButton.text")); // NOI18N
+        loadButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.loadButton.tooltip")); // NOI18N
         loadButton.setActionCommand("load");
         loadButton.setEnabled(false);
         buttonPanel.add(loadButton);
 
-        unloadButton.setMnemonic(ResourceManager.getManager().getButtonMnemonic("unload"));
-        unloadButton.setText(ResourceManager.getManager().getButtonText("unload"));
-        unloadButton.setToolTipText(ResourceManager.getManager().getButtonTooltip("unload"));
+        unloadButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.unloadButton.mnemonic").charAt(0));
+        unloadButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.unloadButton.text")); // NOI18N
+        unloadButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.unloadButton.tooltip")); // NOI18N
         unloadButton.setActionCommand("unload");
         unloadButton.setEnabled(false);
         buttonPanel.add(unloadButton);
 
-        activateButton.setMnemonic(ResourceManager.getManager().getButtonMnemonic("activate"));
-        activateButton.setText(ResourceManager.getManager().getButtonText("activate"));
-        activateButton.setToolTipText(ResourceManager.getManager().getButtonTooltip("activate"));
+        activateButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.activateButton.mnemonic").charAt(0));
+        activateButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.activateButton.text")); // NOI18N
+        activateButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.activateButton.tooltip")); // NOI18N
         activateButton.setActionCommand("activate");
         activateButton.setEnabled(false);
         buttonPanel.add(activateButton);
 
-        deactivateButton.setMnemonic(ResourceManager.getManager().getButtonMnemonic("deactivate"));
-        deactivateButton.setText(ResourceManager.getManager().getButtonText("deactivate"));
-        deactivateButton.setToolTipText(ResourceManager.getManager().getButtonTooltip("deactivate"));
+        deactivateButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.deactivateButton.mnemonic").charAt(0));
+        deactivateButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.deactivateButton.text")); // NOI18N
+        deactivateButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.deactivateButton.tooltip")); // NOI18N
         deactivateButton.setActionCommand("deactivate");
         deactivateButton.setEnabled(false);
         buttonPanel.add(deactivateButton);
 
-        closeButton.setMnemonic(ResourceManager.getManager().getButtonMnemonic("close"));
-        closeButton.setText(ResourceManager.getManager().getButtonText("close"));
-        closeButton.setToolTipText(ResourceManager.getManager().getButtonTooltip("close"));
+        closeButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.closeButton.mnemonic").charAt(0));
+        closeButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.closeButton.text")); // NOI18N
+        closeButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.closeButton.tooltip")); // NOI18N
         closeButton.setActionCommand("close");
         buttonPanel.add(closeButton);
 
@@ -325,7 +326,8 @@ public class PluginManager extends javax.swing.JDialog
             
             this.progressObserver.reset();
             this.progressObserver.setName(strings[2]);
-            try{this.progressObserver.setMessage(ResourceManager.getManager().getString("plugin.progress.default"));}
+            try{this.progressObserver.setMessage(
+                    I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.init().progress.default"));}
             catch(InterruptedException iexp){}
         }
         
@@ -335,13 +337,14 @@ public class PluginManager extends javax.swing.JDialog
             {
                try
                {
-                   this.progressObserver.setMessage(ResourceManager.getManager().getString("plugin.progress.load"));
+                   this.progressObserver.setMessage(
+                           I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.doInvoke().progress.load"));
                    PluginRegistry.getRegistry().loadPlugin(pluginId);
                }
                catch(Throwable t)
                {
                     logger.error("could not load plugin '" + pluginId + "'", t);
-                    ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("px01"), ResourceManager.getManager().getExceptionMessage("px01"), t);
+                    ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resource.getExceptionName("px01"), resource.getExceptionMessage("px01"), t);
                }
                finally
                {
@@ -362,7 +365,8 @@ public class PluginManager extends javax.swing.JDialog
             {
                 try
                 {
-                    this.progressObserver.setMessage(ResourceManager.getManager().getString("plugin.progress.activate"));
+                    this.progressObserver.setMessage(
+                            I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.doInvoke().progress.activate"));
                     Thread.currentThread().sleep(1000);
                     PluginRegistry.getRegistry().activatePlugin(pluginId);
                     Thread.currentThread().sleep(1000);
@@ -370,7 +374,7 @@ public class PluginManager extends javax.swing.JDialog
                 catch(Throwable t)
                 {
                    logger.error("could not activate plugin '" + pluginId + "'", t);
-                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("px01"), ResourceManager.getManager().getExceptionMessage("px01"), t);
+                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resource.getExceptionName("px01"), resource.getExceptionMessage("px01"), t);
                 }
                 finally
                 {
@@ -385,7 +389,8 @@ public class PluginManager extends javax.swing.JDialog
             {
                 try
                 {
-                    this.progressObserver.setMessage(ResourceManager.getManager().getString("plugin.progress.deactivate"));
+                    this.progressObserver.setMessage(
+                            I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.doInvoke().progress.deactivate"));
                     Thread.currentThread().sleep(1000);
                     PluginRegistry.getRegistry().deactivatePlugin(pluginId);
                     Thread.currentThread().sleep(1000);
@@ -393,7 +398,7 @@ public class PluginManager extends javax.swing.JDialog
                 catch(Throwable t)
                 {
                    logger.error("could not deactivate plugin '" + pluginId + "'", t);
-                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("px01"), ResourceManager.getManager().getExceptionMessage("px01"), t);
+                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resource.getExceptionName("px01"), resource.getExceptionMessage("px01"), t);
                 }
                 finally
                 {

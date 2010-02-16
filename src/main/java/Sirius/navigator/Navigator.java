@@ -75,7 +75,7 @@ public class Navigator extends JFrame {
 
     private final Logger logger;// = Logger.getLogger(Navigator.class);
     private final PropertyManager propertyManager;
-    private final ResourceManager resourceManager;
+    private static final ResourceManager resourceManager = ResourceManager.getManager();
     private final ExceptionManager exceptionManager;
     private final ProgressObserver progressObserver;
     private LoginDialog loginDialog;
@@ -109,7 +109,6 @@ public class Navigator extends JFrame {
 
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
-        this.resourceManager = ResourceManager.getManager();
         this.exceptionManager = ExceptionManager.getManager();
 
         this.init();
@@ -199,12 +198,14 @@ public class Navigator extends JFrame {
 
     // #########################################################################
     private void initConnection() throws ConnectionException, InterruptedException {
-        progressObserver.setProgress(25, resourceManager.getString("navigator.progress.connection"));
+        progressObserver.setProgress(25,
+                I18N.getString("Sirius.navigator.Navigator.initConnection().progress.connection"));
         Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL());
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
-        progressObserver.setProgress(50, resourceManager.getString("navigator.progress.login"));
+        progressObserver.setProgress(50,
+                I18N.getString("Sirius.navigator.Navigator.initConnection().progress.login"));
         // autologin
         if (propertyManager.isAutoLogin()) {
             logger.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'");
@@ -240,7 +241,8 @@ public class Navigator extends JFrame {
     // #########################################################################
 
     private void initUI() throws InterruptedException {
-        progressObserver.setProgress(100, resourceManager.getString("navigator.progress.ui.create"));
+        progressObserver.setProgress(100,
+                I18N.getString("Sirius.navigator.Navigator.initUI().progress.create"));
 
         // vergiss es 2 GHz, keine sanduhr
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(200));
@@ -255,7 +257,8 @@ public class Navigator extends JFrame {
         popupMenu = new MutablePopupMenu();
 
 
-        progressObserver.setProgress(150, resourceManager.getString("navigator.progress.ui.register"));
+        progressObserver.setProgress(150,
+                I18N.getString("Sirius.navigator.Navigator.initUI().progress.register"));
         this.setContentPane(new JPanel(new BorderLayout(), true));
         this.setJMenuBar(menuBar);
 
@@ -276,51 +279,78 @@ public class Navigator extends JFrame {
 
     private void initWidgets() throws Exception {
         // MetaCatalogueTree ---------------------------------------------------
-        progressObserver.setProgress(200, resourceManager.getString("navigator.progress.widgets.catalogue"));
+        progressObserver.setProgress(200, 
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.catalogue"));
         RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
         metaCatalogueTree = new MetaCatalogueTree(rootTreeNode, PropertyManager.getManager().isEditable(), true, propertyManager.getMaxConnections());
         // dnd
         MetaTreeNodeDnDHandler dndHandler = new MetaTreeNodeDnDHandler(metaCatalogueTree);
 
         MutableConstraints catalogueTreeConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
-        catalogueTreeConstraints.addAsScrollPane(ComponentRegistry.CATALOGUE_TREE, metaCatalogueTree, resourceManager.getString("tree.catalogue.ui.name"), resourceManager.getString("tree.catalogue.ui.tooltip"), resourceManager.getIcon("catalogue_tree_icon.gif"), MutableConstraints.P1, MutableConstraints.ANY_INDEX, true);
+        catalogueTreeConstraints.addAsScrollPane(ComponentRegistry.CATALOGUE_TREE,
+                metaCatalogueTree,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().metaCatalogueTree.ui.name"),
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().metaCatalogueTree.ui.tooltip"),
+                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().metaCatalogueTree.ui.icon")),
+                MutableConstraints.P1, MutableConstraints.ANY_INDEX, true);
         container.add(catalogueTreeConstraints);
 
         // SearchResultsTree ---------------------------------------------------
-        progressObserver.setProgress(225, resourceManager.getString("navigator.progress.widgets.searchresults"));
+        progressObserver.setProgress(225,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.searchresults"));
         searchResultsTree = new SearchResultsTree();
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
         new MetaTreeNodeDnDHandler(searchResultsTree);
 
         MutableConstraints searchResultsTreeConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
-        searchResultsTreeConstraints.addAsComponent(ComponentRegistry.SEARCHRESULTS_TREE, searchResultsTreePanel, resourceManager.getString("tree.searchresults.ui.name"), resourceManager.getString("tree.searchresults.ui.tooltip"), resourceManager.getIcon("searchresults_tree_icon.gif"), MutableConstraints.P1, MutableConstraints.ANY_INDEX);
+        searchResultsTreeConstraints.addAsComponent(ComponentRegistry.SEARCHRESULTS_TREE,
+                searchResultsTreePanel,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().searchresults.ui.name"),
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().searchresults.ui.tooltip"),
+                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().searchresults.ui.icon")),
+                MutableConstraints.P1, MutableConstraints.ANY_INDEX);
         container.add(searchResultsTreeConstraints);
 
         // AttributePanel ------------------------------------------------------
-        progressObserver.setProgress(250, resourceManager.getString("navigator.progress.widgets.attributeviewer"));
+        progressObserver.setProgress(250,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.attributeviewer"));
         attributeViewer = new AttributeViewer();
-        FloatingFrameConfigurator configurator = new FloatingFrameConfigurator(ComponentRegistry.ATTRIBUTE_VIEWER, resourceManager.getString("attribute.viewer.ui.name"));
+        FloatingFrameConfigurator configurator = new FloatingFrameConfigurator(
+                ComponentRegistry.ATTRIBUTE_VIEWER,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.name"));
         configurator.setTitleBarEnabled(false);
 
         MutableConstraints attributePanelConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
-        attributePanelConstraints.addAsFloatingFrame(ComponentRegistry.ATTRIBUTE_VIEWER, attributeViewer, resourceManager.getString("attribute.viewer.ui.name"), resourceManager.getString("attribute.viewer.ui.tooltip"), resourceManager.getIcon("attributetable_icon.gif"), MutableConstraints.P2, 0, false, configurator, false);
+        attributePanelConstraints.addAsFloatingFrame(ComponentRegistry.ATTRIBUTE_VIEWER,
+                attributeViewer,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.name"),
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.tooltip"),
+                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.icon")),
+                MutableConstraints.P2, 0, false, configurator, false);
         container.add(attributePanelConstraints);
 
         // AttributeEditor .....................................................
         if (PropertyManager.getManager().isEditable()) {
-            progressObserver.setProgress(275, resourceManager.getString("navigator.progress.widgets.attributeeditor"));
+            progressObserver.setProgress(275,
+                    I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.attributeeditor"));
             //HELL
 //            if (StaticDebuggingTools.checkHomeForFile("cidsExperimentalBeanEditorsEnabled")) {
             attributeEditor = new NavigatorAttributeEditorGui();
 //            } else {
 //                attributeEditor = new AttributeEditor();
 //            }
-            configurator = new FloatingFrameConfigurator(ComponentRegistry.ATTRIBUTE_EDITOR, resourceManager.getString("attribute.editor.ui.name"));
+            configurator = new FloatingFrameConfigurator(ComponentRegistry.ATTRIBUTE_EDITOR,
+                    I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.name"));
             configurator.setTitleBarEnabled(false);
 
             final MutableConstraints attributeEditorConstraints = new MutableConstraints(true);
-            attributeEditorConstraints.addAsFloatingFrame(ComponentRegistry.ATTRIBUTE_EDITOR, attributeEditor, resourceManager.getString("attribute.editor.ui.name"), resourceManager.getString("attribute.editor.ui.tooltip"), resourceManager.getIcon("attributetable_icon.gif"), MutableConstraints.P3, 1, false, configurator, false);
+            attributeEditorConstraints.addAsFloatingFrame(ComponentRegistry.ATTRIBUTE_EDITOR,
+                    attributeEditor,
+                    I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.name"),
+                    I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.tooltip"),
+                    resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.icon")),
+                    MutableConstraints.P3, 1, false, configurator, false);
             container.add(attributeEditorConstraints);
 
             // verschieben nach position 1 oder zwei beim Dr�cken von
@@ -351,45 +381,58 @@ public class Navigator extends JFrame {
         }
 
         // DescriptionPane -----------------------------------------------------
-        progressObserver.setProgress(325, resourceManager.getString("navigator.progress.widgets.descriptionpane"));
+        progressObserver.setProgress(325, 
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.descriptionpane"));
 
         descriptionPane = new DescriptionPane();
 
 
 
-        configurator = new FloatingFrameConfigurator(ComponentRegistry.DESCRIPTION_PANE, resourceManager.getString("descriptionpane.name"));
+        configurator = new FloatingFrameConfigurator(ComponentRegistry.DESCRIPTION_PANE,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.name"));
         //configurator.setTitleBarEnabled(false);
 
         MutableConstraints descriptionPaneConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
-        descriptionPaneConstraints.addAsFloatingFrame(ComponentRegistry.DESCRIPTION_PANE, descriptionPane, resourceManager.getString("descriptionpane.name"), resourceManager.getString("descriptionpane.tooltip"), resourceManager.getIcon("descriptionpane_icon.gif"), MutableConstraints.P3, 0, false, configurator, false);
+        descriptionPaneConstraints.addAsFloatingFrame(ComponentRegistry.DESCRIPTION_PANE,
+                descriptionPane,
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.name"),
+                I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.tooltip"),
+                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.icon")),
+                MutableConstraints.P3, 0, false, configurator, false);
         container.add(descriptionPaneConstraints);
     }
 
     private void initDialogs() throws Exception {
-        progressObserver.setProgress(350, resourceManager.getString("navigator.progress.dialogs.search"));
+        progressObserver.setProgress(350,
+                I18N.getString("Sirius.navigator.Navigator.initDialogs().progress.searchdialog"));
 
         //searchDialog = new SearchDialog(this, this.searchResultsTree, "Suche", SessionManager.getProxy().getClassTreeNodes(SessionManager.getSession().getUser()), PropertyManager.getManager().getMaxSearchResults());
         searchDialog = new SearchDialog(this, SessionManager.getProxy().getSearchOptions(), SessionManager.getProxy().getClassTreeNodes());
 
-        progressObserver.setProgress(550, resourceManager.getString("navigator.progress.widgets.register"));
+        progressObserver.setProgress(550,
+                I18N.getString("Sirius.navigator.Navigator.initDialogs().progress.registerwidges"));
         ComponentRegistry.registerComponents(this, container, menuBar, toolBar, popupMenu, metaCatalogueTree, searchResultsTree, attributeViewer, attributeEditor, searchDialog, descriptionPane);
     }
     // #########################################################################
 
     private void initPlugins() throws Exception {
-        progressObserver.setProgress(575, resourceManager.getString("navigator.progress.plugins.preload"));
+        progressObserver.setProgress(575,
+                I18N.getString("Sirius.navigator.Navigator.initPlugins().progress.preloadplugins"));
         PluginRegistry.getRegistry().preloadPlugins();
 
-        progressObserver.setProgress(650, resourceManager.getString("navigator.progress.plugins.load"));
+        progressObserver.setProgress(650,
+                I18N.getString("Sirius.navigator.Navigator.initPlugins().progress.loadplugins"));
         PluginRegistry.getRegistry().loadPlugins();
 
-        progressObserver.setProgress(850, resourceManager.getString("navigator.progress.plugins.activate"));
+        progressObserver.setProgress(850,
+                I18N.getString("Sirius.navigator.Navigator.initPlugins().progress.activateplugins"));
         PluginRegistry.getRegistry().activatePlugins();
     }
     // #########################################################################
 
     private void initEvents() throws InterruptedException {
-        progressObserver.setProgress(900, resourceManager.getString("navigator.progress.events"));
+        progressObserver.setProgress(900,
+                I18N.getString("Sirius.navigator.Navigator.initEvents().progress.eventhandling"));
         StatusChangeListener statusChangeListener = new StatusChangeListener(statusBar);
 
         metaCatalogueTree.addStatusChangeListener(statusChangeListener);
@@ -412,13 +455,16 @@ public class Navigator extends JFrame {
     // #########################################################################
 
     private void initWindow() throws InterruptedException {
-        progressObserver.setProgress(950, resourceManager.getString("navigator.progress.window"));
-        this.setTitle(resourceManager.getString("navigator.title"));
-        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());
+        progressObserver.setProgress(950, 
+                I18N.getString("Sirius.navigator.Navigator.initWindow().progress.window"));
+        this.setTitle(I18N.getString("Sirius.navigator.Navigator.title"));
+        this.setIconImage(resourceManager.getIcon(
+                I18N.getString("Sirius.navigator.Navigator.icon")).getImage());
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new ClosingListener());
-        progressObserver.setProgress(1000, resourceManager.getString("navigator.progress.finished"));
+        progressObserver.setProgress(1000, 
+                I18N.getString("Sirius.navigator.Navigator.initWindow().progress.finished"));
     }
     // .........................................................................
 
@@ -673,7 +719,7 @@ public class Navigator extends JFrame {
                     // log4j configuration .....................................
 
                     PropertyManager.getManager().configure(args[1], args[2], args[3], args[4], (args.length > 5 ? args[5] : null));
-                    ResourceManager.getManager().setLocale(PropertyManager.getManager().getLocale());
+                    resourceManager.setLocale(PropertyManager.getManager().getLocale());
                 }
             }//</RELEASE>
             else {
@@ -684,7 +730,7 @@ public class Navigator extends JFrame {
 
                 // mit plugins:
                 PropertyManager.getManager().configure("D:\\cids\\res\\Sirius\\navigator\\resource\\cfg\\navigator.cfg", System.getProperty("user.home") + "\\.navigator\\", "D:\\cids\\dist\\client\\plugins\\", "D:\\cids\\dist\\client\\search\\", null);
-                ResourceManager.getManager().setLocale(PropertyManager.getManager().getLocale());
+                resourceManager.setLocale(PropertyManager.getManager().getLocale());
 
                 // Properties ausgeben:
                 PropertyManager.getManager().print();
@@ -709,7 +755,9 @@ public class Navigator extends JFrame {
             //navigator.setVisible(true);
 
             //logger.debug("SPLASH");
-            NavigatorSplashScreen navigatorSplashScreen = new NavigatorSplashScreen(PropertyManager.getManager().getSharedProgressObserver(), ResourceManager.getManager().getIcon(ResourceManager.getManager().getString("navigator.splash.icon")));
+            NavigatorSplashScreen navigatorSplashScreen =
+                    new NavigatorSplashScreen(PropertyManager.getManager().getSharedProgressObserver(),
+                    resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.splashscreenicon")));
 
             navigatorSplashScreen.pack();
             navigatorSplashScreen.setLocationRelativeTo(null);
@@ -720,7 +768,10 @@ public class Navigator extends JFrame {
         } catch (Throwable t) {
             // error .............................................................
             Logger.getLogger(Navigator.class).fatal("could not create navigator instance", t);
-            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, ResourceManager.getManager().getExceptionName("nx01"), ResourceManager.getManager().getExceptionMessage("nx01"), t);
+            ExceptionManager.getManager().showExceptionDialog(
+                    ExceptionManager.FATAL,
+                    resourceManager.getExceptionName("nx01"),
+                    resourceManager.getExceptionMessage("nx01"), t);
 
             System.exit(1);
             // error .............................................................

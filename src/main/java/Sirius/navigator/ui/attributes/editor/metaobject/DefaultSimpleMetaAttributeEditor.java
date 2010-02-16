@@ -6,7 +6,7 @@
 
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import Sirius.navigator.resource.ResourceManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;

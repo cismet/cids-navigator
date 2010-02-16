@@ -57,6 +57,7 @@ public class NavigatorApplet extends javax.swing.JApplet
     private JPanel firstContentPane, secondContentPane;
     private JProgressBar progressBar;
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private static final ResourceManager resource = ResourceManager.getManager();
     private JProgressBar pluginProgressBar;
     private JLabel infoLabel, statusLabel, pluginInfoLabel, pluginStatusLabel;
     private JButton startButton, optionsButton, cancelButton, restartButton;
@@ -136,7 +137,7 @@ public class NavigatorApplet extends javax.swing.JApplet
             
             // configure navigator properties
             PropertyManager.getManager().configure(this);
-            ResourceManager.getManager().setLocale(PropertyManager.getManager().getLocale());
+            resource.setLocale(PropertyManager.getManager().getLocale());
             //this.getHtmlParameter();
             
             // look and feel ...................................................
@@ -209,9 +210,11 @@ public class NavigatorApplet extends javax.swing.JApplet
         String title = this.getParameter("applet_title");
         if(title == null || title.length() == 0)
         {
-            title = ResourceManager.getManager().getString("navigator.title");
+            title = I18N.getString("Sirius.navigator.NavigatorApplet.buildFirstContentPane().title");
         }
-        JLabel welcomeLabel = new JLabel("<html><center>" + ResourceManager.getManager().getString("applet.welcome") + "<h2>" + title + "</h2></center></html>");
+        JLabel welcomeLabel = new JLabel("<html><center>" +
+                I18N.getString("Sirius.navigator.NavigatorApplet.buildFirstContentPane().welcomeLabel.text") +
+                "<h2>" + title + "</h2></center></html>");
         welcomeLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(welcomeLabel, BorderLayout.CENTER);
         firstContentPane.add(panel, gridBagConstraints);
@@ -255,9 +258,9 @@ public class NavigatorApplet extends javax.swing.JApplet
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         gridBagConstraints.weightx = 1.0;
         //_TA_startButton = new JButton("Navigator starten");
-        startButton = new JButton(ResourceManager.getManager().getString("navigator.applet.startNavigator"));
+        startButton = new JButton(I18N.getString("Sirius.navigator.NavigatorApplet.startButton.text"));
         //_TA_startButton.setMnemonic('s');
-        startButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.SMnemonic").charAt(FIRSTPOS));
+        startButton.setMnemonic(I18N.getString("Sirius.navigator.NavigatorApplet.startButton.mnemonic").charAt(FIRSTPOS));
         startButton.setActionCommand("start");
         startButton.addActionListener(buttonListener);
         firstContentPane.add(startButton, gridBagConstraints);
@@ -276,8 +279,8 @@ public class NavigatorApplet extends javax.swing.JApplet
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
         gridBagConstraints.weightx = 1.0;
-        optionsButton = new JButton(ResourceManager.getManager().getString("navigator.applet.moreOptions"));
-        optionsButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.OMnemonic").charAt(FIRSTPOS));
+        optionsButton = new JButton(I18N.getString("Sirius.navigator.NavigatorApplet.optionsButton.text"));
+        optionsButton.setMnemonic(I18N.getString("Sirius.navigator.NavigatorApplet.optionsButton.mnemonic").charAt(FIRSTPOS));
         
         optionsButton.setActionCommand("options");
         optionsButton.addActionListener(buttonListener);
@@ -305,7 +308,8 @@ public class NavigatorApplet extends javax.swing.JApplet
         panel.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(10,10,10,10)));
         //_TA_JLabel infoLabel = new JLabel("CallServer auf " + navigatorModel.getCallServerIP());
         //infoLabel = new JLabel(StringLoader.getString("STL@callServerOn") + navigatorModel.getCallServerIP());
-        infoLabel = new JLabel(ResourceManager.getManager().getString("navigator.applet.callServerOn") + PropertyManager.getManager().getConnectionInfo().getCallserverURL());
+        infoLabel = new JLabel(I18N.getString("Sirius.navigator.NavigatorApplet.infoLabel.text") +
+                PropertyManager.getManager().getConnectionInfo().getCallserverURL());
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(infoLabel, BorderLayout.CENTER);
         secondContentPane.add(panel, constraints);
@@ -363,8 +367,8 @@ public class NavigatorApplet extends javax.swing.JApplet
                 cancelButton.setMnemonic('A');
                 _TA_
                  */
-        cancelButton = new JButton(ResourceManager.getManager().getString("navigator.applet.cancel"));
-        cancelButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.AMnemonic").charAt(FIRSTPOS));
+        cancelButton = new JButton(I18N.getString("Sirius.navigator.NavigatorApplet.cancelButton.text"));
+        cancelButton.setMnemonic(I18N.getString("Sirius.navigator.NavigatorApplet.cancelButton.mnemonic").charAt(FIRSTPOS));
         cancelButton.setActionCommand("cancel");
         cancelButton.addActionListener(buttonListener);
         secondContentPane.add(cancelButton, constraints);
@@ -378,8 +382,8 @@ public class NavigatorApplet extends javax.swing.JApplet
                 restartButton.setMnemonic('N');
                 _TA_
                  */
-        restartButton = new JButton(ResourceManager.getManager().getString("navigator.applet.restart"));
-        restartButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.NMnemonic").charAt(FIRSTPOS));
+        restartButton = new JButton(ResourceManager.getManager().getString("Sirius.navigator.NavigatorApplet.restartButton.text"));
+        restartButton.setMnemonic(ResourceManager.getManager().getString("Sirius.navigator.NavigatorApplet.restartButton.mnemonic").charAt(FIRSTPOS));
         restartButton.setActionCommand("restart");
         restartButton.addActionListener(buttonListener);
         secondContentPane.add(restartButton, constraints);
@@ -411,7 +415,7 @@ public class NavigatorApplet extends javax.swing.JApplet
         else
         {
             //_TA_statusLabel.setText("Es ist ein unbekannter Fehler aufgetreten");
-            statusLabel.setText(ResourceManager.getManager().getString("navigator.applet.unknownError"));
+            statusLabel.setText(I18N.getString("Sirius.navigator.NavigatorApplet.statusLabel.text"));
         }
         
         repaint();
@@ -504,7 +508,8 @@ public class NavigatorApplet extends javax.swing.JApplet
     {
         invalidate();
         //infoLabel.setText(StringLoader.getString("STL@callServerOn") + navigatorModel.getCallServerIP());
-        infoLabel.setText(ResourceManager.getManager().getString("navigator.applet.callServerOn") + PropertyManager.getManager().getConnectionInfo().getCallserverURL());
+        infoLabel.setText(I18N.getString("Sirius.navigator.NavigatorApplet.startAction().infoLabel.text") +
+                PropertyManager.getManager().getConnectionInfo().getCallserverURL());
         setContentPane(secondContentPane);
         firstContentPane = null;
         optionsDialog = null;
@@ -622,7 +627,8 @@ public class NavigatorApplet extends javax.swing.JApplet
             catch(Exception exp)
             {
                 logger.fatal("could not create navigator instance", exp);
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, ResourceManager.getManager().getExceptionName("nx01"), ResourceManager.getManager().getExceptionMessage("nx01"), exp);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL,
+                        resource.getExceptionName("nx01"), resource.getExceptionMessage("nx01"), exp);
             }
         }
     }

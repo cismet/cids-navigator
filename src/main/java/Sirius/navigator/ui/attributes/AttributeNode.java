@@ -10,7 +10,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.iterator.AttributeIterator;
 import Sirius.navigator.types.iterator.AttributeRestriction;
 import Sirius.navigator.types.iterator.SimpleAttributeRestriction;

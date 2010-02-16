@@ -38,6 +38,7 @@ import Sirius.server.middleware.types.Node;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.ui.tree.*;
 import Sirius.navigator.resource.*;
+import java.util.ResourceBundle;
 
 
 
@@ -45,6 +46,7 @@ public class QueryResultProfileManager extends ProfileManager
 {
     protected SearchResultsTree searchTree;
     protected boolean newNodesLoaded = false;
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     //protected JMenu searchMenu;
     
@@ -52,7 +54,7 @@ public class QueryResultProfileManager extends ProfileManager
     {
         super(dialog, profileType);
         this.searchTree = searchTree;
-        this.setTitle(ResourceManager.getManager().getString("dialog.profile.search.results.title"));
+        this.setTitle(I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.title"));
         
         this.initQueryResultProfileManager();
     }
@@ -61,7 +63,7 @@ public class QueryResultProfileManager extends ProfileManager
     {
         super(frame, profileType);
         this.searchTree = searchTree;
-        this.setTitle(ResourceManager.getManager().getString("dialog.profile.search.results.title"));
+        this.setTitle(I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.title"));
         
         this.initQueryResultProfileManager();
     }
@@ -95,8 +97,10 @@ public class QueryResultProfileManager extends ProfileManager
         catch(Exception exp)
         {
             exp.printStackTrace();
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.error.message") ,
-                    ResourceManager.getManager().getString("dialog.profile.search.results.error"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.updateQueryResultProfileManager().searchResultsWarning.message") ,
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.updateQueryResultProfileManager().searchResultsWarning.title"),
+                    JOptionPane.WARNING_MESSAGE);
             
             logger.error("could not load user info", exp);
         }
@@ -165,9 +169,10 @@ public class QueryResultProfileManager extends ProfileManager
         }
         catch(Throwable t)
         {
-            logger.error("Fehler beim laden der profile:", t);
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.load.error.message"),
-                    ResourceManager.getManager().getString("dialog.profile.search.results.load.error"),
+            logger.error("Error while loading profiles:", t);
+            JOptionPane.showMessageDialog(this,
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.loadSearchResults().loadSearchResultsError.message"),
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.loadSearchResults().loadSearchResultsError.title"),
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -187,8 +192,10 @@ public class QueryResultProfileManager extends ProfileManager
             {
                 if(searchTree.getResultNodes() == null)
                 {
-                    JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.error.message") ,
-                            ResourceManager.getManager().getString("dialog.profile.search.results.error"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().searchResultsWarning.message") ,
+                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().searchResultsWarning.title"),
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 
@@ -219,8 +226,9 @@ public class QueryResultProfileManager extends ProfileManager
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.save.nodir.message"),
-                                ResourceManager.getManager().getString("dialog.profile.search.results.save.error"),
+                        JOptionPane.showMessageDialog(this,
+                                I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().noDirError.message"),
+                                I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().noDirError.title"),
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -228,7 +236,7 @@ public class QueryResultProfileManager extends ProfileManager
             catch(Throwable t)
             {
                 // TODO display error dialog
-                logger.error("Fehler beim speichern der profile:", t);
+                logger.error("Error while saving profiles:", t);
             }
         }
         else if(selectedQueryResultInfo != null)
@@ -248,9 +256,10 @@ public class QueryResultProfileManager extends ProfileManager
                 }
                 catch(Throwable t)
                 {
-                    logger.error("Fehler beim l\u00F6schen der profile:", t);
-                    JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.delete.error.message"),
-                            ResourceManager.getManager().getString("dialog.profile.search.results.delete.error"),
+                    logger.error("Error while deleting profiles:", t);
+                    JOptionPane.showMessageDialog(this,
+                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().deleteError.message"),
+                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().deleteError.title"),
                             JOptionPane.ERROR_MESSAGE);
                 }
                 
@@ -260,8 +269,9 @@ public class QueryResultProfileManager extends ProfileManager
         else
         {
             //_TA_JOptionPane.showMessageDialog(this, "Bitte waehlen Sie zuerst ein "+profileTypeName+" aus.", "Keine Selektion", JOptionPane.WARNING_MESSAGE);
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.noprofile.message"),
-                    ResourceManager.getManager().getString("dialog.profile.search.results.noprofile"),
+            JOptionPane.showMessageDialog(this,
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().noProfileWarning.message"),
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryResultProfileManager.actionPerformed().noProfileWarning.title"),
                     JOptionPane.WARNING_MESSAGE);
         }
     }

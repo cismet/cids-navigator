@@ -25,6 +25,7 @@ package Sirius.navigator.search.dynamic.profile;
  *******************************************************************************/
 import java.io.*;
 import java.util.zip.*;
+import java.util.ResourceBundle;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -52,6 +53,8 @@ import Sirius.navigator.resource.*;
 
 public class QueryProfileManager extends ProfileManager
 {
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
     //protected SearchDialog searchDialog;
     protected boolean groupFlag = false;
     protected boolean saveFlag = false;
@@ -312,9 +315,10 @@ public class QueryProfileManager extends ProfileManager
                 if(selectedQueryInfo.getUserGroups().size() > 0 && !canStoreUserGroupProfile(new QueryInfo[]{selectedQueryInfo}))
                 {
                     //_TA_JOptionPane.showMessageDialog(this, "Sie haben nicht die Berechtigung ein Benutzergruppenprofil zu loeschen", "Profil loeschen", JOptionPane.WARNING_MESSAGE);
-                    JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.delete.nopermission.message"),
-                    ResourceManager.getManager().getString("dialog.profile.search.delete.nopermission"),
-                    JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noDeletePermissionErrorMessage.message"),
+                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noDeletePermissionErrorMessage.title"),
+                            JOptionPane.WARNING_MESSAGE);
                 }
                 else
                 {
@@ -337,9 +341,10 @@ public class QueryProfileManager extends ProfileManager
         else
         {
             //_TA_JOptionPane.showMessageDialog(this, "Bitte waehlen Sie zuerst ein "+profileTypeName+" aus.", "Keine Selektion", JOptionPane.WARNING_MESSAGE);
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.noprofile.message"),
-            ResourceManager.getManager().getString("dialog.profile.search.results.noprofile"),
-            JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noProfileSelectedErrorMessage.message"),
+                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noProfileSelectedErrorMessage.title"),
+                    JOptionPane.WARNING_MESSAGE);
         }
     }
     

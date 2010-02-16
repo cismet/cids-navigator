@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import Sirius.server.middleware.types.*;
 import Sirius.server.newuser.permission.*;
 import Sirius.navigator.tools.*;
-import Sirius.navigator.resource.ResourceManager;
+
 import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
@@ -72,13 +72,12 @@ public class MethodManager
     protected Vector methodVector = new Vector(5,1);
     
     protected boolean wrongParameters = false;
-    
-    private ResourceManager resources;
+  
     
     
     private MethodManager()
     {
-        this.resources = ResourceManager.getManager();
+        
     }
     private final static Object blocker=new Object();
     public final static MethodManager getManager()
@@ -848,8 +847,14 @@ public class MethodManager
     
     public boolean deleteNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode sourceNode)
     {
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.delete.1") + sourceNode + resources.getString("tree.method.node.delete.2"), resources.getString("tree.method.node.delete.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().OptionDialog.message1") + sourceNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().OptionDialog.message2"),
+                I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().OptionDialog.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().OptionDialog.commitButton"),
+         I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().OptionDialog.cancelButton")},
+         I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().OptionDialog.commitButton")))
         {
             try
             {
@@ -873,7 +878,10 @@ public class MethodManager
                 logger.error("deleteNode() could not delete node " + sourceNode, exp);
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.delete.error.title"), resources.getString("tree.method.node.delete.error.1") + sourceNode + resources.getString("tree.method.node.delete.error.2"), exp);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().ErrorMessage.title"),
+                        I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().ErrorMessage.message1") + sourceNode +
+                        I18N.getString("Sirius.navigator.method.MethodManager.deleteNode().ErrorMessage.message2"), exp);
             }
         }
         
@@ -888,8 +896,16 @@ public class MethodManager
     public boolean copyNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode destinationNode,  DefaultMetaTreeNode sourceNode)
     {
         logger.info("copy node " + sourceNode + " -> " + destinationNode);
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.copy.1") + sourceNode + resources.getString("tree.method.node.copy.2") + destinationNode + resources.getString("tree.method.node.copy.3"), resources.getString("tree.method.node.copy.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                ComponentRegistry.getRegistry().getMainWindow(),
+                I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.message1") + sourceNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.message2") + destinationNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.message3"),
+                I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.commitButton"),
+         I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.cancelButton")},
+         I18N.getString("Sirius.navigator.method.MethodManager.copyNode().OptionDialog.commitButton")))
         {
             try
             {
@@ -918,7 +934,10 @@ public class MethodManager
             catch(Exception exp)
             {
                 logger.error("could not create copy of node " + sourceNode, exp);
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.clone.error.title"), resources.getString("tree.method.node.clone.error.1") + sourceNode + resources.getString("tree.method.node.clone.title"), exp);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        I18N.getString("Sirius.navigator.method.MethodManager.copyNode().ErrorMessage.title"),
+                        I18N.getString("Sirius.navigator.method.MethodManager.copyNode().ErrorMessage.message1") + sourceNode +
+                        I18N.getString("Sirius.navigator.method.MethodManager.copyNode().ErrorMessage.message2"), exp);
             }
         }
         
@@ -928,8 +947,16 @@ public class MethodManager
     public boolean moveNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode destinationNode,  DefaultMetaTreeNode sourceNode)
     {
         logger.info("move node " + sourceNode + " -> " + destinationNode);
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.move.1") + sourceNode + resources.getString("tree.method.node.move.2") + destinationNode + resources.getString("tree.method.node.move.3"), resources.getString("tree.method.node.move.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                ComponentRegistry.getRegistry().getMainWindow(),
+                I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.message1") + sourceNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.message2") + destinationNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.message3"),
+                I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.commitButton"),
+         I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.cancelButton")},
+         I18N.getString("Sirius.navigator.method.MethodManager.moveNode().OptionDialog.commitButton")))
         {
             try
             {
@@ -949,7 +976,10 @@ public class MethodManager
                 logger.error("addNode() could not add node");
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.add.error.title"), resources.getString("tree.method.node.add.error.1") + sourceNode + resources.getString("tree.method.node.add.error.2"), exp);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        I18N.getString("Sirius.navigator.method.MethodManager.moveNode().ErrorMessage.title"),
+                        I18N.getString("Sirius.navigator.method.MethodManager.moveNode().ErrorMessage.message1") + sourceNode +
+                        I18N.getString("Sirius.navigator.method.MethodManager.moveNode().ErrorMessage.message2"), exp);
             }
         }
         
@@ -1036,7 +1066,10 @@ public class MethodManager
             logger.error("addOrLinkNode() could not add node " + sourceNode, cexp);
             ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
             
-            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.add.error.title"), resources.getString("tree.method.node.add.error.1") + sourceNode + resources.getString("tree.method.node.add.error.2"), cexp);
+            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                    I18N.getString("Sirius.navigator.method.MethodManager.addOrLinkNode().ErrorMessage.title"),
+                    I18N.getString("Sirius.navigator.method.MethodManager.addOrLinkNode().ErrorMessage.message1") + sourceNode +
+                    I18N.getString("Sirius.navigator.method.MethodManager.addOrLinkNode().ErrorMessage.message2"), cexp);
         }
         
         return false;
@@ -1045,8 +1078,15 @@ public class MethodManager
     public boolean linkNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode destinationNode,  DefaultMetaTreeNode sourceNode)
     {
         logger.info("link node " + sourceNode + " -> " + destinationNode);
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.link.1") + sourceNode + resources.getString("tree.method.node.link.2") + destinationNode + resources.getString("tree.method.node.link.3"), resources.getString("tree.method.node.link.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.message1") + sourceNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.message2") + destinationNode +
+                I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.message3"),
+                I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.title"),
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.commitButton"),
+         I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.cancelButton")},
+         I18N.getString("Sirius.navigator.method.MethodManager.linkNode().OptionDialog.commitButton")))
         {
             try
             {
@@ -1061,7 +1101,10 @@ public class MethodManager
             catch(CloneNotSupportedException cnse)
             {
                 logger.error("could not create copy of linked node " + sourceNode, cnse);
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.clone.error.title"), resources.getString("tree.method.node.clone.error.1") + sourceNode + resources.getString("tree.method.node.clone.title"), cnse);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        I18N.getString("Sirius.navigator.method.MethodManager.linkNode().ErrorMessage.title"),
+                        I18N.getString("Sirius.navigator.method.MethodManager.linkNode().ErrorMessage.message1") + sourceNode +
+                        I18N.getString("Sirius.navigator.method.MethodManager.linkNode().ErrorMessage.message2"), cnse);
             }
         }
         

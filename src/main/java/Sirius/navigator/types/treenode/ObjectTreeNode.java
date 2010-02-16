@@ -16,6 +16,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     protected ImageIcon nodeIcon;
     private MetaClass metaClass;
+    private static final ResourceManager resource = ResourceManager.getManager();
 
     public ObjectTreeNode(MetaObjectNode MetaObjectNode) {
         super(MetaObjectNode);
@@ -25,10 +26,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
             if (metaClass != null && metaClass.getObjectIconData().length > 0) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = ResourceManager.getManager().getIcon("ObjectNodeIcon.gif");
+                this.nodeIcon = resource.getIcon(resource.getString("Sirius.navigator.types.treenode.ObjectTreeNode.nodeIcon"));
             }
         } catch (Exception exp) {
-            this.nodeIcon = ResourceManager.getManager().getIcon("ObjectNodeIcon.gif");
+            this.nodeIcon = resource.getIcon(resource.getString("Sirius.navigator.types.treenode.ObjectTreeNode.nodeIcon"));
         }
 
     }

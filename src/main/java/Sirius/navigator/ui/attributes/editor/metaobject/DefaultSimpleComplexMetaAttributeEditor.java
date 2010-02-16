@@ -37,6 +37,7 @@ import de.cismet.cids.tools.fromstring.StringCreateable;
 public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor //javax.swing.JPanel
 {
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private static final ResourceManager resource = ResourceManager.getManager();
     /**
      * Gibt an, ob dieses komplexe Object als String ver\u00E4ndert wurde.
      */
@@ -165,11 +166,13 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
         
         if(this.getValue() != null && this.getMetaObject(this.getValue()) != null && this.getMetaObject(this.getValue()).getID() != -1)
         {
-            this.linkLabel.setIcon(ResourceManager.getManager().getIcon("link_icon.gif"));
+            this.linkLabel.setIcon(resource.getIcon(
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.linkIcon")));
         }
         else
         {
-            this.linkLabel.setIcon(ResourceManager.getManager().getIcon("copy_icon.gif"));
+            this.linkLabel.setIcon(resource.getIcon(
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.copyIcon")));
         }
     }
     
@@ -239,12 +242,14 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
             {
                 if(logger.isDebugEnabled())logger.debug("setValueFromDragAndDrop() creating a copy of the selected meta object");
                 this.getMetaObject(this.getValue()).setPrimaryKey(new Integer(-1));
-                this.linkLabel.setIcon(ResourceManager.getManager().getIcon("copy_icon.gif"));
+                this.linkLabel.setIcon(resource.getIcon(
+                        I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.copyIcon")));
             }
             else
             {
                 if(logger.isDebugEnabled())logger.debug("setValueFromDragAndDrop() creating a link to the selected meta object");
-                this.linkLabel.setIcon(ResourceManager.getManager().getIcon("link_icon.gif"));
+                this.linkLabel.setIcon(resource.getIcon(
+                        I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.linkIcon")));
             }
             
             this.setComponentValue(this.getValue());
@@ -268,10 +273,10 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
             
             // XXX i18n
             JOptionPane.showMessageDialog(DefaultSimpleComplexMetaAttributeEditor.this,
-                    ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop.ErrorMessage1") + oldClassName +
-                    ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop.ErrorMessage2") + newClassName +
-                    ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop.ErrorMessage3"),
-                    ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage1") + oldClassName +
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage2") + newClassName +
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage3"),
+                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorTitle"), JOptionPane.WARNING_MESSAGE);
             return false;
         }
     }
@@ -302,7 +307,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                     //MetaObject MetaObject = getMetaObject(getValue());
                     if(isStringCreateable((Attribute)getValue()) && DefaultSimpleComplexMetaAttributeEditor.this.setValueFromString(getValue(), this.getNewValue().toString()))
                     {
-                        if(logger.isDebugEnabled())logger.debug("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): speichere neue Eingabe");
+                        if(logger.isDebugEnabled())logger.debug("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): saves new input");
                         DefaultSimpleComplexMetaAttributeEditor.this.stopEditing();
                     }
                     else
@@ -317,8 +322,8 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                     
                     // XXX i18n
                     JOptionPane.showMessageDialog(DefaultSimpleComplexMetaAttributeEditor.this,
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.actionPerformed.ErrorMessage"),
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.actionPerformed.ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.actionPerformed().ErrorMessage"),
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.actionPerformed().ErrorTitle"), JOptionPane.ERROR_MESSAGE);
                     
                     // reset
                     setComponentValue(getValue());
@@ -452,8 +457,8 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                     
                     // XXX i18n
                     JOptionPane.showMessageDialog(DefaultSimpleComplexMetaAttributeEditor.this,
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.importData.ErrorMessage"),
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.importData.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.importData().ErrorMessage"),
+                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.importData().ErrorTitle"), JOptionPane.WARNING_MESSAGE);
                 }
             }
             catch (Throwable th)

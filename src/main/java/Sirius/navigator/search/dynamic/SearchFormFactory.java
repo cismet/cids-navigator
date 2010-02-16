@@ -31,6 +31,7 @@ public class SearchFormFactory
 {   
     private final Logger logger;
     private final Log log;
+    private static final ResourceManager resource = ResourceManager.getManager();
     
     /** Creates a new instance of SearchFormFactory */
     protected SearchFormFactory()
@@ -74,7 +75,7 @@ public class SearchFormFactory
         String searchDescriptorPath = searchPath + "/" + searchFormsDescriptor;
         if(logger.isDebugEnabled())logger.debug("loading search forms XML descriptor from remote URL '" + searchDescriptorPath + "'");
         
-        return new BufferedInputStream(ResourceManager.getManager().getResourceAsStream(searchDescriptorPath), 8192);
+        return new BufferedInputStream(resource.getResourceAsStream(searchDescriptorPath), 8192);
     }
     
     // RuleSet
@@ -179,7 +180,7 @@ public class SearchFormFactory
                 // load jar files
                 URL[] urls = new URL[this.librariesList.size()];
                 //String jarBase = ResourceManager.getManager().pathToIURIString(PropertyManager.getManager().getSearchFormPath() + "lib/");
-                String jarBase = ResourceManager.getManager().pathToIURIString(this.searchFormsPath + "/lib/");
+                String jarBase = resource.pathToIURIString(this.searchFormsPath + "/lib/");
                 for (int i = 0; i < this.librariesList.size(); i++)
                 {
                     if(logger.isDebugEnabled())logger.debug("loading search form library: '" + jarBase + this.librariesList.get(i).toString() + "'");
@@ -324,7 +325,7 @@ public class SearchFormFactory
         
         private ResourceBundle getResourceBundle(String resourceBundleName)
         {
-            Locale locale = ResourceManager.getManager().getLocale();
+            Locale locale = resource.getLocale();
             if(logger.isDebugEnabled())logger.debug("loading resource bundle '" + resourceBundleName + "' for locale '" + locale + "'");
             
             try

@@ -26,6 +26,7 @@ import Sirius.navigator.method.*;
 import Sirius.server.newuser.permission.*;
 import java.awt.event.MouseAdapter;
 import java.util.Vector;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -33,7 +34,8 @@ import java.util.Vector;
  */
 public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetListener, DragSourceListener{
     private final Logger logger;
-    private final ResourceManager resources;
+    private static final ResourceManager resources = ResourceManager.getManager();
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     private final MetaCatalogueTree metaTree;
     private final DragSource dragSource;
@@ -58,7 +60,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     
     public MetaTreeNodeDnDHandler(final MetaCatalogueTree metaTree) {
         this.logger = Logger.getLogger(this.getClass());
-        this.resources = ResourceManager.getManager();
        
         logger.info("MetaTreeNodeDnDHandler() creating new instance. Drag Image Support: " + DragSource.isDragImageSupported());
         
@@ -149,7 +150,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         
         try {
             nodeEditable = this.metaTree.getSelectedNode().isEditable(key, PermissionHolder.WRITEPERMISSION);
-        }catch(Exception e){logger.debug(" Knoten nicht editierbar");}
+        }catch(Exception e){logger.debug(" Node not editable");}
         
         if(this.metaTree.isEditable()&& nodeEditable) {
             Transferable transferable = dtde.getTransferable();
@@ -191,7 +192,10 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                 break;
                                 
                             default:     logger.error("unsupported dnd operation: " + dtde.getDropAction());
-                            JOptionPane.showMessageDialog(this.metaTree, resources.getString("tree.dnd.error.unsupported.operation"), resources.getString("tree.dnd.error.unsupported.operation.title"), JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(this.metaTree,
+                                    I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.drop().unsupportedOperationError.message"),
+                                    I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.drop().unsupportedOperationError.title"),
+                                    JOptionPane.ERROR_MESSAGE);
                             dtde.rejectDrop();
                         }
                     } else {
@@ -203,12 +207,18 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             } catch(Throwable t) {
                 logger.warn("data flavour '" + MetaTreeNodeTransferable.dataFlavors[0].getHumanPresentableName() + "' is not supported, rejecting dnd", t);
                 
-                JOptionPane.showMessageDialog(this.metaTree, resources.getString("tree.dnd.error.unsupported.object"), resources.getString("tree.dnd.error.unsupported.object.title"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this.metaTree,
+                        I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.drop().unsupportedObjectError.message"),
+                        I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.drop().unsupportedObjectError.title"),
+                        JOptionPane.ERROR_MESSAGE);
                 dtde.rejectDrop();
             }
         } else {
             logger.error("catalog is not editable");
-            JOptionPane.showMessageDialog(this.metaTree, resources.getString("tree.dnd.error.readonly"), resources.getString("tree.dnd.error.readonly.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this.metaTree,
+                    I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.drop().notEditableError.message"),
+                    I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.drop().notEditableError.title"),
+                    JOptionPane.ERROR_MESSAGE);
             dtde.rejectDrop();
         }
     }
@@ -335,7 +345,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             graphics.dispose();
             return master;
         } catch (Exception e) {
-            logger.error("Fehler beim Erstellen des DragImages",e);
+            logger.error("Error while creating DragImages",e);
             return null;
         }
 //        try {
@@ -485,20 +495,40 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             if(destinationPath.getLastPathComponent() instanceof PureTreeNode || destinationPath.getLastPathComponent() instanceof ObjectTreeNode) {
                 if(destinationPath.equals(sourcePath)) {
                     logger.warn("destination path equals source path");
-                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.path.equal.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.path.equal.2"), resources.getString("tree.dnd.error.path.equal.title"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().pathsEqualWarning.message1") +
+                            destinationPath.getLastPathComponent() +
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().pathsEqualWarning.message2"),
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().pathsEqualWarning.title"),
+                            JOptionPane.WARNING_MESSAGE);
                 } else if(sourcePath.isDescendant(destinationPath)) {
                     logger.warn("destination path can not be a descendant of the source path");
-                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.path.descendant.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.path.descendant.2"), resources.getString("tree.dnd.error.path.descendant.title"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().pathIsDecendantWarning.message1") +
+                            destinationPath.getLastPathComponent() +
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().pathIsDecendantWarning.message2"),
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().pathIsDecendantWarning.title"),
+                            JOptionPane.WARNING_MESSAGE);
                 } else if(dropAction != DnDConstants.ACTION_COPY && sourcePath.getParentPath().equals(destinationPath)) {
                     logger.warn("destination node is the parent of the source node");
-                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.path.parent.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.path.parent.2"), resources.getString("tree.dnd.error.path.parent.title"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().destinationParentOfSourceWarning.message1") +
+                            destinationPath.getLastPathComponent() +
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().destinationParentOfSourceWarning.message2"),
+                            I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().destinationParentOfSourceWarning.title"),
+                            JOptionPane.WARNING_MESSAGE);
                 } else {
                     if(logger.isDebugEnabled())logger.debug("checkDestination() dnd destination ok: " + sourcePath.getLastPathComponent() + " -> " + destinationPath.getLastPathComponent());
                     return true;
                 }
             } else {
                 logger.warn("destination node '" + destinationPath.getLastPathComponent() + "' is no pure or object node");
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.node.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.node.2"), resources.getString("tree.dnd.error.node.title"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                        I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().noPureNodeWarning.message1") +
+                        destinationPath.getLastPathComponent() +
+                        I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().noPureNodeWarning.message2"),
+                        I18N.getString("Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler.checkDestination().noPureNodeWarning.title"),
+                        JOptionPane.WARNING_MESSAGE);
             }
         } else {
             logger.warn("no node found at this location");

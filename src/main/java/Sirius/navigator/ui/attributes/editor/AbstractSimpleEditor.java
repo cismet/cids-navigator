@@ -25,6 +25,9 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractSimpleEditor extends JPanel implements SimpleEditor
 {
+    /**
+     * ResourceBundle f\u00FCr internationalisierte Strings
+     */
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     /**
      * Der Logger des Editors
@@ -88,10 +91,6 @@ public abstract class AbstractSimpleEditor extends JPanel implements SimpleEdito
     
     // Properties ..............................................................
     
-    /**
-     * ResourceBundle f\u00FCr internationalisierte Strings
-     */
-    protected Sirius.navigator.resource.ResourceManager resources;
     
     /**
      * Eigenschaft f\u00FCr den Klassenenamen eines komplexen Editors
@@ -111,7 +110,6 @@ public abstract class AbstractSimpleEditor extends JPanel implements SimpleEdito
         this.childrenMap = new LinkedHashMap();
         this.listenerList = new EventListenerList();
         
-        this.resources = Sirius.navigator.resource.ResourceManager.getManager();
     }
     
     

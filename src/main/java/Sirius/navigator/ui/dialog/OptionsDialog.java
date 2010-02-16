@@ -35,7 +35,7 @@ import Sirius.navigator.*;
 //import Sirius.navigator.ui.widget.SingleLineListBox;
 
 import Sirius.navigator.resource.*;
-
+import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
 
 
@@ -61,7 +61,7 @@ import org.apache.log4j.Logger;
 public class OptionsDialog extends JDialog implements ActionListener
 {
     private final Logger logger;
-    private final ResourceManager resources;
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     //private NavigatorModel navigatorModel;
     //private ISFloatingFrameModel isFloatingFrameModel;
@@ -135,7 +135,7 @@ public class OptionsDialog extends JDialog implements ActionListener
     
     public OptionsDialog()
     {
-        this(null, ResourceManager.getManager().getString("dialog.options.title"));
+        this(null, I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.title"));
     }
     
     
@@ -144,7 +144,6 @@ public class OptionsDialog extends JDialog implements ActionListener
         super(owner, title, true);
         
         this.logger = Logger.getLogger(this.getClass());
-        this.resources = ResourceManager.getManager();
         
         this.initOptionsDialog();
         
@@ -202,17 +201,17 @@ public class OptionsDialog extends JDialog implements ActionListener
         contentPane.add(buttonPanel, gbc);
         
         //_TA_okButton = new JButton("Uebernehmen");
-        okButton = new JButton(this.resources.getButtonText("apply"));
+        okButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.okButton.text"));
         //_TA_okButton.setMnemonic('U');
-        okButton.setMnemonic(this.resources.getButtonMnemonic("apply"));
+        okButton.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.okButton.mnemonics").charAt(0));
         okButton.setActionCommand("apply");
         okButton.addActionListener(this);
         buttonPanel.add(okButton);
         
         //_TA_cancelButton = new JButton("Abbrechen");
-        cancelButton = new JButton(this.resources.getButtonText("cancel"));
+        cancelButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.cancelButton.text"));
         //_TA_cancelButton.setMnemonic('A');
-        cancelButton.setMnemonic(this.resources.getButtonMnemonic("cancel"));
+        cancelButton.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.cancelButton.mnemonics").charAt(0));
         cancelButton.setActionCommand("cancel");
         cancelButton.addActionListener(this);
         buttonPanel.add(cancelButton);
@@ -247,7 +246,10 @@ public class OptionsDialog extends JDialog implements ActionListener
         gbc.weighty = 1.0;
         JPanel navigatorServerPanel = new JPanel(new GridBagLayout());
         //_TA_navigatorServerPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Server", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
-        navigatorServerPanel.setBorder(new CompoundBorder(new TitledBorder(null, resources.getString("dialog.options.server.title"), TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
+        navigatorServerPanel.setBorder(new CompoundBorder(
+                new TitledBorder(null,
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.border.title"),
+                TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorPanel.add(navigatorServerPanel, gbc);
         
         
@@ -263,14 +265,17 @@ public class OptionsDialog extends JDialog implements ActionListener
         gbc2.weighty = 0.0;
         //_TA_navigatorServerPanel.add(new JLabel("CallServer IP Adresse:"), gbc2);
         //navigatorServerPanel.add(new JLabel(this.resources.getString("STL@callServerIP")), gbc2);
-        navigatorServerPanel.add(new JLabel(resources.getString("dialog.options.server.url")), gbc2);
+        navigatorServerPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.urlLabel.text")), gbc2);
         gbc2.gridy++;
         //_TA_navigatorServerPanel.add(new JLabel("max. Verbindungen:"), gbc2);
-        navigatorServerPanel.add(new JLabel(resources.getString("dialog.options.server.connections")), gbc2);
+        navigatorServerPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.connectionsLabel.text")), gbc2);
         gbc2.insets = new Insets(0, 0, 0, 5);
         gbc2.gridy++;
         //_TA_navigatorServerPanel.add(new JLabel("max. Suchergebnisse:"), gbc2);
-        navigatorServerPanel.add(new JLabel(this.resources.getString("dialog.options.server.results")), gbc2);
+        navigatorServerPanel.add(new JLabel(
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.resultsLabel.text")), gbc2);
         
         // Eingabefelder
         gbc2.insets = new Insets(0, 0, 7, 0);
@@ -302,7 +307,10 @@ public class OptionsDialog extends JDialog implements ActionListener
         gbc.gridy++;
         JPanel navigatorLayoutManagerPanel = new JPanel(new GridBagLayout());
         //_TA_navigatorLayoutManagerPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Komponenten Ansicht", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
-        navigatorLayoutManagerPanel.setBorder(new CompoundBorder(new TitledBorder(null, this.resources.getString("dialog.options.view.title"), TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
+        navigatorLayoutManagerPanel.setBorder(new CompoundBorder(
+                new TitledBorder(null,
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorLayoutManagerPanel.border.title"),
+                TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorPanel.add(navigatorLayoutManagerPanel, gbc);
         
         gbc2.insets = new Insets(0, 0, 5, 0);
@@ -326,7 +334,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //navigatorLayoutManagerPanel.add(navProportionalResizeCheck, gbc2);
         
         ButtonGroup buttonGroup = new ButtonGroup();
-        optimizeLayout = new JRadioButton(resources.getString("dialog.options.view.layout")); 
+        optimizeLayout = new JRadioButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.optimizeLayout.text"));
         buttonGroup.add(optimizeLayout);
         navigatorLayoutManagerPanel.add(optimizeLayout, gbc2);
         
@@ -336,7 +344,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //navContinuousLayoutCheck = new JCheckBox(this.resources.getString("STL@showWhileSizeChange"));
         //navigatorLayoutManagerPanel.add(navContinuousLayoutCheck, gbc2);
         
-        optimizeSpeed= new JRadioButton(resources.getString("dialog.options.view.performance")); 
+        optimizeSpeed= new JRadioButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.optimizeSpeed.text"));
         buttonGroup.add(optimizeSpeed);
         navigatorLayoutManagerPanel.add(optimizeSpeed, gbc2);
         
@@ -347,7 +355,10 @@ public class OptionsDialog extends JDialog implements ActionListener
         JPanel sortPanel = new JPanel(new GridBagLayout());
         //_TA_navigatorLayoutManagerPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Komponenten Ansicht", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         //_TA_2.sortPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Sortierung", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
-        sortPanel.setBorder(new CompoundBorder(new TitledBorder(null, this.resources.getString("dialog.options.sort.title"), TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
+        sortPanel.setBorder(new CompoundBorder(
+                new TitledBorder(null,
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.sortPanel.border.title"),
+                TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorPanel.add(sortPanel, gbc);
         
         gbc2.insets = new Insets(0, 0, 5, 0);
@@ -361,7 +372,9 @@ public class OptionsDialog extends JDialog implements ActionListener
         gbc2.weighty = 1.0;
         
         //_TA_navSortChildrenCheck = new JCheckBox("Sortierung verwenden", true);
-        navSortChildrenCheck = new JCheckBox(this.resources.getString("dialog.options.sort.enabled"), true);
+        navSortChildrenCheck = new JCheckBox(
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navSortChildrenCheck.text"),
+                true);
         navSortChildrenCheck.setActionCommand("sort");
         navSortChildrenCheck.addActionListener(this);
         sortPanel.add(navSortChildrenCheck, gbc2);
@@ -370,14 +383,16 @@ public class OptionsDialog extends JDialog implements ActionListener
         
         gbc2.gridy++;
         //_TA_sortAscendingOption = new JRadioButton("aufsteigend sortieren");
-        sortAscendingOption = new JRadioButton(this.resources.getString("dialog.options.sort.ascending"));
+        sortAscendingOption = new JRadioButton(
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.sortAscendingOption.text"));
         buttonGroup1.add(sortAscendingOption);
         sortPanel.add(sortAscendingOption, gbc2);
         
         gbc2.insets = new Insets(0, 0, 0, 0);
         gbc2.gridy++;
         //_TA_sortDescendingOption = new JRadioButton("absteigend sortieren");
-        sortDescendingOption = new JRadioButton(this.resources.getString("dialog.options.sort.descending"));
+        sortDescendingOption = new JRadioButton(
+                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.sortDescendingOption.text"));
         buttonGroup1.add(sortDescendingOption);
         sortPanel.add(sortDescendingOption, gbc2);
     }

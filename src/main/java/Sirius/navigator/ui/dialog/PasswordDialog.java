@@ -31,17 +31,21 @@ import Sirius.navigator.*;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.connection.proxy.*;
 import Sirius.navigator.resource.*;
+import java.util.ResourceBundle;
 
 
 public class PasswordDialog extends JDialog
 {
     private JButton btn_change, btn_cancel;
     private JPasswordField password_old, password_new, password_again;
-    
+
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private static final ResourceManager resources = ResourceManager.getManager();
+
     public PasswordDialog(JFrame parent)
     {
         //TA_super(navigator, "Passwort aendern", true);
-        super(parent, ResourceManager.getManager().getString("dialog.password.title") , true);
+        super(parent, I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.title") , true);
         initPasswordDialog();
     }
     
@@ -64,7 +68,8 @@ public class PasswordDialog extends JDialog
         constraints.weighty = 1.0;
         constraints.gridy = 0;
         constraints.gridx = 0;
-        JLabel passwordIcon = new JLabel(ResourceManager.getManager().getIcon("password_icon.gif"));
+        JLabel passwordIcon = new JLabel(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.initPasswordDialog().passwordIcon.icon")));
         //JLabel passwordIcon = new JLabel(ConnectionHandler.getDefaultIcon("animated.gif"));
         passwordIcon.setBorder(new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(10,10,10,10)));
         contentPane.add(passwordIcon, constraints);
@@ -78,7 +83,7 @@ public class PasswordDialog extends JDialog
         constraints.gridy = 0;
         constraints.gridx++;
         //_TA_contentPane.add(new JLabel("Altes Passwort:"), constraints);
-        contentPane.add(new JLabel(ResourceManager.getManager().getString("dialog.password.old")), constraints);
+        contentPane.add(new JLabel(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.initPasswordDialog().contentPane.oldPWLabel.text")), constraints);
         
         //constraints.gridheight = 1;
         //constraints.gridwidth = 1;
@@ -87,11 +92,11 @@ public class PasswordDialog extends JDialog
         constraints.gridy++;
         //constraints.gridx;
         //_TA_contentPane.add(new JLabel("Neues Passwort:"), constraints);
-        contentPane.add(new JLabel(ResourceManager.getManager().getString("dialog.password.new")), constraints);
+        contentPane.add(new JLabel(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.initPasswordDialog().contentPane.newPWLabel.text")), constraints);
         
         constraints.gridy++;
         //_TA_contentPane.add(new JLabel("Bestaetigung:"), constraints);
-        contentPane.add(new JLabel(ResourceManager.getManager().getString("dialog.password.repeat")), constraints);
+        contentPane.add(new JLabel(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.initPasswordDialog().contentPane.repeatPWLabel.text")), constraints);
         
         constraints.insets = new Insets(0, 0, 10, 0);
         constraints.gridx++;
@@ -114,9 +119,9 @@ public class PasswordDialog extends JDialog
         constraints.gridx--;
         constraints.gridy++;
         //_TA_btn_change = new JButton("Aendern");
-        btn_change = new JButton(ResourceManager.getManager().getButtonText("ok"));
+        btn_change = new JButton(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.btn_change.text"));
         //_TA_btn_change.setMnemonic('A');
-        btn_change.setMnemonic(ResourceManager.getManager().getButtonMnemonic("ok"));
+        btn_change.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.btn_change.mnemonic").charAt(0));
         btn_change.setActionCommand("btn_change");
         btn_change.addActionListener(passwordActionListener);
         contentPane.add(btn_change, constraints);
@@ -124,9 +129,9 @@ public class PasswordDialog extends JDialog
         constraints.insets = new Insets(0, 0, 0, 0);
         constraints.gridx++;
         //_TA_btn_cancel = new JButton("Abbrechen");
-        btn_cancel = new JButton(ResourceManager.getManager().getButtonText("cancel"));
+        btn_cancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.btn_cancel.text"));
         //_TA_btn_cancel.setMnemonic('b');
-        btn_cancel.setMnemonic(ResourceManager.getManager().getButtonMnemonic("cancel"));
+        btn_cancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.btn_cancel.mnemonic").charAt(0));
         btn_cancel.setActionCommand("btn_cancel");
         btn_cancel.addActionListener(passwordActionListener);
         contentPane.add(btn_cancel, constraints);
@@ -146,14 +151,18 @@ public class PasswordDialog extends JDialog
                 if(password_old.getPassword().length < 1 || password_new.getPassword().length < 1 || password_new.getPassword().length < 1)
                 {
                     //_TA_JOptionPane.showMessageDialog(null, "Bitte fuellen Sie alle Felder aus.", "Kennwort aendern", JOptionPane.ERROR_MESSAGE);
-                    JOptionPane.showMessageDialog(null, ResourceManager.getManager().getString("dialog.password.error.missing"),
-                    ResourceManager.getManager().getString("dialog.password.error")		 , JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.missingInputError.message"),
+                            I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.missingInputError.title"),
+                            JOptionPane.ERROR_MESSAGE);
                 }
                 else if(!new String(password_new.getPassword()).equals(new String(password_again.getPassword())))
                 {
                     //_TA_JOptionPane.showMessageDialog(null, "Das neue Kennwort stimmt nicht mit dem Bestaetigungskennwort ueberein.", "Kennwort aendern", JOptionPane.ERROR_MESSAGE);
-                    JOptionPane.showMessageDialog(null, ResourceManager.getManager().getString("dialog.password.error.different"),
-                    ResourceManager.getManager().getString("dialog.password.error")			, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.passwordsDifferentError.message"),
+                            I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.passwordsDifferentError.title"),
+                            JOptionPane.ERROR_MESSAGE);
                     password_new.setText("");
                     password_again.setText("");
                 }
@@ -164,8 +173,10 @@ public class PasswordDialog extends JDialog
                         if(!SessionManager.getProxy().changePassword(SessionManager.getSession().getUser(), new String(password_old.getPassword()), new String(password_new.getPassword())))
                         {
                             //_TA_JOptionPane.showMessageDialog(null, "Ihr Kennwort konnte nicht geaendert werden.", "Kennwort aendern", JOptionPane.ERROR_MESSAGE);
-                            JOptionPane.showMessageDialog(null, ResourceManager.getManager().getString("dialog.password.error"),
-                            ResourceManager.getManager().getString("dialog.password.error"), JOptionPane.ERROR_MESSAGE);
+                            JOptionPane.showMessageDialog(null,
+                                    I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.changePasswordError.message"),
+                                    I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.changePasswordError.title"),
+                                    JOptionPane.ERROR_MESSAGE);
                             password_old.setText("");
                             password_new.setText("");
                             password_again.setText("");
@@ -174,16 +185,20 @@ public class PasswordDialog extends JDialog
                         else
                         {
                             //_TA_JOptionPane.showMessageDialog(null, "Ihr Kennwort wurde geaendert.", "Kennwort aendern", JOptionPane.INFORMATION_MESSAGE);
-                            JOptionPane.showMessageDialog(null, ResourceManager.getManager().getString("dialog.password.ok"),
-                            ResourceManager.getManager().getString("dialog.password.title")	, JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null,
+                                    I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.passwordOK.message"),
+                                    I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.passwordOK.title"),
+                                    JOptionPane.INFORMATION_MESSAGE);
                             dispose();
                         }
                     }
                     catch(Exception exp)
                     {
                         exp.printStackTrace();
-                        JOptionPane.showMessageDialog(null, ResourceManager.getManager().getString("dialog.password.error"),
-                        exp.getMessage()	, JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null,
+                                exp.getMessage(),
+                                I18N.getString("Sirius.navigator.ui.dialog.PasswordDialog.PasswordActionListener.error.title"),
+                                JOptionPane.ERROR_MESSAGE);
                         dispose();
                     }
                 }

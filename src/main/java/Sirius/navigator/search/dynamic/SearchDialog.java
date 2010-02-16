@@ -41,6 +41,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     
     private final DefaultStatusChangeSupport statusChangeSupport;
     private final ResourceManager resources;
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     
     
@@ -50,7 +51,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         //super(parent, ResourceManager.getManager().getString("search.dialog.title"), true);
         
         // nicht modal
-        super(parent, ResourceManager.getManager().getString("search.dialog.title"), false);
+        super(parent, I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.title"), false);
         
         this.logger = Logger.getLogger(this.getClass());
         logger.info("creating SearchDialog with " + searchOptionsMap.size() + " queries & " + classNodes.length + " class nodes");
@@ -114,7 +115,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             else
             {
                 if(logger.isDebugEnabled())logger.warn("could not show search results in search results tree: no result available");
-                JOptionPane.showMessageDialog(this, resources.getString("search.dialog.noresults"), resources.getString("search.dialog.noresults.title"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()2.noresultsErrorDialog.message"),
+                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()2.noresultsErrorDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         }
         catch(Exception exp)
@@ -145,7 +149,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             else
             {
                 if(logger.isDebugEnabled())logger.warn("could not show search results in search results tree: no result available");
-                JOptionPane.showMessageDialog(this, resources.getString("search.dialog.noresults"), resources.getString("search.dialog.noresults.title"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()4.noresultsErrorDialog.message"),
+                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()4.noresultsErrorDialog.title"),
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         }
         catch(Exception exp)
@@ -289,7 +296,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
            SearchOption searchOption = this.searchFormManager.getSearchOption(dataBean.getQueryId());
            if(searchOption == null)
            {
-                throw new FormValidationException(dataBean.getFormId(), new StringBuffer(resources.getString("search.forms.exception.validation.message.noquery")).append(" '").append(dataBean.getQueryId()).append("'.").toString());                 
+                throw new FormValidationException(dataBean.getFormId(),
+                        new StringBuffer(
+                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.fillSearchOptions().FormValidationException.message")).
+                        append(" '").append(dataBean.getQueryId()).append("'.").toString());
            }
            
            try
@@ -326,7 +336,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     
     private void loadSearchForms()
     {
-        logger.info("loading dynmaic search categories & forms ...");
+        logger.info("loading dynamic search categories & forms ...");
         
         SearchContext searchContext = new SearchContext(this);
         SearchFormFactory formFactory = new SearchFormFactory();
@@ -427,7 +437,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         {
             // XXX show error dialog
             logger.warn("incomplete search data: no formData available");
-            JOptionPane.showMessageDialog(this, resources.getString("search.dialog.incomplete.categories"), resources.getString("search.dialog.incomplete.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()1.messageDialog.message"),
+                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()1.messageDialog.title"),
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         }
         
@@ -439,7 +452,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         if(selectedClassNodeKeys != null && selectedClassNodeKeys.size() == 0)
         {
             logger.warn("incomplete search data: no class nodes selected");
-            JOptionPane.showMessageDialog(this, resources.getString("search.dialog.incomplete.themes"), resources.getString("search.dialog.incomplete.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()2.messageDialog.message"),
+                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()2.messageDialog.title"),
+                    JOptionPane.ERROR_MESSAGE);
             return false;
         } 
 
@@ -624,41 +640,41 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         buttonPanel.setLayout(new java.awt.GridLayout(1, 3, 5, 0));
 
-        searchButton.setMnemonic(resources.getMnemonic("Sirius.navigator.search.dynamic.SearchDialog.searchButton.mnemonic"));
-        searchButton.setText(resources.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.text"));
-        searchButton.setToolTipText(resources.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.tooltip"));
+        searchButton.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.mnemonic").charAt(0));
+        searchButton.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.text"));
+        searchButton.setToolTipText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.tooltip"));
         searchButton.setActionCommand("search");
         buttonPanel.add(searchButton);
 
-        cancelButton.setMnemonic(resources.getMnemonic("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.mnemonics"));
-        cancelButton.setText(resources.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.text"));
-        cancelButton.setToolTipText(resources.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.tooltip"));
+        cancelButton.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.mnemonics").charAt(0));
+        cancelButton.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.text"));
+        cancelButton.setToolTipText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.tooltip"));
         cancelButton.setActionCommand("cancel");
         buttonPanel.add(cancelButton);
 
-        resetButton.setMnemonic(resources.getMnemonic("Sirius.navigator.search.dynamic.SearchDialog.resetButton.mnemonic"));
-        resetButton.setText(resources.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.text"));
-        resetButton.setToolTipText(resources.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.tooltip"));
+        resetButton.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.mnemonic").charAt(0));
+        resetButton.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.text"));
+        resetButton.setToolTipText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.tooltip"));
         resetButton.setActionCommand("reset");
         buttonPanel.add(resetButton);
 
         getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
 
-        profilesMenu.setMnemonic(resources.getMenuMnemonic("searchdialog.profiles"));
-        profilesMenu.setText(resources.getMenuText("searchdialog.profiles"));
+        profilesMenu.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.mnemonic").charAt(0));
+        profilesMenu.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.text"));
 
-        manageProfilesItem.setMnemonic(resources.getMenuMnemonic("searchdialog.profiles.administration"));
-        manageProfilesItem.setText(resources.getMenuText("searchdialog.profiles.administration"));
+        manageProfilesItem.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.mnemonic").charAt(0));
+        manageProfilesItem.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.text"));
         manageProfilesItem.setActionCommand("manageProfiles");
         profilesMenu.add(manageProfilesItem);
 
         menuBar.add(profilesMenu);
 
-        optionsMenu.setMnemonic(resources.getMenuMnemonic("searchdialog.options"));
-        optionsMenu.setText(resources.getMenuText("searchdialog.options"));
+        optionsMenu.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.mnemonic").charAt(0));
+        optionsMenu.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.text"));
 
-        appendResultsItem.setMnemonic(resources.getMenuMnemonic("searchdialog.options.append"));
-        appendResultsItem.setText(resources.getMenuText("searchdialog.options.append"));
+        appendResultsItem.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.mnemonic").charAt(0));
+        appendResultsItem.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.text"));
         optionsMenu.add(appendResultsItem);
 
         menuBar.add(optionsMenu);

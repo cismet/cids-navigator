@@ -11,10 +11,10 @@
         <Menu class="javax.swing.JMenu" name="profilesMenu">
           <Properties>
             <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMenuMnemonic(&quot;searchdialog.profiles&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.mnemonic&quot;).charAt(0)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMenuText(&quot;searchdialog.profiles&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.text&quot;)" type="code"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -25,10 +25,10 @@
             <MenuItem class="javax.swing.JMenuItem" name="manageProfilesItem">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="resources.getMenuMnemonic(&quot;searchdialog.profiles.administration&quot;)" type="code"/>
+                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.mnemonic&quot;).charAt(0)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="resources.getMenuText(&quot;searchdialog.profiles.administration&quot;)" type="code"/>
+                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.text&quot;)" type="code"/>
                 </Property>
                 <Property name="actionCommand" type="java.lang.String" value="manageProfiles"/>
               </Properties>
@@ -38,10 +38,10 @@
         <Menu class="javax.swing.JMenu" name="optionsMenu">
           <Properties>
             <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMenuMnemonic(&quot;searchdialog.options&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.mnemonic&quot;).charAt(0)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMenuText(&quot;searchdialog.options&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.text&quot;)" type="code"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -52,10 +52,10 @@
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="appendResultsItem">
               <Properties>
                 <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="resources.getMenuMnemonic(&quot;searchdialog.options.append&quot;)" type="code"/>
+                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.mnemonic&quot;).charAt(0)" type="code"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="resources.getMenuText(&quot;searchdialog.options.append&quot;)" type="code"/>
+                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.text&quot;)" type="code"/>
                 </Property>
               </Properties>
             </MenuItem>
@@ -177,13 +177,13 @@
         <Component class="javax.swing.JButton" name="searchButton">
           <Properties>
             <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMnemonic(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.mnemonic&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.mnemonic&quot;).charAt(0)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.text&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.text&quot;)" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.tooltip&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.tooltip&quot;)" type="code"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="search"/>
           </Properties>
@@ -191,13 +191,13 @@
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMnemonic(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.mnemonics&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.mnemonics&quot;).charAt(0)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.text&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.text&quot;)" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.tooltip&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.tooltip&quot;)" type="code"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="cancel"/>
           </Properties>
@@ -205,13 +205,13 @@
         <Component class="javax.swing.JButton" name="resetButton">
           <Properties>
             <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getMnemonic(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.mnemonic&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.mnemonic&quot;).charAt(0)" type="code"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.text&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.text&quot;)" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.tooltip&quot;)" type="code"/>
+              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.tooltip&quot;)" type="code"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="reset"/>
           </Properties>

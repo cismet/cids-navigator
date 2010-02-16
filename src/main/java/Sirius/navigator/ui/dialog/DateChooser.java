@@ -34,6 +34,7 @@ import java.util.Calendar;
 import java.util.Vector;
 import java.util.Date;
 import java.text.*;
+import java.util.ResourceBundle;
 
 import Sirius.navigator.resource.ResourceManager;
 
@@ -70,11 +71,13 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
     
     private ActionListener actionListener = new ButtonListener();
     
-    private final ResourceManager resources = ResourceManager.getManager();
+    private static final ResourceManager resources = ResourceManager.getManager();
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     public DateChooser()
     {
-        this(new JFrame(), ResourceManager.getManager().getString("dialog.date.title"));
+        this(new JFrame(),
+                I18N.getString("Sirius.navigator.ui.dialog.DateChooser.title"));
     }
     
     /**
@@ -257,10 +260,10 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
         gl.setHgap(10);
         buttons.setLayout(gl);
         
-        acceptButton = new JButton(this.resources.getButtonText("apply"));
+        acceptButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.DateChooser.acceptButton.title"));
         acceptButton.setActionCommand("apply");
         acceptButton.addActionListener(actionListener);
-        cancelButton = new JButton(this.resources.getButtonText("cancel"));
+        cancelButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.DateChooser.cancelButton.title"));
         cancelButton.setActionCommand("cancel");
         cancelButton.addActionListener(actionListener);
         
@@ -443,7 +446,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
         cal.set(2004, calendarMonth, 1);
         date = cal.getTime();
         
-        SimpleDateFormat dateF =  new SimpleDateFormat("MMMM", ResourceManager.getManager().getLocale());
+        SimpleDateFormat dateF =  new SimpleDateFormat("MMMM", resources.getLocale());
         //dateF.applyLocalizedPattern("MMMM"); // complete monthname
         
         
@@ -460,7 +463,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
         cal.set(2001, 0, calendarDay);
         date = cal.getTime();
         
-        SimpleDateFormat dateF =  new SimpleDateFormat("E", ResourceManager.getManager().getLocale());
+        SimpleDateFormat dateF =  new SimpleDateFormat("E", resources.getLocale());
         //dateF.applyLocalizedPattern("DDDD"); // complete monthname
         
         

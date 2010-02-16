@@ -32,6 +32,7 @@ import javax.swing.Timer;
  */
 public class NavigatorSplashScreen extends JWindow {
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private static final ResourceManager resource = ResourceManager.getManager();
 
     private final ProgressObserver progressObserver;
     private final NavigatorLoader navigatorLoader;
@@ -186,7 +187,7 @@ public class NavigatorSplashScreen extends JWindow {
                         });
                     } catch (Throwable t) {
                         logger.fatal("could not create navigator instance", t);
-                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, ResourceManager.getManager().getExceptionName("nx01"), ResourceManager.getManager().getExceptionMessage("nx01"), t);
+                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, resource.getExceptionName("nx01"), resource.getExceptionMessage("nx01"), t);
                         System.exit(1);
                     }
                 }

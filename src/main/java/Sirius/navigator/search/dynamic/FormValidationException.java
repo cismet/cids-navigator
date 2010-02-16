@@ -6,14 +6,16 @@
 
 package Sirius.navigator.search.dynamic;
 
-import Sirius.navigator.resource.ResourceManager;
+import java.util.ResourceBundle;
 
 /**
  *
  * @author  pascal
  */
 public class FormValidationException extends Exception
-{   
+{
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
     /** Holds value of property formName. */
     private String formName;
     
@@ -102,19 +104,19 @@ public class FormValidationException extends Exception
     {
         StringBuffer buffer = new StringBuffer("<html>");
         
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.message.default"));
+        buffer.append(I18N.getString("Sirius.navigator.search.dynamic.FormValidationException.makeDefaultMessage().defaultMessage"));
         buffer.append("<p>");
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.form"));
+        buffer.append(I18N.getString("Sirius.navigator.search.dynamic.FormValidationException.makeDefaultMessage().form"));
         buffer.append(' ');
         buffer.append(formName);
         buffer.append("</p>");
         buffer.append("<p>");
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.parameter"));
+        buffer.append(I18N.getString("Sirius.navigator.search.dynamic.FormValidationException.makeDefaultMessage().parameter"));
         buffer.append(' ');
         buffer.append(parameterName);
         buffer.append("</p>");
         buffer.append("<p>");
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.type"));
+        buffer.append(I18N.getString("Sirius.navigator.search.dynamic.FormValidationException.makeDefaultMessage().type"));
         buffer.append(' ');
         buffer.append(expectedType);
         buffer.append("</p>");
@@ -127,7 +129,7 @@ public class FormValidationException extends Exception
     {
         StringBuffer buffer = new StringBuffer("<html>");
         
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.message.custom"));
+        buffer.append(I18N.getString("Sirius.navigator.search.dynamic.FormValidationException.makeCustomMessage().customMessage"));
         buffer.append("<p>");
         buffer.append(message);
         buffer.append("</p>");

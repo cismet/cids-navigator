@@ -49,12 +49,12 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private Object treeNode = null;
     private MetaObject backupObject = null;
     private MetaObject editorObject = null;
-    private final ResourceManager resources;
+    private static final ResourceManager resources = ResourceManager.getManager();;
     private JComponent wrappedWaitingPanel;
 
     /** Creates new form AttributeEditor */
     public NavigatorAttributeEditorGui() {
-        this.resources = ResourceManager.getManager();
+        
         initComponents();
         if (!StaticDebuggingTools.checkHomeForFile("cidsNavigatorGuiHiddenDebugControls")) {
             panDebug.setVisible(false);

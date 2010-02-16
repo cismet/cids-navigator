@@ -128,14 +128,12 @@
         <Component class="javax.swing.JButton" name="commitButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(&quot;save_subobjekt.gif&quot;)" type="code"/>
+              <Connection code="resource.getIcon(I18N.getString(&quot;Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.commitButton.icon&quot;))" type="code"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;attribute.viewer.commit.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.commitButton.tooltip" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
             </Property>
-            <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <PlainString value="commit"/>
-            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="commit" noResource="true"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                 <EmptyBorder/>
@@ -166,14 +164,12 @@
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(&quot;zurueck_sub_objekt.gif&quot;)" type="code"/>
+              <Connection code="resource.getIcon(I18N.getString(&quot;Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.cancelButton.icon&quot;))" type="code"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;attribute.viewer.cancel.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.cancelButton.tooltip" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
             </Property>
-            <Property name="actionCommand" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <PlainString value="cancel"/>
-            </Property>
+            <Property name="actionCommand" type="java.lang.String" value="cancel" noResource="true"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
               <Border info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
                 <EmptyBorder/>

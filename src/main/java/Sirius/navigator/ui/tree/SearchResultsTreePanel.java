@@ -73,7 +73,7 @@ public class SearchResultsTreePanel extends JPanel
         ResourceManager resources = ResourceManager.getManager();
         ActionListener toolBarListener = new ToolBarListener();
         
-        browseBackButton = new JButton(resources.getIcon("back24.gif"));
+        browseBackButton = new JButton(resources.getIcon(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.browseBackButton.icon")));
         browseBackButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.backButton.tooltip"));
         browseBackButton.setActionCommand("back");
         browseBackButton.setMargin(new Insets(4,4,4,4));
@@ -81,7 +81,7 @@ public class SearchResultsTreePanel extends JPanel
         toolBar.add(browseBackButton);
         //toolBar.addSeparator();
         
-        browseForwardButton = new JButton(resources.getIcon("forward24.gif"));
+        browseForwardButton = new JButton(resources.getIcon(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.browseForwardButton.icon")));
         browseForwardButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.browseForwardButton.tooltip"));
         browseForwardButton.setActionCommand("forward");
         browseForwardButton.setMargin(new Insets(4,4,4,4));
@@ -89,7 +89,7 @@ public class SearchResultsTreePanel extends JPanel
         toolBar.add(browseForwardButton);
         toolBar.addSeparator();
         
-        removeButton = new JButton(resources.getIcon("remove24.gif"));
+        removeButton = new JButton(resources.getIcon(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.removeButton.icon")));
         removeButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.removeButton.tooltip"));
         removeButton.setActionCommand("remove");
         removeButton.setMargin(new Insets(4,4,4,4));
@@ -97,7 +97,7 @@ public class SearchResultsTreePanel extends JPanel
         toolBar.add(removeButton);
         //toolBar.addSeparator();
         
-        clearButton = new JButton(resources.getIcon("delete24.gif"));
+        clearButton = new JButton(resources.getIcon(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.clearButton.icon")));
         clearButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.clearButton.tooltip"));
         clearButton.setActionCommand("clear");
         clearButton.setMargin(new Insets(4,4,4,4));
@@ -108,7 +108,7 @@ public class SearchResultsTreePanel extends JPanel
         //saveAllButton = new JButton(resources.getIcon("saveall24.gif"));
         saveAllButton = new JPopupMenuButton();
         saveAllButton.setPopupMenu(new HistoryPopupMenu());
-        saveAllButton.setIcon(resources.getIcon("saveall24.gif"));
+        saveAllButton.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.saveAllButton.icon")));
         saveAllButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.saveAllButton.tooltip"));
         saveAllButton.setActionCommand("saveall");
         saveAllButton.setMargin(new Insets(4,4,4,4));
@@ -124,7 +124,7 @@ public class SearchResultsTreePanel extends JPanel
         });
         showDirectlyInMap.setSelected(false);
         toolBar.add(showDirectlyInMap);
-        JLabel showDirectlyInMapLabel= new JLabel(resources.getIcon("map.png"));
+        JLabel showDirectlyInMapLabel= new JLabel(resources.getIcon(I18N.getString("Sirius.navigator.ui.tree.SearchResultsTreePanel.showDirectlyInMapLabel.icon")));
         showDirectlyInMapLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {

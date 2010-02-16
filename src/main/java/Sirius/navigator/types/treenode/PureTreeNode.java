@@ -18,13 +18,18 @@ public class PureTreeNode extends DefaultMetaTreeNode {
     private static ImageIcon closedIcon = null;
     private static ImageIcon leafIcon = null;
 
+    private static final ResourceManager resource = ResourceManager.getManager();
+
     public PureTreeNode(MetaNode metaNode) {
         super(metaNode);
 
         if (openIcon == null) {
-            openIcon = ResourceManager.getManager().getIcon("NodeIconOpen.gif");
-            closedIcon = ResourceManager.getManager().getIcon("NodeIconClosed.gif");
-            leafIcon = ResourceManager.getManager().getIcon("NodeIconClosed.gif");
+            openIcon = resource.getIcon(
+                    resource.getString("Sirius.navigator.types.treenode.PureTreeNode.openIcon"));
+            closedIcon = resource.getIcon(
+                    resource.getString("Sirius.navigator.types.treenode.PureTreeNode.closeIcon"));
+            leafIcon = resource.getIcon(
+                    resource.getString("Sirius.navigator.types.treenode.PureTreeNode.leafIcon"));
         }
     }
 

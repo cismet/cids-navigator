@@ -6,7 +6,7 @@
 
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import Sirius.navigator.resource.ResourceManager;
+
 import Sirius.server.localserver.attribute.Attribute;
 import java.awt.image.RescaleOp;
 import org.apache.log4j.lf5.util.Resource;

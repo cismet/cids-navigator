@@ -51,9 +51,10 @@ import java.awt.image.BufferedImage;
  */
 public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll {
 
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+
     protected final Logger logger = Logger.getLogger(MetaCatalogueTree.class);
     protected final DefaultStatusChangeSupport statusChangeSupport;
-    protected final ResourceManager resources;
     protected final DefaultTreeModel defaultTreeModel;
     protected final boolean useThread;
     protected final int maxThreadCount;
@@ -72,7 +73,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         this.maxThreadCount = maxThreadCount;
 
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
-        this.resources = ResourceManager.getManager();
         this.defaultTreeModel = (DefaultTreeModel) this.getModel();
 
         this.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
@@ -362,7 +362,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public void valueChanged(TreeSelectionEvent e) {
             DefaultMetaTreeNode selectedNode = (DefaultMetaTreeNode) (e.getPath().getLastPathComponent());
-            statusChangeSupport.fireStatusChange(MetaCatalogueTree.this.getSelectionCount() + " " + resources.getString("tree.catalogue.status.selected"), Status.MESSAGE_POSITION_1);
+            statusChangeSupport.fireStatusChange(MetaCatalogueTree.this.getSelectionCount() + " " +
+                    I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.valueChanged().objectsSelected"),
+                    Status.MESSAGE_POSITION_1);
         }
     }
 
@@ -413,12 +415,18 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     CismetThreadPool.execute(treeExploreThread);
                 } else {
                     try {
-                        statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_IGNORE, Status.ICON_BLINKING);
+                        statusChangeSupport.fireStatusChange(
+                                I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.treeExpanded().loadingObjects"),
+                                Status.MESSAGE_POSITION_1, Status.ICON_IGNORE, Status.ICON_BLINKING);
                         selectedNode.explore();
                         defaultTreeModel.nodeStructureChanged(selectedNode);
-                        statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.server"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                        statusChangeSupport.fireStatusChange(
+                                I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.treeExpanded().dataLoadedFromServer"),
+                                Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                     } catch (Exception exp) {
-                        statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading.error"), Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                        statusChangeSupport.fireStatusChange(
+                                I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.treeExpanded().loadingError"),
+                                Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
                         logger.fatal("treeExpanded() could not load nodes", exp);
                         selectedNode.removeChildren();
                     }
@@ -427,7 +435,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 if (logger.isDebugEnabled()) {
                     logger.debug("treeExpanded() " + selectedNode.getNode() + "'s children loaded from cache");
                 }
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.cache"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.treeExpanded().dataLoadedFromCache"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             }
         }
     }
@@ -464,7 +474,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 public void run() {
                     MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("<THREAD>: TreeExploreThread GUI Update fertig");
+                        logger.debug("<THREAD>: TreeExploreThread GUI update done");
                     }
                 }
             };
@@ -472,7 +482,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public void run() {
             try {
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.TreeExploreThread.loadingObjects"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
                 node.explore();
 
 
@@ -532,11 +544,15 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 // GUI Update asynchron zum EventDispatchThread
                 SwingUtilities.invokeLater(treeUpdateThread);
                 //SwingUtilities.invokeAndWait(runnable);
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.server"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.TreeExploreThread.dataLoadedFromServer"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                 threadCount--;
             } catch (Exception exp) {
                 logger.fatal("could not load nodes", exp);
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading.error"), Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.TreeExploreThread.loadingError"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
                 node.removeChildren();
                 SwingUtilities.invokeLater(treeUpdateThread);
                 threadCount--;
@@ -560,7 +576,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public void run() {
             try {
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.SubTreeExploreThread.loadingObjects"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
 
                 TreePath selectionPath = this.node.explore(this.childrenNodes);
 
@@ -568,10 +586,14 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                 SwingUtilities.invokeLater(treeUpdateThread);
 
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.server"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.SubTreeExploreThread.dataLoadedFromServer"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             } catch (Exception exp) {
                 logger.fatal("SubTreeExploreThread: could not load nodes", exp);
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading.error"), Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        I18N.getString("Sirius.navigator.ui.tree.MetaCatalogueTree.SubTreeExploreThread.loadingError"),
+                        Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
 
                 node.removeChildren();
                 MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);

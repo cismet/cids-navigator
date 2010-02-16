@@ -15,7 +15,7 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 import Sirius.navigator.ui.widget.MutablePanel;
-import Sirius.navigator.resource.ResourceManager;
+
 
 /**
  *

@@ -12,9 +12,12 @@ import javax.swing.tree.*;
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.resource.*;
 
+import java.util.ResourceBundle;
+
 public class RootTreeNode extends DefaultMetaTreeNode
 {
     private final TreeNodeLoader treeNodeLoader;
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     public RootTreeNode() //throws Exception
     {
@@ -100,12 +103,12 @@ public class RootTreeNode extends DefaultMetaTreeNode
     
     public String toString()
     { 
-        return ResourceManager.getManager().getString("node.root.name");
+        return I18N.getString("Sirius.navigator.types.treenode.RootTreeNode.toString().returnValue");
     }
     
     public String getDescription()
     {
-        return ResourceManager.getManager().getString("node.root.description");
+        return I18N.getString("Sirius.navigator.types.treenode.RootTreeNode.getDescription().returnValue");
     }
     
     /**

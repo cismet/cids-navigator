@@ -19,7 +19,9 @@ import Sirius.navigator.plugin.*;
  * @author  Peter Alzheimer
  */
 public class PluginTree extends JTree
-{   
+{
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    private static final ResourceManager resources = ResourceManager.getManager();
     private final PluginTreeNode rootNode;
     
     /** Holds value of property initialized. (lazy initialization) */
@@ -121,10 +123,10 @@ public class PluginTree extends JTree
         
         public PluginTreeNode()
         {
-            super(ResourceManager.getManager().getString("plugin.tree.rootnode"));
+            super(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.rootNode"));
             this.pluginDescriptor = null;
             this.methodDescriptor = null;
-            this.icon = ResourceManager.getManager().getIcon("plugin_node_root.gif");
+            this.icon = resources.getIcon(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.icon.root"));
         }
         
         public PluginTreeNode(PluginDescriptor pluginDescriptor)
@@ -132,7 +134,7 @@ public class PluginTree extends JTree
             super(pluginDescriptor.getName());
             this.pluginDescriptor = pluginDescriptor;
             this.methodDescriptor = null;
-            this.icon = ResourceManager.getManager().getIcon("plugin_node_plugin.gif");
+            this.icon = resources.getIcon(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.icon.pluginNode"));
             
             if(pluginDescriptor.isPluginMethodsAvailable())
             {
@@ -145,7 +147,7 @@ public class PluginTree extends JTree
             super(methodDescriptor.getName());
             this.pluginDescriptor = null;
             this.methodDescriptor = methodDescriptor;
-            this.icon = ResourceManager.getManager().getIcon("plugin_node_method.gif");
+            this.icon = resources.getIcon(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.icon.pluginNodeMethod"));
         }
         
         protected void addMethods()

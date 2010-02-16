@@ -23,6 +23,7 @@ public class ExceptionManager
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private final static Logger logger = Logger.getLogger(ExceptionManager.class);
     private static ExceptionManager manager = null;
+    private static final ResourceManager resource = ResourceManager.getManager();
     
     public final static int WARNING = 1;
     public final static int ERROR = 2;
@@ -81,21 +82,21 @@ public class ExceptionManager
     {
         JDialog exceptionDialog = new JDialog(owner, true);
         exceptionDialog.setLocationRelativeTo(owner);
-        showExceptionDialog(exceptionDialog, level, ResourceManager.getManager().getExceptionName(errorcode), ResourceManager.getManager().getExceptionMessage(errorcode), exception);
+        showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
     }
     
     public void showExceptionDialog(JDialog owner, int level, String errorcode, Throwable exception)
     {
         JDialog exceptionDialog = new JDialog(owner, true);
         exceptionDialog.setLocationRelativeTo(owner);
-        showExceptionDialog(exceptionDialog, level, ResourceManager.getManager().getExceptionName(errorcode), ResourceManager.getManager().getExceptionMessage(errorcode), exception);
+        showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
     }
     
     public void showExceptionDialog(int level, String errorcode, Throwable exception)
     {
         JDialog exceptionDialog = new JDialog(new JFrame(), true);
         exceptionDialog.setLocationRelativeTo(null);
-        showExceptionDialog(exceptionDialog, level, ResourceManager.getManager().getExceptionName(errorcode), ResourceManager.getManager().getExceptionMessage(errorcode), exception);
+        showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
     }
     
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .

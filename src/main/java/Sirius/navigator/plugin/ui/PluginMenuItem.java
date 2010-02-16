@@ -9,7 +9,7 @@ import Sirius.navigator.plugin.*;
 import Sirius.navigator.plugin.interfaces.*;
 import Sirius.navigator.method.*;
 import Sirius.server.localserver.method.*;
-import Sirius.navigator.resource.ResourceManager;
+import java.util.ResourceBundle;
 
 /**
  *
@@ -19,6 +19,8 @@ public class PluginMenuItem extends JMenuItem
 {
     protected PluginMethod pluginMethod = null;
     protected Method method = null;
+
+    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     /** Holds value of property availability. */
     private long availability = 0;
@@ -99,9 +101,9 @@ public class PluginMenuItem extends JMenuItem
                 
                 // XXX i18n
                 JOptionPane.showMessageDialog(PluginMenuItem.this,
-                        ResourceManager.getManager().getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed.ErrorMessage1") + t.getMessage() +
-                        ResourceManager.getManager().getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed.ErrorMessage2"),
-                        ResourceManager.getManager().getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed.ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+                        I18N.getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed().ErrorMessage1") + t.getMessage() +
+                        I18N.getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed().ErrorMessage2"),
+                        I18N.getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed().ErrorTitle"), JOptionPane.ERROR_MESSAGE);
             }
         }
     }

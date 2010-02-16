@@ -56,7 +56,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
     private final static Logger logger = Logger.getLogger(MutableToolBar.class);
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
-    private final ResourceManager resources;
+    private static final ResourceManager resources = ResourceManager.getManager();
     
     private final JToolBar defaultToolBar;
     private final MoveableToolBarsMap moveableToolBars;
@@ -107,8 +107,6 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         
         this.advancedLayout = advancedLayout;
         
-        resources = ResourceManager.getManager();
-        
         moveableToolBars = new MoveableToolBarsMap();
         pluginToolBars = new PluginToolBarsMap();
         
@@ -148,7 +146,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
     private void createDefaultButtons() 
     {
         logger.debug("creating default buttons");
-        ResourceManager resources = ResourceManager.getManager();
+
         ActionListener toolBarListener = new ToolBarListener();
         JButton button = null;
         
@@ -159,7 +157,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);*/
         
-        button = new JButton(resources.getButtonIcon("toolbar.search"));
+        button = new JButton(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutableToolBar.createDefaultButtons().defaultButton1.icon")));
         button.setToolTipText(I18N.getString("Sirius.navigator.ui.MutableToolBar.createDefaultButtons().defaultButton1.tooltip"));
         button.setActionCommand("search");
         //button.setMargin(new Insets(0,0,0,0));
@@ -174,7 +172,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);*/
         
-        button = new JButton(resources.getButtonIcon("toolbar.plugin"));
+        button = new JButton(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutableToolBar.createDefaultButtons().defaultButton2.icon")));
         button.setToolTipText(I18N.getString("Sirius.navigator.ui.MutableToolBar.createDefaultButtons().defaultButton2.tooltip"));
         button.setActionCommand("plugin");
         button.setEnabled(false);//HELL
@@ -456,7 +454,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
                 }
                 catch (Throwable t)
                 {
-                    logger.fatal("Fehler bei der Verarbeitung der Suchmethode", t);
+                    logger.fatal("Error while processing searchmethod", t);
                     
                     //ErrorDialog errorDialog = new ErrorDialog("Fehler bei der Verarbeitung der Suchmethode", t.toString(), ErrorDialog.WARNING);
                     //errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
