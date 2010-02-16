@@ -45,7 +45,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     private final Logger logger = Logger.getLogger(this.getClass());
     private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
-    private final ResourceManager resources = ResourceManager.getManager();;
+    private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
     
     private ComplexEditor editor = null;
