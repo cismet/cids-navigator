@@ -25,11 +25,12 @@ public class TitleBar extends javax.swing.JPanel
     public TitleBar(String title, Icon icon)
     {
         this();
-        
+
         this.setTitle(title);
         this.setIcon(icon);
     }
     
+    @Override
     protected void paintComponent(Graphics g)
     {
         Color left=this.getForeground();
@@ -127,6 +128,24 @@ public class TitleBar extends javax.swing.JPanel
     {
         this.titleLabel.setForeground(titleColor);
     }
+
+    public JLabel getIconLabel() {
+        return iconLabel;
+    }
+
+    public void setIconLabel(JLabel iconLabel) {
+        this.iconLabel = iconLabel;
+    }
+
+    public JLabel getTitleLabel() {
+        return titleLabel;
+    }
+
+    public void setTitleLabel(JLabel titleLabel) {
+        this.titleLabel = titleLabel;
+    }
+
+    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel iconLabel;

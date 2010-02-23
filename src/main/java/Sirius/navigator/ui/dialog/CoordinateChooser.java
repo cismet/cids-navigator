@@ -101,7 +101,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridx = 0;
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
-        JLabel infoLabel = new JLabel(I18N.getString("dialog.coordinate.info"));
+        JLabel infoLabel = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.infoLabel.text"));
         infoLabel.setVerticalAlignment(JLabel.CENTER);
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));

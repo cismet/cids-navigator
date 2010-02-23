@@ -378,7 +378,7 @@ public abstract class ProfileManager extends JDialog implements ActionListener
                     "' " +  entry +  "' " +
                     I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.confirmOverwrite().confirmOptionPane.message1");
             int result = JOptionPane.showConfirmDialog (this, message,
-                    I18N.getString ("dialog.profile.save.overwrite"), 
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.confirmOverwrite().confirmOptionPane.title"),
                     JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             
             if(result == JOptionPane.YES_OPTION)
@@ -498,8 +498,8 @@ public abstract class ProfileManager extends JDialog implements ActionListener
                 else
                 {
                     JOptionPane.showMessageDialog (this,
-                    I18N.getString ("dialog.profile.save.error.message"),
-                    I18N.getString ("dialog.profile.save.error"),
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.actionPerformed().saveErrorOptionPane.message"),
+                    I18N.getString ("Sirius.navigator.search.dynamic.profile.ProfileManager.ProfileSaveDialog.actionPerformed().saveErrorOptionPane.title"),
                     JOptionPane.WARNING_MESSAGE);
                 }
             }

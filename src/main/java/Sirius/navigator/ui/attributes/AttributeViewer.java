@@ -27,13 +27,13 @@ import javax.swing.AbstractButton;
  */
 public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar {
 
-    private final ResourceManager resources;
+    private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
     private final Logger logger;
 
     /** Creates new form AttributeViewer */
     public AttributeViewer() {
-        this.resources = ResourceManager.getManager();
+//        this.resources = ResourceManager.getManager();
         this.logger = Logger.getLogger(this.getClass());
 
         initComponents();

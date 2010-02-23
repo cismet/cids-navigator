@@ -157,7 +157,7 @@ public class SearchProgressDialog extends javax.swing.JDialog
         public void actionPerformed(ActionEvent e)
         {
             SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
-                    I18N.getString("search.dialog.progress.status.canceld"),
+                    I18N.getString("Sirius.navigator.search.dynamic.SearchProgressDialog.ButtonListener.actionPerformed().status.canceled"),
                     Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
             SearchProgressDialog.this.animationLabel.switchOff(true);
             SearchProgressDialog.this.setCanceld(true);

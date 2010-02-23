@@ -116,7 +116,7 @@
           <SubComponents>
             <Component class="Sirius.navigator.ui.attributes.AttributeTable" name="attributeTable">
               <Properties>
-                <Property name="autoResizeMode" type="int" value="4"/>
+                <!--Property name="autoResizeMode" type="int" value="4"/-->
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[100, 50]"/>
                 </Property>
