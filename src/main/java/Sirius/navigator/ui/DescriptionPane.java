@@ -53,8 +53,6 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
-import java.util.Map;
-import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -119,10 +117,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         //breadCrumbGui= new SimplestBreadCrumbGui(breadCrumbModel);
         panBreadCrump.add(breadCrumbGui, BorderLayout.CENTER);
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
+        BufferedReader reader = null;
         try {
             StringBuffer buffer = new StringBuffer();
             String string = null;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(ResourceManager.getManager().getNavigatorResourceAsStream(ResourceManager.getManager().getString("descriptionpane.html.welcome"))));
+            reader = new BufferedReader(new InputStreamReader(ResourceManager.getManager().getNavigatorResourceAsStream(ResourceManager.getManager().getString("descriptionpane.html.welcome"))));
 
             while ((string = reader.readLine()) != null) {
                 buffer.append(string);
@@ -130,6 +129,15 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             this.welcomePage = buffer.toString();
         } catch (IOException ioexp) {
+            log.debug(ioexp, ioexp);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    log.warn(ex, ex);
+                }
+            }
         }
 
         scpRenderer.setViewportView(panRenderer);
@@ -276,7 +284,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 @Override
                 protected JComponent doInBackground() throws Exception {
-                    Vector filteredObjects = new Vector(objects);
+//                    Vector filteredObjects = new Vector(objects);
                     MultiMap objectsByClass = new MultiMap();
                     for (Object object : objects) {
                         if (object != null && !((DefaultMetaTreeNode) object).isWaitNode() && !((DefaultMetaTreeNode) object).isRootNode() && !((DefaultMetaTreeNode) object).isPureNode() && ((DefaultMetaTreeNode) object).isObjectNode()) {
@@ -288,7 +296,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                             }
                         }
                     }
-                    int y = 0;
+//                    int y = 0;
                     Iterator it = objectsByClass.keySet().iterator();
 
 
@@ -298,7 +306,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         Object key = it.next();
                         List l = (List) objectsByClass.get(key);
 
-                        Vector<MetaObject> v = new Vector<MetaObject>();
+                        List<MetaObject> v = TypeSafeCollections.newArrayList();
                         for (Object o : l) {
                             v.add(((ObjectTreeNode) o).getMetaObject());
                         }
