@@ -111,7 +111,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 super.mouseClicked(e);
                 if (e.getClickCount() > 1) {
                     try {
-                        PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap");
+//                        PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap");
 
                         Vector<DefaultMetaTreeNode> v = new Vector<DefaultMetaTreeNode>();
                         DefaultMetaTreeNode[] resultNodes = getSelectedNodesArray();

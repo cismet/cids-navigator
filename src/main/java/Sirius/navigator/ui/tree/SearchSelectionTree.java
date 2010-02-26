@@ -10,19 +10,12 @@ import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import java.awt.*;
-import java.awt.event.*;
-import java.beans.*;
-import java.io.*;
 import java.util.*;
 import javax.swing.tree.*;
-import java.util.*;
-import javax.swing.tree.*;
-import javax.swing.event.*;
 import org.apache.log4j.Logger;
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.types.treenode.*;
-import Sirius.navigator.types.*;
 import Sirius.navigator.types.iterator.*;
 //import Sirius.navigator.NavigatorLogger;
 
