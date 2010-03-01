@@ -35,7 +35,6 @@ import Sirius.navigator.connection.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
 import de.cismet.tools.CismetThreadPool;
-import java.beans.Beans;
 
 /**
  *
@@ -57,17 +56,14 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         
         initComponents();
 
-        if(!Beans.isDesignTime()) {
+        ActionListener buttonListener = new ButtonListener();
+        this.cancelButton.addActionListener(buttonListener);
+        this.commitButton.addActionListener(buttonListener);
+        //this.editButton.addActionListener(buttonListener);
+        //this.pinButton.addActionListener(buttonListener);
 
-            ActionListener buttonListener = new ButtonListener();
-            this.cancelButton.addActionListener(buttonListener);
-            this.commitButton.addActionListener(buttonListener);
-            //this.editButton.addActionListener(buttonListener);
-            //this.pinButton.addActionListener(buttonListener);
-
-            this.attributeTree.addTreeSelectionListener(new MetaObjectListener());
-            this.attributeTree.setIgnoreInvisibleAttributes(false);
-        }
+        this.attributeTree.addTreeSelectionListener(new MetaObjectListener());
+        this.attributeTree.setIgnoreInvisibleAttributes(false);
         
     }
 

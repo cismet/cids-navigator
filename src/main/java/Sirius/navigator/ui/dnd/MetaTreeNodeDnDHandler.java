@@ -76,18 +76,18 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 //                }
 //            });
         int sourceActions = DnDConstants.ACTION_COPY_OR_MOVE;
-        if(this.metaTree instanceof SearchResultsTree) {
-            sourceActions = DnDConstants.ACTION_COPY;// & InputEvent.BUTTON3_MASK;
-        } else {
-            sourceActions = DnDConstants.ACTION_COPY_OR_MOVE + DnDConstants.ACTION_LINK;// & InputEvent.BUTTON3_MASK;
-        }
+//        if(this.metaTree instanceof SearchResultsTree) {
+//            sourceActions = DnDConstants.ACTION_COPY;// & InputEvent.BUTTON3_MASK;
+//        } else {
+//            sourceActions = DnDConstants.ACTION_COPY_OR_MOVE + DnDConstants.ACTION_LINK;// & InputEvent.BUTTON3_MASK;
+//        }
         
         _colorCueLine = new Color(SystemColor.controlShadow.getRed(), SystemColor.controlShadow.getGreen(),SystemColor.controlShadow.getBlue(), 64);
         
         DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(this.metaTree, sourceActions , this);
-        if(!(this.metaTree instanceof SearchResultsTree)) {
-            DropTarget dropTarget = new DropTarget(this.metaTree, this);
-        }
+//        if(!(this.metaTree instanceof SearchResultsTree)) {
+//            DropTarget dropTarget = new DropTarget(this.metaTree, this);
+//        }
     }
     
     public void dragGestureRecognized(DragGestureEvent dge) {
@@ -123,7 +123,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             TreePath treePath = this.metaTree.getPathForLocation(dragOrigin.x, dragOrigin.y);
             //
             dragPaths=metaTree.getSelectionPaths();
-           
             Rectangle pathBounds = this.metaTree.getPathBounds(treePath);
             this.dragPoint.setLocation(dragOrigin.x - pathBounds.x, dragOrigin.y - pathBounds.y);
             

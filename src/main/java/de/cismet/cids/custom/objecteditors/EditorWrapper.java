@@ -4,6 +4,7 @@
  */
 package de.cismet.cids.custom.objecteditors;
 
+import Sirius.navigator.ui.RequestsFullSizeComponent;
 import de.cismet.cids.tools.metaobjectrenderer.Titled;
 import de.cismet.tools.gui.BorderProvider;
 import de.cismet.tools.gui.ComponentWrapper;
@@ -27,7 +28,13 @@ public class EditorWrapper implements ComponentWrapper {
 
     public WrappedComponent wrapComponent(JComponent component) {
         component.setBorder(new EmptyBorder(10, 10, 10, 10));
-        final CoolEditor ced = new CoolEditor();
+        final CoolEditor ced;
+        if (component instanceof RequestsFullSizeComponent) {
+            //tagging interface fue full size an umschliessende komponente "weitervererben"
+            ced = new FullSizeCoolEditor();
+        } else {
+            ced = new CoolEditor();
+        }
         if (component instanceof BorderProvider) {
             final BorderProvider borderProvider = (BorderProvider) component;
             ced.getPanEdit().setBorder(borderProvider.getCenterrBorder());
@@ -51,5 +58,10 @@ public class EditorWrapper implements ComponentWrapper {
         }
         return ced;
 
+
+    }
+
+    private static final class FullSizeCoolEditor extends CoolEditor implements RequestsFullSizeComponent {
+        //existiert nur um FullSize tagging interface an die umschliessende Komponente zu "vererben"
     }
 }

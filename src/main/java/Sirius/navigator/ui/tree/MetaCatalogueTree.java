@@ -111,7 +111,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 super.mouseClicked(e);
                 if (e.getClickCount() > 1) {
                     try {
-                        PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap");
+//                        PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap");
 
                         Vector<DefaultMetaTreeNode> v = new Vector<DefaultMetaTreeNode>();
                         DefaultMetaTreeNode[] resultNodes = getSelectedNodesArray();
@@ -184,38 +184,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
             SubTreeExploreThread subTreeExploreThread = new SubTreeExploreThread((DefaultMetaTreeNode) rootNode, childrenIterator);
             CismetThreadPool.execute(subTreeExploreThread);
-
-
-            //Versuch den den refresh Bug bei dyn Knoten rauszumachen
-//
-//            DefaultMetaTreeNode parentNode = (DefaultMetaTreeNode) rootNode;
-//            while (childrenIterator.hasNext()) {
-//                DefaultMetaTreeNode child = (DefaultMetaTreeNode) childrenIterator.next();
-//
-//                final DefaultMetaTreeNode parent = parentNode;
-//                Iterator singleChild = Arrays.asList(child).iterator();
-//                try {
-////                    final TreePath selectionPath = parent.explore(singleChild);
-//////                    SwingUtilities.invokeAndWait(new Runnable() {
-//////                        public void run() {
-////                            MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged((TreeNode)parent);
-////                            MetaCatalogueTree.this.expandPath(selectionPath);
-////                            MetaCatalogueTree.this.setSelectionPath(selectionPath);
-//////                        }
-//////                    });
-//                    logger.info("parent="+ parent+"  child=" + child);
-//                    SubTreeExploreThread subTreeExploreThread = new SubTreeExploreThread(parent, singleChild);
-//                    subTreeExploreThread.start();
-//                    parentNode = child;
-//
-//                } catch (Exception ex) {
-//                    logger.error("Fehler beim selektieren", ex);
-//                }
-//
-////                SwingUtilities.invokeLater(treeUpdateThread);
-//            }
-
-
 
         } else {
             logger.warn("could not explore subtree");
@@ -354,7 +322,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         return false;
     }
 
-    // INNERE KLASSEN ==========================================================
     /**
      *
      */

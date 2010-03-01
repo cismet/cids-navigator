@@ -54,6 +54,7 @@ import javax.swing.tree.TreePath;
 public class MutableMenuBar extends JMenuBar {
 
     ResourceManager resources = ResourceManager.getManager();
+
     private final static Logger logger = Logger.getLogger(MutableMenuBar.class);
     private final PluginMenuesMap pluginMenues;
     private final EmbeddedContainersMap moveableMenues;
@@ -166,9 +167,8 @@ public class MutableMenuBar extends JMenuBar {
         JMenu menu = null;
         JMenuItem item = null;
         MenuItemActionListener itemListener = new MenuItemActionListener();
-        
 
-        // NAVIGATOR MENU ======================================================
+
         menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.title"));
         menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.navigatorMenu.mnemonic").charAt(0));
         this.add(menu);
@@ -212,7 +212,6 @@ public class MutableMenuBar extends JMenuBar {
         item.setActionCommand("navigator.exit");
         item.addActionListener(itemListener);
 
-        // SEARCH MENU =========================================================
         menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.title"));
         menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.searchMenu.mnemonic").charAt(0));
         this.add(menu);
@@ -247,7 +246,6 @@ public class MutableMenuBar extends JMenuBar {
         item.setActionCommand("search.profiles");
         item.addActionListener(itemListener);
 
-        // TOOLS MENU ==========================================================
         menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.toolsMenu.title"));
         menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.toolsMenu.mnemonic").charAt(0));
         this.add(menu);
@@ -261,7 +259,6 @@ public class MutableMenuBar extends JMenuBar {
 
         //this.add(new JSeparator(SwingConstants.HORIZONTAL));
 
-        // Plugin Menu =========================================================
         menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.pluginMenu.title"));
         menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.pluginMenu.mnemonic").charAt(0));
         menu.setEnabled(false); //HELL
@@ -276,14 +273,12 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         menu.addSeparator();
 
-        // Fenster Menu ======================================================
         menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.windowMenu.title"));
         menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.windowMenu.mnemonic").charAt(0));
         this.add(menu);
         viewMenu = menu;
 
 
-        // Help Menu ===========================================================
         menu = new JMenu(resources.getString("Sirius.navigator.ui.MutableMenuBar.helpMenu.title"));
         menu.setMnemonic(resources.getString("Sirius.navigator.ui.MutableMenuBar.helpMenu.mnemonic").charAt(0));
         this.add(menu);
@@ -302,7 +297,6 @@ public class MutableMenuBar extends JMenuBar {
         }
     }
 
-    // INNERE KLASSEN ZUM BEARBEITEN DER EREIGNISSE ============================
     private class MenuItemActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {

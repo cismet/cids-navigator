@@ -157,7 +157,6 @@ public class MutablePopupMenu extends JPopupMenu {
         return this.pluginMenues.isAvailable(id);
     }
 
-    // INNERE KLASSEN ZUM BEARBEITEN DER EREIGNISSE ============================
     /**
      * Innere Klasse zum verarbeiten des PopupMenuEvent.<br>
      * Wenn das PopupMenu sichtbar wird, werden anhand der im Baum selektierten

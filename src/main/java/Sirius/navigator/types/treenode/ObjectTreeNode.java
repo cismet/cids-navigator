@@ -132,7 +132,6 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         }
     }
 
-    // ===========================================================================
     public final int getID() {
         return this.getMetaObjectNode().getId();
     }
@@ -141,7 +140,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         return this.getMetaObjectNode().getDomain();
     }
 
-    public final MetaObject getMetaObject() {
+    public final synchronized MetaObject getMetaObject() {
         if (this.getMetaObjectNode().getObject() == null) {
             try {
                 if (logger.isDebugEnabled()) {
@@ -156,7 +155,6 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                 logger.error("could not retrieve meta object of node '" + this + "'", t);
             }
         }
-
         return this.getMetaObjectNode().getObject();
     }
 

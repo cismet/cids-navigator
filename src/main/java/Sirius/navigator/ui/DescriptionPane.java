@@ -22,10 +22,12 @@ import calpa.html.DefaultCalHTMLObserver;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
+import de.cismet.cids.utils.MetaTreeNodeStore;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
 import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.WrappedComponent;
 import de.cismet.tools.gui.breadcrumb.DefaultBreadCrumbModel;
 import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
 import java.awt.BorderLayout;
@@ -118,10 +120,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         //breadCrumbGui= new SimplestBreadCrumbGui(breadCrumbModel);
         panBreadCrump.add(breadCrumbGui, BorderLayout.CENTER);
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
+        BufferedReader reader = null;
         try {
             StringBuffer buffer = new StringBuffer();
             String string = null;
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
+            reader = new BufferedReader(new InputStreamReader(
                     resource.getNavigatorResourceAsStream(
                     I18N.getString("Sirius.navigator.ui.DescriptionPane.html.welcome"))));
 
@@ -131,6 +134,15 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             this.welcomePage = buffer.toString();
         } catch (IOException ioexp) {
+            log.debug(ioexp, ioexp);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    log.warn(ex, ex);
+                }
+            }
         }
 
         scpRenderer.setViewportView(panRenderer);
@@ -264,7 +276,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     //Multiple Objects
     public void setNodesDescriptions(final List<?> objects) {
-        breadCrumbModel.clear();
+//        breadCrumbModel.clear();
         if (objects.size() == 1) {
             setNodeDescription(objects.get(0));
         } else {
@@ -279,7 +291,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 @Override
                 protected JComponent doInBackground() throws Exception {
-                    Vector filteredObjects = new Vector(objects);
+//                    Vector filteredObjects = new Vector(objects);
                     MultiMap objectsByClass = new MultiMap();
                     for (Object object : objects) {
                         if (object != null && !((DefaultMetaTreeNode) object).isWaitNode() && !((DefaultMetaTreeNode) object).isRootNode() && !((DefaultMetaTreeNode) object).isPureNode() && ((DefaultMetaTreeNode) object).isObjectNode()) {
@@ -287,11 +299,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                                 ObjectTreeNode n = (ObjectTreeNode) object;
                                 objectsByClass.put(n.getMetaClass(), n);
                             } catch (Throwable t) {
-                                log.warn("Error while preparing object representation", t);
+                                log.warn("Fehler beim Vorbereiten der Darstellung der Objekte", t);
                             }
                         }
                     }
-                    int y = 0;
+//                    int y = 0;
                     Iterator it = objectsByClass.keySet().iterator();
 
 
@@ -301,7 +313,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         Object key = it.next();
                         List l = (List) objectsByClass.get(key);
 
-                        Vector<MetaObject> v = new Vector<MetaObject>();
+                        List<MetaObject> v = TypeSafeCollections.newArrayList();
                         for (Object o : l) {
                             v.add(((ObjectTreeNode) o).getMetaObject());
                         }
@@ -386,6 +398,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     gridBagConstraints.weightx = 1;
                     gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                     gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                    if (!(panRenderer.getLayout() instanceof GridBagLayout)) {
+                        panRenderer.setLayout(new GridBagLayout());
+                    }
                     if (wrappedWaitingPanel != null) {
                         panRenderer.add(wrappedWaitingPanel, gridBagConstraints);
                     }
@@ -402,9 +417,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
         breadCrumbModel.appendCrumb(new CidsMetaObjectBreadCrumb(to) {
+
             @Override
             public void crumbActionPerformed(ActionEvent e) {
-                startSingleRendererWorker(to,optionalTitle);
+
+                startSingleRendererWorker(to, optionalTitle);
+
             }
         });
         startSingleRendererWorker(to, optionalTitle);
@@ -416,7 +434,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             @Override
             protected MetaObject doInBackground() throws Exception {
-                return SessionManager.getProxy().getMetaObject(toObjectId,  mc.getId(), mc.getDomain());
+                return SessionManager.getProxy().getMetaObject(toObjectId, mc.getId(), mc.getDomain());
             }
 
             @Override
@@ -433,11 +451,15 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     private final void startSingleRendererWorker(final DefaultMetaTreeNode node) {
         final MetaObject o = ((ObjectTreeNode) node).getMetaObject();
-        
-        startSingleRendererWorker(o, node.toString());
+
+        startSingleRendererWorker(o, node, node.toString());
     }
 
     private final void startSingleRendererWorker(final MetaObject o, final String title) {
+        startSingleRendererWorker(o, null, title);
+    }
+
+    private final void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node, final String title) {
 
         worker = new javax.swing.SwingWorker<JComponent, Void>() {
 
@@ -447,6 +469,11 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
                 final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
+                if (jComp instanceof MetaTreeNodeStore && node != null) {
+                    ((MetaTreeNodeStore) jComp).setMetaTreeNode(node);
+                } else if (jComp instanceof WrappedComponent && ((WrappedComponent) jComp).getOriginalComponent() instanceof MetaTreeNodeStore && node != null) {
+                    ((MetaTreeNodeStore) ((WrappedComponent) jComp).getOriginalComponent()).setMetaTreeNode(node);
+                }
                 o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
                     @Override
@@ -473,7 +500,14 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         gridBagConstraints.weightx = 1;
                         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                        panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
+                        if (comp instanceof RequestsFullSizeComponent) {
+                            log.info("Renderer is FullSize Component!");
+                            panRenderer.setLayout(new BorderLayout());
+                            panRenderer.add(comp, BorderLayout.CENTER);
+
+                        } else {
+                            panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
+                        }
                         panRenderer.revalidate();
                         revalidate();
                         repaint();
@@ -499,7 +533,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         final String descriptionURL = n.getDescription();
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
-           
+
             final MetaObject o = ((ObjectTreeNode) n).getMetaObject();
             breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
 
@@ -510,7 +544,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             });
 
 
-            
+
             startSingleRendererWorker(n);
         } else {
             if (n.isClassNode()) {
@@ -558,7 +592,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
 
             //this.setText("<html><body><h3>" + ResourceManager.getManager().getString("descriptionpane.welcome") + "</h3></body></html>");
-            htmlPane.showHTMLDocument(welcomePage);
+            htmlPane.showHTMLDocument(welcomePage); 
         }
     }
 

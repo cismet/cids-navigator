@@ -627,7 +627,6 @@ public class Navigator extends JFrame {
             this.setExtendedState(MAXIMIZED_BOTH);
         }
     }
-    // =========================================================================
 
     private class ClosingListener extends WindowAdapter {
 
@@ -860,10 +859,10 @@ public class Navigator extends JFrame {
                                     }
 
                                 } else {
-                                    logger.warn("Jemand versucht von einem anderen Rechner auf das Http Interface zuzugreifen. Abgelehnt.");
+                                    logger.warn("Sombody tries to access the HTTP Interface from a different Terminal. Rejected.");
                                 }
                             } catch (Throwable t) {
-                                logger.error("Fehler im behandelen von HttpRequests", t);
+                                logger.error("Error while handling HttpRequests", t);
                             }
                         }
                     };
@@ -875,7 +874,7 @@ public class Navigator extends JFrame {
                     server.start();
                     server.join();
                 } catch (Throwable t) {
-                    logger.error("Fehler im HttpInterface des Navigators auf Port " + propertyManager.getHttpInterfacePort(), t);
+                    logger.error("Error in  Navigator HttpInterface on port " + propertyManager.getHttpInterfacePort(), t);
                 }
             }
         });
