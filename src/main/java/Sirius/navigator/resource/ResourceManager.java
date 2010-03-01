@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import Sirius.navigator.exception.*;
 import Sirius.util.image.*;
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
+import Sirius.navigator.connection.proxy.*; 
 
 
 /**

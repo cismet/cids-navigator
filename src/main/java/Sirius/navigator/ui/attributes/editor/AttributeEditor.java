@@ -353,8 +353,8 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         javax.swing.JScrollPane treeScrollPane = new javax.swing.JScrollPane();
         attributeTree = new Sirius.navigator.ui.attributes.AttributeTree();
 
-        pinButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon")));
-        pinButton.setToolTipText(resources.getString("attribute.viewer.pin.tooltip"));
+        pinButton.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.pinButton.icon")));
+        pinButton.setToolTipText(I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.pinButton.tooltip"));
         pinButton.setActionCommand("pin");
         pinButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pinButton.setContentAreaFilled(false);
@@ -362,12 +362,16 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         pinButton.setMaximumSize(new java.awt.Dimension(16, 16));
         pinButton.setMinimumSize(new java.awt.Dimension(16, 16));
         pinButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        pinButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.rollover")));
-        pinButton.setRolloverSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.selected.rollover")));
-        pinButton.setSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.selected")));
+        pinButton.setRolloverIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.pinButton.rolloverIcon")));
+        pinButton.setRolloverSelectedIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.pinButton.rolloverSelectedIcon")));
+        pinButton.setSelectedIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.pinButton.selectedIcon")));
 
-        editButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon")));
-        editButton.setToolTipText(resources.getString("attribute.viewer.edit.tooltip"));
+        editButton.setIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.editButton.icon")));
+        editButton.setToolTipText(I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.editButton.tooltip"));
         editButton.setActionCommand("edit");
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
@@ -375,16 +379,21 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         editButton.setMaximumSize(new java.awt.Dimension(16, 16));
         editButton.setMinimumSize(new java.awt.Dimension(16, 16));
         editButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        editButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.rollover")));
-        editButton.setRolloverSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.selected.rollover")));
-        editButton.setSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.selected")));
+        editButton.setRolloverIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.editButton.rolloverIcon")));
+        editButton.setRolloverSelectedIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.editButton.rolloverSelectedIcon")));
+        editButton.setSelectedIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.editButton.selectedIcon")));
 
         setLayout(new java.awt.BorderLayout());
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
-        titleBar.setIcon(resources.getIcon("floatingframe.gif"));
-        titleBar.setTitle(resources.getString("attribute.editor.title"));
+        titleBar.setIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.titleBar.icon")));
+        titleBar.setTitle(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.titleBar.title"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -392,8 +401,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         gridBagConstraints.weighty = 1.0;
         controlBar.add(titleBar, gridBagConstraints);
 
-        commitButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon")));
-        commitButton.setToolTipText(resources.getString("attribute.viewer.commit.tooltip"));
+        commitButton.setIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.commitButton.icon")));
+        commitButton.setToolTipText(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.commitButton.tooltip"));
         commitButton.setActionCommand("commit");
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
@@ -402,13 +413,16 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         commitButton.setMaximumSize(new java.awt.Dimension(16, 16));
         commitButton.setMinimumSize(new java.awt.Dimension(16, 16));
         commitButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        commitButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon.rollover")));
+        commitButton.setRolloverIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.commitButton.rolloverIcon")));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         controlBar.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon")));
-        cancelButton.setToolTipText(resources.getString("attribute.viewer.cancel.tooltip"));
+        cancelButton.setIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.cancelButton.icon")));
+        cancelButton.setToolTipText(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.cancelButton.tooltip"));
         cancelButton.setActionCommand("cancel");
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
@@ -417,7 +431,8 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         cancelButton.setMaximumSize(new java.awt.Dimension(16, 16));
         cancelButton.setMinimumSize(new java.awt.Dimension(16, 16));
         cancelButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        cancelButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon.rollover")));
+        cancelButton.setRolloverIcon(resources.getIcon(
+                I18N.getString("Sirius.navigator.ui.attributes.editor.AttributeEditor.cancelButton.rolloverIcon")));
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
         add(controlBar, java.awt.BorderLayout.NORTH);
