@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.cismet.cids</groupId>
         <artifactId>cids-parent</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
     </parent>
 
     <groupId>de.cismet.cids.navigator</groupId>
@@ -53,6 +53,41 @@
     <build>
         <finalName>cidsNavigator</finalName>
     </build>
+
+    <profiles>
+        <profile>
+            <id>nb-exec</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>de.cismet.cids.navigator</groupId>
+                    <artifactId>default-forms</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>de.cismet.cismap</groupId>
+                    <artifactId>cismap-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>de.cismet.cids.navigator.plugin</groupId>
+                    <artifactId>wf-akuk</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>de.cismet.cids.navigator.plugin</groupId>
+                    <artifactId>rm-plugin</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>
 
 
