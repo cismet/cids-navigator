@@ -49,7 +49,7 @@ import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.permission.PermissionHolder;
 import Sirius.server.newuser.permission.Policy;
-import de.cismet.cids.utils.MetaTreeNodeVisualization;
+import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 

@@ -22,7 +22,7 @@ import calpa.html.DefaultCalHTMLObserver;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
-import de.cismet.cids.utils.MetaTreeNodeStore;
+import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
 import de.cismet.tools.collections.TypeSafeCollections;

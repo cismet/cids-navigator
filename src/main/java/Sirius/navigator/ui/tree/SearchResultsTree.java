@@ -11,7 +11,7 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 import de.cismet.tools.CismetThreadPool;
-import de.cismet.cids.utils.MetaTreeNodeVisualization;
+import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import java.awt.EventQueue;
 
 

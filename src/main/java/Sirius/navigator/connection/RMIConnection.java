@@ -47,7 +47,7 @@ import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
 import Sirius.server.dataretrieval.*;
 import Sirius.server.localserver.attribute.ClassAttribute;
-import de.cismet.cids.utils.ClassCacheMultiple;
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import java.io.File;
 
 /**

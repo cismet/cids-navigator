@@ -8,7 +8,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
-import de.cismet.cids.utils.FinalReference;
+import de.cismet.cids.navigator.utils.FinalReference;
 import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;

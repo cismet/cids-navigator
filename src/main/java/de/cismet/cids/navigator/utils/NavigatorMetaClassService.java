@@ -3,9 +3,10 @@
  * and open the template in the editor.
  */
 
-package de.cismet.cids.utils;
+package de.cismet.cids.navigator.utils;
 
 import Sirius.server.middleware.types.MetaClass;
+import de.cismet.cids.utils.MetaClassCacheService;
 import java.util.Hashtable;
 
 /**

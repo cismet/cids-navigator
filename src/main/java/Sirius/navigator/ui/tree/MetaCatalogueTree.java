@@ -39,7 +39,7 @@ import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.permission.PermissionHolder;
 import de.cismet.tools.CismetThreadPool;
-import de.cismet.cids.utils.MetaTreeNodeVisualization;
+import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
