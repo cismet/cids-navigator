@@ -48,6 +48,13 @@
             <artifactId>jetty</artifactId>
             <version>6.1.16</version>
         </dependency>
+        <!-- missing runtime dependency, probably because of faulty swingx poms -->
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swing-worker</artifactId>
+            <version>1.1</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
