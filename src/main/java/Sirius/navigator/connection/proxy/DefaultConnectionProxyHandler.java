@@ -80,9 +80,10 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             if(method.getDeclaringClass().equals(Sirius.navigator.connection.Connection.class)) {
                 //if(log.isDebugEnabled()log.debug("[ConnectionProxy] invoking connection method '" + method.getName() + "'");
                 // icon cache --------------------------------------------------
-                if(method.getName().equals("getDefaultIcons")) {
+                if(method.getName().equals("getDefaultIcons")) {  // NOI18N
                     if(iconCache == null) {
-                        log.info("[ConnectionProxy] filling icon cache");
+                        if(log.isInfoEnabled())
+                            log.info("[ConnectionProxy] filling icon cache");  // NOI18N
                         iconCache = (ImageHashMap)method.invoke(connection, args);
                     }
                     
@@ -105,15 +106,15 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 //if(log.isDebugEnabled()log.debug("[ConnectionProxy] invoking proxy method '" + method.getName() + "'");
                 return method.invoke(proxyHandler, args);
             } else {
-                log.error("[ConnectionProxy] undeclared method '" + method.getName() + "'");
-                throw new RuntimeException("[ConnectionProxy] undeclared method '" + method.getName() + "'");
+                log.error("[ConnectionProxy] undeclared method '" + method.getName() + "'");  // NOI18N
+                throw new RuntimeException("[ConnectionProxy] undeclared method '" + method.getName() + "'");  // NOI18N
             }
         } catch (InvocationTargetException itex) {
             // ok, no need to worry about
             throw itex.getTargetException();
         } catch (Exception ex) {
-            log.error("[ConnectionProxy] unexpected invocation exception' " + ex.getMessage() + "'", ex);
-            throw new RuntimeException("[ConnectionProxy] unexpected invocation exception' " + ex.getMessage() + "'");
+            log.error("[ConnectionProxy] unexpected invocation exception' " + ex.getMessage() + "'", ex);  // NOI18N
+            throw new RuntimeException("[ConnectionProxy] unexpected invocation exception' " + ex.getMessage() + "'");  // NOI18N
         }
     }
     
@@ -156,7 +157,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                     this.putMethods(methodMap);
                 
             } catch (Exception e) {
-                log.fatal("Ausnahme im ClassAndMethodCache beim Aufruf von remoteNodeRef.getMethods(...): ", e);
+                log.fatal("Ausnahme im ClassAndMethodCache beim Aufruf von remoteNodeRef.getMethods(...): ", e);  // NOI18N
                 
                 //_TA_ErrorDialog errorDialog = new ErrorDialog("<html><p>ClassCache Fehler:</p><p>Die Classes konnten nicht vom Server geladen werden.</p></html>", e.toString(), ErrorDialog.WARNING);
                 //ErrorDialog errorDialog = new ErrorDialog(StringLoader.getString("STL@classCacheError"), e.toString(), ErrorDialog.WARNING);
@@ -173,7 +174,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 //                    if(methodMap != null)
 //                        this.putMethods(methodMap);
                 } catch (Exception e) {
-                    log.fatal("Ausnahme im ClassAndMethodCache beim Aufruf von remoteNodeRef.getClasses(...): ", e);
+                    log.fatal("Ausnahme im ClassAndMethodCache beim Aufruf von remoteNodeRef.getClasses(...): ", e);  // NOI18N
                     
                     //_TA_ErrorDialog errorDialog = new ErrorDialog("<html><p>ClassCache Fehler:</p><p>Die Classes konnten nicht vom Server geladen werden.</p></html>", e.toString(), ErrorDialog.WARNING);
                     //ErrorDialog errorDialog = new ErrorDialog(StringLoader.getString("STL@classCacheError"), e.toString(), ErrorDialog.WARNING);
@@ -207,7 +208,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 MetaClass[] tmpClasses = connection.getClasses(user, localServerName);
                 this.putClasses(tmpClasses, localServerName);
                 this.putMethods(connection.getMethods(user, localServerName));
-                if(log.isDebugEnabled())log.debug("<CC> Classes von neuem LocalServer " + localServerName + " gecacht");
+                if(log.isDebugEnabled())log.debug("<CC> Classes von neuem LocalServer " + localServerName + " gecacht");  // NOI18N
             }
             
             // Falls die Class nicht im Cache enthalten ist
@@ -265,9 +266,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 if (!classHash.containsKey(key))
                     classHash.put(key, classes[i]);
                 
-                if(log.isDebugEnabled())log.debug("<CMC> Class gecacht: " + classes[i].getName() + " " + classes[i].getID() + " " + classes[i].getDomain());
+                if(log.isDebugEnabled())log.debug("<CMC> Class gecacht: " + classes[i].getName() + " " + classes[i].getID() + " " + classes[i].getDomain());  // NOI18N
             }
-            if(log.isDebugEnabled())log.debug("<CMC> " + classes.length + " Classes von LocalServer " + localServerName + " gecacht.");
+            if(log.isDebugEnabled())log.debug("<CMC> " + classes.length + " Classes von LocalServer " + localServerName + " gecacht.");  // NOI18N
         }
         
         public Sirius.server.localserver.method.Method getCachedMethod(String methodKey) {
@@ -278,7 +279,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             String key = new String(localServerName + method.getID());
             if (!methodHash.containsKey(key)) {
                 methodHash.put(key, method);
-                if(log.isDebugEnabled())log.debug("<CMC> method '" + key + "' gecacht.");
+                if(log.isDebugEnabled())log.debug("<CMC> method '" + key + "' gecacht.");  // NOI18N
             }
         }
         
@@ -287,7 +288,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 methodHash.putAll(methodMap);
                 if(log.isDebugEnabled()) {
                     Iterator iterator = methodMap.keySet().iterator();
-                    log.debug("<CMC> method '" + iterator.next() + " gecacht.");
+                    log.debug("<CMC> method '" + iterator.next() + " gecacht.");  // NOI18N
                 }
             }
         }
@@ -295,7 +296,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
     
     class DefaultConnectionProxy implements ProxyInterface {
         public void setProperty(String name, String value) {
-            if(log.isDebugEnabled())log.debug("[ProxyInterface] setting propety '" + name + "' to '" + value + "'");
+            if(log.isDebugEnabled())log.debug("[ProxyInterface] setting propety '" + name + "' to '" + value + "'");  // NOI18N
         }
         
         public ConnectionSession getSession() {
@@ -364,10 +365,10 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         
         
         public HashMap getSearchOptions() throws ConnectionException {
-            if(log.isDebugEnabled()) {
+            if(log.isInfoEnabled()) {
                 //HashMap searchOptions = connection.getSearchOptions(session.getUser(), session.getUser().getDomain());
                 HashMap searchOptions = connection.getSearchOptions(session.getUser());
-                log.info(searchOptions.size() + " search options loaded");
+                log.info(searchOptions.size() + " search options loaded");  // NOI18N
                 return searchOptions;
             } else {
                 return connection.getSearchOptions(session.getUser());
@@ -413,7 +414,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 }
                 
                 catch (Throwable t) {
-                    log.error("Fehler im DefaultConnectionProxyHandler bei getClasses",t);
+                    log.error("Fehler im DefaultConnectionProxyHandler bei getClasses",t);  // NOI18N
                     //throw new ConnectionException(t.getMessage());
                 }
                 
@@ -439,15 +440,18 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
         public MetaClass getMetaClass(int classID, String domain) throws ConnectionException {
             if(classAndMethodCache == null) {
-                log.info("[ConnectionProxy] filling meta class cache");
+                if(log.isInfoEnabled())
+                    log.info("[ConnectionProxy] filling meta class cache");  // NOI18N
                 classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
             }
-            
-            log.debug("getgetMetaClass(): classID=" + classID + ", domain=" + domain);
+
+            if(log.isDebugEnabled())
+                log.debug("getgetMetaClass(): classID=" + classID + ", domain=" + domain);  // NOI18N
             
             MetaClass metaClass = classAndMethodCache.getCachedClass(session.getUser(), classID, domain);
-            
-            log.debug("MetaClass: " + metaClass+"\nMetaClass.getName(): " + metaClass.getName()+"\nMetaClass.getEditor(): " + metaClass.getEditor()+"\nMetaClass.getComplexEditor(): " + metaClass.getComplexEditor());
+
+            if(log.isDebugEnabled())
+                log.debug("MetaClass: " + metaClass+"\nMetaClass.getName(): " + metaClass.getName()+"\nMetaClass.getEditor(): " + metaClass.getEditor()+"\nMetaClass.getComplexEditor(): " + metaClass.getComplexEditor());  // NOI18N
             
             
             return metaClass;
@@ -457,7 +461,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         
         public MetaClass getMetaClass(String classKey) throws ConnectionException {
             try {
-                StringTokenizer tokenizer = new StringTokenizer(classKey, "@");
+                StringTokenizer tokenizer = new StringTokenizer(classKey, "@");  // NOI18N
                 int classID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 String domain = tokenizer.nextToken();
                 
@@ -466,14 +470,15 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             } catch(ConnectionException cexp) {
                 throw cexp;
             } catch(Throwable t) {
-                log.error("malformed classKey: '" + classKey + "' (classId@domain expected)");
-                throw new ConnectionException("malformed class key: '" + classKey + "' (classId@domain expected)", ConnectionException.ERROR, t);
+                log.error("malformed classKey: '" + classKey + "' (classId@domain expected)");  // NOI18N
+                throw new ConnectionException("malformed class key: '" + classKey + "' (classId@domain expected)", ConnectionException.ERROR, t);  // NOI18N
             }
         }
         
         public Sirius.server.localserver.method.Method getMethod(String methodKey) throws ConnectionException {
             if(classAndMethodCache == null) {
-                log.info("[ConnectionProxy] filling meta class cache");
+                if(log.isInfoEnabled())
+                    log.info("[ConnectionProxy] filling meta class cache");  // NOI18N
                 classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
             }
             
@@ -481,9 +486,12 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
         
         public MetaObject getMetaObject(int objectID, int classID, String domain) throws ConnectionException {
-            log.debug("getMetaObject(): objectID=" + objectID + ", classID=" + classID + ", domain=" + domain);
+
+            if(log.isDebugEnabled())
+                log.debug("getMetaObject(): objectID=" + objectID + ", classID=" + classID + ", domain=" + domain);  // NOI18N
             MetaObject MetaObject = connection.getMetaObject(session.getUser(), objectID, classID, domain);
-            log.debug(" MetaObject: " + MetaObject +" MetaObject.getName(): " + MetaObject.getName()+" MetaObject.getEditor(): " + MetaObject.getEditor()+" MetaObject.getComplexEditor(): " + MetaObject.getComplexEditor());
+            if(log.isDebugEnabled())
+                log.debug(" MetaObject: " + MetaObject +" MetaObject.getName(): " + MetaObject.getName()+" MetaObject.getEditor(): " + MetaObject.getEditor()+" MetaObject.getComplexEditor(): " + MetaObject.getComplexEditor());  // NOI18N
             
             MetaObject.setLogger();
             
@@ -510,7 +518,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         
         public MetaObject getMetaObject(String objectId) throws ConnectionException {
             try {
-                StringTokenizer tokenizer = new StringTokenizer(objectId, "@");
+                StringTokenizer tokenizer = new StringTokenizer(objectId, "@");  // NOI18N
                 int objectID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 int classID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 String domain = tokenizer.nextToken();
@@ -520,8 +528,8 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             } catch(ConnectionException cexp) {
                 throw cexp;
             } catch(Throwable t) {
-                log.error("malformed object id: '" + objectId + "' (objectID@classID@domain expected)");
-                throw new ConnectionException("malformed object id: '" + objectId + "' (objectID@classID@domain expected)", ConnectionException.ERROR, t);
+                log.error("malformed object id: '" + objectId + "' (objectID@classID@domain expected)");  // NOI18N
+                throw new ConnectionException("malformed object id: '" + objectId + "' (objectID@classID@domain expected)", ConnectionException.ERROR, t);  // NOI18N
             }
         }
         
@@ -538,7 +546,8 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         
         public MetaObject[] getMetaObjectByQuery(String query,int sig) throws ConnectionException {
            if (classAndMethodCache==null) initClassAndMethodCache();
-            log.debug("getMetaObjectByQuery");
+           if(log.isDebugEnabled())
+                log.debug("getMetaObjectByQuery");  // NOI18N
             try {
                 MetaObject[] obs = connection.getMetaObjectByQuery(session.getUser(), query);
                 
@@ -549,7 +558,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 }
                 return obs;
             } catch (Throwable t) {
-                log.warn("Fehler in getMetaObjectByQuery",t);
+                log.warn("Fehler in getMetaObjectByQuery",t);  // NOI18N
             }
             return null;
         }
