@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.2" maxVersion="1.2" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
     <Container class="javax.swing.JToolBar" name="jToolBar3">
 
@@ -9,7 +9,7 @@
     <Component class="javax.swing.JButton" name="jButton16">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.NavigatorX.jButton16.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/Bundle.properties" key="NavigatorX.jButton16.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -21,7 +21,7 @@
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.NavigatorX.jMenu1.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/Bundle.properties" key="NavigatorX.jMenu1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Menu>
@@ -31,7 +31,7 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="title" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-      <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.NavigatorX.title" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+      <ResourceString bundle="Sirius/navigator/Bundle.properties" key="NavigatorX.title" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
     </Property>
   </Properties>
   <SyntheticProperties>
@@ -42,10 +42,11 @@
     <SyntheticProperty name="generateCenter" type="boolean" value="true"/>
   </SyntheticProperties>
   <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
-    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
@@ -84,7 +85,7 @@
                 <Component class="javax.swing.JButton" name="jButton1">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.NavigatorX.jButton1.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+                      <ResourceString bundle="Sirius/navigator/Bundle.properties" key="NavigatorX.jButton1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                 </Component>
@@ -104,7 +105,7 @@
             <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.NavigatorX.jLabel1.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="Sirius/navigator/Bundle.properties" key="NavigatorX.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>

@@ -31,9 +31,7 @@ import javax.swing.Timer;
  * @author  pascal
  */
 public class NavigatorSplashScreen extends JWindow {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-    private static final ResourceManager resource = ResourceManager.getManager();
-
+    
     private final ProgressObserver progressObserver;
     private final NavigatorLoader navigatorLoader;
     private final Logger logger;
@@ -119,7 +117,7 @@ public class NavigatorSplashScreen extends JWindow {
         progressBarPlugin.setBorderPainted(false);
         progressBarPlugin.setDoubleBuffered(true);
         progressBarPlugin.setFocusable(false);
-        progressBarPlugin.setString(I18N.getString("Sirius.navigator.NavigatorSplashSceen.progressBarPlugin.progressText")); // NOI18N
+        progressBarPlugin.setString(org.openide.util.NbBundle.getMessage(NavigatorSplashScreen.class, "NavigatorSplashSceen.progressBarPlugin.string")); // NOI18N
         progressBarPlugin.setStringPainted(true);
         progressBarPlugin.setVerifyInputWhenFocusTarget(false);
         jPanel1.add(progressBarPlugin, java.awt.BorderLayout.SOUTH);
@@ -176,9 +174,11 @@ public class NavigatorSplashScreen extends JWindow {
 
                 public void run() {
                     try {
-                        logger.info("creating navigator instance");
+                        if(logger.isInfoEnabled())
+                            logger.info("creating navigator instance"); // NOI18N
                         final Navigator navigator = new Navigator(NavigatorLoader.this.progressObserver);
-                        logger.info("new navigator instance created");
+                        if(logger.isInfoEnabled())
+                            logger.info("new navigator instance created"); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {
 
                             public void run() {
@@ -186,8 +186,11 @@ public class NavigatorSplashScreen extends JWindow {
                             }
                         });
                     } catch (Throwable t) {
-                        logger.fatal("could not create navigator instance", t);
-                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, resource.getExceptionName("nx01"), resource.getExceptionMessage("nx01"), t);
+                        logger.fatal("could not create navigator instance", t);  // NOI18N
+                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL,
+                                org.openide.util.NbBundle.getMessage(NavigatorSplashScreen.class, "NavigatorSplashScreen.NavigatorLoader.doInvoke().ExceptionManager_anon.name"),  // NOI18N
+                                org.openide.util.NbBundle.getMessage(NavigatorSplashScreen.class, "NavigatorSplashScreen.NavigatorLoader.doInvoke().ExceptionManager_anon.message"),  // NOI18N
+                                t);
                         System.exit(1);
                     }
                 }
@@ -209,7 +212,7 @@ public class NavigatorSplashScreen extends JWindow {
                 }
 
                 progressBarPlugin.setValue(pluginPogressObserver.getProgress());
-                String msg = "";
+                String msg = "";  // NOI18N
                 if (pluginPogressObserver.getMessage() != null) {
                     msg = pluginPogressObserver.getMessage();
                 }
