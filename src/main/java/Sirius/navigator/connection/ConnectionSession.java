@@ -53,7 +53,8 @@ public class ConnectionSession
     
     protected ConnectionSession(Connection connection, ConnectionInfo connectionInfo, boolean autoLogin) throws ConnectionException, UserException
     {
-        logger.debug("creating new connection session");
+        if(logger.isDebugEnabled())
+            logger.debug("creating new connection session");  // NOI18N
         
         this.connection = connection;
         this.connectionInfo = connectionInfo;
@@ -96,13 +97,14 @@ public class ConnectionSession
     {
         if(loggedin && user != null && connectionInfo.getUsergroupDomain().equals(usergroupDomain) && connectionInfo.getUsergroup().equals(usergroup) && connectionInfo.getUserDomain().equals(userDomain) && connectionInfo.getUsername().equals(username) && connectionInfo.getPassword().equals(password))
         {
-            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in");
+            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in");  // NOI18N
         }
         else
         {
             if(loggedin && user != null)
             {
-                logger.info("logging out user '" + connectionInfo.getUsername() + "'");
+                if(logger.isInfoEnabled())
+                    logger.info("logging out user '" + connectionInfo.getUsername() + "'");  // NOI18N
             }
             
             connectionInfo.setUsername(username);
@@ -119,23 +121,24 @@ public class ConnectionSession
     {
         if(!connection.isConnected())
         {
-            logger.error("can't login: no connection established");
-            throw new ConnectionException("can't login: no connection established", ConnectionException.ERROR);
+            logger.error("can't login: no connection established");  // NOI18N
+            throw new ConnectionException("can't login: no connection established", ConnectionException.ERROR);  // NOI18N
         }
 
         try
 	{
-            logger.debug("logging in user '" +  connectionInfo.getUsergroupDomain() + "' '" + connectionInfo.getUsergroup() + "' '" + connectionInfo.getUserDomain() + "' '" + connectionInfo.getUsername() + "' '" /*+ connectionInfo.getPassword() + "'"*/);
+            if(logger.isDebugEnabled())
+                logger.debug("logging in user '" +  connectionInfo.getUsergroupDomain() + "' '" + connectionInfo.getUsergroup() + "' '" + connectionInfo.getUserDomain() + "' '" + connectionInfo.getUsername() + "' '" /*+ connectionInfo.getPassword() + "'"*/);  // NOI18N
             this.user = connection.getUser(connectionInfo.getUsergroupDomain(), connectionInfo.getUsergroup(), connectionInfo.getUserDomain(), connectionInfo.getUsername(), connectionInfo.getPassword());
 	}
 	catch (UserException ue)
 	{
-            logger.warn("can't login: wrong user informations", ue);
+            logger.warn("can't login: wrong user informations", ue);  // NOI18N
             throw ue;
 	}
 	catch(ConnectionException ce)
 	{
-            logger.fatal("[ServerError] can't login");
+            logger.fatal("[ServerError] can't login");  // NOI18N
             //throw new ConnectionException("[ServerError] can't login", ConnectionException.FATAL, re);
             throw ce;
         }
@@ -162,7 +165,7 @@ public class ConnectionSession
         }
         catch(Exception ex)
         {
-            logger.fatal("An unexpected exception occoured in method 'Connection.isConnected()'", ex);
+            logger.fatal("An unexpected exception occoured in method 'Connection.isConnected()'", ex);  // NOI18N
             return false;
         }
     }

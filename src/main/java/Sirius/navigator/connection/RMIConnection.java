@@ -64,16 +64,16 @@ public final class RMIConnection implements Connection {
     protected boolean connected = false;
     protected java.lang.Object callserver;
     private static final boolean IS_LEIGHTWEIGHT_MO_CODE_ENABLED;
-    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo";
+    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo";  // NOI18N
 
     static {
-        final String uHome = System.getProperty("user.home");
+        final String uHome = System.getProperty("user.home");  // NOI18N
         if (uHome != null) {
             final File homeDir = new File(uHome);
             final File disableIndicator = new File(homeDir, DISABLE_MO_FILENAME);
             IS_LEIGHTWEIGHT_MO_CODE_ENABLED = !disableIndicator.isFile();
             if (!IS_LEIGHTWEIGHT_MO_CODE_ENABLED) {
-                logger.warn("LIGHTWIGHTMETAOBJECT CODE IS DISABLED! FOUND FILE: " + disableIndicator);
+                logger.warn("LIGHTWIGHTMETAOBJECT CODE IS DISABLED! FOUND FILE: " + disableIndicator);  // NOI18N
             }
         } else {
             IS_LEIGHTWEIGHT_MO_CODE_ENABLED = true;
@@ -86,21 +86,22 @@ public final class RMIConnection implements Connection {
         this.connected = false;
 
         try {
-            logger.info("creating network connection to callserver '" + callserverURL + "'");
+            if(logger.isInfoEnabled())
+                logger.info("creating network connection to callserver '" + callserverURL + "'");  // NOI18N
             callserver = Naming.lookup(callserverURL);
         } catch (MalformedURLException mue) {
-            logger.fatal("'" + callserverURL + "' is not a valid URL", mue);
-            throw new ConnectionException("'" + callserverURL + "' is not a valid URL", mue);
+            logger.fatal("'" + callserverURL + "' is not a valid URL", mue);  // NOI18N
+            throw new ConnectionException("'" + callserverURL + "' is not a valid URL", mue);  // NOI18N
         } catch (NotBoundException nbe) {
-            logger.fatal("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
-            throw new ConnectionException("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
+            logger.fatal("[NetworkError] could not connect to '" + callserverURL + "'", nbe);  // NOI18N
+            throw new ConnectionException("[NetworkError] could not connect to '" + callserverURL + "'", nbe);  // NOI18N
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not connect to '" + callserverURL + "'", re);
-            throw new ConnectionException("[ServerError] could not connect to '" + callserverURL + "'", re);
+            logger.fatal("[ServerError] could not connect to '" + callserverURL + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not connect to '" + callserverURL + "'", re);  // NOI18N
         }
 
         if (logger.isDebugEnabled()) {
-            StringBuffer buffer = new StringBuffer("remote interfaces of '").append(callserver.getClass().getName()).append("': ");
+            StringBuffer buffer = new StringBuffer("remote interfaces of '").append(callserver.getClass().getName()).append("': ");  // NOI18N
             Class[] interfaces = callserver.getClass().getInterfaces();
 
             for (int i = 0; i < interfaces.length; i++) {
@@ -125,8 +126,8 @@ public final class RMIConnection implements Connection {
         if (callserverURL != null) {
             return connect(callserverURL);
         } else {
-            logger.error("can't reconnect - no connection informations from previous connection found");
-            throw new ConnectionException("can't reconnect - no connection informations from previous connection found", ConnectionException.ERROR);
+            logger.error("can't reconnect - no connection informations from previous connection found");  // NOI18N
+            throw new ConnectionException("can't reconnect - no connection informations from previous connection found", ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -146,8 +147,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getDomains();
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not retrieve the local server names", re);
-            throw new ConnectionException("[ServerError] could not retrieve the local server names: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] could not retrieve the local server names", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve the local server names: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -155,8 +156,8 @@ public final class RMIConnection implements Connection {
         try {
             return new ImageHashMap(((SystemService) callserver).getDefaultIcons());
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not retrieve the default icons", re);
-            throw new ConnectionException("[ServerError] could not retrieve the default icons: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] could not retrieve the default icons", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve the default icons: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -165,7 +166,7 @@ public final class RMIConnection implements Connection {
             // proxy should implement caching here
             return this.getDefaultIcons().get(name);
         } catch (ConnectionException ce) {
-            logger.fatal("[ServerError] could not retrieve the default icon for '" + name + "'");
+            logger.fatal("[ServerError] could not retrieve the default icon for '" + name + "'");  // NOI18N
             //throw new ConnectionException("[ServerError] could not retrieve the default icon for '" + name + "'", ConnectionException.FATAL);
             throw ce;
         }
@@ -176,11 +177,11 @@ public final class RMIConnection implements Connection {
         try {
             return ((UserService) callserver).getUser(usergroupLocalserver, usergroup, userLocalserver, username, password);
         } catch (UserException ue) {
-            logger.warn("can't login: wrong user informations", ue);
+            logger.warn("can't login: wrong user informations", ue);  // NOI18N
             throw ue;
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] can't login", re);
-            throw new ConnectionException("[ServerError] can't login: " + re.getMessage(), ConnectionException.FATAL, re);
+            logger.fatal("[ServerError] can't login", re);  // NOI18N
+            throw new ConnectionException("[ServerError] can't login: " + re.getMessage(), ConnectionException.FATAL, re);  // NOI18N
         }
     }
 
@@ -188,8 +189,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((UserService) callserver).getUserGroupNames();
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not retrieve the usergroup names", re);
-            throw new ConnectionException("[ServerError] could not retrieve the usergroup names: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] could not retrieve the usergroup names", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve the usergroup names: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -197,26 +198,27 @@ public final class RMIConnection implements Connection {
         try {
             return ((UserService) callserver).getUserGroupNames(username, domain);
         } catch (RemoteException re) {
-            if (re.getMessage().indexOf("UserGroupException") != -1) {
-                logger.warn("[ServerError] could not retrieve the usergroup names for user '" + username + "'", re);
+            if (re.getMessage().indexOf("UserGroupException") != -1) {  // NOI18N
+                logger.warn("[ServerError] could not retrieve the usergroup names for user '" + username + "'", re);  // NOI18N
                 throw new UserException(re.getMessage());
             } else {
-                logger.fatal("[ServerError] could not retrieve the usergroup names for user '" + username + "' on localserver '" + domain + "'", re);
-                throw new ConnectionException("[ServerError] could not retrieve the usergroup names for user '" + username + "' on localserver '" + domain + "': " + re.getMessage(), ConnectionException.FATAL);
+                logger.fatal("[ServerError] could not retrieve the usergroup names for user '" + username + "' on localserver '" + domain + "'", re);  // NOI18N
+                throw new ConnectionException("[ServerError] could not retrieve the usergroup names for user '" + username + "' on localserver '" + domain + "': " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
             }
         }
     }
 
     public boolean changePassword(User user, String oldPassword, String newPassword) throws ConnectionException, UserException {
         try {
-            logger.debug("changing user password");
+            if(logger.isDebugEnabled())
+                logger.debug("changing user password");   // NOI18N
             return ((UserService) callserver).changePassword(user, oldPassword, newPassword);
         } catch (UserException ue) {
-            logger.warn("could not change password");
+            logger.warn("could not change password");  // NOI18N
             throw ue;
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not change user password", re);
-            throw new ConnectionException("[ServerError] could not change user password: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not change user password", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not change user password: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -225,8 +227,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((CatalogueService) callserver).getRoots(user, domain);
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not retrieve the top nodes of domain '" + domain + "'", re);
-            throw new ConnectionException("[ServerError] could not  retrieve the top nodes of domain '" + domain + "': " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] could not retrieve the top nodes of domain '" + domain + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not  retrieve the top nodes of domain '" + domain + "': " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -234,8 +236,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((CatalogueService) callserver).getRoots(user);
         } catch (RemoteException re) {
-            logger.fatal("[CatalogueService] could not retrieve the top nodes", re);
-            throw new ConnectionException("[CatalogueService] could not retrieve the top nodes: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[CatalogueService] could not retrieve the top nodes", re);  // NOI18N
+            throw new ConnectionException("[CatalogueService] could not retrieve the top nodes: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
     //yxc
@@ -281,8 +283,8 @@ public final class RMIConnection implements Connection {
 
             return Sirius.navigator.tools.NodeSorter.sortNodes(n);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve children of node '" + node, re);
-            throw new ConnectionException("[ServerError] could not retrieve children of node '" + node + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve children of node '" + node, re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve children of node '" + node + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -290,8 +292,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getMetaObjectNode(user, nodeID, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve node '" + nodeID + "' of domain '" + domain + "'", re);
-            throw new ConnectionException("[ServerError] could not retrieve node '" + nodeID + "' of domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve node '" + nodeID + "' of domain '" + domain + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve node '" + nodeID + "' of domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -300,8 +302,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((CatalogueService) callserver).addNode(node, parent, user);
         } catch (RemoteException re) {
-            logger.error("[ServerError] addNode() could not add node '" + node + "'", re);
-            throw new ConnectionException("[ServerError] addNode() could not add node '" + node + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] addNode() could not add node '" + node + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] addNode() could not add node '" + node + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -309,8 +311,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((CatalogueService) callserver).deleteNode(node, user);
         } catch (RemoteException re) {
-            logger.error("[ServerError] deleteNode() could not delete node '" + node + "'", re);
-            throw new ConnectionException("[ServerError] deleteNode() could not delete node '" + node + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] deleteNode() could not delete node '" + node + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] deleteNode() could not delete node '" + node + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -318,8 +320,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((CatalogueService) callserver).addLink(from, to, user);
         } catch (RemoteException re) {
-            logger.error("[ServerError] addLink() could not add Link", re);
-            throw new ConnectionException("[ServerError] addLink() could not add Link: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] addLink() could not add Link", re);  // NOI18N
+            throw new ConnectionException("[ServerError] addLink() could not add Link: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -327,8 +329,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((CatalogueService) callserver).deleteLink(from, to, user);
         } catch (RemoteException re) {
-            logger.error("[ServerError] deleteLink() could not delete Link", re);
-            throw new ConnectionException("[ServerError] deleteLink() could not delete Link: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] deleteLink() could not delete Link", re);  // NOI18N
+            throw new ConnectionException("[ServerError] deleteLink() could not delete Link: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -349,8 +351,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getClassTreeNodes(user);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve the class tree nodes", re);
-            throw new ConnectionException("[ServerError] could not retrieve the class tree nodes: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve the class tree nodes", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve the class tree nodes: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -359,8 +361,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getClass(user, classID, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve meta class '" + classID + "' from domain '" + domain + "'", re);
-            throw new ConnectionException("[ServerError] could not retrieve meta class '" + classID + "' from domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve meta class '" + classID + "' from domain '" + domain + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve meta class '" + classID + "' from domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -368,8 +370,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getClasses(user, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve the classes from domain '" + domain + "'", re);
-            throw new ConnectionException("[ServerError] could not retrieve the classes from domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve the classes from domain '" + domain + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve the classes from domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -377,8 +379,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getMetaObject(user, query);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve MetaObject", re);
-            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve MetaObject", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -387,8 +389,8 @@ public final class RMIConnection implements Connection {
 
             return ((MetaService) callserver).getMetaObject(user, query);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve MetaObject", re);
-            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve MetaObject", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -396,8 +398,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getMetaObject(user, objectID, classID, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve MetaObject '" + objectID + '@' + classID + '@' + domain + '\'', re);
-            throw new ConnectionException("[ServerError] could not retrieve the classes from domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve MetaObject '" + objectID + '@' + classID + '@' + domain + '\'', re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve the classes from domain '" + domain + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -405,8 +407,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).insertMetaObject(user, query, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not insert / update MetaObject '" + query + "'", re);
-            throw new ConnectionException("[[ServerError] could not insert / update MetaObject '" + query + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not insert / update MetaObject '" + query + "'", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] could not insert / update MetaObject '" + query + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -414,8 +416,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).insertMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not insert MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] could not insert MetaObject '" + MetaObject + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not insert MetaObject '" + MetaObject + "'", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] could not insert MetaObject '" + MetaObject + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -423,8 +425,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).updateMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not update MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] could not update MetaObject '" + MetaObject + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not update MetaObject '" + MetaObject + "'", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] could not update MetaObject '" + MetaObject + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -432,8 +434,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).deleteMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
-            logger.error("[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "'", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -445,12 +447,12 @@ public final class RMIConnection implements Connection {
 //                mo.setMetaClass(c);
                 return mo;
             } catch (CloneNotSupportedException ce) {
-                logger.warn("could not clone MetaObject", ce);
+                logger.warn("could not clone MetaObject", ce);  // NOI18N
                 return ((MetaService) callserver).getInstance(user, c);
             }
         } catch (RemoteException re) {
-            logger.error("[ServerError] getInstance(): could not get instance of class '" + c + "'", re);
-            throw new ConnectionException("[[ServerError] getInstance(): could not get instance of class '" + c + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] getInstance(): could not get instance of class '" + c + "'", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] getInstance(): could not get instance of class '" + c + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -459,8 +461,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((Sirius.server.middleware.interfaces.proxy.SearchService) callserver).getSearchOptions(user);
         } catch (RemoteException re) {
-            logger.fatal("[SearchService] getSearchOptions() failed ...", re);
-            throw new ConnectionException("[SearchService] getSearchOptions() failed: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[SearchService] getSearchOptions() failed ...", re);  // NOI18N
+            throw new ConnectionException("[SearchService] getSearchOptions() failed: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -468,8 +470,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((Sirius.server.middleware.interfaces.proxy.SearchService) callserver).getSearchOptions(user, domain);
         } catch (RemoteException re) {
-            logger.fatal("[SearchService] getSearchOptions() failed ...", re);
-            throw new ConnectionException("[SearchService] getSearchOptions() failed: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[SearchService] getSearchOptions() failed ...", re);  // NOI18N
+            throw new ConnectionException("[SearchService] getSearchOptions() failed: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -477,8 +479,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((Sirius.server.middleware.interfaces.proxy.SearchService) callserver).search(user, classIds, searchOptions);
         } catch (RemoteException re) {
-            logger.fatal("[SearchService] search failed ...", re);
-            throw new ConnectionException("[SearchService] search failed: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[SearchService] search failed ...", re);  // NOI18N
+            throw new ConnectionException("[SearchService] search failed: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -487,8 +489,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((QueryStore) callserver).getQueryInfos(user);
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] getUserGroupQueryInfos(UserGroup userGroup)", re);
-            throw new ConnectionException("[ServerError] getUserGroupQueryInfos(UserGroup userGroup): " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] getUserGroupQueryInfos(UserGroup userGroup)", re);  // NOI18N
+            throw new ConnectionException("[ServerError] getUserGroupQueryInfos(UserGroup userGroup): " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -496,8 +498,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((QueryStore) callserver).getQueryInfos(userGroup);
         } catch (RemoteException re) {
-            logger.fatal("[QueryStore] getUserGroupQueryInfos(UserGroup userGroup)", re);
-            throw new ConnectionException("[QueryStore] getUserGroupQueryInfos(UserGroup userGroup): " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[QueryStore] getUserGroupQueryInfos(UserGroup userGroup)", re);  // NOI18N
+            throw new ConnectionException("[QueryStore] getUserGroupQueryInfos(UserGroup userGroup): " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -505,8 +507,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((QueryStore) callserver).getQuery(id, domain);
         } catch (RemoteException re) {
-            logger.fatal("[QueryStore] getQuery(QueryInfo queryInfo)", re);
-            throw new ConnectionException("[QueryStore] getQuery(QueryInfo queryInfo): " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[QueryStore] getQuery(QueryInfo queryInfo)", re);  // NOI18N
+            throw new ConnectionException("[QueryStore] getQuery(QueryInfo queryInfo): " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -514,8 +516,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((QueryStore) callserver).storeQuery(user, data);
         } catch (RemoteException re) {
-            logger.fatal("[ueryStore] storeUserQuery(User user, Query query)", re);
-            throw new ConnectionException("[ueryStore] storeUserQuery(User user, Query query): " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ueryStore] storeUserQuery(User user, Query query)", re);  // NOI18N
+            throw new ConnectionException("[ueryStore] storeUserQuery(User user, Query query): " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -523,8 +525,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((QueryStore) callserver).delete(queryDataId, domain);
         } catch (RemoteException re) {
-            logger.fatal("[QueryStore] deleteQuery(QueryInfo queryInfo)", re);
-            throw new ConnectionException("[QueryStore] deleteQuery(QueryInfo queryInfo): " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[QueryStore] deleteQuery(QueryInfo queryInfo)", re);  // NOI18N
+            throw new ConnectionException("[QueryStore] deleteQuery(QueryInfo queryInfo): " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -533,8 +535,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getMethods(user);
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not retrieve methods", re);
-            throw new ConnectionException("[ServerError] could not retrieve methods: " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] could not retrieve methods", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve methods: " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -542,8 +544,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((MetaService) callserver).getMethods(user, domain);
         } catch (RemoteException re) {
-            logger.fatal("[ServerError] could not retrieve methods from domain " + domain + "", re);
-            throw new ConnectionException("[ServerError] could not retrieve methods from domain " + domain + ": " + re.getMessage(), ConnectionException.FATAL);
+            logger.fatal("[ServerError] could not retrieve methods from domain " + domain + "", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not retrieve methods from domain " + domain + ": " + re.getMessage(), ConnectionException.FATAL);  // NOI18N
         }
     }
 
@@ -552,8 +554,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((DataService) callserver).getDataObject(user, query);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve data objects", re);
-            throw new ConnectionException("[[ServerError] could not retrieve data objects: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve data objects", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] could not retrieve data objects: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -561,8 +563,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((DataService) callserver).getDataObject(user, MetaObject);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve data object", re);
-            throw new ConnectionException("[[ServerError] could not retrieve data object: " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not retrieve data object", re);  // NOI18N
+            throw new ConnectionException("[[ServerError] could not retrieve data object: " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -570,8 +572,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((SearchService) callserver).addQuery(user, name, description, statement);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not add query '" + name + "'", re);
-            throw new ConnectionException("[ServerError] could not add query '" + name + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not add query '" + name + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not add query '" + name + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -579,8 +581,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((SearchService) callserver).addQuery(user, name, description, statement, resultType, isUpdate, isRoot, isUnion, isBatch);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not add query '" + name + "'", re);
-            throw new ConnectionException("[ServerError] could not add query '" + name + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not add query '" + name + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not add query '" + name + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -588,8 +590,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((SearchService) callserver).addQueryParameter(user, queryId, paramkey, description);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not add query parameter '" + queryId + "'", re);
-            throw new ConnectionException("[ServerError] could not add query parameter '" + queryId + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not add query parameter '" + queryId + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not add query parameter '" + queryId + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -597,8 +599,8 @@ public final class RMIConnection implements Connection {
         try {
             return ((SearchService) callserver).addQueryParameter(user, queryId, paramkey, description);
         } catch (RemoteException re) {
-            logger.error("[ServerError] could not add query parameter '" + queryId + "'", re);
-            throw new ConnectionException("[ServerError] could not add query parameter '" + queryId + "': " + re.getMessage(), ConnectionException.ERROR);
+            logger.error("[ServerError] could not add query parameter '" + queryId + "'", re);  // NOI18N
+            throw new ConnectionException("[ServerError] could not add query parameter '" + queryId + "': " + re.getMessage(), ConnectionException.ERROR);  // NOI18N
         }
     }
 
@@ -614,7 +616,7 @@ public final class RMIConnection implements Connection {
                 return getLightweightMetaObjectsFallback(classId, user);
             }
         } catch (RemoteException ex) {
-            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);
+            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);  // NOI18N
         }
     }
 
@@ -628,7 +630,7 @@ public final class RMIConnection implements Connection {
                 return getLightweightMetaObjectsFallback(classId, user);
             }
         } catch (RemoteException ex) {
-            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);
+            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);  // NOI18N
         }
     }
 
@@ -642,7 +644,7 @@ public final class RMIConnection implements Connection {
                 return getLightweightMetaObjectsFallback(classId, user);
             }
         } catch (RemoteException ex) {
-            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);
+            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);  // NOI18N
         }
     }
 
@@ -656,7 +658,7 @@ public final class RMIConnection implements Connection {
                 return getLightweightMetaObjectsFallback(classId, user);
             }
         } catch (RemoteException ex) {
-            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);
+            throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId, ex);  // NOI18N
         }
     }
 
@@ -669,13 +671,13 @@ public final class RMIConnection implements Connection {
      */
     private final MetaObject[] getLightweightMetaObjectsFallback(int classId, User user) throws ConnectionException {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId);
-        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");
-        String orderBy = "";
+        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");  // NOI18N
+        String orderBy = "";  // NOI18N
         if (ca != null) {
             String value = ca.getValue().toString();
-            orderBy = " order by " + value;
+            orderBy = " order by " + value;  // NOI18N
         }
-        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;
+        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;  // NOI18N
 
         return getMetaObjectByQuery(user, query);
     }

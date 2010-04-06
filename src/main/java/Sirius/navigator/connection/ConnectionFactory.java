@@ -57,7 +57,8 @@ public class ConnectionFactory
     /** Creates a new instance of ConnectionManager */
     private ConnectionFactory() 
     {
-       logger.debug("creating singleton shared ConnectionManager instance");
+        if(logger.isDebugEnabled())
+            logger.debug("creating singleton shared ConnectionManager instance");   // NOI18N
     }
     
     public final static ConnectionFactory getFactory()
@@ -142,7 +143,8 @@ public class ConnectionFactory
         
         try
         {
-            logger.debug("creating connection class instance '" + connectionClassName + "'");
+            if(logger.isDebugEnabled())
+                logger.debug("creating connection class instance '" + connectionClassName + "'");   // NOI18N
             //connectionClass = Class.forName(connectionClassName);   
             //connection = (Connection)connectionClass.newInstance();
             //return connection;
@@ -151,18 +153,18 @@ public class ConnectionFactory
         }
         catch(ClassNotFoundException cne)
         {
-            logger.fatal("connection class '" + connectionClassName + "' not found", cne);
-            throw new ConnectionException("connection class '" + connectionClassName + "' not found", cne);
+            logger.fatal("connection class '" + connectionClassName + "' not found", cne);  // NOI18N
+            throw new ConnectionException("connection class '" + connectionClassName + "' not found", cne);  // NOI18N
         }
         catch(InstantiationException ie)
         {
-            logger.fatal("could not instantiate connection class '" + connectionClassName + "'", ie);
-            throw new ConnectionException("could not connection proxy class '" + connectionClassName + "'", ie);
+            logger.fatal("could not instantiate connection class '" + connectionClassName + "'", ie);  // NOI18N
+            throw new ConnectionException("could not connection proxy class '" + connectionClassName + "'", ie);  // NOI18N
         }
         catch(IllegalAccessException iae)
         {
-            logger.fatal("could not instantiate connection class '" + connectionClassName + "'", iae);
-            throw new ConnectionException("could not connection proxy class '" + connectionClassName + "'", iae);
+            logger.fatal("could not instantiate connection class '" + connectionClassName + "'", iae);  // NOI18N
+            throw new ConnectionException("could not connection proxy class '" + connectionClassName + "'", iae);  // NOI18N
         }
     }
     
@@ -174,8 +176,8 @@ public class ConnectionFactory
         }
         catch(UserException ue)
         {
-            logger.fatal("unexpected Exception");
-            throw new RuntimeException("unexpected Exception", ue);
+            logger.fatal("unexpected Exception");  // NOI18N
+            throw new RuntimeException("unexpected Exception", ue);  // NOI18N
         }
      }
     
@@ -208,18 +210,19 @@ public class ConnectionFactory
         
         try
         {
-            logger.debug("creating connection proxy handler instance '" + connectionProxyHandlerClassName + "'");
+            if(logger.isDebugEnabled())
+                logger.debug("creating connection proxy handler instance '" + connectionProxyHandlerClassName + "'");  // NOI18N
             connectionProxyHandler = (ConnectionProxyHandler)Class.forName(connectionProxyHandlerClassName).getConstructor(new Class[] {ConnectionSession.class}).newInstance(new Object[] {connectionSession});  
         }
         catch(ClassNotFoundException cne)
         {
-            logger.fatal("connection proxy handler class '" + connectionProxyHandlerClassName + "' not found", cne);
-            throw new ConnectionException("connection proxy handler class '" + connectionProxyHandlerClassName + "' not found", cne);
+            logger.fatal("connection proxy handler class '" + connectionProxyHandlerClassName + "' not found", cne);  // NOI18N
+            throw new ConnectionException("connection proxy handler class '" + connectionProxyHandlerClassName + "' not found", cne);  // NOI18N
         }
         catch(Exception e)
         {
-            logger.fatal("could not instantiate connection proxy handler class '" + connectionProxyHandlerClassName + "'", e);
-            throw new ConnectionException("could not connection proxy handler class '" + connectionProxyHandlerClassName + "'", e);
+            logger.fatal("could not instantiate connection proxy handler class '" + connectionProxyHandlerClassName + "'", e);  // NOI18N
+            throw new ConnectionException("could not connection proxy handler class '" + connectionProxyHandlerClassName + "'", e);  // NOI18N
         }
         /*catch(InstantiationException ie)
         {
@@ -240,7 +243,8 @@ public class ConnectionFactory
         
         try
         {
-            logger.debug("creating the connection proxy");
+            if(logger.isDebugEnabled())
+                logger.debug("creating the connection proxy");  // NOI18N
             return (ConnectionProxy)java.lang.reflect.Proxy.newProxyInstance(ConnectionProxy.class.getClassLoader(), new Class[] { ConnectionProxy.class }, connectionProxyHandler);
             //return (ConnectionProxy)Proxy.newProxyInstance(ConnectionProxy.class.getClassLoader(), ConnectionProxy.class.getInterfaces(), connectionProxyHandler);
             
@@ -251,8 +255,8 @@ public class ConnectionFactory
         }
         catch(Exception e)
         {
-            logger.fatal("could not create connection proxy", e);
-            throw new ConnectionException("could not create connection proxy", e);
+            logger.fatal("could not create connection proxy", e);  // NOI18N
+            throw new ConnectionException("could not create connection proxy", e);  // NOI18N
         }
     }
     

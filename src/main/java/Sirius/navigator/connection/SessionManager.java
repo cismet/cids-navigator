@@ -15,28 +15,31 @@ public final class SessionManager {
 
     private SessionManager(ConnectionProxy proxy) {
         this.proxy = proxy;
-        logger.info("singleton shared instance of SessionManager created");
+        if(logger.isInfoEnabled())
+            logger.info("singleton shared instance of SessionManager created");  // NOI18N
     }
     private final static Object blocker = new Object();
 
     public final static void init(ConnectionProxy proxy) {
-        logger.debug("init SessionManager " + nonce, new CurrentStackTrace());
+        if(logger.isDebugEnabled())
+            logger.debug("init SessionManager " + nonce, new CurrentStackTrace());  // NOI18N
         synchronized (blocker) {
             if (manager == null) {
                 manager = new SessionManager(proxy);
 
             } else {
                 manager.proxy = proxy;
-                logger.warn("SessionManager has already been initialized");
+                logger.warn("SessionManager has already been initialized");  // NOI18N
                 //throw new RuntimeException("SessionManager has alreadyt been initialized");
             }
         }
     }
 
     public final static void destroy() {
-        logger.info("destroy SessionManager" + manager, new CurrentStackTrace());
+        if(logger.isInfoEnabled())
+            logger.info("destroy SessionManager" + manager, new CurrentStackTrace());  // NOI18N
         synchronized (blocker) {
-            logger.warn("destroying singelton SessionManager instance");
+            logger.warn("destroying singelton SessionManager instance");  // NOI18N
 //            manager = null;
         }
     }
@@ -56,8 +59,8 @@ public final class SessionManager {
     private final static SessionManager getManager() {
         if (manager == null) {
             Throwable t = new CurrentStackTrace();
-            logger.warn("SessionManager has not been initialized", t);
-            throw new RuntimeException("SessionManager has not been initialized", t);
+            logger.warn("SessionManager has not been initialized", t);  // NOI18N
+            throw new RuntimeException("SessionManager has not been initialized", t);  // NOI18N
         }
 
         return manager;
@@ -67,7 +70,7 @@ public final class SessionManager {
         try {
             return getManager().proxy.getSession().getConnection();
         } catch (Exception e) {
-            logger.error("Error in getConnection()\nmaybe the manager is null" + getManager(), e);
+            logger.error("Error in getConnection()\nmaybe the manager is null" + getManager(), e);  // NOI18N
         }
         return null;
     }
