@@ -98,7 +98,7 @@ public class Navigator extends JFrame {
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
     private JPanel metaCatalogueTreePanel;
-    public final static String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator/";
+    public final static String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator/";  // NOI18N
 
     /** Creates a new instance of Navigator */
     public Navigator(ProgressObserver progressObserver) throws Exception {
@@ -114,7 +114,7 @@ public class Navigator extends JFrame {
         this.init();
 
     }
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    
 
     public Navigator() throws Exception {
         this(new ProgressObserver());
@@ -122,13 +122,13 @@ public class Navigator extends JFrame {
 
     private void init() throws Exception {
         //LAFManager.getManager().changeLookAndFeel(LAFManager.WINDOWS);
-        if (StaticDebuggingTools.checkHomeForFile("cismetDebuggingInitEventDispatchThreadHangMonitor")) {
+        if (StaticDebuggingTools.checkHomeForFile("cismetDebuggingInitEventDispatchThreadHangMonitor")) {  // NOI18N
             EventDispatchThreadHangMonitor.initMonitoring();
         }
-        if (StaticDebuggingTools.checkHomeForFile("cismetBeansbindingDebuggingOn")) {
-            System.setProperty("cismet.beansdebugging", "true");
+        if (StaticDebuggingTools.checkHomeForFile("cismetBeansbindingDebuggingOn")) {  // NOI18N
+            System.setProperty("cismet.beansdebugging", "true");  // NOI18N
         }
-        if (StaticDebuggingTools.checkHomeForFile("cismetCheckForEDThreadVialoation")) {
+        if (StaticDebuggingTools.checkHomeForFile("cismetCheckForEDThreadVialoation")) {  // NOI18N
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
 
@@ -153,11 +153,11 @@ public class Navigator extends JFrame {
                 });
 
             }
-            if (!StaticDebuggingTools.checkHomeForFile("cismetTurnOffInternalWebserver")) {
+            if (!StaticDebuggingTools.checkHomeForFile("cismetTurnOffInternalWebserver")) {  // NOI18N
                 initHttpServer();
             }
         } catch (InterruptedException iexp) {
-            logger.error("navigator start interrupted: " + iexp.getMessage() + "\n disconnecting from server");
+            logger.error("navigator start interrupted: " + iexp.getMessage() + "\n disconnecting from server");  // NOI18N
             SessionManager.getSession().logout();
             SessionManager.getConnection().disconnect();
             this.progressObserver.reset();
@@ -176,8 +176,8 @@ public class Navigator extends JFrame {
                 });
             }
         };
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(configLoggerKeyStroke, "CONFIGLOGGING");
-        getRootPane().getActionMap().put("CONFIGLOGGING", configAction);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(configLoggerKeyStroke, "CONFIGLOGGING");  // NOI18N
+        getRootPane().getActionMap().put("CONFIGLOGGING", configAction);  // NOI18N
 
     }
 
@@ -185,43 +185,48 @@ public class Navigator extends JFrame {
         try {
             File file = new File(NAVIGATOR_HOME);
             if (file.exists()) {
-                logger.debug("Navigator Verzeichniss vorhanden.");
+                if(logger.isDebugEnabled())
+                    logger.debug("Navigator Directory exists."); // NOI18N
             } else {
-                logger.debug("Navigator Verzeichniss nicht vorhanden --> wird angelegt");
+                if(logger.isDebugEnabled())
+                    logger.debug("Navigator Directory does not exist --> creating"); // NOI18N
                 file.mkdir();
-                logger.debug("Navigator Verzeichniss erfolgreich angelegt");
+                if(logger.isDebugEnabled())
+                    logger.debug("Navigator Directory successfully created");  // NOI18N
             }
         } catch (Exception ex) {
-            logger.error("Fehler beim überprüfen/anlegen des Navigator Homeverzeichnisses", ex);
+            logger.error("Error while checking/creating Navigator home directory", ex);  // NOI18N
         }
     }
 
     // #########################################################################
     private void initConnection() throws ConnectionException, InterruptedException {
         progressObserver.setProgress(25,
-                I18N.getString("Sirius.navigator.Navigator.initConnection().progress.connection"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25"));
         Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL());
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
         progressObserver.setProgress(50,
-                I18N.getString("Sirius.navigator.Navigator.initConnection().progress.login"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_50"));
         // autologin
         if (propertyManager.isAutoLogin()) {
-            logger.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'");
+            if(logger.isInfoEnabled())
+                logger.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'"); // NOI18N
             try {
                 session = ConnectionFactory.getFactory().createSession(connection, propertyManager.getConnectionInfo(), true);
                 proxy = ConnectionFactory.getFactory().createProxy(propertyManager.getConnectionProxyClass(), session);
                 SessionManager.init(proxy);
             } catch (UserException uexp) {
-                logger.error("autologin failed", uexp);
+                logger.error("autologin failed", uexp); // NOI18N
                 session = null;
             }
         }
 
         // autologin = false || autologin failed
         if (!propertyManager.isAutoLogin() || session == null) {
-            logger.info("performing login");
+            if(logger.isInfoEnabled())
+                logger.info("performing login"); // NOI18N
             try {
                 session = ConnectionFactory.getFactory().createSession(connection, propertyManager.getConnectionInfo(), false);
             } catch (UserException uexp) {
@@ -236,13 +241,14 @@ public class Navigator extends JFrame {
 
         PropertyManager.getManager().setEditable(this.hasPermission(SessionManager.getProxy().getClasses(), PermissionHolder.WRITEPERMISSION));
         //PropertyManager.getManager().setEditable(true);
-        logger.info("initConnection(): navigator editor enabled: " + PropertyManager.getManager().isEditable());
+        if(logger.isInfoEnabled())
+            logger.info("initConnection(): navigator editor enabled: " + PropertyManager.getManager().isEditable()); // NOI18N
     }
     // #########################################################################
 
     private void initUI() throws InterruptedException {
         progressObserver.setProgress(100,
-                I18N.getString("Sirius.navigator.Navigator.initUI().progress.create"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_100"));  // NOI18N
 
         // vergiss es 2 GHz, keine sanduhr
         //Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(200));
@@ -258,7 +264,7 @@ public class Navigator extends JFrame {
 
 
         progressObserver.setProgress(150,
-                I18N.getString("Sirius.navigator.Navigator.initUI().progress.register"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_150"));  // NOI18N
         this.setContentPane(new JPanel(new BorderLayout(), true));
         this.setJMenuBar(menuBar);
 
@@ -280,7 +286,7 @@ public class Navigator extends JFrame {
     private void initWidgets() throws Exception {
         // MetaCatalogueTree ---------------------------------------------------
         progressObserver.setProgress(200, 
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.catalogue"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_200"));  // NOI18N
         RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
         metaCatalogueTree = new MetaCatalogueTree(rootTreeNode, PropertyManager.getManager().isEditable(), true, propertyManager.getMaxConnections());
         // dnd
@@ -289,15 +295,15 @@ public class Navigator extends JFrame {
         MutableConstraints catalogueTreeConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
         catalogueTreeConstraints.addAsScrollPane(ComponentRegistry.CATALOGUE_TREE,
                 metaCatalogueTree,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().metaCatalogueTree.ui.name"),
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().metaCatalogueTree.ui.tooltip"),
-                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().metaCatalogueTree.ui.icon")),
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.name"),  // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.tooltip"),  // NOI18N
+                resourceManager.getIcon("catalogue_tree_icon.gif"), // NOI18N
                 MutableConstraints.P1, MutableConstraints.ANY_INDEX, true);
         container.add(catalogueTreeConstraints);
 
         // SearchResultsTree ---------------------------------------------------
         progressObserver.setProgress(225,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.searchresults"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225"));  // NOI18N
         searchResultsTree = new SearchResultsTree();
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
@@ -306,34 +312,35 @@ public class Navigator extends JFrame {
         MutableConstraints searchResultsTreeConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
         searchResultsTreeConstraints.addAsComponent(ComponentRegistry.SEARCHRESULTS_TREE,
                 searchResultsTreePanel,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().searchresults.ui.name"),
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().searchresults.ui.tooltip"),
-                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().searchresults.ui.icon")),
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.searchResultsTreePanel.name"), // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.searchResultsTreePanel.tooltip"),  // NOI18N
+                resourceManager.getIcon("searchresults_tree_icon.gif"), // NOI18N
                 MutableConstraints.P1, MutableConstraints.ANY_INDEX);
         container.add(searchResultsTreeConstraints);
 
         // AttributePanel ------------------------------------------------------
         progressObserver.setProgress(250,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.attributeviewer"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_250"));  // NOI18N
+
         attributeViewer = new AttributeViewer();
         FloatingFrameConfigurator configurator = new FloatingFrameConfigurator(
                 ComponentRegistry.ATTRIBUTE_VIEWER,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.name"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.initWidgets().configurator.name.attributeViewer")); // NOI18N
         configurator.setTitleBarEnabled(false);
 
         MutableConstraints attributePanelConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
         attributePanelConstraints.addAsFloatingFrame(ComponentRegistry.ATTRIBUTE_VIEWER,
                 attributeViewer,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.name"),
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.tooltip"),
-                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeviewer.ui.icon")),
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeviewer.name"), // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeviewer.tooltip"), // NOI18N
+                resourceManager.getIcon("attributetable_icon.gif"),
                 MutableConstraints.P2, 0, false, configurator, false);
         container.add(attributePanelConstraints);
 
         // AttributeEditor .....................................................
         if (PropertyManager.getManager().isEditable()) {
             progressObserver.setProgress(275,
-                    I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.attributeeditor"));
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_275"));  // NOI18N
             //HELL
 //            if (StaticDebuggingTools.checkHomeForFile("cidsExperimentalBeanEditorsEnabled")) {
             attributeEditor = new NavigatorAttributeEditorGui();
@@ -341,15 +348,15 @@ public class Navigator extends JFrame {
 //                attributeEditor = new AttributeEditor();
 //            }
             configurator = new FloatingFrameConfigurator(ComponentRegistry.ATTRIBUTE_EDITOR,
-                    I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.name"));
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.initWidgets().configurator.name.attributeEditor")); // NOI18N
             configurator.setTitleBarEnabled(false);
 
             final MutableConstraints attributeEditorConstraints = new MutableConstraints(true);
             attributeEditorConstraints.addAsFloatingFrame(ComponentRegistry.ATTRIBUTE_EDITOR,
                     attributeEditor,
-                    I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.name"),
-                    I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.tooltip"),
-                    resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().attributeeditor.ui.icon")),
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeeditor.name"), // NOI18N
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeeditor.tooltip"), // NOI18N
+                    resourceManager.getIcon("attributetable_icon.gif"),
                     MutableConstraints.P3, 1, false, configurator, false);
             container.add(attributeEditorConstraints);
 
@@ -375,64 +382,66 @@ public class Navigator extends JFrame {
                 }
             });
 
-            logger.info("attribute editor enabled");
+            if(logger.isInfoEnabled())
+                logger.info("attribute editor enabled");    // NOI18N
         } else {
-            logger.info("attribute editor disabled");
+            if(logger.isInfoEnabled())
+                logger.info("attribute editor disabled");  // NOI18N
         }
 
         // DescriptionPane -----------------------------------------------------
         progressObserver.setProgress(325, 
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().progress.descriptionpane"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_325"));  // NOI18N
 
         descriptionPane = new DescriptionPane();
 
 
 
         configurator = new FloatingFrameConfigurator(ComponentRegistry.DESCRIPTION_PANE,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.name"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.initWidgets().configurator.name.descriptionPane")); // NOI18N
         //configurator.setTitleBarEnabled(false);
 
         MutableConstraints descriptionPaneConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
         descriptionPaneConstraints.addAsFloatingFrame(ComponentRegistry.DESCRIPTION_PANE,
                 descriptionPane,
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.name"),
-                I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.tooltip"),
-                resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.initWidgets().descriptionpane.icon")),
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.descriptionpane.name"), // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.descriptionpane.tooltip"), // NOI18N
+                resourceManager.getIcon("descriptionpane_icon.gif"),
                 MutableConstraints.P3, 0, false, configurator, false);
         container.add(descriptionPaneConstraints);
     }
 
     private void initDialogs() throws Exception {
         progressObserver.setProgress(350,
-                I18N.getString("Sirius.navigator.Navigator.initDialogs().progress.searchdialog"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_350"));  // NOI18N
 
         //searchDialog = new SearchDialog(this, this.searchResultsTree, "Suche", SessionManager.getProxy().getClassTreeNodes(SessionManager.getSession().getUser()), PropertyManager.getManager().getMaxSearchResults());
         searchDialog = new SearchDialog(this, SessionManager.getProxy().getSearchOptions(), SessionManager.getProxy().getClassTreeNodes());
 
         progressObserver.setProgress(550,
-                I18N.getString("Sirius.navigator.Navigator.initDialogs().progress.registerwidges"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_550"));  // NOI18N
         ComponentRegistry.registerComponents(this, container, menuBar, toolBar, popupMenu, metaCatalogueTree, searchResultsTree, attributeViewer, attributeEditor, searchDialog, descriptionPane);
     }
     // #########################################################################
 
     private void initPlugins() throws Exception {
         progressObserver.setProgress(575,
-                I18N.getString("Sirius.navigator.Navigator.initPlugins().progress.preloadplugins"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_575"));  // NOI18N
         PluginRegistry.getRegistry().preloadPlugins();
 
         progressObserver.setProgress(650,
-                I18N.getString("Sirius.navigator.Navigator.initPlugins().progress.loadplugins"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_650"));  // NOI18N
         PluginRegistry.getRegistry().loadPlugins();
 
         progressObserver.setProgress(850,
-                I18N.getString("Sirius.navigator.Navigator.initPlugins().progress.activateplugins"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_850"));  // NOI18N
         PluginRegistry.getRegistry().activatePlugins();
     }
     // #########################################################################
 
     private void initEvents() throws InterruptedException {
         progressObserver.setProgress(900,
-                I18N.getString("Sirius.navigator.Navigator.initEvents().progress.eventhandling"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_900"));  // NOI18N
         StatusChangeListener statusChangeListener = new StatusChangeListener(statusBar);
 
         metaCatalogueTree.addStatusChangeListener(statusChangeListener);
@@ -456,15 +465,14 @@ public class Navigator extends JFrame {
 
     private void initWindow() throws InterruptedException {
         progressObserver.setProgress(950, 
-                I18N.getString("Sirius.navigator.Navigator.initWindow().progress.window"));
-        this.setTitle(I18N.getString("Sirius.navigator.Navigator.title"));
-        this.setIconImage(resourceManager.getIcon(
-                I18N.getString("Sirius.navigator.Navigator.icon")).getImage());
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950"));  // NOI18N
+        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));
+        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new ClosingListener());
         progressObserver.setProgress(1000, 
-                I18N.getString("Sirius.navigator.Navigator.initWindow().progress.finished"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_1000"));  // NOI18N
     }
     // .........................................................................
 
@@ -481,12 +489,12 @@ public class Navigator extends JFrame {
                 // falsch aufgerufen schlob SessionManager.getSession().getUser().getUserGroup().getKey()
                 PermissionHolder perm = classes[i].getPermissions();
                 if (logger.isDebugEnabled()) {
-                    logger.debug(" usergroup can edit ?? " + key + " permissions :: " + perm);                //logger.debug(perm +" \n" +key);
+                    logger.debug(" usergroup can edit ?? " + key + " permissions :: " + perm);      // NOI18N          //logger.debug(perm +" \n" +key);
                 }
                 if (perm != null && perm.hasPermission(key, permission)) //xxxxxxxxxxxxxxxxxxxxxx user????
                 {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'");
+                        logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'");  // NOI18N
                     }
                     return true;
                 }
@@ -497,21 +505,23 @@ public class Navigator extends JFrame {
                 //                    return true;
                 //                }
             } catch (Exception exp) {
-                logger.error("hasPermission(): could not check permissions", exp);
+                logger.error("hasPermission(): could not check permissions", exp); // NOI18N
             }
         }
 
-        logger.warn("permission '" + permission + "' not found, disabling editor");
+        logger.warn("permission '" + permission + "' not found, disabling editor");  // NOI18N
         return false;
     }
 
     public void setVisible(final boolean visible) {
-        logger.info("setting main window visible to '" + visible + "'");
+        if(logger.isInfoEnabled())
+            logger.info("setting main window visible to '" + visible + "'");  // NOI18N
 
         if (SwingUtilities.isEventDispatchThread()) {
             doSetVisible(visible);
         } else {
-            logger.debug("doSetVisible(): synchronizing method");
+            if(logger.isDebugEnabled())
+                logger.debug("doSetVisible(): synchronizing method");  // NOI18N
             SwingUtilities.invokeLater(new Runnable() {
 
                 public void run() {
@@ -571,9 +581,11 @@ public class Navigator extends JFrame {
     public void dispose() {
 
 
-        logger.info("dispose() called");
+        if(logger.isInfoEnabled())
+            logger.info("dispose() called"); // NOI18N
         if (container instanceof LayoutedContainer) {
-            logger.info("saving Layout");
+            if(logger.isInfoEnabled())
+                logger.info("saving Layout"); // NOI18N
             ((LayoutedContainer) container).saveLayout(LayoutedContainer.DEFAULT_LAYOUT, this);
         }
         Navigator.this.saveWindowState();
@@ -589,7 +601,7 @@ public class Navigator extends JFrame {
             Navigator.super.dispose();
             Navigator.this.setDisposed(true);
         } else {
-            logger.warn("...............................");
+            logger.warn("...............................");  // NOI18N
         }
     }
 
@@ -600,25 +612,29 @@ public class Navigator extends JFrame {
         int windowY = (int) this.getLocation().getY();
         boolean windowMaximised = (this.getExtendedState() == MAXIMIZED_BOTH);
 
-        logger.info("saving window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth + ", windowX=" + windowX + ", windowY=" + windowY + ", windowMaximised=" + windowMaximised);
+        if(logger.isInfoEnabled())
+            logger.info("saving window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth + ", windowX=" + windowX + ", windowY=" + windowY + ", windowMaximised=" + windowMaximised); // NOI18N
 
-        this.preferences.putInt("windowHeight", windowHeight);
-        this.preferences.putInt("windowWidth", windowWidth);
-        this.preferences.putInt("windowX", windowX);
-        this.preferences.putInt("windowY", windowY);
-        this.preferences.putBoolean("windowMaximised", windowMaximised);
-        logger.info("saved window state");
+        this.preferences.putInt("windowHeight", windowHeight);  // NOI18N
+        this.preferences.putInt("windowWidth", windowWidth);    // NOI18N
+        this.preferences.putInt("windowX", windowX);            // NOI18N
+        this.preferences.putInt("windowY", windowY);            // NOI18N
+        this.preferences.putBoolean("windowMaximised", windowMaximised);    // NOI18N
+        if(logger.isInfoEnabled())
+            logger.info("saved window state");  // NOI18N
     }
 
     private void restoreWindowState() {
-        logger.info("restoring window state ...");
-        int windowHeight = this.preferences.getInt("windowHeight", PropertyManager.getManager().getHeight());
-        int windowWidth = this.preferences.getInt("windowWidth", PropertyManager.getManager().getWidth());
-        int windowX = this.preferences.getInt("windowX", 0);
-        int windowY = this.preferences.getInt("windowY", 0);
-        boolean windowMaximised = this.preferences.getBoolean("windowMaximised", propertyManager.isMaximizeWindow());
+        if(logger.isInfoEnabled())
+            logger.info("restoring window state ...");  // NOI18N
+        int windowHeight = this.preferences.getInt("windowHeight", PropertyManager.getManager().getHeight());   // NOI18N
+        int windowWidth = this.preferences.getInt("windowWidth", PropertyManager.getManager().getWidth());      // NOI18N
+        int windowX = this.preferences.getInt("windowX", 0);        // NOI18N
+        int windowY = this.preferences.getInt("windowY", 0);        // NOI18N
+        boolean windowMaximised = this.preferences.getBoolean("windowMaximised", propertyManager.isMaximizeWindow());   // NOI18N
 
-        logger.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth + ", windowX=" + windowX + ", windowY=" + windowY + ", windowMaximised=" + windowMaximised);
+        if(logger.isInfoEnabled())
+            logger.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth + ", windowX=" + windowX + ", windowY=" + windowY + ", windowMaximised=" + windowMaximised);  // NOI18N
 
         this.setSize(windowWidth, windowHeight);
         this.setLocation(windowX, windowY);
@@ -639,7 +655,8 @@ public class Navigator extends JFrame {
         public void windowClosing(WindowEvent e) {
             if (exceptionManager.showExitDialog(Navigator.this)) {
                 dispose();
-                logger.info("closing navigator");
+                if(logger.isInfoEnabled())
+                    logger.info("closing navigator"); // NOI18N
                 System.exit(0);
             }
         }
@@ -669,24 +686,24 @@ public class Navigator extends JFrame {
             // <RELEASE>
             if (release) {
                 if (args.length < 5) {
-                    String errorString = new String("\nusage: navigator %1 %2 %3 %4 %5 %6(%5)\n%1 = navigator config file \n%2 = navigator working directory \n%3 = plugin base directory \n%4 = navigator search forms base directory \n%5 navigator search profile store (optional, default: %1/profiles \n\nexample: java Sirius.navigator.Navigator c:\\programme\\cids\\navigator\\navigator.cfg c:\\programme\\cids\\navigator\\ c:\\programme\\cids\\navigator\\plugins\\ c:\\programme\\cids\\navigator\\search\\ c:\\programme\\cids\\navigator\\search\\profiles\\");
+                    String errorString = new String("\nusage: navigator %1 %2 %3 %4 %5 %6(%5)\n%1 = navigator config file \n%2 = navigator working directory \n%3 = plugin base directory \n%4 = navigator search forms base directory \n%5 navigator search profile store (optional, default: %1/profiles \n\nexample: java Sirius.navigator.Navigator c:\\programme\\cids\\navigator\\navigator.cfg c:\\programme\\cids\\navigator\\ c:\\programme\\cids\\navigator\\plugins\\ c:\\programme\\cids\\navigator\\search\\ c:\\programme\\cids\\navigator\\search\\profiles\\"); // NOI18N
                     System.out.println(errorString);
 
                     //System.exit(1);
                     throw new Exception(errorString);
                 } else {
-                    System.out.println("-------------------------------------------------------");
-                    System.out.println("C I D S   N A V I G A T 0 R   C O N F I G U R A T I 0 N");
-                    System.out.println("-------------------------------------------------------");
-                    System.out.println("log4j.properties = " + args[0]);
-                    System.out.println("navigator.cfg    = " + args[1]);
-                    System.out.println("basedir          = " + args[2]);
-                    System.out.println("plugindir        = " + args[3]);
-                    System.out.println("searchdir        = " + args[4]);
+                    System.out.println("-------------------------------------------------------");  // NOI18N
+                    System.out.println("C I D S   N A V I G A T 0 R   C O N F I G U R A T I 0 N");  // NOI18N
+                    System.out.println("-------------------------------------------------------");  // NOI18N
+                    System.out.println("log4j.properties = " + args[0]);                            // NOI18N
+                    System.out.println("navigator.cfg    = " + args[1]);                            // NOI18N
+                    System.out.println("basedir          = " + args[2]);                            // NOI18N
+                    System.out.println("plugindir        = " + args[3]);                            // NOI18N
+                    System.out.println("searchdir        = " + args[4]);                            // NOI18N
                     if (args.length > 5) {
-                        System.out.println("profilesdir      = " + args[5]);
+                        System.out.println("profilesdir      = " + args[5]);                        // NOI18N
                     }
-                    System.out.println("-------------------------------------------------------");
+                    System.out.println("-------------------------------------------------------");  // NOI18N
 
 
                     // log4j configuration .....................................
@@ -698,7 +715,7 @@ public class Navigator extends JFrame {
 
                         l4jinited = true;
                     } catch (Throwable t) {
-                        System.err.println("could not lode log4jproperties will try to load it from file" + t.getMessage());
+                        System.err.println("could not lode log4jproperties will try to load it from file" + t.getMessage());    // NOI18N
                         t.printStackTrace();
                     }
 
@@ -708,7 +725,7 @@ public class Navigator extends JFrame {
                         }
                     } catch (Throwable t) {
 
-                        System.err.println("could not lode log4jproperties " + t.getMessage());
+                        System.err.println("could not lode log4jproperties " + t.getMessage()); // NOI18N
                         t.printStackTrace();
 
                     }
@@ -722,13 +739,13 @@ public class Navigator extends JFrame {
                 }
             }//</RELEASE>
             else {
-                PropertyConfigurator.configure(ClassLoader.getSystemResource("Sirius/navigator/resource/cfg/log4j.debug.properties"));
+                PropertyConfigurator.configure(ClassLoader.getSystemResource("Sirius/navigator/resource/cfg/log4j.debug.properties"));  // NOI18N
 
                 // ohne plugins:
                 //PropertyManager.getManager().configure("D:\\cids\\res\\Sirius\\navigator\\resource\\cfg\\navigator.cfg", System.getProperty("user.home") + "\\.navigator\\", System.getProperty("user.home") + "\\.navigator\\plugins\\", "D:\\cids\\dist\\client\\search\\", null);
 
                 // mit plugins:
-                PropertyManager.getManager().configure("D:\\cids\\res\\Sirius\\navigator\\resource\\cfg\\navigator.cfg", System.getProperty("user.home") + "\\.navigator\\", "D:\\cids\\dist\\client\\plugins\\", "D:\\cids\\dist\\client\\search\\", null);
+                PropertyManager.getManager().configure("D:\\cids\\res\\Sirius\\navigator\\resource\\cfg\\navigator.cfg", System.getProperty("user.home") + "\\.navigator\\", "D:\\cids\\dist\\client\\plugins\\", "D:\\cids\\dist\\client\\search\\", null);    // NOI18N
                 resourceManager.setLocale(PropertyManager.getManager().getLocale());
 
                 // Properties ausgeben:
@@ -756,7 +773,7 @@ public class Navigator extends JFrame {
             //logger.debug("SPLASH");
             NavigatorSplashScreen navigatorSplashScreen =
                     new NavigatorSplashScreen(PropertyManager.getManager().getSharedProgressObserver(),
-                    resourceManager.getIcon(I18N.getString("Sirius.navigator.Navigator.splashscreenicon")));
+                    resourceManager.getIcon("wundaLogo.png"));
 
             navigatorSplashScreen.pack();
             navigatorSplashScreen.setLocationRelativeTo(null);
@@ -766,11 +783,11 @@ public class Navigator extends JFrame {
             // run .............................................................
         } catch (Throwable t) {
             // error .............................................................
-            Logger.getLogger(Navigator.class).fatal("could not create navigator instance", t);
+            Logger.getLogger(Navigator.class).fatal("could not create navigator instance", t);  // NOI18N
             ExceptionManager.getManager().showExceptionDialog(
                     ExceptionManager.FATAL,
-                    resourceManager.getExceptionName("nx01"),
-                    resourceManager.getExceptionMessage("nx01"), t);
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.main(String[]).ExceptionManager_anon.name"),  // NOI18N
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.main(String[]).ExceptionManager_anon.message"), t);
 
             System.exit(1);
             // error .............................................................
@@ -810,9 +827,9 @@ public class Navigator extends JFrame {
                         public void handle(String target, HttpServletRequest request, HttpServletResponse response, int dispatch) throws IOException, ServletException {
                             Request base_request = (request instanceof Request) ? (Request) request : HttpConnection.getCurrentConnection().getRequest();
                             base_request.setHandled(true);
-                            response.setContentType("text/html");
+                            response.setContentType("text/html");   // NOI18N
                             response.setStatus(HttpServletResponse.SC_OK);
-                            response.getWriter().println("<html><head><title>HTTP interface</title></head><body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"80%\"><tr><td width=\"30%\" align=\"center\" valign=\"middle\"><img border=\"0\" src=\"http://www.cismet.de/images/cismetLogo250M.png\" ><br></td><td width=\"%\">&nbsp;</td><td width=\"50%\" align=\"left\" valign=\"middle\"><font face=\"Arial\" size=\"3\" color=\"#1c449c\">... and <b><font face=\"Arial\" size=\"3\" color=\"#1c449c\">http://</font></b> just works</font><br><br><br></td></tr></table></body></html>");
+                            response.getWriter().println("<html><head><title>HTTP interface</title></head><body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"80%\"><tr><td width=\"30%\" align=\"center\" valign=\"middle\"><img border=\"0\" src=\"http://www.cismet.de/images/cismetLogo250M.png\" ><br></td><td width=\"%\">&nbsp;</td><td width=\"50%\" align=\"left\" valign=\"middle\"><font face=\"Arial\" size=\"3\" color=\"#1c449c\">... and <b><font face=\"Arial\" size=\"3\" color=\"#1c449c\">http://</font></b> just works</font><br><br><br></td></tr></table></body></html>");  // NOI18N
                         }
                     };
                     Handler hello = new AbstractHandler() {
@@ -821,19 +838,20 @@ public class Navigator extends JFrame {
                             try {
                                 if (request.getLocalAddr().equals(request.getRemoteAddr())) {
 
-                                    logger.info("HttpInterface angesprochen");
-                                    if (target.equalsIgnoreCase("/executeSearch")) {
-                                        String query = request.getParameter("query");
-                                        String domain = request.getParameter("domain");
-                                        String classId = request.getParameter("classId");
+                                    if(logger.isInfoEnabled())
+                                        logger.info("HttpInterface asked");  // NOI18N
+                                    if (target.equalsIgnoreCase("/executeSearch")) {    // NOI18N
+                                        String query = request.getParameter("query");   // NOI18N
+                                        String domain = request.getParameter("domain"); // NOI18N
+                                        String classId = request.getParameter("classId");   // NOI18N
                                         HashMap dataBeans = ComponentRegistry.getRegistry().getSearchDialog().getSearchFormManager().getFormDataBeans();
-                                        Object object = dataBeans.get(query + "@" + domain);
+                                        Object object = dataBeans.get(query + "@" + domain);    // NOI18N
                                         HashMap<String, String> params = new HashMap<String, String>();
                                         Set keys = request.getParameterMap().keySet();
                                         Iterator it = keys.iterator();
                                         while (it.hasNext()) {
                                             String key = it.next().toString();
-                                            if (!(key.equalsIgnoreCase("query") || key.equalsIgnoreCase("domain") || key.equalsIgnoreCase("classId"))) {
+                                            if (!(key.equalsIgnoreCase("query") || key.equalsIgnoreCase("domain") || key.equalsIgnoreCase("classId"))) {    // NOI18N
                                                 params.put(key, request.getParameter(key));
                                             }
                                         }
@@ -843,26 +861,26 @@ public class Navigator extends JFrame {
                                                 parambean.setBeanParameter(key, params.get(key));
                                             }
                                             Vector v = new Vector();
-                                            String cid = classId + "@" + domain;
+                                            String cid = classId + "@" + domain;    // NOI18N
                                             v.add(cid);
                                             LinkedList searchFormData = new LinkedList();
                                             searchFormData.add(parambean);
                                             ComponentRegistry.getRegistry().getSearchDialog().search(v, searchFormData, Navigator.this, false);
                                         }
                                     }
-                                    if (target.equalsIgnoreCase("/showAkuk")) {
-                                        String domain = request.getParameter("domain");
-                                        String classId = request.getParameter("classId");
-                                        String objectIds = request.getParameter("objectIds");
+                                    if (target.equalsIgnoreCase("/showAkuk")) { // NOI18N
+                                        String domain = request.getParameter("domain"); // NOI18N
+                                        String classId = request.getParameter("classId");   // NOI18N
+                                        String objectIds = request.getParameter("objectIds");   // NOI18N
                                     } else {
-                                        logger.warn("Unbekanntes Target: " + target);
+                                        logger.warn("Unknown Target: " + target);   // NOI18N
                                     }
 
                                 } else {
-                                    logger.warn("Sombody tries to access the HTTP Interface from a different Terminal. Rejected.");
+                                    logger.warn("Sombody tries to access the HTTP Interface from a different Terminal. Rejected."); // NOI18N
                                 }
                             } catch (Throwable t) {
-                                logger.error("Error while handling HttpRequests", t);
+                                logger.error("Error while handling HttpRequests", t);   // NOI18N
                             }
                         }
                     };
@@ -874,7 +892,7 @@ public class Navigator extends JFrame {
                     server.start();
                     server.join();
                 } catch (Throwable t) {
-                    logger.error("Error in  Navigator HttpInterface on port " + propertyManager.getHttpInterfacePort(), t);
+                    logger.error("Error in  Navigator HttpInterface on port " + propertyManager.getHttpInterfacePort(), t); // NOI18N
                 }
             }
         });
