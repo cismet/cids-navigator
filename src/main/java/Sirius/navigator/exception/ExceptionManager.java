@@ -20,7 +20,7 @@ import Sirius.navigator.resource.ResourceManager;
  */
 public class ExceptionManager
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
+    
     private final static Logger logger = Logger.getLogger(ExceptionManager.class);
     private static ExceptionManager manager = null;
     private static final ResourceManager resource = ResourceManager.getManager();
@@ -39,16 +39,17 @@ public class ExceptionManager
     /** Creates a new instance of ExceptionManager */
     private ExceptionManager()
     {
-        logger.info("creating singleton exception manager instance");
+        if(logger.isInfoEnabled())
+            logger.info("creating singleton exception manager instance"); //NOI18N
         exitOption = new JOptionPane(
-                I18N.getString("Sirius.navigator.exception.ExceptionManager.exitMessage"),
+                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.message"), //NOI18N
                 JOptionPane.QUESTION_MESSAGE,
                 JOptionPane.YES_NO_OPTION,
                 null,
                 new String[] {
-                    I18N.getString("Sirius.navigator.exception.ExceptionManager.confirmButton.text"),
-                    I18N.getString("Sirius.navigator.exception.ExceptionManager.cancelButton.text")},
-                I18N.getString("Sirius.navigator.exception.ExceptionManager.cancelButton.text"));
+                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm"), //NOI18N
+                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")}, //NOI18N
+                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")); //NOI18N
     }
     
     public final static ExceptionManager getManager()
@@ -148,7 +149,7 @@ public class ExceptionManager
         }
         else {
         JDialog exitDialog = exitOption.createDialog(owner,
-                I18N.getString("Sirius.navigator.exception.ExceptionManager.title"));
+                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.showExitDialog(JFrame).exitDialog.title"));  // NOI18N
         return doShowExitDialog(exitDialog);
         }
     }
@@ -160,7 +161,7 @@ public class ExceptionManager
         }
         else {
         JDialog exitDialog = exitOption.createDialog(owner,
-                I18N.getString("Sirius.navigator.exception.ExceptionManager.title"));
+                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.showExitDialog(JDialog).exitDialog.title"));  // NOI18N
         return doShowExitDialog(exitDialog);
         }
 
@@ -173,7 +174,7 @@ public class ExceptionManager
         }
         else {
         JDialog exitDialog = exitOption.createDialog(null,
-                I18N.getString("Sirius.navigator.exception.ExceptionManager.title"));
+                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.showExitDialog().exitDialog.title"));  // NOI18N
         return doShowExitDialog(exitDialog);
         }
     }
@@ -187,9 +188,10 @@ public class ExceptionManager
         exitDialog.show();
         
         if(exitOption.getValue().equals(
-                I18N.getString("Sirius.navigator.exception.ExceptionManager.confirmButton.text")))
+                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")))  // NOI18N
         {
-            logger.debug("user wants to close program");
+            if(logger.isDebugEnabled())
+                logger.debug("user wants to close program"); // NOI18N
             //System.exit(0);
             return true;
         }
@@ -281,7 +283,7 @@ public class ExceptionManager
             constraints.gridx = 0;
             
             exceptionIconLabel = new JLabel();
-            exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
+            exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
             exceptionIconLabel.setBorder(new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(10,10,10,10)));
             this.add(exceptionIconLabel, constraints);
             
@@ -300,24 +302,24 @@ public class ExceptionManager
             constraints.gridx = 0;
             JPanel buttonPanel = new JPanel(new GridLayout(1,3,10,10));
             
-            ignoreButton = new JButton(I18N.getString("Sirius.navigator.exception.ExceptionManager.ignoreButton.text"));
-            ignoreButton.setMnemonic(I18N.getString("Sirius.navigator.exception.ExceptionManager.ignoreButton.mnemonic").charAt(0));
-            ignoreButton.setToolTipText(I18N.getString("Sirius.navigator.exception.ExceptionManager.ignoreButton.tooltip"));
-            ignoreButton.setActionCommand("ignore");
+            ignoreButton = new JButton(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.ignoreButton.text"));  // NOI18N
+            ignoreButton.setMnemonic(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.ignoreButton.mnemonic").charAt(0));  // NOI18N
+            ignoreButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.ignoreButton.tooltip"));  // NOI18N
+            ignoreButton.setActionCommand("ignore");  // NOI18N
             ignoreButton.addActionListener(buttonListener);
             buttonPanel.add(ignoreButton);
             
-            exitButton = new JButton(I18N.getString("Sirius.navigator.exception.ExceptionManager.exitButton.text"));
-            exitButton.setMnemonic(I18N.getString("Sirius.navigator.exception.ExceptionManager.exitButton.mnemonic").charAt(0));
-            exitButton.setToolTipText(I18N.getString("Sirius.navigator.exception.ExceptionManager.exitButton.tooltip"));
-            exitButton.setActionCommand("exit");
+            exitButton = new JButton(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitButton.text"));  // NOI18N
+            exitButton.setMnemonic(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitButton.mnemonic").charAt(0));  // NOI18N
+            exitButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitButton.tooltip"));  // NOI18N
+            exitButton.setActionCommand("exit");  // NOI18N
             exitButton.addActionListener(buttonListener);
             buttonPanel.add(exitButton);
             
-            detailsButton = new JToggleButton(I18N.getString("Sirius.navigator.exception.ExceptionManager.detailsButton.text"));
-            detailsButton.setMnemonic(I18N.getString("Sirius.navigator.exception.ExceptionManager.detailsButton.mnemonic").charAt(0));
-            detailsButton.setToolTipText(I18N.getString("Sirius.navigator.exception.ExceptionManager.detailsButton.tooltip"));
-            detailsButton.setActionCommand("details");
+            detailsButton = new JToggleButton(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.detailsButton.text"));  // NOI18N
+            detailsButton.setMnemonic(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.detailsButton.mnemonic").charAt(0));  // NOI18N
+            detailsButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.detailsButton.tooltip"));  // NOI18N
+            detailsButton.setActionCommand("details");  // NOI18N
             detailsButton.addActionListener(buttonListener);
             buttonPanel.add(detailsButton);
             
@@ -343,39 +345,39 @@ public class ExceptionManager
             if(level == FATAL)
             {
                 ignoreButton.setEnabled(false);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.fatal"));
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.fatal"));  // NOI18N
                 }
             }
             else if(level == ERROR)
             {
                 ignoreButton.setEnabled(true);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.error"));
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.error"));  // NOI18N
                 }
             
             }
             else if(level == WARNING)
             {
                 ignoreButton.setEnabled(true);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));  // NOI18N
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.warning"));
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.warning"));  // NOI18N
                 }
             }
             else if(level == PLUGIN_ERROR)
             {
                 ignoreButton.setEnabled(true);
                 exitButton.setEnabled(false);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.error"));
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.error"));  // NOI18N
                 }
             
             }
@@ -383,10 +385,10 @@ public class ExceptionManager
             {
                 ignoreButton.setEnabled(true);
                 exitButton.setEnabled(false);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));  // NOI18N
                 if(parent.getTitle() == null)
                 {
-                    parent.setTitle(I18N.getString("Sirius.navigator.exception.ExceptionManager.title.warning"));
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.warning"));  // NOI18N
                 }
             }
             
@@ -415,7 +417,7 @@ public class ExceptionManager
             else
             {
                 detailsButton.setEnabled(false);
-                detailsTextArea.setText("");
+                detailsTextArea.setText("");  // NOI18N
             }
 
             detailsButton.setSelected(false);
@@ -437,7 +439,7 @@ public class ExceptionManager
                     while(iterator.hasNext())
                     {
                         stringBuffer.append(iterator.next().toString());
-                        stringBuffer.append("\n");
+                        stringBuffer.append("\n");  // NOI18N
                     }
 
                     detailsButton.setEnabled(true);
@@ -445,13 +447,13 @@ public class ExceptionManager
                 }
                 catch(Exception exp)
                 {
-                    logger.error("error initializing exception pane: " + exp.getMessage() + "'");
+                    logger.error("error initializing exception pane: " + exp.getMessage() + "'");  // NOI18N
                 }
             }
             else
             {
                 detailsButton.setEnabled(false);
-                detailsTextArea.setText("");
+                detailsTextArea.setText("");  // NOI18N
             }
 
             detailsButton.setSelected(false);
@@ -463,20 +465,21 @@ public class ExceptionManager
         {
             public void actionPerformed(ActionEvent e)
             {
-                if(e.getActionCommand().equals("exit"))
+                if(e.getActionCommand().equals("exit"))  // NOI18N
                 {
                     if(ExceptionManager.this.showExitDialog(parent))
                     {
-                        logger.info("closing program");
+                        if(logger.isInfoEnabled())
+                            logger.info("closing program");  // NOI18N
                         System.exit(1);
                     }
                 }
-                else if(e.getActionCommand().equals("ignore"))
+                else if(e.getActionCommand().equals("ignore"))  // NOI18N
                 {
                     parent.dispose();
                     //parent = null;
                 }
-                else if(e.getActionCommand().equals("details"))
+                else if(e.getActionCommand().equals("details"))  // NOI18N
                 {
                     if(detailsButton.isSelected())
                     {
@@ -491,7 +494,7 @@ public class ExceptionManager
                 }
                 else
                 {
-                    logger.warn("unknown action '" + e.getActionCommand() + "'");
+                    logger.warn("unknown action '" + e.getActionCommand() + "'");  // NOI18N
                 }
             }
         }
