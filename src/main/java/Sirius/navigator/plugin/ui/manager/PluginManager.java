@@ -27,15 +27,13 @@ import org.apache.log4j.Logger;
 public class PluginManager extends javax.swing.JDialog 
 {
     protected final Logger logger;
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-    private static final ResourceManager resource = ResourceManager.getManager();
     private final PluginMetaInfoPanel metaInfoPanel;
     private final PluginTree pluginTree;
     
     /** Creates new form PluginManager */
     public PluginManager(java.awt.Frame parent) 
     {
-        super(parent, I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.title"), true);
+        super(parent, org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.title"), true);  // NOI18N
         
         this.logger = Logger.getLogger(this.getClass());
         this.pluginTree = new PluginTree();
@@ -96,7 +94,7 @@ public class PluginManager extends javax.swing.JDialog
         closeButton = new javax.swing.JButton();
 
         setModal(true);
-        setName(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.name")); // NOI18N
+        setName("pluginManagerDialog"); // NOI18N
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -132,37 +130,37 @@ public class PluginManager extends javax.swing.JDialog
         buttonPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 3)));
         buttonPanel.setLayout(new java.awt.GridLayout(1, 5, 5, 0));
 
-        loadButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.loadButton.mnemonic").charAt(0));
-        loadButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.loadButton.text")); // NOI18N
-        loadButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.loadButton.tooltip")); // NOI18N
+        loadButton.setMnemonic(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.loadButton.mnemonics").charAt(0));
+        loadButton.setText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.loadButton.text")); // NOI18N
+        loadButton.setToolTipText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.loadButton.tooltip")); // NOI18N
         loadButton.setActionCommand("load");
         loadButton.setEnabled(false);
         buttonPanel.add(loadButton);
 
-        unloadButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.unloadButton.mnemonic").charAt(0));
-        unloadButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.unloadButton.text")); // NOI18N
-        unloadButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.unloadButton.tooltip")); // NOI18N
+        unloadButton.setMnemonic(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.unloadButton.mnemonics").charAt(0));
+        unloadButton.setText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.unloadButton.text")); // NOI18N
+        unloadButton.setToolTipText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.unloadButton.tooltip")); // NOI18N
         unloadButton.setActionCommand("unload");
         unloadButton.setEnabled(false);
         buttonPanel.add(unloadButton);
 
-        activateButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.activateButton.mnemonic").charAt(0));
-        activateButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.activateButton.text")); // NOI18N
-        activateButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.activateButton.tooltip")); // NOI18N
+        activateButton.setMnemonic(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.activateButton.mnemonics").charAt(0));
+        activateButton.setText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.activateButton.text")); // NOI18N
+        activateButton.setToolTipText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.activateButton.tooltip")); // NOI18N
         activateButton.setActionCommand("activate");
         activateButton.setEnabled(false);
         buttonPanel.add(activateButton);
 
-        deactivateButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.deactivateButton.mnemonic").charAt(0));
-        deactivateButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.deactivateButton.text")); // NOI18N
-        deactivateButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.deactivateButton.tooltip")); // NOI18N
+        deactivateButton.setMnemonic(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.deactivateButton.mnemonics").charAt(0));
+        deactivateButton.setText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.deactivateButton.text")); // NOI18N
+        deactivateButton.setToolTipText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.deactivateButton.tooltip")); // NOI18N
         deactivateButton.setActionCommand("deactivate");
         deactivateButton.setEnabled(false);
         buttonPanel.add(deactivateButton);
 
-        closeButton.setMnemonic(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.closeButton.mnemonic").charAt(0));
-        closeButton.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.closeButton.text")); // NOI18N
-        closeButton.setToolTipText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.closeButton.tooltip")); // NOI18N
+        closeButton.setMnemonic(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.closeButton.mnemonics").charAt(0));
+        closeButton.setText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.closeButton.text")); // NOI18N
+        closeButton.setToolTipText(org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.closeButton.tooltip")); // NOI18N
         closeButton.setActionCommand("close");
         buttonPanel.add(closeButton);
 
@@ -262,7 +260,7 @@ public class PluginManager extends javax.swing.JDialog
         public void actionPerformed(ActionEvent e)
         {
             PluginTree.PluginTreeNode pluginNode = PluginManager.this.pluginTree.getSelectedNode();
-            if(e.getActionCommand().equals("close"))
+            if(e.getActionCommand().equals("close"))  // NOI18N
             {
                 PluginManager.this.setVisible(false);
                 PluginManager.this.dispose();
@@ -271,11 +269,11 @@ public class PluginManager extends javax.swing.JDialog
             {
                 //try
                 //{
-                    if(logger.isDebugEnabled())logger.debug("performing plugin action");
-                    if(e.getActionCommand().equals("load") && pluginNode.getPluginDescriptor().isProgressObservable())
+                    if(logger.isDebugEnabled())logger.debug("performing plugin action");  // NOI18N
+                    if(e.getActionCommand().equals("load") && pluginNode.getPluginDescriptor().isProgressObservable())  // NOI18N
                     {
                         ProgressObserver pluginProgressObserver = pluginNode.getPluginDescriptor().getContext().getEnvironment().getProgressObserver();
-                        if(logger.isDebugEnabled())logger.debug("using plugin progress observer '" + pluginProgressObserver.getName() + "'");
+                        if(logger.isDebugEnabled())logger.debug("using plugin progress observer '" + pluginProgressObserver.getName() + "'");  // NOI18N
                         this.pluginManagerMethod.setProgressObserver(pluginProgressObserver);
                     }
                     else
@@ -287,7 +285,7 @@ public class PluginManager extends javax.swing.JDialog
                     this.progressDialog.setLocationRelativeTo(PluginManager.this);
                     this.progressDialog.show(this.pluginManagerMethod, strings);
                     
-                    if(logger.isDebugEnabled())logger.debug("plugin action performed");
+                    if(logger.isDebugEnabled())logger.debug("plugin action performed");  // NOI18N
                     PluginManager.this.setButtonsEnabled(pluginNode);
                 /*}
                 catch(Exception exp)
@@ -327,85 +325,94 @@ public class PluginManager extends javax.swing.JDialog
             this.progressObserver.reset();
             this.progressObserver.setName(strings[2]);
             try{this.progressObserver.setMessage(
-                    I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.init().progress.default"));}
+                    org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.progressObserver.message.default"));}  // NOI18N
             catch(InterruptedException iexp){}
         }
         
         protected void doInvoke()
         {        
-            if(actionCommand.equals("load"))
+            if(actionCommand.equals("load"))  // NOI18N
             {
                try
                {
                    this.progressObserver.setMessage(
-                           I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.doInvoke().progress.load"));
+                           org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.progressObserver.message.load"));  // NOI18N
                    PluginRegistry.getRegistry().loadPlugin(pluginId);
                }
                catch(Throwable t)
                {
-                    logger.error("could not load plugin '" + pluginId + "'", t);
-                    ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resource.getExceptionName("px01"), resource.getExceptionMessage("px01"), t);
+                    logger.error("could not load plugin '" + pluginId + "'", t);  // NOI18N
+                    ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                            org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.doInvoke().ExceptionManager_anon1.name"),  // NOI18N
+                            org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.doInvoke().ExceptionManager_anon1.message"),  // NOI18N
+                            t);
                }
                finally
                {
                    try{this.progressObserver.setFinished(true);}
                    catch(InterruptedException iexp)
                    {
-                    logger.error("could not load plugin", iexp);
+                    logger.error("could not load plugin", iexp);  // NOI18N
                    }
                }
             }
-            else if(actionCommand.equals("unload"))
+            else if(actionCommand.equals("unload"))  // NOI18N
             {
-                logger.fatal("method not implemented");
-                throw new RuntimeException("method not implemented");
+                logger.fatal("method not implemented");  // NOI18N
+                throw new RuntimeException("method not implemented");  // NOI18N
                 //this.progressObserver.setMessage(ResourceManager.getManager().getString("plugin.progress.unload"));
             }
-            else if(actionCommand.equals("activate"))
+            else if(actionCommand.equals("activate"))  // NOI18N
             {
                 try
                 {
                     this.progressObserver.setMessage(
-                            I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.doInvoke().progress.activate"));
+                            org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.progressObserver.message.activate"));  // NOI18N
                     Thread.currentThread().sleep(1000);
                     PluginRegistry.getRegistry().activatePlugin(pluginId);
                     Thread.currentThread().sleep(1000);
                 }
                 catch(Throwable t)
                 {
-                   logger.error("could not activate plugin '" + pluginId + "'", t);
-                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resource.getExceptionName("px01"), resource.getExceptionMessage("px01"), t);
+                   logger.error("could not activate plugin '" + pluginId + "'", t);  // NOI18N
+                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                           org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.doInvoke().ExceptionManager_anon2.name"),  // NOI18N
+                           org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.doInvoke().ExceptionManager_anon2.message"),  // NOI18N
+                           t);
                 }
                 finally
                 {
                    try{this.progressObserver.setFinished(true);}
                    catch(InterruptedException iexp)
                    {
-                    logger.error("could not activate plugin", iexp);
+                    logger.error("could not activate plugin", iexp);  // NOI18N
                    }
                 }
             }
-            else if(actionCommand.equals("deactivate"))
+            else if(actionCommand.equals("deactivate"))  // NOI18N
             {
                 try
                 {
                     this.progressObserver.setMessage(
-                            I18N.getString("Sirius.navigator.plugin.ui.manager.PluginManager.doInvoke().progress.deactivate"));
+                            org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.progressObserver.message.deactivate"));  // NOI18N
                     Thread.currentThread().sleep(1000);
                     PluginRegistry.getRegistry().deactivatePlugin(pluginId);
                     Thread.currentThread().sleep(1000);
                 }
                 catch(Throwable t)
                 {
-                   logger.error("could not deactivate plugin '" + pluginId + "'", t);
-                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resource.getExceptionName("px01"), resource.getExceptionMessage("px01"), t);
+                   logger.error("could not deactivate plugin '" + pluginId + "'", t);  // NOI18N
+                   ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                           org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.doInvoke().ExceptionManager_anon3.name"),  // NOI18N
+                           org.openide.util.NbBundle.getMessage(PluginManager.class, "PluginManager.doInvoke().ExceptionManager_anon3.message"),  // NOI18N
+                           t);
                 }
                 finally
                 {
                    try{this.progressObserver.setFinished(true);}
                    catch(InterruptedException iexp)
                    {
-                    logger.error("could not deactivate plugin", iexp);
+                    logger.error("could not deactivate plugin", iexp);  // NOI18N
                    }
                 }
             }
