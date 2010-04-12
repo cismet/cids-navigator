@@ -76,7 +76,7 @@ public class PluginMenu extends EmbeddedMenu
      */
     public void setAvailability(MethodAvailability methodAvailability)
     {
-        if(logger.isDebugEnabled())logger.debug("setting plugin menu items availability '" + methodAvailability.getAvailability() + "' of '" + this.getMenuComponentCount() + "' components");
+        if(logger.isDebugEnabled())logger.debug("setting plugin menu items availability '" + methodAvailability.getAvailability() + "' of '" + this.getMenuComponentCount() + "' components");  // NOI18N
         Component[] components = this.getMenuComponents();
         
         for(int i = 0; i < components.length; i++)
@@ -87,23 +87,25 @@ public class PluginMenu extends EmbeddedMenu
                 //if(logger.isDebugEnabled())logger.debug("changing availability '" + pluginMenuItem.getAvailability() + "' of '" + pluginMenuItem.getText() + "' to '" + availability + "': '"  + (pluginMenuItem.getAvailability() & availability) + "'");
                 
                 boolean available = (pluginMenuItem.getAvailability() & methodAvailability.getAvailability()) > 0;
-                if(logger.isDebugEnabled())logger.debug(pluginMenuItem.getText() + " is available: " + available + " (" + pluginMenuItem.getAvailability() + " & " + methodAvailability.getAvailability() + " > 0)");
+                if(logger.isDebugEnabled())logger.debug(pluginMenuItem.getText() + " is available: " + available + " (" + pluginMenuItem.getAvailability() + " & " + methodAvailability.getAvailability() + " > 0)");  // NOI18N
                 
                 if(pluginMenuItem.getMethod() != null && available)
                 {
                     available = methodAvailability.containsClasses(pluginMenuItem.getMethod().getClassKeys());
-                    if(logger.isDebugEnabled())logger.debug(pluginMenuItem.getText() + " is available for selected classes: " + available);
+                    if(logger.isDebugEnabled())logger.debug(pluginMenuItem.getText() + " is available for selected classes: " + available);  // NOI18N
                     
                     Iterator iterator = methodAvailability.getClassKeys().iterator();
                     while(iterator.hasNext())
                     {
-                        logger.debug("class key of selected nodes: " + iterator.next());
+                        if(logger.isDebugEnabled())
+                            logger.debug("class key of selected nodes: " + iterator.next());  // NOI18N
                     }
                     
                     iterator = pluginMenuItem.getMethod().getClassKeys().iterator();
                     while(iterator.hasNext())
                     {
-                        logger.debug("class key of selected method: " + iterator.next());
+                        if(logger.isDebugEnabled())
+                            logger.debug("class key of selected method: " + iterator.next());  // NOI18N
                     }
                 }
                 
@@ -118,7 +120,7 @@ public class PluginMenu extends EmbeddedMenu
             }
             else if(!(components[i] instanceof JSeparator))
             {
-                logger.warn("could not set availability of component '" + components[i].getClass().getName() + "'");
+                logger.warn("could not set availability of component '" + components[i].getClass().getName() + "'");  // NOI18N
             }
         }
     }   
