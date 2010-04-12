@@ -24,8 +24,6 @@ public class PluginRegistry
 {
     private final static Logger logger = Logger.getLogger(PluginRegistry.class);
 
-    private final ResourceManager resource = ResourceManager.getManager();
-
     private static PluginRegistry registry = null;
     
     private final PluginFactory pluginFactory;
@@ -55,7 +53,7 @@ public class PluginRegistry
     {
         synchronized(blocker)
         {
-            logger.warn("destroying singelton PluginRegistry instance");
+            logger.warn("destroying singelton PluginRegistry instance");  // NOI18N
             
             try
             {
@@ -63,7 +61,7 @@ public class PluginRegistry
             }
             catch(Throwable t)
             {
-                logger.error("could not deactivate plugins", t);
+                logger.error("could not deactivate plugins", t);  // NOI18N
             }
             
             registry = null;
@@ -79,20 +77,22 @@ public class PluginRegistry
             {
                 
                 PluginDescriptor pluginDescriptor = new PluginDescriptor((String)iterator.next());
-                if(logger.isDebugEnabled())logger.debug("preloading new plugin");
+                if(logger.isDebugEnabled())logger.debug("preloading new plugin");  // NOI18N
                 
                 try
                 {
                     pluginFactory.preloadPlugin(pluginDescriptor, true);
                     this.registerPlugin(pluginDescriptor);
-                    logger.info("plugin' " + pluginDescriptor.getMetaInfo().getName() + " (" + pluginDescriptor.getName() + ")' successfully registred");
+                    if(logger.isInfoEnabled())
+                        logger.info("plugin' " + pluginDescriptor.getMetaInfo().getName() + " (" + pluginDescriptor.getName() + ")' successfully registred");  // NOI18N
                 }
                 catch(Throwable t)
                 {
-                    logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);
+                    logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);  // NOI18N
                     ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
-                            resource.getExceptionName("px01"),
-                            resource.getExceptionMessage("px01"), t);
+                            org.openide.util.NbBundle.getMessage(PluginRegistry.class,"PluginRegistry.preloadPlugins().ExceptionManager_anon.name"),  // NOI18N
+                            org.openide.util.NbBundle.getMessage(PluginRegistry.class,"PluginRegistry.preloadPlugins().ExceptionManager_anon.message"),  // NOI18N
+                            t);
                     pluginDescriptor.setLoaded(false);
                 }
                 
@@ -115,7 +115,8 @@ public class PluginRegistry
         }
         else
         {
-            logger.info("no plugins found");
+            if(logger.isInfoEnabled())
+                logger.info("no plugins found");  // NOI18N
         }
     }
     
@@ -128,7 +129,7 @@ public class PluginRegistry
         }
         else
         {
-            logger.error("plugin '" + id + "' not found");
+            logger.error("plugin '" + id + "' not found");  // NOI18N
         }
     }
     
@@ -140,12 +141,14 @@ public class PluginRegistry
             while(iterator.hasNext())
             {
                 PluginDescriptor pluginDescriptor = (PluginDescriptor)iterator.next();
-                
-                logger.info("users: " + pluginDescriptor.getUsers().size());
+
+                if(logger.isInfoEnabled())
+                    logger.info("users: " + pluginDescriptor.getUsers().size());  // NOI18N
                 Iterator uIterator = pluginDescriptor.getUsers().iterator();
                 while(uIterator.hasNext())
                 {
-                    logger.info("user: '" + uIterator.next() + "'");
+                    if(logger.isInfoEnabled())
+                        logger.info("user: '" + uIterator.next() + "'");  // NOI18N
                 }
                 
                 if(pluginDescriptor.getUsers().size() == 0 || pluginDescriptor.getUsers().contains(SessionManager.getSession().getUser().getName()))
@@ -158,27 +161,29 @@ public class PluginRegistry
                         }
                         catch(Throwable t)
                         {
-                            logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);
+                            logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);  // NOI18N
                             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
-                                    resource.getExceptionName("px01"),
-                                    resource.getExceptionMessage("px01"), t);
+                                    org.openide.util.NbBundle.getMessage(PluginRegistry.class,"PluginRegistry.loadPlugins().ExceptionManager_anon.name"),  // NOI18N
+                                    org.openide.util.NbBundle.getMessage(PluginRegistry.class,"PluginRegistry.loadPlugins().ExceptionManager_anon.message"),  // NOI18N
+                                    t);
                             pluginDescriptor.setLoaded(false);
                         }
                     }
                     else
                     {
-                        logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '" + SessionManager.getSession().getUser().getUserGroup() + "'");
+                        logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '" + SessionManager.getSession().getUser().getUserGroup() + "'");  // NOI18N
                     }
                 }
                 else
                 {
-                    logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no user  '" + SessionManager.getSession().getUser().getName() + "'");
+                    logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no user  '" + SessionManager.getSession().getUser().getName() + "'");  // NOI18N
                 }                
             }
         }
         else
         {
-            logger.info("could not load any plugins: no plugins found or preloaded");
+            if(logger.isInfoEnabled())
+                logger.info("could not load any plugins: no plugins found or preloaded");  // NOI18N
         }
     }
     
@@ -191,7 +196,7 @@ public class PluginRegistry
         }
         else
         {
-            logger.error("plugin '" + id + "' not found");
+            logger.error("plugin '" + id + "' not found");  // NOI18N
         }
     }
     
@@ -204,7 +209,7 @@ public class PluginRegistry
         }
         else
         {
-            logger.error("plugin '" + id + "' not found");
+            logger.error("plugin '" + id + "' not found");  // NOI18N
         }
     }
     
@@ -220,7 +225,8 @@ public class PluginRegistry
         }
         else
         {
-            logger.info("could not activate any plugins: no plugins found or preloaded");
+            if(logger.isInfoEnabled())
+                logger.info("could not activate any plugins: no plugins found or preloaded");  // NOI18N
         }
     }
     
@@ -236,7 +242,8 @@ public class PluginRegistry
         }
         else
         {
-            logger.info("could not deactivate any plugins: no plugins found or preloaded");
+            if(logger.isInfoEnabled())
+                logger.info("could not deactivate any plugins: no plugins found or preloaded");  // NOI18N
         }
     }
     
@@ -252,7 +259,8 @@ public class PluginRegistry
         }
         else
         {
-            logger.info("could not activate any plugins: no plugins found or preloaded");
+            if(logger.isInfoEnabled())
+                logger.info("could not activate any plugins: no plugins found or preloaded");  // NOI18N
         }
     }
     
@@ -293,11 +301,11 @@ public class PluginRegistry
     
     private void registerPlugin(PluginDescriptor descriptor)
     {
-        if(logger.isDebugEnabled())logger.debug("register new plugin: name='" + descriptor.getName() + "', id='" + descriptor.getId() + "'");
+        if(logger.isDebugEnabled())logger.debug("register new plugin: name='" + descriptor.getName() + "', id='" + descriptor.getId() + "'");  // NOI18N
         
         if(plugins.containsKey(descriptor.getId()))
         {
-            logger.fatal("duplicate plugin id '" + descriptor.getId() + "' detected in plugin '" + descriptor.getMetaInfo().getName() + " (" + descriptor.getName() + ")'");
+            logger.fatal("duplicate plugin id '" + descriptor.getId() + "' detected in plugin '" + descriptor.getMetaInfo().getName() + " (" + descriptor.getName() + ")'");  // NOI18N
         }
         else
         {
@@ -309,13 +317,13 @@ public class PluginRegistry
     {
         if(!descriptor.isLoaded())
         {
-            if(logger.isDebugEnabled())logger.debug("loading plugin '" + descriptor.getName() + "'");
+            if(logger.isDebugEnabled())logger.debug("loading plugin '" + descriptor.getName() + "'");  // NOI18N
             pluginFactory.loadPlugin(descriptor);
             descriptor.setLoaded(true);
         }
         else if(logger.isDebugEnabled())
         {
-            logger.debug("plugin '" + descriptor.getName() + "' already loaded");
+            logger.debug("plugin '" + descriptor.getName() + "' already loaded");  // NOI18N
         }
     }
     
@@ -323,30 +331,30 @@ public class PluginRegistry
     {
         if(descriptor.isLoaded() && !descriptor.isActivated())
         {
-            if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "'");
+            if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "'");  // NOI18N
             
             // activate ui(s) ..................................................
             if(descriptor.isPluginToolBarAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' toolbar");
+                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' toolbar");  // NOI18N
                 ComponentRegistry.getRegistry().getMutableToolBar().addPluginToolBar(descriptor.getPluginToolBar());
             }
             
             if(descriptor.isPluginMenuAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' menu");
+                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' menu");  // NOI18N
                 ComponentRegistry.getRegistry().getMutableMenuBar().addPluginMenu(descriptor.getPluginMenu());
             }
             
             if(descriptor.isPluginPopupMenuAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' popup menu");
+                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' popup menu");  // NOI18N
                 ComponentRegistry.getRegistry().getMutablePopupMenu().addPluginMenu(descriptor.getPluginPopupMenu());
             }
             
             if(descriptor.isPluginUIDescriptorsAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' user interface");
+                if(logger.isDebugEnabled())logger.debug("activating plugin '" + descriptor.getName() + "' user interface");  // NOI18N
                 Iterator iterator = descriptor.getPluginUIDescriptors();
                 while(iterator.hasNext())
                 {
@@ -361,11 +369,11 @@ public class PluginRegistry
         {
             if(!descriptor.isLoaded())
             {
-                logger.warn("plugin '" + descriptor.getName() + "' could not be activated (not loaded)");
+                logger.warn("plugin '" + descriptor.getName() + "' could not be activated (not loaded)");  // NOI18N
             }
             else if(logger.isDebugEnabled())
             {
-                logger.debug("plugin '" + descriptor.getName() + "' could not be activated (already activated)");
+                logger.debug("plugin '" + descriptor.getName() + "' could not be activated (already activated)");  // NOI18N
             }
         }
     }
@@ -374,30 +382,30 @@ public class PluginRegistry
     {
         if(descriptor.isDeactivateable() && descriptor.isLoaded() && descriptor.isActivated())
         {
-            if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "'");
+            if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "'");  // NOI18N
             
             // activate ui(s) ..................................................
             if(descriptor.isPluginToolBarAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' toolbar");
+                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' toolbar");  // NOI18N
                 ComponentRegistry.getRegistry().getMutableToolBar().removePluginToolBar(descriptor.getId());
             }
             
             if(descriptor.isPluginMenuAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' menu");
+                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' menu");  // NOI18N
                 ComponentRegistry.getRegistry().getMutableMenuBar().removePluginMenu(descriptor.getId());
             }
             
             if(descriptor.isPluginPopupMenuAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' popup menu");
+                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' popup menu");  // NOI18N
                 ComponentRegistry.getRegistry().getMutablePopupMenu().removePluginMenu(descriptor.getId());
             }
             
             if(descriptor.isPluginUIDescriptorsAvailable())
             {
-                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' user interface");
+                if(logger.isDebugEnabled())logger.debug("deactivating plugin '" + descriptor.getName() + "' user interface");  // NOI18N
                 Iterator iterator = descriptor.getPluginUIDescriptors();
                 while(iterator.hasNext())
                 {
@@ -413,11 +421,11 @@ public class PluginRegistry
         {
             if(!descriptor.isLoaded())
             {
-                logger.warn("plugin '" + descriptor.getName() + "' could not be deactivated (not loaded)");
+                logger.warn("plugin '" + descriptor.getName() + "' could not be deactivated (not loaded)");  // NOI18N
             }
             else if(logger.isDebugEnabled())
             {
-                logger.debug("plugin '" + descriptor.getName() + "' could not be deactivated (already deactivated or not deactivateable)");
+                logger.debug("plugin '" + descriptor.getName() + "' could not be deactivated (already deactivated or not deactivateable)");  // NOI18N
             }
         }
     }
@@ -426,12 +434,12 @@ public class PluginRegistry
     {
         if(descriptor.isActivated())
         {
-            if(logger.isDebugEnabled())logger.debug("setting plugin '" + descriptor.getName() + "' visible");
+            if(logger.isDebugEnabled())logger.debug("setting plugin '" + descriptor.getName() + "' visible");  // NOI18N
             descriptor.getPlugin().setVisible(visible);
         }
         else if(logger.isDebugEnabled())
         {
-            logger.debug("plugin '" + descriptor.getName() + "' is not activated");
+            logger.debug("plugin '" + descriptor.getName() + "' is not activated");  // NOI18N
         }
     }
 }

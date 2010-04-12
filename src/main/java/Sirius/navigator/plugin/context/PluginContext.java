@@ -224,14 +224,14 @@ public class PluginContext
         
         private Environment(PluginDescriptor pluginDescriptor, PluginProgressObserver progressObserver, HashMap paramTable, HashMap mappingTable)
         {
-            this.pluginLogger = Logger.getLogger("Sirius.navigator.plugin.plugins." + pluginDescriptor.getName());
+            this.pluginLogger = Logger.getLogger("Sirius.navigator.plugin.plugins." + pluginDescriptor.getName());  // NOI18N
             
             this.progressObserver = progressObserver;
             this.mappingTable = mappingTable;
             this.paramTable = paramTable;
             
-            this.documentBase = pluginDescriptor.getPluginPath() + "res/";
-            this.codeBase = pluginDescriptor.getPluginPath() + "lib/";
+            this.documentBase = pluginDescriptor.getPluginPath() + "res/";  // NOI18N
+            this.codeBase = pluginDescriptor.getPluginPath() + "lib/";  // NOI18N
         }
         
         public boolean isApplet()
@@ -295,7 +295,7 @@ public class PluginContext
         {
             if(this.mappingTable == null)
             {
-                PluginContext.logger.warn("attribute '" + attributeName + "' could not be not found, no mappings loaded");
+                PluginContext.logger.warn("attribute '" + attributeName + "' could not be not found, no mappings loaded");  // NOI18N
             }
             
             Object object = mappingTable.get(attributeName);
@@ -306,7 +306,7 @@ public class PluginContext
             }
             else
             {
-                PluginContext.logger.warn("attribute '" + attributeName + "' not found");
+                PluginContext.logger.warn("attribute '" + attributeName + "' not found");  // NOI18N
             }
             
             // besser als nix ...
@@ -342,10 +342,11 @@ public class PluginContext
          */
         public String getParameter(String paramName)
         {
-            PluginContext.logger.debug("retrieving parameter '" + paramName + "'");
+            if(PluginContext.logger.isDebugEnabled())
+                PluginContext.logger.debug("retrieving parameter '" + paramName + "'");  // NOI18N
             if(this.paramTable == null)
             {
-                PluginContext.logger.warn("parameter '" + paramName + "' could not be not found, no parameters loaded");
+                PluginContext.logger.warn("parameter '" + paramName + "' could not be not found, no parameters loaded");  // NOI18N
                 return null;
             }
             
@@ -356,7 +357,7 @@ public class PluginContext
             }
             else
             {
-                PluginContext.logger.warn("parameter '" + paramName + "' not found");
+                PluginContext.logger.warn("parameter '" + paramName + "' not found");  // NOI18N
                 return null;
             }
         }
@@ -432,7 +433,7 @@ public class PluginContext
         
         public void showDocumentInDefaultBrowser(URL url)
         {
-            PropertyManager.getManager().getAppletContext().showDocument(url, "_blank");
+            PropertyManager.getManager().getAppletContext().showDocument(url, "_blank");  // NOI18N
         }
         
         public void showDocumentInDefaultBrowser(String url) throws MalformedURLException
@@ -461,13 +462,14 @@ public class PluginContext
         public InputStream getPluginResourceAsStream(String resource) throws IOException
         {
             String path = getEnvironment().getDocumentBase() + resource;
-            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading resource '" + path + "'");
+            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading resource '" + path + "'");  // NOI18N
             
             try
             {
                 if(getEnvironment().isApplet()) // oder webstart, dann ist applet auch true
                 {
-                    logger.debug("ich denk ich bin ein applet: path:"+path);
+                    if(PluginContext.logger.isDebugEnabled())
+                        logger.debug("ich denk ich bin ein applet: path:"+path);  // NOI18N
                     URL url = new URL(path);
                     URLConnection connection = url.openConnection();
                     return connection.getInputStream();
@@ -480,14 +482,14 @@ public class PluginContext
             }
             catch(IOException ioexp)
             {
-                PluginContext.logger.error("resource '" + path + "' could not be found", ioexp);
+                PluginContext.logger.error("resource '" + path + "' could not be found", ioexp);  // NOI18N
                 throw ioexp;
             }
         }
         
         public InputStream getResourceAsStream(String resource) throws IOException
         {
-            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading resource '" + resource + "'");
+            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading resource '" + resource + "'");  // NOI18N
             return resources.getResourceAsStream(resource);
             
             
@@ -507,13 +509,13 @@ public class PluginContext
         
         public Image getImage(URL url)
         {
-            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading image '" + url.toString() + "'");
+            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading image '" + url.toString() + "'");  // NOI18N
             return Toolkit.getDefaultToolkit().getImage(url);
         }
         
         public Image getImage(String image)
         {
-            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading image '" + image + "'");
+            if(PluginContext.logger.isDebugEnabled())PluginContext.logger.debug("loading image '" + image + "'");  // NOI18N
             
             try
             {
@@ -528,7 +530,8 @@ public class PluginContext
                     return i;
                 }
                 else {
-                    PluginContext.logger.debug("could not load image from url '" + image + "' returnvalue is null");
+                    if(PluginContext.logger.isDebugEnabled())
+                        PluginContext.logger.debug("could not load image from url '" + image + "' returnvalue is null");  // NOI18N
                     return null;
                 }
             }
@@ -544,7 +547,7 @@ public class PluginContext
             }
             else
             {
-                PluginContext.logger.error("could not load image '" + file + "'");
+                PluginContext.logger.error("could not load image '" + file + "'");  // NOI18N
                 return null;
             }
         }
@@ -558,7 +561,7 @@ public class PluginContext
             }
             else
             {
-                PluginContext.logger.error("could not load image '" + url.toString() + "'");
+                PluginContext.logger.error("could not load image '" + url.toString() + "'");  // NOI18N
                 return null;
             }
         }
@@ -589,7 +592,7 @@ public class PluginContext
             }
             else
             {
-                logger.warn("unknown catalogue '" + fromCatalogue + "', retunring nodes of selected catalogue");
+                logger.warn("unknown catalogue '" + fromCatalogue + "', retunring nodes of selected catalogue");  // NOI18N
                 return this.getSelectedNodes();
             }
         }
@@ -620,14 +623,14 @@ public class PluginContext
         
         public void addMetaAttributeSelectionListener(MetaAttributeSelectionListener metaAttributeSelectionListener)
         {
-            PluginContext.logger.error("method 'addSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");
-            throw new RuntimeException("method 'addSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");
+            PluginContext.logger.error("method 'addSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");  // NOI18N
+            throw new RuntimeException("method 'addSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");  // NOI18N
         }
         
         public void removeMetaAttributeSelectionListener(MetaAttributeSelectionListener metaAttributeSelectionListener)
         {
-            PluginContext.logger.error("method 'removeSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");
-            throw new RuntimeException("method 'removeSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");
+            PluginContext.logger.error("method 'removeSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");  // NOI18N
+            throw new RuntimeException("method 'removeSirius.server.localserver.attribute.AttributeSelectionListener' is not implemented");  // NOI18N
         }
     }
     
@@ -649,7 +652,8 @@ public class PluginContext
         
         public Search()
         {
-            logger.debug("initializing search form data beans");
+            if(logger.isDebugEnabled())
+                logger.debug("initializing search form data beans");  // NOI18N
             
             this.dataBeans = ComponentRegistry.getRegistry().getSearchDialog().getSearchFormManager().getFormDataBeans();
             
@@ -831,14 +835,16 @@ public class PluginContext
         
         public void performSearch(Collection classNodeKeys, Collection searchFormData)
         {
-            logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and " + searchFormData.size() + " searchFormData");
+            if(logger.isDebugEnabled())
+                logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and " + searchFormData.size() + " searchFormData");  // NOI18N
             
             ComponentRegistry.getRegistry().getSearchDialog().search(classNodeKeys, searchFormData);
         }
         
         public void performSearch(Collection classNodeKeys, FormDataBean formData)
         {
-            logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and one searchFormData");
+            if(logger.isDebugEnabled())
+                logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and one searchFormData");  // NOI18N
             
             LinkedList searchFormData = new LinkedList();
             searchFormData.add(formData);
@@ -847,14 +853,16 @@ public class PluginContext
         
         public void performSearch(Collection classNodeKeys, Collection searchFormData, Component owner, boolean appendSearchResults)
         {
-            logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and " + searchFormData.size() + " searchFormData");
+            if(logger.isDebugEnabled())
+                logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and " + searchFormData.size() + " searchFormData");  // NOI18N
             
             ComponentRegistry.getRegistry().getSearchDialog().search(classNodeKeys, searchFormData, owner, appendSearchResults);
         }
         
         public void performSearch(Collection classNodeKeys, FormDataBean formData, Component owner, boolean appendSearchResults)
         {
-            logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and one searchFormData");
+            if(logger.isDebugEnabled())
+                logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and one searchFormData");  // NOI18N
             
             LinkedList searchFormData = new LinkedList();
             searchFormData.add(formData);
@@ -863,13 +871,15 @@ public class PluginContext
         
         public void performSearch(FormDataBean formDataBean, Component owner, boolean appendSearchResults)
         {
-            logger.debug("performing search with one searchFormData (" + formDataBean.getFormId() + ")");
+            if(logger.isDebugEnabled())
+                logger.debug("performing search with one searchFormData (" + formDataBean.getFormId() + ")");  // NOI18N
             ComponentRegistry.getRegistry().getSearchDialog().search(formDataBean, owner, appendSearchResults);
         }
         
         public void performSearch(FormDataBean formDataBean)
         {
-            logger.debug("performing search with one searchFormData (" + formDataBean.getFormId() + ")");
+            if(logger.isDebugEnabled())
+                logger.debug("performing search with one searchFormData (" + formDataBean.getFormId() + ")");  // NOI18N
             ComponentRegistry.getRegistry().getSearchDialog().search(formDataBean);
         }
 
@@ -946,7 +956,7 @@ public class PluginContext
                 }
             }
             
-            logger.warn("Locale '" + locale + "' not supported");
+            logger.warn("Locale '" + locale + "' not supported");  // NOI18N
             return null;
         }
         
@@ -962,13 +972,13 @@ public class PluginContext
                 }
                 catch(IOException ioexp)
                 {
-                    logger.error("could not load resource file '" + this.pluginLocale.getResourceFile() + "':\n" + ioexp.getMessage());
+                    logger.error("could not load resource file '" + this.pluginLocale.getResourceFile() + "':\n" + ioexp.getMessage());  // NOI18N
                     return null;
                 }
             }
             else
             {
-                getEnvironment().getLogger().error("[I18N] unknown language/country '" + name + "'");
+                getEnvironment().getLogger().error("[I18N] unknown language/country '" + name + "'");  // NOI18N
                 return null;
             }
         }
@@ -993,7 +1003,7 @@ public class PluginContext
             }
             catch(Exception exp)
             {
-                getEnvironment().getLogger().error("[I18N] could not find key '" + key + "':\n" + exp.getMessage());
+                getEnvironment().getLogger().error("[I18N] could not find key '" + key + "':\n" + exp.getMessage());  // NOI18N
                 return ERROR_STRING;
             }
         }

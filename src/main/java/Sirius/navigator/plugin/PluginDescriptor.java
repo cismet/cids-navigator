@@ -47,7 +47,7 @@ public class PluginDescriptor
 {
     private final static Logger logger = Logger.getLogger(PluginDescriptor.class);
     
-    public final static String XML_DESCRIPTOR = "plugin.xml";
+    public final static String XML_DESCRIPTOR = "plugin.xml";  // NOI18N
     
     /** Holds value of property metaInfo. */
     private PluginMetaInfo metaInfo = null;
@@ -192,7 +192,7 @@ public class PluginDescriptor
         }
         else
         {
-            return "null";
+            return "null";  // NOI18N
         }
         
         
@@ -260,7 +260,7 @@ public class PluginDescriptor
     {
         boolean oldActive = this.activated;
         this.activated = activated;
-        propertyChangeSupport.firePropertyChange("activated", new Boolean(oldActive), new Boolean(activated));
+        propertyChangeSupport.firePropertyChange("activated", new Boolean(oldActive), new Boolean(activated));  // NOI18N
     }
     
     public PluginMethodDescriptor getMethodDescriptor(String id)
@@ -612,7 +612,7 @@ public class PluginDescriptor
      */
     public void addUser(String user)
     {
-        if(logger.isDebugEnabled())logger.debug("adding user: " + user);
+        if(logger.isDebugEnabled())logger.debug("adding user: " + user);  // NOI18N
         this.getUsers().add(user);
     }
     
@@ -621,7 +621,7 @@ public class PluginDescriptor
      */
     public void addUsergroup(String usergroup)
     {
-        if(logger.isDebugEnabled())logger.debug("adding usergroup: " + usergroup);
+        if(logger.isDebugEnabled())logger.debug("adding usergroup: " + usergroup);  // NOI18N
         this.getUsergroups().add(usergroup);
     }  
 }
