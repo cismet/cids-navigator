@@ -35,7 +35,6 @@ import Sirius.server.newuser.UserException;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.exception.*;
-import java.util.ResourceBundle;
 
 
 //import Sirius.server.user.UserException;
@@ -50,11 +49,9 @@ import java.util.ResourceBundle;
  * @version 1.0
  */
 public class LoginDialog extends JDialog {
-
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-    private final static String PREF_NAME = "username";
-    private final static String PREF_DOMAIN = "domain";
-    private final static String PREF_USERGROUP = "usergroup";
+    private final static String PREF_NAME = "username";//NOI18N
+    private final static String PREF_DOMAIN = "domain";//NOI18N
+    private final static String PREF_USERGROUP = "usergroup";//NOI18N
     private final static Logger logger = Logger.getLogger(LoginDialog.class);
     private final ResourceManager resources;
     private UserGroupChooser userGroupChooser;
@@ -73,7 +70,7 @@ public class LoginDialog extends JDialog {
      * @param iCom Die InitialisationConnection (fuer User, LocalServer + LoginIcon)
      */
     public LoginDialog(JFrame owner) {
-        super(owner, I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.title"), true);
+        super(owner, org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.title"), true);//NOI18N
         this.resources = ResourceManager.getManager();
         this.preferences = Preferences.userNodeForPackage(this.getClass());
         this.setAlwaysOnTop(true);
@@ -101,26 +98,26 @@ public class LoginDialog extends JDialog {
         this.getContentPane().setLayout(new GridBagLayout());
 
         userGroupChooser = new UserGroupChooser(this,
-                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.title"),
-                I18N.getString("Bitte wählen Sie Ihre Benutzergruppe"));
+                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.title"),//NOI18N
+                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.infoString"));//NOI18N
         userGroupChooser.setLocationRelativeTo(this);
 
-        JLabel lbl_img = new JLabel(resources.getIcon("login_icon.gif"));
+        JLabel lbl_img = new JLabel(resources.getIcon("login_icon.gif"));//NOI18N
         lbl_img.setBorder(new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(20, 20, 20, 20)));
 
-        JLabel lbl_info = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_info.text"));
-        JLabel lbl_name = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_name.text"));
-        JLabel lbl_pass = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_pass.text"));
-        JLabel lbl_usr = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_usr.text"));
-        JLabel lbl_srv = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.userGroupChooser.lbl_srv.text"));
+        JLabel lbl_info = new JLabel(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.lbl_info.text"));//NOI18N
+        JLabel lbl_name = new JLabel(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.lbl_name.text"));//NOI18N
+        JLabel lbl_pass = new JLabel(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.lbl_pass.text"));//NOI18N
+        JLabel lbl_usr = new JLabel(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.lbl_usr.text"));//NOI18N
+        JLabel lbl_srv = new JLabel(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.userGroupChooser.lbl_srv.text"));//NOI18N
 
         tf_name = new JTextField(12);
-        tf_name.setActionCommand("ok");
+        tf_name.setActionCommand("ok");//NOI18N
         tf_name.addActionListener(loginListener);
         tf_name.addFocusListener(new NameListener());
 
         pf_pass = new JPasswordField(12);
-        pf_pass.setActionCommand("ok");
+        pf_pass.setActionCommand("ok");//NOI18N
         pf_pass.addActionListener(loginListener);
 
         cb_srv = new JComboBox();
@@ -130,16 +127,16 @@ public class LoginDialog extends JDialog {
         cb_userGroup = new JComboBox();
         cb_userGroup.setLightWeightPopupEnabled(false);
 
-        btn_ok = new JButton(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_ok.text"));
-        btn_ok.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_ok.mnemonic").charAt(0));
-        btn_ok.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_ok.tooltip"));
-        btn_ok.setActionCommand("ok");
+        btn_ok = new JButton(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.btn_ok.text"));//NOI18N
+        btn_ok.setMnemonic(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.btn_ok.mnemonic").charAt(0));//NOI18N
+        btn_ok.setToolTipText(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.btn_ok.tooltip"));//NOI18N
+        btn_ok.setActionCommand("ok");//NOI18N
         btn_ok.addActionListener(loginListener);
 
-        btn_cancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_cancel.text"));
-        btn_cancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_cancel.mnemonic").charAt(0));
-        btn_cancel.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.btn_cancel.tooltip"));
-        btn_cancel.setActionCommand("cancel");
+        btn_cancel = new JButton(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.btn_cancel.text"));//NOI18N
+        btn_cancel.setMnemonic(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.btn_cancel.mnemonic").charAt(0));//NOI18N
+        btn_cancel.setToolTipText(org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.btn_cancel.tooltip"));//NOI18N
+        btn_cancel.setActionCommand("cancel");//NOI18N
         btn_cancel.addActionListener(loginListener);
 
         //_TA_Muss wohl nicht ersetzt werden
@@ -269,8 +266,8 @@ public class LoginDialog extends JDialog {
     }
 
     public void reset() {
-        tf_name.setText("");
-        pf_pass.setText("");
+        tf_name.setText("");//NOI18N
+        pf_pass.setText("");//NOI18N
         cb_userGroup.setSelectedIndex(0);
         cb_srv.setSelectedIndex(0);
     }
@@ -309,8 +306,8 @@ public class LoginDialog extends JDialog {
                 this.tf_name.requestFocus();
             }
         } catch (Throwable t) {
-            logger.fatal("fatal error during login", t);
-            ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.FATAL, "lx01", t);
+            logger.fatal("fatal error during login", t);//NOI18N
+            ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.FATAL, "lx01", t);//NOI18N
             System.exit(1);
         }
 
@@ -328,22 +325,22 @@ public class LoginDialog extends JDialog {
         } else {
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("retrieving usergroups for user '" + user + "' @ domain '" + domain + "'");
+                    logger.debug("retrieving usergroups for user '" + user + "' @ domain '" + domain + "'");//NOI18N
                 }
 
                 Vector tmpVector = SessionManager.getProxy().getUserGroupNames(user, domain);
                 userGroupLSNames = (String[][]) tmpVector.toArray(new String[tmpVector.size()][2]);
             } catch (UserException ue) {
                 JOptionPane.showMessageDialog(LoginDialog.this,
-                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.updateUserGroups().errorOptionPane.message"),
-                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.updateUserGroups().errorOptionPane.title"),
+                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.updateUserGroups().errorOptionPane.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.updateUserGroups().errorOptionPane.title"),//NOI18N
                         JOptionPane.ERROR_MESSAGE);
-                tf_name.setText("");
+                tf_name.setText("");//NOI18N
             }
         }
 
         for (int i = 0; i < userGroupLSNames.length; i++) {
-            cb_userGroup.addItem(userGroupLSNames[i][0] + "@" + userGroupLSNames[i][1].trim());
+            cb_userGroup.addItem(userGroupLSNames[i][0] + "@" + userGroupLSNames[i][1].trim());//NOI18N
         }
     }
 
@@ -359,8 +356,8 @@ public class LoginDialog extends JDialog {
                     updateUserGroups(tf_name.getText(), cb_srv.getSelectedItem().toString());
                 }
             } catch (Throwable t) {
-                logger.fatal("fatal error during login", t);
-                ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL, "lx01", t);
+                logger.fatal("fatal error during login", t);//NOI18N
+                ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL, "lx01", t);//NOI18N
                 System.exit(1);
             }
         }
@@ -376,8 +373,8 @@ public class LoginDialog extends JDialog {
                         updateUserGroups(tf_name.getText(), cb_srv.getSelectedItem().toString());
                     }
                 } catch (Throwable t) {
-                    logger.fatal("fatal error during login", t);
-                    ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL, "lx01", t);
+                    logger.fatal("fatal error during login", t);//NOI18N
+                    ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL, "lx01", t);//NOI18N
                     System.exit(1);
                 }
             }
@@ -420,26 +417,26 @@ public class LoginDialog extends JDialog {
                 }
                 }
                 else*/
-                if (e.getActionCommand().equals("ok")) {
+                if (e.getActionCommand().equals("ok")) {//NOI18N
                     if (tf_name.getText().length() <= 0) {
                         JOptionPane.showMessageDialog(LoginDialog.this,
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsernameOptionPane.message"),
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsernameOptionPane.title"),
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingUsernameOptionPane.message"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingUsernameOptionPane.title"),//NOI18N
                                 JOptionPane.WARNING_MESSAGE);
                     } else if (pf_pass.getPassword().length <= 0) {
                         JOptionPane.showMessageDialog(LoginDialog.this,
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingPasswordOptionPane.message"),
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingPasswordOptionPane.title"),
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingPasswordOptionPane.message"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingPasswordOptionPane.title"),//NOI18N
                                 JOptionPane.WARNING_MESSAGE);
                     } else if (cb_userGroup.getSelectedIndex() < 0) {
                         JOptionPane.showMessageDialog(LoginDialog.this,
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsergroupOptionPane.message"),
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingUsergroupOptionPane.title"),
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingUsergroupOptionPane.message"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingUsergroupOptionPane.title"),//NOI18N
                                 JOptionPane.WARNING_MESSAGE);
                     } else if (cb_srv.getSelectedIndex() < 0) {
                         JOptionPane.showMessageDialog(LoginDialog.this,
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingDomainOptionPane.message"),
-                                I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().missingDomainOptionPane.title"),
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingDomainOptionPane.message"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingDomainOptionPane.title"),//NOI18N
                                 JOptionPane.WARNING_MESSAGE);
                     } else {
                         try {
@@ -453,39 +450,39 @@ public class LoginDialog extends JDialog {
                         } catch (UserException u) {
                             if (u.wrongUserName()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.message"),
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsernameOptionPane.title"),
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsernameOptionPane.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsernameOptionPane.title"),//NOI18N
                                         JOptionPane.ERROR_MESSAGE);
-                                tf_name.setText("");
+                                tf_name.setText("");//NOI18N
                             } else if (u.wrongPassword()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.message"),
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongPasswordOptionPane.title"),
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongPasswordOptionPane.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongPasswordOptionPane.title"),//NOI18N
                                         JOptionPane.ERROR_MESSAGE);
-                                pf_pass.setText("");
+                                pf_pass.setText("");//NOI18N
                             } else if (u.wrongUserGroup()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.message"),
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongUsergroupOptionPane.title"),
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsergroupOptionPane.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsergroupOptionPane.title"),//NOI18N
                                         JOptionPane.ERROR_MESSAGE);
                                 cb_userGroup.setSelectedIndex(0);
                             } else if (u.wrongLocalServer()) {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.message"),
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().wrongDomainOptionPane.title"),
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongDomainOptionPane.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongDomainOptionPane.title"),//NOI18N
                                         JOptionPane.ERROR_MESSAGE);
                                 cb_srv.setSelectedIndex(0);
                             } else {
                                 JOptionPane.showMessageDialog(LoginDialog.this,
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().loginFailedOptionPane.message"),
-                                        I18N.getString("Sirius.navigator.ui.dialog.LoginDialog.LoginListener.actionPerformed().loginFailedOptionPane.title"),
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginFailedOptionPane.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginFailedOptionPane.title"),//NOI18N
                                         JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     }
-                } else if (e.getActionCommand().equals("cancel")) {
+                } else if (e.getActionCommand().equals("cancel")) {//NOI18N
                     if (ExceptionManager.getManager().showExitDialog(LoginDialog.this)) {
-                        logger.info("close program");
+                        logger.info("close program");//NOI18N
                         System.exit(0);
                     }
                 }
@@ -515,7 +512,7 @@ public class LoginDialog extends JDialog {
                     tmpStrArray[i] = userGroups[i][0];
 
                     if (userGroups[i][1] != null && userGroups[i][1].length() > 0) {
-                        tmpStrArray[i] += ("@" + userGroups[i][1]);
+                        tmpStrArray[i] += ("@" + userGroups[i][1]);//NOI18N
                     }
                 }
 

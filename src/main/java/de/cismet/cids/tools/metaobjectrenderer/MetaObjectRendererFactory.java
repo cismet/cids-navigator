@@ -40,7 +40,7 @@ public class MetaObjectRendererFactory {
             renderer=mo.getMetaClass().getRenderer();
             
         } catch (Throwable  e) {
-            log.warn("Fehler beim Zuweisen des Renderers",e);
+            log.warn("Error while assigning the renderer",e);//NOI18N
         }
         if (renderer!=null) {
             Class rendererClass=null;
@@ -53,7 +53,7 @@ public class MetaObjectRendererFactory {
                 return comp;
                 
             } catch (Throwable ex) {
-                log.error("Fehler im Renderer "+renderer,ex);
+                log.error("Error in renderer "+renderer,ex);//NOI18N
             }
         }
         try {
@@ -62,7 +62,7 @@ public class MetaObjectRendererFactory {
             comp.putClientProperty(MetaObjectRenderer.WIDTH_RATIO,mor.getWidthRatio());
             return comp;
         } catch (Throwable t) {
-            log.fatal("Fehler im Exceptionhandling ",t);
+            log.fatal("Error while exception handling ",t);//NOI18N
             return null;
         }
         
@@ -77,7 +77,7 @@ public class MetaObjectRendererFactory {
                 renderer=((MetaObject)mc.toArray()[0]).getMetaClass().getRenderer();
                 
             } catch (Throwable e) {
-                log.warn("Fehler beim Zuweisen des Renderers",e);
+                log.warn("Error while assigning the renderer",e);//NOI18N
             }
             if (renderer!=null) {
                 Class rendererClass=null;
@@ -88,7 +88,7 @@ public class MetaObjectRendererFactory {
                     return mor.getAggregationRenderer(mc,title);
                     
                 } catch (Throwable ex) {
-                    log.error("Fehler im Renderer "+renderer,ex);
+                    log.error("Error in Renderer "+renderer,ex);//NOI18N
                     return null;
                 }
                 

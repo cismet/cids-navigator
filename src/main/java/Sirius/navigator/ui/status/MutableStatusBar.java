@@ -48,9 +48,9 @@ public class MutableStatusBar extends JPanel
     public MutableStatusBar()
     {
         super();
-        status_1 = new JLabel("");
-        status_2 = new JLabel("");
-        status_3 = new JLabel("");
+        status_1 = new JLabel("");//NOI18N
+        status_2 = new JLabel("");//NOI18N
+        status_3 = new JLabel("");//NOI18N
         this.init();
     }
     
@@ -81,13 +81,13 @@ public class MutableStatusBar extends JPanel
         status_3.setPreferredSize(new Dimension(300, 16));
         
         greenStatusIcon = new MutableImageLabel(
-                resource.getIcon(resource.getString("Sirius.navigator.ui.status.MutableStatusBar.greenStatusIcon.off")),
-                resource.getIcon(resource.getString("Sirius.navigator.ui.status.MutableStatusBar.greenStatusIcon.on")));
+                resource.getIcon("green_off.gif"),
+                resource.getIcon("green_on.gif"));
         greenStatusIcon.setBorder(new EmptyBorder(2,2,2,1));
         
         redStatusIcon = new MutableImageLabel(
-                resource.getIcon(resource.getString("Sirius.navigator.ui.status.MutableStatusBar.redStatusIcon.off")),
-                resource.getIcon(resource.getString("Sirius.navigator.ui.status.MutableStatusBar.redStatusIcon.on")));
+                resource.getIcon("red_off.gif"),
+                resource.getIcon("red_on.gif"));
         redStatusIcon.setBorder(new EmptyBorder(2,1,2,3));
         // =====================================================================
         

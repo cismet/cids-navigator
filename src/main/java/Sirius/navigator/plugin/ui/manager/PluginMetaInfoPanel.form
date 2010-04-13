@@ -22,7 +22,7 @@
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.titleLabel.defaulttext" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.titleLabel.defaulttext" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="alignmentX" type="float" value="0.5"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -42,7 +42,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.nameLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.nameLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -56,7 +56,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.versionLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.versionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -70,7 +70,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.authorLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.authorLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -84,7 +84,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.copyrightLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.copyrightLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -98,7 +98,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.companyLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.companyLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -112,7 +112,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.contactLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.contactLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -126,7 +126,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="2"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.homepageLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.homepageLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -138,7 +138,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="nameField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -152,7 +151,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="versionField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -166,7 +164,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="authorField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -180,7 +177,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="copyrightField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -194,7 +190,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="companyField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -208,7 +203,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="contactField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -222,7 +216,6 @@
     </Component>
     <Component class="javax.swing.JTextField" name="homepageField">
       <Properties>
-        <Property name="autoscrolls" type="boolean" value="false"/>
         <Property name="enabled" type="boolean" value="false"/>
         <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
           <Insets value="[2, 2, 2, 2]"/>
@@ -240,8 +233,8 @@
           <Border info="org.netbeans.modules.form.compat2.border.CompoundBorderInfo">
             <CompoundBorder>
               <Border PropertyName="outside" info="org.netbeans.modules.form.compat2.border.TitledBorderInfo">
-                <TitledBorder title="&lt;User Code&gt;">
-                  <Connection PropertyName="titleX" code="I18N.getString(&quot;Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.descriptionPanel.title&quot;)" type="code"/>
+                <TitledBorder title="Beschreibung">
+                  <ResourceString PropertyName="titleX" bundle="Sirius/navigator/plugin/ui/manager/Bundle.properties" key="PluginMetaInfoPanel.descriptionPanel.title" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </TitledBorder>
               </Border>
               <Border PropertyName="inside" info="org.netbeans.modules.form.compat2.border.EmptyBorderInfo">
@@ -274,7 +267,6 @@
                 <Property name="editable" type="boolean" value="false"/>
                 <Property name="lineWrap" type="boolean" value="true"/>
                 <Property name="wrapStyleWord" type="boolean" value="true"/>
-                <Property name="autoscrolls" type="boolean" value="false"/>
                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                   <Insets value="[2, 2, 2, 2]"/>
                 </Property>

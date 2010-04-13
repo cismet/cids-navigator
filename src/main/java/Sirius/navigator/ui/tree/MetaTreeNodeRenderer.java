@@ -39,8 +39,8 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
     //private	LocalObjectNode lon;
     //private java.lang.Object userObject;
 
-    private static String CLASS_PREFIX = "de.cismet.cids.custom.treeicons.";
-    private static String CLASS_POSTFIX = "IconFactory";
+    private static String CLASS_PREFIX = "de.cismet.cids.custom.treeicons.";//NOI18N
+    private static String CLASS_POSTFIX = "IconFactory";//NOI18N
     HashMap<String, CidsTreeObjectIconFactory> iconFactories = new HashMap<String, CidsTreeObjectIconFactory>();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(getClass());
 
@@ -73,7 +73,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
         String domain = treeNode.getDomain();
 
         CidsTreeObjectIconFactory iconFactory = null;
-        iconFactory = iconFactories.get(cid + "@" + domain);
+        iconFactory = iconFactories.get(cid + "@" + domain);//NOI18N
 
 
         //TODO Iconfactory from DB
@@ -87,14 +87,14 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                 MetaClass mc = SessionManager.getConnection().getMetaClass(SessionManager.getSession().getUser(), cid, domain);
                 String tablename = mc.getTableName();
                 tablename = tablename.substring(0, 1).toUpperCase() + tablename.substring(1).toLowerCase();
-                String className = CLASS_PREFIX + domain.toLowerCase() + "." + tablename + CLASS_POSTFIX;
+                String className = CLASS_PREFIX + domain.toLowerCase() + "." + tablename + CLASS_POSTFIX;//NOI18N
                 Class iconFactoryClass = BlacklistClassloading.forName(className);
                 if (iconFactoryClass != null) {
                     iconFactory = (CidsTreeObjectIconFactory) iconFactoryClass.getConstructor().newInstance();
-                    iconFactories.put(cid + "@" + domain, iconFactory);
+                    iconFactories.put(cid + "@" + domain, iconFactory);//NOI18N
                 }
             } catch (Exception e) {
-                log.debug("Could not load IconFactory for " + cid + "@" + domain, e);
+                log.error("Could not load IconFactory for " + cid + "@" + domain, e);//NOI18N
             }
         }
 
@@ -108,9 +108,9 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
         if (metaNode != null && metaNode.getIconString() != null) {
             try {
                 String baseIcon = metaNode.getIconString();
-                String openIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Open" + baseIcon.substring(baseIcon.lastIndexOf("."));
-                String closedIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Closed" + baseIcon.substring(baseIcon.lastIndexOf("."));
-                String leafIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Leaf" + baseIcon.substring(baseIcon.lastIndexOf("."));
+                String openIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Open" + baseIcon.substring(baseIcon.lastIndexOf("."));//NOI18N
+                String closedIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Closed" + baseIcon.substring(baseIcon.lastIndexOf("."));//NOI18N
+                String leafIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Leaf" + baseIcon.substring(baseIcon.lastIndexOf("."));//NOI18N
 
                 javax.swing.ImageIcon base = new javax.swing.ImageIcon(getClass().getResource(baseIcon));
                 try {
@@ -129,7 +129,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                     closedIco = base;
                 }
             } catch (Exception e) {
-                log.debug("Error during Iconstuff", e);
+                log.error("Error during Iconstuff", e);//NOI18N
             }
         }
 

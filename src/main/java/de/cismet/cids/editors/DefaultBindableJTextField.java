@@ -38,7 +38,7 @@ public class DefaultBindableJTextField extends JTextField implements Bindable{
     }
 
     public String getBindingProperty() {
-        return "text";
+        return "text";//NOI18N
     }
 
     public Converter getConverter() {

@@ -27,15 +27,11 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-import java.util.ResourceBundle;
 import Sirius.navigator.tools.InputValidator;
-import Sirius.navigator.resource.*;
 
 
 public class CoordinateChooser extends JDialog implements ActionListener
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-
     protected int coordinates[] = new int[]
     {0,0,0,0};
     //_TA_protected String infoString = "<html><center><p>Bitte geben Sie die Koordinaten des Interessensbereichs an,</p><p>auf den Sie die Karte beschraenken wollen.</p></center></html>";
@@ -57,7 +53,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     public CoordinateChooser(JFrame parent)
     {
         //_TA_super(new JFrame(), "Interessensbereich angeben", true);
-        super(parent, I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.title"), true);
+        super(parent, org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.title"), true);//NOI18N
         
         initCoordinateChooser();
     }
@@ -65,7 +61,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     public CoordinateChooser(JDialog parent)
     {
         //_TA_super(new JFrame(), "Interessensbereich angeben", true);
-        super(parent, I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.title"), true);
+        super(parent, org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.title"), true);//NOI18N
         
         initCoordinateChooser();
     }
@@ -101,7 +97,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridx = 0;
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
-        JLabel infoLabel = new JLabel(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.infoLabel.text"));
+        JLabel infoLabel = new JLabel(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.infoLabel.text"));//NOI18N
         infoLabel.setVerticalAlignment(JLabel.CENTER);
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -129,7 +125,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.weighty = 0.0;
         //_TA_koordinatenPanel.add(new JLabel("Rechtswert linksunten:"), constraints);
         koordinatenPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.rwluLabel.text")),
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.rwluLabel.text")),//NOI18N
                 constraints);
         
         // Rechtswert 1 Textfield
@@ -147,7 +143,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridy = 1;
         //_TA_koordinatenPanel.add(new JLabel("Hochwert linksunten:"), constraints);
         koordinatenPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.hwluLabel.text")),
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.hwluLabel.text")),//NOI18N
                 constraints);
         // Hochwert 1 Textfield
         constraints.insets = new Insets(0, 0, 8, 5);
@@ -164,7 +160,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridy = 2;
         //_TA_koordinatenPanel.add(new JLabel("Rechtswert rechtsoben:"), constraints);
         koordinatenPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.rwroLabel.text")),
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.rwroLabel.text")),//NOI18N
                 constraints);
         //  Rechtswert 2 Textfield
         constraints.insets = new Insets(0, 0, 8, 5);
@@ -180,7 +176,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridy = 3;
         //_TA_koordinatenPanel.add(new JLabel("Hochwert rechtsoben:"), constraints);
         koordinatenPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.koordinatenPanel.hwroLabel.text")),
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.hwroLabel.text")),//NOI18N
                 constraints);
         // Hochwert 1 Textfield
         constraints.insets = new Insets(0, 0, 5, 5);
@@ -199,20 +195,20 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridy++;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
-        buttonAccept = new JButton(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonAccept.text"));
+        buttonAccept = new JButton(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonAccept.text"));//NOI18N
         //_TA_buttonAccept.setMnemonic('U');
-        buttonAccept.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonAccept.mnemonic").charAt(0));
-        buttonAccept.setActionCommand("accept");
+        buttonAccept.setMnemonic(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonAccept.mnemonic").charAt(0));//NOI18N
+        buttonAccept.setActionCommand("accept");//NOI18N
         buttonAccept.addActionListener(this);
         contentPane.add(buttonAccept, gbc);
         
         gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridx++;
         //_TA_buttonCancel = new JButton("Ignorieren");
-        buttonCancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonCancel.text"));
+        buttonCancel = new JButton(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonCancel.text"));//NOI18N
         //_TA_buttonCancel.setMnemonic('I');
-        buttonCancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.buttonCancel.mnemonic").charAt(0));
-        buttonCancel.setActionCommand("cancel");
+        buttonCancel.setMnemonic(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonCancel.mnemonic").charAt(0));//NOI18N
+        buttonCancel.setActionCommand("cancel");//NOI18N
         buttonCancel.addActionListener(this);
         contentPane.add(buttonCancel, gbc);
         
@@ -256,7 +252,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     
     public void actionPerformed(ActionEvent e)
     {
-        if(e.getActionCommand().equals("accept"))
+        if(e.getActionCommand().equals("accept"))//NOI18N
         {
             accepted = true;
             
@@ -264,8 +260,8 @@ public class CoordinateChooser extends JDialog implements ActionListener
             {
                 //_TA_JOptionPane.showMessageDialog(this, "Bitte geben Sie alle Rechtswerte an.", "Fehlerhafte Eingabe", JOptionPane.WARNING_MESSAGE);
                 JOptionPane.showMessageDialog(this,
-                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingRWOptionPane.message"),
-                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingRWOptionPane.title"),
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingRWOptionPane.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingRWOptionPane.title"),//NOI18N
                         JOptionPane.WARNING_MESSAGE);
                 accepted = false;
             }
@@ -275,8 +271,8 @@ public class CoordinateChooser extends JDialog implements ActionListener
                 //_TA_JOptionPane.showMessageDialog(this, "Bitte geben Sie alle Hochwerte an.", "Fehlerhafte Eingabe", JOptionPane.WARNING_MESSAGE);
 
                 JOptionPane.showMessageDialog(this,
-                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingHWOptionPane.message"),
-                        I18N.getString("Sirius.navigator.ui.dialog.CoordinateChooser.actionPerformed().missingHWOptionPane.title"),
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingHWOptionPane.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingHWOptionPane.title"),//NOI18N
                         JOptionPane.WARNING_MESSAGE);
                 accepted = false;
             }
@@ -290,7 +286,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
                 dispose();
             }
         }
-        else if(e.getActionCommand().equals("cancel"))
+        else if(e.getActionCommand().equals("cancel"))//NOI18N
         {
             accepted = false;
             dispose();

@@ -26,8 +26,6 @@ import org.jdesktop.swingx.JXTable;
  */
 public class AttributeTable extends JXTable //implements ComplexContainer
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-
     private final Logger logger;
     private final HashMap cellEditors;
     
@@ -37,8 +35,8 @@ public class AttributeTable extends JXTable //implements ComplexContainer
     
     public AttributeTable()
     {
-        this(I18N.getString("Sirius.navigator.ui.attributes.AttributeTable.AttributeTable().nameColumnName"),
-                I18N.getString("Sirius.navigator.ui.attributes.AttributeTable.AttributeTable().valueColumnName"));
+        this(org.openide.util.NbBundle.getMessage(AttributeTable.class, "AttributeTable.AttributeTable().nameColumnName"),//NOI18N
+                org.openide.util.NbBundle.getMessage(AttributeTable.class, "AttributeTable.AttributeTable().valueColumnName"));//NOI18N
     }
     
     
@@ -131,7 +129,7 @@ public class AttributeTable extends JXTable //implements ComplexContainer
                     }
                     catch(Throwable exp)
                     {
-                        logger.debug("getCellRenderer() attribute " + attribute.getName() + " is no valid url");
+                        logger.debug("getCellRenderer() attribute " + attribute.getName() + " is no valid url");//NOI18N
                     }
                 }
             }
@@ -190,7 +188,7 @@ public class AttributeTable extends JXTable //implements ComplexContainer
         
         public void mouseClicked(MouseEvent event)
         {
-           logger.debug("mouseClick");
+           logger.debug("mouseClick");//NOI18N
             this.translateMouseEvent(event);
         }
         

@@ -49,7 +49,7 @@ import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.permission.PermissionHolder;
 import Sirius.server.newuser.permission.Policy;
-import de.cismet.cids.utils.MetaTreeNodeVisualization;
+import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
@@ -60,7 +60,6 @@ public class MutablePopupMenu extends JPopupMenu {
     protected PopupMenuItemsActionListener itemActionListener;
     // statische Men\u00FCeintr\u00E4ge
     protected JMenuItem searchItem, passwordItem, specialTreeItem, newNode, editNode, editObject, deleteNode, deleteObject;
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     // statische Men\u00FCeintr\u00E4ge
     protected JMenuItem newObject;
     private TreeEditorMenu treeEditorMenu = null;
@@ -80,13 +79,13 @@ public class MutablePopupMenu extends JPopupMenu {
     protected void createDefaultMenues() {
         itemActionListener = new PopupMenuItemsActionListener();
 
-        searchItem = new JMenuItem(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.searchItem.text"));
-        searchItem.setActionCommand("search");
+        searchItem = new JMenuItem(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.searchItem.text"));//NOI18N
+        searchItem.setActionCommand("search");//NOI18N
         searchItem.addActionListener(itemActionListener);
         this.add(searchItem);
 
-        specialTreeItem = new JMenuItem(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.specialTreeItem.text"));
-        specialTreeItem.setActionCommand("treecommand");
+        specialTreeItem = new JMenuItem(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.specialTreeItem.text"));//NOI18N
+        specialTreeItem.setActionCommand("treecommand");//NOI18N
         specialTreeItem.addActionListener(itemActionListener);
         this.add(specialTreeItem);
 
@@ -136,8 +135,8 @@ public class MutablePopupMenu extends JPopupMenu {
         if (menu.getItemCount() > 0) {
             this.pluginMenues.add(menu);
 
-        } else if (logger.isDebugEnabled()) {
-            logger.warn("menu '" + menu.getId() + "' does not contain any items, ignoring menu");
+        } else {
+            logger.warn("menu '" + menu.getId() + "' does not contain any items, ignoring menu");//NOI18N
         }
     }
 
@@ -180,13 +179,13 @@ public class MutablePopupMenu extends JPopupMenu {
                 treeNodeEditor = new TreeNodeEditor(ComponentRegistry.getRegistry().getMainWindow(), true);
             }
 
-            logger.info("showing popup menu");
+            logger.info("showing popup menu");//NOI18N
             // lazily construct tree editor menues
             //treeEditorMenu wird immer neu angelegt, damit auf unterschiedliche Anforderungen des selected Nodes reagiert werden kann
 
             if (treeEditorMenu == null && PropertyManager.getManager().isEditable()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("creating new tree editor menu");
+                    logger.debug("creating new tree editor menu");//NOI18N
                 }
 //                treeEditorMenu = new TreeEditorMenu(ComponentRegistry.getRegistry().getMainWindow(), ComponentRegistry.getRegistry().getCatalogueTree());
 //                addPluginMenu(treeEditorMenu);
@@ -212,7 +211,7 @@ public class MutablePopupMenu extends JPopupMenu {
                         ((NewObjectMethod) newObject).init(classID, domain);
                         newObject.setVisible(true);
                     } catch (Exception ex) {
-                        logger.error("Error when adding the NewObjectMethodMenuItem", ex);
+                        logger.error("Error when adding the NewObjectMethodMenuItem", ex);//NOI18N
                     }
                 }
             }
@@ -221,17 +220,17 @@ public class MutablePopupMenu extends JPopupMenu {
             // viel SPass beim /u0000DCbersetzen ;o)
             if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof SearchResultsTree) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("showing default search tree menues");
+                    logger.debug("showing default search tree menues");//NOI18N
                 }
-                specialTreeItem.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.specialTreeItem.deleteEntries.text"));
+                specialTreeItem.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.specialTreeItem.deleteEntries.text"));//NOI18N
                 if (treeEditorMenu != null) {
                     setPluginMenuEnabled(treeEditorMenu.getId(), false);
                 }
             } else if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof MetaCatalogueTree) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("showing default catalogue menues");
+                    logger.debug("showing default catalogue menues");//NOI18N
                 }
-                specialTreeItem.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.specialTreeItem.adoptInTree.text"));
+                specialTreeItem.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.specialTreeItem.adoptInTree.text"));//NOI18N
                 if (treeEditorMenu != null) {
                     setPluginMenuEnabled(treeEditorMenu.getId(), true);
                 }
@@ -239,7 +238,7 @@ public class MutablePopupMenu extends JPopupMenu {
 
             // enable/disable menues
             if (logger.isDebugEnabled()) {
-                logger.debug("setting menues availability");
+                logger.debug("setting menues availability");//NOI18N
             }
             MutablePopupMenu.this.pluginMenues.setAvailability(MethodManager.getManager().getMethodAvailability());
         }
@@ -267,23 +266,23 @@ public class MutablePopupMenu extends JPopupMenu {
 
         public void actionPerformed(ActionEvent e) {
 
-            if (e.getActionCommand().equals("search")) {
+            if (e.getActionCommand().equals("search")) {//NOI18N
                 try {
                     // TODO select class nodes in searchtree
                     //MethodManager.getManager().showSearchDialog(true);
                     MethodManager.getManager().showSearchDialog();
                 } catch (Throwable t) {
-                    logger.error("Error while processing searchmethod", t);
+                    logger.error("Error while processing searchmethod", t);//NOI18N
 
                     ErrorDialog errorDialog = new ErrorDialog(
-                            I18N.getString("Sirius.navigator.ui.MutablePopupMenu.PopupMenuItemsActionListener.actionPerformed().errorDialog.errorMessage"),
+                            org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.PopupMenuItemsActionListener.actionPerformed(ActionEvent).errorDialog.errorMessage"),//NOI18N
                             t.toString(), ErrorDialog.WARNING);
                     errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
                     errorDialog.show();
                 }
-            } else if (e.getActionCommand().equals("Passwort aendern")) {
+            } else if (e.getActionCommand().equals("Passwort aendern")) {//NOI18N
                 MethodManager.getManager().showPasswordDialog();
-            } else if (e.getActionCommand().equals("treecommand")) {
+            } else if (e.getActionCommand().equals("treecommand")) {//NOI18N
                 MethodManager.getManager().callSpecialTreeCommand();
             }
         }
@@ -303,7 +302,7 @@ public class MutablePopupMenu extends JPopupMenu {
             if (component instanceof EmbeddedMenu) {
                 MutablePopupMenu.this.add((EmbeddedMenu) component);
             } else {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");
+                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");//NOI18N
             }
         }
 
@@ -311,7 +310,7 @@ public class MutablePopupMenu extends JPopupMenu {
             if (component instanceof EmbeddedMenu) {
                 MutablePopupMenu.this.remove((EmbeddedMenu) component);
             } else {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");
+                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");//NOI18N
             }
         }
 
@@ -330,8 +329,8 @@ public class MutablePopupMenu extends JPopupMenu {
 
             this.pluginMethod = this;
 
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.title"));
-            this.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.icon")));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewNodeMethod.title"));//NOI18N
+            this.setIcon(resources.getIcon("neuer_knoten.gif"));//NOI18N
         }
 
         public String getId() {
@@ -342,7 +341,7 @@ public class MutablePopupMenu extends JPopupMenu {
             DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
 
             if (logger.isDebugEnabled()) {
-                logger.debug("NewNodeMethod: creating new node as parent of " + selectedNode);
+                logger.debug("NewNodeMethod: creating new node as parent of " + selectedNode);//NOI18N
             }
             if (selectedNode != null && selectedNode.isPureNode()) {
                 String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
@@ -352,14 +351,14 @@ public class MutablePopupMenu extends JPopupMenu {
                     // knoten aufklappen
                     if (!selectedNode.isLeaf() && !selectedNode.isExplored()) {
                         if (logger.isDebugEnabled()) {
-                            logger.warn("NewNodeMethod: parent node is not explored");
+                            logger.debug("NewNodeMethod: parent node is not explored");//NOI18N
                         }
                         try {
                             metaCatalogueTree.expandPath(new TreePath(selectedNode.getPath()));
                             //selectedNode.explore();
                             //((DefaultTreeModel)metaCatalogueTree.getModel()).nodeStructureChanged(selectedNode);
                         } catch (Exception exp) {
-                            logger.error("could not explore node: " + selectedNode, exp);
+                            logger.error("could not explore node: " + selectedNode, exp);//NOI18N
                         }
                     }
 
@@ -380,11 +379,11 @@ public class MutablePopupMenu extends JPopupMenu {
                                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
                                 ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), metaTreeNode);
                             } else {
-                                logger.warn("could not create new object node: edited object still unsaved");
+                                logger.warn("could not create new object node: edited object still unsaved");//NOI18N
                                 JOptionPane.showMessageDialog(
                                         ComponentRegistry.getRegistry().getMainWindow(),
-                                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.NewObjectInfoMessage.message"),
-                                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.JOptionPane.NewObjectInfoMessage.title"),
+                                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.invoke().JOptionPane.NewObjectInfoMessage.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.invoke().JOptionPane.NewObjectInfoMessage.title"),//NOI18N
                                         JOptionPane.INFORMATION_MESSAGE);
                             }
                         } else {
@@ -392,26 +391,24 @@ public class MutablePopupMenu extends JPopupMenu {
                                 MethodManager.getManager().addTreeNode(metaCatalogueTree, selectedNode, metaTreeNode);
                                 metaTreeNode.setNew(false);
                             } else if (logger.isDebugEnabled()) {
-                                logger.warn("addNode failed, omitting addTreeNode");
+                                logger.warn("addNode failed, omitting addTreeNode");//NOI18N
                             }
                         }
                     }
                 } else {
-                    logger.warn("no permission to create node");
+                    logger.warn("no permission to create node");//NOI18N
                     JOptionPane.showMessageDialog(
                             ComponentRegistry.getRegistry().getMainWindow(),
-                            I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.invoke().nopermissonDialog.message"),
-                            I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.invoke().nopermissonDialog.title"),
+                            org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewNodeMethod.invoke().nopermissonDialog.message"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewNodeMethod.invoke().nopermissonDialog.title"),//NOI18N
                             JOptionPane.WARNING_MESSAGE);
                 }
             } else {
-                logger.warn("parent node '" + selectedNode + "' is no pure node");
+                logger.warn("parent node '" + selectedNode + "' is no pure node");//NOI18N
                 JOptionPane.showMessageDialog(
                         ComponentRegistry.getRegistry().getMainWindow(),
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.invoke().nopurenodeDialog.message1") +
-                        selectedNode +
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.invoke().nopurenodeDialog.message2"),
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewNodeMethod.invoke().nopurenodeDialog.title"),
+                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewNodeMethod.invoke().nopurenodeDialog.message", new Object[]{selectedNode}), //NOI18N
+                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewNodeMethod.invoke().nopurenodeDialog.title"),//NOI18N
                         JOptionPane.WARNING_MESSAGE);
             }
         }
@@ -427,17 +424,15 @@ public class MutablePopupMenu extends JPopupMenu {
             this.classID = classID;
             this.domain = domain;
             metaClass = SessionManager.getProxy().getMetaClass(classID, domain);
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewObjectMethod.text") +
-                    " (" + metaClass.getName() + ")");
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewObjectMethod.text", new Object[]{metaClass.getName()}));//NOI18N
         }
 
         public NewObjectMethod() {
             super(MethodManager.PURE_NODE);
             this.pluginMethod = this;
 
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewObjectMethod.text"));
-            this.setIcon(resources.getIcon(
-                    I18N.getString("Sirius.navigator.ui.MutablePopupMenu.NewObjectMethod.icon")));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.NewObjectMethod.text"));//NOI18N
+            this.setIcon(resources.getIcon("neuer_knoten.gif"));//NOI18N
             //funzt eh nicht
             //this.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_MASK));
         }
@@ -470,9 +465,9 @@ public class MutablePopupMenu extends JPopupMenu {
             this.pluginMethod = this;
 
             // XXX i18n
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.EditNodeMethod.text"));
-            this.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.EditNodeMethod.icon")));
-            this.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutablePopupMenu.EditNodeMethod.accelerator"));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.EditNodeMethod.text"));//NOI18N
+            this.setIcon(resources.getIcon("attr_edit_on.gif"));//NOI18N
+            this.setAccelerator(KeyStroke.getKeyStroke("F2"));//NOI18N
         }
 
         public String getId() {
@@ -491,11 +486,11 @@ public class MutablePopupMenu extends JPopupMenu {
                         ((DefaultTreeModel) metaCatalogueTree.getModel()).nodeChanged(selectedNode);
                     }
                 } else {
-                    logger.warn("can not rename top node " + selectedNode);
+                    logger.warn("can not rename top node " + selectedNode);//NOI18N
                     // XXX dialog ...
                 }
-            } else if (logger.isDebugEnabled()) {
-                logger.warn("insufficient permission to edit node " + selectedNode);
+            } else {
+                logger.warn("insufficient permission to edit node " + selectedNode);//NOI18N
             }
         }
     }
@@ -507,8 +502,8 @@ public class MutablePopupMenu extends JPopupMenu {
 
             this.pluginMethod = this;
 
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.EditObjectMethod.text"));
-            this.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.EditObjectMethod.icon")));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.EditObjectMethod.text"));//NOI18N
+            this.setIcon(resources.getIcon("objekt_bearbeiten.gif"));//NOI18N
         }
 
         public String getId() {
@@ -525,8 +520,8 @@ public class MutablePopupMenu extends JPopupMenu {
             if (MethodManager.getManager().checkPermission(mon, PermissionHolder.WRITEPERMISSION)) {
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
                 ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
-            } else if (logger.isDebugEnabled()) {
-                logger.warn("insufficient permission to edit node " + selectedNode);
+            } else {
+                logger.warn("insufficient permission to edit node " + selectedNode);//NOI18N
             }
         }
     }
@@ -538,8 +533,8 @@ public class MutablePopupMenu extends JPopupMenu {
 
             this.pluginMethod = this;
 
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteNodeMethod.text"));
-            this.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteNodeMethod.icon")));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.DeleteNodeMethod.text"));//NOI18N
+            this.setIcon(resources.getIcon("knoten_loeschen.gif"));//NOI18N
         }
 
         public String getId() {
@@ -557,18 +552,20 @@ public class MutablePopupMenu extends JPopupMenu {
 //                            CidsFeature cf = new CidsFeature((MetaObjectNode) selectedNode.getNode());
 //                            CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
                         } catch (Exception e) {
-                            logger.debug("Could not remove Node from map.", e);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Could not remove Node from map.", e);//NOI18N
+                            }
                         }
                         ComponentRegistry.getRegistry().getDescriptionPane().clear();
                     }
-                } else if (logger.isDebugEnabled()) {
-                    logger.warn("insufficient permission to delete node: " + selectedNode);
+                } else {
+                    logger.warn("insufficient permission to delete node: " + selectedNode);//NOI18N
                 }
             } else {
-                logger.warn("can not delete node, node is no leaf: " + selectedNode);
+                logger.warn("can not delete node, node is no leaf: " + selectedNode);//NOI18N
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteNodeMethod.invoke().deleteNodeMessage.message"),
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteNodeMethod.invoke().deleteNodeMessage.title"),
+                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.DeleteNodeMethod.invoke().deleteNodeMessage.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.DeleteNodeMethod.invoke().deleteNodeMessage.title"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -582,8 +579,8 @@ public class MutablePopupMenu extends JPopupMenu {
 
             this.pluginMethod = this;
 
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteObjectMethod.text"));
-            this.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteObjectMethod.icon")));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.DeleteObjectMethod.text"));//NOI18N
+            this.setIcon(resources.getIcon("knoten_loeschen.gif"));//NOI18N
         }
 
         public String getId() {
@@ -603,18 +600,20 @@ public class MutablePopupMenu extends JPopupMenu {
 //                            CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
                             MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
                         } catch (Exception e) {
-                            logger.debug("Could not remove Node from map.", e);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Could not remove Node from map.", e);//NOI18N
+                            }
                         }
                         ComponentRegistry.getRegistry().getDescriptionPane().clear();
                     }
-                } else if (logger.isDebugEnabled()) {
-                    logger.warn("insufficient permission to delete node: " + selectedNode);
+                } else {
+                    logger.warn("insufficient permission to delete node: " + selectedNode);//NOI18N
                 }
             } else {
-                logger.warn("can not delete node, node is no leaf: " + selectedNode);
+                logger.warn("can not delete node, node is no leaf: " + selectedNode);//NOI18N
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.message"),
-                        I18N.getString("Sirius.navigator.ui.MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.title"),
+                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.title"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -627,9 +626,9 @@ public class MutablePopupMenu extends JPopupMenu {
 
             this.pluginMethod = this;
 
-            this.setText(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.ExploreSubTreeMethod.text"));
-            this.setIcon(resources.getIcon(I18N.getString("Sirius.navigator.ui.MutablePopupMenu.ExploreSubTreeMethod.icon")));
-            this.setAccelerator(resources.getMenuAccelerator("Sirius.navigator.ui.MutablePopupMenu.ExploreSubTreeMethod.accelerator"));
+            this.setText(org.openide.util.NbBundle.getMessage(MutablePopupMenu.class, "MutablePopupMenu.ExploreSubTreeMethod.text"));//NOI18N
+            this.setIcon(resources.getIcon("teilbaum_neu_laden.gif"));//NOI18N
+            this.setAccelerator(KeyStroke.getKeyStroke("F5"));//NOI18N
         }
 
         public String getId() {

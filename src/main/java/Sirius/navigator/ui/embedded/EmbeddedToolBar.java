@@ -95,7 +95,7 @@ public class EmbeddedToolBar extends JToolBar implements EmbeddedComponent
     
     protected void add(Collection components)
     {
-        if(logger.isDebugEnabled())logger.debug("adding '" + components.size() + "' toolbar buttons");
+        if(logger.isDebugEnabled())logger.debug("adding '" + components.size() + "' toolbar buttons");//NOI18N
         Iterator iterator = components.iterator();
         
         while(iterator.hasNext())
@@ -129,13 +129,13 @@ public class EmbeddedToolBar extends JToolBar implements EmbeddedComponent
             }
             else
             {
-                logger.warn("button type '" + button.getClass().getName() + "' found, 'javax.swing.JButton' or 'javax.swing.JSeparator' preferred");
+                logger.warn("button type '" + button.getClass().getName() + "' found, 'javax.swing.JButton' or 'javax.swing.JSeparator' preferred");//NOI18N
                 this.add((JComponent)button);
             }
         }
         else
         {
-            logger.error("invalid button type '" + button.getClass().getName() + "', 'javax.swing.JComponent' expected");
+            logger.error("invalid button type '" + button.getClass().getName() + "', 'javax.swing.JComponent' expected");//NOI18N
         }
     }
 }

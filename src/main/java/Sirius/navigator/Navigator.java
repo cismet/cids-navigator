@@ -202,13 +202,13 @@ public class Navigator extends JFrame {
     // #########################################################################
     private void initConnection() throws ConnectionException, InterruptedException {
         progressObserver.setProgress(25,
-                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25"));//NOI18N
         Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL());
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
         progressObserver.setProgress(50,
-                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_50"));
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_50"));//NOI18N
         // autologin
         if (propertyManager.isAutoLogin()) {
             if(logger.isInfoEnabled())
@@ -466,8 +466,8 @@ public class Navigator extends JFrame {
     private void initWindow() throws InterruptedException {
         progressObserver.setProgress(950, 
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950"));  // NOI18N
-        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));
-        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());
+        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));//NOI18N
+        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());//NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new ClosingListener());
@@ -787,7 +787,7 @@ public class Navigator extends JFrame {
             ExceptionManager.getManager().showExceptionDialog(
                     ExceptionManager.FATAL,
                     org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.main(String[]).ExceptionManager_anon.name"),  // NOI18N
-                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.main(String[]).ExceptionManager_anon.message"), t);
+                    org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.main(String[]).ExceptionManager_anon.message"), t);//NOI18N
 
             System.exit(1);
             // error .............................................................

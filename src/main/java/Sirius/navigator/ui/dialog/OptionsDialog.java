@@ -35,7 +35,6 @@ import Sirius.navigator.*;
 //import Sirius.navigator.ui.widget.SingleLineListBox;
 
 import Sirius.navigator.resource.*;
-import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
 
 
@@ -61,7 +60,6 @@ import org.apache.log4j.Logger;
 public class OptionsDialog extends JDialog implements ActionListener
 {
     private final Logger logger;
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     //private NavigatorModel navigatorModel;
     //private ISFloatingFrameModel isFloatingFrameModel;
@@ -135,7 +133,7 @@ public class OptionsDialog extends JDialog implements ActionListener
     
     public OptionsDialog()
     {
-        this(null, I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.title"));
+        this(null, org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.title"));//NOI18N
     }
     
     
@@ -201,18 +199,18 @@ public class OptionsDialog extends JDialog implements ActionListener
         contentPane.add(buttonPanel, gbc);
         
         //_TA_okButton = new JButton("Uebernehmen");
-        okButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.okButton.text"));
+        okButton = new JButton(org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.okButton.text"));//NOI18N
         //_TA_okButton.setMnemonic('U');
-        okButton.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.okButton.mnemonics").charAt(0));
-        okButton.setActionCommand("apply");
+        okButton.setMnemonic(org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.okButton.mnemonics").charAt(0));//NOI18N
+        okButton.setActionCommand("apply");//NOI18N
         okButton.addActionListener(this);
         buttonPanel.add(okButton);
         
         //_TA_cancelButton = new JButton("Abbrechen");
-        cancelButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.cancelButton.text"));
+        cancelButton = new JButton(org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.cancelButton.text"));//NOI18N
         //_TA_cancelButton.setMnemonic('A');
-        cancelButton.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.cancelButton.mnemonics").charAt(0));
-        cancelButton.setActionCommand("cancel");
+        cancelButton.setMnemonic(org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.cancelButton.mnemonics").charAt(0));//NOI18N
+        cancelButton.setActionCommand("cancel");//NOI18N
         cancelButton.addActionListener(this);
         buttonPanel.add(cancelButton);
         
@@ -248,7 +246,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //_TA_navigatorServerPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Server", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorServerPanel.setBorder(new CompoundBorder(
                 new TitledBorder(null,
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.border.title"),
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.navigatorServerPanel.border.title"),//NOI18N
                 TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorPanel.add(navigatorServerPanel, gbc);
         
@@ -266,16 +264,16 @@ public class OptionsDialog extends JDialog implements ActionListener
         //_TA_navigatorServerPanel.add(new JLabel("CallServer IP Adresse:"), gbc2);
         //navigatorServerPanel.add(new JLabel(this.resources.getString("STL@callServerIP")), gbc2);
         navigatorServerPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.urlLabel.text")), gbc2);
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.navigatorServerPanel.urlLabel.text")), gbc2);//NOI18N
         gbc2.gridy++;
         //_TA_navigatorServerPanel.add(new JLabel("max. Verbindungen:"), gbc2);
         navigatorServerPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.connectionsLabel.text")), gbc2);
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.navigatorServerPanel.connectionsLabel.text")), gbc2);//NOI18N
         gbc2.insets = new Insets(0, 0, 0, 5);
         gbc2.gridy++;
         //_TA_navigatorServerPanel.add(new JLabel("max. Suchergebnisse:"), gbc2);
         navigatorServerPanel.add(new JLabel(
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorServerPanel.resultsLabel.text")), gbc2);
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.navigatorServerPanel.resultsLabel.text")), gbc2);//NOI18N
         
         // Eingabefelder
         gbc2.insets = new Insets(0, 0, 7, 0);
@@ -309,7 +307,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //_TA_navigatorLayoutManagerPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Komponenten Ansicht", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorLayoutManagerPanel.setBorder(new CompoundBorder(
                 new TitledBorder(null,
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navigatorLayoutManagerPanel.border.title"),
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.navigatorLayoutManagerPanel.border.title"),//NOI18N
                 TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorPanel.add(navigatorLayoutManagerPanel, gbc);
         
@@ -334,7 +332,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //navigatorLayoutManagerPanel.add(navProportionalResizeCheck, gbc2);
         
         ButtonGroup buttonGroup = new ButtonGroup();
-        optimizeLayout = new JRadioButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.optimizeLayout.text"));
+        optimizeLayout = new JRadioButton(org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.optimizeLayout.text"));//NOI18N
         buttonGroup.add(optimizeLayout);
         navigatorLayoutManagerPanel.add(optimizeLayout, gbc2);
         
@@ -344,7 +342,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //navContinuousLayoutCheck = new JCheckBox(this.resources.getString("STL@showWhileSizeChange"));
         //navigatorLayoutManagerPanel.add(navContinuousLayoutCheck, gbc2);
         
-        optimizeSpeed= new JRadioButton(I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.optimizeSpeed.text"));
+        optimizeSpeed= new JRadioButton(org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.optimizeSpeed.text"));//NOI18N
         buttonGroup.add(optimizeSpeed);
         navigatorLayoutManagerPanel.add(optimizeSpeed, gbc2);
         
@@ -357,7 +355,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         //_TA_2.sortPanel.setBorder(new CompoundBorder(new TitledBorder(null, "Sortierung", TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         sortPanel.setBorder(new CompoundBorder(
                 new TitledBorder(null,
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.sortPanel.border.title"),
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.sortPanel.border.title"),//NOI18N
                 TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder(2,5,5,5)));
         navigatorPanel.add(sortPanel, gbc);
         
@@ -373,9 +371,9 @@ public class OptionsDialog extends JDialog implements ActionListener
         
         //_TA_navSortChildrenCheck = new JCheckBox("Sortierung verwenden", true);
         navSortChildrenCheck = new JCheckBox(
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.navSortChildrenCheck.text"),
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.navSortChildrenCheck.text"),//NOI18N
                 true);
-        navSortChildrenCheck.setActionCommand("sort");
+        navSortChildrenCheck.setActionCommand("sort");//NOI18N
         navSortChildrenCheck.addActionListener(this);
         sortPanel.add(navSortChildrenCheck, gbc2);
         
@@ -384,7 +382,7 @@ public class OptionsDialog extends JDialog implements ActionListener
         gbc2.gridy++;
         //_TA_sortAscendingOption = new JRadioButton("aufsteigend sortieren");
         sortAscendingOption = new JRadioButton(
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.sortAscendingOption.text"));
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.sortAscendingOption.text"));//NOI18N
         buttonGroup1.add(sortAscendingOption);
         sortPanel.add(sortAscendingOption, gbc2);
         
@@ -392,14 +390,14 @@ public class OptionsDialog extends JDialog implements ActionListener
         gbc2.gridy++;
         //_TA_sortDescendingOption = new JRadioButton("absteigend sortieren");
         sortDescendingOption = new JRadioButton(
-                I18N.getString("Sirius.navigator.ui.dialog.OptionsDialog.sortDescendingOption.text"));
+                org.openide.util.NbBundle.getMessage(OptionsDialog.class, "OptionsDialog.sortDescendingOption.text"));//NOI18N
         buttonGroup1.add(sortDescendingOption);
         sortPanel.add(sortDescendingOption, gbc2);
     }
     
     private void updateNavigatorPanel()
     {
-        if(logger.isDebugEnabled())logger.debug("loading properties");
+        if(logger.isDebugEnabled())logger.debug("loading properties");//NOI18N
         PropertyManager properties = PropertyManager.getManager();
         
         navCallServerIPTextField.setText(properties.getConnectionInfo().getCallserverURL());
@@ -426,7 +424,7 @@ public class OptionsDialog extends JDialog implements ActionListener
     
     private void updateNavigatorModel()
     {
-        if(logger.isDebugEnabled())logger.debug("saving properties");
+        if(logger.isDebugEnabled())logger.debug("saving properties");//NOI18N
         PropertyManager properties = PropertyManager.getManager();
         
         properties.getConnectionInfo().setCallserverURL(navCallServerIPTextField.getText());
@@ -550,16 +548,16 @@ public class OptionsDialog extends JDialog implements ActionListener
     
     public void actionPerformed(ActionEvent e)
     {
-        if(e.getActionCommand().equals("sort"))
+        if(e.getActionCommand().equals("sort"))//NOI18N
         {
             sortDescendingOption.setEnabled(navSortChildrenCheck.isSelected());
             sortAscendingOption.setEnabled(navSortChildrenCheck.isSelected());
         }
-        else if(e.getActionCommand().equals("cancel"))
+        else if(e.getActionCommand().equals("cancel"))//NOI18N
         {
             dispose();
         }
-        else if(e.getActionCommand().equals("apply"))
+        else if(e.getActionCommand().equals("apply"))//NOI18N
         {
             updateNavigatorModel();
             //updateISFloatingFrameModel();

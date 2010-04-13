@@ -14,7 +14,7 @@ package Sirius.navigator.ui.attributes.editor;
  */
 public interface EditorActivationDelegate
 {
-    public final static String ACTIVE_CHILD_EDITOR_TREE = "activeChildEditorTree";
+    public final static String ACTIVE_CHILD_EDITOR_TREE = "activeChildEditorTree";//NOI18N
     
     /**
      * Setzt den komplexen Editor dieses einfachen Editors.<p>

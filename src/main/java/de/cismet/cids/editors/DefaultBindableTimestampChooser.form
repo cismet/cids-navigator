@@ -30,8 +30,12 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="btnCreateTimestamp">
           <Properties>
-            <Property name="text" type="java.lang.String" value="kein Datum angelegt"/>
-            <Property name="toolTipText" type="java.lang.String" value="Hier klicken um ein Datum auszuw&#xe4;hlen."/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="de/cismet/cids/editors/Bundle.properties" key="DefaultBindableTimestampChooser.btnCreateTimestamp.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+            </Property>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="de/cismet/cids/editors/Bundle.properties" key="DefaultBindableTimestampChooser.btnCreateTimestamp.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnCreateTimestampActionPerformed"/>

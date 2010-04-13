@@ -28,7 +28,6 @@ import Sirius.navigator.resource.ResourceManager;
  */
 public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaAttributeEditor
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private static final ResourceManager resource = ResourceManager.getManager();
     protected ActionListener addListener;
     protected ActionListener removeListener;
@@ -67,7 +66,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         cancelButton = new javax.swing.JButton();
 
         statusLabel.setBackground(java.awt.SystemColor.info);
-        statusLabel.setFont(new java.awt.Font("MS Sans Serif", 1, 11));
+        statusLabel.setFont(new java.awt.Font("MS Sans Serif", 1, 11)); // NOI18N
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         statusLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         statusLabel.setMaximumSize(null);
@@ -95,8 +94,8 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         statusPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
         statusPanel.setLayout(new java.awt.GridBagLayout());
 
-        commitButton.setIcon(resource.getIcon(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.commitButton.icon")));
-        commitButton.setToolTipText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.commitButton.tooltip")); // NOI18N
+        commitButton.setIcon(resource.getIcon("save_objekt.gif"));
+        commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeArrayEditor.class, "DefaultComplexMetaAttributeArrayEditor.commitButton.tooltip")); // NOI18N
         commitButton.setActionCommand("commit"); // NOI18N
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
@@ -116,8 +115,8 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         statusPanel.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resource.getIcon(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.cancelButton.icon")));
-        cancelButton.setToolTipText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.cancelButton.tooltip")); // NOI18N
+        cancelButton.setIcon(resource.getIcon("zurueck_objekt.gif"));
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeArrayEditor.class, "DefaultComplexMetaAttributeArrayEditor.cancelButton.tooltip")); // NOI18N
         cancelButton.setActionCommand("cancel"); // NOI18N
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
@@ -172,7 +171,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         }
         else if(logger.isDebugEnabled())
         {
-            logger.debug("initUI(" + this + "): ui already initialized");
+            logger.debug("initUI(" + this + "): ui already initialized");//NOI18N
         }
         
         this.arrayAttributeMap = new ArrayAttributeMap(this.getMetaObject(this.getValue()));
@@ -185,7 +184,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         {
             if(this.getChildEditors() != null && this.getChildEditors().size() > 0 && this.editorHandler != null)
             {
-                if(logger.isDebugEnabled())logger.debug("initUI(" + this.getId() + "): removing editor listeners from previous session");
+                if(logger.isDebugEnabled())logger.debug("initUI(" + this.getId() + "): removing editor listeners from previous session");//NOI18N
                 Iterator iterator = this.getChildEditors().values().iterator();
                 while(iterator.hasNext())
                 {
@@ -196,11 +195,11 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             // Objekt nach editoren untersuchen
             // hier die array helper objekte aussortieren:
             this.childrenMap = this.editorLocator.getEditors(this.getMetaObjectAttributes(this.getValue()));
-            if(logger.isDebugEnabled())logger.debug("initUI(): " + this.childrenMap.size() + " child editors initialized");
+            if(logger.isDebugEnabled())logger.debug("initUI(): " + this.childrenMap.size() + " child editors initialized");//NOI18N
         }
         else
         {
-            logger.warn("initUI(): value is null, no child editors available");
+            logger.warn("initUI(): value is null, no child editors available");//NOI18N
             this.childrenMap = new HashMap();
         }
         
@@ -219,16 +218,16 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         Map metaAttributes = this.getMetaObjectAttributes(this.getValue());
         if(metaAttributes != null)
         {
-            if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): adding " + metaAttributes.size() + " to this complex editor ui");
+            if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): adding " + metaAttributes.size() + " to this complex editor ui");//NOI18N
             Iterator iterator = metaAttributes.keySet().iterator();
             while(iterator.hasNext())
             {
                 Object key = iterator.next();
-                if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): adding editor ui for attribute " + key);
+                if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): adding editor ui for attribute " + key);//NOI18N
                 this.addEditorUI(key, metaAttributes.get(key), gridBagConstraints);
             }
             
-            JButton addButton = new JButton(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.initUI.addButton.text"));
+            JButton addButton = new JButton(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeArrayEditor.class, "DefaultComplexMetaAttributeArrayEditor.initUI.addButton.text"));//NOI18N
             addButton.addActionListener(this.addListener);
             
             gridBagConstraints.gridy++;
@@ -240,7 +239,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         }
         else
         {
-            logger.error("initUI(" + this + "): no meta attributes found");
+            logger.error("initUI(" + this + "): no meta attributes found");//NOI18N
         }
         
         this.editorPanel.validate();
@@ -264,7 +263,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                 
                 if(complexEditorClass != null)
                 {
-                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor with complex editor support (" + complexEditorClass + ")");
+                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor with complex editor support (" + complexEditorClass + ")");//NOI18N
                     try
                     {
                         ComplexEditor complexEditor = (ComplexEditor)((Class)complexEditorClass).newInstance();
@@ -274,13 +273,13 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                     }
                     catch(Throwable t)
                     {
-                        logger.error("addEditorUI(" + this + "): could not register complex editor for simple editor", t);
+                        logger.error("addEditorUI(" + this + "): could not register complex editor for simple editor", t);//NOI18N
                         editorComponent = simpleEditor.getEditorComponent(this, id, value);
                     }
                 }
                 else
                 {
-                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor without complex editor support");
+                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor without complex editor support");//NOI18N
                     editorComponent = simpleEditor.getEditorComponent(this, id, value);
                 }
                 
@@ -288,11 +287,11 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             }
             else
             {
-                logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");
-                editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText2"));
+                logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");//NOI18N
+                editorComponent = new JLabel(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeArrayEditor.class, "DefaultComplexMetaAttributeArrayEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText", new Object[]{this}));//NOI18N
             }
             
-            JButton removeButton = new JButton(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeArrayEditor.addEditorUI.removeButton.text"));
+            JButton removeButton = new JButton(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeArrayEditor.class, "DefaultComplexMetaAttributeArrayEditor.addEditorUI.removeButton.text"));//NOI18N
             removeButton.setActionCommand(id.toString());
             removeButton.addActionListener(this.removeListener);
             
@@ -317,7 +316,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         }
         else if(logger.isDebugEnabled())
         {
-            logger.warn("attribute '" + id + "' is marked to be deleted, ignoring attribute in editor ui");
+            logger.warn("attribute '" + id + "' is marked to be deleted, ignoring attribute in editor ui");//NOI18N
         }
     }
     
@@ -328,11 +327,11 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             Map MetaObjectAttributes = this.getMetaObjectAttributes(this.getValue());
             if(MetaObjectAttributes.containsKey(key))
             {
-                logger.error("addValue(): editor " + key + " already in map");
+                logger.error("addValue(): editor " + key + " already in map");//NOI18N
             }
             else
             {
-                if(logger.isDebugEnabled())logger.debug("addValue(): adding new array element " + key);
+                if(logger.isDebugEnabled())logger.debug("addValue(): adding new array element " + key);//NOI18N
                 
                 try
                 {
@@ -341,13 +340,13 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                 }
                 catch(Throwable t)
                 {
-                    logger.error("addValue(): could not add attribute '" + key + "'", t);
+                    logger.error("addValue(): could not add attribute '" + key + "'", t);//NOI18N
                 }
             }
         }
         else
         {
-            logger.warn("addValue(): object '" + key + "' is no object attribute");
+            logger.warn("addValue(): object '" + key + "' is no object attribute");//NOI18N
         }
     }
     
@@ -356,11 +355,11 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         Map MetaObjectAttributes = this.getMetaObjectAttributes(this.getValue());
         if(!MetaObjectAttributes.containsKey(key))
         {
-            logger.error("removeValue(): attribute " + key + "not in map");
+            logger.error("removeValue(): attribute " + key + "not in map");//NOI18N
         }
         else
         {
-            if(logger.isDebugEnabled())logger.debug("remove array element " + key);
+            if(logger.isDebugEnabled())logger.debug("remove array element " + key);//NOI18N
             return MetaObjectAttributes.remove(key);
             //return this.getMetaObject(this.getValue()).getAttributes().remove(key);
       
@@ -381,12 +380,12 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
     {
         if(value == this.getValue())
         {
-            if(logger.isDebugEnabled())logger.debug("getMetaObjectAttributes(): return array attributes");
+            if(logger.isDebugEnabled())logger.debug("getMetaObjectAttributes(): return array attributes");//NOI18N
             return this.arrayAttributeMap;
         }
         else
         {
-            if(logger.isDebugEnabled())logger.warn("getMetaObjectAttributes(): return array helper attributes");
+            logger.warn("getMetaObjectAttributes(): return array helper attributes");//NOI18N
             return super.getMetaObjectAttributes(value);
         }
     }
@@ -413,7 +412,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
     {
         public void actionPerformed(ActionEvent e)
         {
-            if(logger.isDebugEnabled())logger.info("AddListener: adding attribute");
+            if(logger.isDebugEnabled())logger.info("AddListener: adding attribute");//NOI18N
             try
             {
                 // root objekt
@@ -429,15 +428,16 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                 MemberAttributeInfo memberAttributeInfo = (MemberAttributeInfo)metaClass.getMemberAttributeInfos().get(attribute.getKey());
                 
                 // klasse des referenzobjektes besorgen
-                MetaClass arrayHelperClass = SessionManager.getProxy().getMetaClass(String.valueOf(memberAttributeInfo.getForeignKeyClassId()) + "@" + MetaObject.getDomain());
+                MetaClass arrayHelperClass = SessionManager.getProxy().getMetaClass(String.valueOf(memberAttributeInfo.getForeignKeyClassId()) + "@" + MetaObject.getDomain());//NOI18N
                
                 // referenzObjekt besorgen
                 MetaObject arrayHelperObject = DefaultComplexMetaAttributeArrayEditor.this.getMetaObjectInstance(arrayHelperClass.getKey());
                 
                 arrayHelperObject.setStatus(MetaObject.NEW);
-                
-                logger.info("AddListener(): arrayHelperObject.hashCode(): " + arrayHelperObject.hashCode());
-               
+
+                if (logger.isInfoEnabled()) {
+                    logger.info("AddListener(): arrayHelperObject.hashCode(): " + arrayHelperObject.hashCode());//NOI18N
+                }
                 ObjectAttribute arrayHelperAttribute = new ObjectAttribute(String.valueOf(Math.random()), memberAttributeInfo, arrayHelperObject.getID(), arrayHelperObject,Policy.createWIKIPolicy());
                 
                 
@@ -449,19 +449,21 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                     
                     if(attr.referencesObject())// arrayElement
                     {
-                        if(logger.isDebugEnabled())logger.debug("AddListener: adding array element object '" + arrayHelperObject.getName() + "'");
+                        if(logger.isDebugEnabled())logger.debug("AddListener: adding array element object '" + arrayHelperObject.getName() + "'");//NOI18N
                         memberAttributeInfo = (MemberAttributeInfo)arrayHelperClass.getMemberAttributeInfos().get(attr.getKey());
-                        MetaObject arrayElementObject = DefaultComplexMetaAttributeArrayEditor.this.getMetaObjectInstance(memberAttributeInfo.getForeignKeyClassId()  + "@" + MetaObject.getDomain());
+                        MetaObject arrayElementObject = DefaultComplexMetaAttributeArrayEditor.this.getMetaObjectInstance(memberAttributeInfo.getForeignKeyClassId()  + "@" + MetaObject.getDomain());//NOI18N
                         
                         
                         arrayElementObject.setStatus(MetaObject.NEW);
                         //arrayElementObject.setStatus(MetaObject.NO_STATUS);
                         attr.setValue(arrayElementObject);
-                        logger.info("AddListener(): arrayElementAttribute.hashCode(): " + attr.hashCode());
+                        if (logger.isInfoEnabled()) {
+                            logger.info("AddListener(): arrayElementAttribute.hashCode(): " + attr.hashCode());//NOI18N
+                        }
                     }
                     else if(!attr.isPrimaryKey())
                     {
-                        if(logger.isDebugEnabled())logger.debug("AddListener: setting value of id from attribute '" + attr.getName() + "' to " + MetaObject.getID());
+                        if(logger.isDebugEnabled())logger.debug("AddListener: setting value of id from attribute '" + attr.getName() + "' to " + MetaObject.getID());//NOI18N
                         attr.setValue(new Integer(MetaObject.getID()));
                     }
                 }
@@ -472,7 +474,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             }
             catch(Throwable t)
             {
-                logger.error("AddListener: could not add new attribute", t);
+                logger.error("AddListener: could not add new attribute", t);//NOI18N
             }
         }
     }
@@ -482,7 +484,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         public void actionPerformed(ActionEvent e)
         {
             String key = e.getActionCommand();
-            if(logger.isDebugEnabled())logger.info("RemoveListener: removing attribute " + key);
+            if(logger.isInfoEnabled())logger.info("RemoveListener: removing attribute " + key);//NOI18N
             
             if(DefaultComplexMetaAttributeArrayEditor.this.getChildEditors().containsKey(key))
             {
@@ -492,7 +494,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             }
             else
             {
-                logger.error("actionPerformed(): editor " + key + "not in map");
+                logger.error("actionPerformed(): editor " + key + "not in map");//NOI18N
             }
         }
     }
@@ -541,12 +543,12 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                     Attribute arrayAttribute = (Attribute)arrayHelperObject.getAttributes().get(arrayElementKey);
                     if(arrayAttribute != null && arrayAttribute.referencesObject() && arrayAttribute.getValue() != null)
                     {
-                        if(this.logger.isDebugEnabled())this.logger.debug("ArrayAttributeMap(): array object " + arrayAttribute.getKey() + " (" + arrayAttribute.getName() + "): '" + arrayAttribute + "'");
-                        logger.info("ArrayAttributeMap(): arrayElementAttribute.hashCode(): " + key + " = "+ arrayAttribute.hashCode());
+                        if(this.logger.isDebugEnabled())this.logger.debug("ArrayAttributeMap(): array object " + arrayAttribute.getKey() + " (" + arrayAttribute.getName() + "): '" + arrayAttribute + "'");//NOI18N
+                        logger.info("ArrayAttributeMap(): arrayElementAttribute.hashCode(): " + key + " = "+ arrayAttribute.hashCode());//NOI18N
                         
                         if(this.containsValue(arrayAttribute))
                         {
-                            logger.error(arrayAttribute + " already in map");
+                            logger.error(arrayAttribute + " already in map");//NOI18N
                         }
                         
                         return super.put(key, arrayAttribute);
@@ -555,7 +557,7 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             }
             else
             {
-                this.logger.error("ArrayAttributeMap(): array helper object '" + arrayHelperAttribute.getName() + "' is null or not of type MetaObject");
+                this.logger.error("ArrayAttributeMap(): array helper object '" + arrayHelperAttribute.getName() + "' is null or not of type MetaObject");//NOI18N
             }
             
             return null;
@@ -563,13 +565,12 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
         
         public Object remove(Object key)
         {
-            logger.fatal("Nudelholz");
-            if(logger.isDebugEnabled())this.logger.debug("remove(): setting attribute to delete: " + key);
+            if(logger.isDebugEnabled())this.logger.debug("remove(): setting attribute to delete: " + key);//NOI18N
             
             MetaObject MetaObject = DefaultComplexMetaAttributeArrayEditor.this.getMetaObject(this.metaArrayContainerObject.getAttributes().get(key));
             if(MetaObject.getStatus() == MetaObject.NEW)
             {
-                if(logger.isDebugEnabled())this.logger.debug("remove(): meta attribute is new, deleting meta attribute");
+                if(logger.isDebugEnabled())this.logger.debug("remove(): meta attribute is new, deleting meta attribute");//NOI18N
                 this.metaArrayContainerObject.getAttributes().remove(key);
             }
             else

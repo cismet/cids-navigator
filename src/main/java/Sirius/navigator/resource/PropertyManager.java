@@ -42,12 +42,12 @@ import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
 
 public final class PropertyManager {
 
-    private final static String HEADER = "Navigator Configuration File";
-    public final static String TRUE = "true";
-    public final static String FALSE = "false";
-    public final static String SORT_TOKEN_SEPARATOR = ",";
-    public final static String SORT_NAME_TOKEN = "%name%";
-    public final static String SORT_ID_TOKEN = "%id%";
+    private final static String HEADER = "Navigator Configuration File";//NOI18N
+    public final static String TRUE = "true";//NOI18N
+    public final static String FALSE = "false";//NOI18N
+    public final static String SORT_TOKEN_SEPARATOR = ",";//NOI18N
+    public final static String SORT_NAME_TOKEN = "%name%";//NOI18N
+    public final static String SORT_ID_TOKEN = "%id%";//NOI18N
     public final static int MIN_SERVER_THREADS = 3;
     public final static int MAX_SERVER_THREADS = 10;
     public final static int MIN_SEARCH_RESULTS = 20;
@@ -128,27 +128,27 @@ public final class PropertyManager {
         setLookAndFeel(LAFManager.getManager().getDefaultLookAndFeel().getName());
 
         //this.setCallserverURL("rmi://192.168.0.12/callServer");
-        setConnectionClass("Sirius.navigator.connection.RMIConnection");
-        setConnectionProxyClass("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler");
+        setConnectionClass("Sirius.navigator.connection.RMIConnection");//NOI18N
+        setConnectionProxyClass("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler");//NOI18N
         setAutoLogin(false);
         setMaxConnections(MIN_SERVER_THREADS);
         setMaxSearchResults(MIN_SEARCH_RESULTS);
         setSortChildren(false);
         setSortAscending(false);
 
-        setCountry("DE");
-        setLanguage("de");
+        setCountry("DE");//NOI18N
+        setLanguage("de");//NOI18N
 
         setLoadable(true);
         setSaveable(false);
         setConnectionInfoSaveable(false);
 
-        connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer");
-        connectionInfo.setPassword("");
-        connectionInfo.setUserDomain("");
-        connectionInfo.setUsergroup("");
-        connectionInfo.setUsergroupDomain("");
-        connectionInfo.setUsername("");
+        connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer");//NOI18N
+        connectionInfo.setPassword("");//NOI18N
+        connectionInfo.setUserDomain("");//NOI18N
+        connectionInfo.setUsergroup("");//NOI18N
+        connectionInfo.setUsergroupDomain("");//NOI18N
+        connectionInfo.setUsername("");//NOI18N
     }
     // TITLE ===================================================================
     /*public void setTitle(String title)
@@ -169,13 +169,13 @@ public final class PropertyManager {
     return this.title;
     }*/    // SIZE ====================================================================
     public void setMaximizeWindow(String maximizeWindow) {
-        if (maximizeWindow != null && (maximizeWindow.equalsIgnoreCase(TRUE) || maximizeWindow.equals("1"))) {
+        if (maximizeWindow != null && (maximizeWindow.equalsIgnoreCase(TRUE) || maximizeWindow.equals("1"))) {//NOI18N
             this.setMaximizeWindow(true);
-        } else if (maximizeWindow != null && (maximizeWindow.equalsIgnoreCase(FALSE) || maximizeWindow.equals("0"))) {
+        } else if (maximizeWindow != null && (maximizeWindow.equalsIgnoreCase(FALSE) || maximizeWindow.equals("0"))) {//NOI18N
             this.setMaximizeWindow(false);
         } else {
             this.setMaximizeWindow(false);
-            logger.warn("setMaximizeWindow(): invalid property 'maximizeWindow': '" + maximizeWindow + "', setting default value to '" + this.maximizeWindow + "'");
+            logger.warn("setMaximizeWindow(): invalid property 'maximizeWindow': '" + maximizeWindow + "', setting default value to '" + this.maximizeWindow + "'");//NOI18N
         }
     }
 
@@ -185,7 +185,7 @@ public final class PropertyManager {
      */
     public void setMaximizeWindow(boolean maximizeWindow) {
         this.maximizeWindow = maximizeWindow;
-        properties.setProperty("maximizeWindow", String.valueOf(maximizeWindow));
+        properties.setProperty("maximizeWindow", String.valueOf(maximizeWindow));//NOI18N
     }
 
     /** Getter for property maximizeWindow.
@@ -211,13 +211,13 @@ public final class PropertyManager {
             int iwidth = Integer.parseInt(width);
             this.setWidth(iwidth);
         } catch (Exception exp) {
-            logger.warn("setWidth(): invalid property 'witdh': '" + exp.getMessage() + "'");
+            logger.warn("setWidth(): invalid property 'witdh': '" + exp.getMessage() + "'");//NOI18N
         }
     }
 
     public void setWidth(int width) {
         this.width = width;
-        properties.setProperty("width", String.valueOf(width));
+        properties.setProperty("width", String.valueOf(width));//NOI18N
     }
 
     public int getWidth() {
@@ -229,13 +229,13 @@ public final class PropertyManager {
             int iheight = Integer.parseInt(height);
             this.setHeight(iheight);
         } catch (Exception exp) {
-            logger.warn("setHeight(): invalid property 'height': '" + exp.getMessage() + "'");
+            logger.warn("setHeight(): invalid property 'height': '" + exp.getMessage() + "'");//NOI18N
         }
     }
 
     public void setHeight(int height) {
         this.height = height;
-        properties.setProperty("height", String.valueOf(height));
+        properties.setProperty("height", String.valueOf(height));//NOI18N
     }
 
     public int getHeight() {
@@ -256,7 +256,7 @@ public final class PropertyManager {
      */
     public void setConnectionClass(String connectionClass) {
         this.connectionClass = connectionClass;
-        properties.setProperty("connectionClass", this.connectionClass);
+        properties.setProperty("connectionClass", this.connectionClass);//NOI18N
     }
 
     /** Getter for property connectionProxyClass.
@@ -273,23 +273,23 @@ public final class PropertyManager {
      */
     public void setConnectionProxyClass(String connectionProxyClass) {
         this.connectionProxyClass = connectionProxyClass;
-        properties.setProperty("connectionProxyClass", this.connectionProxyClass);
+        properties.setProperty("connectionProxyClass", this.connectionProxyClass);//NOI18N
     }
 
     public void setAutoLogin(String autoLogin) {
-        if (autoLogin != null && (autoLogin.equalsIgnoreCase(TRUE) || autoLogin.equals("1"))) {
+        if (autoLogin != null && (autoLogin.equalsIgnoreCase(TRUE) || autoLogin.equals("1"))) {//NOI18N
             this.setAutoLogin(true);
-        } else if (autoLogin != null && (autoLogin.equalsIgnoreCase(FALSE) || autoLogin.equals("0"))) {
+        } else if (autoLogin != null && (autoLogin.equalsIgnoreCase(FALSE) || autoLogin.equals("0"))) {//NOI18N
             this.setAutoLogin(false);
         } else {
             this.setAutoLogin(false);
-            logger.warn("setAutoLogin(): invalid property 'autoLogin': '" + autoLogin + "', setting default value to '" + this.autoLogin + "'");
+            logger.warn("setAutoLogin(): invalid property 'autoLogin': '" + autoLogin + "', setting default value to '" + this.autoLogin + "'");//NOI18N
         }
     }
 
     public void setAutoLogin(boolean autoLogin) {
         this.autoLogin = autoLogin;
-        properties.setProperty("autoLogin", String.valueOf(this.autoLogin));
+        properties.setProperty("autoLogin", String.valueOf(this.autoLogin));//NOI18N
     }
 
     public boolean isAutoLogin() {
@@ -330,18 +330,18 @@ public final class PropertyManager {
             int imaxConnections = Integer.parseInt(maxConnections);
             this.setMaxConnections(imaxConnections);
         } catch (Exception exp) {
-            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + exp.getMessage() + "'");
+            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + exp.getMessage() + "'");//NOI18N
         }
     }
 
     public void setMaxConnections(int maxConnections) {
         if (maxConnections < MIN_SERVER_THREADS || maxConnections > MAX_SERVER_THREADS) {
             this.maxConnections = MIN_SERVER_THREADS;
-            properties.setProperty("maxConnections", String.valueOf(MIN_SERVER_THREADS));
-            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + maxConnections + "', setting default value to '" + MIN_SERVER_THREADS + "'");
+            properties.setProperty("maxConnections", String.valueOf(MIN_SERVER_THREADS));//NOI18N
+            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + maxConnections + "', setting default value to '" + MIN_SERVER_THREADS + "'");//NOI18N
         } else {
             this.maxConnections = maxConnections;
-            properties.setProperty("maxConnections", String.valueOf(maxConnections));
+            properties.setProperty("maxConnections", String.valueOf(maxConnections));//NOI18N
         }
     }
 
@@ -354,18 +354,18 @@ public final class PropertyManager {
             int imaxSearchResults = Integer.parseInt(maxSearchResults);
             this.setMaxSearchResults(imaxSearchResults);
         } catch (NumberFormatException nfe) {
-            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + nfe.getMessage() + "'");
+            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + nfe.getMessage() + "'");//NOI18N
         }
     }
 
     public void setMaxSearchResults(int maxSearchResults) {
         if (maxSearchResults < MIN_SEARCH_RESULTS || maxSearchResults > MAX_SEARCH_RESULTS) {
             this.maxSearchResults = MIN_SEARCH_RESULTS;
-            properties.setProperty("maxSearchResults", String.valueOf(this.maxSearchResults));
-            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + maxSearchResults + "', setting default value to '" + MIN_SEARCH_RESULTS + "'");
+            properties.setProperty("maxSearchResults", String.valueOf(this.maxSearchResults));//NOI18N
+            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + maxSearchResults + "', setting default value to '" + MIN_SEARCH_RESULTS + "'");//NOI18N
         } else {
             this.maxSearchResults = maxSearchResults;
-            properties.setProperty("maxSearchResults", String.valueOf(maxSearchResults));
+            properties.setProperty("maxSearchResults", String.valueOf(maxSearchResults));//NOI18N
         }
     }
 
@@ -374,19 +374,19 @@ public final class PropertyManager {
     }
     // AdvancedLayout ======================================================
     public void setAdvancedLayout(String advancedLayout) {
-        if (advancedLayout != null && (advancedLayout.equalsIgnoreCase(TRUE) || advancedLayout.equals("1"))) {
+        if (advancedLayout != null && (advancedLayout.equalsIgnoreCase(TRUE) || advancedLayout.equals("1"))) {//NOI18N
             this.setAdvancedLayout(true);
-        } else if (advancedLayout != null && (advancedLayout.equalsIgnoreCase(FALSE) || advancedLayout.equals("0"))) {
+        } else if (advancedLayout != null && (advancedLayout.equalsIgnoreCase(FALSE) || advancedLayout.equals("0"))) {//NOI18N
             this.setAdvancedLayout(false);
         } else {
             this.setAdvancedLayout(false);
-            logger.warn("setAdvancedLayout(): invalid property 'advancedLayout': '" + advancedLayout + "', setting default value to '" + this.advancedLayout + "'");
+            logger.warn("setAdvancedLayout(): invalid property 'advancedLayout': '" + advancedLayout + "', setting default value to '" + this.advancedLayout + "'");//NOI18N
         }
     }
 
     public void setAdvancedLayout(boolean advancedLayout) {
         this.advancedLayout = advancedLayout;
-        properties.setProperty("advancedLayout", String.valueOf(this.advancedLayout));
+        properties.setProperty("advancedLayout", String.valueOf(this.advancedLayout));//NOI18N
     }
 
     public boolean isAdvancedLayout() {
@@ -418,7 +418,7 @@ public final class PropertyManager {
         {
             //this.lookAndFeel = LNF_METAL;
             this.lookAndFeel = LAFManager.getManager().getDefaultLookAndFeel().getName();
-            logger.warn("setLookAndFeel(): invalid property 'lookAndFeel': '" + lookAndFeelName + "', setting default value to '" + this.lookAndFeel + "'");
+            logger.warn("setLookAndFeel(): invalid property 'lookAndFeel': '" + lookAndFeelName + "', setting default value to '" + this.lookAndFeel + "'");//NOI18N
         }
 //        try {
 //            UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
@@ -429,7 +429,7 @@ public final class PropertyManager {
 ////        Plastic3DLookAndFeel.set
 //        } catch (Exception e) {
 //        }
-        properties.setProperty("lookAndFeel", this.lookAndFeel);
+        properties.setProperty("lookAndFeel", this.lookAndFeel);//NOI18N
         //properties.setProperty("lookAndFeel", "HARDWIRED");
     }
 
@@ -438,19 +438,19 @@ public final class PropertyManager {
     }
     // sortChildren =============================================================
     public void setSortChildren(String sortChildren) {
-        if (sortChildren != null && (sortChildren.equalsIgnoreCase(TRUE) || sortChildren.equals("1"))) {
+        if (sortChildren != null && (sortChildren.equalsIgnoreCase(TRUE) || sortChildren.equals("1"))) {//NOI18N
             this.setSortChildren(true);
-        } else if (sortChildren != null && (sortChildren.equalsIgnoreCase(FALSE) || sortChildren.equals("0"))) {
+        } else if (sortChildren != null && (sortChildren.equalsIgnoreCase(FALSE) || sortChildren.equals("0"))) {//NOI18N
             this.setSortChildren(false);
         } else {
             this.setSortChildren(false);
-            logger.warn("setSortChildren(): invalid property 'sortChildren': '" + sortChildren + "', setting default value to '" + this.sortChildren + "'");
+            logger.warn("setSortChildren(): invalid property 'sortChildren': '" + sortChildren + "', setting default value to '" + this.sortChildren + "'");//NOI18N
         }
     }
 
     public void setSortChildren(boolean sortChildren) {
         this.sortChildren = sortChildren;
-        properties.setProperty("sortChildren", String.valueOf(this.sortChildren));
+        properties.setProperty("sortChildren", String.valueOf(this.sortChildren));//NOI18N
     }
 
     public boolean isSortChildren() {
@@ -458,19 +458,19 @@ public final class PropertyManager {
     }
     // sortAscending ============================================================
     public void setSortAscending(String sortAscending) {
-        if (sortAscending != null && (sortAscending.equalsIgnoreCase(TRUE) || sortAscending.equals("1"))) {
+        if (sortAscending != null && (sortAscending.equalsIgnoreCase(TRUE) || sortAscending.equals("1"))) {//NOI18N
             this.setSortAscending(true);
-        } else if (sortAscending != null && (sortAscending.equalsIgnoreCase(FALSE) || sortAscending.equals("0"))) {
+        } else if (sortAscending != null && (sortAscending.equalsIgnoreCase(FALSE) || sortAscending.equals("0"))) {//NOI18N
             this.setSortAscending(false);
         } else {
             this.setSortAscending(false);
-            logger.warn("setSortAscending(): invalid property 'sortAscending': '" + sortAscending + "', setting default value to '" + this.sortAscending + "'");
+            logger.warn("setSortAscending(): invalid property 'sortAscending': '" + sortAscending + "', setting default value to '" + this.sortAscending + "'");//NOI18N
         }
     }
 
     public void setSortAscending(boolean sortAscending) {
         this.sortAscending = sortAscending;
-        properties.setProperty("sortAscending", String.valueOf(this.sortAscending));
+        properties.setProperty("sortAscending", String.valueOf(this.sortAscending));//NOI18N
 
     }
 
@@ -479,13 +479,13 @@ public final class PropertyManager {
     }
 
     public void setConnectionInfoSaveable(String connectionInfoSaveable) {
-        if (connectionInfoSaveable != null && (connectionInfoSaveable.equalsIgnoreCase(TRUE) || connectionInfoSaveable.equals("1"))) {
+        if (connectionInfoSaveable != null && (connectionInfoSaveable.equalsIgnoreCase(TRUE) || connectionInfoSaveable.equals("1"))) {//NOI18N
             this.setConnectionInfoSaveable(true);
-        } else if (connectionInfoSaveable != null && (connectionInfoSaveable.equalsIgnoreCase(FALSE) || connectionInfoSaveable.equals("0"))) {
+        } else if (connectionInfoSaveable != null && (connectionInfoSaveable.equalsIgnoreCase(FALSE) || connectionInfoSaveable.equals("0"))) {//NOI18N
             this.setConnectionInfoSaveable(false);
         } else {
             this.setConnectionInfoSaveable(false);
-            logger.warn("connectionInfoSaveable(): invalid property 'connectionInfoSaveable': '" + connectionInfoSaveable + "', setting default value to '" + this.connectionInfoSaveable + "'");
+            logger.warn("connectionInfoSaveable(): invalid property 'connectionInfoSaveable': '" + connectionInfoSaveable + "', setting default value to '" + this.connectionInfoSaveable + "'");//NOI18N
         }
     }
 
@@ -495,7 +495,7 @@ public final class PropertyManager {
      */
     public void setConnectionInfoSaveable(boolean connectionInfoSaveable) {
         this.connectionInfoSaveable = this.isSaveable() & connectionInfoSaveable;
-        properties.setProperty("connectionInfoSaveable", String.valueOf(this.connectionInfoSaveable));
+        properties.setProperty("connectionInfoSaveable", String.valueOf(this.connectionInfoSaveable));//NOI18N
     }
 
     /** Getter for property connectionInfoSaveable.
@@ -507,13 +507,13 @@ public final class PropertyManager {
     }
 
     public void setLoadable(String loadable) {
-        if (loadable != null && (loadable.equalsIgnoreCase(TRUE) || loadable.equals("1"))) {
+        if (loadable != null && (loadable.equalsIgnoreCase(TRUE) || loadable.equals("1"))) {//NOI18N
             this.setLoadable(true);
-        } else if (loadable != null && (loadable.equalsIgnoreCase(FALSE) || loadable.equals("0"))) {
+        } else if (loadable != null && (loadable.equalsIgnoreCase(FALSE) || loadable.equals("0"))) {//NOI18N
             this.setLoadable(false);
         } else {
             this.setLoadable(false);
-            logger.warn("loadable(): invalid property 'loadable': '" + loadable + "', setting default value to '" + this.loadable + "'");
+            logger.warn("loadable(): invalid property 'loadable': '" + loadable + "', setting default value to '" + this.loadable + "'");//NOI18N
         }
     }
 
@@ -523,7 +523,7 @@ public final class PropertyManager {
      */
     public void setLoadable(boolean loadable) {
         this.loadable = loadable;
-        properties.setProperty("loadable", String.valueOf(this.loadable));
+        properties.setProperty("loadable", String.valueOf(this.loadable));//NOI18N
     }
 
     /** Getter for property loadable.
@@ -535,13 +535,13 @@ public final class PropertyManager {
     }
 
     public void setSaveable(String saveable) {
-        if (saveable != null && (saveable.equalsIgnoreCase(TRUE) || saveable.equals("1"))) {
+        if (saveable != null && (saveable.equalsIgnoreCase(TRUE) || saveable.equals("1"))) {//NOI18N
             this.setSaveable(true);
-        } else if (saveable != null && (saveable.equalsIgnoreCase(FALSE) || saveable.equals("0"))) {
+        } else if (saveable != null && (saveable.equalsIgnoreCase(FALSE) || saveable.equals("0"))) {//NOI18N
             this.setSaveable(false);
         } else {
             this.setSaveable(false);
-            logger.warn("saveable(): invalid property 'saveable': '" + saveable + "', setting default value to '" + this.saveable + "'");
+            logger.warn("saveable(): invalid property 'saveable': '" + saveable + "', setting default value to '" + this.saveable + "'");//NOI18N
         }
     }
 
@@ -551,7 +551,7 @@ public final class PropertyManager {
      */
     public void setSaveable(boolean saveable) {
         this.saveable = saveable;
-        properties.setProperty("saveable", String.valueOf(this.saveable));
+        properties.setProperty("saveable", String.valueOf(this.saveable));//NOI18N
     }
 
     /** Getter for property saveable.
@@ -576,58 +576,58 @@ public final class PropertyManager {
 
     private synchronized void setProperty(String property, String value) {
         if (logger.isDebugEnabled()) {
-            logger.debug("setting property '" + property + "' to '" + value + "'");
+            logger.debug("setting property '" + property + "' to '" + value + "'");//NOI18N
         /*if(property.equalsIgnoreCase("title"))
         {
         this.setTitle(value);
         }
         else*/
         }
-        if (property.equalsIgnoreCase("width")) {
+        if (property.equalsIgnoreCase("width")) {//NOI18N
             this.setWidth(value);
-        } else if (property.equalsIgnoreCase("height")) {
+        } else if (property.equalsIgnoreCase("height")) {//NOI18N
             this.setHeight(value);
-        } else if (property.equalsIgnoreCase("maximizeWindow")) {
+        } else if (property.equalsIgnoreCase("maximizeWindow")) {//NOI18N
             this.setMaximizeWindow(value);
-        } else if (property.equalsIgnoreCase("advancedLayout")) {
+        } else if (property.equalsIgnoreCase("advancedLayout")) {//NOI18N
             this.setAdvancedLayout(value);
-        } else if (property.equalsIgnoreCase("lookAndFeel")) {
+        } else if (property.equalsIgnoreCase("lookAndFeel")) {//NOI18N
             this.setLookAndFeel(value);
-        } else if (property.equalsIgnoreCase("autoLogin")) {
+        } else if (property.equalsIgnoreCase("autoLogin")) {//NOI18N
             this.setAutoLogin(value);
-        } else if (property.equalsIgnoreCase("connectionClass")) {
+        } else if (property.equalsIgnoreCase("connectionClass")) {//NOI18N
             this.setConnectionClass(value);
-        } else if (property.equalsIgnoreCase("connectionProxyClass")) {
+        } else if (property.equalsIgnoreCase("connectionProxyClass")) {//NOI18N
             this.setConnectionProxyClass(value);
-        } else if (property.equalsIgnoreCase("maxConnections")) {
+        } else if (property.equalsIgnoreCase("maxConnections")) {//NOI18N
             this.setMaxConnections(value);
-        } else if (property.equalsIgnoreCase("maxSearchResults")) {
+        } else if (property.equalsIgnoreCase("maxSearchResults")) {//NOI18N
             this.setMaxSearchResults(value);
-        } else if (property.equalsIgnoreCase("sortChildren")) {
+        } else if (property.equalsIgnoreCase("sortChildren")) {//NOI18N
             this.setSortChildren(value);
-        } else if (property.equalsIgnoreCase("sortAscending")) {
+        } else if (property.equalsIgnoreCase("sortAscending")) {//NOI18N
             this.setSortAscending(value);
-        } else if (property.equalsIgnoreCase("saveable")) {
+        } else if (property.equalsIgnoreCase("saveable")) {//NOI18N
             this.setSaveable(value);
-        } else if (property.equalsIgnoreCase("loadable")) {
+        } else if (property.equalsIgnoreCase("loadable")) {//NOI18N
             this.setLoadable(value);
-        } else if (property.equalsIgnoreCase("language")) {
+        } else if (property.equalsIgnoreCase("language")) {//NOI18N
             this.setLanguage(value);
-        } else if (property.equalsIgnoreCase("country")) {
+        } else if (property.equalsIgnoreCase("country")) {//NOI18N
             this.setCountry(value);
-        } else if (property.equalsIgnoreCase("connectionInfoSaveable")) {
+        } else if (property.equalsIgnoreCase("connectionInfoSaveable")) {//NOI18N
             this.setConnectionInfoSaveable(value);
-        } else if (property.equalsIgnoreCase("callserverURL")) {
+        } else if (property.equalsIgnoreCase("callserverURL")) {//NOI18N
             this.connectionInfo.setCallserverURL(value);
-        } else if (property.equalsIgnoreCase("password")) {
+        } else if (property.equalsIgnoreCase("password")) {//NOI18N
             this.connectionInfo.setPassword(value);
-        } else if (property.equalsIgnoreCase("userDomain")) {
+        } else if (property.equalsIgnoreCase("userDomain")) {//NOI18N
             this.connectionInfo.setUserDomain(value);
-        } else if (property.equalsIgnoreCase("usergroup")) {
+        } else if (property.equalsIgnoreCase("usergroup")) {//NOI18N
             this.connectionInfo.setUsergroup(value);
-        } else if (property.equalsIgnoreCase("usergroupDomain")) {
+        } else if (property.equalsIgnoreCase("usergroupDomain")) {//NOI18N
             this.connectionInfo.setUsergroupDomain(value);
-        } else if (property.equalsIgnoreCase("username")) {
+        } else if (property.equalsIgnoreCase("username")) {//NOI18N
             this.connectionInfo.setUsername(value);
         } else {
             //logger.warn("setProperty(): unknown property '" + property + "' = '" + value + "'");
@@ -640,15 +640,15 @@ public final class PropertyManager {
                 this.properties.load(inStream);
                 this.load();
             } catch (Exception exp) {
-                logger.fatal("could not load properties: " + exp.getMessage(), exp);
+                logger.fatal("could not load properties: " + exp.getMessage(), exp);//NOI18N
             }
         } else {
-            logger.error("could not load properties: properties not loadable");
+            logger.error("could not load properties: properties not loadable");//NOI18N
         }
     }
 
     public void configure() {
-        this.load(this.getClass().getResourceAsStream("cfg/navigator.cfg"));
+        this.load(this.getClass().getResourceAsStream("cfg/navigator.cfg"));//NOI18N
     }
 
     public void configure(String cfgFile, String basePath, String pluginPath, String searchFormPath, String profilesPath) throws Exception {
@@ -656,28 +656,28 @@ public final class PropertyManager {
         this.application = true;
 
         if (basePath != null) {
-            logger.info("setting base path to '" + basePath + "'");
+            logger.info("setting base path to '" + basePath + "'");//NOI18N
             this.basePath = basePath;
         } else {
             this.getBasePath();
         }
 
         if (pluginPath != null) {
-            logger.info("setting base plugin to '" + pluginPath + "'");
+            logger.info("setting base plugin to '" + pluginPath + "'");//NOI18N
             this.pluginPath = pluginPath;
         } else {
             this.getPluginPath();
         }
 
         if (searchFormPath != null) {
-            logger.info("setting search form path to '" + searchFormPath + "'");
+            logger.info("setting search form path to '" + searchFormPath + "'");//NOI18N
             this.searchFormPath = searchFormPath;
         } else {
             this.getSearchFormPath();
         }
 
         if (profilesPath != null) {
-            logger.info("setting profiles path to '" + profilesPath + "'");
+            logger.info("setting profiles path to '" + profilesPath + "'");//NOI18N
             this.profilesPath = profilesPath;
         } else {
             this.getProfilesPath();
@@ -686,11 +686,11 @@ public final class PropertyManager {
         if (cfgFile != null) {
             //try
             //{
-            if (cfgFile.indexOf("http://") == 0 || cfgFile.indexOf("https://") == 0 || cfgFile.indexOf("file://") == 0) {
+            if (cfgFile.indexOf("http://") == 0 || cfgFile.indexOf("https://") == 0 || cfgFile.indexOf("file://") == 0) {//NOI18N
                 URL url = new URL(cfgFile);
                 this.load(url.openStream());
 
-                logger.info("config file loaded from url (assuming webstart)");
+                logger.info("config file loaded from url (assuming webstart)");//NOI18N
                 this.applet = true;
             } else {
                 File file = new File(cfgFile);
@@ -703,23 +703,23 @@ public final class PropertyManager {
         throw exp;
         }*/
         } else {
-            throw new Exception("loading of config file '" + cfgFile + "' failed");
+            throw new Exception("loading of config file '" + cfgFile + "' failed");//NOI18N
         //this.configure();
         }
 
         //\u00C4nderungen wg. Webstart HELL
         try {
-            String parameter = this.properties.getProperty("plugins");
-            setHttpInterfacePort(new Integer(properties.getProperty("httpInterfacePort", "9099")));
-            setAutoClose(new Boolean(properties.getProperty("closeWithoutAsking", "false")));
+            String parameter = this.properties.getProperty("plugins");//NOI18N
+            setHttpInterfacePort(new Integer(properties.getProperty("httpInterfacePort", "9099")));//NOI18N
+            setAutoClose(new Boolean(properties.getProperty("closeWithoutAsking", "false")));//NOI18N
 
             if (parameter != null && parameter.length() > 0) {
                 pluginList = new ArrayList();
-                StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
+                StringTokenizer tokenizer = new StringTokenizer(parameter, ";");//NOI18N
                 while (tokenizer.hasMoreTokens()) {
-                    String plugin = tokenizer.nextToken().trim() + "/";
-                    logger.info("adding plugin from config file: '" + plugin + "'");
-                    pluginList.add(pluginPath + "/" + plugin);
+                    String plugin = tokenizer.nextToken().trim() + "/";//NOI18N
+                    logger.info("adding plugin from config file: '" + plugin + "'");//NOI18N
+                    pluginList.add(pluginPath + "/" + plugin);//NOI18N
                 }
             }
         } catch (Exception except) {
@@ -730,59 +730,59 @@ public final class PropertyManager {
     }
 
     public void configure(JApplet applet) {
-        logger.debug("configure property manager (applet)");
+        logger.debug("configure property manager (applet)");//NOI18N
         this.pluginList = new ArrayList();
         this.applet = true;
         this.application = false;
         this.appletContext = applet.getAppletContext();
 
         this.basePath = applet.getCodeBase().toString(); // + "/";
-        logger.info("setting base path to '" + this.basePath + "'");
+        logger.info("setting base path to '" + this.basePath + "'");//NOI18N
 
-        this.pluginPath = this.basePath + "plugins/";
-        logger.info("setting plugins path to '" + this.pluginPath + "'");
+        this.pluginPath = this.basePath + "plugins/";//NOI18N
+        logger.info("setting plugins path to '" + this.pluginPath + "'");//NOI18N
 
-        this.searchFormPath = this.basePath + "search/";
-        logger.info("setting search forms path to '" + this.searchFormPath + "'");
+        this.searchFormPath = this.basePath + "search/";//NOI18N
+        logger.info("setting search forms path to '" + this.searchFormPath + "'");//NOI18N
 
         this.readAppletParameters(applet);
     }
 
     private void readAppletParameters(JApplet applet) {
         // configfile
-        String parameter = applet.getParameter("configfile");
+        String parameter = applet.getParameter("configfile");//NOI18N
         if (parameter != null && parameter.length() > 0) {
             if (logger.isDebugEnabled()) {
-                logger.debug("loading configfile from remote url '" + this.getBasePath() + parameter + "'");
+                logger.debug("loading configfile from remote url '" + this.getBasePath() + parameter + "'");//NOI18N
             }
             try {
                 URL url = new URL(this.getBasePath() + parameter);
                 this.load(new BufferedInputStream(url.openStream()));
             } catch (Exception exp) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("could not load configfile, trying to load file from local filesystem\n" + exp.getMessage());
+                    logger.debug("could not load configfile, trying to load file from local filesystem\n" + exp.getMessage());//NOI18N
                 }
                 try {
                     File file = new File(parameter);
                     this.load(new BufferedInputStream(new FileInputStream(file)));
                 } catch (Exception ioexp) {
-                    logger.error("could not load configfile, using default configuration\n" + ioexp.getMessage());
+                    logger.error("could not load configfile, using default configuration\n" + ioexp.getMessage());//NOI18N
                     this.configure();
                 }
             }
         }
 
-        parameter = applet.getParameter("language");
+        parameter = applet.getParameter("language");//NOI18N
         if (parameter != null && parameter.length() > 0) {
             ResourceManager.getManager().setLocale(new Locale(parameter));
         }
 
-        parameter = applet.getParameter("plugins");
+        parameter = applet.getParameter("plugins");//NOI18N
         if (parameter != null && parameter.length() > 0) {
-            StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
+            StringTokenizer tokenizer = new StringTokenizer(parameter, ";");//NOI18N
             while (tokenizer.hasMoreTokens()) {
-                String plugin = this.pluginPath + tokenizer.nextToken().trim() + "/";
-                logger.info("adding plugin '" + plugin + "'");
+                String plugin = this.pluginPath + tokenizer.nextToken().trim() + "/";//NOI18N
+                logger.info("adding plugin '" + plugin + "'");//NOI18N
                 pluginList.add(plugin);
             }
         }
@@ -793,10 +793,10 @@ public final class PropertyManager {
             try {
                 this.properties.store(outStream, HEADER);
             } catch (Exception exp) {
-                logger.fatal("could not save properties: " + exp.getMessage(), exp);
+                logger.fatal("could not save properties: " + exp.getMessage(), exp);//NOI18N
             }
         } else {
-            logger.error("could not save properties: properties not saveable");
+            logger.error("could not save properties: properties not saveable");//NOI18N
         }
     }
 
@@ -831,14 +831,15 @@ public final class PropertyManager {
 
     public String getBasePath() {
         if (this.basePath == null) {
-            this.basePath = System.getProperty("user.home") + System.getProperty("file.separator") + ".navigator" + System.getProperty("file.separator");
-            logger.info("no base path set, setting default base path to '" + this.basePath + "'");
-
+            this.basePath = System.getProperty("user.home") + System.getProperty("file.separator") + ".navigator" + System.getProperty("file.separator");//NOI18N
+            if (logger.isInfoEnabled()) {
+                logger.info("no base path set, setting default base path to '" + this.basePath + "'");//NOI18N
+            }
             File file = new File(this.basePath);
             if (!file.exists()) {
-                logger.warn("base path does not exist, creating base path");
+                logger.warn("base path does not exist, creating base path");//NOI18N
                 if (!file.mkdirs()) {
-                    logger.error("could not create base path");
+                    logger.error("could not create base path");//NOI18N
                 }
             }
         }
@@ -848,13 +849,13 @@ public final class PropertyManager {
 
     public String getPluginPath() {
         if (this.pluginPath == null) {
-            if (this.getBasePath().startsWith("http") || this.getBasePath().startsWith("file")) {
-                this.pluginPath = this.getBasePath() + "plugins/";
+            if (this.getBasePath().startsWith("http") || this.getBasePath().startsWith("file")) {//NOI18N
+                this.pluginPath = this.getBasePath() + "plugins/";//NOI18N
             } else {
-                this.pluginPath = this.getBasePath() + "plugins" + System.getProperty("file.separator");
+                this.pluginPath = this.getBasePath() + "plugins" + System.getProperty("file.separator");//NOI18N
             }
 
-            logger.info("no plugin path set, setting default plugin path to '" + this.pluginPath + "'");
+            logger.info("no plugin path set, setting default plugin path to '" + this.pluginPath + "'");//NOI18N
         }
 
         return this.pluginPath;
@@ -862,33 +863,33 @@ public final class PropertyManager {
 
     public String getSearchFormPath() {
         if (this.searchFormPath == null) {
-            if (this.getBasePath().startsWith("http")) {
-                this.searchFormPath = this.basePath + "search/";
+            if (this.getBasePath().startsWith("http")) {//NOI18N
+                this.searchFormPath = this.basePath + "search/";//NOI18N
             } else {
-                this.searchFormPath = this.basePath + "search" + System.getProperty("file.separator");
+                this.searchFormPath = this.basePath + "search" + System.getProperty("file.separator");//NOI18N
             }
-            logger.info("no search form path set, setting default search form path to '" + this.searchFormPath + "'");
+            logger.info("no search form path set, setting default search form path to '" + this.searchFormPath + "'");//NOI18N
         }
 
         return this.searchFormPath;
     }
 
     public String getProfilesPath() {
-        if (this.profilesPath == null || this.profilesPath.equals("AUTO")) {
-            if (this.getBasePath().startsWith("http")) {
-                logger.info("no profiles path set and base path == URL, settting default profiles path to user.home");
-                this.profilesPath = new StringBuffer().append(System.getProperty("user.home")).append(System.getProperty("file.separator")).append(".navigator").append(System.getProperty("file.separator")).append("profiles").append(System.getProperty("file.separator")).toString();
+        if (this.profilesPath == null || this.profilesPath.equals("AUTO")) {//NOI18N
+            if (this.getBasePath().startsWith("http")) {//NOI18N
+                logger.info("no profiles path set and base path == URL, settting default profiles path to user.home");//NOI18N
+                this.profilesPath = new StringBuffer().append(System.getProperty("user.home")).append(System.getProperty("file.separator")).append(".navigator").append(System.getProperty("file.separator")).append("profiles").append(System.getProperty("file.separator")).toString();//NOI18N
             } else {
-                this.profilesPath = this.basePath + "profiles" + System.getProperty("file.separator");
+                this.profilesPath = this.basePath + "profiles" + System.getProperty("file.separator");//NOI18N
             }
 
-            logger.info("no profiles form path set, setting default search form path to '" + this.profilesPath + "'");
+            logger.info("no profiles form path set, setting default search form path to '" + this.profilesPath + "'");//NOI18N
 
             File file = new File(this.profilesPath);
             if (!file.exists()) {
-                logger.warn("profiles path does not exist, creating base path");
+                logger.warn("profiles path does not exist, creating base path");//NOI18N
                 if (!file.mkdirs()) {
-                    logger.error("could not create profiles path");
+                    logger.error("could not create profiles path");//NOI18N
                 }
             }
         }
@@ -905,20 +906,20 @@ public final class PropertyManager {
                 if (plugins != null && plugins.length > 0) {
                     for (int i = 0; i < plugins.length; i++) {
                         if (plugins[i].isDirectory()) {
-                            if (!plugins[i].getName().equalsIgnoreCase("CVS")) {
-                                String plugin = plugins[i].getPath() + System.getProperty("file.separator");
-                                logger.info("adding plugin '" + plugin + "'");
+                            if (!plugins[i].getName().equalsIgnoreCase("CVS")) {//NOI18N
+                                String plugin = plugins[i].getPath() + System.getProperty("file.separator");//NOI18N
+                                logger.info("adding plugin '" + plugin + "'");//NOI18N
                                 pluginList.add(plugin);
                             } else {
                                 if (logger.isDebugEnabled()) {
-                                    logger.warn("plugin directory with name 'CVS' found. ignoring plugin!");
+                                    logger.warn("plugin directory with name 'CVS' found. ignoring plugin!");//NOI18N
                                 }
                             }
                         }
                     }
                 }
             } else {
-                logger.warn("'" + this.pluginPath + "' does not exist or is no valid plugin directory");
+                logger.warn("'" + this.pluginPath + "' does not exist or is no valid plugin directory");//NOI18N
             }
         }
 
@@ -929,7 +930,7 @@ public final class PropertyManager {
         if (this.isPluginListAvailable()) {
             return this.pluginList.iterator();
         } else {
-            logger.warn("sorry, no plugins could be found");
+            logger.warn("sorry, no plugins could be found");//NOI18N
             return null;
         }
     }
@@ -974,8 +975,8 @@ public final class PropertyManager {
         if (language.trim().length() == 2) {
             this.language = language.toLowerCase();
         } else {
-            logger.warn("malformed language code '" + language + "', setting to default (de)");
-            this.language = "de";
+            logger.warn("malformed language code '" + language + "', setting to default (de)");//NOI18N
+            this.language = "de";//NOI18N
         }
     }
 
@@ -995,8 +996,8 @@ public final class PropertyManager {
         if (country.length() == 2) {
             this.country = country.toUpperCase();
         } else {
-            logger.warn("malformed country code '" + country + "', setting to default (de)");
-            this.language = "de";
+            logger.warn("malformed country code '" + country + "', setting to default (de)");//NOI18N
+            this.language = "de";//NOI18N
         }
     }
 

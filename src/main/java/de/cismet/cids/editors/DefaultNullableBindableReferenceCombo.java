@@ -5,19 +5,15 @@
 
 package de.cismet.cids.editors;
 
-import java.util.ResourceBundle;
 
 /**
  *
  * @author thorsten
  */
 public class DefaultNullableBindableReferenceCombo extends DefaultBindableReferenceCombo{
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-
     public DefaultNullableBindableReferenceCombo() {
         super();
         super.setNullable(true);
-        super.setNullValueRepresentation(I18N.getString("de.cismet.cids.editors.DefaultNullableBindableReferenceCombo.nullValueRepresentation"));
+        super.setNullValueRepresentation(org.openide.util.NbBundle.getMessage(DefaultNullableBindableReferenceCombo.class, "DefaultNullableBindableReferenceCombo.nullValueRepresentation"));//NOI18N
     }
-
 }

@@ -25,8 +25,8 @@ import java.util.Collection;
 public abstract class AbstractCidsBeanDropTarget extends DropTarget {
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    DataFlavor fromNavigatorNode = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + DefaultMetaTreeNode.class.getName(), "a DefaultMetaTreeNode");
-    DataFlavor fromNavigatorCollection = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + java.util.Collection.class.getName(), "a java.util.Collection of Sirius.navigator.types.treenode.DefaultMetaTreeNode objects");
+    DataFlavor fromNavigatorNode = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + DefaultMetaTreeNode.class.getName(), "a DefaultMetaTreeNode");//NOI18N
+    DataFlavor fromNavigatorCollection = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + java.util.Collection.class.getName(), "a java.util.Collection of Sirius.navigator.types.treenode.DefaultMetaTreeNode objects");//NOI18N
 
     public AbstractCidsBeanDropTarget(Component c) throws HeadlessException {
         super();
@@ -35,7 +35,7 @@ public abstract class AbstractCidsBeanDropTarget extends DropTarget {
 
     @Override
     public synchronized void drop(DropTargetDropEvent dtde) {
-        log.fatal("drop");
+        log.fatal("drop");//NOI18N
         try {
             ArrayList<CidsBean> beans = new ArrayList<CidsBean>();
             if (dtde.getTransferable().isDataFlavorSupported(fromNavigatorNode) && dtde.getTransferable().isDataFlavorSupported(fromNavigatorCollection)) {
@@ -53,16 +53,16 @@ public abstract class AbstractCidsBeanDropTarget extends DropTarget {
 
                     }
                 } catch (Throwable t) {
-                    log.fatal("Drop Problems occurred", t);
+                    log.fatal("Drop Problems occurred", t);//NOI18N
                 }
 
             } else {
-                log.fatal("Wrong transferable");
+                log.fatal("Wrong transferable");//NOI18N
             }
             beansDropped(beans);
 
         } catch (Throwable ups) {
-            log.error("Problem during the DnD Opertaion",ups);
+            log.error("Problem during the DnD Opertaion",ups);//NOI18N
         }
     }
 

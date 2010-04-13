@@ -7,7 +7,6 @@
 
 package Sirius.navigator.ui.progress;
 
-import java.util.ResourceBundle;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -24,7 +23,6 @@ import Sirius.navigator.method.*;
  */
 public class ProgressPanel extends javax.swing.JPanel
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     protected final Logger logger;
     
     private final Timer progressTimer;
@@ -51,7 +49,7 @@ public class ProgressPanel extends javax.swing.JPanel
     
     public void invokeMethod (MultithreadedMethod method, Object arguments) //throws Exception
     {
-        if(logger.isDebugEnabled())logger.debug("invoking new multithreaded method");
+        if(logger.isDebugEnabled())logger.debug("invoking new multithreaded method");//NOI18N
         if(!isLocked() && !progressTimer.isRunning() && method.getProgressObserver() != null)   
         {
             method.invoke(arguments);
@@ -60,14 +58,14 @@ public class ProgressPanel extends javax.swing.JPanel
         else
         {
             //System.out.println("isLocked() '" + isLocked() + "'");   
-            logger.error("can not invoke method: progress panel is locked (" + isLocked() + "), progress timer is running (" + progressTimer.isRunning() + ") or progress observer is null (" + method.getProgressObserver() + ")");
-            throw new RuntimeException("can not invoke method: progress panel is locked (" + isLocked() + "), progress timer is running (" + progressTimer.isRunning() + ") or progress observer is null (" + method.getProgressObserver() + ")");
+            logger.error("can not invoke method: progress panel is locked (" + isLocked() + "), progress timer is running (" + progressTimer.isRunning() + ") or progress observer is null (" + method.getProgressObserver() + ")");//NOI18N
+            throw new RuntimeException("can not invoke method: progress panel is locked (" + isLocked() + "), progress timer is running (" + progressTimer.isRunning() + ") or progress observer is null (" + method.getProgressObserver() + ")");//NOI18N
         }
     }
     
     public void start(ProgressObserver progressObserver)
     {
-        if(logger.isDebugEnabled())logger.debug("starting progress observer '" + progressObserver.getName() + "' (" + progressObserver.getMessage() + ")");
+        if(logger.isDebugEnabled())logger.debug("starting progress observer '" + progressObserver.getName() + "' (" + progressObserver.getMessage() + ")");//NOI18N
         if(!isLocked() && !progressTimer.isRunning())   
         {
             setLocked(true);
@@ -81,7 +79,7 @@ public class ProgressPanel extends javax.swing.JPanel
             {
                 try
                 {
-                    if(logger.isDebugEnabled())logger.debug("synchronizing method 'reset'");
+                    if(logger.isDebugEnabled())logger.debug("synchronizing method 'reset'");//NOI18N
                     SwingUtilities.invokeAndWait(new Runnable()
                     {
                         public void run()
@@ -92,7 +90,7 @@ public class ProgressPanel extends javax.swing.JPanel
                 }
                 catch(Exception exp)
                 {
-                    logger.warn("could not synchronize method 'reset':\n" + exp.getMessage());
+                    logger.warn("could not synchronize method 'reset':\n" + exp.getMessage());//NOI18N
                     this.reset();
                 }
             }
@@ -103,13 +101,13 @@ public class ProgressPanel extends javax.swing.JPanel
         else
         {
             //System.out.println("isLocked() '" + isLocked() + "'");   
-            logger.error("can not start: progress panel is locked (" + isLocked() + ") or progress timer is running (" + progressTimer.isRunning() + ")");
+            logger.error("can not start: progress panel is locked (" + isLocked() + ") or progress timer is running (" + progressTimer.isRunning() + ")");//NOI18N
         }
     }
     
     private void reset()
     {
-        if(logger.isDebugEnabled())logger.debug("resetting progress panel");
+        if(logger.isDebugEnabled())logger.debug("resetting progress panel");//NOI18N
         progressBar.setMinimum(0);
         progressBar.setMaximum(progressObserver.getMaxProgress());
         progressBar.setValue(0);
@@ -128,24 +126,24 @@ public class ProgressPanel extends javax.swing.JPanel
     
     protected void interrupted()
     {
-        logger.warn("progress observer interrupted");
+        logger.warn("progress observer interrupted");//NOI18N
         progressBar.setIndeterminate(false);
         progressTimer.stop();
         this.setProgress();
         setLocked(false);
         
-        propertyChangeSupport.firePropertyChange("interrupted", new Boolean(false), new Boolean(true));
+        propertyChangeSupport.firePropertyChange("interrupted", new Boolean(false), new Boolean(true));//NOI18N
     }
     
     protected void finished()
     {
-        if(logger.isDebugEnabled())logger.debug("progress observer finished");
+        if(logger.isDebugEnabled())logger.debug("progress observer finished");//NOI18N
         progressBar.setIndeterminate(false);
         progressTimer.stop();
         this.setProgress();
         setLocked(false);
         
-        propertyChangeSupport.firePropertyChange("finished", new Boolean(false), new Boolean(true));
+        propertyChangeSupport.firePropertyChange("finished", new Boolean(false), new Boolean(true));//NOI18N
     }
     
     protected void setProgress()
@@ -205,7 +203,7 @@ public class ProgressPanel extends javax.swing.JPanel
         progressPanel.add(progressBar, gridBagConstraints);
 
         progressLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        progressLabel.setText(I18N.getString("Sirius.navigator.ui.progress.ProgressPanel.progressLabel.initialText")); // NOI18N
+        progressLabel.setText(org.openide.util.NbBundle.getMessage(ProgressPanel.class, "ProgressPanel.progressLabel.initialText")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -224,7 +222,7 @@ public class ProgressPanel extends javax.swing.JPanel
 
         buttonPanel.setLayout(new java.awt.GridLayout(1, 1, 5, 0));
 
-        restartButton.setText(I18N.getString("Sirius.navigator.ui.progress.ProgressPanel.restartButton.text")); // NOI18N
+        restartButton.setText(org.openide.util.NbBundle.getMessage(ProgressPanel.class, "ProgressPanel.restartButton.text")); // NOI18N
         restartButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 restartButtonActionPerformed(evt);
@@ -232,7 +230,7 @@ public class ProgressPanel extends javax.swing.JPanel
         });
         buttonPanel.add(restartButton);
 
-        cancelButton.setText(I18N.getString("Sirius.navigator.ui.progress.ProgressPanel.cancelButton.text")); // NOI18N
+        cancelButton.setText(org.openide.util.NbBundle.getMessage(ProgressPanel.class, "ProgressPanel.cancelButton.text")); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cancelButtonActionPerformed(evt);
@@ -247,7 +245,7 @@ public class ProgressPanel extends javax.swing.JPanel
         add(buttonPanel, gridBagConstraints);
 
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        titleLabel.setText(I18N.getString("Sirius.navigator.ui.progress.ProgressPanel.titleLabel.text")); // NOI18N
+        titleLabel.setText(org.openide.util.NbBundle.getMessage(ProgressPanel.class, "ProgressPanel.titleLabel.text")); // NOI18N
         titleLabel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         titleLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -261,35 +259,35 @@ public class ProgressPanel extends javax.swing.JPanel
 
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cancelButtonActionPerformed
     {//GEN-HEADEREND:event_cancelButtonActionPerformed
-        if(logger.isDebugEnabled())logger.debug("interrupting progess observer");
+        if(logger.isDebugEnabled())logger.debug("interrupting progess observer");//NOI18N
         if(isLocked())
         {
             progressTimer.stop();
-            progressLabel.setText(I18N.getString("Sirius.navigator.ui.progress.ProgressPanel.progressLabel.canceldText"));
+            progressLabel.setText(org.openide.util.NbBundle.getMessage(ProgressPanel.class, "ProgressPanel.progressLabel.canceldText"));//NOI18N
             progressBar.setValue(progressObserver.getProgress());
             //progressBar.setString(progressObserver.getPercentage() + "%");
             progressObserver.setInterrupted(true);
         }
         else
         {
-            logger.warn("can not cancel: progress panel is not locked (" + isLocked() + ") or progress timer is not running (" + progressTimer.isRunning() + ")");
+            logger.warn("can not cancel: progress panel is not locked (" + isLocked() + ") or progress timer is not running (" + progressTimer.isRunning() + ")");//NOI18N
         }
     }//GEN-LAST:event_cancelButtonActionPerformed
 
     private void restartButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_restartButtonActionPerformed
     {//GEN-HEADEREND:event_restartButtonActionPerformed
-        if(logger.isDebugEnabled())logger.debug("restarting progess observer");
+        if(logger.isDebugEnabled())logger.debug("restarting progess observer");//NOI18N
         if(isLocked())
         {
             progressTimer.stop();
-            progressLabel.setText("");
+            progressLabel.setText("");//NOI18N
             progressBar.setValue(0);
             progressBar.setString(null);
             progressObserver.setInterrupted(true);
         }
         else
         {
-            logger.warn("can not cancel: progress panel is not locked (" + isLocked() + ") or progress timer is not running (" + progressTimer.isRunning() + ")");
+            logger.warn("can not cancel: progress panel is not locked (" + isLocked() + ") or progress timer is not running (" + progressTimer.isRunning() + ")");//NOI18N
         }
     }//GEN-LAST:event_restartButtonActionPerformed
     

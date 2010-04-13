@@ -34,14 +34,12 @@
 
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import java.util.ResourceBundle;
 
 /**
  *
  * @author  thorsten.hell@cismet.de
  */
 public class AdressenEditor extends DefaultComplexMetaAttributeEditor {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     /**
      * Creates new form AdressenEditor 
@@ -66,9 +64,9 @@ public class AdressenEditor extends DefaultComplexMetaAttributeEditor {
 
         panTitle.setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setFont(new java.awt.Font("MS Sans Serif", 0, 48));
+        jLabel1.setFont(new java.awt.Font("MS Sans Serif", 0, 48)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/ui/attributes/editor/metaobject/haus.png"))); // NOI18N
-        jLabel1.setText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.AdressenEditor.jLabel1.text")); // NOI18N
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(AdressenEditor.class, "AdressenEditor.jLabel1.text")); // NOI18N
         panTitle.add(jLabel1, java.awt.BorderLayout.CENTER);
 
         setLayout(new java.awt.BorderLayout());

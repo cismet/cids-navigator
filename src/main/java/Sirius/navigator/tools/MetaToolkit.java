@@ -61,7 +61,7 @@ public class MetaToolkit
         
         currentGroup.enumerate(listOfThreads);
         for (int i = 0; i < numThreads; i++)
-            System.out.println("Thread #" + i + " = " + listOfThreads[i].getName());
+            System.out.println("Thread #" + i + " = " + listOfThreads[i].getName());//NOI18N
     }
     
     

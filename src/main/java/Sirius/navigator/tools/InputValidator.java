@@ -35,11 +35,11 @@ import javax.swing.text.*;
 */
 public class InputValidator extends PlainDocument
 {
-	public static final String LOWERCASE  = "abcdefghijklmnopqrstuvwxyz\u00E4\u00F6\u00FC\u00DF";
-	public static final String UPPERCASE  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\u00C4\u00D6\u00DC";
+	public static final String LOWERCASE  = "abcdefghijklmnopqrstuvwxyz\u00E4\u00F6\u00FC\u00DF";//NOI18N
+	public static final String UPPERCASE  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ\u00C4\u00D6\u00DC";//NOI18N
 	public static final String ALPHA   = LOWERCASE + UPPERCASE;
 	public static final String STREET   = LOWERCASE + UPPERCASE + '.';
-	public static final String NUMERIC = "0123456789";
+	public static final String NUMERIC = "0123456789";//NOI18N
 	public static final String FLOAT = NUMERIC + '.';
 	public static final String COORDINATE = NUMERIC + ',';
 	public static final String ALPHA_NUMERIC = ALPHA + NUMERIC;
@@ -64,7 +64,7 @@ public class InputValidator extends PlainDocument
 		if (acceptedChars.equals(NUMERIC) || acceptedChars.equals(FLOAT) || acceptedChars.equals(ALPHA_NUMERIC))
 		{
 			negativeAccepted = negativeaccepted;
-			acceptedChars += "-";
+			acceptedChars += "-";//NOI18N
 		}
 	}
 
@@ -89,14 +89,14 @@ public class InputValidator extends PlainDocument
 				return;
 		}
 
-		if (acceptedChars.equals(FLOAT) || (acceptedChars.equals(FLOAT + "-") && negativeAccepted))
+		if (acceptedChars.equals(FLOAT) || (acceptedChars.equals(FLOAT + "-") && negativeAccepted))//NOI18N
 		{
-			if (str.indexOf(".")  != -1)
+			if (str.indexOf(".")  != -1)//NOI18N
 			{
 				if(getLength() == 0)
 					return;
 
-				if (getText(0, getLength()).indexOf(".") != -1)
+				if (getText(0, getLength()).indexOf(".") != -1)//NOI18N
 					return;
 			}
 		}
@@ -105,7 +105,7 @@ public class InputValidator extends PlainDocument
 		if (acceptedChars.equals(COORDINATE))
 		{
 
-			if (str.indexOf(",")  != -1)
+			if (str.indexOf(",")  != -1)//NOI18N
 			{
 				if(getLength() == 0)
 					return;
@@ -129,9 +129,9 @@ public class InputValidator extends PlainDocument
 			}
 		}
 
-		if (negativeAccepted && str.indexOf("-") != -1)
+		if (negativeAccepted && str.indexOf("-") != -1)//NOI18N
 		{
-			if (str.indexOf("-") != 0 || offset != 0 )
+			if (str.indexOf("-") != 0 || offset != 0 )//NOI18N
 				return;
 
 	   	}

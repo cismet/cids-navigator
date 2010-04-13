@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
  * @author  pascal
  */
 public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     private DateFormat dateFormat;
     private DateChooser dateChooser;
@@ -44,7 +43,7 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
         this.simpleValueField.addFocusListener(valueChangeListener);
         this.simpleValueField.addActionListener(valueChangeListener);
 
-        this.dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        this.dateFormat = new SimpleDateFormat("dd.MM.yyyy");//NOI18N
         this.dateChooser = new DateChooser();
 
         this.complexEditorButton.setPreferredSize(new Dimension(this.simpleValueField.getPreferredSize().height, this.complexEditorButton.getPreferredSize().width));
@@ -74,7 +73,7 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
         gridBagConstraints.weightx = 1.0;
         add(simpleValueField, gridBagConstraints);
 
-        complexEditorButton.setText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleDateMetaAttributeEditor.complexEditorButton.text")); // NOI18N
+        complexEditorButton.setText(org.openide.util.NbBundle.getMessage(SimpleDateMetaAttributeEditor.class, "SimpleDateMetaAttributeEditor.complexEditorButton.text")); // NOI18N
         complexEditorButton.setActionCommand(AbstractSimpleEditor.SimpleEditorActivationDelegate.SHOW_UI_COMMAND);
         complexEditorButton.setMargin(new java.awt.Insets(1, 1, 1, 1));
         complexEditorButton.setMaximumSize(new java.awt.Dimension(0, 0));
@@ -94,14 +93,14 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
     {//GEN-HEADEREND:event_complexEditorButtonActionPerformed
         // TODO add your handling code here:
 
-        logger.debug("complexEditorButtonActionPerformed");
+        logger.debug("complexEditorButtonActionPerformed");//NOI18N
         this.dateChooser.pack();
         this.dateChooser.setLocationRelativeTo(this);
         Object object = this.getAttributeValue(this.getValue());
 
         if (object != null && object instanceof Date) {
             if (logger.isDebugEnabled()) {
-                logger.debug("showing date chooser with date " + this.dateFormat.format(object));
+                logger.debug("showing date chooser with date " + this.dateFormat.format(object));//NOI18N
             }
             this.dateChooser.show((Date) object);
         } else {
@@ -151,8 +150,9 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
         DateFormat shortDF = DateFormat.getDateInstance(DateFormat.SHORT);
         DateFormat mediumDF=DateFormat.getDateInstance(DateFormat.MEDIUM);
         protected Object getNewValue() {
-            logger.debug("getNewValue:" + simpleValueField.getText());
-
+            if (logger.isDebugEnabled()) {
+                logger.debug("getNewValue:" + simpleValueField.getText());//NOI18N
+            }
             String textValue = simpleValueField.getText();
             if (textValue != null && textValue.length() == 0) {
                 setValue(null);

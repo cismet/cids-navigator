@@ -32,12 +32,9 @@ import java.util.*;
 import org.apache.log4j.Logger;
 
 
-import Sirius.navigator.resource.*;
-
 public class StringChooser extends JDialog //implements ActionListener
 {
     protected final static Logger logger = Logger.getLogger(StringChooser.class);
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     protected JList stringList;
     protected JButton buttonAccept, buttonCancel;
@@ -82,7 +79,6 @@ public class StringChooser extends JDialog //implements ActionListener
     protected void init()
     {
         ActionListener actionListener = new ButtonListener();
-        ResourceManager resources = ResourceManager.getManager();
         
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         JPanel contentPane = new JPanel(new GridBagLayout());
@@ -121,10 +117,10 @@ public class StringChooser extends JDialog //implements ActionListener
         gbc.weighty = 0.1;
         //_TA_buttonAccept = new JButton("Uebernehmen");
         //buttonAccept = new JButton(StringLoader.getString("STL@takeOn"));
-        buttonAccept = new JButton(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonAccept.text"));
-        buttonAccept.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonAccept.mnemonic").charAt(0));
-        buttonAccept.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonAccept.tooltip"));
-        buttonAccept.setActionCommand("accept");
+        buttonAccept = new JButton(org.openide.util.NbBundle.getMessage(StringChooser.class, "StringChooser.buttonAccept.text"));//NOI18N
+        buttonAccept.setMnemonic(org.openide.util.NbBundle.getMessage(StringChooser.class, "StringChooser.buttonAccept.mnemonic").charAt(0));//NOI18N
+        buttonAccept.setToolTipText(org.openide.util.NbBundle.getMessage(StringChooser.class, "StringChooser.buttonAccept.tooltip"));//NOI18N
+        buttonAccept.setActionCommand("accept");//NOI18N
         buttonAccept.addActionListener(actionListener);
         contentPane.add(buttonAccept, gbc);
         
@@ -132,10 +128,10 @@ public class StringChooser extends JDialog //implements ActionListener
         gbc.gridx++;
         //_TA_buttonCancel = new JButton("Abbrechen");
         //buttonCancel = new JButton(StringLoader.getString("STL@cancel"));
-        buttonCancel = new JButton(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonCancel.text"));
-        buttonCancel.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonCancel.mnemonic").charAt(0));
-        buttonCancel.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.StringChooser.buttonCancel.tooltip"));
-        buttonCancel.setActionCommand("cancel");
+        buttonCancel = new JButton(org.openide.util.NbBundle.getMessage(StringChooser.class, "StringChooser.buttonCancel.text"));//NOI18N
+        buttonCancel.setMnemonic(org.openide.util.NbBundle.getMessage(StringChooser.class, "StringChooser.buttonCancel.mnemonic").charAt(0));//NOI18N
+        buttonCancel.setToolTipText(org.openide.util.NbBundle.getMessage(StringChooser.class, "StringChooser.buttonCancel.tooltip"));//NOI18N
+        buttonCancel.setActionCommand("cancel");//NOI18N
         buttonCancel.addActionListener(actionListener);
         contentPane.add(buttonCancel, gbc);
         
@@ -194,7 +190,7 @@ public class StringChooser extends JDialog //implements ActionListener
     
     public void setSelectedString(String selectedString)
     {
-         if(logger.isDebugEnabled())logger.debug("selecting string '" + selectedString + "'");
+         if(logger.isDebugEnabled())logger.debug("selecting string '" + selectedString + "'");//NOI18N
          if(((DefaultListModel)stringList.getModel()).indexOf(selectedString) != -1)
          {
             stringList.setSelectedValue(selectedString, true);
@@ -205,7 +201,7 @@ public class StringChooser extends JDialog //implements ActionListener
          {
              accepted = false;
              this.selectedString = null;
-             logger.warn("string '" + selectedString + "' not found in list");
+             logger.warn("string '" + selectedString + "' not found in list");//NOI18N
          }   
     }
     
@@ -228,7 +224,7 @@ public class StringChooser extends JDialog //implements ActionListener
     {
         public void actionPerformed(ActionEvent e)
         {
-            if(e.getActionCommand().equals("accept"))
+            if(e.getActionCommand().equals("accept"))//NOI18N
             {
                 if(!stringList.isSelectionEmpty()) // && (String)stringList.getSelectedValue() != naMessage)
                 {
@@ -239,14 +235,14 @@ public class StringChooser extends JDialog //implements ActionListener
                 else
                 {
                     //if(logger.isDebugEnabled())logger.debug("unavailable string '" + naMessage + "' or nothing selected");
-                    if(logger.isDebugEnabled())logger.debug("nothing selected");
+                    if(logger.isDebugEnabled())logger.debug("nothing selected");//NOI18N
                     accepted = false;
                     selectedString = null;
                 }
 
                 dispose();
             }
-            else if(e.getActionCommand().equals("cancel"))
+            else if(e.getActionCommand().equals("cancel"))//NOI18N
             {
                 accepted = false;
                 selectedString = null;

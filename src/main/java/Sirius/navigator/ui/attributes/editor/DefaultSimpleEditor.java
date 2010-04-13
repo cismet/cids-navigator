@@ -6,7 +6,6 @@
 
 package Sirius.navigator.ui.attributes.editor;
 
-import java.util.ResourceBundle;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -21,7 +20,6 @@ import org.apache.log4j.Logger;
  */
 public class DefaultSimpleEditor extends AbstractSimpleEditor //javax.swing.JPanel
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     /** Creates new form DefaultSimpleEditor */
     public DefaultSimpleEditor()
@@ -53,7 +51,7 @@ public class DefaultSimpleEditor extends AbstractSimpleEditor //javax.swing.JPan
         gridBagConstraints.weightx = 1.0;
         add(simpleValueField, gridBagConstraints);
 
-        complexEditorButton.setText(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultSimpleEditor.complexEditorButton.text")); // NOI18N
+        complexEditorButton.setText(org.openide.util.NbBundle.getMessage(DefaultSimpleEditor.class, "DefaultSimpleEditor.complexEditorButton.text")); // NOI18N
         complexEditorButton.setActionCommand(AbstractSimpleEditor.SimpleEditorActivationDelegate.SHOW_UI_COMMAND);
         complexEditorButton.setEnabled(false);
         complexEditorButton.setMargin(new java.awt.Insets(1, 1, 1, 1));
@@ -101,7 +99,7 @@ public class DefaultSimpleEditor extends AbstractSimpleEditor //javax.swing.JPan
         }
         else if(logger.isDebugEnabled())
         {
-            logger.debug("initUI(" + this.getId() + "): ui already initialized");
+            logger.debug("initUI(" + this.getId() + "): ui already initialized");//NOI18N
         }
         
         this.simpleValueField.setEditable(!this.readOnly);
@@ -114,7 +112,7 @@ public class DefaultSimpleEditor extends AbstractSimpleEditor //javax.swing.JPan
      */
     public boolean isEditable(java.util.EventObject anEvent)
     {
-        return this.simpleValueField.isEnabled() | (this.complexEditorButton != null && this.complexEditorButton.isEnabled());
+        return this.simpleValueField.isEnabled() | (this.complexEditorButton != null && this.complexEditorButton.isEnabled());//NOI18N
     }
     
     protected Object getComponentValue()

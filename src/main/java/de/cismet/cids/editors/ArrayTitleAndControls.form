@@ -98,7 +98,7 @@
             <Component class="javax.swing.JLabel" name="lblTitle">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="de.cismet.cids.editors.ArrayTitleAndControls.lblTitle.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cismet/cids/editors/Bundle.properties" key="ArrayTitleAndControls.lblTitle.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Constraints>

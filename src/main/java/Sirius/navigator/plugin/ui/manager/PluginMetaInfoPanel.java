@@ -7,7 +7,6 @@
 package Sirius.navigator.plugin.ui.manager;
 
 import java.awt.*;
-import java.util.ResourceBundle;
 import javax.swing.*;
 
 import Sirius.navigator.resource.*;
@@ -18,7 +17,6 @@ import Sirius.navigator.plugin.*;
  * @author  Peter Alzheimer
  */
 public class PluginMetaInfoPanel extends javax.swing.JPanel {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     /** Creates new form PluginMetaInfoPanel */
     public PluginMetaInfoPanel() 
@@ -28,7 +26,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
     
     public void setPluginDescription(PluginMetaInfo metaInfo)
     {
-        titleLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.titleLabel.defaulttext"));
+        titleLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.titleLabel.defaulttext"));//NOI18N
         
         nameField.setText(metaInfo.getName());
         nameField.setEnabled(true);
@@ -60,7 +58,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
     public void setMethodDescription(PluginMethodDescriptor methodDescriptor)
     {
         this.clear();
-        titleLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.setMethodDescription().titleLabel.text"));
+        titleLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.setMethodDescription(PluginMethodDescriptor).titleLabel.text"));//NOI18N
         
         nameField.setText(methodDescriptor.getName());
         nameField.setEnabled(true);
@@ -73,7 +71,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
     
     protected void clear()
     {
-        titleLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.titleLabel.defaulttext"));
+        titleLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.titleLabel.defaulttext"));//NOI18N
         
         nameField.setText(null);
         nameField.setEnabled(false);
@@ -149,7 +147,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
 
         titleLabel.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
         titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        titleLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.titleLabel.defaulttext")); // NOI18N
+        titleLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.titleLabel.defaulttext")); // NOI18N
         titleLabel.setAlignmentX(0.5F);
         titleLabel.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         titleLabel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -165,7 +163,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(titleLabel, gridBagConstraints);
 
         nameLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        nameLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.nameLabel.text")); // NOI18N
+        nameLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.nameLabel.text")); // NOI18N
         nameLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -174,7 +172,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(nameLabel, gridBagConstraints);
 
         versionLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        versionLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.versionLabel.text")); // NOI18N
+        versionLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.versionLabel.text")); // NOI18N
         versionLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -183,7 +181,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(versionLabel, gridBagConstraints);
 
         authorLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        authorLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.authorLabel.text")); // NOI18N
+        authorLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.authorLabel.text")); // NOI18N
         authorLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -192,7 +190,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(authorLabel, gridBagConstraints);
 
         copyrightLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        copyrightLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.copyrightLabel.text")); // NOI18N
+        copyrightLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.copyrightLabel.text")); // NOI18N
         copyrightLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -201,7 +199,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(copyrightLabel, gridBagConstraints);
 
         companyLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        companyLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.companyLabel.text")); // NOI18N
+        companyLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.companyLabel.text")); // NOI18N
         companyLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -210,7 +208,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(companyLabel, gridBagConstraints);
 
         contactLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        contactLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.contactLabel.text")); // NOI18N
+        contactLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.contactLabel.text")); // NOI18N
         contactLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -219,7 +217,7 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         add(contactLabel, gridBagConstraints);
 
         homepageLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        homepageLabel.setText(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.homepageLabel.text")); // NOI18N
+        homepageLabel.setText(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.homepageLabel.text")); // NOI18N
         homepageLabel.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -227,7 +225,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         add(homepageLabel, gridBagConstraints);
 
-        nameField.setAutoscrolls(false);
         nameField.setEnabled(false);
         nameField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -237,7 +234,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(nameField, gridBagConstraints);
 
-        versionField.setAutoscrolls(false);
         versionField.setEnabled(false);
         versionField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -247,7 +243,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(versionField, gridBagConstraints);
 
-        authorField.setAutoscrolls(false);
         authorField.setEnabled(false);
         authorField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -257,7 +252,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(authorField, gridBagConstraints);
 
-        copyrightField.setAutoscrolls(false);
         copyrightField.setEnabled(false);
         copyrightField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -267,7 +261,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(copyrightField, gridBagConstraints);
 
-        companyField.setAutoscrolls(false);
         companyField.setEnabled(false);
         companyField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -277,7 +270,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(companyField, gridBagConstraints);
 
-        contactField.setAutoscrolls(false);
         contactField.setEnabled(false);
         contactField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -287,7 +279,6 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(contactField, gridBagConstraints);
 
-        homepageField.setAutoscrolls(false);
         homepageField.setEnabled(false);
         homepageField.setMargin(new java.awt.Insets(2, 2, 2, 2));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -297,14 +288,13 @@ public class PluginMetaInfoPanel extends javax.swing.JPanel {
         gridBagConstraints.insets = new java.awt.Insets(4, 10, 4, 10);
         add(homepageField, gridBagConstraints);
 
-        descriptionPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginMetaInfoPanel.descriptionPanel.title")), javax.swing.BorderFactory.createEmptyBorder(1, 2, 2, 2)));
+        descriptionPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createTitledBorder(org.openide.util.NbBundle.getMessage(PluginMetaInfoPanel.class, "PluginMetaInfoPanel.descriptionPanel.title")), javax.swing.BorderFactory.createEmptyBorder(1, 2, 2, 2))); // NOI18N
         descriptionPanel.setPreferredSize(new java.awt.Dimension(450, 125));
         descriptionPanel.setLayout(new java.awt.GridLayout(1, 1));
 
         descriptionArea.setEditable(false);
         descriptionArea.setLineWrap(true);
         descriptionArea.setWrapStyleWord(true);
-        descriptionArea.setAutoscrolls(false);
         descriptionArea.setMargin(new java.awt.Insets(2, 2, 2, 2));
         scrollPane.setViewportView(descriptionArea);
 

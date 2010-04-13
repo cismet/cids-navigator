@@ -41,7 +41,6 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     
     private final DefaultStatusChangeSupport statusChangeSupport;
     private final ResourceManager resources;
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     
     
@@ -51,11 +50,12 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         //super(parent, ResourceManager.getManager().getString("search.dialog.title"), true);
         
         // nicht modal
-        super(parent, I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.title"), false);
+        super(parent, org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.title"), false);//NOI18N
         
         this.logger = Logger.getLogger(this.getClass());
-        logger.info("creating SearchDialog with " + searchOptionsMap.size() + " queries & " + classNodes.length + " class nodes");
-        
+        if (logger.isInfoEnabled()) {
+            logger.info("creating SearchDialog with " + searchOptionsMap.size() + " queries & " + classNodes.length + " class nodes");//NOI18N
+        }
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
         this.resources = ResourceManager.getManager();
         
@@ -107,23 +107,23 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             
             if(searchResult != null && searchResult.isNode() && searchResult.getNodes().length > 0)
             {
-                if(logger.isDebugEnabled())logger.debug("showing search results in search results tree");
+                if(logger.isDebugEnabled())logger.debug("showing search results in search results tree");//NOI18N
                 // XXX event w\u00E4re besser ...
                 MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults);
                 SearchDialog.this.dispose();
             }
             else
             {
-                if(logger.isDebugEnabled())logger.warn("could not show search results in search results tree: no result available");
+                if(logger.isDebugEnabled())logger.warn("could not show search results in search results tree: no result available");//NOI18N
                 JOptionPane.showMessageDialog(this,
-                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()2.noresultsErrorDialog.message"),
-                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()2.noresultsErrorDialog.title"),
+                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(FormDataBean,Component,boolean).noresultsErrorDialog.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(FormDataBean,Component,boolean).noresultsErrorDialog.title"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
             }
         }
         catch(Exception exp)
         {
-            logger.fatal("could not show search results", exp);
+            logger.fatal("could not show search results", exp);//NOI18N
             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, this.resources.getExceptionName("sx02"), this.resources.getExceptionMessage("sx02"), exp);
         } 
     }
@@ -141,23 +141,23 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             
             if(searchResult != null && searchResult.isNode() && searchResult.getNodes().length > 0)
             {
-                if(logger.isDebugEnabled())logger.debug("showing search results in search results tree");
+                if(logger.isDebugEnabled())logger.debug("showing search results in search results tree");//NOI18N
                 // XXX event w\u00E4re besser ...
                 MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults);
                 SearchDialog.this.dispose();
             }
             else
             {
-                if(logger.isDebugEnabled())logger.warn("could not show search results in search results tree: no result available");
+                if(logger.isDebugEnabled())logger.warn("could not show search results in search results tree: no result available");//NOI18N
                 JOptionPane.showMessageDialog(this,
-                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()4.noresultsErrorDialog.message"),
-                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.search()4.noresultsErrorDialog.title"),
+                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(Collection,Collection,Component,boolean).noresultsErrorDialog.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(Collection,Collection,Component,boolean).noresultsErrorDialog.title"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
             }
         }
         catch(Exception exp)
         {
-            logger.fatal("could not show search results", exp);
+            logger.fatal("could not show search results", exp);//NOI18N
             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, this.resources.getExceptionName("sx02"), this.resources.getExceptionMessage("sx02"), exp);
         } 
     }
@@ -180,12 +180,12 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                 }
                 else if(logger.isDebugEnabled())
                 {
-                    logger.debug("search canceld, don't do anything");
+                    logger.debug("search canceld, don't do anything");//NOI18N
                 }
             }
             else
             {
-                logger.warn("could not perform search: incomplete data");
+                logger.warn("could not perform search: incomplete data");//NOI18N
             }
         }
         catch(FormValidationException fvexp)
@@ -218,12 +218,12 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                 }
                 else if(logger.isDebugEnabled())
                 {
-                    logger.debug("search canceld, don't do anything");
+                    logger.debug("search canceld, don't do anything");//NOI18N
                 }
             }
             else
             {
-                logger.warn("could not perform search: incomplete data");
+                logger.warn("could not perform search: incomplete data");//NOI18N
             }
         }
         catch(FormValidationException fvexp)
@@ -280,7 +280,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         //java.util.List searchFormData = this.getSelectedFormData();
         LinkedList searchOptionsList = new LinkedList();
         
-        if(logger.isDebugEnabled())logger.debug("filling " + searchFormData.size() + " search option objects with data");
+        if(logger.isDebugEnabled())logger.debug("filling " + searchFormData.size() + " search option objects with data");//NOI18N
         Iterator iterator = searchFormData.iterator();
         while(iterator.hasNext())
         {
@@ -289,7 +289,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
            
            if(logger.isDebugEnabled())
            {
-               logger.info("filling search option '" + dataBean.getQueryId() + "' with data");
+               logger.info("filling search option '" + dataBean.getQueryId() + "' with data");//NOI18N
                logger.debug(dataBean.toString());
            }
            
@@ -297,9 +297,8 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
            if(searchOption == null)
            {
                 throw new FormValidationException(dataBean.getFormId(),
-                        new StringBuffer(
-                        I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.fillSearchOptions().FormValidationException.message")).
-                        append(" '").append(dataBean.getQueryId()).append("'.").toString());
+                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.fillSearchOptions(Collection).FormValidationException.message", //NOI18N
+                        new Object[]{dataBean.getQueryId()}));
            }
            
            try
@@ -310,7 +309,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                    String parameterName = parameterIterator.next().toString();
                    Object parameterValue = dataBean.getQueryParameter(parameterName);
                    
-                   if(logger.isDebugEnabled())logger.debug("parameterName: '" + parameterName + "' parameterValue: '" + parameterValue + "'");
+                   if(logger.isDebugEnabled())logger.debug("parameterName: '" + parameterName + "' parameterValue: '" + parameterValue + "'");//NOI18N
                    searchOption.setDefaultSearchParameter(parameterName, parameterValue);
                }
                
@@ -322,10 +321,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
            }
            catch(Exception exp)
            {
-               logger.error("could not set query parameters", exp);
+               logger.error("could not set query parameters", exp);//NOI18N
                
                // TODO more info
-               throw new FormValidationException("could not set query parameters",exp.getMessage(),exp.getMessage());
+               throw new FormValidationException("could not set query parameters",exp.getMessage(),exp.getMessage());//NOI18N
            }
         }
 
@@ -336,20 +335,20 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     
     private void loadSearchForms()
     {
-        logger.info("loading dynamic search categories & forms ...");
+        logger.info("loading dynamic search categories & forms ...");//NOI18N
         
         SearchContext searchContext = new SearchContext(this);
         SearchFormFactory formFactory = new SearchFormFactory();
         
         try
         {
-            java.util.List searchCategories = formFactory.createSearchForms(PropertyManager.getManager().getSearchFormPath(), "search.xml", searchContext);
-            logger.info(searchCategories.size() + " search categories loaded");
+            java.util.List searchCategories = formFactory.createSearchForms(PropertyManager.getManager().getSearchFormPath(), "search.xml", searchContext);//NOI18N
+            logger.info(searchCategories.size() + " search categories loaded");//NOI18N
             this.searchFormManager.setSearchFormContainers(searchCategories);
         }
         catch(Exception exp)
         {
-            logger.fatal("could create dynmaic search categories & forms", exp);
+            logger.fatal("could create dynmaic search categories & forms", exp);//NOI18N
             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, this.resources.getExceptionName("sx01"), this.resources.getExceptionMessage("sx01"), exp);
         }
     }
@@ -371,7 +370,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
      */
     public void setSearchProperties(SearchPropertiesBean searchProperties)
     {
-        logger.info("loading search properties");
+        logger.info("loading search properties");//NOI18N
         Collection userGroups = new LinkedList();
         userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
 
@@ -390,7 +389,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
      */
     public SearchPropertiesBean getSearchProperties() throws FormValidationException
     {
-        logger.info("saving search properties");
+        logger.info("saving search properties");//NOI18N
         
         SearchPropertiesBean searchProperties = new SearchPropertiesBean();
         searchProperties.setFormDataBeans(this.searchFormManager.getSelectedFormData());
@@ -436,10 +435,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         if(selectedSearchOptions != null && selectedSearchOptions.size() == 0)
         {
             // XXX show error dialog
-            logger.warn("incomplete search data: no formData available");
+            logger.warn("incomplete search data: no formData available");//NOI18N
             JOptionPane.showMessageDialog(this,
-                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()1.messageDialog.message"),
-                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()1.messageDialog.title"),
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.checkCompleteness(Collection).messageDialog.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.checkCompleteness(Collection).messageDialog.title"),//NOI18N
                     JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -451,10 +450,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     {
         if(selectedClassNodeKeys != null && selectedClassNodeKeys.size() == 0)
         {
-            logger.warn("incomplete search data: no class nodes selected");
+            logger.warn("incomplete search data: no class nodes selected");//NOI18N
             JOptionPane.showMessageDialog(this,
-                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()2.messageDialog.message"),
-                    I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.checkCompleteness()2.messageDialog.title"),
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.checkCompleteness(Collection,Collection).messageDialog.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.checkCompleteness(Collection,Collection).messageDialog.title"),//NOI18N
                     JOptionPane.ERROR_MESSAGE);
             return false;
         } 
@@ -468,9 +467,9 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     {
         public void actionPerformed(ActionEvent e)
         {
-            if(logger.isDebugEnabled())logger.debug("performing action '" + e.getActionCommand() + "'");
+            if(logger.isDebugEnabled())logger.debug("performing action '" + e.getActionCommand() + "'");//NOI18N
             
-            if(e.getActionCommand().equals("search"))
+            if(e.getActionCommand().equals("search"))//NOI18N
             {
                 try
                 {
@@ -485,7 +484,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                     SearchDialog.this.handleFormValidationException(fvexp);
                 }
             }
-            else if(e.getActionCommand().equals("reset"))
+            else if(e.getActionCommand().equals("reset"))//NOI18N
             {
                 // rest dialog
                 
@@ -493,12 +492,12 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                 
                 SearchDialog.this.searchFormManager.resetAllForms();
             }
-            else if(e.getActionCommand().equals("cancel"))
+            else if(e.getActionCommand().equals("cancel"))//NOI18N
             {
                 // close dialog
                 SearchDialog.this.dispose();
             }
-            else if(e.getActionCommand().equals("manageProfiles"))
+            else if(e.getActionCommand().equals("manageProfiles"))//NOI18N
             {
                 // show profiles manager
                 SearchDialog.this.showQueryProfilesManager();
@@ -550,12 +549,14 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                 if(path != null)
                 {
                     DefaultMetaTreeNode node = (DefaultMetaTreeNode)path.getLastPathComponent();
-                    logger.debug("selecting theme (and all subthemes) '" + node + "'");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("selecting theme (and all subthemes) '" + node + "'");//NOI18N
+                    }
                     //logger.debug("node.isSelected(): " + node + "  " + node.isSelected());
                     node.selectSubtree(!node.isSelected());
                     //logger.debug("node.isSelected(): " + node + "  " + node.isSelected());
                     
-                    logger.debug("setting search forms enabled");
+                    logger.debug("setting search forms enabled");//NOI18N
                     Collection userGroups = new LinkedList();
                     userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
                     
@@ -569,7 +570,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                 }
                 else if(logger.isDebugEnabled())
                 {
-                    logger.debug("no class tree nodes selected");
+                    logger.debug("no class tree nodes selected");//NOI18N
                 }
             }
         }
@@ -583,7 +584,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             {
                 if(e.getItem() instanceof SearchForm)
                 {
-                    logger.debug("setting search form enabled");
+                    logger.debug("setting search form enabled");//NOI18N
                     Collection userGroups = new LinkedList();
                     userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
                     
@@ -640,41 +641,41 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         buttonPanel.setLayout(new java.awt.GridLayout(1, 3, 5, 0));
 
-        searchButton.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.mnemonic").charAt(0));
-        searchButton.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.text"));
-        searchButton.setToolTipText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.searchButton.tooltip"));
-        searchButton.setActionCommand("search");
+        searchButton.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.searchButton.mnemonic").charAt(0));
+        searchButton.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.searchButton.text")); // NOI18N
+        searchButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.searchButton.tooltip")); // NOI18N
+        searchButton.setActionCommand("search"); // NOI18N
         buttonPanel.add(searchButton);
 
-        cancelButton.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.mnemonics").charAt(0));
-        cancelButton.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.text"));
-        cancelButton.setToolTipText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.cancelButton.tooltip"));
-        cancelButton.setActionCommand("cancel");
+        cancelButton.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.cancelButton.mnemonic").charAt(0));
+        cancelButton.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.cancelButton.text")); // NOI18N
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.cancelButton.tooltip")); // NOI18N
+        cancelButton.setActionCommand("cancel"); // NOI18N
         buttonPanel.add(cancelButton);
 
-        resetButton.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.mnemonic").charAt(0));
-        resetButton.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.text"));
-        resetButton.setToolTipText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.resetButton.tooltip"));
-        resetButton.setActionCommand("reset");
+        resetButton.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.resetButton.mnemonic").charAt(0));
+        resetButton.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.resetButton.text")); // NOI18N
+        resetButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.resetButton.tooltip")); // NOI18N
+        resetButton.setActionCommand("reset"); // NOI18N
         buttonPanel.add(resetButton);
 
         getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
 
-        profilesMenu.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.mnemonic").charAt(0));
-        profilesMenu.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.text"));
+        profilesMenu.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.profilesMenu.mnemonic").charAt(0));
+        profilesMenu.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.profilesMenu.text")); // NOI18N
 
-        manageProfilesItem.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.mnemonic").charAt(0));
-        manageProfilesItem.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.text"));
+        manageProfilesItem.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.profilesMenu.manageProfilesItem.mnemonic").charAt(0));
+        manageProfilesItem.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.profilesMenu.manageProfilesItem.text")); // NOI18N
         manageProfilesItem.setActionCommand("manageProfiles");
         profilesMenu.add(manageProfilesItem);
 
         menuBar.add(profilesMenu);
 
-        optionsMenu.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.mnemonic").charAt(0));
-        optionsMenu.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.text"));
+        optionsMenu.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.optionsMenu.mnemonic").charAt(0));
+        optionsMenu.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.optionsMenu.text")); // NOI18N
 
-        appendResultsItem.setMnemonic(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.mnemonic").charAt(0));
-        appendResultsItem.setText(I18N.getString("Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.text"));
+        appendResultsItem.setMnemonic(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.optionsMenu.appendResultsItem.mnemonic").charAt(0));
+        appendResultsItem.setText(org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.optionsMenu.appendResultsItem.text")); // NOI18N
         optionsMenu.add(appendResultsItem);
 
         menuBar.add(optionsMenu);

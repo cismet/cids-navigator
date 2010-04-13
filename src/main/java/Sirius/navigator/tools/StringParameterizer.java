@@ -82,7 +82,7 @@ public class StringParameterizer
 	public static String parameterizeString(String string, String[] tokens, String[] values) throws Exception
 	{
 		if(string == null || tokens == null || values == null || (tokens.length != values.length))
-			throw new Exception("# of Tokens and Values is unequal");
+			throw new Exception("# of Tokens and Values is unequal");//NOI18N
 
 		// Hier muss mit String und StringBuffer gearbeitet werden, da StringBuffer
 		// keine Methode indexOf(...) und String kein Methode replace(...) hat. %o|
@@ -94,9 +94,9 @@ public class StringParameterizer
 		for(int i = 0; i < tokens.length; i++)
 		{
 			if(tokens[i] == null) 
-				throw new Exception("Token  is NULL");
+				throw new Exception("Token  is NULL");//NOI18N
                         if( values[i] == null)
-                            throw new Exception("Value is NULL");
+                            throw new Exception("Value is NULL");//NOI18N
 
 			pos = parameterizedString.indexOf(tokens[i]);
 			// NavigatorLogger.printMessage(pos + " : " + tokens[i] + " = " + values[i]);

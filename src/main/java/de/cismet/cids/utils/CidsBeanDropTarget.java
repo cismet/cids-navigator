@@ -27,7 +27,7 @@ public class CidsBeanDropTarget extends AbstractCidsBeanDropTarget {
         if (c instanceof CidsBeanDropListener) {
             dropListener = (CidsBeanDropListener) c;
         } else {
-            throw new IllegalArgumentException("Cosntructor-Parameter has to be a CidsBeanDropListener and a Component");
+            throw new IllegalArgumentException("Cosntructor-Parameter has to be a CidsBeanDropListener and a Component");//NOI18N
         }
     }
 

@@ -26,10 +26,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
             if (metaClass != null && metaClass.getObjectIconData().length > 0) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = resource.getIcon(resource.getString("Sirius.navigator.types.treenode.ObjectTreeNode.nodeIcon"));
+                this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
             }
         } catch (Exception exp) {
-            this.nodeIcon = resource.getIcon(resource.getString("Sirius.navigator.types.treenode.ObjectTreeNode.nodeIcon"));
+            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
         }
 
     }
@@ -45,7 +45,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     // --------------------------------------------------------------------------
     public final synchronized void explore() throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("[ObjectNode] Begin explore()");
+            logger.debug("[ObjectNode] Begin explore()");//NOI18N
         }
 
         if (!isExplored() && !this.getMetaObjectNode().isLeaf()) {
@@ -56,7 +56,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[ObjectNode] End explore()");
+            logger.debug("[ObjectNode] End explore()");//NOI18N
         }
     }
 
@@ -144,15 +144,15 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         if (this.getMetaObjectNode().getObject() == null) {
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("caching object node");
+                    logger.debug("caching object node");//NOI18N
                 }
                 MetaObject metaObject = SessionManager.getProxy().getMetaObject(this.getMetaObjectNode().getObjectId(), this.getMetaObjectNode().getClassId(), this.getMetaObjectNode().getDomain());
                 this.getMetaObjectNode().setObject(metaObject);
-                if (getNode().getName() == null || getNode().getName().equals("NameWirdGeladen")) {
+                if (getNode().getName() == null || getNode().getName().equals("NameWirdGeladen")) {//NOI18N
                     getNode().setName(metaObject.toString());
                 }
             } catch (Throwable t) {
-                logger.error("could not retrieve meta object of node '" + this + "'", t);
+                logger.error("could not retrieve meta object of node '" + this + "'", t);//NOI18N
             }
         }
         return this.getMetaObjectNode().getObject();
@@ -163,7 +163,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      * MetaObjects dieser Node.
      */
     public final void setMetaObject(MetaObject metaObject) {
-        logger.fatal("setting mo from " + getMetaObject() + " to " + metaObject);
+        logger.fatal("setting mo from " + getMetaObject() + " to " + metaObject);//NOI18N
         this.getMetaObjectNode().setObject(metaObject);
         this.setChanged(true);
     }
@@ -176,7 +176,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     }
 
     public String getKey() throws Exception {
-        logger.debug("getkey");
+        logger.debug("getkey");//NOI18N
         return this.getMetaObject().getKey().toString();
     }
 

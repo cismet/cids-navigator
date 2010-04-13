@@ -27,14 +27,18 @@ public final class LAFManager
         
         for(int i = 0; i < lnfinfo.length; i++)
         {
-            logger.debug ("installed look and feel #" + i + ": '" + lnfinfo[i].getName () + "' (" + lnfinfo[i].getClassName () + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug ("installed look and feel #" + i + ": '" + lnfinfo[i].getName () + "' (" + lnfinfo[i].getClassName () + ")");//NOI18N
+            }
             this.installedLookAndFeels.put (lnfinfo[i].getName (), lnfinfo[i]);
         }
-        
-        logger.debug ("- SystemLookAndFeel class: '" + UIManager.getSystemLookAndFeelClassName () + "'");
-        logger.debug ("- CrossPlatformLookAndFeel class: '" + UIManager.getCrossPlatformLookAndFeelClassName () + "'");
-        logger.debug ("- Default look and feel: '" + this.getDefaultLookAndFeel () + "'");
-        logger.debug ("- Current look and feel: '" + UIManager.getLookAndFeel () + "'"); 
+
+        if (logger.isDebugEnabled()) {
+            logger.debug ("- SystemLookAndFeel class: '" + UIManager.getSystemLookAndFeelClassName () + "'");//NOI18N
+            logger.debug ("- CrossPlatformLookAndFeel class: '" + UIManager.getCrossPlatformLookAndFeelClassName () + "'");//NOI18N
+            logger.debug ("- Default look and feel: '" + this.getDefaultLookAndFeel () + "'");//NOI18N
+            logger.debug ("- Current look and feel: '" + UIManager.getLookAndFeel () + "'"); //NOI18N
+        }
     }
     
     public final static LAFManager getManager ()
@@ -77,16 +81,18 @@ public final class LAFManager
         }
         else
         {
-            logger.warn ("could not change look & feel: unknown look and feel '" + lnfName + "'");
+            logger.warn ("could not change look & feel: unknown look and feel '" + lnfName + "'");//NOI18N
             lnfinfo = this.getDefaultLookAndFeel ();
         }
         
         try
         {
-            logger.info ("changing look & feel to '" + lnfinfo + "' (" + lnfinfo.getClassName () + ")");
-            if(lnfinfo.getName ().equalsIgnoreCase ("Plastic 3D"))
+            if (logger.isInfoEnabled()) {
+                logger.info ("changing look & feel to '" + lnfinfo + "' (" + lnfinfo.getClassName () + ")");//NOI18N
+            }
+            if(lnfinfo.getName ().equalsIgnoreCase ("Plastic 3D"))//NOI18N
             {
-                logger.debug ("setting Plastic 3D Theme");
+                logger.debug ("setting Plastic 3D Theme");//NOI18N
                 //com.jgoodies.looks.plastic.Plastic3DLookAndFeel.setMyCurrentTheme (new com.jgoodies.looks.plastic.theme.SkyBluer());
             }
 
@@ -102,7 +108,7 @@ public final class LAFManager
         }
         catch(Throwable t)
         {
-            logger.error ("could not change look to '" + lnfName + "'", t);
+            logger.error ("could not change look to '" + lnfName + "'", t);//NOI18N
             return false;
         }
         
@@ -113,12 +119,12 @@ public final class LAFManager
     {
         try
         {
-            logger.debug ("installing GTK+ Look & Feel");
-            UIManager.installLookAndFeel ("GTK+", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            logger.debug ("installing GTK+ Look & Feel");//NOI18N
+            UIManager.installLookAndFeel ("GTK+", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel");//NOI18N
         }
         catch(Throwable e)
         {
-            logger.warn ("could not install GTK+ & Feel",e);
+            logger.warn ("could not install GTK+ & Feel",e);//NOI18N
         }
         
         try
@@ -127,15 +133,15 @@ public final class LAFManager
             //javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel());
             // javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
             
-            logger.debug ("installing Plastic 3D Look & Feel");
-            UIManager.installLookAndFeel ("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
+            logger.debug ("installing Plastic 3D Look & Feel");//NOI18N
+            UIManager.installLookAndFeel ("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel");//NOI18N
           
             
             //com.jgoodies.looks.plastic.Plastic3DLookAndFeel.setMyCurrentTheme (new com.jgoodies.looks.plastic.theme.SkyBluer());
         }
         catch (Throwable e)
         {
-            logger.warn ("could not install Plastic 3D Look & Feel",e);
+            logger.warn ("could not install Plastic 3D Look & Feel",e);//NOI18N
         }
     }
 }

@@ -34,7 +34,6 @@ import java.util.Calendar;
 import java.util.Vector;
 import java.util.Date;
 import java.text.*;
-import java.util.ResourceBundle;
 
 import Sirius.navigator.resource.ResourceManager;
 
@@ -72,12 +71,11 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
     private ActionListener actionListener = new ButtonListener();
     
     private static final ResourceManager resources = ResourceManager.getManager();
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     public DateChooser()
     {
         this(new JFrame(),
-                I18N.getString("Sirius.navigator.ui.dialog.DateChooser.title"));
+                org.openide.util.NbBundle.getMessage(DateChooser.class, "DateChooser.title"));//NOI18N
     }
     
     /**
@@ -260,11 +258,11 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
         gl.setHgap(10);
         buttons.setLayout(gl);
         
-        acceptButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.DateChooser.acceptButton.title"));
-        acceptButton.setActionCommand("apply");
+        acceptButton = new JButton(org.openide.util.NbBundle.getMessage(DateChooser.class, "DateChooser.acceptButton.title"));//NOI18N
+        acceptButton.setActionCommand("apply");//NOI18N
         acceptButton.addActionListener(actionListener);
-        cancelButton = new JButton(I18N.getString("Sirius.navigator.ui.dialog.DateChooser.cancelButton.title"));
-        cancelButton.setActionCommand("cancel");
+        cancelButton = new JButton(org.openide.util.NbBundle.getMessage(DateChooser.class, "DateChooser.cancelButton.title"));//NOI18N
+        cancelButton.setActionCommand("cancel");//NOI18N
         cancelButton.addActionListener(actionListener);
         
         buttons.add(acceptButton);
@@ -334,7 +332,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
             dayButton.setVerticalAlignment(AbstractButton.CENTER);
             dayButton.setPreferredSize(new Dimension(30,30));
             dayButton.setMargin(new Insets(1, 1, 1, 1));
-            dayButton.setActionCommand("day");
+            dayButton.setActionCommand("day");//NOI18N
             dayButton.addActionListener(actionListener);
             
             dayPanel.add(dayButton, constraints);
@@ -446,7 +444,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
         cal.set(2004, calendarMonth, 1);
         date = cal.getTime();
         
-        SimpleDateFormat dateF =  new SimpleDateFormat("MMMM", resources.getLocale());
+        SimpleDateFormat dateF =  new SimpleDateFormat("MMMM", resources.getLocale());//NOI18N
         //dateF.applyLocalizedPattern("MMMM"); // complete monthname
         
         
@@ -463,7 +461,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
         cal.set(2001, 0, calendarDay);
         date = cal.getTime();
         
-        SimpleDateFormat dateF =  new SimpleDateFormat("E", resources.getLocale());
+        SimpleDateFormat dateF =  new SimpleDateFormat("E", resources.getLocale());//NOI18N
         //dateF.applyLocalizedPattern("DDDD"); // complete monthname
         
         
@@ -562,7 +560,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
     {
         public void actionPerformed(ActionEvent e)
         {
-            if (e.getActionCommand().equals("day"))
+            if (e.getActionCommand().equals("day"))//NOI18N
             {
                 if (e.getSource() instanceof JToggleButton)
                 {
@@ -575,7 +573,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
                     dayPanel.repaint();
                 }
             }
-            else if (e.getActionCommand().equals("cancel"))
+            else if (e.getActionCommand().equals("cancel"))//NOI18N
             {
                 accept = false;
                 //reset();
@@ -584,7 +582,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
                 DateChooser.this.dispose();
                 
             }
-            else if (e.getActionCommand().equals("apply"))
+            else if (e.getActionCommand().equals("apply"))//NOI18N
             {
                 accept = true;
                 DateChooser.this.setVisible(false);
@@ -601,7 +599,7 @@ public class DateChooser extends JDialog //implements ActionListener, ListSelect
     {
         DateChooser dc = new DateChooser();
      
-        ((JSpinner.NumberEditor)dc.yearList.getEditor()).getFormat().applyPattern("#");
+        ((JSpinner.NumberEditor)dc.yearList.getEditor()).getFormat().applyPattern("#");//NOI18N
      
         System.out.println(dc.yearList.getEditor().getClass());
         dc.show();

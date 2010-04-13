@@ -24,7 +24,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ResourceBundle;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractButton;
@@ -43,8 +42,6 @@ import org.jdesktop.swingx.error.ErrorInfo;
  * @author  pascal
  */
 public class NavigatorAttributeEditorGui extends AttributeEditor {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Object treeNode = null;
     private MetaObject backupObject = null;
@@ -56,7 +53,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     public NavigatorAttributeEditorGui() {
         
         initComponents();
-        if (!StaticDebuggingTools.checkHomeForFile("cidsNavigatorGuiHiddenDebugControls")) {
+        if (!StaticDebuggingTools.checkHomeForFile("cidsNavigatorGuiHiddenDebugControls")) {//NOI18N
             panDebug.setVisible(false);
         }
         ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
@@ -78,7 +75,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButtonActionListener.JOptionPane.message"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButtonActionListener.JOptionPane.title"), JOptionPane.YES_NO_CANCEL_OPTION);
+                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, 
+                            org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), //NOI18N
+                            org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"),//NOI18N
+                            JOptionPane.YES_NO_CANCEL_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
                         saveIt();
 
@@ -98,7 +98,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButtonActionListener.JOptionPane.message"), I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButtonActionListener.JOptionPane.title"), JOptionPane.YES_NO_OPTION);
+                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, 
+                            org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().cancelButton.JOptionPane.message"), //NOI18N
+                            org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().cancelButton.JOptionPane.title"), //NOI18N
+                            JOptionPane.YES_NO_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
                         reloadFromDB();
                         clear();
@@ -142,7 +145,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
                 metaCatalogueTree.exploreSubtree(treePath);
             } catch (Exception e) {
-                log.error("Error when refreshing Tree", e);
+                log.error("Error when refreshing Tree", e);//NOI18N
             }
         }
     }
@@ -155,7 +158,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             User user = SessionManager.getSession().getUser();
             backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
         } catch (Exception e) {
-            log.error("Error during Backupcreation. Cannot detect whether the objects is changed.", e);
+            log.error("Error during Backupcreation. Cannot detect whether the objects is changed.", e);//NOI18N
         }
     }
 
@@ -175,14 +178,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             MetaObject reloaded = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
             reloaded.setAllClasses();
-            log.debug("Reloaded MO:" + reloaded.getDebugString());
+            if (log.isDebugEnabled()) {
+                log.debug("Reloaded MO:" + reloaded.getDebugString());//NOI18N
+            }
             otn.setMetaObject(reloaded);
 
             refreshAttributeTable();
         } catch (Exception e) {
-            log.error("Error durig reload from DB.", e);
-            ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.title"),
-                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.message"),
+            log.error("Error durig reload from DB.", e);//NOI18N
+            ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.title"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.reloadFromDB().ErrorInfo.message"),//NOI18N
                     null, null, e, Level.SEVERE, null);
             JXErrorPane.showDialog(this, ei);
         }
@@ -195,11 +200,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             mo.getBean().persist();
             refreshTree();
             JOptionPane jop = new JOptionPane(
-                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.message"),
+                    org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().jop.message"),//NOI18N
                     JOptionPane.INFORMATION_MESSAGE);
 
             final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this,
-                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().successInfo.title"));
+                    org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().dialog.title"));//NOI18N
 
             Timer t = new Timer(900, new ActionListener() {
 
@@ -214,9 +219,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             dialog.setVisible(true);
             clear();
         } catch (Exception ex) {
-            log.error("Error while saving", ex);
-            ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),
-                    I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),
+            log.error("Error while saving", ex);//NOI18N
+            ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),//NOI18N
                     null, null, ex, Level.SEVERE, null);
             JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
         }
@@ -228,8 +233,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         if (treeNode != null && editorObject != null && backupObject != null) {
             if (!editorObject.propertyEquals(backupObject)) {
                 int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this,
-                        I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"),
-                        I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"),
+                        org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"),//NOI18N
                         JOptionPane.YES_NO_CANCEL_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     saveIt();
@@ -278,18 +283,20 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 protected void done() {
                     try {
                         JComponent ed = get();
-                        log.debug("editor:" + ed);
+                        if (log.isDebugEnabled()) {
+                            log.debug("editor:" + ed);//NOI18N
+                        }
                         scpEditor.getViewport().removeAll();
                         scpEditor.getViewport().setView(ed);
                         NavigatorAttributeEditorGui.this.revalidate();
-                        log.debug("editor added");
+                        log.debug("editor added");//NOI18N
                         cancelButton.setEnabled(true);
                         commitButton.setEnabled(true);
                     } catch (Exception e) {
-                        ErrorInfo ei = new ErrorInfo(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.title"),
-                                I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.done().ErrorInfo.message"),
+                        ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.done().ErrorInfo.title"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.done().ErrorInfo.message"),//NOI18N
                                 null, null, e, Level.SEVERE, null);
-                        log.error("Error while displaying Editor" + ei.getState() + editorObject.getDebugString() + "\n", e);
+                        log.error("Error while displaying Editor" + ei.getState() + editorObject.getDebugString() + "\n", e);//NOI18N
                         JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
                         clear();
                     }
@@ -297,7 +304,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             });
 
         } else {
-            log.warn("Given Treenode is not instance of ObjectTreeMode, but: " + node.getClass());
+            log.warn("Given Treenode is not instance of ObjectTreeMode, but: " + node.getClass());//NOI18N
         }
     }
 
@@ -344,8 +351,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         panDebug = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
 
-        pinButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.icon")));
-        pinButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.tooltip"));
+        pinButton.setIcon(resources.getIcon("attr_pin_off.gif"));
+        pinButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.pinButton.tooltip")); // NOI18N
         pinButton.setActionCommand("pin");
         pinButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pinButton.setContentAreaFilled(false);
@@ -353,12 +360,12 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         pinButton.setMaximumSize(new java.awt.Dimension(16, 16));
         pinButton.setMinimumSize(new java.awt.Dimension(16, 16));
         pinButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        pinButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.rolloverIcon")));
-        pinButton.setRolloverSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.rolloverSelectedIcon")));
-        pinButton.setSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.pinButton.selectedIcon")));
+        pinButton.setRolloverIcon(resources.getIcon("attr_pin_off.gif"));
+        pinButton.setRolloverSelectedIcon(resources.getIcon("attr_pin_on.gif"));
+        pinButton.setSelectedIcon(resources.getIcon("attr_pin_on.gif"));
 
-        editButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.icon")));
-        editButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.tooltip"));
+        editButton.setIcon(resources.getIcon("objekt_bearbeiten.gif"));
+        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.editButton.tooltip")); // NOI18N
         editButton.setActionCommand("edit");
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
@@ -366,9 +373,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         editButton.setMaximumSize(new java.awt.Dimension(16, 16));
         editButton.setMinimumSize(new java.awt.Dimension(16, 16));
         editButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        editButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.rolloverIcon")));
-        editButton.setRolloverSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.rolloverSelectedIcon")));
-        editButton.setSelectedIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.editButton.selectedIcon")));
+        editButton.setRolloverIcon(resources.getIcon("objekt_bearbeiten.gif"));
+        editButton.setRolloverSelectedIcon(resources.getIcon("objekt_bearbeiten.gif"));
+        editButton.setSelectedIcon(resources.getIcon("objekt_bearbeiten.gif"));
 
         editorScrollPane.setPreferredSize(new java.awt.Dimension(250, 150));
 
@@ -379,8 +386,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
-        commitButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.icon")));
-        commitButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.tooltip"));
+        commitButton.setIcon(resources.getIcon("save_objekt.gif"));
+        commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.commitButton.tooltip")); // NOI18N
         commitButton.setActionCommand("commit");
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
@@ -389,13 +396,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         commitButton.setMaximumSize(new java.awt.Dimension(16, 16));
         commitButton.setMinimumSize(new java.awt.Dimension(16, 16));
         commitButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        commitButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.commitButton.rolloverIcon")));
+        commitButton.setRolloverIcon(resources.getIcon("save_objekt.gif"));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         controlBar.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.icon")));
-        cancelButton.setToolTipText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.tooltip"));
+        cancelButton.setIcon(resources.getIcon("zurueck_objekt.gif"));
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.cancelButton.tooltip")); // NOI18N
         cancelButton.setActionCommand("cancel");
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
@@ -404,7 +411,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         cancelButton.setMaximumSize(new java.awt.Dimension(16, 16));
         cancelButton.setMinimumSize(new java.awt.Dimension(16, 16));
         cancelButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        cancelButton.setRolloverIcon(resources.getIcon(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.cancelButton.rolloverIcon")));
+        cancelButton.setRolloverIcon(resources.getIcon("zurueck_objekt.gif"));
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
         add(controlBar, java.awt.BorderLayout.NORTH);
@@ -414,7 +421,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         panDebug.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton1.setText(I18N.getString("de.cismet.cids.editors.NavigatorAttributeEditorGui.jButton1.text")); // NOI18N
+        jButton1.setText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -430,7 +437,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if (getTreeNode() != null && getTreeNode() instanceof ObjectTreeNode) {
             MetaObject mo = ((ObjectTreeNode) getTreeNode()).getMetaObject();
-            log.fatal("Current MetaObject:" + mo.getDebugString());
+            log.fatal("Current MetaObject:" + mo.getDebugString());//NOI18N
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed

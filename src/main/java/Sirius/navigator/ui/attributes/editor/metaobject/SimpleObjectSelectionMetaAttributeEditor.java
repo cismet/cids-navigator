@@ -81,7 +81,7 @@ public abstract class SimpleObjectSelectionMetaAttributeEditor extends AbstractS
     {                                                    
         if(evt.getStateChange() == ItemEvent.SELECTED)
         {
-            if(logger.isDebugEnabled())logger.debug("stringComboBoxItemStateChanged() item selected: " + evt.getItem());
+            if(logger.isDebugEnabled())logger.debug("stringComboBoxItemStateChanged() item selected: " + evt.getItem());//NOI18N
             this.setValueChanged(true);
             this.stopEditing();
         }
@@ -108,7 +108,7 @@ public abstract class SimpleObjectSelectionMetaAttributeEditor extends AbstractS
         
         if(value == null && logger.isDebugEnabled())
         {
-            logger.debug("value of item '" + this.stringComboBox.getSelectedItem() + "' is null, return item");
+            logger.debug("value of item '" + this.stringComboBox.getSelectedItem() + "' is null, return item");//NOI18N
         }
         
         //if(logger.isDebugEnabled())logger.debug("value of item '" + this.stringComboBox.getSelectedItem() + "' is null, return item");
@@ -120,13 +120,13 @@ public abstract class SimpleObjectSelectionMetaAttributeEditor extends AbstractS
     // value ist immer ein Attribut!!!
     protected void setComponentValue(Object value)
     { 
-        if(logger.isDebugEnabled())logger.debug("setComponentValue(): setting value: " + value);
+        if(logger.isDebugEnabled())logger.debug("setComponentValue(): setting value: " + value);//NOI18N
         if(value != null && this.getAttributeValue(value) != null)
         {
             Object attributeValue = this.getAttributeValue(value);
             if(this.selectionValues.values().contains(attributeValue))
             {
-                if(logger.isDebugEnabled())logger.debug("setComponentValue(value): this.stringComboBox.setSelectedItem(value): " + value);
+                if(logger.isDebugEnabled())logger.debug("setComponentValue(value): this.stringComboBox.setSelectedItem(value): " + value);//NOI18N
                 Iterator iterator = this.selectionValues.keySet().iterator();
                 while(iterator.hasNext())
                 {
@@ -140,12 +140,12 @@ public abstract class SimpleObjectSelectionMetaAttributeEditor extends AbstractS
             }
             else if(this.selectionValues.keySet().contains(attributeValue))
             {
-                if(logger.isDebugEnabled())logger.debug("setComponentValue(key): this.stringComboBox.setSelectedItem(value): " + value);
+                if(logger.isDebugEnabled())logger.debug("setComponentValue(key): this.stringComboBox.setSelectedItem(value): " + value);//NOI18N
                 this.stringComboBox.setSelectedItem(attributeValue);
             }
             else
             {
-                logger.warn("setComponentValue(): new value (" + value + ") is not in the list of allowed selection values");
+                logger.warn("setComponentValue(): new value (" + value + ") is not in the list of allowed selection values");//NOI18N
                 this.stringComboBox.setSelectedIndex(0);
                 
                 /*logger.debug(value.getClass());
@@ -160,7 +160,7 @@ public abstract class SimpleObjectSelectionMetaAttributeEditor extends AbstractS
         {
             // standardm\u00E4\u00DFig auf 0 setzen
             this.stringComboBox.setSelectedIndex(0);
-            if(logger.isDebugEnabled())logger.debug("setComponentValue(): value is null, setting index 0 to: " + this.getComponentValue());
+            if(logger.isDebugEnabled())logger.debug("setComponentValue(): value is null, setting index 0 to: " + this.getComponentValue());//NOI18N
             this.setValue(this.getComponentValue());
             this.setValueChanged(true);
         } 

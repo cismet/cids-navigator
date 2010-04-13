@@ -40,7 +40,7 @@ public class DefaultMetaObjectRenderer extends MetaObjectRenderer implements Tit
     public DefaultMetaObjectRenderer() {
         super();
         titleComponent=new JLabel();
-        titleComponent.setFont(new java.awt.Font("Tahoma", 1, 18));
+        titleComponent.setFont(new java.awt.Font("Tahoma", 1, 18));//NOI18N
         titleComponent.setForeground(new java.awt.Color(255, 255, 255));
     }
 
@@ -87,7 +87,7 @@ public class DefaultMetaObjectRenderer extends MetaObjectRenderer implements Tit
                     //ARRAY
                     if (attr.getValue() instanceof MetaObject && attr.isArray()) {
                         //Sammeln der richtigen MetaObjects in einem Vector<MetaObject>
-                        String attrName = "";
+                        String attrName = "";//NOI18N
                         Vector<MetaObject> arrayObjects = new Vector<MetaObject>();
                         MetaObject artificialObject = (MetaObject) attr.getValue();
                         HashMap artificialAttributes = artificialObject.getAttributes();
@@ -149,8 +149,8 @@ public class DefaultMetaObjectRenderer extends MetaObjectRenderer implements Tit
                     //comp.setPreferredSize(new Dimension(800,ySize));
                     } else {
                         JLabel lblDesc = new JLabel(attr.getName());
-                        lblDesc.setFont(new java.awt.Font("Tahoma", 1, 11));
-                        String val = " ";
+                        lblDesc.setFont(new java.awt.Font("Tahoma", 1, 11));//NOI18N
+                        String val = " ";//NOI18N
                         if (attr.getValue() != null) {
                             val = attr.getValue().toString();
                         }
@@ -179,7 +179,7 @@ public class DefaultMetaObjectRenderer extends MetaObjectRenderer implements Tit
             Border b = new CompoundBorder(new EmptyBorder(2, 2, 2, 2), javax.swing.BorderFactory.createTitledBorder(title));
             this.setBorder(b);
         } catch (Throwable t) {
-            log.error("Fehler beim Erzeugen des MetaObjectRenderer", t);
+            log.error("Error while creating the MetaObjectRenderer", t);//NOI18N
         }
         setOpaque(false);
         return this;

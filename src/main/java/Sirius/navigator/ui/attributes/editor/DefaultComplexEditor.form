@@ -64,7 +64,7 @@
         <Component class="javax.swing.JButton" name="stopButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.stopButton.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/ui/attributes/editor/Bundle.properties" key="DefaultComplexEditor.stopButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="stopEditing" noResource="true"/>
           </Properties>
@@ -78,7 +78,7 @@
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.cancelButton.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/ui/attributes/editor/Bundle.properties" key="DefaultComplexEditor.cancelButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="cancelEditing" noResource="true"/>
           </Properties>

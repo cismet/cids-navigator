@@ -77,12 +77,12 @@ public class CloneHelper
             }
             catch(Exception exp)
             {
-                throw new NotSerializableException(toBeClonedClass.getName() + " is not serializable: \n" + exp.getMessage());
+                throw new NotSerializableException(toBeClonedClass.getName() + " is not serializable: \n" + exp.getMessage());//NOI18N
             }  
         }
         else
         {
-            throw new NotSerializableException(toBeClonedClass.getName() + " is not serializable");
+            throw new NotSerializableException(toBeClonedClass.getName() + " is not serializable");//NOI18N
         }
     }
     
@@ -107,7 +107,7 @@ public class CloneHelper
         {
             try
             {
-                Method method = toBeClonedClass.getMethod("clone", new Class[0]);
+                Method method = toBeClonedClass.getMethod("clone", new Class[0]);//NOI18N
                 
                 try
                 {
@@ -137,16 +137,16 @@ public class CloneHelper
             }
             catch (NoSuchMethodException ne)
             {
-                throw new CloneNotSupportedException(toBeClonedClass.getName() + " is not cloneable: \n" + ne.getMessage());
+                throw new CloneNotSupportedException(toBeClonedClass.getName() + " is not cloneable: \n" + ne.getMessage());//NOI18N
             }
             catch (IllegalAccessException ie)
             {
-                throw new CloneNotSupportedException(toBeClonedClass.getName() + " is not cloneable: \n" + ie.getMessage());
+                throw new CloneNotSupportedException(toBeClonedClass.getName() + " is not cloneable: \n" + ie.getMessage());//NOI18N
             }
         }
         else
         {
-            throw new CloneNotSupportedException(toBeClonedClass.getName() + " is not cloneable");
+            throw new CloneNotSupportedException(toBeClonedClass.getName() + " is not cloneable");//NOI18N
         }
     }
     

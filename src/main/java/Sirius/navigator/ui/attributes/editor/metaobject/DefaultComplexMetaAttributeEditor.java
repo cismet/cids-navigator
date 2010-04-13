@@ -25,7 +25,6 @@ import Sirius.navigator.resource.ResourceManager;
  */
 public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor //javax.swing.JPanel
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private static final ResourceManager resource = ResourceManager.getManager();
 
     /** Creates new form DefaultComplexMetaAttributeEditor */
@@ -60,7 +59,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         cancelButton = new javax.swing.JButton();
 
         statusLabel.setBackground(java.awt.SystemColor.info);
-        statusLabel.setFont(new java.awt.Font("MS Sans Serif", 1, 11));
+        statusLabel.setFont(new java.awt.Font("MS Sans Serif", 1, 11)); // NOI18N
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         statusLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         statusLabel.setMaximumSize(null);
@@ -88,8 +87,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         statusPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
         statusPanel.setLayout(new java.awt.GridBagLayout());
 
-        commitButton.setIcon(resource.getIcon(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.commitButton.icon")));
-        commitButton.setToolTipText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.commitButton.tooltip")); // NOI18N
+        commitButton.setIcon(resource.getIcon("save_objekt.gif"));
+        commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeEditor.class, "DefaultComplexMetaAttributeEditor.commitButton.tooltip")); // NOI18N
         commitButton.setActionCommand("commit"); // NOI18N
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
@@ -109,8 +108,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         statusPanel.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resource.getIcon(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.cancelButton.icon")));
-        cancelButton.setToolTipText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.cancelButton.tooltip")); // NOI18N
+        cancelButton.setIcon(resource.getIcon("zurueck_objekt.gif"));
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeEditor.class, "DefaultComplexMetaAttributeEditor.cancelButton.tooltip")); // NOI18N
         cancelButton.setActionCommand("cancel"); // NOI18N
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
@@ -175,7 +174,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         }
         else if(logger.isDebugEnabled())
         {
-            logger.debug("initUI(" + this + "): ui already initialized");
+            logger.debug("initUI(" + this + "): ui already initialized");//NOI18N
         }
         
         // das f\u00FCllt die editor map ....
@@ -194,7 +193,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         Map metaAttributes = this.getMetaObjectAttributes(this.getValue());
         if(metaAttributes != null)
         {
-            if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): adding " + metaAttributes.size() + " to this complex editor ui");
+            if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): adding " + metaAttributes.size() + " to this complex editor ui");//NOI18N
             Iterator iterator = metaAttributes.keySet().iterator();
             while(iterator.hasNext())
             {
@@ -219,13 +218,13 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                 }
                 catch(Throwable t)
                 {
-                    logger.error("setValue(" + this + ") could not create editor for attribute '" + attribute + "' (" + key + ")", t);
+                    logger.error("setValue(" + this + ") could not create editor for attribute '" + attribute + "' (" + key + ")", t);//NOI18N
                 }
             }
         }
         else
         {
-            logger.error("initUI(" + this + "): no meta attributes found");
+            logger.error("initUI(" + this + "): no meta attributes found");//NOI18N
         }
     }
     
@@ -244,7 +243,9 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
             
             if(complexEditorClass != null)
             {
-                logger.info("addEditorUI(" + this + "): creating simple editor (" + id + ") with complex editor support (" + complexEditorClass + ")");
+                if (logger.isInfoEnabled()) {
+                    logger.info("addEditorUI(" + this + "): creating simple editor (" + id + ") with complex editor support (" + complexEditorClass + ")");//NOI18N
+                }
                 try
                 {
                     ComplexEditor complexEditor = (ComplexEditor)((Class)complexEditorClass).newInstance();
@@ -253,13 +254,15 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                 }
                 catch(Throwable t)
                 {
-                    logger.error("addEditorUI(" + this + "): could not register complex editor (" + id + ") for simple editor", t);
+                    logger.error("addEditorUI(" + this + "): could not register complex editor (" + id + ") for simple editor", t);//NOI18N
                     editorComponent = simpleEditor.getEditorComponent(this, id, value);
                 }
             }
             else
             {
-                logger.info("addEditorUI(" + this + "): creating simple editor (" + id + ") without complex editor support");
+                if (logger.isInfoEnabled()) {
+                    logger.info("addEditorUI(" + this + "): creating simple editor (" + id + ") without complex editor support");//NOI18N
+                }
                 editorComponent = simpleEditor.getEditorComponent(this, id, value);
             }
             
@@ -267,8 +270,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         }
         else
         {
-            logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");
-            editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultComplexMetaAttributeEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText2"));
+            logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");//NOI18N
+            editorComponent = new JLabel(org.openide.util.NbBundle.getMessage(DefaultComplexMetaAttributeEditor.class, "DefaultComplexMetaAttributeEditor.addEditorUI.editorComponent.NoEditorAvailableLabelText", new Object[]{this}));//NOI18N
         }
         
         gridBagConstraints.gridy++;
@@ -288,13 +291,13 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
 // XXX method not supported
     public void addValue(java.lang.Object key, java.lang.Object value)
     {
-        logger.error("addValue() method not supported");
+        logger.error("addValue() method not supported");//NOI18N
     }
     
 // XXX method not supported
     public java.lang.Object removeValue(java.lang.Object key)
     {
-        logger.error("removeValue() method not supported");
+        logger.error("removeValue() method not supported");//NOI18N
         return null;
     }
     
@@ -323,7 +326,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         }
         catch(Exception exp)
         {
-            logger.error("isEditable() could not check permissions of object " + this.getValue(), exp);
+            logger.error("isEditable() could not check permissions of object " + this.getValue(), exp);//NOI18N
         }
         
         return false;

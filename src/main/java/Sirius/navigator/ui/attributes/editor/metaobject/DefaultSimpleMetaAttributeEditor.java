@@ -8,19 +8,11 @@ package Sirius.navigator.ui.attributes.editor.metaobject;
 
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
-import javax.swing.event.*;
 import java.util.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
-
-import Sirius.server.localserver.attribute.Attribute;
-import Sirius.server.middleware.types.MetaObject;
-import Sirius.navigator.ui.attributes.editor.*;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.lf5.util.Resource;
 
 /**
  *
@@ -28,7 +20,6 @@ import org.apache.log4j.lf5.util.Resource;
  */
 public class DefaultSimpleMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor //javax.swing.JPanel
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     protected ValueChangeListener valueChangeListener;
     
     /** Creates new form DefaultSimpleMetaAttributeEditor */
@@ -46,14 +37,14 @@ public class DefaultSimpleMetaAttributeEditor extends AbstractSimpleMetaAttribut
         this.simpleValueField.addActionListener(valueChangeListener);
         
         InputMap inputMap = this.simpleValueField.getInputMap();
-        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "escape");//NOI18N
         
         ActionMap actionMap = this.simpleValueField.getActionMap();
-        actionMap.put("escape", new AbstractAction()
+        actionMap.put("escape", new AbstractAction()//NOI18N
         {
             public void actionPerformed(ActionEvent ae)
             {
-                if(logger.isDebugEnabled())logger.debug("resetting text field");
+                if(logger.isDebugEnabled())logger.debug("resetting text field");//NOI18N
                 DefaultSimpleMetaAttributeEditor.this.setComponentValue(DefaultSimpleMetaAttributeEditor.this.getValue());
             }
         });
@@ -186,7 +177,7 @@ public class DefaultSimpleMetaAttributeEditor extends AbstractSimpleMetaAttribut
                     // String
                     if(dataFlavor.equals(this.supportedDataFlavours[0]))
                     {
-                        if(logger.isDebugEnabled())logger.debug("importData() importing String Data");
+                        if(logger.isDebugEnabled())logger.debug("importData() importing String Data");//NOI18N
 
                         String data = (String)t.getTransferData(dataFlavor);
                         DefaultSimpleMetaAttributeEditor.this.simpleValueField.setText(data);
@@ -197,14 +188,14 @@ public class DefaultSimpleMetaAttributeEditor extends AbstractSimpleMetaAttribut
                     
                     // XXX i18n
                     JOptionPane.showMessageDialog(DefaultSimpleMetaAttributeEditor.this,
-                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleMetaAttributeEditor.DefaultDropTargetListener.importData().errorOptionPane.ErrorMessage"),
-                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleMetaAttributeEditor.DefaultDropTargetListener.importData().errorOptionPane.ErrorTitle"),
+                            org.openide.util.NbBundle.getMessage(DefaultSimpleMetaAttributeEditor.class, "DefaultSimpleMetaAttributeEditor.DefaultDropTargetListener.importData().errorOptionPane.ErrorMessage"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(DefaultSimpleMetaAttributeEditor.class, "DefaultSimpleMetaAttributeEditor.DefaultDropTargetListener.importData().errorOptionPane.ErrorTitle"),//NOI18N
                             JOptionPane.WARNING_MESSAGE);
                 }
             }
             catch (Throwable th)
             {
-                logger.error("importData():  data import failed", th);
+                logger.error("importData():  data import failed", th);//NOI18N
             }   
             
             return false;

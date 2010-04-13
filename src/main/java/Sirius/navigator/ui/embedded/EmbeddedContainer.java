@@ -74,7 +74,7 @@ public abstract class EmbeddedContainer implements EmbeddedComponent
         }
         else
         {
-            this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");
+            this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
         }
     }
     
@@ -143,7 +143,7 @@ public abstract class EmbeddedContainer implements EmbeddedComponent
             }
             else
             {
-                logger.error("object '" + next  + "' is not of type 'javax.swing.JComponent' but '" + next.getClass().getName() + "'");
+                logger.error("object '" + next  + "' is not of type 'javax.swing.JComponent' but '" + next.getClass().getName() + "'");//NOI18N
                 iterator.remove();
                 return null;
             }

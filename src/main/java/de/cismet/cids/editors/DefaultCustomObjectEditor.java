@@ -72,7 +72,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
                 bindingGroup = ((BindingGroupStore) this).getBindingGroup();
             } else {
 
-                Field bindingGroupField = getClass().getDeclaredField("bindingGroup");
+                Field bindingGroupField = getClass().getDeclaredField("bindingGroup");//NOI18N
 
                 bindingGroupField.setAccessible(true);
 
@@ -86,7 +86,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
             bindingGroup.bind();
             boundAndReadyNotify();
         } catch (Exception e) {
-            throw new RuntimeException("Bindingproblems occur", e);
+            throw new RuntimeException("Bindingproblems occur", e);//NOI18N
         }
     }
 
@@ -100,7 +100,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
                     MetaClassStore mcs = (MetaClassStore) binding.getTargetObject();
                     ELProperty p = (ELProperty) binding.getSourceProperty();
                     String expr = getPropertyStringOutOfELProperty(p);
-                    expr = expr.substring(expr.indexOf(".") + 1);
+                    expr = expr.substring(expr.indexOf(".") + 1);//NOI18N
                     expr = expr.substring(0, expr.length() - 1);
 
                     //in expr steckt in den allermeisten faellen ein feldname
@@ -121,7 +121,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
                     MetaClass foreignClass = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId);
                     mcs.setMetaClass(foreignClass);
                 } catch (Exception e) {
-                    throw new RuntimeException("Error during Bind: " + fieldname + " of " + cidsBean.getMetaObject().getMetaClass(), e);
+                    throw new RuntimeException("Error during Bind: " + fieldname + " of " + cidsBean.getMetaObject().getMetaClass(), e);//NOI18N
                 }
 
             }
@@ -130,7 +130,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
     }
 
     private static String getPropertyStringOutOfELProperty(ELProperty p) throws Exception {
-        Field expressionField = p.getClass().getDeclaredField("expression");
+        Field expressionField = p.getClass().getDeclaredField("expression");//NOI18N
         expressionField.setAccessible(true);
 
         ValueExpressionImpl valueExpression = (ValueExpressionImpl) expressionField.get(p);

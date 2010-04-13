@@ -17,7 +17,6 @@ import Sirius.navigator.method.*;
 import Sirius.navigator.ui.progress.*;
 import Sirius.navigator.exception.ExceptionManager;
 
-import java.util.ResourceBundle;
 import org.apache.log4j.Logger;
 
 /**

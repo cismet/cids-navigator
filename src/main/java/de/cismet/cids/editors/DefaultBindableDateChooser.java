@@ -6,7 +6,6 @@ package de.cismet.cids.editors;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.ResourceBundle;
 import javax.swing.border.EmptyBorder;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
@@ -19,7 +18,6 @@ import org.jdesktop.swingx.JXDatePicker;
 public class DefaultBindableDateChooser extends JXDatePicker implements Bindable {
 
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultBindableDateChooser.class);
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     public DefaultBindableDateChooser() {
         super();
@@ -29,12 +27,12 @@ public class DefaultBindableDateChooser extends JXDatePicker implements Bindable
     public void inint() {
         setBorder(new EmptyBorder(1, 1, 1, 1));
         setEditable(true);
-        setFormats(new String[]{I18N.getString("de.cismet.cids,editors.DefaultBindableDateChooser.inint().Formatstring")});
-        setLinkFormat(new MessageFormat(I18N.getString("de.cismet.cids.editors.DefaultBindableDateChooser.inint().Messageformat")));
+        setFormats(new String[]{org.openide.util.NbBundle.getMessage(DefaultBindableDateChooser.class, "DefaultBindableDateChooser.inint().Formatstring")});//NOI18N
+        setLinkFormat(new MessageFormat(org.openide.util.NbBundle.getMessage(DefaultBindableDateChooser.class, "DefaultBindableDateChooser.inint().Messageformat")));//NOI18N
     }
 
     public String getBindingProperty() {
-        return "date";
+        return "date";//NOI18N
     }
 
     public Converter getConverter() {
@@ -72,7 +70,7 @@ public class DefaultBindableDateChooser extends JXDatePicker implements Bindable
     }
 
     public Validator getValidator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");//NOI18N
     }
 //    @Override
 //    public Date getDate() {

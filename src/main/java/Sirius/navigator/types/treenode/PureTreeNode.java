@@ -24,12 +24,9 @@ public class PureTreeNode extends DefaultMetaTreeNode {
         super(metaNode);
 
         if (openIcon == null) {
-            openIcon = resource.getIcon(
-                    resource.getString("Sirius.navigator.types.treenode.PureTreeNode.openIcon"));
-            closedIcon = resource.getIcon(
-                    resource.getString("Sirius.navigator.types.treenode.PureTreeNode.closeIcon"));
-            leafIcon = resource.getIcon(
-                    resource.getString("Sirius.navigator.types.treenode.PureTreeNode.leafIcon"));
+            openIcon = resource.getIcon("NodeIconOpen.gif");//NOI18N
+            closedIcon = resource.getIcon("NodeIconClosed.gif");//NOI18N
+            leafIcon = resource.getIcon("NodeIconClosed.gif");//NOI18N
         }
     }
 
@@ -45,7 +42,7 @@ public class PureTreeNode extends DefaultMetaTreeNode {
     // --------------------------------------------------------------------------
     public final synchronized void explore() throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("[PureNode] Begin explore()");
+            logger.debug("[PureNode] Begin explore()");//NOI18N
         }
 
         if (!isExplored() && !getMetaNode().isLeaf()) {
@@ -53,7 +50,7 @@ public class PureTreeNode extends DefaultMetaTreeNode {
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[PureNode] End explore()");
+            logger.debug("[PureNode] End explore()");//NOI18N
         }
     }
 
@@ -100,11 +97,11 @@ public class PureTreeNode extends DefaultMetaTreeNode {
 
     public final boolean equals(DefaultMetaTreeNode node) {
         if (logger.isDebugEnabled()) {
-            logger.debug("equals pure node :" + node);
+            logger.debug("equals pure node :" + node);//NOI18N
         }
         if (node.isPureNode() && this.getID() == node.getID() && this.getDomain().equals(node.getDomain())) {
             if (logger.isDebugEnabled()) {
-                logger.debug("equals pure node :" + node);
+                logger.debug("equals pure node :" + node);//NOI18N
             }
             return true;
         } else {

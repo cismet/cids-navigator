@@ -3,7 +3,6 @@ package Sirius.navigator.ui.dialog;
 import java.io.*;
 
 import Sirius.navigator.resource.*;
-import java.util.ResourceBundle;
 
 /**
  *
@@ -11,8 +10,6 @@ import java.util.ResourceBundle;
  */
 public class AboutDialog extends javax.swing.JDialog
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-    
     /** Creates new form AboutDialog */
     public AboutDialog(java.awt.Frame parent)
     {
@@ -25,7 +22,7 @@ public class AboutDialog extends javax.swing.JDialog
             String string = null;
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     ResourceManager.getManager().getNavigatorResourceAsStream(
-                    I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.AboutDialog().aboutHTMLFile"))));
+                    "doc/about_de_DE.html")));//NOI18N
         
             while((string = reader.readLine()) != null)
             {
@@ -37,7 +34,7 @@ public class AboutDialog extends javax.swing.JDialog
         catch(IOException ioexp)
         {
             //logger.warn("could not load html about file", ioexp);
-            this.aboutLabel.setText(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.aboutLabel.defaulttext"));
+            this.aboutLabel.setText(org.openide.util.NbBundle.getMessage(AboutDialog.class, "AboutDialog.aboutLabel.defaulttext"));//NOI18N
         }
     }
     
@@ -56,7 +53,7 @@ public class AboutDialog extends javax.swing.JDialog
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setModal(true);
-        setName(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.name")); // NOI18N
+        setName("AboutDialog"); // NOI18N
         setResizable(false);
         setUndecorated(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -70,7 +67,7 @@ public class AboutDialog extends javax.swing.JDialog
 
         aboutLabel.setBackground(new java.awt.Color(255, 255, 240));
         aboutLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        aboutLabel.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.aboutLabel.tooltip")); // NOI18N
+        aboutLabel.setToolTipText(org.openide.util.NbBundle.getMessage(AboutDialog.class, "AboutDialog.aboutLabel.tooltip")); // NOI18N
         aboutLabel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), javax.swing.BorderFactory.createEmptyBorder(10, 10, 10, 10)));
         aboutLabel.setOpaque(true);
         aboutLabel.setPreferredSize(null);
@@ -81,9 +78,9 @@ public class AboutDialog extends javax.swing.JDialog
         closePanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 5, 5, 5));
         closePanel.setLayout(new java.awt.GridLayout(1, 0));
 
-        closeButton.setMnemonic(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.closeButton.mnemonic").charAt(0));
-        closeButton.setText(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.closeButton.text")); // NOI18N
-        closeButton.setToolTipText(I18N.getString("Sirius.navigator.ui.dialog.AboutDialog.closeButton.tooltip")); // NOI18N
+        closeButton.setMnemonic(org.openide.util.NbBundle.getMessage(AboutDialog.class, "AboutDialog.closeButton.mnemonic").charAt(0));
+        closeButton.setText(org.openide.util.NbBundle.getMessage(AboutDialog.class, "AboutDialog.closeButton.text")); // NOI18N
+        closeButton.setToolTipText(org.openide.util.NbBundle.getMessage(AboutDialog.class, "AboutDialog.closeButton.tooltip")); // NOI18N
         closeButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 closeButtonActionPerformed(evt);

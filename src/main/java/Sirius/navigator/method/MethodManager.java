@@ -424,8 +424,8 @@ public class MethodManager
             if(!((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeResultNodes(ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNodes()))
             {
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.message"),
-                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.title"),
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.title"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
                 //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Bitte stellen Sie sicher, dass sie mindestens einen Knoten selektiert haben,</p><p>und dass es sicht dabei um einen Root-Knoten handelt.</p></html>", "Knoten konnten nicht geloescht werden", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -448,8 +448,8 @@ public class MethodManager
             else
             {
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon2.message"),
-                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon2.title"),
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon2.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon2.title"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
                 //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Bitte stellen Sie sicher, dass sie mindestens einen Knoten selektiert haben.</p></html>", "Knoten konnten nicht uebertragen werden", JOptionPane.INFORMATION_MESSAGE);
             }
@@ -802,8 +802,8 @@ public class MethodManager
         if(resultNodes == null || resultNodes.length < 1)
         {
             JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
-                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"),
-                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"),
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"),//NOI18N
                     JOptionPane.WARNING_MESSAGE);
         }
         else

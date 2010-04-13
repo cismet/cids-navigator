@@ -22,7 +22,7 @@ import javax.swing.border.TitledBorder;
 public class DefaultMetaAttributeRenderer{
    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     Attribute attr; //
-    public final static Color FOREGROUND_COLOR=new TitledBorder("X").getTitleColor();
+    public final static Color FOREGROUND_COLOR=new TitledBorder("X").getTitleColor();//NOI18N
     /**
      * Creates a new instance of DefaultMetaAttributeRenderer
      */
@@ -36,13 +36,13 @@ public class DefaultMetaAttributeRenderer{
         }
         else {
             JLabel ret=new JLabel();
-            String value="";
+            String value="";//NOI18N
             if (attr!=null&&attr.getValue()!=null){
                 try {
                     ret.setText(attr.toString());    
                 }
                 catch(Throwable e){
-                    log.fatal("Fehler im MetaAttributeRenderer",e);
+                    log.fatal("Error in MetaAttributeRenderer",e);//NOI18N
                 }
             }
             

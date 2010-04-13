@@ -6,7 +6,6 @@
 
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -36,7 +35,6 @@ import de.cismet.cids.tools.fromstring.StringCreateable;
  */
 public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor //javax.swing.JPanel
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private static final ResourceManager resource = ResourceManager.getManager();
     /**
      * Gibt an, ob dieses komplexe Object als String ver\u00E4ndert wurde.
@@ -100,7 +98,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
         gridBagConstraints.weightx = 1.0;
         add(simpleValueField, gridBagConstraints);
 
-        complexEditorButton.setText(I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.complexEditorButton.text")); // NOI18N
+        complexEditorButton.setText(org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.complexEditorButton.text")); // NOI18N
         complexEditorButton.setActionCommand(AbstractSimpleEditor.SimpleEditorActivationDelegate.SHOW_UI_COMMAND);
         complexEditorButton.setEnabled(false);
         complexEditorButton.setMargin(new java.awt.Insets(1, 1, 1, 1));
@@ -166,13 +164,11 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
         
         if(this.getValue() != null && this.getMetaObject(this.getValue()) != null && this.getMetaObject(this.getValue()).getID() != -1)
         {
-            this.linkLabel.setIcon(resource.getIcon(
-                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.linkIcon")));
+            this.linkLabel.setIcon(resource.getIcon("link_icon.gif"));//NOI18N
         }
         else
         {
-            this.linkLabel.setIcon(resource.getIcon(
-                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.copyIcon")));
+            this.linkLabel.setIcon(resource.getIcon("copy_icon.gif"));//NOI18N
         }
     }
     
@@ -201,12 +197,12 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                 }
                 else
                 {
-                    logger.error("getMetaObject(" + this + ") value of Attribute '" + ((Attribute)value).getName() + "' is not of type MetaObject (" + attributeValue.getClass().getName() + ")");
+                    logger.error("getMetaObject(" + this + ") value of Attribute '" + ((Attribute)value).getName() + "' is not of type MetaObject (" + attributeValue.getClass().getName() + ")");//NOI18N
                 }
             }
             else
             {
-                logger.error("getMetaObject(" + this + ") value is not of type Attribute or MetaObject (" + value.getClass().getName() + ")");
+                logger.error("getMetaObject(" + this + ") value is not of type Attribute or MetaObject (" + value.getClass().getName() + ")");//NOI18N
             }
         }
         
@@ -217,7 +213,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
     {
         if(object != null)
         {
-            if(logger.isDebugEnabled())logger.debug("setValueFromString(): setting value from string " + newValue);
+            if(logger.isDebugEnabled())logger.debug("setValueFromString(): setting value from string " + newValue);//NOI18N
             //Object object = ((StringCreateable)MetaObject).fromString(newValue, MetaObject);
             Object newObject = ((StringCreateable)object).fromString(newValue, this.getMetaObject(object));
             this.setComponentValue(newObject);
@@ -240,16 +236,14 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
             
             if(!link)
             {
-                if(logger.isDebugEnabled())logger.debug("setValueFromDragAndDrop() creating a copy of the selected meta object");
+                if(logger.isDebugEnabled())logger.debug("setValueFromDragAndDrop() creating a copy of the selected meta object");//NOI18N
                 this.getMetaObject(this.getValue()).setPrimaryKey(new Integer(-1));
-                this.linkLabel.setIcon(resource.getIcon(
-                        I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.copyIcon")));
+                this.linkLabel.setIcon(resource.getIcon("copy_icon.gif"));//NOI18N
             }
             else
             {
-                if(logger.isDebugEnabled())logger.debug("setValueFromDragAndDrop() creating a link to the selected meta object");
-                this.linkLabel.setIcon(resource.getIcon(
-                        I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.linkLabel.linkIcon")));
+                if(logger.isDebugEnabled())logger.debug("setValueFromDragAndDrop() creating a link to the selected meta object");//NOI18N
+                this.linkLabel.setIcon(resource.getIcon("link_icon.gif"));//NOI18N
             }
             
             this.setComponentValue(this.getValue());
@@ -268,15 +262,13 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
             }
             catch(Throwable t)
             {
-                logger.warn("setValueFromDragAndDrop(): could not retrieve class names", t);
+                logger.warn("setValueFromDragAndDrop(): could not retrieve class names", t);//NOI18N
             }
             
             // XXX i18n
             JOptionPane.showMessageDialog(DefaultSimpleComplexMetaAttributeEditor.this,
-                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage1") + oldClassName +
-                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage2") + newClassName +
-                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage3"),
-                    I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                    org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorMessage", new Object[]{oldClassName, newClassName}), //NOI18N
+                    org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.setValueFromDragAndDrop().ErrorTitle"), JOptionPane.WARNING_MESSAGE);//NOI18N
             return false;
         }
     }
@@ -307,23 +299,23 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                     //MetaObject MetaObject = getMetaObject(getValue());
                     if(isStringCreateable((Attribute)getValue()) && DefaultSimpleComplexMetaAttributeEditor.this.setValueFromString(getValue(), this.getNewValue().toString()))
                     {
-                        if(logger.isDebugEnabled())logger.debug("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): saves new input");
+                        if(logger.isDebugEnabled())logger.debug("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): saves new input");//NOI18N
                         DefaultSimpleComplexMetaAttributeEditor.this.stopEditing();
                     }
                     else
                     {
-                        logger.error("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): value is not from String createable");
+                        logger.error("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): value is not from String createable");//NOI18N
                     }
                     
                 }
                 catch(Throwable t)
                 {
-                    logger.error("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): from String creation ('" + this.getNewValue() + "' failed", t);
+                    logger.error("actionPerformed(" + DefaultSimpleComplexMetaAttributeEditor.this.getId() + "): from String creation ('" + this.getNewValue() + "' failed", t);//NOI18N
                     
                     // XXX i18n
                     JOptionPane.showMessageDialog(DefaultSimpleComplexMetaAttributeEditor.this,
-                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.actionPerformed().ErrorMessage"),
-                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.actionPerformed().ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+                            org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.actionPerformed().ErrorMessage"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.actionPerformed().ErrorTitle"), JOptionPane.ERROR_MESSAGE);//NOI18N
                     
                     // reset
                     setComponentValue(getValue());
@@ -354,13 +346,13 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                 // String
                 this.supportedDataFlavours[0] = DataFlavor.stringFlavor;
                 // MetaTreeNode
-                this.supportedDataFlavours[1] = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + DefaultMetaTreeNode.class.getName());
+                this.supportedDataFlavours[1] = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + DefaultMetaTreeNode.class.getName());//NOI18N
                 // ObjectTreeNode
-                this.supportedDataFlavours[2] = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + ObjectAttributeNode.class.getName());
+                this.supportedDataFlavours[2] = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=" + ObjectAttributeNode.class.getName());//NOI18N
             }
             catch (ClassNotFoundException cnfe)
             {
-                logger.error("getTransferDataFlavors() could not create DnD data flavours", cnfe);
+                logger.error("getTransferDataFlavors() could not create DnD data flavours", cnfe);//NOI18N
                 this.supportedDataFlavours = new DataFlavor[0];
             }
         }
@@ -369,11 +361,11 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
         {
             if(Sirius.navigator.ui.dnd.MetaTransferable.class.isAssignableFrom(t.getClass()))
             {
-                logger.fatal("((MetaTransferable)t).getTransferAction(): " + ((Sirius.navigator.ui.dnd.MetaTransferable)t).getTransferAction());
+                logger.fatal("((MetaTransferable)t).getTransferAction(): " + ((Sirius.navigator.ui.dnd.MetaTransferable)t).getTransferAction());//NOI18N
                 return (((MetaTransferable)t).getTransferAction() & java.awt.dnd.DnDConstants.ACTION_LINK) != 0;
             }
             
-            logger.fatal("((MetaTransferable)t).getTransferAction(): " + ((Sirius.navigator.ui.dnd.MetaTransferable)t).getTransferAction());
+            logger.fatal("((MetaTransferable)t).getTransferAction(): " + ((Sirius.navigator.ui.dnd.MetaTransferable)t).getTransferAction());//NOI18N
             
             return false;
         }
@@ -412,7 +404,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                 {
                     if(dataFlavor.equals(this.supportedDataFlavours[0]))
                     {
-                        if(logger.isDebugEnabled())logger.debug("importData() importing String Data");
+                        if(logger.isDebugEnabled())logger.debug("importData() importing String Data");//NOI18N
                         
                         String data = (String)t.getTransferData(dataFlavor);
                         DefaultSimpleComplexMetaAttributeEditor.this.simpleValueField.setText(data);
@@ -422,7 +414,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                     }
                     else if(dataFlavor.equals(this.supportedDataFlavours[1]))
                     {
-                        if(logger.isDebugEnabled())logger.debug("importData() importing ObjectTreeNode Data");
+                        if(logger.isDebugEnabled())logger.debug("importData() importing ObjectTreeNode Data");//NOI18N
                         Object object = t.getTransferData(dataFlavor);
                         
                         if(object != null && object instanceof ObjectTreeNode)
@@ -434,12 +426,12 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                         }
                         else if(logger.isDebugEnabled())
                         {
-                            logger.warn("not supported MetaTreeNode: " + object);
+                            logger.warn("not supported MetaTreeNode: " + object);//NOI18N
                         }
                     }
                     else if(dataFlavor.equals(this.supportedDataFlavours[2]))
                     {
-                        if(logger.isDebugEnabled())logger.debug("importData() importing ObjectAttributeNode Data");
+                        if(logger.isDebugEnabled())logger.debug("importData() importing ObjectAttributeNode Data");//NOI18N
                         Object object = t.getTransferData(dataFlavor);
                         
                         if(object != null && object instanceof ObjectAttributeNode)
@@ -451,19 +443,19 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                         }
                         else if(logger.isDebugEnabled())
                         {
-                            logger.warn("not supported AttributeTreeNode: " + object);
+                            logger.warn("not supported AttributeTreeNode: " + object);//NOI18N
                         }
                     }
                     
                     // XXX i18n
                     JOptionPane.showMessageDialog(DefaultSimpleComplexMetaAttributeEditor.this,
-                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.importData().ErrorMessage"),
-                            I18N.getString("Sirius.navigator.ui.attributes.editor.metaobject.DefaultSimpleComplexMetaAttributeEditor.importData().ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                            org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.importData().ErrorMessage"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(DefaultSimpleComplexMetaAttributeEditor.class, "DefaultSimpleComplexMetaAttributeEditor.importData().ErrorTitle"), JOptionPane.WARNING_MESSAGE);//NOI18N
                 }
             }
             catch (Throwable th)
             {
-                logger.error("importData():  data import failed", th);
+                logger.error("importData():  data import failed", th);//NOI18N
             }
             
             return false;
@@ -471,7 +463,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
         
         public void dragEnter(DropTargetDragEvent dtde)
         {
-            if(logger.isDebugEnabled())logger.debug("dragEnter()");
+            if(logger.isDebugEnabled())logger.debug("dragEnter()");//NOI18N
             
             if(this.getFlavor(dtde.getCurrentDataFlavors()) == null)
             {
@@ -481,7 +473,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
         
         public void drop(DropTargetDropEvent dtde)
         {
-            if(logger.isDebugEnabled())logger.debug("drop()");
+            if(logger.isDebugEnabled())logger.debug("drop()");//NOI18N
             
             if(!this.importData(dtde.getTransferable(), dtde.getDropAction()))
             {

@@ -48,7 +48,7 @@ public class ClassAttributeNode extends AttributeNode
         }
         else
         {
-            this.icon = resource.getIcon(resource.getString("Sirius.navigator.ui.attributes.ClassAttributeNode.icon"));
+            this.icon = resource.getIcon("ClassNodeIcon.gif");
         }
         
         // load attributes ...

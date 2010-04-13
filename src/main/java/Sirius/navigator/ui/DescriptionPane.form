@@ -16,7 +16,7 @@
           <Color blue="ee" green="ee" id="Button.background" palette="3" red="ee" type="palette"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.DescriptionPane.JButton1" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/ui/Bundle.properties" key="DescriptionPane.JButton1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

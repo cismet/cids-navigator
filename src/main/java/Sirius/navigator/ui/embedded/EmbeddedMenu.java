@@ -74,7 +74,7 @@ public class EmbeddedMenu extends JMenu implements EmbeddedComponent
     
     protected void add(Collection components)
     {
-        if(logger.isDebugEnabled())logger.debug("adding '" + components.size() + "' menu items");
+        if(logger.isDebugEnabled())logger.debug("adding '" + components.size() + "' menu items");//NOI18N
         Iterator iterator = components.iterator();
         
         while(iterator.hasNext())
@@ -97,13 +97,13 @@ public class EmbeddedMenu extends JMenu implements EmbeddedComponent
             }
             else
             {
-                logger.warn("item type '" + item.getClass().getName() + "' found, 'javax.swing.JMenuItem' or 'javax.swing.JSeparator' preferred");
+                logger.warn("item type '" + item.getClass().getName() + "' found, 'javax.swing.JMenuItem' or 'javax.swing.JSeparator' preferred");//NOI18N
                 this.add((JComponent)item);
             }
         }
         else
         {
-            logger.error("invalid item type '" + item.getClass().getName() + "', 'javax.swing.JComponent' expected");
+            logger.error("invalid item type '" + item.getClass().getName() + "', 'javax.swing.JComponent' expected");//NOI18N
         }
     }
 }

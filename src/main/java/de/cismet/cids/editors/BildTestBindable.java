@@ -41,7 +41,7 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
     }
 
     public String getBindingProperty() {
-        return "text";
+        return "text";//NOI18N
     }
 
     public Converter getConverter() {
@@ -54,7 +54,7 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
                 try {
                     if (value != null) {
                         cidsBean=value;
-                        return (String) value.getProperty("url");
+                        return (String) value.getProperty("url");//NOI18N
                     }
                 } catch (Exception e) {
                 }
@@ -66,7 +66,7 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
             public CidsBean convertReverse(String value) {
                 try {
                     if (cidsBean != null) {
-                        cidsBean.setProperty("url", value);
+                        cidsBean.setProperty("url", value);//NOI18N
                     }
                 } catch (Exception exception) {
                 }

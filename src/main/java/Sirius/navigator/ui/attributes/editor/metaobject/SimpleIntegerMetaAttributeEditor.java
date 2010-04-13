@@ -37,7 +37,7 @@ public class SimpleIntegerMetaAttributeEditor extends DefaultSimpleMetaAttribute
         }
         catch(NumberFormatException nfe)
         {
-            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid integer", nfe);
+            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid integer", nfe);//NOI18N
             Integer integer = new Integer(0);
             this.setComponentValue(integer);
             return integer;
@@ -52,7 +52,7 @@ public class SimpleIntegerMetaAttributeEditor extends DefaultSimpleMetaAttribute
         public void insertString(final int i, final String s, final AttributeSet attributes) throws BadLocationException
         {  
             super.insertString(i, s, attributes);
-            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))
+            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))//NOI18N
             {
                 try
                 {

@@ -125,7 +125,7 @@ public class Status
     
     public void clear()
     {
-        this.setStatusMessage("");
+        this.setStatusMessage("");//NOI18N
         this.setMessagePosition(MESSAGE_IGNORE);
         this.setGreenIconState(ICON_IGNORE);
         this.setRedIconState(ICON_IGNORE);

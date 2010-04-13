@@ -22,23 +22,23 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
 {
     public final static int ANY_INDEX = -1;
     
-    public final static String P1 = "P1";
-    public final static String P2 = "P2";
-    public final static String P3 = "P3";
+    public final static String P1 = "P1";//NOI18N
+    public final static String P2 = "P2";//NOI18N
+    public final static String P3 = "P3";//NOI18N
     
-    public final static String NONE = "none";
-    public final static String PANEL = "javax.swing.JPanel";
-    public final static String SCROLLPANE = "javax.swing.JScrollPane";
-    public final static String FLOATINGFRAME = "Sirius.navigator.ui.widget.FloatingFrame";
+    public final static String NONE = "none";//NOI18N
+    public final static String PANEL = "javax.swing.JPanel";//NOI18N
+    public final static String SCROLLPANE = "javax.swing.JScrollPane";//NOI18N
+    public final static String FLOATINGFRAME = "Sirius.navigator.ui.widget.FloatingFrame";//NOI18N
     
-    public final static String CENTER = "GridBabLayout";
-    public final static String FLOW = "FlowLayout";
-    public final static String FILL = "GridLayout";
+    public final static String CENTER = "GridBabLayout";//NOI18N
+    public final static String FLOW = "FlowLayout";//NOI18N
+    public final static String FILL = "GridLayout";//NOI18N
     
     protected final static Logger logger = Logger.getLogger(MutableConstraints.class);
     
     /** Holds value of property name. */
-    private String name = "Component";
+    private String name = "Component";//NOI18N
     
     /** Utility field used by bound properties. */
     //private java.beans.PropertyChangeSupport propertyChangeSupport =  new java.beans.PropertyChangeSupport(this);
@@ -161,7 +161,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         {
             String oldName = this.name;
             this.name = name;
-            propertyChangeSupport.firePropertyChange("name", oldName, name);
+            propertyChangeSupport.firePropertyChange("name", oldName, name);//NOI18N
         }
         else
         {
@@ -186,7 +186,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
     {
         if(!position.equals(P1) && !position.equals(P2) && !position.equals(P3))
         {
-            logger.warn("'" + position + "' is not a valid layout position, using default '" + P3 + "'");
+            logger.warn("'" + position + "' is not a valid layout position, using default '" + P3 + "'");//NOI18N
             position = P3; 
         }
           
@@ -194,7 +194,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         {
             String oldPosition = this.position;
             this.position = position;
-            propertyChangeSupport.firePropertyChange("position", oldPosition, position);
+            propertyChangeSupport.firePropertyChange("position", oldPosition, position);//NOI18N
         }
         else
         {
@@ -259,7 +259,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         }
         else
         {
-            logger.warn("could not set componentEventsEnabled to '" + componentEventsEnabled + "', container is null");
+            logger.warn("could not set componentEventsEnabled to '" + componentEventsEnabled + "', container is null");//NOI18N
         }
     }
     
@@ -282,7 +282,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         {
             Icon oldIcon = this.icon;
             this.icon = icon;
-            propertyChangeSupport.firePropertyChange("icon", oldIcon, icon);
+            propertyChangeSupport.firePropertyChange("icon", oldIcon, icon);//NOI18N
         }
         else
         {
@@ -309,7 +309,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         {
             int oldPreferredIndex = this.preferredIndex;
             this.preferredIndex = preferredIndex;
-            propertyChangeSupport.firePropertyChange("preferredIndex", new Integer(oldPreferredIndex), new Integer(preferredIndex));
+            propertyChangeSupport.firePropertyChange("preferredIndex", new Integer(oldPreferredIndex), new Integer(preferredIndex));//NOI18N
         }
         else
         {
@@ -336,7 +336,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         {
             String oldToolTip = this.toolTip;
             this.toolTip = toolTip;
-            propertyChangeSupport.firePropertyChange("toolTip", oldToolTip, toolTip);
+            propertyChangeSupport.firePropertyChange("toolTip", oldToolTip, toolTip);//NOI18N
         }
         else
         {
@@ -400,7 +400,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
         }
         else
         {
-            logger.warn("'" + layout + "' is not a valid layout, using default '" + FILL + "'");
+            logger.warn("'" + layout + "' is not a valid layout, using default '" + FILL + "'");//NOI18N
             container.setLayout(new GridLayout(1,1));
         }
         
@@ -532,7 +532,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
     {
         if(this.floatingFrameConfigurator == null)
         {
-            logger.warn("unexpected call to 'getFloatingFrameConfigurator()': no FloatingFrame container");
+            logger.warn("unexpected call to 'getFloatingFrameConfigurator()': no FloatingFrame container");//NOI18N
         }
         
         return floatingFrameConfigurator;
@@ -540,11 +540,11 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
     
     public String toString()
     {
-        return new String(  " Id: '" + this.getId() + "'\n" + 
-                            " Name: '" + this.getName() + "'\n" + 
-                            " ToolTip: '" + this.getToolTip() + "'\n" + 
-                            " Position: '" + this.getPosition() + "'\n" + 
-                            " ContainerType: '" + this.getContainerType() + "'\n");
+        return new String(  " Id: '" + this.getId() + "'\n" + //NOI18N
+                            " Name: '" + this.getName() + "'\n" + //NOI18N
+                            " ToolTip: '" + this.getToolTip() + "'\n" + //NOI18N
+                            " Position: '" + this.getPosition() + "'\n" + //NOI18N
+                            " ContainerType: '" + this.getContainerType() + "'\n");//NOI18N
     }
     
     /*public static void main(String args[])

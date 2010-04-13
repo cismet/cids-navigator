@@ -65,9 +65,9 @@ public class NavigatorToolkit
         
         try
         {
-            coordinateString = coordinateString.substring(coordinateString.indexOf("(")+1,coordinateString.indexOf(")"));
+            coordinateString = coordinateString.substring(coordinateString.indexOf("(")+1,coordinateString.indexOf(")"));//NOI18N
             
-            StringTokenizer tokenizer = new StringTokenizer(coordinateString, ",");
+            StringTokenizer tokenizer = new StringTokenizer(coordinateString, ",");//NOI18N
             
             //SICAD Coordinate
             //double minX
@@ -122,7 +122,7 @@ public class NavigatorToolkit
      */
     public double[][] parsePointCoordinatesString(String pointCoordinateString)
     {
-        StringTokenizer tokenizer = new StringTokenizer(pointCoordinateString, "(");
+        StringTokenizer tokenizer = new StringTokenizer(pointCoordinateString, "(");//NOI18N
         double[][] pointCoordinates = new double[tokenizer.countTokens()][2];
         int i = 0;
         
@@ -130,7 +130,7 @@ public class NavigatorToolkit
         {
             String point = tokenizer.nextToken();
             String x = point.substring(0, point.indexOf(','));
-            String y = point.substring(x.length()+1, point.indexOf(')'));
+            String y = point.substring(x.length()+1, point.indexOf(')'));//NOI18N
             
             pointCoordinates[i][0] = Double.parseDouble(x);
             pointCoordinates[i][1] = Double.parseDouble(y);
@@ -159,7 +159,7 @@ public class NavigatorToolkit
                 buffer.append(pointCoordinates[i][0]);
                 buffer.append(',');
                 buffer.append(pointCoordinates[i][1]);
-                buffer.append((i < pointCoordinates.length-1) ? ") " : ")");
+                buffer.append((i < pointCoordinates.length-1) ? ") " : ")");//NOI18N
                 
             }
         }
@@ -256,11 +256,11 @@ public class NavigatorToolkit
         StringBuffer buffer = new StringBuffer();
         
         if(pointCoordinates.length>2)
-            buffer.append("POLYGON").append('(').append('(');
+            buffer.append("POLYGON").append('(').append('(');//NOI18N
         else if(pointCoordinates.length==2)
-            buffer.append("LINESTRING").append('(');
+            buffer.append("LINESTRING").append('(');//NOI18N
         else if(pointCoordinates.length==1)
-            buffer.append("POINT").append('(');
+            buffer.append("POINT").append('(');//NOI18N
         
         if(pointCoordinates != null || pointCoordinates.length != 0)
         {
@@ -272,7 +272,7 @@ public class NavigatorToolkit
                 
                 if(!closePolygon)
                 {
-                    buffer.append((i < pointCoordinates.length-1) ? "," : "");
+                    buffer.append((i < pointCoordinates.length-1) ? "," : "");//NOI18N
                 }
                 else
                 {

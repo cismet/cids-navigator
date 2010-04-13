@@ -46,14 +46,16 @@ public abstract class CoolObjectRenderer extends  CustomMetaObjectRenderer  {
         try {
             SAXBuilder builder = new SAXBuilder(false);
             
-            Document doc=builder.build(getClass().getResource("/coolobjectrenderer/backgroundWMS.xml"));
+            Document doc=builder.build(getClass().getResource("/coolobjectrenderer/backgroundWMS.xml"));//NOI18N
             Element prefs=doc.getRootElement();
             swms=new SimpleWMS(prefs);
             swms.addRetrievalListener(new RetrievalListener() {
                 public void retrievalAborted(RetrievalEvent retrievalEvent) {
                 }
                 public void retrievalComplete(RetrievalEvent retrievalEvent) {
-                    log.debug("FERTICH");
+                    if (log.isDebugEnabled()) {
+                        log.debug("completed");//NOI18N
+                    }
                     Object o=retrievalEvent.getRetrievedObject();
                     if (o instanceof Image){
                         map=(Image)o;
@@ -88,20 +90,20 @@ public abstract class CoolObjectRenderer extends  CustomMetaObjectRenderer  {
                         map=erg;
                         repaint();
                     } else {
-                        log.warn("kein image");
+                        log.warn("no image");//NOI18N
                     }
                 }
                 public void retrievalError(RetrievalEvent retrievalEvent) {
-                    System.out.println("fehler"+ retrievalEvent.getErrorType());
+                    log.error("error"+ retrievalEvent.getErrorType());//NOI18N
                 }
                 public void retrievalProgress(RetrievalEvent retrievalEvent) {
                 }
                 public void retrievalStarted(RetrievalEvent retrievalEvent) {
-                    log.debug("retrievalStarted");
+                    log.debug("retrievalStarted");//NOI18N
                 }
             });
         } catch (Exception e) {
-            log.error("Fehler beim Laden der KartenInfo",e);
+            log.error("Error during loading of the map info",e);//NOI18N
         }
         this.addComponentListener(new ComponentListener() {
             public void componentHidden(ComponentEvent e) {
@@ -130,7 +132,7 @@ public abstract class CoolObjectRenderer extends  CustomMetaObjectRenderer  {
             ImageIcon bild2=new ImageIcon(ref);
             rechtsOben=bild2;
         } catch (Exception e){
-            log.error("Fehler beim Laden des LocationtypeImage",e);
+            log.error("Error during loading of the LocationtypeImage",e);//NOI18N
             rechtsOben=null;
         }
         
@@ -156,7 +158,7 @@ public abstract class CoolObjectRenderer extends  CustomMetaObjectRenderer  {
         );
     }// </editor-fold>//GEN-END:initComponents
     private void mapIt() {
-        log.debug("MAPIT");
+        log.debug("MAPIT");//NOI18N
         try {
             if (geometry!=null) {
                 BoundingBox bb=new BoundingBox(geometry.buffer(40d));
@@ -182,7 +184,7 @@ public abstract class CoolObjectRenderer extends  CustomMetaObjectRenderer  {
                 
             }
         } catch(Exception e) {
-            log.warn("Fehler beim Darstellen der Karte.",e);
+            log.warn("Error while displaying the map.",e);//NOI18N
         }
     }
     @Override
@@ -192,7 +194,7 @@ public abstract class CoolObjectRenderer extends  CustomMetaObjectRenderer  {
         if (map!=null){
             g.drawImage(map,0,0,null);
         } else {
-            log.info("map==null");
+            log.info("map==null");//NOI18N
         }
         g.setColor(Color.WHITE);
         // g.drawLine(0,0,getWidth(),0);

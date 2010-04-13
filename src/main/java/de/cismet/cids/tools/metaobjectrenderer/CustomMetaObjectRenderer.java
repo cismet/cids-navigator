@@ -56,13 +56,13 @@ public abstract class CustomMetaObjectRenderer extends MetaObjectRenderer{
                         }
                         f.set(this,v);
                     } catch (Exception e) {
-                        log.error("Fehler beim Zuweisen im Renderer: "+f,e);
+                        log.error("Error while assigning attributes in the renderer: "+f,e);//NOI18N
                     }
                 } else if (f.isAnnotationPresent(CidsRendererTitle.class)){
                     try {
                         f.set(this,title);
                     } catch (Exception e) {
-                        log.warn("Fehler beim Zuweisen von RendererTitle im Renderer",e);
+                        log.warn("Error while assigning the renderer title in the renderer",e);//NOI18N
                     }
                 }
             }
@@ -93,13 +93,13 @@ public abstract class CustomMetaObjectRenderer extends MetaObjectRenderer{
                     Object value=StaticCidsUtilities.getValueOfAttributeByString(attributeName,mo);
                     f.set(this,value);
                 } catch (Exception e) {
-                    log.warn("Fehler beim Zuweisen im Renderer",e);
+                    log.warn("Error while assigning attributes in the renderer",e);//NOI18N
                 }
             } else if (f.isAnnotationPresent(CidsRendererTitle.class)){
                 try {
                     f.set(this,title);
                 } catch (Exception e) {
-                    log.warn("Fehler beim Zuweisen von RendererTitle im Renderer",e);
+                    log.warn("Error while assigning the renderer title in the renderer",e);//NOI18N
                 }
             }
         }

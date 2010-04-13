@@ -13,7 +13,6 @@ package de.cismet.cids.editors;
 import Sirius.server.middleware.types.MetaClass;
 import de.cismet.cids.dynamics.CidsBean;
 import java.util.List;
-import java.util.ResourceBundle;
 import javax.swing.JList;
 import org.jdesktop.observablecollections.ObservableList;
 
@@ -22,8 +21,6 @@ import org.jdesktop.observablecollections.ObservableList;
  * @author thorsten
  */
 public class ArrayTitleAndControls extends javax.swing.JPanel {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
-
     private MetaClass detailClass;
     private CidsBean cidsBean;
     private String arrayProperty;
@@ -99,7 +96,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
         jPanel3.setOpaque(false);
         jPanel3.setLayout(new java.awt.BorderLayout());
 
-        lblTitle.setText(I18N.getString("de.cismet.cids.editors.ArrayTitleAndControls.lblTitle.text")); // NOI18N
+        lblTitle.setText(org.openide.util.NbBundle.getMessage(ArrayTitleAndControls.class, "ArrayTitleAndControls.lblTitle.text")); // NOI18N
         jPanel3.add(lblTitle, java.awt.BorderLayout.EAST);
 
         jLabel1.setText("           ");
@@ -143,7 +140,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
             } else if (sourcelist!=null && sourcelist.getSelectedValue()!=null) {
                CidsBean localSourceBean=(CidsBean)sourcelist.getSelectedValue();
                //Entferne den String bis zum ersten []
-               String subElement=arrayProperty.substring(arrayProperty.lastIndexOf("[]")+2);
+               String subElement=arrayProperty.substring(arrayProperty.lastIndexOf("[]")+2);//NOI18N
                ((List) (localSourceBean.getProperty(arrayProperty))).add(newOne);
             }
             jList.setSelectedValue(newOne, true);

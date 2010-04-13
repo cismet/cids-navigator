@@ -24,7 +24,6 @@ package Sirius.navigator;
 import java.applet.AppletContext;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.plaf.basic.*;

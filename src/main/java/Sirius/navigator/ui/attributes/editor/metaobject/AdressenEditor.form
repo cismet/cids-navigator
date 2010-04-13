@@ -15,7 +15,7 @@
               <Image iconType="3" name="/Sirius/navigator/ui/attributes/editor/metaobject/haus.png"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.attributes.editor.metaobject.AdressenEditor.jLabel1.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/ui/attributes/editor/metaobject/Bundle.properties" key="AdressenEditor.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>

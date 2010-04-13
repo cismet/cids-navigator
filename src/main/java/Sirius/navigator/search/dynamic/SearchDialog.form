@@ -10,11 +10,11 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="profilesMenu">
           <Properties>
-            <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.mnemonic&quot;).charAt(0)" type="code"/>
+            <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.profilesMenu.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.text&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.profilesMenu.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -24,11 +24,11 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="manageProfilesItem">
               <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.mnemonic&quot;).charAt(0)" type="code"/>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+                  <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.profilesMenu.manageProfilesItem.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
-                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.profilesMenu.manageProfilesItem.text&quot;)" type="code"/>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.profilesMenu.manageProfilesItem.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="actionCommand" type="java.lang.String" value="manageProfiles"/>
               </Properties>
@@ -37,11 +37,11 @@
         </Menu>
         <Menu class="javax.swing.JMenu" name="optionsMenu">
           <Properties>
-            <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.mnemonic&quot;).charAt(0)" type="code"/>
+            <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.optionsMenu.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.text&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.optionsMenu.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -51,11 +51,11 @@
           <SubComponents>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="appendResultsItem">
               <Properties>
-                <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.mnemonic&quot;).charAt(0)" type="code"/>
+                <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+                  <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.optionsMenu.appendResultsItem.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
-                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-                  <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.optionsMenu.appendResultsItem.text&quot;)" type="code"/>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.optionsMenu.appendResultsItem.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </MenuItem>
@@ -176,44 +176,44 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="searchButton">
           <Properties>
-            <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.mnemonic&quot;).charAt(0)" type="code"/>
+            <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.searchButton.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.text&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.searchButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.searchButton.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.searchButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="actionCommand" type="java.lang.String" value="search"/>
+            <Property name="actionCommand" type="java.lang.String" value="search" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
-            <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.mnemonics&quot;).charAt(0)" type="code"/>
+            <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.cancelButton.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.text&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.cancelButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.cancelButton.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.cancelButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="actionCommand" type="java.lang.String" value="cancel"/>
+            <Property name="actionCommand" type="java.lang.String" value="cancel" noResource="true"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="resetButton">
           <Properties>
-            <Property name="mnemonic" type="int" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.mnemonic&quot;).charAt(0)" type="code"/>
+            <Property name="mnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.resetButton.mnemonic" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.text&quot;)" type="code"/>
+            <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.resetButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="I18N.getString(&quot;Sirius.navigator.search.dynamic.SearchDialog.resetButton.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="SearchDialog.resetButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
-            <Property name="actionCommand" type="java.lang.String" value="reset"/>
+            <Property name="actionCommand" type="java.lang.String" value="reset" noResource="true"/>
           </Properties>
         </Component>
       </SubComponents>

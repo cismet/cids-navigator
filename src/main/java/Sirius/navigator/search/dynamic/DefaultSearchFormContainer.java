@@ -24,7 +24,6 @@ import Sirius.navigator.ui.widget.MutablePanel;
  */
 public class DefaultSearchFormContainer extends javax.swing.JPanel implements SearchFormContainer
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     protected final Logger logger;
     protected final LinkedHashMap searchFormsMap;
     protected final MutablePanel container;
@@ -36,7 +35,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
     {
         this.logger = Logger.getLogger(this.getClass());
         this.searchFormsMap = new LinkedHashMap();
-        this.container = new MutablePanel(this, "n/a");
+        this.container = new MutablePanel(this, org.openide.util.NbBundle.getMessage(DefaultSearchFormContainer.class, "DefaultSearchFormContainer.container.disabledMessage"));//NOI18N
         
         initComponents();
         
@@ -66,7 +65,9 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
     
     public void intFormContainer() throws FormInitializationException
     {
-        logger.debug("initalizing searchFormContainer '" + this.getName() + "'");
+        if (logger.isDebugEnabled()) {
+            logger.debug("initalizing searchFormContainer '" + this.getName() + "'");//NOI18N
+        }
         if(this.getResourceBundle() != null)
         {
             try
@@ -85,7 +86,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         }
         else
         {
-            logger.warn("i18n not supported by form container '" + this.getName() + "'");
+            logger.warn("i18n not supported by form container '" + this.getName() + "'");//NOI18N
         }
     }    
 
@@ -119,7 +120,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         }
         else
         {
-            logger.warn("search form '" + formId + "' not found");
+            logger.warn("search form '" + formId + "' not found");//NOI18N
             return null;
         }
     }   
@@ -135,7 +136,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
 
         if(searchForms != null)
         {
-            if(logger.isDebugEnabled())logger.debug("adding " + searchForms.size() + " SearchForms");
+            if(logger.isDebugEnabled())logger.debug("adding " + searchForms.size() + " SearchForms");//NOI18N
 
             Iterator iterator = searchForms.iterator();
             while(iterator.hasNext())
@@ -147,7 +148,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
                 }
                 else if(logger.isDebugEnabled())
                 {
-                    logger.warn("ignoring invisible search form '" + searchForm.getName() + "'");
+                    logger.warn("ignoring invisible search form '" + searchForm.getName() + "'");//NOI18N
                 }
             }
         }
@@ -189,7 +190,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         }
         else
         {
-            logger.warn("no search form selected (" + this.searchFormSelectionBox.getSelectedIndex() + ")");
+            logger.warn("no search form selected (" + this.searchFormSelectionBox.getSelectedIndex() + ")");//NOI18N
             return null;
         }
     }    
@@ -208,7 +209,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         }
         else
         {
-            if(logger.isDebugEnabled())logger.debug("search form '" + formId + "' not found");
+            if(logger.isDebugEnabled())logger.debug("search form '" + formId + "' not found");//NOI18N
             return false;
         }
     }
@@ -234,6 +235,11 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         return this.searchFormsMap.values();
     } 
 
+    /**
+     * @deprecated
+     * @param resourceBundle
+     * @throws MissingResourceException
+     */
     protected void internationalize(ResourceBundle resourceBundle) throws MissingResourceException
     {
         if(this.resourceBundle != null)
@@ -244,8 +250,8 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         }
         else       
         {
-            if(logger.isDebugEnabled())logger.error("i18n falied: property 'resourceBundle' is null");
-            throw new MissingResourceException("i18n falied: property 'resourceBundle' is null", this.getClass().getName(), "resourceBundle");
+            if(logger.isDebugEnabled())logger.error("i18n falied: property 'resourceBundle' is null");//NOI18N
+            throw new MissingResourceException("i18n falied: property 'resourceBundle' is null", this.getClass().getName(), "resourceBundle");//NOI18N
         }
         
     }
@@ -269,7 +275,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
     
     protected void addSearchForm(SearchForm searchForm)
     {
-        if(logger.isDebugEnabled())logger.debug("initializing & adding SearchForm '" + searchForm.getName() + "' (formId: " + searchForm.getFormId() + " queryId: " + searchForm.getQueryId() + ")");
+        if(logger.isDebugEnabled())logger.debug("initializing & adding SearchForm '" + searchForm.getName() + "' (formId: " + searchForm.getFormId() + " queryId: " + searchForm.getQueryId() + ")");//NOI18N
         
         try
         {
@@ -281,7 +287,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         }
         catch(FormInitializationException fiexp)
         {
-            logger.error("could not initialize form '" + searchForm.getName() + "', form not added", fiexp);
+            logger.error("could not initialize form '" + searchForm.getName() + "', form not added", fiexp);//NOI18N
         }
     }
     
@@ -292,7 +298,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
     
     public void setResourceBundle(java.util.ResourceBundle resourceBundle)
     {
-        if(logger.isDebugEnabled())logger.debug("setting resource bundle for locale locale to '" + resourceBundle.getLocale().toString() + "'");
+        if(logger.isDebugEnabled())logger.debug("setting resource bundle for locale locale to '" + resourceBundle.getLocale().toString() + "'");//NOI18N
         this.resourceBundle = resourceBundle;
     }    
     
@@ -304,7 +310,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         {
             if(e.getStateChange() == ItemEvent.DESELECTED)
             {
-                if(logger.isDebugEnabled())logger.debug("search form '" + e.getItem().toString() + "' deselected");
+                if(logger.isDebugEnabled())logger.debug("search form '" + e.getItem().toString() + "' deselected");//NOI18N
                 if(e.getItem() instanceof SearchForm)
                 {
                     ((SearchForm)e.getItem()).setSelected(false);
@@ -312,7 +318,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
             }
             else if(e.getStateChange() == ItemEvent.SELECTED)
             {
-                if(logger.isDebugEnabled())logger.debug("search form '" + e.getItem().toString() + "' selected ["+searchFormSelectionBox.getSelectedIndex()+ "]");
+                if(logger.isDebugEnabled())logger.debug("search form '" + e.getItem().toString() + "' selected ["+searchFormSelectionBox.getSelectedIndex()+ "]");//NOI18N
                 if(searchFormSelectionBox.getSelectedIndex() > 0 && e.getItem() instanceof SearchForm)
                 {
                     ((SearchForm)e.getItem()).setSelected(true);
@@ -358,7 +364,7 @@ public class DefaultSearchFormContainer extends javax.swing.JPanel implements Se
         noFormPanel.setLayout(new java.awt.BorderLayout());
 
         noFormLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        noFormLabel.setText(I18N.getString("Sirius.navigator.search.dynamic.DefaultSearchFormContainer.noFormLabel.text")); // NOI18N
+        noFormLabel.setText(org.openide.util.NbBundle.getMessage(DefaultSearchFormContainer.class, "DefaultSearchFormContainer.noFormLabel.text")); // NOI18N
         noFormPanel.add(noFormLabel, java.awt.BorderLayout.CENTER);
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));

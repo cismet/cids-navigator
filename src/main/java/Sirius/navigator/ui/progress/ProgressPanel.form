@@ -60,7 +60,7 @@
           <Properties>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.progress.ProgressPanel.progressLabel.initialText" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/ui/progress/Bundle.properties" key="ProgressPanel.progressLabel.initialText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -87,7 +87,7 @@
         <Component class="javax.swing.JButton" name="restartButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.progress.ProgressPanel.restartButton.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/ui/progress/Bundle.properties" key="ProgressPanel.restartButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -97,7 +97,7 @@
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.progress.ProgressPanel.cancelButton.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/ui/progress/Bundle.properties" key="ProgressPanel.cancelButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -110,7 +110,7 @@
       <Properties>
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.ui.progress.ProgressPanel.titleLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="Sirius/navigator/ui/progress/Bundle.properties" key="ProgressPanel.titleLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.EtchedBorderInfo">

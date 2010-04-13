@@ -55,22 +55,24 @@ public class DefaultSearchForm extends AbstractSearchForm
         {
             throw new FormInitializationException();
         }
+
+
         
-        if(this.getResourceBundle() != null)
-        {
-            try
-            {
-                super.internationalize(this.getResourceBundle());
-            }
-            catch(MissingResourceException mrexp)
-            {
-                throw new FormInitializationException();
-            }
-        }
-        else
-        {
-            logger.debug("i18n not supported by form '" + this.getName() + "'");
-        }
+//        if(this.getResourceBundle() != null)
+//        {
+//            try
+//            {
+//                super.internationalize(this.getResourceBundle());
+//            }
+//            catch(MissingResourceException mrexp)
+//            {
+//                throw new FormInitializationException();
+//            }
+//        }
+//        else
+//        {
+//            logger.debug("i18n not supported by form '" + this.getName() + "'");//NOI18N
+//        }
     }
     
     protected void initComponents(Collection beanParameterNames)
@@ -142,13 +144,13 @@ public class DefaultSearchForm extends AbstractSearchForm
             }
             else
             {
-                throw new FormValidationException(this.getName(), name, "java.lang.String");
+                throw new FormValidationException(this.getName(), name, "java.lang.String");//NOI18N
             } 
         }
         else
         {
-            logger.error("getParameter() failed: input field '" + name + "' not found");
-            throw new FormValidationException(this.getName(), name, "unknown parameter");
+            logger.error("getParameter() failed: input field '" + name + "' not found");//NOI18N
+            throw new FormValidationException(this.getName(), name, "unknown parameter");//NOI18N
         }
     }
     
@@ -169,13 +171,13 @@ public class DefaultSearchForm extends AbstractSearchForm
         }
         else
         {
-            logger.warn("setParameter() failed: input field '" + name + "' not found");
+            logger.warn("setParameter() failed: input field '" + name + "' not found");//NOI18N
         }
     }
     
     public void resetForm()
     {
-        if(logger.isDebugEnabled())logger.debug("resetting " + this.inputFields.size() + " input fields");
+        if(logger.isDebugEnabled())logger.debug("resetting " + this.inputFields.size() + " input fields");//NOI18N
         
         Iterator iterator = this.inputFields.values().iterator();
         while(iterator.hasNext())

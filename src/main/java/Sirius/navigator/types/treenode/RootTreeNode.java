@@ -10,14 +10,11 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.*;
 
 import Sirius.server.middleware.types.*;
-import Sirius.navigator.resource.*;
 
-import java.util.ResourceBundle;
 
 public class RootTreeNode extends DefaultMetaTreeNode
 {
     private final TreeNodeLoader treeNodeLoader;
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     
     public RootTreeNode() //throws Exception
     {
@@ -57,7 +54,7 @@ public class RootTreeNode extends DefaultMetaTreeNode
         }
         catch(Exception exp)
         {
-            logger.error("could not add children", exp);
+            logger.error("could not add children", exp);//NOI18N
         }   
     }
     
@@ -103,12 +100,12 @@ public class RootTreeNode extends DefaultMetaTreeNode
     
     public String toString()
     { 
-        return I18N.getString("Sirius.navigator.types.treenode.RootTreeNode.toString().returnValue");
+        return org.openide.util.NbBundle.getMessage(RootTreeNode.class, "RootTreeNode.toString().returnValue");//NOI18N
     }
     
     public String getDescription()
     {
-        return I18N.getString("Sirius.navigator.types.treenode.RootTreeNode.getDescription().returnValue");
+        return org.openide.util.NbBundle.getMessage(RootTreeNode.class, "RootTreeNode.getDescription().returnValue");//NOI18N
     }
     
     /**
@@ -146,13 +143,13 @@ public class RootTreeNode extends DefaultMetaTreeNode
     
     public int getID()
     {
-        logger.warn("method 'getID()' should not be called on RootNode");
+        logger.warn("method 'getID()' should not be called on RootNode");//NOI18N
         return -1;
     }
     
     public String getDomain()
     {
-        logger.warn("method 'getDomain()' should not be called on RootNode");
+        logger.warn("method 'getDomain()' should not be called on RootNode");//NOI18N
         return null;
     }
 
@@ -208,8 +205,8 @@ public class RootTreeNode extends DefaultMetaTreeNode
                 }
                 else
                 {
-                    logger.fatal("[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");
-                    throw new Exception("[DDefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");
+                    logger.fatal("[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");//NOI18N
+                    throw new Exception("[DDefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");//NOI18N
                 }
             }
             

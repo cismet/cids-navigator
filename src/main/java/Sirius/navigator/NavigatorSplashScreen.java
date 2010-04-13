@@ -3,7 +3,6 @@ package Sirius.navigator;
 import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ResourceBundle;
 import javax.swing.Icon;
 import javax.swing.JWindow;
 import javax.swing.SwingUtilities;
@@ -12,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MultithreadedMethod;
-import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.ui.progress.ProgressObserver;
 import de.cismet.tools.CismetThreadPool;
 import java.awt.Color;

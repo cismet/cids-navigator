@@ -22,7 +22,6 @@ import org.apache.log4j.Logger;
  */
 public class DefaultComplexEditor extends AbstractComplexEditor
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     /** Creates new form DefalutComplexEditor */
     public DefaultComplexEditor()
     {
@@ -58,7 +57,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
 
         controlPanel.setLayout(new java.awt.GridLayout(1, 2, 0, 1));
 
-        stopButton.setText(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.stopButton.text")); // NOI18N
+        stopButton.setText(org.openide.util.NbBundle.getMessage(DefaultComplexEditor.class, "DefaultComplexEditor.stopButton.text")); // NOI18N
         stopButton.setActionCommand("stopEditing"); // NOI18N
         stopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -67,7 +66,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
         });
         controlPanel.add(stopButton);
 
-        cancelButton.setText(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.cancelButton.text")); // NOI18N
+        cancelButton.setText(org.openide.util.NbBundle.getMessage(DefaultComplexEditor.class, "DefaultComplexEditor.cancelButton.text")); // NOI18N
         cancelButton.setActionCommand("cancelEditing"); // NOI18N
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -100,7 +99,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
         }
         else if(logger.isDebugEnabled())
         {
-            logger.debug("initUI(" + this + "): ui already initialized");
+            logger.debug("initUI(" + this + "): ui already initialized");//NOI18N
         }
         
         // das f\u00FCllt die editor map ....
@@ -118,7 +117,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
         {
             if(java.util.List.class.isAssignableFrom(this.getValue().getClass()))
             {
-                if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): generating default ui for java.util.List");
+                if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): generating default ui for java.util.List");//NOI18N
                 
                 int i = 0;
                 Iterator iterator = ((java.util.List)this.getValue()).iterator();
@@ -130,7 +129,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
             }
             else if(java.util.Map.class.isAssignableFrom(this.getValue().getClass()))
             {
-                if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): generating default ui for java.util.Map");               
+                if(logger.isDebugEnabled())logger.debug("initUI(" + this + "): generating default ui for java.util.Map");//NOI18N
                 
                 Iterator iterator = ((Map)this.getValue()).keySet().iterator();
                 while(iterator.hasNext())
@@ -141,7 +140,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
             }
             else
             {
-                logger.error("getEditor(): " + this.getValue().getClass().getName() + " is not supported by this editor locator");
+                logger.error("getEditor(): " + this.getValue().getClass().getName() + " is not supported by this editor locator");//NOI18N
             }
         } 
     }    
@@ -155,7 +154,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
             Object editor = this.getChildEditors().get(id);
             if(ComplexEditor.class.isAssignableFrom(editor.getClass()))
             {
-                if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating complex editor with complex parent editor");
+                if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating complex editor with complex parent editor");//NOI18N
                 DefaultSimpleEditor simpleEditor = new DefaultSimpleEditor();
                 
                 //((ComplexEditor)editor).setProperty(BasicEditor.PROPERTY_LOCALE, this.getProperty(BasicEditor.PROPERTY_LOCALE));
@@ -165,25 +164,25 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                 
                 if(this.getChildEditors().put(id, simpleEditor) != null)
                 {
-                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor with complex child editor");
+                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor with complex child editor");//NOI18N
                     editorComponent = simpleEditor.getEditorComponent(this, (ComplexEditor)editor, id, value);
                     ((SimpleEditor)simpleEditor).addEditorListener(this.editorHandler);
                 }
                 else
                 {
-                    logger.error("addEditorUI(" + this + "): synchronization error: editor '" + id + "'not in editor map!");
-                    editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.internalErrorText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.internalErrorText2"));
+                    logger.error("addEditorUI(" + this + "): synchronization error: editor '" + id + "'not in editor map!");//NOI18N
+                    editorComponent = new JLabel(org.openide.util.NbBundle.getMessage(DefaultComplexEditor.class, "DefaultComplexEditor.addEditorUI.editorComponent.internalErrorText", new Object[]{this}));//NOI18N
                 }
             }
             else if(SimpleEditor.class.isAssignableFrom(editor.getClass()))
             {
-                if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor");
+                if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor");//NOI18N
                 Object complexEditorClass = ((SimpleEditor)editor).getProperty(SimpleEditor.PROPERTY_COMLPEX_EDTIOR);
                 //((SimpleEditor)editor).setProperty(BasicEditor.PROPERTY_LOCALE, this.getProperty(BasicEditor.PROPERTY_LOCALE));
                 
                 if(complexEditorClass != null)
                 {
-                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating complex editor with simple parent editor");
+                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating complex editor with simple parent editor");//NOI18N
                     
                     try
                     {
@@ -194,13 +193,13 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                     }
                     catch(Throwable t)
                     {
-                        logger.error("addEditorUI(" + this + "): could not register complex editor for simple editor", t);
+                        logger.error("addEditorUI(" + this + "): could not register complex editor for simple editor", t);//NOI18N
                         editorComponent = ((SimpleEditor)editor).getEditorComponent(this, id, value);
                     }
                 }
                 else
                 {
-                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor without complex child editor");
+                    if(logger.isDebugEnabled())logger.debug("addEditorUI(" + this + "): creating simple editor without complex child editor");//NOI18N
                     editorComponent = ((SimpleEditor)editor).getEditorComponent(this, id, value);
                 }
                 
@@ -208,14 +207,14 @@ public class DefaultComplexEditor extends AbstractComplexEditor
             } 
             else
             {
-                logger.error("addEditorUI(" + this + "): unknown editor type'" + editor.getClass() + "'");
-                editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.wrongEditorTypeText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.wrongEditorTypeText2"));
+                logger.error("addEditorUI(" + this + "): unknown editor type'" + editor.getClass() + "'");//NOI18N
+                editorComponent = new JLabel(org.openide.util.NbBundle.getMessage(DefaultComplexEditor.class, "DefaultComplexEditor.addEditorUI.editorComponent.wrongEditorTypeText", new Object[]{this}));//NOI18N
             }
         }
         else
         {
-            logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");
-            editorComponent = new JLabel(I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.EditorNotFoundText1") + this + I18N.getString("Sirius.navigator.ui.attributes.editor.DefaultComplexEditor.addEditorUI.editorComponent.EditorNotFoundText2"));
+            logger.error("addEditorUI(" + this + "): no editor found for object '" + id + "'");//NOI18N
+            editorComponent = new JLabel(org.openide.util.NbBundle.getMessage(DefaultComplexEditor.class, "DefaultComplexEditor.addEditorUI.editorComponent.EditorNotFoundText", new Object[]{this}));//NOI18N
         }        
         
         gridBagConstraints.gridy++;
@@ -236,7 +235,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
     
     public java.lang.Object getValue(java.lang.Object key)
     {
-        if(logger.isDebugEnabled())logger.debug("setting new value for '" + key + "'");    
+        if(logger.isDebugEnabled())logger.debug("setting new value for '" + key + "'");//NOI18N
         if(this.getValue() != null)
         {
             if(java.util.List.class.isAssignableFrom(this.getValue().getClass()))
@@ -248,14 +247,14 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                     {
                         return ((java.util.List)this.getValue()).get(i);
                     }
-                    else if(logger.isDebugEnabled())
+                    else
                     {
-                        logger.warn("getValue(" + this + "): key index out of bounds '" + i + " (" + ((java.util.List)this.getValue()).size() + ")");    
+                        logger.warn("getValue(" + this + "): key index out of bounds '" + i + " (" + ((java.util.List)this.getValue()).size() + ")");//NOI18N
                     }
                 }
-                else if(logger.isDebugEnabled())
+                else
                 {
-                    logger.warn("getValue(" + this + "): wrong key type '" + key.getClass() + "', 'Integer' expected");                
+                    logger.warn("getValue(" + this + "): wrong key type '" + key.getClass() + "', 'Integer' expected");//NOI18N
                 }
             }
             else if(java.util.Map.class.isAssignableFrom(this.getValue().getClass()))
@@ -266,17 +265,17 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                 }
                 else
                 {
-                    logger.warn("getValue(" + this + "): key not found '" + key + "'");    
+                    logger.warn("getValue(" + this + "): key not found '" + key + "'");//NOI18N
                 }
             }
             else
             {
-                logger.error("getValue(" + this + "): unexpected call to getValue(): wrong type");
+                logger.error("getValue(" + this + "): unexpected call to getValue(): wrong type");//NOI18N
             }
         }
         else
         {
-            logger.error("getValue(" + this + "): unexpected call to getValue(): this.value is null");
+            logger.error("getValue(" + this + "): unexpected call to getValue(): this.value is null");//NOI18N
         }
         
         return null;
@@ -284,7 +283,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
     
     public void setValue(java.lang.Object key, java.lang.Object value)
     {
-        if(logger.isDebugEnabled())logger.debug("setValue(" + this + "): setting new value '" + key + "': " + value);
+        if(logger.isDebugEnabled())logger.debug("setValue(" + this + "): setting new value '" + key + "': " + value);//NOI18N
         
         if(this.getValue() != null)
         {
@@ -293,7 +292,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                 if(Integer.class.isAssignableFrom(key.getClass()))
                 {
                     int i = ((Integer)key).intValue();
-                    if(logger.isDebugEnabled())logger.debug("setValue(" + this + "): setting list value: " + i);
+                    if(logger.isDebugEnabled())logger.debug("setValue(" + this + "): setting list value: " + i);//NOI18N
                     
                     if(i < ((java.util.List)this.getValue()).size())
                     {
@@ -301,47 +300,47 @@ public class DefaultComplexEditor extends AbstractComplexEditor
                     }
                     else if(logger.isDebugEnabled())
                     {
-                        logger.warn("setValue(" + this + "): key index out of bounds '" + i + " (" + ((java.util.List)this.getValue()).size() + ")");    
+                        logger.warn("setValue(" + this + "): key index out of bounds '" + i + " (" + ((java.util.List)this.getValue()).size() + ")");//NOI18N
                     }
                 }
                 else if(logger.isDebugEnabled())
                 {
-                    logger.warn("setValue(" + this + "): wrong key type '" + key.getClass() + "', 'Integer' expected");                
+                    logger.warn("setValue(" + this + "): wrong key type '" + key.getClass() + "', 'Integer' expected");//NOI18N
                 }
             }
             else if(java.util.Map.class.isAssignableFrom(this.getValue().getClass()))
             {
                 if(((Map)this.getValue()).containsKey(key))
                 {
-                    if(logger.isDebugEnabled())logger.debug("setValue(" + this + "): setting map value: " + key);
+                    if(logger.isDebugEnabled())logger.debug("setValue(" + this + "): setting map value: " + key);//NOI18N
                     ((Map)this.getValue()).put(key, value);
                 }
                 else
                 {
-                    logger.warn("setValue(" + this + "): key not found '" + key + "'");    
+                    logger.warn("setValue(" + this + "): key not found '" + key + "'");//NOI18N
                 }
             }
             else
             {
-                logger.error("setValue(" + this + "): unexpected call to getValue(): wrong type");
+                logger.error("setValue(" + this + "): unexpected call to getValue(): wrong type");//NOI18N
             }
         }
         else
         {
-            logger.error("setValue(" + this + "): unexpected call to setValue(): this.value is null");
+            logger.error("setValue(" + this + "): unexpected call to setValue(): this.value is null");//NOI18N
         }
     }
     
     // XXX method not supported
     public void addValue(java.lang.Object key, java.lang.Object value)
     {
-        logger.error("addValue() method not supported");
+        logger.error("addValue() method not supported");//NOI18N
     }
 
     // XXX method not supported
     public java.lang.Object removeValue(java.lang.Object key)
     {
-        logger.error("removeValue() method not supported");
+        logger.error("removeValue() method not supported");//NOI18N
         return null;
     }
 

@@ -221,7 +221,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode //imple
 
         if (!this.isLeaf()) {
             if (logger.isDebugEnabled()) {
-                logger.warn("exploring all children of node '" + this + "'");
+                logger.warn("exploring all children of node '" + this + "'");//NOI18N
             }
             if (!this.isExplored()) {
                 this.explore();
@@ -256,7 +256,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode //imple
                 }
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("explore(): child node '" + childNode + "' not found");
+                    logger.debug("explore(): child node '" + childNode + "' not found");//NOI18N
                 }
                 final TreePath fallback = handleNotMatchingNodeFound();
                 if (fallback != null) {
@@ -281,7 +281,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode //imple
      */
     public void removeChildren() {
         if (logger.isDebugEnabled()) {
-            logger.debug("removing children");
+            logger.debug("removing children");//NOI18N
         }
         this.removeAllChildren();
         this.explored = false;

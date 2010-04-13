@@ -46,9 +46,9 @@ public class SimpleStringSelectionMetaAttributeEditor extends AbstractSimpleMeta
     {
          HashSet selectionValues = new HashSet();
          
-         selectionValues.add("Wert 1");
-         selectionValues.add("Wert 2");
-         selectionValues.add("Wert 3");
+         selectionValues.add("Wert 1");//NOI18N
+         selectionValues.add("Wert 2");//NOI18N
+         selectionValues.add("Wert 3");//NOI18N
          
          return selectionValues;
     }
@@ -87,7 +87,7 @@ public class SimpleStringSelectionMetaAttributeEditor extends AbstractSimpleMeta
     {//GEN-HEADEREND:event_stringComboBoxItemStateChanged
         if(evt.getStateChange() == ItemEvent.SELECTED)
         {
-            if(logger.isDebugEnabled())logger.debug("stringComboBoxItemStateChanged() item selected: " + evt.getItem());
+            if(logger.isDebugEnabled())logger.debug("stringComboBoxItemStateChanged() item selected: " + evt.getItem());//NOI18N
             this.setValueChanged(true);
             this.stopEditing();
         }
@@ -116,17 +116,17 @@ public class SimpleStringSelectionMetaAttributeEditor extends AbstractSimpleMeta
     // value ist immer ein Attribut!!!
     protected void setComponentValue(Object value)
     { 
-        if(logger.isDebugEnabled())logger.debug("setComponentValue(): setting string value: '" + value + "'");
+        if(logger.isDebugEnabled())logger.debug("setComponentValue(): setting string value: '" + value + "'");//NOI18N
         if(value != null && this.getAttributeValue(value) != null)
         {
             if(this.selectionValues.contains(this.getAttributeValue(value)))
             {
-                if(logger.isDebugEnabled())logger.debug("setComponentValue(): this.stringComboBox.setSelectedItem(value): '" + value + "'");
+                if(logger.isDebugEnabled())logger.debug("setComponentValue(): this.stringComboBox.setSelectedItem(value): '" + value + "'");//NOI18N
                 this.stringComboBox.setSelectedItem(value.toString());
             }
             else
             {
-                logger.warn("setComponentValue(): new value (" + value + ") is not in the list of allowed selection values");
+                logger.warn("setComponentValue(): new value (" + value + ") is not in the list of allowed selection values");//NOI18N
                 this.stringComboBox.setSelectedIndex(0);
                 
                 /*logger.debug(value.getClass());
@@ -141,7 +141,7 @@ public class SimpleStringSelectionMetaAttributeEditor extends AbstractSimpleMeta
         {
             // standardm\u00E4\u00DFig auf 0 setzen
             this.stringComboBox.setSelectedIndex(0);
-            if(logger.isDebugEnabled())logger.debug("setComponentValue(): value is null, setting index 0 to: " + this.stringComboBox.getSelectedItem());
+            if(logger.isDebugEnabled())logger.debug("setComponentValue(): value is null, setting index 0 to: " + this.stringComboBox.getSelectedItem());//NOI18N
             this.setValue(this.getComponentValue());
             this.setValueChanged(true);
         } 

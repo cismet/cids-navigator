@@ -51,19 +51,19 @@ public class BrowserControl implements AppletContext
     
     
     // Used to identify the windows platform.
-    private static final String WIN_NT_ID = "Windows NT";
+    private static final String WIN_NT_ID = "Windows NT";//NOI18N
     // Used to identify the windows platform.
-    private static final String WIN_XP_ID = "Windows XP";
+    private static final String WIN_XP_ID = "Windows XP";//NOI18N
     // Used to identify the windows platform.
-    private static final String WIN_9X_ID = "Windows";
+    private static final String WIN_9X_ID = "Windows";//NOI18N
     // The default system browser under windows.
-    private static final String WIN_PATH = "rundll32";
+    private static final String WIN_PATH = "rundll32";//NOI18N
     // The flag to display a url.
-    private static final String WIN_FLAG = "url.dll,FileProtocolHandler";
+    private static final String WIN_FLAG = "url.dll,FileProtocolHandler";//NOI18N
     // The default browser under unix.
-    private static final String UNIX_PATH = "netscape";
+    private static final String UNIX_PATH = "netscape";//NOI18N
     // The flag to display a url.
-    private static final String UNIX_FLAG = "-remote openURL";
+    private static final String UNIX_FLAG = "-remote openURL";//NOI18N
     
     private BrowserControl()
     {}
@@ -89,8 +89,8 @@ public class BrowserControl implements AppletContext
             return appletContext.getAudioClip(url);
         else
         {
-            logger.error("method 'getAudioClip()' not supported");
-            throw new RuntimeException("method 'getAudioClip()' not supported");
+            logger.error("method 'getAudioClip()' not supported");//NOI18N
+            throw new RuntimeException("method 'getAudioClip()' not supported");//NOI18N
         }
     }
     
@@ -100,8 +100,8 @@ public class BrowserControl implements AppletContext
             return appletContext.getImage(url);
         else
         {
-            logger.error("method 'getImage' not supported");
-            throw new RuntimeException("method 'getImage' not supported");
+            logger.error("method 'getImage' not supported");//NOI18N
+            throw new RuntimeException("method 'getImage' not supported");//NOI18N
         }
     }
     
@@ -111,8 +111,8 @@ public class BrowserControl implements AppletContext
             return appletContext.getApplet(name);
         else
         {
-            logger.error("method 'getApplet()' not supported");
-            throw new RuntimeException("method 'getApplet()' not supported");
+            logger.error("method 'getApplet()' not supported");//NOI18N
+            throw new RuntimeException("method 'getApplet()' not supported");//NOI18N
         }
     }
     
@@ -122,8 +122,8 @@ public class BrowserControl implements AppletContext
             return appletContext.getApplets();
         else
         {
-            logger.error("method 'getApplets()' not supported");
-            throw new RuntimeException("method 'getApplets()' not supported");
+            logger.error("method 'getApplets()' not supported");//NOI18N
+            throw new RuntimeException("method 'getApplets()' not supported");//NOI18N
         }
     }
     
@@ -132,7 +132,7 @@ public class BrowserControl implements AppletContext
         //NavigatorLogger.printMessage("showDocument: " + url + " " + appletContext);
         
         if(appletContext != null)
-            appletContext.showDocument(url, "_blank");
+            appletContext.showDocument(url, "_blank");//NOI18N
         else
         {
             this.displayURL(url);
@@ -153,16 +153,16 @@ public class BrowserControl implements AppletContext
             appletContext.showStatus(status);
         else
         {
-            logger.error("method 'showStatus()' not supported");
+            logger.error("method 'showStatus()' not supported");//NOI18N
         }
     }
     
     public String toString()
     {
         if(appletContext != null)
-            return "AppletContext";
+            return "AppletContext";//NOI18N
         else
-            return "BrowserControl for " + System.getProperty("os.name");
+            return "BrowserControl for " + System.getProperty("os.name");//NOI18N
     }
     
     public void setStream(String s, InputStream i) throws IOException
@@ -173,8 +173,8 @@ public class BrowserControl implements AppletContext
         }
         else
         {
-            logger.error("method 'setStream()' not supported");
-            throw new IOException("method 'setStream()' not supported");
+            logger.error("method 'setStream()' not supported");//NOI18N
+            throw new IOException("method 'setStream()' not supported");//NOI18N
         }
     }
     
@@ -186,8 +186,8 @@ public class BrowserControl implements AppletContext
         }
         else
         {
-            logger.error("method 'getStream()' not supported");
-            throw new RuntimeException("method 'hetStream()' not supported");
+            logger.error("method 'getStream()' not supported");//NOI18N
+            throw new RuntimeException("method 'hetStream()' not supported");//NOI18N
         }
     }
     
@@ -199,8 +199,8 @@ public class BrowserControl implements AppletContext
         }
         else
         {
-            logger.error("method 'getStreamKeys()' not supported");
-            throw new RuntimeException("method 'getStreamKeys()' not supported");
+            logger.error("method 'getStreamKeys()' not supported");//NOI18N
+            throw new RuntimeException("method 'getStreamKeys()' not supported");//NOI18N
         }
     }
     
@@ -213,7 +213,7 @@ public class BrowserControl implements AppletContext
     
     public void displayURL(String url)
     {
-        logger.debug("showing url '" + url + "' in browser");
+        logger.debug("showing url '" + url + "' in browser");//NOI18N
         
         try
         {
@@ -221,7 +221,7 @@ public class BrowserControl implements AppletContext
         }
         catch(Throwable t)
         {
-            logger.error("could not open url (" + url + "):\n" + t.getMessage(), t);
+            logger.error("could not open url (" + url + "):\n" + t.getMessage(), t);//NOI18N
         }
         
        

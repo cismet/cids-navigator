@@ -13,7 +13,7 @@
           <Properties>
             <Property name="horizontalAlignment" type="int" value="0"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="Sirius/navigator/resource/i18n/resources.properties" key="Sirius.navigator.search.dynamic.DefaultSearchFormContainer.noFormLabel.text" replaceFormat="I18N.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="Sirius/navigator/search/dynamic/Bundle.properties" key="DefaultSearchFormContainer.noFormLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>

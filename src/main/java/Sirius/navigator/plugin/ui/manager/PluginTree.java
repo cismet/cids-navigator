@@ -20,7 +20,6 @@ import Sirius.navigator.plugin.*;
  */
 public class PluginTree extends JTree
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private static final ResourceManager resources = ResourceManager.getManager();
     private final PluginTreeNode rootNode;
     
@@ -123,10 +122,10 @@ public class PluginTree extends JTree
         
         public PluginTreeNode()
         {
-            super(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.rootNode"));
+            super(org.openide.util.NbBundle.getMessage(PluginTree.class, "PluginTree.PluginTreeNode.rootNode"));//NOI18N
             this.pluginDescriptor = null;
             this.methodDescriptor = null;
-            this.icon = resources.getIcon(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.icon.root"));
+            this.icon = resources.getIcon("plugin_node_root.gif");
         }
         
         public PluginTreeNode(PluginDescriptor pluginDescriptor)
@@ -134,7 +133,7 @@ public class PluginTree extends JTree
             super(pluginDescriptor.getName());
             this.pluginDescriptor = pluginDescriptor;
             this.methodDescriptor = null;
-            this.icon = resources.getIcon(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.icon.pluginNode"));
+            this.icon = resources.getIcon("plugin_node_plugin.gif");
             
             if(pluginDescriptor.isPluginMethodsAvailable())
             {
@@ -147,7 +146,7 @@ public class PluginTree extends JTree
             super(methodDescriptor.getName());
             this.pluginDescriptor = null;
             this.methodDescriptor = methodDescriptor;
-            this.icon = resources.getIcon(I18N.getString("Sirius.navigator.plugin.ui.manager.PluginTree.PluginTreeNode.icon.pluginNodeMethod"));
+            this.icon = resources.getIcon("plugin_node_method.gif");
         }
         
         protected void addMethods()

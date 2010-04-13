@@ -75,7 +75,7 @@ public class FloatingFrame extends JToolBar
     public static final String EAST = BorderLayout.EAST;
     public static final String WEST = BorderLayout.WEST;
     
-    public static final String FLOATING = "floating";
+    public static final String FLOATING = "floating";//NOI18N
     
     //public static final String START_FLOATING = "floating started";
     //public static final String STOP_FLOATING = "floating stopped";
@@ -143,7 +143,7 @@ public class FloatingFrame extends JToolBar
         if(configurator.isTitleBarEnabled())
         {
             titleBar= new TitleBar(configurator.getName(), 
-                    resource.getIcon(resource.getString("Sirius.navigator.ui.widget.FloatingFrame.titleBar.icon")));
+                    resource.getIcon("floatingframe.gif"));
             this.add(titleBar, BorderLayout.NORTH);
         
         }
@@ -173,7 +173,7 @@ public class FloatingFrame extends JToolBar
                     }
                     else
                     {
-                        logger.error("invalid object type '" + object.getClass().getName() + "', 'javax.swing.JMenu' expected");
+                        logger.error("invalid object type '" + object.getClass().getName() + "', 'javax.swing.JMenu' expected");//NOI18N
                     }
                 }
                 
@@ -229,7 +229,7 @@ public class FloatingFrame extends JToolBar
         
         rootPane.getContentPane().add(this.content, BorderLayout.CENTER);
         
-        this.addPropertyChangeListener("ancestor", new FloatingListener());
+        this.addPropertyChangeListener("ancestor", new FloatingListener());//NOI18N
     }
     
     public void setTileBarVisible(boolean isVisible){
@@ -389,7 +389,7 @@ public class FloatingFrame extends JToolBar
                 // Das Panel wurde "herausgezogen"
                 if (isFloating())
                 {
-                    logger.debug("isFloating() == true");
+                    logger.debug("isFloating() == true");//NOI18N
                     // Loest einen neunen PropertyChangeEvent aus
                     // Der PropertyChangeEvent "anchestor" sollte von anderen
                     // Widgets nicht mehr benutzt werden (um herauszufinden ob der
@@ -410,7 +410,7 @@ public class FloatingFrame extends JToolBar
                 // Das Fenster wurde geschlossen bzw. wieder "hereingezogen"
                 else
                 {
-                    logger.debug("isFloating() == false");
+                    logger.debug("isFloating() == false");//NOI18N
                     // Urspruengliche Groesse des Panels wiederherstellen
                     setPreferredSize(panelSize);
                     
@@ -447,7 +447,7 @@ public class FloatingFrame extends JToolBar
             // nicht disabled werden.
             if(!isFloating())
             {
-                if(logger.isDebugEnabled())logger.debug("setting floating frame menu/toolbar enabled to 'true'");
+                if(logger.isDebugEnabled())logger.debug("setting floating frame menu/toolbar enabled to 'true'");//NOI18N
                 if(configurator.isDisableToolBar())
                 {
                     floatingFrameToolBar.setEnabled(allEnabled);
@@ -469,7 +469,7 @@ public class FloatingFrame extends JToolBar
             // nicht disabled werden.
             if(!isFloating())
             {
-                if(logger.isDebugEnabled())logger.debug("setting floating frame menu/toolbar enabled to 'false'");
+                if(logger.isDebugEnabled())logger.debug("setting floating frame menu/toolbar enabled to 'false'");//NOI18N
                 if(configurator.isDisableToolBar())
                 {
                     floatingFrameToolBar.setEnabled(allEnabled);
@@ -495,14 +495,14 @@ public class FloatingFrame extends JToolBar
         
         public void setVisible(final boolean visible)
         {
-            logger.debug("FloatingFrameMenuBar:setVisible(" + visible + ")");
+            logger.debug("FloatingFrameMenuBar:setVisible(" + visible + ")");//NOI18N
             if(SwingUtilities.isEventDispatchThread())
             {
                 doSetVisible(visible);
             }
             else
             {
-                logger.debug("setVisible(): synchronizing method");
+                logger.debug("setVisible(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -515,7 +515,7 @@ public class FloatingFrame extends JToolBar
         
         private void doSetVisible(boolean visible)
         {
-            logger.debug("FloatingFrameMenuBar:doSetVisible(" + visible + ")");
+            logger.debug("FloatingFrameMenuBar:doSetVisible(" + visible + ")");//NOI18N
             if(this.isVisible() != visible)
             {
                 super.setVisible(visible);
@@ -531,13 +531,13 @@ public class FloatingFrame extends JToolBar
             }
             else
             {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");
+                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
             }
         }
         
         protected void addComponents()
         {
-            logger.debug("FloatingFrameMenuBar:addComponents()");
+            logger.debug("FloatingFrameMenuBar:addComponents()");//NOI18N
             ComponentIterator iterator = this.iterator();
             while(iterator.hasNext())
             {
@@ -550,7 +550,7 @@ public class FloatingFrame extends JToolBar
                     }
                     else
                     {
-                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");
+                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");//NOI18N
                     }
                 }
             }
@@ -560,7 +560,7 @@ public class FloatingFrame extends JToolBar
         
         protected void removeComponents()
         {
-            logger.debug("FloatingFrameMenuBar:removeComponents()");
+            logger.debug("FloatingFrameMenuBar:removeComponents()");//NOI18N
             FloatingFrame.this.menuBar.removeAll();
             FloatingFrame.this.rootPane.setJMenuBar(null);
         }
@@ -576,41 +576,45 @@ public class FloatingFrame extends JToolBar
         
         public void setVisible(boolean visible)
         {
-            logger.debug("FloatingFrameToolBar:setVisible(" + visible + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameToolBar:setVisible(" + visible + ")");//NOI18N
+            }
             this.setVisible(toolBar.getId(), visible);
         }
         
         public void setEnabled(boolean enabled)
         {
-            logger.debug("FloatingFrameToolBar:setEnabled(" + enabled + ")");
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameToolBar:setEnabled(" + enabled + ")");//NOI18N
+            }
             this.setEnabled(toolBar.getId(), enabled);
         }
         
         protected void doAdd(EmbeddedComponent component)
         {
-            logger.debug("FloatingFrameToolBar:doAdd()");
+            logger.debug("FloatingFrameToolBar:doAdd()");//NOI18N
             if(component instanceof EmbeddedToolBar)
             {
                 if(FloatingFrame.this.rootPane != null)
                 {
-                    logger.info("rootPane");
+                    logger.info("rootPane");//NOI18N
                     FloatingFrame.this.rootPane.getContentPane().add((JToolBar)component, BorderLayout.NORTH);
                 }
                 else
                 {
-                    logger.info(component);
+                    logger.info(component);//NOI18N
                     FloatingFrame.this.add((JToolBar)component, BorderLayout.NORTH);
                 }
             }
             else
             {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");
+                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");//NOI18N
             }
         }
         
         protected void doRemove(EmbeddedComponent component)
         {
-            logger.debug("FloatingFrameToolBar:doRemove()");
+            logger.debug("FloatingFrameToolBar:doRemove()");//NOI18N
             if(component instanceof EmbeddedToolBar)
             {
                 /*if(FloatingFrame.this.rootPane != null)
@@ -626,13 +630,13 @@ public class FloatingFrame extends JToolBar
             }
             else
             {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");
+                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");//NOI18N
             }
         }
         
         protected void doSetVisible(EmbeddedComponent component, boolean visible)
         {
-            logger.debug("FloatingFrameToolBar:doSetVisible()");
+            logger.debug("FloatingFrameToolBar:doSetVisible()");//NOI18N
             if(component.isVisible() != visible)
             {
                 super.doSetVisible(component, visible);
@@ -648,7 +652,7 @@ public class FloatingFrame extends JToolBar
             }
             else
             {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");
+                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
             }
         }
     }
@@ -845,7 +849,7 @@ public class FloatingFrame extends JToolBar
         
         protected RootPaneContainer createFloatingWindow(JToolBar toolbar)
         {
-            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName());
+            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName());//NOI18N
             
             FloatingFrame ff;
             class FloatingDialog extends JFrame //JDialog
@@ -945,7 +949,7 @@ public class FloatingFrame extends JToolBar
          */
         protected JFrame createFloatingFrame(JToolBar toolBar)
         {
-            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingFrame: " + toolBar.getClass().getName());
+            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingFrame: " + toolBar.getClass().getName());//NOI18N
             
             WindowListener wl = createFrameListener();
             JFrame frame = new JFrame(toolBar.getName());
@@ -1033,7 +1037,7 @@ public class FloatingFrame extends JToolBar
         
         protected RootPaneContainer createFloatingWindow(JToolBar toolbar)
         {
-            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName());
+            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName());//NOI18N
             
             FloatingFrame ff;
             class FloatingDialog extends JFrame //JDialog

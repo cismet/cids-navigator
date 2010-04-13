@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
     <action>
-        <actionName>CUSTOM-deploy</actionName>
-        <displayName>deploy</displayName>
-        <goals>
-            <goal>deploy</goal>
-        </goals>
-    </action>
-    <action>
         <actionName>run</actionName>
         <goals>
             <goal>process-classes</goal>
             <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
         </goals>
+        <activatedProfiles>
+            <activatedProfile>nb-exec</activatedProfile>
+        </activatedProfiles>
         <properties>
-            <exec.workingdir>C:\cvs_work\cidsDistribution\client\wunda</exec.workingdir>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>-Xms256m -Xmx1024m -classpath %classpath Sirius.navigator.Navigator</exec.args>
+            <exec.workingdir>${de.cismet.cids.navigator.workingDir}</exec.workingdir>
+            <exec.args>-Xms256m -Xmx1024m -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
     </action>
@@ -26,10 +22,13 @@
             <goal>process-classes</goal>
             <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
         </goals>
+        <activatedProfiles>
+            <activatedProfile>nb-exec</activatedProfile>
+        </activatedProfiles>
         <properties>
-            <exec.workingdir>C:\cvs_work\cidsDistribution\client\wunda</exec.workingdir>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms256m -Xmx1024m -classpath %classpath Sirius.navigator.Navigator</exec.args>
+            <exec.workingdir>${de.cismet.cids.navigator.workingDir}</exec.workingdir>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms256m -Xmx1024m -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
             <jpda.listen>true</jpda.listen>
             <exec.executable>java</exec.executable>
         </properties>
@@ -40,9 +39,12 @@
             <goal>process-classes</goal>
             <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
         </goals>
+        <activatedProfiles>
+            <activatedProfile>nb-exec</activatedProfile>
+        </activatedProfiles>
         <properties>
-            <exec.workingdir>C:\cvs_work\cidsDistribution\client\wunda</exec.workingdir>
-            <exec.args>${profiler.args} -Xms256m -Xmx1024m -classpath %classpath Sirius.navigator.Navigator</exec.args>
+            <exec.args>${profiler.args} -Xms256m -Xmx1024m -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
+            <exec.workingdir>${de.cismet.cids.navigator.workingDir}</exec.workingdir>
             <profiler.action>profile</profiler.action>
             <exec.executable>${profiler.java}</exec.executable>
         </properties>
@@ -59,5 +61,4 @@
             <activatedProfile>deploy-public</activatedProfile>
         </activatedProfiles>
     </action>
-
 </actions>

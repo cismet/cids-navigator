@@ -25,7 +25,6 @@ package Sirius.navigator.search.dynamic.profile;
  *******************************************************************************/
 import java.io.*;
 import java.util.zip.*;
-import java.util.ResourceBundle;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -53,7 +52,6 @@ import Sirius.navigator.resource.*;
 
 public class QueryProfileManager extends ProfileManager
 {
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
 
     //protected SearchDialog searchDialog;
     protected boolean groupFlag = false;
@@ -157,7 +155,7 @@ public class QueryProfileManager extends ProfileManager
         catch(Exception exp)
         {
             logger.error(exp.getMessage(), exp);
-            ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.ERROR, "Exception", exp.getMessage(), exp);
+            ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.ERROR, "Exception", exp.getMessage(), exp);//NOI18N
         }
     }
     
@@ -182,11 +180,11 @@ public class QueryProfileManager extends ProfileManager
     {
         QueryInfo selectedQueryInfo = (QueryInfo)getSelectedInfo();
         
-        if(e.getActionCommand().equals("close"))
+        if(e.getActionCommand().equals("close"))//NOI18N
         {
             dispose();
         }
-        else if(e.getActionCommand().equals("save"))
+        else if(e.getActionCommand().equals("save"))//NOI18N
         {
             try
             {
@@ -232,12 +230,12 @@ public class QueryProfileManager extends ProfileManager
                     
                     if(profileSaveDialog.isGroupProfile())
                     {
-                        if(logger.isDebugEnabled())logger.debug("<SEARCH PROFILE> Save UserGroupQuery key: " + SessionManager.getSession().getUser().getUserGroup().getKey().toString());
+                        if(logger.isDebugEnabled())logger.debug("<SEARCH PROFILE> Save UserGroupQuery key: " + SessionManager.getSession().getUser().getUserGroup().getKey().toString());//NOI18N
                         queryData.addUserGroup(SessionManager.getSession().getUser().getUserGroup().getKey().toString());     
                     }
                     else if(logger.isDebugEnabled())
                     {
-                        logger.debug("<SEARCH PROFILE> Save UserQuery: " + queryData);
+                        logger.debug("<SEARCH PROFILE> Save UserQuery: " + queryData);//NOI18N
                     }
                     
                     SessionManager.getProxy().storeQueryData(SessionManager.getSession().getUser(), queryData);
@@ -265,29 +263,29 @@ public class QueryProfileManager extends ProfileManager
                 }
                 else if(logger.isDebugEnabled())
                 {
-                    logger.debug("<SEARCH PROFILE> Saving canceled");
+                    logger.debug("<SEARCH PROFILE> Saving canceled");//NOI18N
                 }
             }
             catch(Throwable t)
             {
                 logger.error(t.getMessage(), t);
-                ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.ERROR, "Exception", t.getMessage(), t);
+                ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.ERROR, "Exception", t.getMessage(), t);//NOI18N
             }
         }
         else if(selectedQueryInfo != null)
         {
-            if(e.getActionCommand().equals("load"))
+            if(e.getActionCommand().equals("load"))//NOI18N
             {
                 try
                 {
-                    if(logger.isDebugEnabled())logger.debug("loading query data, id: " + selectedQueryInfo.getID() + ", domain: " + selectedQueryInfo.getDomain());
+                    if(logger.isDebugEnabled())logger.debug("loading query data, id: " + selectedQueryInfo.getID() + ", domain: " + selectedQueryInfo.getDomain());//NOI18N
                     QueryData queryData = SessionManager.getProxy().getQueryData(selectedQueryInfo.getID(), selectedQueryInfo.getDomain());
                     
                     XMLDecoder xmlDecoder = new XMLDecoder(new ByteArrayInputStream(queryData.getData()));
                     Object result = xmlDecoder.readObject();
                     xmlDecoder.close();
                     
-                    if(logger.isDebugEnabled())logger.debug("<SEARCH PROFILE> Load Query: " + result + " GroupQueryInfo: " + selectedQueryInfo.getUserGroups().size() + "("+selectedQueryInfo+")");
+                    if(logger.isDebugEnabled())logger.debug("<SEARCH PROFILE> Load Query: " + result + " GroupQueryInfo: " + selectedQueryInfo.getUserGroups().size() + "("+selectedQueryInfo+")");//NOI18N
                     
                     //this.setSearchPropertiesBean((SearchPropertiesBean)result);
                     
@@ -304,29 +302,29 @@ public class QueryProfileManager extends ProfileManager
                 }
                 catch(Throwable t)
                 {
-                    logger.error("error loading stored beand data:", t);
-                    ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.ERROR, "Exception", t.getMessage(), t);
+                    logger.error("error loading stored beand data:", t);//NOI18N
+                    ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.ERROR, "Exception", t.getMessage(), t);//NOI18N
                 }
                 
                 this.dispose();
             }
-            else if(e.getActionCommand().equals("delete"))
+            else if(e.getActionCommand().equals("delete"))//NOI18N
             {
                 if(selectedQueryInfo.getUserGroups().size() > 0 && !canStoreUserGroupProfile(new QueryInfo[]{selectedQueryInfo}))
                 {
                     //_TA_JOptionPane.showMessageDialog(this, "Sie haben nicht die Berechtigung ein Benutzergruppenprofil zu loeschen", "Profil loeschen", JOptionPane.WARNING_MESSAGE);
                     JOptionPane.showMessageDialog(this,
-                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noDeletePermissionErrorMessage.message"),
-                            I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noDeletePermissionErrorMessage.title"),
+                            org.openide.util.NbBundle.getMessage(QueryProfileManager.class, "QueryProfileManager.actionPerformed().noDeletePermissionErrorMessage.message"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(QueryProfileManager.class, "QueryProfileManager.actionPerformed().noDeletePermissionErrorMessage.title"),//NOI18N
                             JOptionPane.WARNING_MESSAGE);
                 }
                 else
                 {
                     try
                     {
-                        if(logger.isDebugEnabled())logger.debug("<SEARCH PROFILE> Delete Query: " + selectedQueryInfo + " GroupQueryInfo: " + selectedQueryInfo.getUserGroups().size());
+                        if(logger.isDebugEnabled())logger.debug("<SEARCH PROFILE> Delete Query: " + selectedQueryInfo + " GroupQueryInfo: " + selectedQueryInfo.getUserGroups().size());//NOI18N
                         
-                        if(logger.isDebugEnabled())logger.debug("deleting query data, id: " + selectedQueryInfo.getID() + ", domain: " + selectedQueryInfo.getDomain());
+                        if(logger.isDebugEnabled())logger.debug("deleting query data, id: " + selectedQueryInfo.getID() + ", domain: " + selectedQueryInfo.getDomain());//NOI18N
                         SessionManager.getProxy().deleteQueryData(selectedQueryInfo.getID(), selectedQueryInfo.getDomain());
                         
                         updateQueryProfileManager();
@@ -342,8 +340,8 @@ public class QueryProfileManager extends ProfileManager
         {
             //_TA_JOptionPane.showMessageDialog(this, "Bitte waehlen Sie zuerst ein "+profileTypeName+" aus.", "Keine Selektion", JOptionPane.WARNING_MESSAGE);
             JOptionPane.showMessageDialog(this,
-                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noProfileSelectedErrorMessage.message"),
-                    I18N.getString("Sirius.navigator.search.dynamic.profile.QueryProfileManager.actionPerformed().noProfileSelectedErrorMessage.title"),
+                    org.openide.util.NbBundle.getMessage(QueryProfileManager.class, "QueryProfileManager.actionPerformed().noProfileSelectedErrorMessage.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(QueryProfileManager.class, "QueryProfileManager.actionPerformed().noProfileSelectedErrorMessage.title"),//NOI18N
                     JOptionPane.WARNING_MESSAGE);
         }
     }

@@ -59,7 +59,7 @@ public class ObjectAttributeNode extends AttributeNode
         }
         catch(Exception exp)
         {
-            logger.error("could not load class for Object :"+MetaObject, exp);
+            logger.error("could not load class for Object :"+MetaObject, exp);//NOI18N
         }
         
         //logger.fatal(name + " isArrayHelperObject: " + tempClass.isArrayElementLink());
@@ -69,13 +69,13 @@ public class ObjectAttributeNode extends AttributeNode
         }
         else
         {
-            this.icon = resource.getIcon(resource.getString("Sirius.navigator.ui.attributes.ObjectAttributeNode.icon"));
+            this.icon = resource.getIcon("ClassNodeIcon.gif");//NOI18N
         }
         
         // ignore array attribute nodes
         if (tempClass != null && this.ignoreArrayHelperObjects && tempClass.isArrayElementLink())
         {
-            if(logger.isDebugEnabled())logger.debug("addArrayAttributeNodes(): ignoring array helper objects '" + MetaObject.getName() + "'");
+            if(logger.isDebugEnabled())logger.debug("addArrayAttributeNodes(): ignoring array helper objects '" + MetaObject.getName() + "'");//NOI18N
             SingleAttributeIterator arrayAttributeIterator = new SingleAttributeIterator(this.objectAttributeRestriction, false);
             arrayAttributeIterator.init(MetaObject.getAttributes().values());
             attributeValues = new LinkedList();
@@ -93,7 +93,7 @@ public class ObjectAttributeNode extends AttributeNode
         // load attributes ...
         if(attributeValues != null && !this.attributeIterator.init(attributeValues))
         {
-            logger.error("could not initialize attribute iterator");
+            logger.error("could not initialize attribute iterator");//NOI18N
         }
         
         

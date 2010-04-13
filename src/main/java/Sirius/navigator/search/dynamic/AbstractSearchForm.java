@@ -43,7 +43,7 @@ public abstract class AbstractSearchForm extends JPanel implements SearchForm
         //this.logger = Logger.getLogger(this.getClass());
         this.logger = Logger.getLogger(AbstractSearchForm.class);
         
-        this.formPanel = new MutablePanel(this, "n/a");
+        this.formPanel = new MutablePanel(this, org.openide.util.NbBundle.getMessage(AbstractSearchForm.class, "AbstractSearchForm.formPanel.disabledMessage"));//NOI18N
         this.formProperties = new HashMap();
     }
     
@@ -161,14 +161,22 @@ public abstract class AbstractSearchForm extends JPanel implements SearchForm
         this.searchContext = searchContext;
     }
     
+    /**
+     * @deprecated
+     * This method should not be used. Instead the netbeans I18N API should be used.
+     */
     public java.util.ResourceBundle getResourceBundle()
     {
         return this.resourceBundle;
     }
-    
+
+    /**
+     * @deprecated
+     * This method should not be used. Instead the netbeans I18N API should be used.
+     */
     public void setResourceBundle(java.util.ResourceBundle resourceBundle)
     {
-        if(logger.isDebugEnabled())logger.debug("setting resource bundle for locale locale to '" + resourceBundle.getLocale().toString() + "'");
+        if(logger.isDebugEnabled())logger.debug("setting resource bundle for locale locale to '" + resourceBundle.getLocale().toString() + "'");//NOI18N
         this.resourceBundle = resourceBundle;
     }
     
@@ -182,7 +190,7 @@ public abstract class AbstractSearchForm extends JPanel implements SearchForm
     {
         if(this.getDataBean() != null)
         {
-            if(logger.isDebugEnabled())logger.debug("showing " + this.getDataBean().getBeanParameterNames().size() + " parameter(s) in data bean in form ui");
+            if(logger.isDebugEnabled())logger.debug("showing " + this.getDataBean().getBeanParameterNames().size() + " parameter(s) in data bean in form ui");//NOI18N
 
             Iterator iterator = this.getDataBean().getBeanParameterNames().iterator();
             while(iterator.hasNext())
@@ -197,7 +205,7 @@ public abstract class AbstractSearchForm extends JPanel implements SearchForm
     {
         if(this.getDataBean() != null)
         {
-            if(logger.isDebugEnabled())logger.debug("storing " + this.getDataBean().getBeanParameterNames().size() + " parameter(s) from form ui in data bean");
+            if(logger.isDebugEnabled())logger.debug("storing " + this.getDataBean().getBeanParameterNames().size() + " parameter(s) from form ui in data bean");//NOI18N
         
             this.getDataBean().clear();
             Iterator iterator = this.getDataBean().getBeanParameterNames().iterator();
@@ -231,6 +239,9 @@ public abstract class AbstractSearchForm extends JPanel implements SearchForm
     // .........................................................................
     
     /**
+     * @deprecated
+     * This method should not be used. Instead the netbeans I18N way should be used.
+     *
      * Should be called in the init() method.<p>
      * Override this method, if your form supports i18n!<p>
      *
@@ -246,8 +257,8 @@ public abstract class AbstractSearchForm extends JPanel implements SearchForm
         }
         else
         {
-            if(logger.isDebugEnabled())logger.error("i18n falied: property 'resourceBundle' is null");
-            throw new MissingResourceException("i18n falied: property 'resourceBundle' is null", this.getClass().getName(), "resourceBundle");
+            if(logger.isDebugEnabled())logger.error("i18n falied: property 'resourceBundle' is null");//NOI18N
+            throw new MissingResourceException("i18n falied: property 'resourceBundle' is null", this.getClass().getName(), "resourceBundle");//NOI18N
         }
     }  
     

@@ -8,7 +8,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
-import de.cismet.cids.utils.FinalReference;
+import de.cismet.cids.navigator.utils.FinalReference;
 import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
@@ -29,9 +29,9 @@ public class CidsObjectRendererFactory {
     private static final Map<MetaClass, JComponent> singleRenderer = TypeSafeCollections.newHashMap();
 //    private HashMap<MetaClass,JComponent> aggregationRenderer=new HashMap<MetaClass, JComponent>();
 //    private static final boolean lazyClassFetching = true;
-    private static final String RENDERER_PREFIX = "de.cismet.cids.custom.objectrenderer.";
-    private static final String SINGLE_RENDERER_SUFFIX = "Renderer";
-    private static final String AGGREGATION_RENDERER_SUFFIX = "AggregationRenderer";
+    private static final String RENDERER_PREFIX = "de.cismet.cids.custom.objectrenderer.";//NOI18N
+    private static final String SINGLE_RENDERER_SUFFIX = "Renderer";//NOI18N
+    private static final String AGGREGATION_RENDERER_SUFFIX = "AggregationRenderer";//NOI18N
     private final ComponentWrapper cw;
 
     private CidsObjectRendererFactory() {
@@ -57,7 +57,7 @@ public class CidsObjectRendererFactory {
         //Transform due to JavaCodeConventions
         String className = mo.getMetaClass().getTableName().toLowerCase();
         className = className.substring(0, 1).toUpperCase() + className.substring(1);
-        className = Prefix + mo.getDomain().toLowerCase() + "." + className + Suffix;
+        className = Prefix + mo.getDomain().toLowerCase() + "." + className + Suffix;//NOI18N
         return className;
     }
 
@@ -74,10 +74,10 @@ public class CidsObjectRendererFactory {
     }
 
     public JComponent getSingleRenderer(final MetaObject mo, final String title) {
-        log.debug("getSingleRenderer");
+        log.debug("getSingleRenderer");//NOI18N
 //        final boolean isEDT = EventQueue.isDispatchThread();
         JComponent result = null;
-        final String overrideRendererClassName = System.getProperty(mo.getDomain().toLowerCase() + "." + mo.getMetaClass().getTableName().toLowerCase() + ".renderer");
+        final String overrideRendererClassName = System.getProperty(mo.getDomain().toLowerCase() + "." + mo.getMetaClass().getTableName().toLowerCase() + ".renderer");//NOI18N
         final String rendererClassNameByConvention = overrideRendererClassName == null ? getSingleRendererClassnameByConvention(mo) : overrideRendererClassName;
         final String rendererClassNameFromDB = mo.getMetaClass().getRenderer();
 //        //Caching bleibt erstmal aus, da sonst nicht mehrere Editoren gleichzeitigt erzeugt werden
@@ -115,7 +115,7 @@ public class CidsObjectRendererFactory {
                         final MetaObjectRenderer mor = (MetaObjectRenderer) o;
                         rendererComp = mor.getSingleRenderer(mo, title);
                     } else {
-                        throw new RuntimeException("Not a valid Renderer. The Renderer should be a CidsBeanRenderer or a MetaObjectRenderer");
+                        throw new RuntimeException("Not a valid Renderer. The Renderer should be a CidsBeanRenderer or a MetaObjectRenderer");//NOI18N
                     }
 
                     singleRenderer.put(mo.getMetaClass(), rendererComp);
@@ -129,7 +129,7 @@ public class CidsObjectRendererFactory {
                 }
             }
         } catch (Throwable e) {
-            log.error("Fehler beim Erzeugen des Renderers.", e);
+            log.error("Error during creating the renderer.", e);//NOI18N
         }
 
         result = componentReferenceHolder.getObject();
@@ -157,7 +157,7 @@ public class CidsObjectRendererFactory {
 //                }
 
             } catch (Throwable t) {
-                log.error("Fehler im Exceptionhandling ", t);
+                log.error("Error while Exception handling ", t);//NOI18N
             }
             result = componentReferenceHolder.getObject();
         }
@@ -173,11 +173,13 @@ public class CidsObjectRendererFactory {
 //            final boolean isEDT = EventQueue.isDispatchThread();
             final MetaObject mo = moCollection.iterator().next();
             final MetaClass mc = mo.getMetaClass();
-            final String overrideRendererClassName = System.getProperty(mc.getDomain().toLowerCase() + "." + mc.getTableName().toLowerCase() + ".aggregationrenderer");
+            final String overrideRendererClassName = System.getProperty(mc.getDomain().toLowerCase() + "." + mc.getTableName().toLowerCase() + ".aggregationrenderer");//NOI18N
             final String rendererClassNameByConvention = overrideRendererClassName == null ? getAggregationRendererClassnameByConvention(mo) : overrideRendererClassName;
             final String rendererClassNameFromDB = mc.getRenderer();
             final FinalReference<JComponent> resultReferenceHolder = new FinalReference<JComponent>();
-            log.debug("LazyClass:" + rendererClassNameByConvention);
+            if (log.isDebugEnabled()) {
+                log.debug("LazyClass:" + rendererClassNameByConvention);//NOI18N
+            }
             try {
                 final Class<?> rendererClass = loadRendererClass(rendererClassNameByConvention, rendererClassNameFromDB);
                 if (rendererClass != null) {
@@ -200,7 +202,9 @@ public class CidsObjectRendererFactory {
                             final CidsBeanAggregationRenderer rendererComp = (CidsBeanAggregationRenderer) rendererInstanceObject;
                             rendererComp.setTitle(title);
                             rendererComp.setCidsBeans(beans);
-                            log.debug("Will return " + rendererComp);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Will return " + rendererComp);//NOI18N
+                            }
                             if (cw != null && !(rendererComp instanceof DoNotWrap)) {
                                 resultReferenceHolder.setObject((JComponent) cw.wrapComponent((JComponent) rendererComp));
                             } else {
@@ -228,7 +232,7 @@ public class CidsObjectRendererFactory {
 //                }
                 }
             } catch (Exception e) {
-                log.error("Fehler beim Erzeugen des Renderers.", e);
+                log.error("Error while creating the renderer.", e);//NOI18N
             }
             return resultReferenceHolder.getObject();
         }

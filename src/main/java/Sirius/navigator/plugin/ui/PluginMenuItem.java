@@ -9,7 +9,6 @@ import Sirius.navigator.plugin.*;
 import Sirius.navigator.plugin.interfaces.*;
 import Sirius.navigator.method.*;
 import Sirius.server.localserver.method.*;
-import java.util.ResourceBundle;
 
 /**
  *

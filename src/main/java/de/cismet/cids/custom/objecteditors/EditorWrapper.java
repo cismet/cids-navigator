@@ -48,7 +48,7 @@ public class EditorWrapper implements ComponentWrapper {
             ced.getPanTitleAndIcon().add(((TitleComponentProvider) component).getTitleComponent());
         } else if (component instanceof Titled) {
             JLabel l = new JLabel(((Titled) component).getTitle());
-            l.setFont(new java.awt.Font("Tahoma", 1, 18));
+            l.setFont(new java.awt.Font("Tahoma", 1, 18));//NOI18N
             l.setForeground(new java.awt.Color(255, 255, 255));
             ced.getPanTitleAndIcon().add(l);
         }

@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 public class TreeNodeEditor extends javax.swing.JDialog {
 
     private DefaultMetaTreeNode metaTreeNode = null;
-    private static final ResourceBundle I18N = ResourceBundle.getBundle("Sirius/navigator/resource/i18n/resources");
     private Logger logger;
 
     /** Creates new form MetaClassChooser */
@@ -78,17 +77,17 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         scrollPane.setViewportView(classList);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-        setTitle(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.title")); // NOI18N
+        setTitle(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.title")); // NOI18N
 
         infoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        infoLabel.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.infoLabel.text")); // NOI18N
+        infoLabel.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.infoLabel.text")); // NOI18N
         infoLabel.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 10, 5, 10));
         getContentPane().add(infoLabel, java.awt.BorderLayout.NORTH);
 
         editorPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 5, 10), javax.swing.BorderFactory.createEtchedBorder()));
         editorPanel.setLayout(new java.awt.GridBagLayout());
 
-        nameLabel.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.nameLabel.text")); // NOI18N
+        nameLabel.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.nameLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -107,7 +106,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(25, 5, 5, 25);
         editorPanel.add(nameField, gridBagConstraints);
 
-        typeLabel.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.typeLabel.text")); // NOI18N
+        typeLabel.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.typeLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -119,7 +118,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         editorPanel.add(typeLabel, gridBagConstraints);
 
         typeButtonGroup.add(pureNodeRadioButton);
-        pureNodeRadioButton.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.pureNodeRadioButton.text")); // NOI18N
+        pureNodeRadioButton.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.pureNodeRadioButton.text")); // NOI18N
         pureNodeRadioButton.setActionCommand("pure");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -130,7 +129,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         editorPanel.add(pureNodeRadioButton, gridBagConstraints);
 
         typeButtonGroup.add(classNodeRadioButton);
-        classNodeRadioButton.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.classNodeRadioButton.text")); // NOI18N
+        classNodeRadioButton.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.classNodeRadioButton.text")); // NOI18N
         classNodeRadioButton.setActionCommand("class");
         classNodeRadioButton.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -143,7 +142,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
 
         typeButtonGroup.add(objectNodeRadioButton);
         objectNodeRadioButton.setSelected(true);
-        objectNodeRadioButton.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.objectNodeRadioButton.text")); // NOI18N
+        objectNodeRadioButton.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.objectNodeRadioButton.text")); // NOI18N
         objectNodeRadioButton.setActionCommand("object");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -153,7 +152,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 25);
         editorPanel.add(objectNodeRadioButton, gridBagConstraints);
 
-        classLabel.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.classLabel.text")); // NOI18N
+        classLabel.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.classLabel.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
@@ -180,15 +179,15 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 10, 10, 10));
         buttonPanel.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-        okButton.setMnemonic(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.okButton.mnemonic").charAt(0));
-        okButton.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.okButton.text")); // NOI18N
-        okButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.okButton.tooltip")); // NOI18N
+        okButton.setMnemonic(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.okButton.mnemonic").charAt(0));
+        okButton.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.okButton.text")); // NOI18N
+        okButton.setToolTipText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.okButton.tooltip")); // NOI18N
         okButton.setActionCommand("ok");
         buttonPanel.add(okButton);
 
-        cancelButton.setMnemonic(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.cancelButton.mnemonic").charAt(0));
-        cancelButton.setText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.cancelButton.text")); // NOI18N
-        cancelButton.setToolTipText(I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.cancelButton.tooltip")); // NOI18N
+        cancelButton.setMnemonic(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.cancelButton.mnemonic").charAt(0));
+        cancelButton.setText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.cancelButton.text")); // NOI18N
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.cancelButton.tooltip")); // NOI18N
         cancelButton.setActionCommand("cancel");
         buttonPanel.add(cancelButton);
 
@@ -226,7 +225,9 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                             filtered.add(cs[i]);
                         }
                     } catch (Exception e) {
-                        logger.debug("filter for " + cs[i]);
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("filter for " + cs[i]);//NOI18N
+                        }
                     }
                 }
 
@@ -237,7 +238,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                     this.classBox.setSelectedIndex(0);
                 }
             } catch (ConnectionException cexp) {
-                logger.error("could not load class nodes", cexp);
+                logger.error("could not load class nodes", cexp);//NOI18N
             }
 
             this.pack();
@@ -279,7 +280,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
     protected class ButtonListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            if (e.getActionCommand().equals("ok")) {
+            if (e.getActionCommand().equals("ok")) {//NOI18N
                 if (TreeNodeEditor.this.nameField.getText().length() > 0) {
                     // create
                     if (metaTreeNode == null) {
@@ -297,7 +298,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                     MetaClass metaClass = (MetaClass) TreeNodeEditor.this.classBox.getSelectedItem();
 
                                     if (logger.isDebugEnabled()) {
-                                        logger.debug("actionPerformed(): creating new meta object node of type " + metaClass);
+                                        logger.debug("actionPerformed(): creating new meta object node of type " + metaClass);//NOI18N
                                     }
 
                                     ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
@@ -309,23 +310,19 @@ public class TreeNodeEditor extends javax.swing.JDialog {
 
                                     TreeNodeEditor.this.dispose();
                                 } catch (Throwable t) {
-                                    logger.error("actionPerformed(): could not create new empty meta object", t);
+                                    logger.error("actionPerformed(): could not create new empty meta object", t);//NOI18N
                                     ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 
                                     JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                                            I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().createMetaObjectError.message1") +
-                                            TreeNodeEditor.this.classBox.getSelectedItem() +
-                                            I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().createMetaObjectError.message2") +
-                                            t.getMessage() +
-                                            I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().createMetaObjectError.message3"),
-                                            I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().createMetaObjectError.title"),
+                                            org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.ButtonListener.actionPerformed().createMetaObjectError.message", new Object[]{TreeNodeEditor.this.classBox.getSelectedItem(), t.getMessage()}),//NOI18N
+                                            org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.ButtonListener.actionPerformed().createMetaObjectError.title"), //NOI18N
                                             JOptionPane.ERROR_MESSAGE);
                                 }
                             } else {
-                                logger.warn("actionPerformed() no class");
+                                logger.warn("actionPerformed() no class");//NOI18N
                                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                                        I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().noClassInfo.message"),
-                                        I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().noClassInfo.title"),
+                                        org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.ButtonListener.actionPerformed().noClassInfo.message"),//NOI18N
+                                        org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.ButtonListener.actionPerformed().noClassInfo.title"),//NOI18N
                                         JOptionPane.INFORMATION_MESSAGE);
                             }
                         }
@@ -336,20 +333,20 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                         TreeNodeEditor.this.dispose();
                     }
                 } else {
-                    logger.warn("actionPerformed() no name");
+                    logger.warn("actionPerformed() no name");//NOI18N
                     JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                            I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().noNameInfo.message"),
-                            I18N.getString("Sirius.navigator.ui.tree.editor.TreeNodeEditor.ButtonListener.actionPerformed().noNameInfo.title"),
+                            org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.ButtonListener.actionPerformed().noNameInfo.message"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(TreeNodeEditor.class, "TreeNodeEditor.ButtonListener.actionPerformed().noNameInfo.title"),//NOI18N
                             JOptionPane.INFORMATION_MESSAGE);
                 }
-            } else if (e.getActionCommand().equals("cancel")) {
+            } else if (e.getActionCommand().equals("cancel")) {//NOI18N
                 TreeNodeEditor.this.metaTreeNode = null;
                 TreeNodeEditor.this.dispose();
-            } else if (e.getActionCommand().equals("pure")) {
+            } else if (e.getActionCommand().equals("pure")) {//NOI18N
                 TreeNodeEditor.this.classBox.setEnabled(false);
-            } else if (e.getActionCommand().equals("class")) {
+            } else if (e.getActionCommand().equals("class")) {//NOI18N
                 TreeNodeEditor.this.classBox.setEnabled(true);
-            } else if (e.getActionCommand().equals("object")) {
+            } else if (e.getActionCommand().equals("object")) {//NOI18N
                 TreeNodeEditor.this.classBox.setEnabled(true);
             }
         }
