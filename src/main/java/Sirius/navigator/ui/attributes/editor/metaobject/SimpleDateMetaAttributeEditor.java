@@ -164,7 +164,7 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
                 try {
                     d = shortDF.parse(textValue);
                 } catch (ParseException ex) {
-                    logger.warn("Error while parsing date:", ex);
+                    logger.warn("Error while parsing date:", ex);//NOI18N
                     setValue(null);
                     setComponentValue(null);
                     setValueChanged(true);

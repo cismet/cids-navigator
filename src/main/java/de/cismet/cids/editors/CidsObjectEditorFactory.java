@@ -916,7 +916,7 @@ public class CidsObjectEditorFactory {
 
                         }
                     });
-                    JButton cmdLog = new JButton("Log");
+                    JButton cmdLog = new JButton(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.cmdLog.text"));//NOI18N
                     cmdLog.addActionListener(new ActionListener() {
 
                         public void actionPerformed(ActionEvent e) {
@@ -931,7 +931,7 @@ public class CidsObjectEditorFactory {
                             }
                         }
                     });
-                    JButton cmdReload = new JButton("Reload");
+                    JButton cmdReload = new JButton(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.cmdReload.text"));//NOI18N
                     cmdReload.addActionListener(new ActionListener() {
 
                         public void actionPerformed(ActionEvent e) {
