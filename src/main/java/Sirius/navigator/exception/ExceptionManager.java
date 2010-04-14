@@ -79,20 +79,42 @@ public class ExceptionManager
         showExceptionDialog(exception.getLevel(), exception.getName(), exception.getMessage(), exception.getCause());
     }
 
+    /**
+     * @deprecated
+     *
+     * @param owner
+     * @param level
+     * @param errorcode
+     * @param exception
+     */
     public void showExceptionDialog(JFrame owner, int level, String errorcode, Throwable exception)
     {
         JDialog exceptionDialog = new JDialog(owner, true);
         exceptionDialog.setLocationRelativeTo(owner);
         showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
     }
-    
+
+    /**
+     * @deprecated
+     *
+     * @param owner
+     * @param level
+     * @param errorcode
+     * @param exception
+     */
     public void showExceptionDialog(JDialog owner, int level, String errorcode, Throwable exception)
     {
         JDialog exceptionDialog = new JDialog(owner, true);
         exceptionDialog.setLocationRelativeTo(owner);
         showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
     }
-    
+
+    /**
+     * @deprecated
+     * @param level
+     * @param errorcode
+     * @param exception
+     */
     public void showExceptionDialog(int level, String errorcode, Throwable exception)
     {
         JDialog exceptionDialog = new JDialog(new JFrame(), true);

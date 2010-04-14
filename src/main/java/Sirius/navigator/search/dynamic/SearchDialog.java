@@ -124,7 +124,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         catch(Exception exp)
         {
             logger.fatal("could not show search results", exp);//NOI18N
-            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, this.resources.getExceptionName("sx02"), this.resources.getExceptionMessage("sx02"), exp);
+            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, 
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(FormDataBean,Component,boolean).name"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(FormDataBean,Component,boolean).message"),//NOI18N
+                    exp);
         } 
     }
     
@@ -158,7 +161,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         catch(Exception exp)
         {
             logger.fatal("could not show search results", exp);//NOI18N
-            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, this.resources.getExceptionName("sx02"), this.resources.getExceptionMessage("sx02"), exp);
+            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL,
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(Collection,Collection,Component,boolean).name"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.search(Collection,Collection,Component,boolean).message"),//NOI18N
+                    exp);
         } 
     }
     
@@ -349,7 +355,10 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         catch(Exception exp)
         {
             logger.fatal("could create dynmaic search categories & forms", exp);//NOI18N
-            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, this.resources.getExceptionName("sx01"), this.resources.getExceptionMessage("sx01"), exp);
+            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL,
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.loadSearchForms().name"), //NOI18N
+                    org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.loadSearchForms().message"), //NOI18N
+                    exp);
         }
     }
 

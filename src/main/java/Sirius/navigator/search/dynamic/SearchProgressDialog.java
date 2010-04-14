@@ -256,7 +256,10 @@ public class SearchProgressDialog extends javax.swing.JDialog
                         SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
                                 org.openide.util.NbBundle.getMessage(SearchProgressDialog.class,"SearchProgressDialog.SearchThread.run().status.error"),//NOI18N
                                 Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
-                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, resources.getExceptionName("sx02"), resources.getExceptionMessage("sx02"), t);
+                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.SearchThread.run().name"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.SearchThread.run().message"),//NOI18N
+                                t);
                         SearchProgressDialog.this.dispose();
                     }    
                 }

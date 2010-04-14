@@ -307,7 +307,10 @@ public class LoginDialog extends JDialog {
             }
         } catch (Throwable t) {
             logger.fatal("fatal error during login", t);//NOI18N
-            ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.FATAL, "lx01", t);//NOI18N
+            ExceptionManager.getManager().showExceptionDialog(this, ExceptionManager.FATAL,
+                    org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.show().name"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.show().message"),//NOI18N
+                    t);//NOI18N
             System.exit(1);
         }
 
@@ -357,7 +360,10 @@ public class LoginDialog extends JDialog {
                 }
             } catch (Throwable t) {
                 logger.fatal("fatal error during login", t);//NOI18N
-                ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL, "lx01", t);//NOI18N
+                ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL,
+                    org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.NameListener.focusLost(FocusEvent).name"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.NameListener.focusLost(FocusEvent).message"),//NOI18N
+                    t);
                 System.exit(1);
             }
         }
@@ -374,7 +380,10 @@ public class LoginDialog extends JDialog {
                     }
                 } catch (Throwable t) {
                     logger.fatal("fatal error during login", t);//NOI18N
-                    ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL, "lx01", t);//NOI18N
+                    ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, ExceptionManager.FATAL,
+                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.DomainListener.itemStateChanged(ItemEvent).name"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(LoginDialog.class, "LoginDialog.DomainListener.itemStateChanged(ItemEvent).message"),//NOI18N
+                        t);
                     System.exit(1);
                 }
             }
