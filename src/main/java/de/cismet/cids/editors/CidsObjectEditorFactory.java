@@ -157,10 +157,10 @@ public class CidsObjectEditorFactory {
 //
 //                @Override
 //                public void run() {
-                    ((CidsBeanStore) finalEditorComponent).setCidsBean(bean);
-                    if (finalEditorComponent instanceof AutoBindableCidsEditor) {
-                        bindCidsEditor((AutoBindableCidsEditor) finalEditorComponent);
-                    }
+            ((CidsBeanStore) finalEditorComponent).setCidsBean(bean);
+            if (finalEditorComponent instanceof AutoBindableCidsEditor) {
+                bindCidsEditor((AutoBindableCidsEditor) finalEditorComponent);
+            }
 //                }
 //            };
 //            if (EventQueue.isDispatchThread()) {
@@ -257,15 +257,15 @@ public class CidsObjectEditorFactory {
 //
 //                    @Override
 //                    public void run() {
-                        try {
-                            final JComponent ed = (JComponent) editorClass.newInstance();
-                            if (ed instanceof MetaClassStore) {
-                                ((MetaClassStore) ed).setMetaClass(metaClass);
-                            }
-                            result.setObject(ed);
-                        } catch (Throwable t) {
-                            throw new RuntimeException(t);
-                        }
+                try {
+                    final JComponent ed = (JComponent) editorClass.newInstance();
+                    if (ed instanceof MetaClassStore) {
+                        ((MetaClassStore) ed).setMetaClass(metaClass);
+                    }
+                    result.setObject(ed);
+                } catch (Throwable t) {
+                    throw new RuntimeException(t);
+                }
 //                    }
 //                };
 //                if (EventQueue.isDispatchThread()) {
@@ -286,113 +286,113 @@ public class CidsObjectEditorFactory {
 
     private AutoBindableCidsEditor getDefaultEditor(final MetaClass metaClass) {
         final Vector<MemberAttributeInfo> mais = new Vector<MemberAttributeInfo>(metaClass.getMemberAttributeInfos().values());
-        final FinalReference<AutoBindableCidsEditor> result = new FinalReference<AutoBindableCidsEditor>();
+//        final FinalReference<AutoBindableCidsEditor> result = new FinalReference<AutoBindableCidsEditor>();
 //        final Runnable createDefaultEditorRunnable = new Runnable() {
 //
 //            @Override
 //            public void run() {
 
-                DefaultCidsEditor cidsEditor = new DefaultCidsEditor();
-                result.setObject(cidsEditor);
-                GridBagLayout gbl = new GridBagLayout();
-                GridBagConstraints gbc = null;
-                cidsEditor.setLayout(gbl);
-                int row = 0;
+        DefaultCidsEditor cidsEditor = new DefaultCidsEditor();
+//                result.setObject(cidsEditor);
+        GridBagLayout gbl = new GridBagLayout();
+        GridBagConstraints gbc = null;
+        cidsEditor.setLayout(gbl);
+        int row = 0;
 
-                for (MemberAttributeInfo mai : mais) {
-                    if (mai.isVisible()) {
-                        //Description
-                        JLabel lblDescription = new JLabel();
-                        lblDescription.setText(mai.getName());
-                        lblDescription.setHorizontalAlignment(JLabel.RIGHT);
+        for (MemberAttributeInfo mai : mais) {
+            if (mai.isVisible()) {
+                //Description
+                JLabel lblDescription = new JLabel();
+                lblDescription.setText(mai.getName());
+                lblDescription.setHorizontalAlignment(JLabel.RIGHT);
+                gbc = getCommonConstraints();
+                modifyForLabel(gbc);
+                gbc.gridy = row;
+                cidsEditor.add(lblDescription, gbc);
+
+
+
+                //Editor
+                JComponent cmpEditor = null;
+
+                if (mai.isForeignKey()) {
+                    int foreignKey = mai.getForeignKeyClassId();
+                    String domain = metaClass.getDomain();
+                    MetaClass foreignClass = getMetaClass(domain, foreignKey);
+
+                    if (mai.isArray()) {
+                        //--------------------------------------------------
+                        //Arrays
+                        //--------------------------------------------------
+                        MetaClass detailClass = null;
+
+                        //Detaileditorcomponent
+                        Vector<MemberAttributeInfo> arrayAttrs = new Vector<MemberAttributeInfo>(foreignClass.getMemberAttributeInfos().values());
+                        for (MemberAttributeInfo arrayMai : arrayAttrs) {
+                            if (arrayMai.isForeignKey()) {
+                                int detailKey = arrayMai.getForeignKeyClassId();
+                                detailClass = getMetaClass(domain, detailKey);
+                                cmpEditor = (JComponent) getObjectEditor(detailClass);
+                                if (cmpEditor == null) {
+                                    cmpEditor = (JComponent) getDefaultEditor(detailClass);
+                                }
+
+                                if (cmpEditor instanceof BindingInformationProvider) {
+                                    BindingInformationProvider ed = (BindingInformationProvider) cmpEditor;
+                                    Set<String> fields = ed.getAllControls().keySet();
+                                    for (String key : fields) {
+                                        String newKey = mai.getFieldName().toLowerCase() + "[]." + key;//NOI18N
+                                        cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
+                                    }
+
+                                } else if (cmpEditor instanceof Bindable) {
+                                    //TODO
+                                    throw new UnsupportedOperationException();
+                                }
+
+                                break;
+                            }
+
+                        }
+
+                        //Masterliste
+                        cidsEditor.remove(lblDescription);
                         gbc = getCommonConstraints();
                         modifyForLabel(gbc);
-                        gbc.gridy = row;
-                        cidsEditor.add(lblDescription, gbc);
+                        gbc.insets = new java.awt.Insets(4, 25, 3, 0);
+                        gbc.gridy = row++;
+                        gbc.fill = java.awt.GridBagConstraints.BOTH;
+                        String field = mai.getFieldName().toLowerCase();
 
+                        BindableJList lstArrayMaster = new BindableJList();
 
+                        // <editor-fold defaultstate="collapsed" desc="CellRenderer">
+                        final DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
+                        lstArrayMaster.setCellRenderer(new ListCellRenderer() {
 
-                        //Editor
-                        JComponent cmpEditor = null;
-
-                        if (mai.isForeignKey()) {
-                            int foreignKey = mai.getForeignKeyClassId();
-                            String domain = metaClass.getDomain();
-                            MetaClass foreignClass = getMetaClass(domain, foreignKey);
-
-                            if (mai.isArray()) {
-                                //--------------------------------------------------
-                                //Arrays
-                                //--------------------------------------------------
-                                MetaClass detailClass = null;
-
-                                //Detaileditorcomponent
-                                Vector<MemberAttributeInfo> arrayAttrs = new Vector<MemberAttributeInfo>(foreignClass.getMemberAttributeInfos().values());
-                                for (MemberAttributeInfo arrayMai : arrayAttrs) {
-                                    if (arrayMai.isForeignKey()) {
-                                        int detailKey = arrayMai.getForeignKeyClassId();
-                                        detailClass = getMetaClass(domain, detailKey);
-                                        cmpEditor = (JComponent) getObjectEditor(detailClass);
-                                        if (cmpEditor == null) {
-                                            cmpEditor = (JComponent) getDefaultEditor(detailClass);
+                            public Component getListCellRendererComponent(
+                                    JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                                JLabel l = (JLabel) dlcr.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                                if (l.getText() == null || l.getText().trim().equals("") || l.getText().equals("null")) { //TODO Der check auf den String "null" muss wieder raus //NOI18N
+                                    CidsBean cb = (CidsBean) value;
+                                    if (cb.getMetaObject().getStatus() == MetaObject.NEW) {
+                                        l.setText("neues Element");//NOI18N
+                                        if (isSelected) {
+                                            l.setBackground(Color.GREEN);
                                         }
 
-                                        if (cmpEditor instanceof BindingInformationProvider) {
-                                            BindingInformationProvider ed = (BindingInformationProvider) cmpEditor;
-                                            Set<String> fields = ed.getAllControls().keySet();
-                                            for (String key : fields) {
-                                                String newKey = mai.getFieldName().toLowerCase() + "[]." + key;//NOI18N
-                                                cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
-                                            }
-
-                                        } else if (cmpEditor instanceof Bindable) {
-                                            //TODO
-                                            throw new UnsupportedOperationException();
-                                        }
-
-                                        break;
+                                    } else {
+                                        l.setText(cb.getMetaObject().getMetaClass().toString() + " " + cb.getProperty(cb.getMetaObject().getMetaClass().getPrimaryKey().toLowerCase()));//NOI18N
                                     }
 
                                 }
-
-                                //Masterliste
-                                cidsEditor.remove(lblDescription);
-                                gbc = getCommonConstraints();
-                                modifyForLabel(gbc);
-                                gbc.insets = new java.awt.Insets(4, 25, 3, 0);
-                                gbc.gridy = row++;
-                                gbc.fill = java.awt.GridBagConstraints.BOTH;
-                                String field = mai.getFieldName().toLowerCase();
-
-                                BindableJList lstArrayMaster = new BindableJList();
-
-                                // <editor-fold defaultstate="collapsed" desc="CellRenderer">
-                                final DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
-                                lstArrayMaster.setCellRenderer(new ListCellRenderer() {
-
-                                    public Component getListCellRendererComponent(
-                                            JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                                        JLabel l = (JLabel) dlcr.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                                        if (l.getText() == null || l.getText().trim().equals("") || l.getText().equals("null")) { //TODO Der check auf den String "null" muss wieder raus//NOI18N
-                                            CidsBean cb = (CidsBean) value;
-                                            if (cb.getMetaObject().getStatus() == MetaObject.NEW) {
-                                                l.setText(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.getDefaultEditor().getListCellRendererComponent.newElementText"));//NOI18N
-                                                if (isSelected) {
-                                                    l.setBackground(Color.GREEN);
-                                                }
-
-                                            } else {
-                                                l.setText(cb.getMetaObject().getMetaClass().toString() + " " + cb.getProperty(cb.getMetaObject().getMetaClass().getPrimaryKey().toLowerCase()));//NOI18N
-                                            }
-
-                                        }
-                                        return l;
-                                    }
-                                });
+                                return l;
+                            }
+                        });
 // </editor-fold>
 
-                                ArrayTitleAndControls arrayTitleAndControls = new ArrayTitleAndControls(lblDescription.getText(), detailClass, field, lstArrayMaster);
-                                cidsEditor.add(arrayTitleAndControls, gbc);
+                        ArrayTitleAndControls arrayTitleAndControls = new ArrayTitleAndControls(lblDescription.getText(), detailClass, field, lstArrayMaster);
+                        cidsEditor.add(arrayTitleAndControls, gbc);
 
                                 gbc = getCommonConstraints();
                                 modifyForLabel(gbc);
@@ -402,42 +402,42 @@ public class CidsObjectEditorFactory {
                                 cidsEditor.addControlInformation(field + "[]", lstArrayMaster);//NOI18N
                                 cidsEditor.add(lstArrayMaster, gbc);
 
-                                gbc = getCommonConstraints();
-                                modifyForEditor(gbc);
-                                gbc.gridy = row;
-                                cmpEditor.putClientProperty(PARENT_CIDS_EDITOR, cidsEditor);
-                                cidsEditor.add(cmpEditor, gbc);
+                        gbc = getCommonConstraints();
+                        modifyForEditor(gbc);
+                        gbc.gridy = row;
+                        cmpEditor.putClientProperty(PARENT_CIDS_EDITOR, cidsEditor);
+                        cidsEditor.add(cmpEditor, gbc);
 
 
-                            } else if (mai.isForeignKey()) {
-                                //--------------------------------------------------
-                                //Normale Unterobjekte
-                                //--------------------------------------------------
+                    } else if (mai.isForeignKey()) {
+                        //--------------------------------------------------
+                        //Normale Unterobjekte
+                        //--------------------------------------------------
 
-                                //Entfernen Button
-                                gbc = getCommonConstraints();
-                                modifyForLabel(gbc);
-                                gbc.fill = GridBagConstraints.NONE;
-                                gbc.insets = new java.awt.Insets(0, 0, 0, 3);
-                                gbc.gridx = 3;
-                                gbc.gridy = row;
-                                JButton cmdRemove = new JButton();
-                                cmdRemove.setBorderPainted(false);
-                                cmdRemove.setMinimumSize(new Dimension(12, 12));
-                                cmdRemove.setPreferredSize(new Dimension(12, 12));
+                        //Entfernen Button
+                        gbc = getCommonConstraints();
+                        modifyForLabel(gbc);
+                        gbc.fill = GridBagConstraints.NONE;
+                        gbc.insets = new java.awt.Insets(0, 0, 0, 3);
+                        gbc.gridx = 3;
+                        gbc.gridy = row;
+                        JButton cmdRemove = new JButton();
+                        cmdRemove.setBorderPainted(false);
+                        cmdRemove.setMinimumSize(new Dimension(12, 12));
+                        cmdRemove.setPreferredSize(new Dimension(12, 12));
 
                                 cmdRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_remove_mini.png")));//NOI18N
                                 cmdRemove.setVisible(false);
                                 cidsEditor.add(cmdRemove, gbc);
 
 
-                                //Erstellen Button
-                                gbc = getCommonConstraints();
-                                modifyForLabel(gbc);
-                                gbc.insets = new java.awt.Insets(0, 0, 0, 3);
-                                gbc.fill = GridBagConstraints.NONE;
-                                gbc.gridx = 3;
-                                gbc.gridy = row;
+                        //Erstellen Button
+                        gbc = getCommonConstraints();
+                        modifyForLabel(gbc);
+                        gbc.insets = new java.awt.Insets(0, 0, 0, 3);
+                        gbc.fill = GridBagConstraints.NONE;
+                        gbc.gridx = 3;
+                        gbc.gridy = row;
 
                                 JButton cmdAdd = new JButton();
                                 cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_add_mini.png")));//NOI18N
@@ -447,79 +447,79 @@ public class CidsObjectEditorFactory {
                                 cmdAdd.setVisible(false);
                                 cidsEditor.add(cmdAdd, gbc);
 
-                                //Editor
+                        //Editor
 
 
-                                cmpEditor = getCustomAttributeEditor(metaClass, mai);
+                        cmpEditor = getCustomAttributeEditor(metaClass, mai);
 
-                                if (cmpEditor == null) {
-                                    cmpEditor = (JComponent) getObjectEditor(foreignClass);
-                                }
+                        if (cmpEditor == null) {
+                            cmpEditor = (JComponent) getObjectEditor(foreignClass);
+                        }
 
-                                if (cmpEditor == null && mai.isSubstitute()) {
-                                    cmpEditor = getSimpleAttributeEditor(metaClass, mai);
-                                }
+                        if (cmpEditor == null && mai.isSubstitute()) {
+                            cmpEditor = getSimpleAttributeEditor(metaClass, mai);
+                        }
 
-                                //Sicherheithalber ....
-                                if (cmpEditor == null) {
-                                    cmpEditor = (JComponent) getDefaultEditor(foreignClass);
-                                }
+                        //Sicherheithalber ....
+                        if (cmpEditor == null) {
+                            cmpEditor = (JComponent) getDefaultEditor(foreignClass);
+                        }
 
 
-                                //bindable geht vor
-                                if (cmpEditor instanceof Bindable) {
-                                    cidsEditor.addControlInformation(mai.getFieldName().toLowerCase(), (Bindable) cmpEditor);
-
-                                } else if (cmpEditor instanceof BindingInformationProvider) {
-                                    BindingInformationProvider ed = (BindingInformationProvider) cmpEditor;
-                                    Set<String> fields = ed.getAllControls().keySet();
-                                    for (String key : fields) {
-                                        String newKey = mai.getFieldName().toLowerCase() + "." + key;//NOI18N
-                                        cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
-                                    }
-                                }
-
-                                gbc = getCommonConstraints();
-                                modifyForEditor(gbc);
-                                gbc.gridwidth = 1;
-                                gbc.gridy = row;
-                                if (cmpEditor != null) {
-                                    cmpEditor.putClientProperty(PARENT_CIDS_EDITOR, cidsEditor);
-                                    cidsEditor.add(cmpEditor, gbc);
-                                    cmpEditor.putClientProperty(CMD_ADD_OBJECT, cmdAdd);
-                                    cmpEditor.putClientProperty(CMD_REMOVE_OBJECT, cmdRemove);
-                                } else {
-                                    log.warn("Editor was null. " + metaClass.getTableName() + "." + mai.getFieldName());//NOI18N
-                                }
-
-                            }
-
-                        } else {
-                            // Die Editorkomponente über die Metainformations checken
-
-                            //--------------------------------------------------
-                            //Einfache Attribute
-                            //--------------------------------------------------
-
-                            cmpEditor = getCustomAttributeEditor(metaClass, mai);
-
-                            if (cmpEditor == null) {
-                                cmpEditor = getSimpleAttributeEditor(metaClass, mai);
-                            }
-
-                            log.debug("ATTRIBUTE_CLASS_NAME:" + mai.getJavaclassname() + " --> " + cmpEditor.getClass().toString() );//NOI18N
+                        //bindable geht vor
+                        if (cmpEditor instanceof Bindable) {
                             cidsEditor.addControlInformation(mai.getFieldName().toLowerCase(), (Bindable) cmpEditor);
-                            gbc = getCommonConstraints();
-                            modifyForEditor(gbc);
-                            gbc.gridy = row;
+
+                        } else if (cmpEditor instanceof BindingInformationProvider) {
+                            BindingInformationProvider ed = (BindingInformationProvider) cmpEditor;
+                            Set<String> fields = ed.getAllControls().keySet();
+                            for (String key : fields) {
+                                String newKey = mai.getFieldName().toLowerCase() + "." + key;//NOI18N
+                                cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
+                            }
+                        }
+
+                        gbc = getCommonConstraints();
+                        modifyForEditor(gbc);
+                        gbc.gridwidth = 1;
+                        gbc.gridy = row;
+                        if (cmpEditor != null) {
                             cmpEditor.putClientProperty(PARENT_CIDS_EDITOR, cidsEditor);
                             cidsEditor.add(cmpEditor, gbc);
+                            cmpEditor.putClientProperty(CMD_ADD_OBJECT, cmdAdd);
+                            cmpEditor.putClientProperty(CMD_REMOVE_OBJECT, cmdRemove);
+                        } else {
+                            log.warn("Editor was null. " + metaClass.getTableName() + "." + mai.getFieldName());//NOI18N
                         }
 
                     }
 
-                    row++;
+                } else {
+                    // Die Editorkomponente über die Metainformations checken
+
+                    //--------------------------------------------------
+                    //Einfache Attribute
+                    //--------------------------------------------------
+
+                    cmpEditor = getCustomAttributeEditor(metaClass, mai);
+
+                    if (cmpEditor == null) {
+                        cmpEditor = getSimpleAttributeEditor(metaClass, mai);
+                    }
+
+                    log.debug("ATTRIBUTE_CLASS_NAME:" + mai.getJavaclassname() + " --> " + cmpEditor.getClass().toString());//NOI18N
+                    cidsEditor.addControlInformation(mai.getFieldName().toLowerCase(), (Bindable) cmpEditor);
+                    gbc = getCommonConstraints();
+                    modifyForEditor(gbc);
+                    gbc.gridy = row;
+                    cmpEditor.putClientProperty(PARENT_CIDS_EDITOR, cidsEditor);
+                    cidsEditor.add(cmpEditor, gbc);
                 }
+
+            }
+
+            row++;
+        }
 //            }
 //        };
 //        if (EventQueue.isDispatchThread()) {
@@ -532,7 +532,8 @@ public class CidsObjectEditorFactory {
 //                return null;
 //            }
 //        }
-        return result.getObject();
+//        return result.getObject();
+        return cidsEditor;
     }
 
     private final String getAttributeEditorClassnameByConvention(MetaClass metaClass, MemberAttributeInfo mai) {
@@ -554,13 +555,13 @@ public class CidsObjectEditorFactory {
 
         //MetaClass contains the MemberAttributeInfo
         final String className = getAttributeEditorClassnameByConvention(metaClass, mai);
-        
+
         final FinalReference<JComponent> result = new FinalReference<JComponent>();
         try {
             Class<?> attrEditorClass = BlacklistClassloading.forName(className);
-            
-            if (attrEditorClass==null&& mai.getEditor()!=null) {
-                attrEditorClass=BlacklistClassloading.forName(mai.getEditor());
+
+            if (attrEditorClass == null && mai.getEditor() != null) {
+                attrEditorClass = BlacklistClassloading.forName(mai.getEditor());
             }
 
             if (attrEditorClass != null) {
@@ -595,7 +596,7 @@ public class CidsObjectEditorFactory {
         } catch (Exception e) {
             log.error("Error when creating a SimpleAttributeEditor", e);//NOI18N
         }
-        JComponent ret= result.getObject();
+        JComponent ret = result.getObject();
         return ret;
     }
 
@@ -702,6 +703,7 @@ public class CidsObjectEditorFactory {
 
                 binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, jc, ELProperty.create("${text==null}"), jc, BeanProperty.create("background"));//NOI18N
                 binding.setConverter(nullToBackgroundColorConverter);
+
                 bg.addBinding(binding);
 
 
@@ -719,6 +721,14 @@ public class CidsObjectEditorFactory {
                     Converter c = bjc.getConverter();
                     if (c != null) {
                         binding.setConverter(c);
+                    }
+                    Object nullValue = bjc.getNullSourceValue();
+                    Object errorValue = bjc.getErrorSourceValue();
+                    if (nullValue != null) {
+                        binding.setSourceNullValue(nullValue);
+                    }
+                    if (errorValue != null) {
+                        binding.setSourceUnreadableValue(errorValue);
                     }
 
                     bg.addBinding(binding);
@@ -739,10 +749,17 @@ public class CidsObjectEditorFactory {
                     //--------------------------------------------------
 
                     binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, ed, ELProperty.create("${cidsBean." + key + "}"), jc, BeanProperty.create(bjc.getBindingProperty()));//NOI18N
-
                     Converter c = bjc.getConverter();
                     if (c != null) {
                         binding.setConverter(c);
+                    }
+                    Object nullValue = bjc.getNullSourceValue();
+                    Object errorValue = bjc.getErrorSourceValue();
+                    if (nullValue != null) {
+                        binding.setSourceNullValue(nullValue);
+                    }
+                    if (errorValue != null) {
+                        binding.setSourceUnreadableValue(errorValue);
                     }
 
                     bg.addBinding(binding);
@@ -1010,6 +1027,16 @@ class BindableJList extends JList implements Bindable {
     }
 
     public Validator getValidator() {
+        return null;
+    }
+
+    @Override
+    public Object getNullSourceValue() {
+        return null;
+    }
+
+    @Override
+    public Object getErrorSourceValue() {
         return null;
     }
 }

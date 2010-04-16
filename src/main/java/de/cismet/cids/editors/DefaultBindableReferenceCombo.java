@@ -157,6 +157,16 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         this.nullable = nullable;
     }
 
+    @Override
+    public Object getNullSourceValue() {
+        return null;
+    }
+
+    @Override
+    public Object getErrorSourceValue() {
+        return null;
+    }
+
     public static DefaultComboBoxModel getModelByMetaClass(MetaClass mc, boolean nullable) throws Exception {
         ClassAttribute ca = mc.getClassAttribute("sortingColumn");//NOI18N
         String orderBy = "";//NOI18N

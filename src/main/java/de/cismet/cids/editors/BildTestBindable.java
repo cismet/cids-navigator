@@ -88,6 +88,14 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
         this.cidsBean=cidsBean;
     }
 
+    @Override
+    public Object getNullSourceValue() {
+        return null;
+    }
 
+    @Override
+    public Object getErrorSourceValue() {
+        return null;
+    }
 
 }

@@ -100,9 +100,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
             log.debug("setTimestamp: " + timestamp);//NOI18N
         }
         if (timestamp == null) {
-            ((CardLayout)getLayout()).show(this, CARDS_CREATE);
+            ((CardLayout) getLayout()).show(this, CARDS_CREATE);
         } else {
-            ((CardLayout)getLayout()).show(this, CARDS_CHOOSE);
+            ((CardLayout) getLayout()).show(this, CARDS_CHOOSE);
         }
 
         try {
@@ -225,7 +225,6 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     private void btnCreateTimestampActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateTimestampActionPerformed
         setTimestamp(Calendar.getInstance().getTime());
     }//GEN-LAST:event_btnCreateTimestampActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCreateTimestamp;
     private javax.swing.JFormattedTextField jFormattedTextField1;
@@ -261,6 +260,16 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
 
     public Date getTime() {
         return time;
+    }
+
+    @Override
+    public Object getNullSourceValue() {
+        return null;
+    }
+
+    @Override
+    public Object getErrorSourceValue() {
+        return null;
     }
 
     public void setTime(Date time) {

@@ -52,5 +52,13 @@ public class DefaultBindableJTextField extends JTextField implements Bindable{
         return null;
     }
 
+    @Override
+    public Object getNullSourceValue() {
+        return "";
+    }
 
+    @Override
+    public Object getErrorSourceValue() {
+        return "";
+    }
 }

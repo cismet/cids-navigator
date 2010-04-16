@@ -16,4 +16,6 @@ public interface Bindable {
     public String getBindingProperty();
     public Validator getValidator();
     public Converter getConverter();
+    public Object getNullSourceValue();
+    public Object getErrorSourceValue();
 }
