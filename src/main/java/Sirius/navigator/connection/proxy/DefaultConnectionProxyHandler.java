@@ -287,7 +287,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 methodHash.putAll(methodMap);
                 if(log.isDebugEnabled()) {
                     Iterator iterator = methodMap.keySet().iterator();
-                    log.debug("<CMC> method '" + iterator.next() + " gecacht.");
+                    if(iterator.hasNext()) {
+                        log.debug("<CMC> method '" + iterator.next() + " gecacht.");
+                    }
                 }
             }
         }

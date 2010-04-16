@@ -124,6 +124,16 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
         return null;
     }
 
+    @Override
+    public Object getNullSourceValue() {
+        return null;
+    }
+
+    @Override
+    public Object getErrorSourceValue() {
+        return null;
+    }
+
     /**
      * DANGER: could be buggy :(
      * @return

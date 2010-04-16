@@ -72,6 +72,16 @@ public class DefaultBindableDateChooser extends JXDatePicker implements Bindable
     public Validator getValidator() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public Object getNullSourceValue() {
+        return null;
+    }
+
+    @Override
+    public Object getErrorSourceValue() {
+        return null;
+    }
 //    @Override
 //    public Date getDate() {
 //        log.fatal("getDate returns: " + super.getDate());
