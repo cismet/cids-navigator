@@ -48,7 +48,7 @@ public class ExceptionManager
                 null,
                 new String[] {
                     org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm"), //NOI18N
-                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")}, //NOI18N
+                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.cancel")}, //NOI18N
                 org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")); //NOI18N
     }
     

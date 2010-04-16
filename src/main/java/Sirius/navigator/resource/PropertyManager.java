@@ -997,7 +997,7 @@ public final class PropertyManager {
             this.country = country.toUpperCase();
         } else {
             logger.warn("malformed country code '" + country + "', setting to default (de)");//NOI18N
-            this.language = "de";//NOI18N
+            this.country = "DE";//NOI18N
         }
     }
 
