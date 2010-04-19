@@ -684,8 +684,8 @@ public class Navigator extends JFrame {
         // must explicitly set as default locale. This is requiered for the cids-navigator project, but
         // not for the other internationalized projects
         try {
-            String lang = System.getProperty("user.language");
-            String country = System.getProperty("user.country");
+            String lang = System.getProperty("user.language");//NOI18N
+            String country = System.getProperty("user.country");//NOI18N
 
             if (lang != null && country != null) {
                 Locale.setDefault( new Locale(lang, country) );
@@ -693,7 +693,7 @@ public class Navigator extends JFrame {
                 Locale.setDefault( new Locale(lang) );
             }
         } catch (SecurityException e) {
-            System.err.println("You have insufficient rights to set the default locale.");
+            System.err.println("You have insufficient rights to set the default locale.");//NOI18N
         }
 
         try {

@@ -33,8 +33,8 @@ public class ResourceManager
     private ImageHashMap remoteIconCache = null;
     private final Hashtable localIconCache;
 
-    private ResourceBundle resourcesBundle;
-    private ResourceBundle errorcodesBundle;
+//    private ResourceBundle resourcesBundle;
+//    private ResourceBundle errorcodesBundle;
 
     /** Creates a new instance of ResourceManager */
     private ResourceManager()
@@ -107,29 +107,15 @@ public class ResourceManager
     @Deprecated
     public String getString(String key)
     {
-        try
-        {
-            return resourcesBundle.getString(key);
-        }
-        catch(MissingResourceException mrex)
-        {
-            logger.error(mrex.getMessage());
-            return ERROR_STRING;
-        }
+        logger.error("The ResourceManager.getString() method was called. This method should not be used.", new Throwable());//NOI18N
+        return "";//NOI18N
     }
 
     @Deprecated
     public char getMnemonic(String key)
     {
-        try
-        {
-            return resourcesBundle.getString(key).charAt(0);
-        }
-        catch(MissingResourceException mrex)
-        {
-            logger.error(mrex.getMessage());
-            return ERROR_MNEMONIC;
-        }
+        logger.error("The ResourceManager.getMnemonic() method was called. This method should not be used.", new Throwable());//NOI18N
+        return 'a';
     }
 
     // buttons .......................................................
@@ -278,15 +264,8 @@ public class ResourceManager
 
     private String getException(String errorcode)
     {
-        try
-        {
-            return errorcodesBundle.getString(errorcode);
-        }
-        catch(MissingResourceException mrex)
-        {
-            logger.error(mrex.getMessage());
-            return ERROR_STRING;
-        }
+        logger.error("The ResourceManager.getException() method was called. This method should not be used.", new Throwable());//NOI18N
+        return "";//NOI18N
     }
 
     // ICON ====================================================================
@@ -395,10 +374,43 @@ public class ResourceManager
     }*/
 
     /**
-     * resources in or in a subdirectory of thwe navigator's 'resource' directory
+     * resources in or in a subdirectory of the navigator's 'resource' directory.
+     * The returned resources will be internationalised.
      */
     public InputStream getNavigatorResourceAsStream(String resourceName)  throws IOException
     {
+        Iterator<String> it = org.openide.util.NbBundle.getLocalizingSuffixes();
+
+        while (it.hasNext()) {
+            String suffix = it.next();
+            String fileExtension = "";//NOI18N
+            String resourceNameBase = resourceName;
+            String resourceUri;
+
+            if (resourceName.lastIndexOf(".") != -1) {//NOI18N
+                fileExtension = resourceName.substring(resourceName.lastIndexOf("."));//NOI18N
+                resourceNameBase = resourceName.substring(0, resourceName.lastIndexOf("."));//NOI18N
+            }
+
+            resourceUri = PropertyManager.getManager().getBasePath() + "res/" + resourceNameBase + suffix + fileExtension;//NOI18N
+
+            try {
+                if(logger.isDebugEnabled())logger.debug("loading navigator resource '" + resourceUri + "'");//NOI18N
+                return this.getResourceAsStream(resourceUri);//NOI18N
+            } catch(IOException ioexp) {
+                logger.warn("Resource with the uri '" + resourceUri + "' not found");//NOI18N
+                String altResourceName = resourceNameBase + suffix + fileExtension;
+                if (logger.isDebugEnabled()) logger.debug("loading navigator resource '" + this.getClass().getPackage().getName() + "." + altResourceName + "'");//NOI18N
+                InputStream is = this.getClass().getResourceAsStream(altResourceName);
+
+                if (is != null) {
+                    return is;
+                } else {
+                    logger.warn("Resource with name '" + altResourceName + "' not found");//NOI18N
+                }
+            }
+        }
+
         try
         {
             if(logger.isDebugEnabled())logger.debug("loading navigator resource '" + PropertyManager.getManager().getBasePath() + "res/" + resourceName + "'");//NOI18N
@@ -411,6 +423,7 @@ public class ResourceManager
         }
     }
 
+    
     public InputStream getResourceAsStream(String path)  throws IOException
     {
         try

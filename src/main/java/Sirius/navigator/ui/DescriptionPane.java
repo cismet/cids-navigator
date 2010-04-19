@@ -126,7 +126,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             StringBuffer buffer = new StringBuffer();
             String string = null;
             reader = new BufferedReader(new InputStreamReader(
-                    resource.getNavigatorResourceAsStream("doc/welcome_de_DE.html")));//NOI18N
+                    resource.getNavigatorResourceAsStream("doc/welcome.html")));//NOI18N
 
             while ((string = reader.readLine()) != null) {
                 buffer.append(string);

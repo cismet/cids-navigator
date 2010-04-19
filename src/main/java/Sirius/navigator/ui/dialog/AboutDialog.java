@@ -22,7 +22,7 @@ public class AboutDialog extends javax.swing.JDialog
             String string = null;
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     ResourceManager.getManager().getNavigatorResourceAsStream(
-                    "doc/about_de_DE.html")));//NOI18N
+                    "doc/about.html")));//NOI18N
         
             while((string = reader.readLine()) != null)
             {
