@@ -34,6 +34,8 @@ import Sirius.navigator.ui.attributes.editor.metaobject.*;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
+import de.cismet.cids.editors.BeanInitializer;
+import de.cismet.cids.editors.EditorBeanInitializerStore;
 import de.cismet.tools.CismetThreadPool;
 
 /**
@@ -108,8 +110,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
             
             this.editor = new DefaultComplexMetaAttributeEditor();
             ObjectAttributeNode rootNode = (ObjectAttributeNode)this.attributeTree.getRootNode();
-            MetaObject metaObject = rootNode.getMetaObject();
-            
+            MetaObject metaObject = rootNode.getMetaObject();            
             MetaAttributeEditorLocator mael=new MetaAttributeEditorLocator();
             try {
                 //HELL

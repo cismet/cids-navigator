@@ -16,9 +16,13 @@ import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanStore;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.WrappedComponent;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,9 +37,9 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeModel;
-import org.apache.commons.beanutils.BeanUtils;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -119,6 +123,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         Vector<AbstractButton> buttons = new Vector<AbstractButton>();
         buttons.add(commitButton);
         buttons.add(cancelButton);
+        buttons.add(copyButton);
+        buttons.add(pasteButton);
         return buttons;
     }
 
@@ -257,6 +263,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
                     editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 
+                        @Override
                         public void propertyChange(PropertyChangeEvent evt) {
                             viewer.repaint();
                             tree.repaint();
@@ -264,6 +271,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
                         }
                     });
+//                    try {
+//                        EditorBeanInitializerStore.getInstance().initialize(editorObject.getBean());
+//                    } catch (Exception ex) {
+//                        log.error("Exception while initializing Bean with template values!", ex);
+//                    }
                     JComponent ed = CidsObjectEditorFactory.getInstance().getEditor(editorObject);
                     return ed;
                 }
@@ -275,10 +287,23 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         log.debug("editor:" + ed);
                         scpEditor.getViewport().removeAll();
                         scpEditor.getViewport().setView(ed);
+                        if (ed instanceof WrappedComponent) {
+                            JComponent originalComponent = ((WrappedComponent) ed).getOriginalComponent();
+                            if (originalComponent instanceof CidsBeanStore) {
+                                currentBeanStore = (CidsBeanStore) originalComponent;
+                                currentInitializer = EditorBeanInitializerStore.getInstance().getInitializer(editorObject.getMetaClass());
+                                cancelButton.setEnabled(true);
+                                commitButton.setEnabled(true);
+                                copyButton.setEnabled(true);
+                                if (currentInitializer != null) {
+                                    //enable editor attribute paste only for new MOs
+                                    boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus() == MetaObject.NEW;
+                                    pasteButton.setEnabled(isNewBean);
+                                }
+                            }
+                        }
                         NavigatorAttributeEditorGui.this.revalidate();
                         log.debug("editor added");
-                        cancelButton.setEnabled(true);
-                        commitButton.setEnabled(true);
                     } catch (Exception e) {
                         ErrorInfo ei = new ErrorInfo("Fehler", "Beim Erzeugen des Editors ist ein Fehler aufgetreten.", null, null, e, Level.SEVERE, null);
                         log.error("Fehler beim Darstellen des Editors" + ei.getState() + editorObject.getDebugString() + "\n", e);
@@ -292,12 +317,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             log.warn("Uebergebener Treenode ist keine ObjectTreeMode, sondern: " + node.getClass());
         }
     }
+    private BeanInitializer currentInitializer = null;
+    private CidsBeanStore currentBeanStore = null;
 
     @Override
     protected void clear() {
+        currentInitializer = null;
+        currentBeanStore = null;
         scpEditor.getViewport().removeAll();
         commitButton.setEnabled(false);
         cancelButton.setEnabled(false);
+        copyButton.setEnabled(false);
+        pasteButton.setEnabled(false);
         revalidate();
         repaint();
         ComponentRegistry.getRegistry().getAttributeViewer().repaint();
@@ -331,6 +362,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         controlBar = new javax.swing.JPanel();
         commitButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        copyButton = new javax.swing.JButton();
+        pasteButton = new javax.swing.JButton();
         switchPanel = new javax.swing.JPanel();
         scpEditor = new javax.swing.JScrollPane();
         panDebug = new javax.swing.JPanel();
@@ -367,8 +400,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
-        setLayout(new java.awt.BorderLayout());
-
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         commitButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon")));
@@ -399,6 +430,42 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         cancelButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon.rollover")));
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
+        copyButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.copy.icon")));
+        copyButton.setToolTipText(resources.getString("attribute.viewer.copy.tooltip"));
+        copyButton.setActionCommand("cancel");
+        copyButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        copyButton.setContentAreaFilled(false);
+        copyButton.setEnabled(false);
+        copyButton.setFocusPainted(false);
+        copyButton.setMaximumSize(new java.awt.Dimension(16, 16));
+        copyButton.setMinimumSize(new java.awt.Dimension(16, 16));
+        copyButton.setPreferredSize(new java.awt.Dimension(16, 16));
+        copyButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.copy.icon.rollover")));
+        copyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyButtonActionPerformed(evt);
+            }
+        });
+        controlBar.add(copyButton, new java.awt.GridBagConstraints());
+
+        pasteButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.paste.icon")));
+        pasteButton.setToolTipText(resources.getString("attribute.viewer.paste.tooltip"));
+        pasteButton.setActionCommand("paste");
+        pasteButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        pasteButton.setContentAreaFilled(false);
+        pasteButton.setEnabled(false);
+        pasteButton.setFocusPainted(false);
+        pasteButton.setMaximumSize(new java.awt.Dimension(16, 16));
+        pasteButton.setMinimumSize(new java.awt.Dimension(16, 16));
+        pasteButton.setPreferredSize(new java.awt.Dimension(16, 16));
+        pasteButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.paste.icon.rollover")));
+        pasteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pasteButtonActionPerformed(evt);
+            }
+        });
+        controlBar.add(pasteButton, new java.awt.GridBagConstraints());
+
         add(controlBar, java.awt.BorderLayout.NORTH);
 
         switchPanel.setLayout(new java.awt.BorderLayout());
@@ -423,18 +490,52 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         if (getTreeNode() != null && getTreeNode() instanceof ObjectTreeNode) {
             MetaObject mo = ((ObjectTreeNode) getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());
+            EditorBeanInitializerStore.getInstance().registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
+        if (currentBeanStore != null) {
+            CidsBean bean = currentBeanStore.getCidsBean();
+            boolean isNewBean = bean.getMetaObject().getStatus() == MetaObject.NEW;
+            if (currentBeanStore instanceof BeanInitializerProvider) {
+                BeanInitializerProvider beanInitProvider = (BeanInitializerProvider) currentBeanStore;
+                currentInitializer = beanInitProvider.getBeanInitializer();
+                if (currentInitializer != null) {
+                    EditorBeanInitializerStore.getInstance().registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
+                } else {
+                    log.error("BeanInitializerProvider delivers null as initializer.");
+                }
+            } else {
+                currentInitializer = new DefaultBeanInitializer(bean);
+                EditorBeanInitializerStore.getInstance().registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
+            }
+            //enable editor attribute paste only for new MOs
+            pasteButton.setEnabled(currentInitializer != null && isNewBean);
+        }
+    }//GEN-LAST:event_copyButtonActionPerformed
+
+    private void pasteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
+        if (currentBeanStore != null) {
+            CidsBean bean = currentBeanStore.getCidsBean();
+            try {
+                EditorBeanInitializerStore.getInstance().initialize(bean);
+            } catch (Exception ex) {
+                log.error(ex, ex);
+            }
+        }
+    }//GEN-LAST:event_pasteButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;
     private javax.swing.JPanel controlBar;
+    private javax.swing.JButton copyButton;
     private javax.swing.JScrollPane editorScrollPane;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel lblEditorCreation;
     private javax.swing.JPanel panDebug;
+    private javax.swing.JButton pasteButton;
     private javax.swing.JScrollPane scpEditor;
     private javax.swing.JPanel switchPanel;
     // End of variables declaration//GEN-END:variables
