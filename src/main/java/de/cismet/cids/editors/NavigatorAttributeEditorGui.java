@@ -252,7 +252,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         });
         treeNode = node;
         if (treeNode instanceof ObjectTreeNode) {
-            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
+//            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
             CismetThreadPool.execute(new SwingWorker<JComponent, Void>() {
 
                 @Override
@@ -288,18 +288,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         scpEditor.getViewport().removeAll();
                         scpEditor.getViewport().setView(ed);
                         if (ed instanceof WrappedComponent) {
-                            JComponent originalComponent = ((WrappedComponent) ed).getOriginalComponent();
-                            if (originalComponent instanceof CidsBeanStore) {
-                                currentBeanStore = (CidsBeanStore) originalComponent;
-                                currentInitializer = EditorBeanInitializerStore.getInstance().getInitializer(editorObject.getMetaClass());
-                                cancelButton.setEnabled(true);
-                                commitButton.setEnabled(true);
-                                copyButton.setEnabled(true);
-                                if (currentInitializer != null) {
-                                    //enable editor attribute paste only for new MOs
-                                    boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus() == MetaObject.NEW;
-                                    pasteButton.setEnabled(isNewBean);
-                                }
+                            ed = ((WrappedComponent) ed).getOriginalComponent();
+                        }
+                        if (ed instanceof CidsBeanStore) {
+                            currentBeanStore = (CidsBeanStore) ed;
+                            currentInitializer = EditorBeanInitializerStore.getInstance().getInitializer(editorObject.getMetaClass());
+                            cancelButton.setEnabled(true);
+                            commitButton.setEnabled(true);
+                            copyButton.setEnabled(true);
+                            if (currentInitializer != null) {
+                                //enable editor attribute paste only for new MOs
+                                boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus() == MetaObject.NEW;
+                                pasteButton.setEnabled(isNewBean);
                             }
                         }
                         NavigatorAttributeEditorGui.this.revalidate();
