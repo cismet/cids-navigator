@@ -80,18 +80,22 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, "Wollen Sie die gemachten Änderungen speichern?", "Speichern", JOptionPane.YES_NO_CANCEL_OPTION);
-                    if (answer == JOptionPane.YES_OPTION) {
-                        saveIt();
-
-
-                    } else if (answer == JOptionPane.CANCEL_OPTION) {
+                    if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                        int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, "Wollen Sie die gemachten Änderungen speichern?", "Speichern", JOptionPane.YES_NO_CANCEL_OPTION);
+                        if (answer == JOptionPane.YES_OPTION) {
+                            saveIt();
+                        } else if (answer == JOptionPane.CANCEL_OPTION) {
+                        } else {
+                            reloadFromDB();
+                            clear();
+                        }
                     } else {
-                        reloadFromDB();
-                        clear();
+                        saveIt(false);
                     }
                 } else {
-                    clear();
+                    if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                        clear();
+                    }
                 }
             }
         });
@@ -197,33 +201,59 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     }
 
     private void saveIt() {
+        saveIt(true);
+    }
+
+    private void saveIt(boolean closeEditor) {
         ObjectTreeNode otn = (ObjectTreeNode) treeNode;
         MetaObject mo = otn.getMetaObject();
         try {
-            mo.getBean().persist();
+            CidsBean savedInstance = mo.getBean().persist();
+            if (closeEditor) {
+                JOptionPane jop = new JOptionPane("Objekt wurde gespeichert.", JOptionPane.INFORMATION_MESSAGE);
+
+                final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this, "Speichern erfolgreich");
+
+                Timer t = new Timer(900, new ActionListener() {
+
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.setVisible(false);
+                        dialog.dispose();
+
+                    }
+                });
+                t.setRepeats(false);
+                t.start();
+                dialog.setVisible(true);
+                clear();
+            } else {
+
+                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
+                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
+                ((ObjectTreeNode) treeNode).setMetaObject(savedInstance.getMetaObject());
+                editorObject = savedInstance.getMetaObject();
+                createBackup(editorObject);
+                editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        viewer.repaint();
+                        tree.repaint();
+
+                    }
+                });
+                currentBeanStore.setCidsBean(savedInstance);
+
+            }
             refreshTree();
-            JOptionPane jop = new JOptionPane("Objekt wurde gespeichert.", JOptionPane.INFORMATION_MESSAGE);
-
-            final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this, "Speichern erfolgreich");
-
-            Timer t = new Timer(900, new ActionListener() {
-
-                public void actionPerformed(ActionEvent e) {
-                    dialog.setVisible(false);
-                    dialog.dispose();
-
-                }
-            });
-            t.setRepeats(false);
-            t.start();
-            dialog.setVisible(true);
-            clear();
         } catch (Exception ex) {
             log.error("Fehler beim Speichern", ex);
             ErrorInfo ei = new ErrorInfo("Fehler", "Beim Speichern des Objektes ist ein Fehler aufgetreten.", null, null, ex, Level.SEVERE, null);
             JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
         }
-        clear();
+        if (closeEditor) {
+            clear();
+        }
     }
 
     @Override
@@ -297,7 +327,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                             commitButton.setEnabled(true);
                             copyButton.setEnabled(true);
                             if (currentInitializer != null) {
-                                //enable editor attribute paste only for new MOs
+                                //enable editor attribute paste only for NEW MOs
                                 boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus() == MetaObject.NEW;
                                 pasteButton.setEnabled(isNewBean);
                             }
