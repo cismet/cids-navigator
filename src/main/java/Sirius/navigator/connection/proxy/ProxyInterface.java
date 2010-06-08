@@ -29,8 +29,6 @@ import Sirius.server.search.*;
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.server.dataretrieval.*;
-import Sirius.server.newuser.User;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -125,11 +123,4 @@ public interface ProxyInterface
     public boolean addQueryParameter(int queryId,String paramkey,String description) throws ConnectionException;
         
     // .........................................................................
-    
-    public DataObject getDataObject(MetaObject MetaObject) throws ConnectionException, DataRetrievalException;
-
-    public DataObject[] getDataObject(Query query) throws ConnectionException, DataRetrievalException;
-
-    // .........................................................................
-
 }
