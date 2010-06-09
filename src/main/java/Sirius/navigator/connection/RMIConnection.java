@@ -45,7 +45,6 @@ import Sirius.server.search.store.QueryData;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
-import Sirius.server.dataretrieval.*;
 import Sirius.server.localserver.attribute.ClassAttribute;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import java.io.File;
@@ -544,25 +543,6 @@ public final class RMIConnection implements Connection {
         } catch (RemoteException re) {
             logger.fatal("[ServerError] could not retrieve methods from domain " + domain + "", re);
             throw new ConnectionException("[ServerError] could not retrieve methods from domain " + domain + ": " + re.getMessage(), ConnectionException.FATAL);
-        }
-    }
-
-    // DataRetrieval -----------------------------------------------------------
-    public DataObject[] getDataObject(User user, Sirius.server.search.Query query) throws ConnectionException, DataRetrievalException {
-        try {
-            return ((DataService) callserver).getDataObject(user, query);
-        } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve data objects", re);
-            throw new ConnectionException("[[ServerError] could not retrieve data objects: " + re.getMessage(), ConnectionException.ERROR);
-        }
-    }
-
-    public DataObject getDataObject(User user, MetaObject MetaObject) throws ConnectionException, DataRetrievalException {
-        try {
-            return ((DataService) callserver).getDataObject(user, MetaObject);
-        } catch (RemoteException re) {
-            logger.error("[ServerError] could not retrieve data object", re);
-            throw new ConnectionException("[[ServerError] could not retrieve data object: " + re.getMessage(), ConnectionException.ERROR);
         }
     }
 
