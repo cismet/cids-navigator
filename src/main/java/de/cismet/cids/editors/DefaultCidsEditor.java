@@ -87,7 +87,9 @@ public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,
         customTitle=title;
     }
 
-
-
+    @Override
+    public void dispose() {
+        bindingGroup.unbind();
+    }
 
 }

@@ -10,14 +10,13 @@ import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.ComponentWrapper;
@@ -28,6 +27,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractButton;
@@ -39,14 +40,15 @@ import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeModel;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
-import org.openide.util.Exceptions;
+import org.openide.util.WeakListeners;
 
 /**
  *
  * @author  pascal
  */
 public class NavigatorAttributeEditorGui extends AttributeEditor {
-
+    //do not remove!
+    private transient PropertyChangeListener strongReferenceOnWeakListener = null;
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Object treeNode = null;
     private MetaObject backupObject = null;
@@ -78,6 +80,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         commitButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
                     if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
@@ -102,6 +105,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         cancelButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
                     int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, "Sind Sie sicher dass Sie den Editor beenden wollen?", "Editor beenden ?", JOptionPane.YES_NO_OPTION);
@@ -207,8 +211,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private void saveIt(boolean closeEditor) {
         ObjectTreeNode otn = (ObjectTreeNode) treeNode;
         MetaObject mo = otn.getMetaObject();
+        CidsBean oldBean = mo.getBean();
         try {
-            CidsBean savedInstance = mo.getBean().persist();
+            CidsBean savedInstance = oldBean.persist();
             if (closeEditor) {
                 JOptionPane jop = new JOptionPane("Objekt wurde gespeichert.", JOptionPane.INFORMATION_MESSAGE);
 
@@ -216,6 +221,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
                 Timer t = new Timer(900, new ActionListener() {
 
+                    @Override
                     public void actionPerformed(ActionEvent e) {
                         dialog.setVisible(false);
                         dialog.dispose();
@@ -233,16 +239,37 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 ((ObjectTreeNode) treeNode).setMetaObject(savedInstance.getMetaObject());
                 editorObject = savedInstance.getMetaObject();
                 createBackup(editorObject);
-                editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
-
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        viewer.repaint();
-                        tree.repaint();
-
-                    }
-                });
+                //---
+//                CidsBean bean = editorObject.getBean();
+//                final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+//
+//                    @Override
+//                    public void propertyChange(PropertyChangeEvent evt) {
+//                        viewer.repaint();
+//                        tree.repaint();
+//
+//                    }
+//                };
+//                if (currentBeanStore instanceof JComponent) {
+//                strongReferenceOnWeakListener = propertyChangeListener;
+//                } else {
+//                    log.error("A CidsBeansStore must be instanceof JComponent here, but it was " + currentBeanStore + "!");
+//                }
+//                bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener, bean));
+                //---
+//                editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+//
+//                    @Override
+//                    public void propertyChange(PropertyChangeEvent evt) {
+//                        viewer.repaint();
+//                        tree.repaint();
+//
+//                    }
+//                });
                 currentBeanStore.setCidsBean(savedInstance);
+                for (PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
+                    savedInstance.addPropertyChangeListener(pcl);
+                }
 
             }
             refreshTree();
@@ -274,8 +301,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
         EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
-                scpEditor.getViewport().removeAll();
+                removeAndDisposeEditor();
                 scpEditor.getViewport().setView(wrappedWaitingPanel);
                 NavigatorAttributeEditorGui.this.revalidate();
             }
@@ -291,16 +319,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     editorObject = otn.getMetaObject();
                     createBackup(editorObject);
 
-                    editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
-
-                        @Override
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            viewer.repaint();
-                            tree.repaint();
-                            //commitButton.setEnabled(!backupObject.propertyEquals(mo)); //vielleicht einfach zuviel des guten
-
-                        }
-                    });
+//                    editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+//
+//                        @Override
+//                        public void propertyChange(PropertyChangeEvent evt) {
+//                            viewer.repaint();
+//                            tree.repaint();
+//                            //commitButton.setEnabled(!backupObject.propertyEquals(mo)); //vielleicht einfach zuviel des guten
+//
+//                        }
+//                    });
 //                    try {
 //                        EditorBeanInitializerStore.getInstance().initialize(editorObject.getBean());
 //                    } catch (Exception ex) {
@@ -315,13 +343,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     try {
                         JComponent ed = get();
                         log.debug("editor:" + ed);
-                        scpEditor.getViewport().removeAll();
+                        removeAndDisposeEditor();
                         scpEditor.getViewport().setView(ed);
                         if (ed instanceof WrappedComponent) {
                             ed = ((WrappedComponent) ed).getOriginalComponent();
                         }
-                        if (ed instanceof CidsBeanStore) {
-                            currentBeanStore = (CidsBeanStore) ed;
+                        if (ed instanceof DisposableCidsBeanStore) {
+                            currentBeanStore = (DisposableCidsBeanStore) ed;
                             currentInitializer = EditorBeanInitializerStore.getInstance().getInitializer(editorObject.getMetaClass());
                             cancelButton.setEnabled(true);
                             commitButton.setEnabled(true);
@@ -332,6 +360,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 pasteButton.setEnabled(isNewBean);
                             }
                         }
+                        CidsBean bean = editorObject.getBean();
+                        final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+
+                            @Override
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                viewer.repaint();
+                                tree.repaint();
+
+                            }
+                        };
+                        strongReferenceOnWeakListener = propertyChangeListener;
+                        bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener, bean));
                         NavigatorAttributeEditorGui.this.revalidate();
                         log.debug("editor added");
                     } catch (Exception e) {
@@ -348,13 +388,22 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         }
     }
     private BeanInitializer currentInitializer = null;
-    private CidsBeanStore currentBeanStore = null;
+    private DisposableCidsBeanStore currentBeanStore = null;
+
+    private void removeAndDisposeEditor() {
+        if (currentBeanStore != null) {
+            currentBeanStore.dispose();
+            currentBeanStore = null;
+        }
+        scpEditor.getViewport().removeAll();
+        //release the strong reference on the listener, so that the weak listener can be GCed.
+        strongReferenceOnWeakListener = null;
+    }
 
     @Override
     protected void clear() {
         currentInitializer = null;
-        currentBeanStore = null;
-        scpEditor.getViewport().removeAll();
+        removeAndDisposeEditor();
         commitButton.setEnabled(false);
         cancelButton.setEnabled(false);
         copyButton.setEnabled(false);
@@ -367,12 +416,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         editorObject = null;
     }
 
+    @Override
     public Object getTreeNode() {
         return treeNode;
     }
 
+    @Override
     public boolean isChanged() {
-
         return true;
     }
 

@@ -14,7 +14,6 @@ import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
 import java.util.Collection;
-import java.util.Map;
 import javax.swing.JComponent;
 
 /**
@@ -26,7 +25,7 @@ public class CidsObjectRendererFactory {
 
     private static CidsObjectRendererFactory instance = null;
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
-    private static final Map<MetaClass, JComponent> singleRenderer = TypeSafeCollections.newHashMap();
+//    private static final Map<MetaClass, JComponent> singleRenderer = TypeSafeCollections.newHashMap();
 //    private HashMap<MetaClass,JComponent> aggregationRenderer=new HashMap<MetaClass, JComponent>();
 //    private static final boolean lazyClassFetching = true;
     private static final String RENDERER_PREFIX = "de.cismet.cids.custom.objectrenderer.";
@@ -93,7 +92,7 @@ public class CidsObjectRendererFactory {
 //        anstelle iner hashmap eine multimap und dann über addnotify die instanz des renderers aus dem cahe entferne und bei removenotify (wenn der renderer
         //nicht mehr bebraucht wird) wieder dem cache zur verfuegung zu stellen. problem ist, das es noch keine gemeinsame oberklasse für die renderer gibt
 
-        final FinalReference<JComponent> componentReferenceHolder = new FinalReference<JComponent>();
+        JComponent componentReferenceHolder = null;
         try {
             final Class<?> rendererClass = loadRendererClass(rendererClassNameByConvention, rendererClassNameFromDB);
             final CidsBean bean;
@@ -118,11 +117,11 @@ public class CidsObjectRendererFactory {
                         throw new RuntimeException("Not a valid Renderer. The Renderer should be a CidsBeanRenderer or a MetaObjectRenderer");
                     }
 
-                    singleRenderer.put(mo.getMetaClass(), rendererComp);
+//                    singleRenderer.put(mo.getMetaClass(), rendererComp);
                     if (cw != null && !(rendererComp instanceof DoNotWrap)) {
-                        componentReferenceHolder.setObject((JComponent) cw.wrapComponent(rendererComp));
+                        componentReferenceHolder = (JComponent) cw.wrapComponent(rendererComp);
                     } else {
-                        componentReferenceHolder.setObject(rendererComp);
+                        componentReferenceHolder = rendererComp;
                     }
                 } catch (Throwable t) {
                     throw new RuntimeException(t);
@@ -132,7 +131,7 @@ public class CidsObjectRendererFactory {
             log.error("Fehler beim Erzeugen des Renderers.", e);
         }
 
-        result = componentReferenceHolder.getObject();
+        result = componentReferenceHolder;
 
         if (result == null) {
             //Im Fehlerfall wird der DefaultRendererGeladen
@@ -144,9 +143,9 @@ public class CidsObjectRendererFactory {
                 final DefaultMetaObjectRenderer mor = new DefaultMetaObjectRenderer();
                 final JComponent comp = mor.getSingleRenderer(mo, title);
                 if (cw != null && !(comp instanceof DoNotWrap)) {
-                    componentReferenceHolder.setObject((JComponent) cw.wrapComponent(comp));
+                    componentReferenceHolder = (JComponent) cw.wrapComponent(comp);
                 } else {
-                    componentReferenceHolder.setObject(comp);
+                    componentReferenceHolder = comp;
                 }
 //                    }
 //                };
@@ -159,7 +158,7 @@ public class CidsObjectRendererFactory {
             } catch (Throwable t) {
                 log.error("Fehler im Exceptionhandling ", t);
             }
-            result = componentReferenceHolder.getObject();
+            result = componentReferenceHolder;
         }
 
         return result;

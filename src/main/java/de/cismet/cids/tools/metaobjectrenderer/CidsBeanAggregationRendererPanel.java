@@ -5,7 +5,7 @@
 
 package de.cismet.cids.tools.metaobjectrenderer;
 
-import de.cismet.cids.dynamics.CidsBeanCollectionStore;
+import de.cismet.cids.dynamics.DisposableCidsBeanCollectionStore;
 import javax.swing.JPanel;
 
 /**

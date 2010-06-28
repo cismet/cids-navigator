@@ -5,12 +5,12 @@
 
 package de.cismet.cids.editors;
 
-import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 
 /**
  *
  * @author thorsten
  */
-public interface AutoBindableCidsEditor extends CidsBeanStore,BindingInformationProvider,BindingGroupStore {
+public interface AutoBindableCidsEditor extends DisposableCidsBeanStore,BindingInformationProvider,BindingGroupStore {
 
 }
