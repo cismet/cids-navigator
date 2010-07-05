@@ -19,10 +19,12 @@ import calpa.html.CalCons;
 import calpa.html.CalHTMLPane;
 import calpa.html.CalHTMLPreferences;
 import calpa.html.DefaultCalHTMLObserver;
+import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
+import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
-import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
+import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
 import de.cismet.tools.collections.TypeSafeCollections;
@@ -39,7 +41,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Paint;
 import java.awt.event.ActionEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
@@ -56,6 +57,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import org.openide.util.WeakListeners;
 
 /**
  *
@@ -63,6 +65,7 @@ import javax.swing.SwingWorker;
  */
 public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
+//    private final transient Map<Component, PropertyChangeListener> strongReferencesOnWeakListenerMap = TypeSafeCollections.newHashMap();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final DefaultStatusChangeSupport statusChangeSupport;
     private final CalHTMLPreferences htmlPrefs = new CalHTMLPreferences();
@@ -77,6 +80,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     //private SimplestBreadCrumbGui breadCrumbGui ;
     DefaultCalHTMLObserver htmlObserver = new DefaultCalHTMLObserver() {
 
+        @Override
         public void statusUpdate(CalHTMLPane calHTMLPane, int status, URL uRL, int i0, String string) {
             super.statusUpdate(calHTMLPane, status, uRL, i0, string);
             // log.debug("DescriptionPane.log.StatusUpdate: Status:"+status+"  Url:"+uRL);
@@ -90,10 +94,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             }
         }
 
+        @Override
         public void linkActivatedUpdate(CalHTMLPane calHTMLPane, URL uRL, String string, String string0) {
             super.linkActivatedUpdate(calHTMLPane, uRL, string, string0);
         }
 
+        @Override
         public void linkFocusedUpdate(CalHTMLPane calHTMLPane, URL uRL) {
             super.linkFocusedUpdate(calHTMLPane, uRL);
         }
@@ -218,6 +224,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     private void showObjects() {
         final Runnable showObjRunnable = new Runnable() {
 
+            @Override
             public void run() {
                 ((CardLayout) getLayout()).show(DescriptionPane.this, "objects");
             }
@@ -230,11 +237,14 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     }
 
     public void clear() {
+
         Runnable clearRunnable = new Runnable() {
 
+            @Override
             public void run() {
+                //release the strong references on the listeners, so that the weak listeners can be GCed.
                 htmlPane.showHTMLDocument("");
-                panRenderer.removeAll();
+                removeAndDisposeAllRendererFromPanel();
                 repaint();
             }
         };
@@ -246,10 +256,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         }
     }
 
+    @Override
     public void addStatusChangeListener(StatusChangeListener listener) {
         this.statusChangeSupport.addStatusChangeListener(listener);
     }
 
+    @Override
     public void removeStatusChangeListener(StatusChangeListener listener) {
         this.statusChangeSupport.removeStatusChangeListener(listener);
     }
@@ -273,17 +285,19 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         if (objects.size() == 1) {
             setNodeDescription(objects.get(0));
         } else {
-            showObjects();
-            clear();
             if (worker != null) {
                 worker.cancel(true);
+                worker = null;
             }
-            worker = new SwingWorker<JComponent, JComponent>() {
+            showObjects();
+            clear();
+            worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
                 final List<JComponent> all = TypeSafeCollections.newArrayList();
+//                final Map<JComponent, PropertyChangeListener> localListenerMap = TypeSafeCollections.newHashMap();
 
                 @Override
-                protected JComponent doInBackground() throws Exception {
+                protected SelfDisposingPanel doInBackground() throws Exception {
 //                    Vector filteredObjects = new Vector(objects);
                     MultiMap objectsByClass = new MultiMap();
                     for (Object object : objects) {
@@ -301,7 +315,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
 
                     //splMain.setDividerLocation(1.0d);
-                    while (it.hasNext()) {
+                    while (it.hasNext() && !isCancelled()) {
                         // JSeparator sep=new JSeparator(JSeparator.HORIZONTAL);
                         Object key = it.next();
                         List l = (List) objectsByClass.get(key);
@@ -325,17 +339,22 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                             for (Object object : l) {
                                 ObjectTreeNode otn = (ObjectTreeNode) object;
                                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
-                                final JComponent comp = CidsObjectRendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
-                                otn.getMetaObject().getBean().addPropertyChangeListener(new PropertyChangeListener() {
+                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(CidsObjectRendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn));
+                                final CidsBean bean = otn.getMetaObject().getBean();
+                                final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
 
+                                    @Override
                                     public void propertyChange(PropertyChangeEvent evt) {
                                         comp.repaint();
                                     }
-                                });
+                                };
+                                bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener, bean));
+                                comp.setStrongListenerReference(propertyChangeListener);
                                 publish(comp);
                             }
                         } else {
-                            publish(aggrRendererTester);
+                            final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
+                            publish(comp);
                         }
                     }
                     return null;
@@ -343,22 +362,38 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 @Override
                 protected void done() {
+//                    if (!isCancelled()) {
+//                        //access only in edt!
+//                        strongReferencesOnWeakListenerMap.clear();
+//                        strongReferencesOnWeakListenerMap.putAll(localListenerMap);
+//                    } else {
+//                        for (JComponent comp : all) {
+//                            if (comp instanceof DisposableCidsBeanStore) {
+//                                ((DisposableCidsBeanStore) comp).dispose();
+//                            }
+//                        }
+//                    }
                     all.clear();
-                    worker = null;
+                    if (worker == this) {
+                        worker = null;
+                    }
                 }
 
                 @Override
-                protected void process(List<JComponent> chunks) {
+                protected void process(List<SelfDisposingPanel> chunks) {
                     int y = all.size();
-                    for (JComponent comp : chunks) {
+                    for (SelfDisposingPanel comp : chunks) {
                         try {
                             GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
                             gridBagConstraints.gridx = 0;
                             gridBagConstraints.gridy = y;
                             gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = gridBagConstraints.HORIZONTAL;
+                            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
                             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
                             panRenderer.add(comp, gridBagConstraints);
+
+                            comp.startChecking();
+
                             panRenderer.revalidate();
                             panRenderer.repaint();
 
@@ -377,6 +412,17 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         }
     }
 
+    private SelfDisposingPanel encapsulateInSelfDisposingPanel(JComponent renderer) {
+        JComponent originalComponent = renderer;
+        if (renderer instanceof WrappedComponent) {
+            originalComponent = ((WrappedComponent) renderer).getOriginalComponent();
+        }
+        SelfDisposingPanel sdp = new SelfDisposingPanel(originalComponent);
+        sdp.setLayout(new BorderLayout());
+        sdp.add(renderer, BorderLayout.CENTER);
+        return sdp;
+    }
+
     private final void showWaitScreen() {
         if (!showsWaitScreen) {
             showsWaitScreen = true;
@@ -384,7 +430,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                 @Override
                 public void run() {
-                    panRenderer.removeAll();
+                    removeAndDisposeAllRendererFromPanel();
                     GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
                     gridBagConstraints.gridx = 0;
                     gridBagConstraints.gridy = 0;
@@ -453,11 +499,10 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     }
 
     private final void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node, final String title) {
-
-        worker = new javax.swing.SwingWorker<JComponent, Void>() {
+        worker = new javax.swing.SwingWorker<SelfDisposingPanel, Void>() {
 
             @Override
-            protected JComponent doInBackground() throws Exception {
+            protected SelfDisposingPanel doInBackground() throws Exception {
 
 
                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(o, n.toString());
@@ -465,42 +510,48 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                 if (jComp instanceof MetaTreeNodeStore && node != null) {
                     ((MetaTreeNodeStore) jComp).setMetaTreeNode(node);
                 } else if (jComp instanceof WrappedComponent && ((WrappedComponent) jComp).getOriginalComponent() instanceof MetaTreeNodeStore && node != null) {
-                    ((MetaTreeNodeStore) ((WrappedComponent) jComp).getOriginalComponent()).setMetaTreeNode(node);
+                    JComponent originalComponent = ((WrappedComponent) jComp).getOriginalComponent();
+                    ((MetaTreeNodeStore) originalComponent).setMetaTreeNode(node);
                 }
-                o.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+                final CidsBean bean = o.getBean();
+                PropertyChangeListener localListener = new PropertyChangeListener() {
 
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
                         jComp.repaint();
                     }
-                });
-
-
-                return jComp;
+                };
+//                strongReferencesOnWeakListenerMap.put(jComp, propertyChangeListener);
+                bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
+                SelfDisposingPanel sdp = encapsulateInSelfDisposingPanel(jComp);
+                sdp.setStrongListenerReference(localListener);
+                return sdp;
             }
 
             @Override
             protected void done() {
                 try {
+                    final SelfDisposingPanel sdp = get();
                     if (!isCancelled()) {
                         showsWaitScreen = false;
-                        final JComponent comp = get();
                         //splMain.setDividerLocation(finalWidthRatio);
-                        panRenderer.removeAll();//log.fatal("All removed");
+                        removeAndDisposeAllRendererFromPanel();
                         gridBagConstraints = new java.awt.GridBagConstraints();
                         gridBagConstraints.gridx = 0;
                         gridBagConstraints.gridy = 0;
                         gridBagConstraints.weightx = 1;
                         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                        if (comp instanceof RequestsFullSizeComponent) {
+
+                        if (sdp instanceof RequestsFullSizeComponent) {
                             log.info("Renderer is FullSize Component!");
                             panRenderer.setLayout(new BorderLayout());
-                            panRenderer.add(comp, BorderLayout.CENTER);
+                            panRenderer.add(sdp, BorderLayout.CENTER);
                         } else {
                             panRenderer.setLayout(new GridBagLayout());
-                            panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
+                            panRenderer.add(sdp, gridBagConstraints);//log.fatal("Comp added");
                         }
+                        sdp.startChecking();
                         panRenderer.revalidate();
                         revalidate();
                         repaint();
@@ -508,6 +559,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         if (log.isDebugEnabled()) {
                             log.debug("Worker canceled!");
                         }
+//                        if (comp instanceof DisposableCidsBeanStore) {
+//                            ((DisposableCidsBeanStore) comp).dispose();
+//                        }
                     }
                 } catch (InterruptedException iex) {
                     if (log.isDebugEnabled()) {
@@ -515,6 +569,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     }
                 } catch (Exception e) {
                     log.error("Error during Renderer creation", e);
+                }
+                if (worker == this) {
+                    worker = null;
                 }
             }
         };
@@ -573,6 +630,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             final DefaultMetaTreeNode n = (DefaultMetaTreeNode) object;
             if (worker != null && !worker.isDone()) {
                 worker.cancel(true);
+                worker = null;
             } else {
                 showObjects();
                 showWaitScreen();
@@ -587,9 +645,24 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         }
     }
 
+    private void removeAndDisposeAllRendererFromPanel() {
+//        Component[] allComponents = panRenderer.getComponents();
+//        for (Component comp : allComponents) {
+//            if (comp instanceof WrappedComponent) {
+//                comp = ((WrappedComponent) comp).getOriginalComponent();
+//            }
+//            if (comp instanceof DisposableCidsBeanStore) {
+//                ((DisposableCidsBeanStore) comp).dispose();
+//            }
+//        }
+//        strongReferencesOnWeakListenerMap.clear();
+        panRenderer.removeAll();
+    }
+
+    @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
-        Paint p = g2d.getPaint();
+//        Paint p = g2d.getPaint();
         GradientPaint gp = new GradientPaint(0, 0, getBackground(), getWidth(), getHeight(), Color.WHITE, false);
         g2d.setPaint(gp);
         g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -605,6 +678,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     class PrintableJPanel extends ScrollableFlowPanel implements Printable {
 
+        @Override
         public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
             if (pageIndex > 0) {
                 return (NO_SUCH_PAGE);
