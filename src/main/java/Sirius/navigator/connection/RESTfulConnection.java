@@ -8,6 +8,7 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.resource.PropertyManager;
 
 import Sirius.server.dataretrieval.DataObject;
 import Sirius.server.dataretrieval.DataRetrievalException;
@@ -42,6 +43,7 @@ import javax.swing.Icon;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.ws.ProxyConfig;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
 /**
@@ -86,7 +88,18 @@ public final class RESTfulConnection implements Connection {
 
     @Override
     public boolean connect(final String callserverURL) throws ConnectionException {
-        connector = new RESTfulSerialInterfaceConnector(callserverURL);
+        final PropertyManager manager = PropertyManager.getManager();
+        final ProxyConfig config;
+        if (manager.getProxyURL() == null) {
+            config = null;
+        } else {
+            config = new ProxyConfig();
+            config.setProxyURL(manager.getProxyURL());
+            config.setUsername(manager.getProxyUsername());
+            config.setPassword(manager.getProxyPassword());
+            config.setDomain(manager.getProxyDomain());
+        }
+        connector = new RESTfulSerialInterfaceConnector(callserverURL, config);
 
         return true;
     }
@@ -159,28 +172,28 @@ public final class RESTfulConnection implements Connection {
             return connector.getUser(userGroupLsName, userGroupName, userLsName, userName, password);
         } catch (final UserException e) {
             final String message = "cannot get user: " // NOI18N
-                + userGroupLsName
-                + " :: "                               // NOI18N
-                + userGroupName
-                + " :: "                               // NOI18N
-                + userLsName
-                + " :: "                               // NOI18N
-                + userName
-                + " :: "                               // NOI18N
-                + password;
+                        + userGroupLsName
+                        + " :: "                       // NOI18N
+                        + userGroupName
+                        + " :: "                       // NOI18N
+                        + userLsName
+                        + " :: "                       // NOI18N
+                        + userName
+                        + " :: "                       // NOI18N
+                        + password;
             LOG.error(message, e);
             throw e;
         } catch (final Exception e) {
             final String message = "cannot get user: " // NOI18N
-                + userGroupLsName
-                + " :: "                               // NOI18N
-                + userGroupName
-                + " :: "                               // NOI18N
-                + userLsName
-                + " :: "                               // NOI18N
-                + userName
-                + " :: "                               // NOI18N
-                + password;
+                        + userGroupLsName
+                        + " :: "                       // NOI18N
+                        + userGroupName
+                        + " :: "                       // NOI18N
+                        + userLsName
+                        + " :: "                       // NOI18N
+                        + userName
+                        + " :: "                       // NOI18N
+                        + password;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -260,11 +273,11 @@ public final class RESTfulConnection implements Connection {
             return connector.getMetaObjectNode(user, nodeID, domain);
         } catch (final Exception e) {
             final String message = "could not get node for user, nodeID, domain: " // NOI18N
-                + user
-                + "@"                                                              // NOI18N
-                + domain
-                + " :: "                                                           // NOI18N
-                + nodeID;
+                        + user
+                        + "@"                                                      // NOI18N
+                        + domain
+                        + " :: "                                                   // NOI18N
+                        + nodeID;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -331,11 +344,11 @@ public final class RESTfulConnection implements Connection {
             return connector.getClass(user, classID, domain);
         } catch (final Exception e) {
             final String message = "could not get metaclass for user, domain, classid " // NOI18N
-                + user
-                + "@"                                                                   // NOI18N
-                + domain
-                + " :: "                                                                // NOI18N
-                + classID;
+                        + user
+                        + "@"                                                           // NOI18N
+                        + domain
+                        + " :: "                                                        // NOI18N
+                        + classID;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -370,13 +383,13 @@ public final class RESTfulConnection implements Connection {
             return connector.getMetaObject(user, objectID, classID, domain);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, objectid, classid, domain: " // NOI18N
-                + user
-                + "@"                                                                               // NOI18N
-                + domain
-                + " :: "                                                                            // NOI18N
-                + objectID
-                + " :: "                                                                            // NOI18N
-                + classID;
+                        + user
+                        + "@"                                                                       // NOI18N
+                        + domain
+                        + " :: "                                                                    // NOI18N
+                        + objectID
+                        + " :: "                                                                    // NOI18N
+                        + classID;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -400,11 +413,11 @@ public final class RESTfulConnection implements Connection {
             return connector.insertMetaObject(user, metaObject, domain);
         } catch (final Exception e) {
             final String message = "could not insert metaobject for user, metaobject, domain: " // NOI18N
-                + user
-                + "@"                                                                           // NOI18N
-                + domain
-                + " :: "                                                                        // NOI18N
-                + metaObject;
+                        + user
+                        + "@"                                                                   // NOI18N
+                        + domain
+                        + " :: "                                                                // NOI18N
+                        + metaObject;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -416,11 +429,11 @@ public final class RESTfulConnection implements Connection {
             return connector.insertMetaObject(user, query, domain);
         } catch (final Exception e) {
             final String message = "could not insert metaobject for user, query, domain: " // NOI18N
-                + user
-                + "@"                                                                      // NOI18N
-                + domain
-                + " :: "                                                                   // NOI18N
-                + query;
+                        + user
+                        + "@"                                                              // NOI18N
+                        + domain
+                        + " :: "                                                           // NOI18N
+                        + query;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -433,11 +446,11 @@ public final class RESTfulConnection implements Connection {
             return connector.updateMetaObject(user, metaObject, domain);
         } catch (final Exception e) {
             final String message = "could not update metaobject for user, metaobject, domain: " // NOI18N
-                + user
-                + "@"                                                                           // NOI18N
-                + domain
-                + " :: "                                                                        // NOI18N
-                + metaObject;
+                        + user
+                        + "@"                                                                   // NOI18N
+                        + domain
+                        + " :: "                                                                // NOI18N
+                        + metaObject;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -450,11 +463,11 @@ public final class RESTfulConnection implements Connection {
             return connector.deleteMetaObject(user, metaObject, domain);
         } catch (final Exception e) {
             final String message = "could not delete metaobject for user, metaobject, domain: " // NOI18N
-                + user
-                + "@"                                                                           // NOI18N
-                + domain
-                + " :: "                                                                        // NOI18N
-                + metaObject;
+                        + user
+                        + "@"                                                                   // NOI18N
+                        + domain
+                        + " :: "                                                                // NOI18N
+                        + metaObject;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -529,23 +542,23 @@ public final class RESTfulConnection implements Connection {
         } catch (final Exception e) {
             final String message =
                 "could not add query for user, name, desc, stmt, type, update, batch, root, union: " // NOI18N
-                + user
-                + " :: "                                                                             // NOI18N
-                + name
-                + " :: "                                                                             // NOI18N
-                + description
-                + " :: "                                                                             // NOI18N
-                + statement
-                + " :: "                                                                             // NOI18N
-                + resultType
-                + " :: "                                                                             // NOI18N
-                + isUpdate
-                + " :: "                                                                             // NOI18N
-                + isBatch
-                + " :: "                                                                             // NOI18N
-                + isRoot
-                + " :: "                                                                             // NOI18N
-                + isUnion;
+                        + user
+                        + " :: "                                                                     // NOI18N
+                        + name
+                        + " :: "                                                                     // NOI18N
+                        + description
+                        + " :: "                                                                     // NOI18N
+                        + statement
+                        + " :: "                                                                     // NOI18N
+                        + resultType
+                        + " :: "                                                                     // NOI18N
+                        + isUpdate
+                        + " :: "                                                                     // NOI18N
+                        + isBatch
+                        + " :: "                                                                     // NOI18N
+                        + isRoot
+                        + " :: "                                                                     // NOI18N
+                        + isUnion;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -562,13 +575,13 @@ public final class RESTfulConnection implements Connection {
                     statement);
         } catch (final Exception e) {
             final String message = "could not add query for user, name, desc, stmt: " // NOI18N
-                + user
-                + " :: "                                                              // NOI18N
-                + name
-                + " :: "                                                              // NOI18N
-                + description
-                + " :: "                                                              // NOI18N
-                + statement;
+                        + user
+                        + " :: "                                                      // NOI18N
+                        + name
+                        + " :: "                                                      // NOI18N
+                        + description
+                        + " :: "                                                      // NOI18N
+                        + statement;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -594,19 +607,19 @@ public final class RESTfulConnection implements Connection {
         } catch (final Exception e) {
             final String message =
                 "could not add query param for user, queryid, typeid, paramkey, desc, result, pos: " // NOI18N
-                + user
-                + " :: "                                                                             // NOI18N
-                + queryId
-                + " :: "                                                                             // NOI18N
-                + typeId
-                + " :: "                                                                             // NOI18N
-                + paramkey
-                + " :: "                                                                             // NOI18N
-                + description
-                + " :: "                                                                             // NOI18N
-                + isQueryResult
-                + " :: "                                                                             // NOI18N
-                + queryPosition;
+                        + user
+                        + " :: "                                                                     // NOI18N
+                        + queryId
+                        + " :: "                                                                     // NOI18N
+                        + typeId
+                        + " :: "                                                                     // NOI18N
+                        + paramkey
+                        + " :: "                                                                     // NOI18N
+                        + description
+                        + " :: "                                                                     // NOI18N
+                        + isQueryResult
+                        + " :: "                                                                     // NOI18N
+                        + queryPosition;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -621,13 +634,13 @@ public final class RESTfulConnection implements Connection {
             return connector.addQueryParameter(user, queryId, paramkey, description);
         } catch (final Exception e) {
             final String message = "could not add query param for user, queryid, paramkey, desc: " // NOI18N
-                + user
-                + " :: "                                                                           // NOI18N
-                + queryId
-                + " :: "                                                                           // NOI18N
-                + paramkey
-                + " :: "                                                                           // NOI18N
-                + description;
+                        + user
+                        + " :: "                                                                   // NOI18N
+                        + queryId
+                        + " :: "                                                                   // NOI18N
+                        + paramkey
+                        + " :: "                                                                   // NOI18N
+                        + description;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -639,9 +652,9 @@ public final class RESTfulConnection implements Connection {
             return connector.delete(queryDataId, domain);
         } catch (final Exception e) {
             final String message = "could not delete querydata for id, domain: "
-                + queryDataId
-                + " :: "
-                + domain; // NOI18N
+                        + queryDataId
+                        + " :: "
+                        + domain; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -653,9 +666,9 @@ public final class RESTfulConnection implements Connection {
             return connector.storeQuery(user, data);
         } catch (final Exception e) {
             final String message = "could not store query data for user, data: "
-                + user
-                + " :: "
-                + data; // NOI18N
+                        + user
+                        + " :: "
+                        + data; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -667,9 +680,9 @@ public final class RESTfulConnection implements Connection {
             return connector.getQuery(id, domain);
         } catch (final Exception e) {
             final String message = "could not get query data for id, domain: "
-                + id
-                + " :: "
-                + domain; // NOI18N
+                        + id
+                        + " :: "
+                        + domain; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -681,7 +694,7 @@ public final class RESTfulConnection implements Connection {
             return connector.getQueryInfos(userGroup);
         } catch (final Exception e) {
             final String message = "could not get query infos for usergroup: "
-                + userGroup; // NOI18N
+                        + userGroup; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -693,7 +706,7 @@ public final class RESTfulConnection implements Connection {
             return connector.getQueryInfos(user);
         } catch (final Exception e) {
             final String message = "could not get query infos for user: "
-                + user; // NOI18N
+                        + user; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -705,7 +718,7 @@ public final class RESTfulConnection implements Connection {
             return connector.getMethods(user);
         } catch (final Exception e) {
             final String message = "could not get methods for user: " // NOI18N
-                + user;
+                        + user;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -717,9 +730,9 @@ public final class RESTfulConnection implements Connection {
             return connector.getMethods(user, domain);
         } catch (final Exception e) {
             final String message = "could not get methods for user, domain: " // NOI18N
-                + user
-                + "@"                                                         // NOI18N
-                + domain;
+                        + user
+                        + "@"                                                 // NOI18N
+                        + domain;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -743,13 +756,13 @@ public final class RESTfulConnection implements Connection {
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields, pattern: " // NOI18N
-                + classId
-                + " :: "                                                                                    // NOI18N
-                + user
-                + " :: "                                                                                    // NOI18N
-                + representationFields
-                + " :: "                                                                                    // NOI18N
-                + representationPattern;
+                        + classId
+                        + " :: "                                                                            // NOI18N
+                        + user
+                        + " :: "                                                                            // NOI18N
+                        + representationFields
+                        + " :: "                                                                            // NOI18N
+                        + representationPattern;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -772,11 +785,11 @@ public final class RESTfulConnection implements Connection {
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields: " // NOI18N
-                + classId
-                + " :: "                                                                           // NOI18N
-                + user
-                + " :: "                                                                           // NOI18N
-                + representationFields;
+                        + classId
+                        + " :: "                                                                   // NOI18N
+                        + user
+                        + " :: "                                                                   // NOI18N
+                        + representationFields;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -802,13 +815,13 @@ public final class RESTfulConnection implements Connection {
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields, pattern: " // NOI18N
-                + classId
-                + " :: "                                                                                    // NOI18N
-                + user
-                + " :: "                                                                                    // NOI18N
-                + representationFields
-                + " :: "                                                                                    // NOI18N
-                + representationPattern;
+                        + classId
+                        + " :: "                                                                            // NOI18N
+                        + user
+                        + " :: "                                                                            // NOI18N
+                        + representationFields
+                        + " :: "                                                                            // NOI18N
+                        + representationPattern;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -833,11 +846,11 @@ public final class RESTfulConnection implements Connection {
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields: " // NOI18N
-                + classId
-                + " :: "                                                                           // NOI18N
-                + user
-                + " :: "                                                                           // NOI18N
-                + representationFields;
+                        + classId
+                        + " :: "                                                                   // NOI18N
+                        + user
+                        + " :: "                                                                   // NOI18N
+                        + representationFields;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -887,16 +900,16 @@ public final class RESTfulConnection implements Connection {
             orderBy = "";          // NOI18N
         } else {
             orderBy = " order by " // NOI18N
-                + ca.getValue().toString();
+                        + ca.getValue().toString();
         }
 
         final String query = "select " // NOI18N
-            + mc.getID()
-            + ","                      // NOI18N
-            + mc.getPrimaryKey()
-            + " from "                 // NOI18N
-            + mc.getTableName()
-            + orderBy;
+                    + mc.getID()
+                    + ","              // NOI18N
+                    + mc.getPrimaryKey()
+                    + " from "         // NOI18N
+                    + mc.getTableName()
+                    + orderBy;
 
         return getMetaObjectByQuery(user, query);
     }
