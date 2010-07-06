@@ -10,20 +10,25 @@ import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.WrappedComponent;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractButton;
@@ -33,15 +38,17 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.tree.DefaultTreeModel;
-import org.apache.commons.beanutils.BeanUtils;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
+import org.openide.util.WeakListeners;
 
 /**
  *
  * @author  pascal
  */
 public class NavigatorAttributeEditorGui extends AttributeEditor {
+    //do not remove!
+    private transient PropertyChangeListener strongReferenceOnWeakListener = null;
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Object treeNode = null;
     private MetaObject backupObject = null;
@@ -73,29 +80,35 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         commitButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, 
+                    if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                        int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this,
                             org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), //NOI18N
                             org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"),//NOI18N
                             JOptionPane.YES_NO_CANCEL_OPTION);
-                    if (answer == JOptionPane.YES_OPTION) {
-                        saveIt();
-
-
-                    } else if (answer == JOptionPane.CANCEL_OPTION) {
+                        if (answer == JOptionPane.YES_OPTION) {
+                            saveIt();
+                        } else if (answer == JOptionPane.CANCEL_OPTION) {
+                        } else {
+                            reloadFromDB();
+                            clear();
+                        }
                     } else {
-                        reloadFromDB();
-                        clear();
+                        saveIt(false);
                     }
                 } else {
-                    clear();
+                    if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                        clear();
+                    }
                 }
             }
         });
 
         cancelButton.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
                     int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, 
@@ -124,6 +137,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         Vector<AbstractButton> buttons = new Vector<AbstractButton>();
         buttons.add(commitButton);
         buttons.add(cancelButton);
+        buttons.add(copyButton);
+        buttons.add(pasteButton);
         return buttons;
     }
 
@@ -194,30 +209,77 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     }
 
     private void saveIt() {
+        saveIt(true);
+    }
+
+    private void saveIt(boolean closeEditor) {
         ObjectTreeNode otn = (ObjectTreeNode) treeNode;
         MetaObject mo = otn.getMetaObject();
+        CidsBean oldBean = mo.getBean();
         try {
-            mo.getBean().persist();
-            refreshTree();
-            JOptionPane jop = new JOptionPane(
-                    org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().jop.message"),//NOI18N
-                    JOptionPane.INFORMATION_MESSAGE);
+            CidsBean savedInstance = oldBean.persist();
+            if (closeEditor) {
+                JOptionPane jop = new JOptionPane(
+                        org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().jop.message"),//NOI18N
+                        JOptionPane.INFORMATION_MESSAGE);
 
             final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this,
                     org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().dialog.title"));//NOI18N
 
-            Timer t = new Timer(900, new ActionListener() {
+                Timer t = new Timer(900, new ActionListener() {
 
-                public void actionPerformed(ActionEvent e) {
-                    dialog.setVisible(false);
-                    dialog.dispose();
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.setVisible(false);
+                        dialog.dispose();
 
+                    }
+                });
+                t.setRepeats(false);
+                t.start();
+                dialog.setVisible(true);
+                clear();
+            } else {
+
+                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
+                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
+                ((ObjectTreeNode) treeNode).setMetaObject(savedInstance.getMetaObject());
+                editorObject = savedInstance.getMetaObject();
+                createBackup(editorObject);
+                //---
+//                CidsBean bean = editorObject.getBean();
+//                final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+//
+//                    @Override
+//                    public void propertyChange(PropertyChangeEvent evt) {
+//                        viewer.repaint();
+//                        tree.repaint();
+//
+//                    }
+//                };
+//                if (currentBeanStore instanceof JComponent) {
+//                strongReferenceOnWeakListener = propertyChangeListener;
+//                } else {
+//                    log.error("A CidsBeansStore must be instanceof JComponent here, but it was " + currentBeanStore + "!");
+//                }
+//                bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener, bean));
+                //---
+//                editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+//
+//                    @Override
+//                    public void propertyChange(PropertyChangeEvent evt) {
+//                        viewer.repaint();
+//                        tree.repaint();
+//
+//                    }
+//                });
+                currentBeanStore.setCidsBean(savedInstance);
+                for (PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
+                    savedInstance.addPropertyChangeListener(pcl);
                 }
-            });
-            t.setRepeats(false);
-            t.start();
-            dialog.setVisible(true);
-            clear();
+
+            }
+            refreshTree();
         } catch (Exception ex) {
             log.error("Error while saving", ex);//NOI18N
             ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),//NOI18N
@@ -225,7 +287,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     null, null, ex, Level.SEVERE, null);
             JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
         }
-        clear();
+        if (closeEditor) {
+            clear();
+        }
     }
 
     @Override
@@ -249,15 +313,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
         EventQueue.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
-                scpEditor.getViewport().removeAll();
+                removeAndDisposeEditor();
                 scpEditor.getViewport().setView(wrappedWaitingPanel);
                 NavigatorAttributeEditorGui.this.revalidate();
             }
         });
         treeNode = node;
         if (treeNode instanceof ObjectTreeNode) {
-            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
+//            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
             CismetThreadPool.execute(new SwingWorker<JComponent, Void>() {
 
                 @Override
@@ -266,15 +331,21 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     editorObject = otn.getMetaObject();
                     createBackup(editorObject);
 
-                    editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
-
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            viewer.repaint();
-                            tree.repaint();
-                            //commitButton.setEnabled(!backupObject.propertyEquals(mo)); //vielleicht einfach zuviel des guten
-
-                        }
-                    });
+//                    editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+//
+//                        @Override
+//                        public void propertyChange(PropertyChangeEvent evt) {
+//                            viewer.repaint();
+//                            tree.repaint();
+//                            //commitButton.setEnabled(!backupObject.propertyEquals(mo)); //vielleicht einfach zuviel des guten
+//
+//                        }
+//                    });
+//                    try {
+//                        EditorBeanInitializerStore.getInstance().initialize(editorObject.getBean());
+//                    } catch (Exception ex) {
+//                        log.error("Exception while initializing Bean with template values!", ex);
+//                    }
                     JComponent ed = CidsObjectEditorFactory.getInstance().getEditor(editorObject);
                     return ed;
                 }
@@ -286,12 +357,37 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         if (log.isDebugEnabled()) {
                             log.debug("editor:" + ed);//NOI18N
                         }
-                        scpEditor.getViewport().removeAll();
+                        removeAndDisposeEditor();
                         scpEditor.getViewport().setView(ed);
+                        if (ed instanceof WrappedComponent) {
+                            ed = ((WrappedComponent) ed).getOriginalComponent();
+                        }
+                        if (ed instanceof DisposableCidsBeanStore) {
+                            currentBeanStore = (DisposableCidsBeanStore) ed;
+                            currentInitializer = EditorBeanInitializerStore.getInstance().getInitializer(editorObject.getMetaClass());
+                            cancelButton.setEnabled(true);
+                            commitButton.setEnabled(true);
+                            copyButton.setEnabled(true);
+                            if (currentInitializer != null) {
+                                //enable editor attribute paste only for NEW MOs
+                                boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus() == MetaObject.NEW;
+                                pasteButton.setEnabled(isNewBean);
+                            }
+                        }
+                        CidsBean bean = editorObject.getBean();
+                        final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+
+                            @Override
+                            public void propertyChange(PropertyChangeEvent evt) {
+                                viewer.repaint();
+                                tree.repaint();
+
+                            }
+                        };
+                        strongReferenceOnWeakListener = propertyChangeListener;
+                        bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener, bean));
                         NavigatorAttributeEditorGui.this.revalidate();
                         log.debug("editor added");//NOI18N
-                        cancelButton.setEnabled(true);
-                        commitButton.setEnabled(true);
                     } catch (Exception e) {
                         ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.done().ErrorInfo.title"),//NOI18N
                                 org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.done().ErrorInfo.message"),//NOI18N
@@ -307,12 +403,27 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             log.warn("Given Treenode is not instance of ObjectTreeMode, but: " + node.getClass());//NOI18N
         }
     }
+    private BeanInitializer currentInitializer = null;
+    private DisposableCidsBeanStore currentBeanStore = null;
+
+    private void removeAndDisposeEditor() {
+        if (currentBeanStore != null) {
+            currentBeanStore.dispose();
+            currentBeanStore = null;
+        }
+        scpEditor.getViewport().removeAll();
+        //release the strong reference on the listener, so that the weak listener can be GCed.
+        strongReferenceOnWeakListener = null;
+    }
 
     @Override
     protected void clear() {
-        scpEditor.getViewport().removeAll();
+        currentInitializer = null;
+        removeAndDisposeEditor();
         commitButton.setEnabled(false);
         cancelButton.setEnabled(false);
+        copyButton.setEnabled(false);
+        pasteButton.setEnabled(false);
         revalidate();
         repaint();
         ComponentRegistry.getRegistry().getAttributeViewer().repaint();
@@ -321,12 +432,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         editorObject = null;
     }
 
+    @Override
     public Object getTreeNode() {
         return treeNode;
     }
 
+    @Override
     public boolean isChanged() {
-
         return true;
     }
 
@@ -346,6 +458,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         controlBar = new javax.swing.JPanel();
         commitButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
+        copyButton = new javax.swing.JButton();
+        pasteButton = new javax.swing.JButton();
         switchPanel = new javax.swing.JPanel();
         scpEditor = new javax.swing.JScrollPane();
         panDebug = new javax.swing.JPanel();
@@ -382,8 +496,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
-        setLayout(new java.awt.BorderLayout());
-
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         commitButton.setIcon(resources.getIcon("save_objekt.gif"));
@@ -414,6 +526,42 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         cancelButton.setRolloverIcon(resources.getIcon("zurueck_objekt.gif"));
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
+        copyButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.copy.icon")));
+        copyButton.setToolTipText(resources.getString("attribute.viewer.copy.tooltip"));
+        copyButton.setActionCommand("cancel");
+        copyButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        copyButton.setContentAreaFilled(false);
+        copyButton.setEnabled(false);
+        copyButton.setFocusPainted(false);
+        copyButton.setMaximumSize(new java.awt.Dimension(16, 16));
+        copyButton.setMinimumSize(new java.awt.Dimension(16, 16));
+        copyButton.setPreferredSize(new java.awt.Dimension(16, 16));
+        copyButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.copy.icon.rollover")));
+        copyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copyButtonActionPerformed(evt);
+            }
+        });
+        controlBar.add(copyButton, new java.awt.GridBagConstraints());
+
+        pasteButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.paste.icon")));
+        pasteButton.setToolTipText(resources.getString("attribute.viewer.paste.tooltip"));
+        pasteButton.setActionCommand("paste");
+        pasteButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        pasteButton.setContentAreaFilled(false);
+        pasteButton.setEnabled(false);
+        pasteButton.setFocusPainted(false);
+        pasteButton.setMaximumSize(new java.awt.Dimension(16, 16));
+        pasteButton.setMinimumSize(new java.awt.Dimension(16, 16));
+        pasteButton.setPreferredSize(new java.awt.Dimension(16, 16));
+        pasteButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.paste.icon.rollover")));
+        pasteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pasteButtonActionPerformed(evt);
+            }
+        });
+        controlBar.add(pasteButton, new java.awt.GridBagConstraints());
+
         add(controlBar, java.awt.BorderLayout.NORTH);
 
         switchPanel.setLayout(new java.awt.BorderLayout());
@@ -438,18 +586,52 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         if (getTreeNode() != null && getTreeNode() instanceof ObjectTreeNode) {
             MetaObject mo = ((ObjectTreeNode) getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());//NOI18N
+            EditorBeanInitializerStore.getInstance().registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
         }
 
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void copyButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
+        if (currentBeanStore != null) {
+            CidsBean bean = currentBeanStore.getCidsBean();
+            boolean isNewBean = bean.getMetaObject().getStatus() == MetaObject.NEW;
+            if (currentBeanStore instanceof BeanInitializerProvider) {
+                BeanInitializerProvider beanInitProvider = (BeanInitializerProvider) currentBeanStore;
+                currentInitializer = beanInitProvider.getBeanInitializer();
+                if (currentInitializer != null) {
+                    EditorBeanInitializerStore.getInstance().registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
+                } else {
+                    log.error("BeanInitializerProvider delivers null as initializer.");////NOI18N
+                }
+            } else {
+                currentInitializer = new DefaultBeanInitializer(bean);
+                EditorBeanInitializerStore.getInstance().registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
+            }
+            //enable editor attribute paste only for new MOs
+            pasteButton.setEnabled(currentInitializer != null && isNewBean);
+        }
+    }//GEN-LAST:event_copyButtonActionPerformed
+
+    private void pasteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
+        if (currentBeanStore != null) {
+            CidsBean bean = currentBeanStore.getCidsBean();
+            try {
+                EditorBeanInitializerStore.getInstance().initialize(bean);
+            } catch (Exception ex) {
+                log.error(ex, ex);
+            }
+        }
+    }//GEN-LAST:event_pasteButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;
     private javax.swing.JPanel controlBar;
+    private javax.swing.JButton copyButton;
     private javax.swing.JScrollPane editorScrollPane;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel lblEditorCreation;
     private javax.swing.JPanel panDebug;
+    private javax.swing.JButton pasteButton;
     private javax.swing.JScrollPane scpEditor;
     private javax.swing.JPanel switchPanel;
     // End of variables declaration//GEN-END:variables

@@ -35,7 +35,6 @@ import Sirius.server.newuser.UserException;
 import Sirius.util.image.ImageHashMap;
 import Sirius.server.search.*;
 import Sirius.server.search.store.*;
-import Sirius.server.dataretrieval.*;
 
 /**
  * A singleton factory class that creates and manages connections.
@@ -154,17 +153,6 @@ public interface Connection {
     public MethodMap getMethods(User user) throws ConnectionException;
 
     public MethodMap getMethods(User user, String domain) throws ConnectionException;
-
-    // DataRetrieval Stuff -----------------------------------------------------
-    /**
-     * retrieves data referenced by a symbolic pointer to the data source
-     */
-    public DataObject getDataObject(User user, MetaObject MetaObject) throws ConnectionException, DataRetrievalException;
-
-    /**
-     * retrieves dataItems with meta data matching query (Search)
-     */
-    public DataObject[] getDataObject(User user, Query query) throws ConnectionException, DataRetrievalException;
 
     // .........................................................................
     //---!!!

@@ -20,7 +20,7 @@ import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.FinalReference;
 import de.cismet.tools.BlacklistClassloading;
@@ -82,7 +82,7 @@ public class CidsObjectEditorFactory {
     public static final String CIDS_BEAN = "cidsBean";//NOI18N
     public static final String SOURCE_LIST = "sourceList";//NOI18N
     private static Converter nullToBackgroundColorConverter = new IsNullToColorConverter();
-    private boolean lazyClassFetching = true;
+//    private boolean lazyClassFetching = true;
     private static final String EDITOR_PREFIX = "de.cismet.cids.custom.objecteditors.";//NOI18N
     private static final String EDITOR_SUFFIX = "Editor";//NOI18N
     private static final String ATTRIBUTE_EDITOR_SUFFIX = "AttributeEditor";//NOI18N
@@ -151,13 +151,13 @@ public class CidsObjectEditorFactory {
             editorComponent = (JComponent) getDefaultEditor(MetaObject.getMetaClass());
         }
         final JComponent finalEditorComponent = editorComponent;
-        if (editorComponent instanceof CidsBeanStore) {
+        if (editorComponent instanceof DisposableCidsBeanStore) {
             final CidsBean bean = MetaObject.getBean();
 //            final Runnable setCidsBeanRunnable = new Runnable() {
 //
 //                @Override
 //                public void run() {
-            ((CidsBeanStore) finalEditorComponent).setCidsBean(bean);
+            ((DisposableCidsBeanStore) finalEditorComponent).setCidsBean(bean);
             if (finalEditorComponent instanceof AutoBindableCidsEditor) {
                 bindCidsEditor((AutoBindableCidsEditor) finalEditorComponent);
             }
@@ -775,7 +775,7 @@ public class CidsObjectEditorFactory {
                         addDisablingAndNullCheckerBindings(bg, expression, ed, jc);
                         addAddRemoveControlVisibilityBinding(bg, (JComponent) parentCidsEditor, (JComponent) ed, object, false);
 
-                    } else if (bjc instanceof CidsBeanStore) {
+                    } else if (bjc instanceof DisposableCidsBeanStore) {
                         //Subobjekt das nur durch ein Bindable editiert wird
                         String expression = "cidsBean." + key;//NOI18N
                         addDisablingAndNullCheckerBindings(bg, expression, ed, jc);
@@ -825,7 +825,7 @@ public class CidsObjectEditorFactory {
                     if (detailObjectOfAnArray) {
                         actionBean = (CidsBean) ((JList) bindingSourceObject).getSelectedValue();
                     } else {
-                        actionBean = ((CidsBeanStore) bindingSourceObject).getCidsBean();
+                        actionBean = ((DisposableCidsBeanStore) bindingSourceObject).getCidsBean();
                     }
                     ObjectAttribute oa = actionBean.getMetaObject().getAttributeByFieldName(attributeName);
                     MetaClass mc = getMetaClass(actionBean.getMetaObject().getDomain(), oa.getMai().getForeignKeyClassId());
@@ -850,7 +850,7 @@ public class CidsObjectEditorFactory {
                     if (detailObjectOfAnArray) {
                         actionBean = (CidsBean) ((JList) bindingSourceObject).getSelectedValue();
                     } else {
-                        actionBean = ((CidsBeanStore) bindingSourceObject).getCidsBean();
+                        actionBean = ((DisposableCidsBeanStore) bindingSourceObject).getCidsBean();
                     }
 
                     try {
@@ -922,9 +922,9 @@ public class CidsObjectEditorFactory {
                             try {
                                 if (ed instanceof WrappedComponent) {
 
-                                    ((CidsBeanStore) ((WrappedComponent) ed).getOriginalComponent()).getCidsBean().persist();
+                                    ((DisposableCidsBeanStore) ((WrappedComponent) ed).getOriginalComponent()).getCidsBean().persist();
                                 } else {
-                                    ((CidsBeanStore) ed).getCidsBean().persist();
+                                    ((DisposableCidsBeanStore) ed).getCidsBean().persist();
                                 }
 
                             } catch (Exception ex) {
@@ -939,9 +939,9 @@ public class CidsObjectEditorFactory {
                         public void actionPerformed(ActionEvent e) {
                             CidsBean cb = null;
                             if (ed instanceof WrappedComponent) {
-                                cb = ((CidsBeanStore) ((WrappedComponent) ed).getOriginalComponent()).getCidsBean();
+                                cb = ((DisposableCidsBeanStore) ((WrappedComponent) ed).getOriginalComponent()).getCidsBean();
                             } else {
-                                cb = ((CidsBeanStore) ed).getCidsBean();
+                                cb = ((DisposableCidsBeanStore) ed).getCidsBean();
                             }
                             if (cb != null) {
                                 log.fatal(cb.getMOString());

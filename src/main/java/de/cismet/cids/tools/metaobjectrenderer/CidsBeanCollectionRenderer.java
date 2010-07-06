@@ -5,12 +5,12 @@
 
 package de.cismet.cids.tools.metaobjectrenderer;
 
-import de.cismet.cids.dynamics.CidsBeanCollectionStore;
+import de.cismet.cids.dynamics.DisposableCidsBeanCollectionStore;
 
 /**
  *
  * @author thorsten
  */
-public interface CidsBeanCollectionRenderer extends CidsBeanCollectionStore,Titled{
+public interface CidsBeanCollectionRenderer extends DisposableCidsBeanCollectionStore,Titled{
 
 }

@@ -506,8 +506,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                             log.info("Renderer is FullSize Component!");//NOI18N
                             panRenderer.setLayout(new BorderLayout());
                             panRenderer.add(comp, BorderLayout.CENTER);
-
                         } else {
+                            panRenderer.setLayout(new GridBagLayout());
                             panRenderer.add(comp, gridBagConstraints);//log.fatal("Comp added");
                         }
                         panRenderer.revalidate();

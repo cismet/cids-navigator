@@ -14,7 +14,7 @@ import Sirius.server.localserver.attribute.ObjectAttribute;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.CidsBeanStore;
+import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import java.awt.Component;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -24,12 +24,13 @@ import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.ELProperty;
 import org.jdesktop.beansbinding.Property;
 import org.jdesktop.el.impl.ValueExpressionImpl;
+import org.openide.util.Exceptions;
 
 /**
  *
  * @author thorsten
  */
-public class DefaultCustomObjectEditor extends javax.swing.JPanel implements CidsBeanStore {
+public class DefaultCustomObjectEditor extends javax.swing.JPanel implements DisposableCidsBeanStore {
 
     protected CidsBean cidsBean;
     private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultCustomObjectEditor.class);
@@ -60,6 +61,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    @Override
     public CidsBean getCidsBean() {
         return cidsBean;
     }
@@ -67,18 +69,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
     synchronized public void setCidsBean(CidsBean cidsBean) {
         this.cidsBean = cidsBean;
         try {
-            BindingGroup bindingGroup = null;
-            if (this instanceof BindingGroupStore) {
-                bindingGroup = ((BindingGroupStore) this).getBindingGroup();
-            } else {
-
-                Field bindingGroupField = getClass().getDeclaredField("bindingGroup");//NOI18N
-
-                bindingGroupField.setAccessible(true);
-
-                bindingGroup = (BindingGroup) bindingGroupField.get(this);
-            }
-
+            BindingGroup bindingGroup = getBindingGroupFormChildClass();
             setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
 
 
@@ -88,6 +79,21 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
         } catch (Exception e) {
             throw new RuntimeException("Bindingproblems occur", e);//NOI18N
         }
+    }
+
+    private BindingGroup getBindingGroupFormChildClass() throws NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        BindingGroup bindingGroup = null;
+        if (this instanceof BindingGroupStore) {
+            bindingGroup = ((BindingGroupStore) this).getBindingGroup();
+        } else {
+
+            Field bindingGroupField = getClass().getDeclaredField("bindingGroup");//NOI18N
+
+            bindingGroupField.setAccessible(true);
+
+            bindingGroup = (BindingGroup) bindingGroupField.get(this);
+        }
+        return bindingGroup;
     }
 
     public static void setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(BindingGroup bindingGroup, CidsBean cidsBean) throws Exception {
@@ -139,6 +145,16 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Cid
     }
 
     public void boundAndReadyNotify() {
+    }
+
+    @Override
+    public void dispose() {
+        try {
+            BindingGroup bindingGroup = getBindingGroupFormChildClass();
+            bindingGroup.unbind();
+        } catch (Exception ex) {
+            throw new RuntimeException("Binding Problem!", ex);//NOI18N
+        }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables

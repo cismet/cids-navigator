@@ -6,8 +6,6 @@ package de.cismet.cids.editors;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanStore;
-import de.cismet.cids.editors.CidsAttributeEditorInfo;
-import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.text.Document;
 import org.jdesktop.beansbinding.Converter;
@@ -17,8 +15,9 @@ import org.jdesktop.beansbinding.Validator;
  * de.cismet.ammunition.cids.BildTestBindable
  * @author thorsten
  */
-public class BildTestBindable extends JTextField implements Bindable,CidsBeanStore {
-    private CidsBean cidsBean=null;
+public class BildTestBindable extends JTextField implements Bindable, CidsBeanStore {
+
+    private CidsBean cidsBean = null;
 
     public BildTestBindable() {
         super();
@@ -47,13 +46,11 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
     public Converter getConverter() {
         return new Converter<CidsBean, String>() {
 
-            
-
             @Override
             public String convertForward(CidsBean value) {
                 try {
                     if (value != null) {
-                        cidsBean=value;
+                        cidsBean = value;
                         return (String) value.getProperty("url");//NOI18N
                     }
                 } catch (Exception e) {
@@ -85,7 +82,7 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
     }
 
     public void setCidsBean(CidsBean cidsBean) {
-        this.cidsBean=cidsBean;
+        this.cidsBean = cidsBean;
     }
 
     @Override
@@ -97,5 +94,4 @@ public class BildTestBindable extends JTextField implements Bindable,CidsBeanSto
     public Object getErrorSourceValue() {
         return null;
     }
-
 }
