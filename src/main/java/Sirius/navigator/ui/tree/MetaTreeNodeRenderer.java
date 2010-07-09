@@ -27,7 +27,7 @@ import Sirius.navigator.connection.SessionManager;
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.types.treenode.*;
-import de.cismet.cids.navigator.utils.ClassloadingByConventionHelper;
+import de.cismet.tools.ClassloadingByConventionHelper;
 import de.cismet.tools.BlacklistClassloading;
 import java.awt.Component;
 import java.util.ArrayList;

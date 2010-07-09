@@ -22,7 +22,7 @@ import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-import de.cismet.cids.navigator.utils.ClassloadingByConventionHelper;
+import de.cismet.tools.ClassloadingByConventionHelper;
 import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
