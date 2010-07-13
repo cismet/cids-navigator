@@ -8,10 +8,7 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.navigator.resource.PropertyManager;
 
-import Sirius.server.dataretrieval.DataObject;
-import Sirius.server.dataretrieval.DataRetrievalException;
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
@@ -43,8 +40,8 @@ import javax.swing.Icon;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.ws.ProxyConfig;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
+import de.cismet.security.Proxy;
 
 /**
  * DOCUMENT ME!
@@ -57,7 +54,7 @@ public final class RESTfulConnection implements Connection {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(RESTfulConnection.class);
-    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo";
+    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo"; // NOI18N
 
     //~ Instance fields --------------------------------------------------------
 
@@ -71,13 +68,13 @@ public final class RESTfulConnection implements Connection {
      * Creates a new RESTfulConnection object.
      */
     public RESTfulConnection() {
-        final String uHome = System.getProperty("user.home");
+        final String uHome = System.getProperty("user.home"); // NOI18N
         if (uHome != null) {
             final File homeDir = new File(uHome);
             final File disableIndicator = new File(homeDir, DISABLE_MO_FILENAME);
             isLWMOEnabled = !disableIndicator.isFile();
             if (!isLWMOEnabled) {
-                LOG.warn("LIGHTWIGHTMETAOBJECT CODE IS DISABLED! FOUND FILE: " + disableIndicator);
+                LOG.warn("LIGHTWIGHTMETAOBJECT CODE IS DISABLED! FOUND FILE: " + disableIndicator); // NOI18N
             }
         } else {
             isLWMOEnabled = true;
@@ -88,32 +85,30 @@ public final class RESTfulConnection implements Connection {
 
     @Override
     public boolean connect(final String callserverURL) throws ConnectionException {
-        final PropertyManager manager = PropertyManager.getManager();
-        final ProxyConfig config;
-        if (manager.getProxyURL() == null) {
-            config = null;
-        } else {
-            config = new ProxyConfig();
-            config.setProxyURL(manager.getProxyURL());
-            config.setUsername(manager.getProxyUsername());
-            config.setPassword(manager.getProxyPassword());
-            config.setDomain(manager.getProxyDomain());
+        return connect(callserverURL, null);
+    }
+
+    @Override
+    public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException{
+        connector = new RESTfulSerialInterfaceConnector(callserverURL, proxy);
+
+        try
+        {
+            connector.getDomains();
+        }catch(final Exception e)
+        {
+            final String message = "no connection to restful interface"; // NOI18N
+            LOG.error(message, e);
+            throw new ConnectionException(message, e);
         }
-        connector = new RESTfulSerialInterfaceConnector(callserverURL, config);
 
         return true;
     }
 
     @Override
-    public boolean connect(final String callserverURL, final String username, final String password)
-            throws ConnectionException {
-        return connect(callserverURL);
-    }
-
-    @Override
     public boolean reconnect() throws ConnectionException {
         if (LOG.isInfoEnabled()) {
-            LOG.info("reconnect not necessary for RESTful connector");
+            LOG.info("reconnect not necessary for RESTful connector"); // NOI18N
         }
 
         return true;

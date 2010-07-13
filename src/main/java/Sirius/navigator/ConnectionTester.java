@@ -29,6 +29,7 @@
 package Sirius.navigator;
 
 import Sirius.navigator.resource.PropertyManager;
+import java.net.MalformedURLException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -39,7 +40,6 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 
 import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.ProxySelector;
 import java.net.URI;
 
@@ -49,10 +49,11 @@ import java.util.Properties;
 
 import javax.swing.JFileChooser;
 
-import de.cismet.cids.server.ws.ProxyConfig;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
+import de.cismet.security.Proxy;
 
 import de.cismet.tools.gui.TextAreaAppender;
+import java.net.URL;
 
 /**
  * DOCUMENT ME!
@@ -116,15 +117,15 @@ public class ConnectionTester extends javax.swing.JFrame {
 
         final Properties logProperties = new Properties();
         logProperties.put("log4j.rootLogger", "DEBUG, CONSOLE, TEXTAREA");
-        logProperties.put("log4j.appender.CONSOLE", "org.apache.log4j.ConsoleAppender");         // A standard console
-                                                                                                 // appender
-        logProperties.put("log4j.appender.CONSOLE.layout", "org.apache.log4j.PatternLayout");    // See:
-                                                                                                 // http://logging.apache.org/log4j/docs/api/org/apache/log4j/PatternLayout.html
+        logProperties.put("log4j.appender.CONSOLE", "org.apache.log4j.ConsoleAppender");      // A standard console
+                                                                                              // appender
+        logProperties.put("log4j.appender.CONSOLE.layout", "org.apache.log4j.PatternLayout"); // See:
+                                                                                              // http://logging.apache.org/log4j/docs/api/org/apache/log4j/PatternLayout.html
         logProperties.put("log4j.appender.CONSOLE.layout.ConversionPattern", "%d{HH:mm:ss} [%12.12t] %5.5p %c: %m%n");
 
-        logProperties.put("log4j.appender.TEXTAREA", "de.cismet.tools.gui.TextAreaAppender");     // Our custom appender
-        logProperties.put("log4j.appender.TEXTAREA.layout", "org.apache.log4j.PatternLayout");    // See:
-                                                                                                  // http://logging.apache.org/log4j/docs/api/org/apache/log4j/PatternLayout.html
+        logProperties.put("log4j.appender.TEXTAREA", "de.cismet.tools.gui.TextAreaAppender");  // Our custom appender
+        logProperties.put("log4j.appender.TEXTAREA.layout", "org.apache.log4j.PatternLayout"); // See:
+                                                                                               // http://logging.apache.org/log4j/docs/api/org/apache/log4j/PatternLayout.html
         logProperties.put("log4j.appender.TEXTAREA.layout.ConversionPattern", "%d{HH:mm:ss} [%12.12t] %5.5p %c: %m%n");
 
         PropertyConfigurator.configure(logProperties);
@@ -141,7 +142,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 final List l = ProxySelector.getDefault().select(new URI("http://www.cismet.de/"));
 
                 for (final Iterator iter = l.iterator(); iter.hasNext();) {
-                    final Proxy proxy = (Proxy)iter.next();
+                    final java.net.Proxy proxy = (java.net.Proxy)iter.next();
                     final InetSocketAddress addr = (InetSocketAddress)proxy.address();
 
                     if (addr != null) {
@@ -267,7 +268,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 .add(jLabel5)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(txtRegex, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 221, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 208, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 212, Short.MAX_VALUE)
                 .add(btnClear))
             .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 663, Short.MAX_VALUE)
         );
@@ -352,16 +353,27 @@ public class ConnectionTester extends javax.swing.JFrame {
     private void btnTestActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnTestActionPerformed
     {//GEN-HEADEREND:event_btnTestActionPerformed
         txaOut.setText("");
-        final ProxyConfig config = new ProxyConfig();
-        config.setProxyURL(txtProxy.getText());
-        config.setUsername(txtUsername.getText());
-        config.setPassword(String.valueOf(pwdPassword.getPassword()));
-        config.setComputerName("");
-        config.setDomain(txtDomain.getText());
+        final Proxy proxy;
+        if ((txtProxy.getText() == null) || txtProxy.getText().trim().isEmpty()) {
+            proxy = null;
+        } else {
+            proxy = new Proxy();
+            try
+            {
+                final URL url = new URL(txtProxy.getText());
+                proxy.setHost(url.getHost());
+                proxy.setPort(url.getPort());
+            }catch(final MalformedURLException ex)
+            {
+                throw new IllegalStateException("illegal proxy url", ex);
+            }
+            proxy.setUsername(txtUsername.getText());
+            proxy.setPassword(String.valueOf(pwdPassword.getPassword()));
+            proxy.setDomain(txtDomain.getText());
+        }
 
         final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
-                "http://flexo.cismet.de:9986/callserver/binary",
-                config);
+                "http://callserver-lung.cismet.de/callserver/binary", proxy);
         try {
             txaOut.setText(connector.getUser("WRRL-DB-MV", "Administratoren", "WRRL-DB-MV", "admin", "cismet")
                         .toString() + "\n\nSUCCESS");
@@ -413,10 +425,15 @@ public class ConnectionTester extends javax.swing.JFrame {
     /**
      * DOCUMENT ME!
      *
-     * @param  args  the command line arguments
+     * @param   args  the command line arguments
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void main(final String[] args) throws Exception {
-        PropertyManager.getManager().configure(args[1], args[2], args[3], args[4], (args.length > 5 ? args[5] : null));
+        if (args.length > 4) {
+            PropertyManager.getManager()
+                    .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
+        }
         java.awt.EventQueue.invokeLater(new Runnable() {
 
                 @Override

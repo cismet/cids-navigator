@@ -33,17 +33,18 @@ import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.permission.*;
 import Sirius.server.middleware.types.*;
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
-import de.cismet.cids.tools.StaticCidsUtilities;
+import de.cismet.lookupoptions.options.ProxyOptionsPanel;
+import de.cismet.security.Proxy;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
-import de.cismet.tools.gui.Static2DTools;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 import java.awt.event.*;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -132,7 +133,30 @@ public class Navigator extends JFrame {
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
 
-        initConnection();
+        while(!SessionManager.isConnected()){
+            try
+            {
+                initConnection(Proxy.fromPreferences());
+            }catch(final ConnectionException e)
+            {
+                final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
+                proxyOptions.setProxy(Proxy.fromPreferences());
+                final JOptionPane pane = new JOptionPane(
+                        proxyOptions,
+                        JOptionPane.QUESTION_MESSAGE,
+                        JOptionPane.OK_CANCEL_OPTION);
+                final JDialog dialog = pane.createDialog(null, "Proxy");
+                dialog.setAlwaysOnTop(true);
+                dialog.setVisible(true);
+                dialog.toFront();
+                final Object answer = pane.getValue();
+                if(answer instanceof Integer && JOptionPane.OK_OPTION == ((Integer)answer).intValue()){
+                    proxyOptions.getProxy().toPreferences();
+                }else{
+                    throw e;
+                }
+            }
+        }
 
         try {
             checkNavigatorHome();
@@ -197,9 +221,12 @@ public class Navigator extends JFrame {
     }
 
     // #########################################################################
-    private void initConnection() throws ConnectionException, InterruptedException {
+    private void initConnection(final Proxy proxyConfig) throws ConnectionException, InterruptedException {
         progressObserver.setProgress(25, resourceManager.getString("navigator.progress.connection"));
-        Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL());
+        if(logger.isDebugEnabled()){
+            logger.debug("initialising connection using proxy: " + proxyConfig);
+        }
+        Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL(), proxyConfig);
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
