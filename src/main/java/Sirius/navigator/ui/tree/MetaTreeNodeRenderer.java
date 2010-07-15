@@ -22,13 +22,12 @@ package Sirius.navigator.ui.tree;
  * History			:
  *
  *******************************************************************************/
-import Sirius.navigator.connection.SessionManager;
 
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.types.treenode.*;
 import de.cismet.tools.ClassloadingByConventionHelper;
-import de.cismet.tools.BlacklistClassloading;
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,7 +88,8 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
         //Iconfactroy from classname
         if (iconFactory == null && cid != -1 && cid != 0 && domain != null) {
             try {
-                MetaClass mc = SessionManager.getConnection().getMetaClass(SessionManager.getSession().getUser(), cid, domain);
+
+                MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
                 List<String> candidateNames = new ArrayList<String>();
                 String tablename = mc.getTableName();
                 tablename = tablename.substring(0, 1).toUpperCase() + tablename.substring(1).toLowerCase();
