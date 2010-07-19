@@ -26,7 +26,7 @@ package Sirius.navigator.ui.tree;
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.types.treenode.*;
-import de.cismet.tools.ClassloadingByConventionHelper;
+import de.cismet.cids.utils.ClassloadingHelper;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import java.awt.Component;
 import java.util.ArrayList;
@@ -90,12 +90,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
             try {
 
                 MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
-                List<String> candidateNames = new ArrayList<String>();
-                String tablename = mc.getTableName();
-                tablename = tablename.substring(0, 1).toUpperCase() + tablename.substring(1).toLowerCase();
-                candidateNames.add(CLASS_PREFIX + domain.toLowerCase() + "." + tablename + CLASS_POSTFIX);
-                candidateNames.add(CLASS_PREFIX + domain.toLowerCase() + "." + ClassloadingByConventionHelper.camelizeTableName(tablename) + CLASS_POSTFIX);
-                Class iconFactoryClass = ClassloadingByConventionHelper.loadClassFromCandidates(candidateNames);
+                Class<?> iconFactoryClass = ClassloadingHelper.getDynamicClass(mc, ClassloadingHelper.CLASS_TYPE.ICON_FACTORY);
                 if (iconFactoryClass != null) {
                     iconFactory = (CidsTreeObjectIconFactory) iconFactoryClass.getConstructor().newInstance();
                     iconFactories.put(cid + "@" + domain, iconFactory);

@@ -22,7 +22,7 @@ import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-import de.cismet.tools.ClassloadingByConventionHelper;
+import de.cismet.cids.utils.ClassloadingHelper;
 import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
@@ -234,31 +234,8 @@ public class CidsObjectEditorFactory {
 
     }
 
-    private final String getObjectEditorClassnameByConvention(MetaClass metaClass, boolean camelize) {
-        return getClassnameByConvention(metaClass, EDITOR_PREFIX, EDITOR_SUFFIX, camelize);
-    }
-
-    private final String getClassnameByConvention(MetaClass metaClass, String prefix, String suffix, boolean camelize) {
-        final String domain = metaClass.getDomain().toLowerCase();
-        String className = metaClass.getTableName().toLowerCase();
-        if (camelize) {
-            className = ClassloadingByConventionHelper.camelizeTableName(className);
-        } else {
-            className = className.substring(0, 1).toUpperCase() + className.substring(1);
-        }
-        className = prefix + domain + "." + className + suffix;
-        return className;
-    }
-
     private final JComponent getObjectEditor(final MetaClass metaClass) {
-        List<String> candidateNames = new ArrayList<String>();
-        final String overrideObjectEditorClassName = System.getProperty(metaClass.getDomain() + "." + metaClass.getTableName().toLowerCase() + ".objecteditor");
-        if (overrideObjectEditorClassName != null) {
-            candidateNames.add(overrideObjectEditorClassName);
-        }
-        candidateNames.add(getObjectEditorClassnameByConvention(metaClass, false));
-        candidateNames.add(getObjectEditorClassnameByConvention(metaClass, true));
-        Class<?> editorClass = ClassloadingByConventionHelper.loadClassFromCandidates(candidateNames);
+        Class<?> editorClass = ClassloadingHelper.getDynamicClass(metaClass, ClassloadingHelper.CLASS_TYPE.EDITOR);
         if (editorClass != null) {
             try {
                 final JComponent ed = (JComponent) editorClass.newInstance();
@@ -526,37 +503,13 @@ public class CidsObjectEditorFactory {
         return cidsEditor;
     }
 
-    private String getAttributeEditorClassnameByConvention(MetaClass metaClass, MemberAttributeInfo mai, boolean camelize) {
-        final String domain = metaClass.getDomain().toLowerCase();
-        String fieldname = mai.getFieldName().toLowerCase();
-        String className = metaClass.getTableName().toLowerCase();
-        if (camelize) {
-            className = ClassloadingByConventionHelper.camelizeTableName(className);
-        }
-        fieldname = fieldname.substring(0, 1).toUpperCase() + fieldname.substring(1);
-        className = EDITOR_PREFIX + domain + "." + className + "." + fieldname + ATTRIBUTE_EDITOR_SUFFIX;
-        String overrideAttributeEditorClassName = System.getProperty(domain + "." + metaClass.getTableName().toLowerCase() + ".attributeeditor");
-        if (overrideAttributeEditorClassName != null) {
-            className = overrideAttributeEditorClassName;
-        }
-        return className;
-    }
-
     private JComponent getCustomAttributeEditor(MetaClass metaClass, MemberAttributeInfo mai) {
         // TODO
         //Hier müssen auch noch die Einstellungen inder DB (ComplexEditor, Editor) berücksichtigt werden
 
         //MetaClass contains the MemberAttributeInfo
-        List<String> candidateClassNames = new ArrayList<String>(2);
-        candidateClassNames.add(getAttributeEditorClassnameByConvention(metaClass, mai, false));
-        candidateClassNames.add(getAttributeEditorClassnameByConvention(metaClass, mai, true));
-
         try {
-            Class<?> attrEditorClass = ClassloadingByConventionHelper.loadClassFromCandidates(candidateClassNames);
-
-            if (attrEditorClass == null && mai.getEditor() != null) {
-                attrEditorClass = BlacklistClassloading.forName(mai.getEditor());
-            }
+            Class<?> attrEditorClass = ClassloadingHelper.getDynamicClass(metaClass, mai, ClassloadingHelper.CLASS_TYPE.ATTRIBUTE_EDITOR);
 
             if (attrEditorClass != null) {
                 final MetaClass foreignClass;
@@ -593,10 +546,10 @@ public class CidsObjectEditorFactory {
         return null;
     }
 
-    private final void bindCidsEditor(final AutoBindableCidsEditor ed) {
+    private void bindCidsEditor(final AutoBindableCidsEditor ed) {
         BindingGroup bg = ed.getBindingGroup();
-        MetaObject MetaObject = ed.getCidsBean().getMetaObject();
-        ObjectAttribute[] allAttrs = MetaObject.getAttribs();
+//        MetaObject MetaObject = ed.getCidsBean().getMetaObject();
+//        ObjectAttribute[] allAttrs = MetaObject.getAttribs();
         Binding binding = null;
         Set<String> keys = ed.getAllControls().keySet();
         HashMap<String, JList> arraylists = new HashMap<String, JList>();
