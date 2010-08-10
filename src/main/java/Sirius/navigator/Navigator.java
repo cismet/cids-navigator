@@ -99,13 +99,16 @@ public class Navigator extends JFrame {
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
     private JPanel metaCatalogueTreePanel;
+    private NavigatorSplashScreen splashScreen;
     public final static String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator/";
 
     /** Creates a new instance of Navigator */
-    public Navigator(ProgressObserver progressObserver) throws Exception {
+    public Navigator(ProgressObserver progressObserver, NavigatorSplashScreen splashScreen) throws Exception {
         this.logger = Logger.getLogger(this.getClass());
 
         this.progressObserver = progressObserver;
+        this.splashScreen = splashScreen;
+
         this.propertyManager = PropertyManager.getManager();
 
         this.preferences = Preferences.userNodeForPackage(this.getClass());
@@ -115,6 +118,11 @@ public class Navigator extends JFrame {
 
         this.init();
 
+    }
+
+    /** Creates a new instance of Navigator */
+    public Navigator(ProgressObserver progressObserver) throws Exception {
+        this(progressObserver, null);
     }
 
     public Navigator() throws Exception {
@@ -133,27 +141,67 @@ public class Navigator extends JFrame {
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
 
-        while(!SessionManager.isConnected()){
-            try
-            {
-                initConnection(Proxy.fromPreferences());
-            }catch(final ConnectionException e)
-            {
-                final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
-                proxyOptions.setProxy(Proxy.fromPreferences());
-                final JOptionPane pane = new JOptionPane(
-                        proxyOptions,
-                        JOptionPane.QUESTION_MESSAGE,
-                        JOptionPane.OK_CANCEL_OPTION);
-                final JDialog dialog = pane.createDialog(null, "Proxy");
-                dialog.setAlwaysOnTop(true);
-                dialog.setVisible(true);
-                dialog.toFront();
-                final Object answer = pane.getValue();
-                if(answer instanceof Integer && JOptionPane.OK_OPTION == ((Integer)answer).intValue()){
+        final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
+        proxyOptions.setProxy(Proxy.fromPreferences());
+        
+        boolean inSplashScreen = false;
+
+        // splashscreen gesetzt?
+        if (splashScreen != null) {
+            // ProxyOptions panel soll im SplashScreen integriert werden
+            inSplashScreen = true;
+
+            // panel übergeben
+            splashScreen.setProxyOptionsPanel(proxyOptions);
+            // panel noch nicht anzeigen
+            splashScreen.setProxyOptionsVisible(false);
+
+            // auf Anwenden-Button horchen
+            splashScreen.addApplyButtonActionListener(new ActionListener() {
+
+                // Anwenden wurde gedrückt
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    // Proxy in den Preferences setzen
                     proxyOptions.getProxy().toPreferences();
-                }else{
-                    throw e;
+                    // Panel wieder verstecken
+                    splashScreen.setProxyOptionsVisible(false);
+                }
+            });
+
+        }
+
+        while(!SessionManager.isConnected()){
+            try {
+                initConnection(Proxy.fromPreferences());
+            } catch (final ConnectionException e) { // Verbinden fehlgeschlagen
+
+                if (inSplashScreen) { // das ProxyOptions panel soll im SplashScreen integriert werden
+
+                    // ProxyOptions panel anzeigen
+                    splashScreen.setProxyOptionsVisible(true);
+
+                    // Solange nicht "Anwenden" gedrückt wurde
+                    while (splashScreen.isProxyOptionsVisible()) {
+                        // warten
+                        Thread.sleep(100);
+                    }
+
+                } else { // das ProxyOptions panel soll als Dialog angezeigt werden
+                    final JOptionPane pane = new JOptionPane(
+                            proxyOptions,
+                            JOptionPane.QUESTION_MESSAGE,
+                            JOptionPane.OK_CANCEL_OPTION);
+                    final JDialog dialog = pane.createDialog(null, "Proxy");
+                    dialog.setAlwaysOnTop(true);
+                    dialog.setVisible(true);
+                    dialog.toFront();
+                    final Object answer = pane.getValue();
+                    if (answer instanceof Integer && JOptionPane.OK_OPTION == ((Integer) answer).intValue()) {
+                        proxyOptions.getProxy().toPreferences();
+                    } else {
+                        throw e;
+                    }
                 }
             }
         }

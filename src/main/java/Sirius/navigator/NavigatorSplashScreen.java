@@ -14,6 +14,7 @@ import Sirius.navigator.method.MultithreadedMethod;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.ui.progress.ProgressObserver;
 import de.cismet.tools.CismetThreadPool;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import java.awt.event.ActionListener;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.PixelGrabber;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.Timer;
@@ -29,7 +31,7 @@ import javax.swing.Timer;
  *
  * @author  pascal
  */
-public class NavigatorSplashScreen extends JWindow {
+public class NavigatorSplashScreen extends JFrame {
 
     private final ProgressObserver progressObserver;
     private final NavigatorLoader navigatorLoader;
@@ -39,11 +41,13 @@ public class NavigatorSplashScreen extends JWindow {
 
     /** Creates new form JWindow */
     public NavigatorSplashScreen(ProgressObserver progressObserver, Icon logo) {
+        this.setUndecorated(true);
         this.setAlwaysOnTop(true);
         this.initComponents();
 
         this.logger = Logger.getLogger(this.getClass());
 
+        this.panConnection.setVisible(false);
         this.progressObserver = progressObserver;
         pluginProgressObserver = progressObserver.getSubProgressObserver();
 
@@ -66,6 +70,7 @@ public class NavigatorSplashScreen extends JWindow {
         Color col = new Color(cCode);
         progressBar.setForeground(col);
         progressBarPlugin.setForeground(col);
+        panCenter.setBackground(col);
 
 
 
@@ -87,10 +92,15 @@ public class NavigatorSplashScreen extends JWindow {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panCenter = new javax.swing.JPanel();
         logoLabel = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        panProgress = new javax.swing.JPanel();
         progressBar = new javax.swing.JProgressBar();
         progressBarPlugin = new javax.swing.JProgressBar();
+        panConnection = new javax.swing.JPanel();
+        panButtons = new javax.swing.JPanel();
+        btnApply = new javax.swing.JButton();
+        panProxy = new javax.swing.JPanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -98,10 +108,14 @@ public class NavigatorSplashScreen extends JWindow {
             }
         });
 
-        logoLabel.setVerifyInputWhenFocusTarget(false);
-        getContentPane().add(logoLabel, java.awt.BorderLayout.CENTER);
+        panCenter.setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.BorderLayout());
+        logoLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        logoLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
+        logoLabel.setVerifyInputWhenFocusTarget(false);
+        panCenter.add(logoLabel, java.awt.BorderLayout.CENTER);
+
+        panProgress.setLayout(new java.awt.BorderLayout());
 
         progressBar.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
         progressBar.setBorderPainted(false);
@@ -109,7 +123,7 @@ public class NavigatorSplashScreen extends JWindow {
         progressBar.setFocusable(false);
         progressBar.setStringPainted(true);
         progressBar.setVerifyInputWhenFocusTarget(false);
-        jPanel1.add(progressBar, java.awt.BorderLayout.NORTH);
+        panProgress.add(progressBar, java.awt.BorderLayout.NORTH);
 
         progressBarPlugin.setMaximum(1000);
         progressBarPlugin.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -119,21 +133,79 @@ public class NavigatorSplashScreen extends JWindow {
         progressBarPlugin.setString("Plugins");
         progressBarPlugin.setStringPainted(true);
         progressBarPlugin.setVerifyInputWhenFocusTarget(false);
-        jPanel1.add(progressBarPlugin, java.awt.BorderLayout.SOUTH);
+        panProgress.add(progressBarPlugin, java.awt.BorderLayout.SOUTH);
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.PAGE_END);
+        panCenter.add(panProgress, java.awt.BorderLayout.PAGE_END);
+
+        getContentPane().add(panCenter, java.awt.BorderLayout.CENTER);
+
+        panConnection.setLayout(new java.awt.BorderLayout());
+
+        btnApply.setText("Anwenden");
+        btnApply.setPreferredSize(new java.awt.Dimension(100, 29));
+        panButtons.add(btnApply);
+
+        panConnection.add(panButtons, java.awt.BorderLayout.SOUTH);
+        panConnection.add(panProxy, java.awt.BorderLayout.CENTER);
+
+        getContentPane().add(panConnection, java.awt.BorderLayout.EAST);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     /** Exit the Application */
     private void exitForm(java.awt.event.WindowEvent evt)//GEN-FIRST:event_exitForm
- {
+    {
         System.exit(0);
     }//GEN-LAST:event_exitForm
+
+    /**
+     * Sets the ProxyOption panel by adding it at the CENTER position of the
+     * panConnection.
+     *
+     * @param panProxyOptions
+     */
+    public void setProxyOptionsPanel(JPanel panProxyOptions) {
+        panConnection.add(panProxyOptions, BorderLayout.CENTER);
+    }
+
+    /**
+     * Adds an ActionListner to the "Apply"-button of the ProxyOptions panel.
+     *
+     * @param al
+     */
+    public void addApplyButtonActionListener(ActionListener al) {
+        btnApply.addActionListener(al);
+    }
+
+    /**
+     * Shows or hides the ProxyOptions panel.
+     *
+     * @param isVisible
+     */
+    public void setProxyOptionsVisible(boolean isVisible) {
+        panConnection.setVisible(isVisible);
+        panConnection.validate();
+        pack();
+    }
+
+    /**
+     * Returns if the ProxyOptions panel is visible or not.
+     *
+     * @return true if ProxyOptions panel is visible, else false
+     */
+    public boolean isProxyOptionsVisible() {
+        return panConnection.isVisible();
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JButton btnApply;
     private javax.swing.JLabel logoLabel;
+    private javax.swing.JPanel panButtons;
+    private javax.swing.JPanel panCenter;
+    private javax.swing.JPanel panConnection;
+    private javax.swing.JPanel panProgress;
+    private javax.swing.JPanel panProxy;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JProgressBar progressBarPlugin;
     // End of variables declaration//GEN-END:variables
@@ -174,7 +246,7 @@ public class NavigatorSplashScreen extends JWindow {
                 public void run() {
                     try {
                         logger.info("creating navigator instance");
-                        final Navigator navigator = new Navigator(NavigatorLoader.this.progressObserver);
+                        final Navigator navigator = new Navigator(NavigatorLoader.this.progressObserver, NavigatorSplashScreen.this);
                         logger.info("new navigator instance created");
                         SwingUtilities.invokeLater(new Runnable() {
 
