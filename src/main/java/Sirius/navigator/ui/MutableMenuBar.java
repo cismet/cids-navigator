@@ -57,7 +57,7 @@ public class MutableMenuBar extends JMenuBar {
     private final PluginMenuesMap pluginMenues;
     private final EmbeddedContainersMap moveableMenues;
     private Sirius.navigator.plugin.interfaces.LayoutManager layoutManager;
-    private JMenu viewMenu = null;
+    private JMenu viewMenu;
     // Control Stuff
     //private ControlModel model;
     //private MethodManager methodManager;
@@ -66,6 +66,8 @@ public class MutableMenuBar extends JMenuBar {
     //private JMenu navigatorMenu;
     //private JMenu functionsMenu;
     private JMenu pluginMenu;
+    private JMenu searchMenu;
+//    private JMenu windowMenu;
     //private JMenu helpMenu;
 
     /*public MutableMenuBar(ControlModel model)
@@ -243,7 +245,7 @@ public class MutableMenuBar extends JMenuBar {
         //item.setAccelerator(resources.getMenuAccelerator("search.profiles"));
         item.setActionCommand("search.profiles");
         item.addActionListener(itemListener);
-
+        searchMenu = menu;
         // TOOLS MENU ==========================================================
         menu = new JMenu(resources.getMenuText("tools"));
         menu.setMnemonic(resources.getMenuMnemonic("tools"));
@@ -297,6 +299,14 @@ public class MutableMenuBar extends JMenuBar {
         if (viewMenu != null) {
             viewMenu.add(viewItem);
         }
+    }
+
+    public JMenu getViewMenu() {
+        return viewMenu;
+    }
+
+    public JMenu getSearchMenu() {
+        return searchMenu;
     }
 
     // INNERE KLASSEN ZUM BEARBEITEN DER EREIGNISSE ============================

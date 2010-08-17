@@ -14,6 +14,7 @@ import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
+import Sirius.navigator.search.CidsSearchInitializer;
 import Sirius.navigator.search.dynamic.FormDataBean;
 import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -44,7 +45,6 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 import java.awt.event.*;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -143,7 +143,7 @@ public class Navigator extends JFrame {
 
         final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
         proxyOptions.setProxy(Proxy.fromPreferences());
-        
+
         boolean inSplashScreen = false;
 
         // splashscreen gesetzt?
@@ -171,7 +171,7 @@ public class Navigator extends JFrame {
 
         }
 
-        while(!SessionManager.isConnected()){
+        while (!SessionManager.isConnected()) {
             try {
                 initConnection(Proxy.fromPreferences());
             } catch (final ConnectionException e) { // Verbinden fehlgeschlagen
@@ -214,6 +214,7 @@ public class Navigator extends JFrame {
             initPlugins();
             initEvents();
             initWindow();
+            initSearch();
             //Not in EDT
             if (container instanceof LayoutedContainer) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -271,7 +272,7 @@ public class Navigator extends JFrame {
     // #########################################################################
     private void initConnection(final Proxy proxyConfig) throws ConnectionException, InterruptedException {
         progressObserver.setProgress(25, resourceManager.getString("navigator.progress.connection"));
-        if(logger.isDebugEnabled()){
+        if (logger.isDebugEnabled()) {
             logger.debug("initialising connection using proxy: " + proxyConfig);
         }
         Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL(), proxyConfig);
@@ -321,6 +322,9 @@ public class Navigator extends JFrame {
 
         menuBar = new MutableMenuBar();
         toolBar = new MutableToolBar(propertyManager.isAdvancedLayout());
+//        JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,5,5));
+//        innerPanel.add(new CidsSearchComboBar());
+//        toolBar.add(innerPanel, -1);
         container = new LayoutedContainer(toolBar, menuBar, propertyManager.isAdvancedLayout());
         if (container instanceof LayoutedContainer) {
             menuBar.registerLayoutManager((LayoutedContainer) container);
@@ -493,6 +497,10 @@ public class Navigator extends JFrame {
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new ClosingListener());
         progressObserver.setProgress(1000, resourceManager.getString("navigator.progress.finished"));
+    }
+
+    private void initSearch() {
+        new CidsSearchInitializer();
     }
     // .........................................................................
 
@@ -905,5 +913,3 @@ public class Navigator extends JFrame {
         CismetThreadPool.execute(t);
     }
 }
-
-

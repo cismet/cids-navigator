@@ -66,7 +66,6 @@ public class CidsObjectRendererFactory {
         JComponent componentReferenceHolder = null;
         try {
             final Class<?> rendererClass = ClassloadingHelper.getDynamicClass(mo.getMetaClass(), ClassloadingHelper.CLASS_TYPE.RENDERER);
-            log.fatal(rendererClass);
             final CidsBean bean;
             if (rendererClass != null) {
                 if (CidsBeanRenderer.class.isAssignableFrom(rendererClass)) {

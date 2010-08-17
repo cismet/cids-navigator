@@ -15,16 +15,12 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
-import java.awt.Component;
 import java.lang.reflect.Field;
 import java.util.List;
-import javax.swing.JComponent;
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
 import org.jdesktop.beansbinding.ELProperty;
-import org.jdesktop.beansbinding.Property;
 import org.jdesktop.el.impl.ValueExpressionImpl;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -96,7 +92,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         return bindingGroup;
     }
 
-    public static void setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(BindingGroup bindingGroup, CidsBean cidsBean) throws Exception {
+    public static void setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(BindingGroup bindingGroup, CidsBean cidsBean) {
         List<Binding> bindings = bindingGroup.getBindings();
         for (Binding binding : bindings) {
             if (binding.getTargetObject() instanceof MetaClassStore) {
@@ -127,7 +123,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
                     MetaClass foreignClass = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId);
                     mcs.setMetaClass(foreignClass);
                 } catch (Exception e) {
-                    throw new RuntimeException("Error during Bind: " + fieldname + " of " + cidsBean.getMetaObject().getMetaClass(), e);
+                    log.error("Error during Bind: " + fieldname + " of " + cidsBean.getMetaObject().getMetaClass(), e);
                 }
 
             }
