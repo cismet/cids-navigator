@@ -14,6 +14,7 @@ import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
+import Sirius.navigator.search.CidsSearchInitializer;
 import Sirius.navigator.search.dynamic.FormDataBean;
 import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -33,12 +34,12 @@ import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.permission.*;
 import Sirius.server.middleware.types.*;
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
-import de.cismet.cids.tools.StaticCidsUtilities;
+import de.cismet.lookupoptions.options.ProxyOptionsPanel;
+import de.cismet.security.Proxy;
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
-import de.cismet.tools.gui.Static2DTools;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -98,13 +99,16 @@ public class Navigator extends JFrame {
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
     private JPanel metaCatalogueTreePanel;
-    public final static String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator/";  // NOI18N
+    private NavigatorSplashScreen splashScreen;
+    public final static String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator/";
 
     /** Creates a new instance of Navigator */
-    public Navigator(ProgressObserver progressObserver) throws Exception {
+    public Navigator(ProgressObserver progressObserver, NavigatorSplashScreen splashScreen) throws Exception {
         this.logger = Logger.getLogger(this.getClass());
 
         this.progressObserver = progressObserver;
+        this.splashScreen = splashScreen;
+
         this.propertyManager = PropertyManager.getManager();
 
         this.preferences = Preferences.userNodeForPackage(this.getClass());
@@ -115,6 +119,11 @@ public class Navigator extends JFrame {
 
     }
     
+
+    /** Creates a new instance of Navigator */
+    public Navigator(ProgressObserver progressObserver) throws Exception {
+        this(progressObserver, null);
+    }
 
     public Navigator() throws Exception {
         this(new ProgressObserver());
@@ -132,7 +141,70 @@ public class Navigator extends JFrame {
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
 
-        initConnection();
+        final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
+        proxyOptions.setProxy(Proxy.fromPreferences());
+
+        boolean inSplashScreen = false;
+
+        // splashscreen gesetzt?
+        if (splashScreen != null) {
+            // ProxyOptions panel soll im SplashScreen integriert werden
+            inSplashScreen = true;
+
+            // panel übergeben
+            splashScreen.setProxyOptionsPanel(proxyOptions);
+            // panel noch nicht anzeigen
+            splashScreen.setProxyOptionsVisible(false);
+
+            // auf Anwenden-Button horchen
+            splashScreen.addApplyButtonActionListener(new ActionListener() {
+
+                // Anwenden wurde gedrückt
+                @Override
+                public void actionPerformed(ActionEvent ae) {
+                    // Proxy in den Preferences setzen
+                    proxyOptions.getProxy().toPreferences();
+                    // Panel wieder verstecken
+                    splashScreen.setProxyOptionsVisible(false);
+                }
+            });
+
+        }
+
+        while (!SessionManager.isConnected()) {
+            try {
+                initConnection(Proxy.fromPreferences());
+            } catch (final ConnectionException e) { // Verbinden fehlgeschlagen
+
+                if (inSplashScreen) { // das ProxyOptions panel soll im SplashScreen integriert werden
+
+                    // ProxyOptions panel anzeigen
+                    splashScreen.setProxyOptionsVisible(true);
+
+                    // Solange nicht "Anwenden" gedrückt wurde
+                    while (splashScreen.isProxyOptionsVisible()) {
+                        // warten
+                        Thread.sleep(100);
+                    }
+
+                } else { // das ProxyOptions panel soll als Dialog angezeigt werden
+                    final JOptionPane pane = new JOptionPane(
+                            proxyOptions,
+                            JOptionPane.QUESTION_MESSAGE,
+                            JOptionPane.OK_CANCEL_OPTION);
+                    final JDialog dialog = pane.createDialog(null, "Proxy");
+                    dialog.setAlwaysOnTop(true);
+                    dialog.setVisible(true);
+                    dialog.toFront();
+                    final Object answer = pane.getValue();
+                    if (answer instanceof Integer && JOptionPane.OK_OPTION == ((Integer) answer).intValue()) {
+                        proxyOptions.getProxy().toPreferences();
+                    } else {
+                        throw e;
+                    }
+                }
+            }
+        }
 
         try {
             checkNavigatorHome();
@@ -142,6 +214,7 @@ public class Navigator extends JFrame {
             initPlugins();
             initEvents();
             initWindow();
+            initSearch();
             //Not in EDT
             if (container instanceof LayoutedContainer) {
                 SwingUtilities.invokeLater(new Runnable() {
@@ -200,10 +273,13 @@ public class Navigator extends JFrame {
     }
 
     // #########################################################################
-    private void initConnection() throws ConnectionException, InterruptedException {
+    private void initConnection(final Proxy proxyConfig) throws ConnectionException, InterruptedException {
         progressObserver.setProgress(25,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25"));//NOI18N
-        Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL());
+        if (logger.isDebugEnabled()) {
+            logger.debug("initialising connection using proxy: " + proxyConfig);
+        }
+        Connection connection = ConnectionFactory.getFactory().createConnection(propertyManager.getConnectionClass(), propertyManager.getConnectionInfo().getCallserverURL(), proxyConfig);
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
@@ -255,6 +331,9 @@ public class Navigator extends JFrame {
 
         menuBar = new MutableMenuBar();
         toolBar = new MutableToolBar(propertyManager.isAdvancedLayout());
+//        JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,5,5));
+//        innerPanel.add(new CidsSearchComboBar());
+//        toolBar.add(innerPanel, -1);
         container = new LayoutedContainer(toolBar, menuBar, propertyManager.isAdvancedLayout());
         if (container instanceof LayoutedContainer) {
             menuBar.registerLayoutManager((LayoutedContainer) container);
@@ -473,6 +552,10 @@ public class Navigator extends JFrame {
         this.addWindowListener(new ClosingListener());
         progressObserver.setProgress(1000, 
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_1000"));  // NOI18N
+    }
+
+    private void initSearch() {
+        new CidsSearchInitializer();
     }
     // .........................................................................
 
@@ -915,5 +998,3 @@ public class Navigator extends JFrame {
         CismetThreadPool.execute(t);
     }
 }
-
-

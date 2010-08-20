@@ -22,7 +22,7 @@ import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
-import de.cismet.cids.navigator.utils.FinalReference;
+import de.cismet.cids.utils.ClassloadingHelper;
 import de.cismet.tools.BlacklistClassloading;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
@@ -41,6 +41,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -234,53 +235,20 @@ public class CidsObjectEditorFactory {
 
     }
 
-    private final String getObjectEditorClassnameByConvention(MetaClass metaClass) {
-        return getClassnameByConvention(metaClass, EDITOR_PREFIX, EDITOR_SUFFIX);
-    }
-
-    private final String getClassnameByConvention(MetaClass metaClass, String prefix, String suffix) {
-        final String domain = metaClass.getDomain().toLowerCase();
-        String className = metaClass.getTableName().toLowerCase();
-        className = className.substring(0, 1).toUpperCase() + className.substring(1);
-        className = prefix + domain + "." + className + suffix;//NOI18N
-        return className;
-    }
-
     private final JComponent getObjectEditor(final MetaClass metaClass) {
-        final String overrideObjectEditorClassName = System.getProperty(metaClass.getDomain() + "." + metaClass.getTableName().toLowerCase() + ".objecteditor");//NOI18N
-        final String editorClassName = overrideObjectEditorClassName == null ? getObjectEditorClassnameByConvention(metaClass) : overrideObjectEditorClassName;
-        try {
-            final Class<?> editorClass = BlacklistClassloading.forName(editorClassName);
-            if (editorClass != null) {
-                final FinalReference<JComponent> result = new FinalReference<JComponent>();
-//                final Runnable createObjectEditorRunnable = new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-                try {
-                    final JComponent ed = (JComponent) editorClass.newInstance();
-                    if (ed instanceof MetaClassStore) {
-                        ((MetaClassStore) ed).setMetaClass(metaClass);
-                    }
-                    result.setObject(ed);
-                } catch (Throwable t) {
-                    throw new RuntimeException(t);
+        Class<?> editorClass = ClassloadingHelper.getDynamicClass(metaClass, ClassloadingHelper.CLASS_TYPE.EDITOR);
+        if (editorClass != null) {
+            try {
+                final JComponent ed = (JComponent) editorClass.newInstance();
+                if (ed instanceof MetaClassStore) {
+                    ((MetaClassStore) ed).setMetaClass(metaClass);
                 }
-//                    }
-//                };
-//                if (EventQueue.isDispatchThread()) {
-//                    createObjectEditorRunnable.run();
-//                } else {
-//                    EventQueue.invokeAndWait(createObjectEditorRunnable);
-//                }
-                return result.getObject();
+                return ed;
+
+            } catch (Throwable e) {
+                log.error("Error beim erzeugen der Editorklasse " + editorClass, e);
             }
-        } catch (Exception e) {
-            log.error("Error while creating the editor class " + editorClassName, e);//NOI18N
         }
-//        if (ret != null) {
-//            ret.setOpaque(false);
-//        }
         return null;
     }
 
@@ -536,33 +504,13 @@ public class CidsObjectEditorFactory {
         return cidsEditor;
     }
 
-    private final String getAttributeEditorClassnameByConvention(MetaClass metaClass, MemberAttributeInfo mai) {
-        final String domain = metaClass.getDomain().toLowerCase();
-        String fieldname = mai.getFieldName().toLowerCase();
-        String className = metaClass.getTableName().toLowerCase();
-        fieldname = fieldname.substring(0, 1).toUpperCase() + fieldname.substring(1);
-        className = EDITOR_PREFIX + domain + "." + className + "." + fieldname + ATTRIBUTE_EDITOR_SUFFIX;//NOI18N
-        String overrideAttributeEditorClassName = System.getProperty(domain + "." + metaClass.getTableName().toLowerCase() + ".attributeeditor");//NOI18N
-        if (overrideAttributeEditorClassName != null) {
-            className = overrideAttributeEditorClassName;
-        }
-        return className;
-    }
-
     private JComponent getCustomAttributeEditor(MetaClass metaClass, MemberAttributeInfo mai) {
         // TODO
         //Hier müssen auch noch die Einstellungen inder DB (ComplexEditor, Editor) berücksichtigt werden
 
         //MetaClass contains the MemberAttributeInfo
-        final String className = getAttributeEditorClassnameByConvention(metaClass, mai);
-
-        final FinalReference<JComponent> result = new FinalReference<JComponent>();
         try {
-            Class<?> attrEditorClass = BlacklistClassloading.forName(className);
-
-            if (attrEditorClass == null && mai.getEditor() != null) {
-                attrEditorClass = BlacklistClassloading.forName(mai.getEditor());
-            }
+            Class<?> attrEditorClass = ClassloadingHelper.getDynamicClass(metaClass, mai, ClassloadingHelper.CLASS_TYPE.ATTRIBUTE_EDITOR);
 
             if (attrEditorClass != null) {
                 final MetaClass foreignClass;
@@ -575,16 +523,16 @@ public class CidsObjectEditorFactory {
 //
 //                    @Override
 //                    public void run() {
-                        try {
-                            final Bindable editor = (Bindable) attrEditorClass.newInstance();
-                            if (foreignClass != null) {
-                                ((MetaClassStore) editor).setMetaClass(foreignClass);
-                            }
-                            result.setObject((JComponent) editor);
-                        } catch (Throwable t) {
-                            log.error("getCustomAttributeEditor of "+metaClass.getTableName()+"."+mai.getFieldName()+" returns an error",t);//NOI18N
-                            throw new RuntimeException(t);
-                        }
+                try {
+                    final Bindable editor = (Bindable) attrEditorClass.newInstance();
+                    if (foreignClass != null) {
+                        ((MetaClassStore) editor).setMetaClass(foreignClass);
+                    }
+                    return (JComponent) editor;
+                } catch (Throwable t) {
+                    log.error("getCustomAttributeEditor von " + metaClass.getTableName() + "." + mai.getFieldName() + " liefert einen Fehler", t);
+                    throw new RuntimeException(t);
+                }
 //                    }
 //                };
 //                if (EventQueue.isDispatchThread()) {
@@ -596,14 +544,13 @@ public class CidsObjectEditorFactory {
         } catch (Exception e) {
             log.error("Error when creating a SimpleAttributeEditor", e);//NOI18N
         }
-        JComponent ret = result.getObject();
-        return ret;
+        return null;
     }
 
-    private final void bindCidsEditor(final AutoBindableCidsEditor ed) {
+    private void bindCidsEditor(final AutoBindableCidsEditor ed) {
         BindingGroup bg = ed.getBindingGroup();
-        MetaObject MetaObject = ed.getCidsBean().getMetaObject();
-        ObjectAttribute[] allAttrs = MetaObject.getAttribs();
+//        MetaObject MetaObject = ed.getCidsBean().getMetaObject();
+//        ObjectAttribute[] allAttrs = MetaObject.getAttribs();
         Binding binding = null;
         Set<String> keys = ed.getAllControls().keySet();
         HashMap<String, JList> arraylists = new HashMap<String, JList>();
@@ -1040,6 +987,3 @@ class BindableJList extends JList implements Bindable {
         return null;
     }
 }
-
-
-

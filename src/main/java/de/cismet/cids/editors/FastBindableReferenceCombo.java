@@ -50,6 +50,10 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     private MetaClass metaClass = null;
     private String nullValueRepresentation = "-";//NOI18N
 
+    public FastBindableReferenceCombo() {
+        this("%1$2s", new String[]{"NAME"});
+    }
+
     public FastBindableReferenceCombo(String representation, String[] representationFields) {
         this("", representation, representationFields);//NOI18N
     }
@@ -451,6 +455,3 @@ final class MetaObjectComboBoxModel extends DefaultComboBoxModel {
         }
     }
 }
-
-
-

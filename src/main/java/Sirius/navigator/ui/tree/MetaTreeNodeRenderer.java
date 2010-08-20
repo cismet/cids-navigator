@@ -22,15 +22,19 @@ package Sirius.navigator.ui.tree;
  * History			:
  *
  *******************************************************************************/
-import Sirius.navigator.connection.SessionManager;
-import java.awt.*;
-import javax.swing.*;
-import javax.swing.tree.*;
+
 
 import Sirius.server.middleware.types.*;
 import Sirius.navigator.types.treenode.*;
-import de.cismet.tools.BlacklistClassloading;
+import de.cismet.cids.utils.ClassloadingHelper;
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+import java.awt.Component;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import javax.swing.Icon;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
     //private MetaTreeNode treeNode;
@@ -84,11 +88,9 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
         //Iconfactroy from classname
         if (iconFactory == null && cid != -1 && cid != 0 && domain != null) {
             try {
-                MetaClass mc = SessionManager.getConnection().getMetaClass(SessionManager.getSession().getUser(), cid, domain);
-                String tablename = mc.getTableName();
-                tablename = tablename.substring(0, 1).toUpperCase() + tablename.substring(1).toLowerCase();
-                String className = CLASS_PREFIX + domain.toLowerCase() + "." + tablename + CLASS_POSTFIX;//NOI18N
-                Class iconFactoryClass = BlacklistClassloading.forName(className);
+
+                MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
+                Class<?> iconFactoryClass = ClassloadingHelper.getDynamicClass(mc, ClassloadingHelper.CLASS_TYPE.ICON_FACTORY);
                 if (iconFactoryClass != null) {
                     iconFactory = (CidsTreeObjectIconFactory) iconFactoryClass.getConstructor().newInstance();
                     iconFactories.put(cid + "@" + domain, iconFactory);//NOI18N

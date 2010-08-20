@@ -1,8 +1,15 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.resource;
 
 /*******************************************************************************
  *
- * Copyright (c)	:	EIG (Environmental Informatics Group)
+ * Copyright (c)        :       EIG (Environmental Informatics Group)
  * http://www.htw-saarland.de/eig
  * Prof. Dr. Reiner Guettler
  * Prof. Dr. Ralf Denzer
@@ -13,67 +20,72 @@ package Sirius.navigator.resource;
  * 66117 Saarbruecken
  * Germany
  *
- * Programmers		:	Pascal
+ * Programmers          :       Pascal
  *
- * Project			:	WuNDA 2
- * Filename		:
- * Version			:	1.0
- * Purpose			:
- * Created			:	01.10.1999
- * History			:
+ * Project                      :       WuNDA 2
+ * Filename             :
+ * Version                      :       1.0
+ * Purpose                      :
+ * Created                      :       01.10.1999
+ * History                      :
  *
  *******************************************************************************/
-import javax.swing.*;
-import java.applet.*;
-import java.beans.*;
-import java.util.*;
-import java.net.*;
-import java.io.*;
+import Sirius.navigator.connection.ConnectionInfo;
+import Sirius.navigator.tools.BrowserControl;
+import Sirius.navigator.ui.LAFManager;
+import Sirius.navigator.ui.progress.*;
 
 import org.apache.log4j.*;
 
-import Sirius.navigator.connection.ConnectionInfo;
-import Sirius.navigator.tools.BrowserControl;
-import Sirius.navigator.ui.progress.*;
-import Sirius.navigator.ui.LAFManager;
-import com.jgoodies.looks.Options;
-import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
-import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
+import java.applet.*;
 
+import java.beans.*;
+
+import java.io.*;
+
+import java.net.*;
+
+import java.util.*;
+
+import javax.swing.*;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class PropertyManager {
 
-    private final static String HEADER = "Navigator Configuration File";//NOI18N
-    public final static String TRUE = "true";//NOI18N
-    public final static String FALSE = "false";//NOI18N
-    public final static String SORT_TOKEN_SEPARATOR = ",";//NOI18N
-    public final static String SORT_NAME_TOKEN = "%name%";//NOI18N
-    public final static String SORT_ID_TOKEN = "%id%";//NOI18N
-    public final static int MIN_SERVER_THREADS = 3;
-    public final static int MAX_SERVER_THREADS = 10;
-    public final static int MIN_SEARCH_RESULTS = 20;
-    public final static int MAX_SEARCH_RESULTS = 300;    //public final static String LNF_METAL = "Java Metal Look & Feel";
-    //public final static String LNF_MOTIF = "Motif Look & Feel";
-    //public final static String LNF_WINDOWS = "Windows Look & Feel";
-    //public final static String LNF_MAC = "Apple Macintosh Look & Feel";
-    //public final static String LNF_GTK = "GTK Look & Feel";
-    //public final static String LNF_PLASTIC = "Plastic Look & Feel";
-    // .........................................................................
-    private final static Logger logger = Logger.getLogger(PropertyManager.class);
-    private final static PropertyManager manager = new PropertyManager();
-    //private static PropertyManager manager = null;
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger logger = Logger.getLogger(PropertyManager.class);
+    private static final PropertyManager manager = new PropertyManager();
+
+    private static final String HEADER = "Navigator Configuration File";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
+    public static final String SORT_TOKEN_SEPARATOR = ",";
+    public static final String SORT_NAME_TOKEN = "%name%";
+    public static final String SORT_ID_TOKEN = "%id%";
+    public static final int MIN_SERVER_THREADS = 3;
+    public static final int MAX_SERVER_THREADS = 10;
+    public static final int MIN_SEARCH_RESULTS = 20;
+    public static final int MAX_SEARCH_RESULTS = 300;
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Properties properties;
-    private final ConnectionInfo connectionInfo;    // .........................................................................
+    private final ConnectionInfo connectionInfo;
     private ArrayList pluginList = null;
     private String basePath = null;
     private String pluginPath = null;
     private String searchFormPath = null;
-    private String profilesPath = null;    // .........................................................................
-    //private String title;
+    private String profilesPath = null;
     private int width;
     private int height;
     private boolean maximizeWindow;
     private boolean advancedLayout;
-    private String lookAndFeel;    //private String callserverURL;
+    private String lookAndFeel;
     private String connectionClass;
     private String connectionProxyClass;
     private boolean autoLogin;
@@ -82,52 +94,41 @@ public final class PropertyManager {
     private boolean sortChildren;
     private boolean sortAscending;
     private int httpInterfacePort = -1;
-    /** Holds value of property connectionInfoSaveable. */
     private boolean connectionInfoSaveable;
-    /** Holds value of property loadable. */
     private boolean loadable;
-    /** Holds value of property saveable. */
     private boolean saveable;
-    /** Holds value of property applet. */
     private boolean applet = false;
-    /** Holds value of property application. */
     private boolean application = true;
-    /** Holds value of property appletContext. */
     private AppletContext appletContext = null;
-    /** Holds value of property sharedProgressObserver. */
     private final ProgressObserver sharedProgressObserver;
-    /**
-     * Holds value of property language.
-     */
     private String language;
-    /**
-     * Holds value of property country.
-     */
     private String country;
-    /**
-     * Holds value of property locale.
-     */
     private java.util.Locale locale;
-    /**
-     * Holds value of property editable.
-     */
     private boolean editable;
     private boolean autoClose = false;
 
+    private transient String proxyURL;
+    private transient String proxyUsername;
+    private transient String proxyPassword;
+    private transient String proxyDomain;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new PropertyManager object.
+     */
     private PropertyManager() {
         this.properties = new Properties();
         this.connectionInfo = new ConnectionInfo();
         this.connectionInfo.addPropertyChangeListener(new ConnectionInfoChangeListener());
         this.sharedProgressObserver = new ProgressObserver(1000, 100);
 
-        //setTitle("Wuppertaler Navigations- und Datenmanagementsystem v3.2");
         setWidth(1024);
         setHeight(768);
         setMaximizeWindow(false);
         setAdvancedLayout(false);
         setLookAndFeel(LAFManager.getManager().getDefaultLookAndFeel().getName());
 
-        //this.setCallserverURL("rmi://192.168.0.12/callServer");
         setConnectionClass("Sirius.navigator.connection.RMIConnection");//NOI18N
         setConnectionProxyClass("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler");//NOI18N
         setAutoLogin(false);
@@ -150,438 +151,638 @@ public final class PropertyManager {
         connectionInfo.setUsergroupDomain("");//NOI18N
         connectionInfo.setUsername("");//NOI18N
     }
-    // TITLE ===================================================================
-    /*public void setTitle(String title)
-    {
-    if(title != null)
-    {
-    this.title = title;
-    properties.setProperty("title",  title);
-    }
-    else
-    {
-    logger.warn("setTitle(): property 'title' is 'null'");
-    }
-    }
-    
-    public String getTitle()
-    {
-    return this.title;
-    }*/    // SIZE ====================================================================
-    public void setMaximizeWindow(String maximizeWindow) {
-        if (maximizeWindow != null && (maximizeWindow.equalsIgnoreCase(TRUE) || maximizeWindow.equals("1"))) {//NOI18N
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  maximizeWindow  DOCUMENT ME!
+     */
+    public void setMaximizeWindow(final String maximizeWindow) {
+        if ((maximizeWindow != null) && (maximizeWindow.equalsIgnoreCase(TRUE) || maximizeWindow.equals("1"))) {
             this.setMaximizeWindow(true);
-        } else if (maximizeWindow != null && (maximizeWindow.equalsIgnoreCase(FALSE) || maximizeWindow.equals("0"))) {//NOI18N
+        } else if ((maximizeWindow != null) && (maximizeWindow.equalsIgnoreCase(FALSE) || maximizeWindow.equals("0"))) {
             this.setMaximizeWindow(false);
         } else {
             this.setMaximizeWindow(false);
-            logger.warn("setMaximizeWindow(): invalid property 'maximizeWindow': '" + maximizeWindow + "', setting default value to '" + this.maximizeWindow + "'");//NOI18N
+            logger.warn("setMaximizeWindow(): invalid property 'maximizeWindow': '" + maximizeWindow
+                        + "', setting default value to '" + this.maximizeWindow + "'");
         }
     }
 
-    /** Setter for property maximizeWindow.
-     * @param maximizeWindow New value of property maximizeWindow.
+    /**
+     * Setter for property maximizeWindow.
      *
+     * @param  maximizeWindow  New value of property maximizeWindow.
      */
-    public void setMaximizeWindow(boolean maximizeWindow) {
+    public void setMaximizeWindow(final boolean maximizeWindow) {
         this.maximizeWindow = maximizeWindow;
         properties.setProperty("maximizeWindow", String.valueOf(maximizeWindow));//NOI18N
     }
 
-    /** Getter for property maximizeWindow.
-     * @return Value of property maximizeWindow.
+    /**
+     * Getter for property maximizeWindow.
      *
+     * @return  Value of property maximizeWindow.
      */
     public boolean isMaximizeWindow() {
         return this.maximizeWindow;
     }
 
-    public void setSize(int width, int height) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  width   DOCUMENT ME!
+     * @param  height  DOCUMENT ME!
+     */
+    public void setSize(final int width, final int height) {
         this.setWidth(width);
         this.setHeight(height);
     }
 
-    public void setSize(String width, String height) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  width   DOCUMENT ME!
+     * @param  height  DOCUMENT ME!
+     */
+    public void setSize(final String width, final String height) {
         this.setWidth(width);
         this.setHeight(height);
     }
 
-    public void setWidth(String width) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  width  DOCUMENT ME!
+     */
+    public void setWidth(final String width) {
         try {
-            int iwidth = Integer.parseInt(width);
+            final int iwidth = Integer.parseInt(width);
             this.setWidth(iwidth);
         } catch (Exception exp) {
             logger.warn("setWidth(): invalid property 'witdh': '" + exp.getMessage() + "'");//NOI18N
         }
     }
 
-    public void setWidth(int width) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  width  DOCUMENT ME!
+     */
+    public void setWidth(final int width) {
         this.width = width;
         properties.setProperty("width", String.valueOf(width));//NOI18N
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getWidth() {
         return this.width;
     }
 
-    public void setHeight(String height) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  height  DOCUMENT ME!
+     */
+    public void setHeight(final String height) {
         try {
-            int iheight = Integer.parseInt(height);
+            final int iheight = Integer.parseInt(height);
             this.setHeight(iheight);
         } catch (Exception exp) {
             logger.warn("setHeight(): invalid property 'height': '" + exp.getMessage() + "'");//NOI18N
         }
     }
 
-    public void setHeight(int height) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  height  DOCUMENT ME!
+     */
+    public void setHeight(final int height) {
         this.height = height;
         properties.setProperty("height", String.valueOf(height));//NOI18N
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getHeight() {
         return this.height;
     }
-    // CALL_SERVER_URL ==========================================================
-    /** Getter for property connectionClass.
-     * @return Value of property connectionClass.
+
+    /**
+     * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public String getProxyURL() {
+        return proxyURL;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getProxyDomain() {
+        return proxyDomain;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getProxyPassword() {
+        return proxyPassword;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getProxyUsername() {
+        return proxyUsername;
+    }
+
+    /**
+     * Getter for property connectionClass.
+     *
+     * @return  Value of property connectionClass.
      */
     public String getConnectionClass() {
         return this.connectionClass;
     }
 
-    /** Setter for property connectionClass.
-     * @param connectionClass New value of property connectionClass.
+    /**
+     * DOCUMENT ME!
      *
+     * @param  proxyDomain  DOCUMENT ME!
      */
-    public void setConnectionClass(String connectionClass) {
+    public void setProxyDomain(final String proxyDomain) {
+        this.proxyDomain = proxyDomain;
+        properties.setProperty("navigator.proxy.domain", proxyDomain); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  proxyPassword  DOCUMENT ME!
+     */
+    public void setProxyPassword(final String proxyPassword) {
+        this.proxyPassword = proxyPassword;
+        properties.setProperty("navigator.proxy.password", proxyPassword); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  proxyURL  DOCUMENT ME!
+     */
+    public void setProxyURL(final String proxyURL) {
+        this.proxyURL = proxyURL;
+        properties.setProperty("navigator.proxy.url", proxyURL); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  proxyUsername  DOCUMENT ME!
+     */
+    public void setProxyUsername(final String proxyUsername) {
+        this.proxyUsername = proxyUsername;
+        properties.setProperty("navigator.proxy.username", proxyUsername); // NOI18N
+    }
+
+    /**
+     * Setter for property connectionClass.
+     *
+     * @param  connectionClass  New value of property connectionClass.
+     */
+    public void setConnectionClass(final String connectionClass) {
         this.connectionClass = connectionClass;
         properties.setProperty("connectionClass", this.connectionClass);//NOI18N
     }
 
-    /** Getter for property connectionProxyClass.
-     * @return Value of property connectionProxyClass.
+    /**
+     * Getter for property connectionProxyClass.
      *
+     * @return  Value of property connectionProxyClass.
      */
     public String getConnectionProxyClass() {
         return this.connectionProxyClass;
     }
 
-    /** Setter for property connectionProxyClass.
-     * @param connectionProxyClass New value of property connectionProxyClass.
+    /**
+     * Setter for property connectionProxyClass.
      *
+     * @param  connectionProxyClass  New value of property connectionProxyClass.
      */
-    public void setConnectionProxyClass(String connectionProxyClass) {
+    public void setConnectionProxyClass(final String connectionProxyClass) {
         this.connectionProxyClass = connectionProxyClass;
         properties.setProperty("connectionProxyClass", this.connectionProxyClass);//NOI18N
     }
 
-    public void setAutoLogin(String autoLogin) {
-        if (autoLogin != null && (autoLogin.equalsIgnoreCase(TRUE) || autoLogin.equals("1"))) {//NOI18N
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  autoLogin  DOCUMENT ME!
+     */
+    public void setAutoLogin(final String autoLogin) {
+        if ((autoLogin != null) && (autoLogin.equalsIgnoreCase(TRUE) || autoLogin.equals("1"))) {
             this.setAutoLogin(true);
-        } else if (autoLogin != null && (autoLogin.equalsIgnoreCase(FALSE) || autoLogin.equals("0"))) {//NOI18N
+        } else if ((autoLogin != null) && (autoLogin.equalsIgnoreCase(FALSE) || autoLogin.equals("0"))) {
             this.setAutoLogin(false);
         } else {
             this.setAutoLogin(false);
-            logger.warn("setAutoLogin(): invalid property 'autoLogin': '" + autoLogin + "', setting default value to '" + this.autoLogin + "'");//NOI18N
+            logger.warn("setAutoLogin(): invalid property 'autoLogin': '" + autoLogin + "', setting default value to '"
+                        + this.autoLogin + "'");
         }
     }
 
-    public void setAutoLogin(boolean autoLogin) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  autoLogin  DOCUMENT ME!
+     */
+    public void setAutoLogin(final boolean autoLogin) {
         this.autoLogin = autoLogin;
         properties.setProperty("autoLogin", String.valueOf(this.autoLogin));//NOI18N
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isAutoLogin() {
         return this.autoLogin;
     }
 
-    /*public void setCallserverURL(String callserverURL)
-    {
-    try
-    {
-    this.setCallserverURL(new URL(callserverURL));
-    }
-    catch(Exception exp)
-    {
-    logger.warn("setCallserverURL(): invalid property 'callserverURL': '" + exp.getMessage() + "'");
-    }
-    }/*
-    
-    /** Setter for property callserverURL.
-     * @param callserverURL New value of property callserverURL.
+    /**
+     * DOCUMENT ME!
      *
+     * @param  maxConnections  DOCUMENT ME!
      */
-    /*public void setCallserverURL(String callserverURL)
-    {
-    this.callserverURL = callserverURL;
-    properties.setProperty("callserverURL",  callserverURL);
-    }*/
-    /** Getter for property callserverURL.
-     * @return Value of property callserverURL.
-     *
-     */
-    /*public String getCallserverURL()
-    {
-    return this.callserverURL;
-    }*/    // MAX_CONNECTIONS =========================================================
-    public void setMaxConnections(String maxConnections) {
+    public void setMaxConnections(final String maxConnections) {
         try {
-            int imaxConnections = Integer.parseInt(maxConnections);
+            final int imaxConnections = Integer.parseInt(maxConnections);
             this.setMaxConnections(imaxConnections);
         } catch (Exception exp) {
             logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + exp.getMessage() + "'");//NOI18N
         }
     }
 
-    public void setMaxConnections(int maxConnections) {
-        if (maxConnections < MIN_SERVER_THREADS || maxConnections > MAX_SERVER_THREADS) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  maxConnections  DOCUMENT ME!
+     */
+    public void setMaxConnections(final int maxConnections) {
+        if ((maxConnections < MIN_SERVER_THREADS) || (maxConnections > MAX_SERVER_THREADS)) {
             this.maxConnections = MIN_SERVER_THREADS;
-            properties.setProperty("maxConnections", String.valueOf(MIN_SERVER_THREADS));//NOI18N
-            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + maxConnections + "', setting default value to '" + MIN_SERVER_THREADS + "'");//NOI18N
+            properties.setProperty("maxConnections", String.valueOf(MIN_SERVER_THREADS));
+            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + maxConnections
+                        + "', setting default value to '" + MIN_SERVER_THREADS + "'");
         } else {
             this.maxConnections = maxConnections;
             properties.setProperty("maxConnections", String.valueOf(maxConnections));//NOI18N
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getMaxConnections() {
         return this.maxConnections;
     }
-    //MAX_SEARCH_RESULTS =======================================================
-    public void setMaxSearchResults(String maxSearchResults) {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  maxSearchResults  DOCUMENT ME!
+     */
+    public void setMaxSearchResults(final String maxSearchResults) {
         try {
-            int imaxSearchResults = Integer.parseInt(maxSearchResults);
+            final int imaxSearchResults = Integer.parseInt(maxSearchResults);
             this.setMaxSearchResults(imaxSearchResults);
         } catch (NumberFormatException nfe) {
             logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + nfe.getMessage() + "'");//NOI18N
         }
     }
 
-    public void setMaxSearchResults(int maxSearchResults) {
-        if (maxSearchResults < MIN_SEARCH_RESULTS || maxSearchResults > MAX_SEARCH_RESULTS) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  maxSearchResults  DOCUMENT ME!
+     */
+    public void setMaxSearchResults(final int maxSearchResults) {
+        if ((maxSearchResults < MIN_SEARCH_RESULTS) || (maxSearchResults > MAX_SEARCH_RESULTS)) {
             this.maxSearchResults = MIN_SEARCH_RESULTS;
-            properties.setProperty("maxSearchResults", String.valueOf(this.maxSearchResults));//NOI18N
-            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + maxSearchResults + "', setting default value to '" + MIN_SEARCH_RESULTS + "'");//NOI18N
+            properties.setProperty("maxSearchResults", String.valueOf(this.maxSearchResults));
+            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + maxSearchResults
+                        + "', setting default value to '" + MIN_SEARCH_RESULTS + "'");
         } else {
             this.maxSearchResults = maxSearchResults;
             properties.setProperty("maxSearchResults", String.valueOf(maxSearchResults));//NOI18N
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getMaxSearchResults() {
         return this.maxSearchResults;
     }
-    // AdvancedLayout ======================================================
-    public void setAdvancedLayout(String advancedLayout) {
-        if (advancedLayout != null && (advancedLayout.equalsIgnoreCase(TRUE) || advancedLayout.equals("1"))) {//NOI18N
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  advancedLayout  DOCUMENT ME!
+     */
+    public void setAdvancedLayout(final String advancedLayout) {
+        if ((advancedLayout != null) && (advancedLayout.equalsIgnoreCase(TRUE) || advancedLayout.equals("1"))) {
             this.setAdvancedLayout(true);
-        } else if (advancedLayout != null && (advancedLayout.equalsIgnoreCase(FALSE) || advancedLayout.equals("0"))) {//NOI18N
+        } else if ((advancedLayout != null) && (advancedLayout.equalsIgnoreCase(FALSE) || advancedLayout.equals("0"))) {
             this.setAdvancedLayout(false);
         } else {
             this.setAdvancedLayout(false);
-            logger.warn("setAdvancedLayout(): invalid property 'advancedLayout': '" + advancedLayout + "', setting default value to '" + this.advancedLayout + "'");//NOI18N
+            logger.warn("setAdvancedLayout(): invalid property 'advancedLayout': '" + advancedLayout
+                        + "', setting default value to '" + this.advancedLayout + "'");
         }
     }
 
-    public void setAdvancedLayout(boolean advancedLayout) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  advancedLayout  DOCUMENT ME!
+     */
+    public void setAdvancedLayout(final boolean advancedLayout) {
         this.advancedLayout = advancedLayout;
         properties.setProperty("advancedLayout", String.valueOf(this.advancedLayout));//NOI18N
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isAdvancedLayout() {
         return this.advancedLayout;
     }
-    //LOOK & FEEL ==============================================================
-    public void setLookAndFeel(String lookAndFeelName) {
-        /*if(lookAndFeel.equalsIgnoreCase(LNF_METAL) || lookAndFeel.equalsIgnoreCase(LNF_WINDOWS) || lookAndFeel.equalsIgnoreCase(LNF_MOTIF) || lookAndFeel.equalsIgnoreCase(LNF_MAC) || lookAndFeel.equalsIgnoreCase(LNF_GTK) || lookAndFeel.equalsIgnoreCase(LNF_PLASTIC))
-            this.lookAndFeel = lookAndFeel;
-        else if(lookAndFeel.equals("0"))
-            this.lookAndFeel = LNF_METAL;
-        else if(lookAndFeel.equals("1"))
-            this.lookAndFeel = LNF_WINDOWS;
-        else if(lookAndFeel.equals("2"))
-            this.lookAndFeel = LNF_MOTIF;
-        else if(lookAndFeel.equals("3"))
-            this.lookAndFeel = LNF_MAC;
-        else if(lookAndFeel.equals("4"))
-            this.lookAndFeel = LNF_GTK;
-        else if(lookAndFeel.equals("5"))
-            this.lookAndFeel = LNF_PLASTIC;
-         */
-        
-        if(LAFManager.getManager().isInstalledLookAndFeel(lookAndFeelName))
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  lookAndFeelName  DOCUMENT ME!
+     */
+    public void setLookAndFeel(final String lookAndFeelName) {
+        if (LAFManager.getManager().isInstalledLookAndFeel(lookAndFeelName)) {
             this.lookAndFeel = lookAndFeelName;
-        }
-        else
-        {
-            //this.lookAndFeel = LNF_METAL;
+        } else {
+            // this.lookAndFeel = LNF_METAL;
             this.lookAndFeel = LAFManager.getManager().getDefaultLookAndFeel().getName();
-            logger.warn("setLookAndFeel(): invalid property 'lookAndFeel': '" + lookAndFeelName + "', setting default value to '" + this.lookAndFeel + "'");//NOI18N
+            logger.warn("setLookAndFeel(): invalid property 'lookAndFeel': '" + lookAndFeelName
+                        + "', setting default value to '" + this.lookAndFeel + "'");
         }
-//        try {
-//            UIManager.setLookAndFeel(new Plastic3DLookAndFeel());
-////            Plastic3DLookAndFeel.setCurrentTheme(new com.jgoodies.looks.plastic.theme.DesertBluer());
-////            Options.setPopupDropShadowEnabled(true);
-//
-//
-////        Plastic3DLookAndFeel.set
-//        } catch (Exception e) {
-//        }
         properties.setProperty("lookAndFeel", this.lookAndFeel);//NOI18N
-        //properties.setProperty("lookAndFeel", "HARDWIRED");
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getLookAndFeel() {
         return this.lookAndFeel;
     }
-    // sortChildren =============================================================
-    public void setSortChildren(String sortChildren) {
-        if (sortChildren != null && (sortChildren.equalsIgnoreCase(TRUE) || sortChildren.equals("1"))) {//NOI18N
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sortChildren  DOCUMENT ME!
+     */
+    public void setSortChildren(final String sortChildren) {
+        if ((sortChildren != null) && (sortChildren.equalsIgnoreCase(TRUE) || sortChildren.equals("1"))) {
             this.setSortChildren(true);
-        } else if (sortChildren != null && (sortChildren.equalsIgnoreCase(FALSE) || sortChildren.equals("0"))) {//NOI18N
+        } else if ((sortChildren != null) && (sortChildren.equalsIgnoreCase(FALSE) || sortChildren.equals("0"))) {
             this.setSortChildren(false);
         } else {
             this.setSortChildren(false);
-            logger.warn("setSortChildren(): invalid property 'sortChildren': '" + sortChildren + "', setting default value to '" + this.sortChildren + "'");//NOI18N
+            logger.warn("setSortChildren(): invalid property 'sortChildren': '" + sortChildren
+                        + "', setting default value to '" + this.sortChildren + "'");
         }
     }
 
-    public void setSortChildren(boolean sortChildren) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sortChildren  DOCUMENT ME!
+     */
+    public void setSortChildren(final boolean sortChildren) {
         this.sortChildren = sortChildren;
         properties.setProperty("sortChildren", String.valueOf(this.sortChildren));//NOI18N
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isSortChildren() {
         return this.sortChildren;
     }
-    // sortAscending ============================================================
-    public void setSortAscending(String sortAscending) {
-        if (sortAscending != null && (sortAscending.equalsIgnoreCase(TRUE) || sortAscending.equals("1"))) {//NOI18N
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sortAscending  DOCUMENT ME!
+     */
+    public void setSortAscending(final String sortAscending) {
+        if ((sortAscending != null) && (sortAscending.equalsIgnoreCase(TRUE) || sortAscending.equals("1"))) {
             this.setSortAscending(true);
-        } else if (sortAscending != null && (sortAscending.equalsIgnoreCase(FALSE) || sortAscending.equals("0"))) {//NOI18N
+        } else if ((sortAscending != null) && (sortAscending.equalsIgnoreCase(FALSE) || sortAscending.equals("0"))) {
             this.setSortAscending(false);
         } else {
             this.setSortAscending(false);
-            logger.warn("setSortAscending(): invalid property 'sortAscending': '" + sortAscending + "', setting default value to '" + this.sortAscending + "'");//NOI18N
+            logger.warn("setSortAscending(): invalid property 'sortAscending': '" + sortAscending
+                        + "', setting default value to '" + this.sortAscending + "'");
         }
     }
 
-    public void setSortAscending(boolean sortAscending) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sortAscending  DOCUMENT ME!
+     */
+    public void setSortAscending(final boolean sortAscending) {
         this.sortAscending = sortAscending;
         properties.setProperty("sortAscending", String.valueOf(this.sortAscending));//NOI18N
-
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isSortAscending() {
         return this.sortAscending;
     }
 
-    public void setConnectionInfoSaveable(String connectionInfoSaveable) {
-        if (connectionInfoSaveable != null && (connectionInfoSaveable.equalsIgnoreCase(TRUE) || connectionInfoSaveable.equals("1"))) {//NOI18N
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  connectionInfoSaveable  DOCUMENT ME!
+     */
+    public void setConnectionInfoSaveable(final String connectionInfoSaveable) {
+        if ((connectionInfoSaveable != null)
+                    && (connectionInfoSaveable.equalsIgnoreCase(TRUE) || connectionInfoSaveable.equals("1"))) {
             this.setConnectionInfoSaveable(true);
-        } else if (connectionInfoSaveable != null && (connectionInfoSaveable.equalsIgnoreCase(FALSE) || connectionInfoSaveable.equals("0"))) {//NOI18N
+        } else if ((connectionInfoSaveable != null)
+                    && (connectionInfoSaveable.equalsIgnoreCase(FALSE) || connectionInfoSaveable.equals("0"))) {
             this.setConnectionInfoSaveable(false);
         } else {
             this.setConnectionInfoSaveable(false);
-            logger.warn("connectionInfoSaveable(): invalid property 'connectionInfoSaveable': '" + connectionInfoSaveable + "', setting default value to '" + this.connectionInfoSaveable + "'");//NOI18N
+            logger.warn("connectionInfoSaveable(): invalid property 'connectionInfoSaveable': '"
+                        + connectionInfoSaveable + "', setting default value to '" + this.connectionInfoSaveable + "'");
         }
     }
 
-    /** Setter for property connectionInfoSaveable.
-     * @param connectionInfoSaveable New value of property connectionInfoSaveable.
+    /**
+     * Setter for property connectionInfoSaveable.
      *
+     * @param  connectionInfoSaveable  New value of property connectionInfoSaveable.
      */
-    public void setConnectionInfoSaveable(boolean connectionInfoSaveable) {
+    public void setConnectionInfoSaveable(final boolean connectionInfoSaveable) {
         this.connectionInfoSaveable = this.isSaveable() & connectionInfoSaveable;
         properties.setProperty("connectionInfoSaveable", String.valueOf(this.connectionInfoSaveable));//NOI18N
     }
 
-    /** Getter for property connectionInfoSaveable.
-     * @return Value of property connectionInfoSaveable.
+    /**
+     * Getter for property connectionInfoSaveable.
      *
+     * @return  Value of property connectionInfoSaveable.
      */
     public boolean isConnectionInfoSaveable() {
         return this.connectionInfoSaveable;
     }
 
-    public void setLoadable(String loadable) {
-        if (loadable != null && (loadable.equalsIgnoreCase(TRUE) || loadable.equals("1"))) {//NOI18N
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  loadable  DOCUMENT ME!
+     */
+    public void setLoadable(final String loadable) {
+        if ((loadable != null) && (loadable.equalsIgnoreCase(TRUE) || loadable.equals("1"))) {
             this.setLoadable(true);
-        } else if (loadable != null && (loadable.equalsIgnoreCase(FALSE) || loadable.equals("0"))) {//NOI18N
+        } else if ((loadable != null) && (loadable.equalsIgnoreCase(FALSE) || loadable.equals("0"))) {
             this.setLoadable(false);
         } else {
             this.setLoadable(false);
-            logger.warn("loadable(): invalid property 'loadable': '" + loadable + "', setting default value to '" + this.loadable + "'");//NOI18N
+            logger.warn("loadable(): invalid property 'loadable': '" + loadable + "', setting default value to '"
+                        + this.loadable + "'");
         }
     }
 
-    /** Setter for property loadable.
-     * @param loadable New value of property loadable.
+    /**
+     * Setter for property loadable.
      *
+     * @param  loadable  New value of property loadable.
      */
-    public void setLoadable(boolean loadable) {
+    public void setLoadable(final boolean loadable) {
         this.loadable = loadable;
         properties.setProperty("loadable", String.valueOf(this.loadable));//NOI18N
     }
 
-    /** Getter for property loadable.
-     * @return Value of property loadable.
+    /**
+     * Getter for property loadable.
      *
+     * @return  Value of property loadable.
      */
     public boolean isLoadable() {
         return this.loadable;
     }
 
-    public void setSaveable(String saveable) {
-        if (saveable != null && (saveable.equalsIgnoreCase(TRUE) || saveable.equals("1"))) {//NOI18N
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  saveable  DOCUMENT ME!
+     */
+    public void setSaveable(final String saveable) {
+        if ((saveable != null) && (saveable.equalsIgnoreCase(TRUE) || saveable.equals("1"))) {
             this.setSaveable(true);
-        } else if (saveable != null && (saveable.equalsIgnoreCase(FALSE) || saveable.equals("0"))) {//NOI18N
+        } else if ((saveable != null) && (saveable.equalsIgnoreCase(FALSE) || saveable.equals("0"))) {
             this.setSaveable(false);
         } else {
             this.setSaveable(false);
-            logger.warn("saveable(): invalid property 'saveable': '" + saveable + "', setting default value to '" + this.saveable + "'");//NOI18N
+            logger.warn("saveable(): invalid property 'saveable': '" + saveable + "', setting default value to '"
+                        + this.saveable + "'");
         }
     }
 
-    /** Setter for property saveable.
-     * @param saveable New value of property saveable.
+    /**
+     * Setter for property saveable.
      *
+     * @param  saveable  New value of property saveable.
      */
-    public void setSaveable(boolean saveable) {
+    public void setSaveable(final boolean saveable) {
         this.saveable = saveable;
         properties.setProperty("saveable", String.valueOf(this.saveable));//NOI18N
     }
 
-    /** Getter for property saveable.
-     * @return Value of property saveable.
+    /**
+     * Getter for property saveable.
      *
+     * @return  Value of property saveable.
      */
     public boolean isSaveable() {
         return this.saveable;
     }
-    // .........................................................................
+
+    /**
+     * .........................................................................
+     *
+     * @return  DOCUMENT ME!
+     */
     public ConnectionInfo getConnectionInfo() {
         return this.connectionInfo;
     }
-    // .........................................................................
+
+    /**
+     * .........................................................................
+     */
     private void load() {
-        Enumeration keys = properties.keys();
+        final Enumeration keys = properties.keys();
         while (keys.hasMoreElements()) {
-            String key = (String) keys.nextElement();
+            final String key = (String)keys.nextElement();
             this.setProperty(key, properties.getProperty(key));
         }
     }
 
-    private synchronized void setProperty(String property, String value) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  property  DOCUMENT ME!
+     * @param  value     DOCUMENT ME!
+     */
+    private synchronized void setProperty(final String property, final String value) {
         if (logger.isDebugEnabled()) {
             logger.debug("setting property '" + property + "' to '" + value + "'");//NOI18N
-        /*if(property.equalsIgnoreCase("title"))
-        {
-        this.setTitle(value);
-        }
-        else*/
+            /*if(property.equalsIgnoreCase("title"))
+             * { this.setTitle(value); }else*/
         }
         if (property.equalsIgnoreCase("width")) {//NOI18N
             this.setWidth(value);
@@ -629,12 +830,23 @@ public final class PropertyManager {
             this.connectionInfo.setUsergroupDomain(value);
         } else if (property.equalsIgnoreCase("username")) {//NOI18N
             this.connectionInfo.setUsername(value);
-        } else {
-            //logger.warn("setProperty(): unknown property '" + property + "' = '" + value + "'");
+        } else if (property.equals("navigator.proxy.url")) {
+            this.setProxyURL(value);
+        } else if (property.equals("navigator.proxy.username")) {
+            this.setProxyUsername(value);
+        } else if (property.equals("navigator.proxy.password")) {
+            this.setProxyPassword(value);
+        } else if (property.equals("navigator.proxy.domain")) {
+            this.setProxyDomain(value);
         }
     }
 
-    public void load(InputStream inStream) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  inStream  DOCUMENT ME!
+     */
+    public void load(final InputStream inStream) {
         if (this.isLoadable()) {
             try {
                 this.properties.load(inStream);
@@ -647,11 +859,29 @@ public final class PropertyManager {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void configure() {
         this.load(this.getClass().getResourceAsStream("cfg/navigator.cfg"));//NOI18N
     }
 
-    public void configure(String cfgFile, String basePath, String pluginPath, String searchFormPath, String profilesPath) throws Exception {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cfgFile         DOCUMENT ME!
+     * @param   basePath        DOCUMENT ME!
+     * @param   pluginPath      DOCUMENT ME!
+     * @param   searchFormPath  DOCUMENT ME!
+     * @param   profilesPath    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void configure(final String cfgFile,
+            final String basePath,
+            final String pluginPath,
+            final String searchFormPath,
+            final String profilesPath) throws Exception {
         this.applet = false;
         this.application = true;
 
@@ -684,42 +914,33 @@ public final class PropertyManager {
         }
 
         if (cfgFile != null) {
-            //try
-            //{
-            if (cfgFile.indexOf("http://") == 0 || cfgFile.indexOf("https://") == 0 || cfgFile.indexOf("file://") == 0) {//NOI18N
-                URL url = new URL(cfgFile);
+            if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
+                        || (cfgFile.indexOf("file://") == 0)) {
+                final URL url = new URL(cfgFile);
                 this.load(url.openStream());
 
                 logger.info("config file loaded from url (assuming webstart)");//NOI18N
                 this.applet = true;
             } else {
-                File file = new File(cfgFile);
+                final File file = new File(cfgFile);
                 this.load(new BufferedInputStream(new FileInputStream(cfgFile)));
             }
-        /*}
-        catch(Exception exp)
-        {
-        logger.fatal("loading of config file '" + cfgFile + "' failed", exp);
-        throw exp;
-        }*/
         } else {
             throw new Exception("loading of config file '" + cfgFile + "' failed");//NOI18N
-        //this.configure();
         }
 
-        //\u00C4nderungen wg. Webstart HELL
         try {
-            String parameter = this.properties.getProperty("plugins");//NOI18N
-            setHttpInterfacePort(new Integer(properties.getProperty("httpInterfacePort", "9099")));//NOI18N
-            setAutoClose(new Boolean(properties.getProperty("closeWithoutAsking", "false")));//NOI18N
+            final String parameter = this.properties.getProperty("plugins");
+            setHttpInterfacePort(new Integer(properties.getProperty("httpInterfacePort", "9099")));
+            setAutoClose(new Boolean(properties.getProperty("closeWithoutAsking", "false")));
 
-            if (parameter != null && parameter.length() > 0) {
+            if ((parameter != null) && (parameter.length() > 0)) {
                 pluginList = new ArrayList();
-                StringTokenizer tokenizer = new StringTokenizer(parameter, ";");//NOI18N
+                final StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
                 while (tokenizer.hasMoreTokens()) {
-                    String plugin = tokenizer.nextToken().trim() + "/";//NOI18N
-                    logger.info("adding plugin from config file: '" + plugin + "'");//NOI18N
-                    pluginList.add(pluginPath + "/" + plugin);//NOI18N
+                    final String plugin = tokenizer.nextToken().trim() + "/";
+                    logger.info("adding plugin from config file: '" + plugin + "'");
+                    pluginList.add(pluginPath + "/" + plugin);
                 }
             }
         } catch (Exception except) {
@@ -729,8 +950,15 @@ public final class PropertyManager {
         this.isPluginListAvailable();
     }
 
-    public void configure(JApplet applet) {
-        logger.debug("configure property manager (applet)");//NOI18N
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  applet  DOCUMENT ME!
+     */
+    public void configure(final JApplet applet) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("configure property manager (applet)");
+        }
         this.pluginList = new ArrayList();
         this.applet = true;
         this.application = false;
@@ -748,22 +976,28 @@ public final class PropertyManager {
         this.readAppletParameters(applet);
     }
 
-    private void readAppletParameters(JApplet applet) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  applet  DOCUMENT ME!
+     */
+    private void readAppletParameters(final JApplet applet) {
         // configfile
         String parameter = applet.getParameter("configfile");//NOI18N
-        if (parameter != null && parameter.length() > 0) {
+        if ((parameter != null) && (parameter.length() > 0)) {
             if (logger.isDebugEnabled()) {
                 logger.debug("loading configfile from remote url '" + this.getBasePath() + parameter + "'");//NOI18N
             }
             try {
-                URL url = new URL(this.getBasePath() + parameter);
+                final URL url = new URL(this.getBasePath() + parameter);
                 this.load(new BufferedInputStream(url.openStream()));
             } catch (Exception exp) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("could not load configfile, trying to load file from local filesystem\n" + exp.getMessage());//NOI18N
+                    logger.debug("could not load configfile, trying to load file from local filesystem\n"
+                                + exp.getMessage());
                 }
                 try {
-                    File file = new File(parameter);
+                    final File file = new File(parameter);
                     this.load(new BufferedInputStream(new FileInputStream(file)));
                 } catch (Exception ioexp) {
                     logger.error("could not load configfile, using default configuration\n" + ioexp.getMessage());//NOI18N
@@ -773,22 +1007,27 @@ public final class PropertyManager {
         }
 
         parameter = applet.getParameter("language");//NOI18N
-        if (parameter != null && parameter.length() > 0) {
+        if ((parameter != null) && (parameter.length() > 0)) {
             ResourceManager.getManager().setLocale(new Locale(parameter));
         }
 
         parameter = applet.getParameter("plugins");//NOI18N
-        if (parameter != null && parameter.length() > 0) {
-            StringTokenizer tokenizer = new StringTokenizer(parameter, ";");//NOI18N
+        if ((parameter != null) && (parameter.length() > 0)) {
+            final StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
             while (tokenizer.hasMoreTokens()) {
-                String plugin = this.pluginPath + tokenizer.nextToken().trim() + "/";//NOI18N
-                logger.info("adding plugin '" + plugin + "'");//NOI18N
+                final String plugin = this.pluginPath + tokenizer.nextToken().trim() + "/";
+                logger.info("adding plugin '" + plugin + "'");
                 pluginList.add(plugin);
             }
         }
     }
 
-    public void save(OutputStream outStream) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  outStream  DOCUMENT ME!
+     */
+    public void save(final OutputStream outStream) {
         if (this.isSaveable()) {
             try {
                 this.properties.store(outStream, HEADER);
@@ -800,42 +1039,52 @@ public final class PropertyManager {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void print() {
         properties.list(System.out);
     }
 
-    public final static PropertyManager getManager() {
-        /*if(manager == null)
-        {
-        manager = new PropertyManager();
-        }*/
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static PropertyManager getManager() {
         return manager;
     }
 
-    /** Getter for property applet.
-     * @return Value of property applet.
+    /**
+     * Getter for property applet.
      *
+     * @return  Value of property applet.
      */
     public boolean isApplet() {
         return this.applet;
     }
 
-    /** Getter for property application.
-     * @return Value of property application.
+    /**
+     * Getter for property application.
      *
+     * @return  Value of property application.
      */
     public boolean isApplication() {
         return this.application;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getBasePath() {
         if (this.basePath == null) {
-            this.basePath = System.getProperty("user.home") + System.getProperty("file.separator") + ".navigator" + System.getProperty("file.separator");//NOI18N
-            if (logger.isInfoEnabled()) {
-                logger.info("no base path set, setting default base path to '" + this.basePath + "'");//NOI18N
-            }
-            File file = new File(this.basePath);
+            this.basePath = System.getProperty("user.home") + System.getProperty("file.separator") + ".navigator"
+                        + System.getProperty("file.separator");
+            logger.info("no base path set, setting default base path to '" + this.basePath + "'");
+
+            final File file = new File(this.basePath);
             if (!file.exists()) {
                 logger.warn("base path does not exist, creating base path");//NOI18N
                 if (!file.mkdirs()) {
@@ -847,6 +1096,11 @@ public final class PropertyManager {
         return this.basePath;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getPluginPath() {
         if (this.pluginPath == null) {
             if (this.getBasePath().startsWith("http") || this.getBasePath().startsWith("file")) {//NOI18N
@@ -861,6 +1115,11 @@ public final class PropertyManager {
         return this.pluginPath;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getSearchFormPath() {
         if (this.searchFormPath == null) {
             if (this.getBasePath().startsWith("http")) {//NOI18N
@@ -874,18 +1133,29 @@ public final class PropertyManager {
         return this.searchFormPath;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getProfilesPath() {
-        if (this.profilesPath == null || this.profilesPath.equals("AUTO")) {//NOI18N
-            if (this.getBasePath().startsWith("http")) {//NOI18N
-                logger.info("no profiles path set and base path == URL, settting default profiles path to user.home");//NOI18N
-                this.profilesPath = new StringBuffer().append(System.getProperty("user.home")).append(System.getProperty("file.separator")).append(".navigator").append(System.getProperty("file.separator")).append("profiles").append(System.getProperty("file.separator")).toString();//NOI18N
+        if ((this.profilesPath == null) || this.profilesPath.equals("AUTO")) {
+            if (this.getBasePath().startsWith("http")) {
+                logger.info("no profiles path set and base path == URL, settting default profiles path to user.home");
+                this.profilesPath = new StringBuffer().append(System.getProperty("user.home"))
+                            .append(System.getProperty("file.separator"))
+                            .append(".navigator")
+                            .append(System.getProperty("file.separator"))
+                            .append("profiles")
+                            .append(System.getProperty("file.separator"))
+                            .toString();
             } else {
                 this.profilesPath = this.basePath + "profiles" + System.getProperty("file.separator");//NOI18N
             }
 
             logger.info("no profiles form path set, setting default search form path to '" + this.profilesPath + "'");//NOI18N
 
-            File file = new File(this.profilesPath);
+            final File file = new File(this.profilesPath);
             if (!file.exists()) {
                 logger.warn("profiles path does not exist, creating base path");//NOI18N
                 if (!file.mkdirs()) {
@@ -897,18 +1167,23 @@ public final class PropertyManager {
         return this.profilesPath;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isPluginListAvailable() {
         if (this.pluginList == null) {
             this.pluginList = new ArrayList();
-            File file = new File(this.pluginPath);
+            final File file = new File(this.pluginPath);
             if (file.exists() && file.isDirectory()) {
-                File[] plugins = file.listFiles();
-                if (plugins != null && plugins.length > 0) {
+                final File[] plugins = file.listFiles();
+                if ((plugins != null) && (plugins.length > 0)) {
                     for (int i = 0; i < plugins.length; i++) {
                         if (plugins[i].isDirectory()) {
-                            if (!plugins[i].getName().equalsIgnoreCase("CVS")) {//NOI18N
-                                String plugin = plugins[i].getPath() + System.getProperty("file.separator");//NOI18N
-                                logger.info("adding plugin '" + plugin + "'");//NOI18N
+                            if (!plugins[i].getName().equalsIgnoreCase("CVS")) {
+                                final String plugin = plugins[i].getPath() + System.getProperty("file.separator");
+                                logger.info("adding plugin '" + plugin + "'");
                                 pluginList.add(plugin);
                             } else {
                                 if (logger.isDebugEnabled()) {
@@ -923,9 +1198,14 @@ public final class PropertyManager {
             }
         }
 
-        return this.pluginList.size() > 0 ? true : false;
+        return (this.pluginList.size() > 0) ? true : false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Iterator getPluginList() {
         if (this.isPluginListAvailable()) {
             return this.pluginList.iterator();
@@ -935,13 +1215,19 @@ public final class PropertyManager {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Properties getProperties() {
         return this.properties;
     }
 
-    /** Getter for property appletContext.
-     * @return Value of property appletContext.
+    /**
+     * Getter for property appletContext.
      *
+     * @return  Value of property appletContext.
      */
     public AppletContext getAppletContext() {
         if (this.appletContext == null) {
@@ -951,9 +1237,10 @@ public final class PropertyManager {
         }
     }
 
-    /** Getter for property sharedProgressObserver.
-     * @return Value of property sharedProgressObserver.
+    /**
+     * Getter for property sharedProgressObserver.
      *
+     * @return  Value of property sharedProgressObserver.
      */
     public synchronized ProgressObserver getSharedProgressObserver() {
         return this.sharedProgressObserver;
@@ -961,7 +1248,8 @@ public final class PropertyManager {
 
     /**
      * Getter for property language.
-     * @return Value of property language.
+     *
+     * @return  Value of property language.
      */
     public String getLanguage() {
         return this.language;
@@ -969,9 +1257,10 @@ public final class PropertyManager {
 
     /**
      * Setter for property language.
-     * @param language New value of property language.
+     *
+     * @param  language  New value of property language.
      */
-    public void setLanguage(String language) {
+    public void setLanguage(final String language) {
         if (language.trim().length() == 2) {
             this.language = language.toLowerCase();
         } else {
@@ -982,7 +1271,8 @@ public final class PropertyManager {
 
     /**
      * Getter for property country.
-     * @return Value of property country.
+     *
+     * @return  Value of property country.
      */
     public String getCountry() {
         return this.country;
@@ -990,9 +1280,10 @@ public final class PropertyManager {
 
     /**
      * Setter for property country.
-     * @param country New value of property country.
+     *
+     * @param  country  New value of property country.
      */
-    public void setCountry(String country) {
+    public void setCountry(final String country) {
         if (country.length() == 2) {
             this.country = country.toUpperCase();
         } else {
@@ -1003,7 +1294,8 @@ public final class PropertyManager {
 
     /**
      * Getter for property locale.
-     * @return Value of property locale.
+     *
+     * @return  Value of property locale.
      */
     public java.util.Locale getLocale() {
         return new Locale(this.getLanguage(), this.getCountry());
@@ -1011,16 +1303,18 @@ public final class PropertyManager {
 
     /**
      * Setter for property locale.
-     * @param locale New value of property locale.
+     *
+     * @param  locale  New value of property locale.
      */
-    public void setLocale(java.util.Locale locale) {
+    public void setLocale(final java.util.Locale locale) {
         this.setLanguage(locale.getLanguage());
         this.setCountry(locale.getCountry());
     }
 
     /**
      * Getter for property editable.
-     * @return Value of property editable.
+     *
+     * @return  Value of property editable.
      */
     public boolean isEditable() {
         return this.editable;
@@ -1028,108 +1322,79 @@ public final class PropertyManager {
 
     /**
      * Setter for property editable.
-     * @param editable New value of property editable.
+     *
+     * @param  editable  New value of property editable.
      */
-    public void setEditable(boolean editable) {
+    public void setEditable(final boolean editable) {
         this.editable = editable;
     }
-    // .........................................................................
+
+    /**
+     * Getter for property webstart.
+     *
+     * @return  Value of property webstart.
+     */
+    public boolean isWebstart() {
+        return this.isApplet() & this.isApplication();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int getHttpInterfacePort() {
+        return httpInterfacePort;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  httpInterfacePort  DOCUMENT ME!
+     */
+    public void setHttpInterfacePort(final int httpInterfacePort) {
+        this.httpInterfacePort = httpInterfacePort;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isAutoClose() {
+        return autoClose;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  autoClose  DOCUMENT ME!
+     */
+    public void setAutoClose(final boolean autoClose) {
+        this.autoClose = autoClose;
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * .........................................................................
+     *
+     * @version  $Revision$, $Date$
+     */
     private class ConnectionInfoChangeListener implements PropertyChangeListener {
 
-        /** This method gets called when a bound property is changed.
-         * @param evt A PropertyChangeEvent object describing the event source
-         *   	and the property that has changed.
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * This method gets called when a bound property is changed.
          *
+         * @param  evt  A PropertyChangeEvent object describing the event source and the property that has changed.
          */
-        public void propertyChange(PropertyChangeEvent evt) {
-            //if(logger.isDebugEnabled())logger.debug("setting property '" + evt.getPropertyName() + "' to '" + evt.getNewValue() + "'");
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
             if (isConnectionInfoSaveable()) {
                 properties.setProperty(evt.getPropertyName(), evt.getNewValue().toString());
             }
         }
     }
-    // TEST --------------------------------------------------------------------
-    /*public static void main(String args[])
-    {
-    BasicConfigurator.configure();
-    PropertyManager.getManager().logger.setLevel(Level.DEBUG);
-    PropertyManager.getManager().print();
-    
-    //PropertyManager.getManager().setAdvancedLayout("n\u00F6");
-    //PropertyManager.getManager().setTitle("TERROR");
-    //PropertyManager.getManager().setProperty("maximizeWindow",  "true");
-    //PropertyManager.getManager().setProperty("TERROR",  "TERROR");
-    
-    try
-    {
-    File file = new File(System.getProperty("user.home") + "\\navigator.cfg");
-    BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
-    PropertyManager.getManager().store(out);
-    out.close();
-    }
-    catch(Exception exp)
-    {
-    exp.printStackTrace();
-    }
-    
-    try
-    {
-    File file = new File(System.getProperty("user.home") + "\\navigator.cfg");
-    BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
-    PropertyManager.getManager().load(in);
-    in.close();
-    }
-    catch(Exception exp)
-    {
-    exp.printStackTrace();
-    }
-    
-    PropertyManager.getManager().print();
-    }*/
-    /*public static void main(String args[])
-    {
-    BasicConfigurator.configure();
-    PropertyManager.getManager().logger.setLevel(Level.DEBUG);
-    
-    //Properties systemProperties = System.getProperties();
-    //systemProperties.list(System.out);
-    
-    System.out.println("basePath: " + PropertyManager.getManager().getBasePath());
-    System.out.println("pluginPath: " + PropertyManager.getManager().getPluginPath());
-    
-    if(PropertyManager.getManager().isPluginListAvailable())
-    {
-    System.out.println("Plugins: ");
-    Iterator iterator = PropertyManager.getManager().getPluginList();
-    while(iterator.hasNext())
-    {
-    System.out.println(iterator.next());
-    }
-    }
-    }*/
-    /**
-     * Getter for property webstart.
-     * @return Value of property webstart.
-     */
-    public boolean isWebstart() {
-
-        return this.isApplet() & this.isApplication();
-    }
-
-    public int getHttpInterfacePort() {
-        return httpInterfacePort;
-    }
-
-    public void setHttpInterfacePort(int httpInterfacePort) {
-        this.httpInterfacePort = httpInterfacePort;
-    }
-
-    public boolean isAutoClose() {
-        return autoClose;
-    }
-
-    public void setAutoClose(boolean autoClose) {
-        this.autoClose = autoClose;
-    }
 }
-

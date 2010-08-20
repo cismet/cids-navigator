@@ -1,29 +1,57 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.types.treenode;
 
-/*
-// header - edit "Data/yourJavaHeader" to customize
-// contents - edit "EventHandlers/Java file/onCreate" to customize
-//
+import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.resource.ResourceManager;
+
+import Sirius.server.middleware.types.MetaClass;
+import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.middleware.types.Node;
+
+import org.apache.log4j.Logger;
+
+import javax.swing.ImageIcon;
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
  */
-import javax.swing.*;
-
-import Sirius.server.middleware.types.*;
-import Sirius.navigator.connection.*;
-import Sirius.navigator.resource.*;
-import java.awt.EventQueue;
-
 public class ObjectTreeNode extends DefaultMetaTreeNode {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    /** Use serialVersionUID for interoperability. */
+    private static final long serialVersionUID = 2948703976584112759L;
+
+    private static final transient Logger LOG = Logger.getLogger(ObjectTreeNode.class);
+
+    //~ Instance fields --------------------------------------------------------
 
     protected ImageIcon nodeIcon;
     private MetaClass metaClass;
     private static final ResourceManager resource = ResourceManager.getManager();
 
-    public ObjectTreeNode(MetaObjectNode MetaObjectNode) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ObjectTreeNode object.
+     *
+     * @param  MetaObjectNode  DOCUMENT ME!
+     */
+    public ObjectTreeNode(final MetaObjectNode MetaObjectNode) {
         super(MetaObjectNode);
 
         try {
-            MetaClass metaClass = this.getMetaClass();
-            if (metaClass != null && metaClass.getObjectIconData().length > 0) {
+            final MetaClass metaClass = this.getMetaClass();
+            if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
                 this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
@@ -31,143 +59,177 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         } catch (Exception exp) {
             this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
         }
-
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public MetaObjectNode getMetaObjectNode() {
-        return (MetaObjectNode) this.userObject;
+        return (MetaObjectNode)this.userObject;
     }
 
+    @Override
     public TreeNodeLoader getTreeNodeLoader() {
-        return ((DefaultMetaTreeNode) this.getParent()).getTreeNodeLoader();
+        return ((DefaultMetaTreeNode)this.getParent()).getTreeNodeLoader();
     }
 
     // --------------------------------------------------------------------------
+    @Override
     public final synchronized void explore() throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("[ObjectNode] Begin explore()");//NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[ObjectNode] Begin explore()"); // NOI18N
         }
 
         if (!isExplored() && !this.getMetaObjectNode().isLeaf()) {
             this.explored = this.getTreeNodeLoader().addChildren(this);
-            //this.explored = this.getTreeNodeLoader().addChildren(this, this.getChildren());
-            //explored = addChildren(this.getMetaObjectNode().getChildren());
         }
 
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("[ObjectNode] End explore()");//NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[ObjectNode] End explore()"); // NOI18N
         }
     }
 
+    @Override
     public final boolean isRootNode() {
         return false;
     }
 
+    @Override
     public final boolean isWaitNode() {
         return false;
     }
 
+    @Override
     public final boolean isPureNode() {
         return false;
     }
 
+    @Override
     public final boolean isObjectNode() {
         return true;
     }
 
+    @Override
     public final boolean isClassNode() {
         return false;
     }
 
-    // ---------------------------------------------------------------------------
+    @Override
     public final String toString() {
         String toString = getMetaObjectNode().getName();
         if (toString == null) {
-            MetaObject mo = getMetaObjectNode().getObject();
+            final MetaObject mo = getMetaObjectNode().getObject();
             if (mo != null) {
                 toString = mo.toString();
                 getNode().setName(toString);
             } else {
-                //Implicitly stores toString in getNode().setName(...) for future use.
-                //See implementation of getMetaObject().
+                // Implicitly stores toString in getNode().setName(...) for future use.
+                // See implementation of getMetaObject().
                 toString = getMetaObject().toString();
             }
         }
         return toString;
     }
 
+    @Override
     public final String getDescription() {
-        // dann eben doch nicht
-        //return this.getMetaObjectNode().getDescription() != null ? this.getMetaObjectNode().getDescription() : this.getMetaObjectNode().getObject().getDescription();
-
         return this.getMetaObjectNode().getDescription();
     }
 
+    @Override
     public final ImageIcon getOpenIcon() {
         return this.nodeIcon;
     }
 
+    @Override
     public final ImageIcon getClosedIcon() {
         return this.nodeIcon;
     }
 
+    @Override
     public final ImageIcon getLeafIcon() {
         return this.nodeIcon;
     }
 
-    public final boolean equals(DefaultMetaTreeNode node) {
-        if (node.isObjectNode() && this.getID() == node.getID() && this.getDomain().equals(node.getDomain())) {
+    @Override
+    public final boolean equals(final DefaultMetaTreeNode node) {
+        if (node.isObjectNode() && (this.getID() == node.getID()) && this.getDomain().equals(node.getDomain())) {
             return true;
         } else {
             return false;
         }
     }
 
-    public final boolean equalsNode(Node node) {
-        if (node instanceof MetaObjectNode && this.getMetaObjectNode().getDomain().equals(node.getDomain()) && this.getMetaObjectNode().getId() == node.getId()) {
+    @Override
+    public final boolean equalsNode(final Node node) {
+        if ((node instanceof MetaObjectNode) && this.getMetaObjectNode().getDomain().equals(node.getDomain())
+                    && (this.getMetaObjectNode().getId() == node.getId())) {
             return true;
         } else {
             return false;
         }
     }
 
+    @Override
     public final int getID() {
         return this.getMetaObjectNode().getId();
     }
 
+    @Override
     public final String getDomain() {
         return this.getMetaObjectNode().getDomain();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public final synchronized MetaObject getMetaObject() {
         if (this.getMetaObjectNode().getObject() == null) {
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("caching object node");//NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("caching object node"); // NOI18N
                 }
-                MetaObject metaObject = SessionManager.getProxy().getMetaObject(this.getMetaObjectNode().getObjectId(), this.getMetaObjectNode().getClassId(), this.getMetaObjectNode().getDomain());
+                final MetaObject metaObject = SessionManager.getProxy()
+                            .getMetaObject(this.getMetaObjectNode().getObjectId(),
+                                this.getMetaObjectNode().getClassId(),
+                                this.getMetaObjectNode().getDomain());
                 this.getMetaObjectNode().setObject(metaObject);
-                if (getNode().getName() == null || getNode().getName().equals("NameWirdGeladen")) {//NOI18N
+                if ((getNode().getName() == null) || getNode().getName().equals("NameWirdGeladen")) {
                     getNode().setName(metaObject.toString());
                 }
-            } catch (Throwable t) {
-                logger.error("could not retrieve meta object of node '" + this + "'", t);//NOI18N
+            } catch (final Throwable t) {
+                LOG.error("could not retrieve meta object of node '" + getMetaObjectNode() + "'", t);
             }
         }
         return this.getMetaObjectNode().getObject();
     }
 
     /**
-     * Setzt ein neues MetaObject, bzw. die ver\u00E4nderte Kopie des alten
-     * MetaObjects dieser Node.
+     * Setzt ein neues MetaObject, bzw. die ver\u00E4nderte Kopie des alten MetaObjects dieser Node.
+     *
+     * @param  metaObject  DOCUMENT ME!
      */
-    public final void setMetaObject(MetaObject metaObject) {
-        logger.fatal("setting mo from " + getMetaObject() + " to " + metaObject);//NOI18N
+    public final void setMetaObject(final MetaObject metaObject) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("setting mo from " + getMetaObject() + " to " + metaObject); // NOI18N
+        }
         this.getMetaObjectNode().setObject(metaObject);
         this.setChanged(true);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
     public final MetaClass getMetaClass() throws Exception {
         if (metaClass == null) {
             metaClass = SessionManager.getProxy().getMetaClass(this.getMetaObjectNode().getClassId(), this.getDomain());
@@ -175,8 +237,11 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         return metaClass;
     }
 
+    @Override
     public String getKey() throws Exception {
-        logger.debug("getkey");//NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("getkey"); // NOI18N
+        }
         return this.getMetaObject().getKey().toString();
     }
 
@@ -184,23 +249,4 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     public int getClassID() {
         return this.getMetaObjectNode().getClassId();
     }
-//    //vor messe
-//    public boolean equals(Object obj) {
-//        try {
-//            return getMetaObject().equals(((ObjectTreeNode)obj).getMetaObject());
-//        }
-//        finally {
-//            return false;
-//        }
-//    }
-//    
-//    public int hashCode() {
-//        try {
-//            return getMetaObject().hashCode();
-//        }
-//        finally {
-//            return super.hashCode();
-//        }
-//                
-//    }
 }

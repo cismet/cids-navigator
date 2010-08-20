@@ -1,359 +1,297 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.connection;
-
-/*******************************************************************************
-
- 	Copyright (c)	:	EIG (Environmental Informatics Group)
-				http://www.enviromatics.net
-				Prof. Dr. Reiner Guettler
-				Prof. Dr. Ralf Denzer
-
-				HTW
-				University of Applied Sciences
-				Goebenstr. 40
- 				66117 Saarbruecken, Germany
-
-	Programmers	:	Pascal <pascal@enviromatics.net>
-
- 	Project		:	Sirius
-	Version		:	1.0
- 	Purpose		:
-	Created		:	12/20/2002
-	History		:
-
-*******************************************************************************/
-
-import java.io.*;
-import java.rmi.*;
-import java.net.*;
-import java.lang.reflect.*;
-
-import org.apache.log4j.*;
-
-import Sirius.navigator.connection.proxy.*;
-import Sirius.server.Server;
-import Sirius.server.newuser.*;
-import Sirius.server.middleware.interfaces.proxy.*;
+import Sirius.navigator.connection.proxy.ConnectionProxy;
+import Sirius.navigator.connection.proxy.ConnectionProxyHandler;
 import Sirius.navigator.exception.ConnectionException;
+
+import Sirius.server.newuser.UserException;
+
+import org.apache.log4j.Logger;
+
+import de.cismet.security.Proxy;
 
 /**
  * A singleton factory class that creates and manages connections.
  *
- * @version 1.0 12/22/2002
- * @author Pascal
+ * @author   Pascal
+ * @author   martin.scholl@cismet.de
+ * @version  1.0 12/22/2002
  */
-public class ConnectionFactory 
-{  
-    // log4j
-    private final static Logger logger = Logger.getLogger(ConnectionFactory.class);
-    
+public class ConnectionFactory {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient Logger LOG = Logger.getLogger(ConnectionFactory.class);
+
     // singleton shared instance
-    private final static ConnectionFactory factory = new ConnectionFactory();
-    
-    //private java.lang.Object callserver = null;
-    
-    //private Connection connection = null;
-   
-    
-    /** Creates a new instance of ConnectionManager */
-    private ConnectionFactory() 
-    {
-        if(logger.isDebugEnabled())
-            logger.debug("creating singleton shared ConnectionManager instance");   // NOI18N
+    private static final ConnectionFactory factory = new ConnectionFactory();
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ConnectionFactory object.
+     */
+    private ConnectionFactory() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("creating singleton shared ConnectionManager instance"); // NOI18N
+        }
     }
-    
-    public final static ConnectionFactory getFactory()
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ConnectionFactory getFactory() {
         return factory;
     }
-    
-    
-    /*public void createConnection(String callserverURL, String connectionClassName, String connectionProxyClassName) throws ConnectionException
-    {
-        createConnection(connectionClassName, connectionProxyClassName);
-        connection.connect(callserverURL); 
-    }
-    
-    public void createConnection(ConnectionInfo connectionInfo, String connectionClassName, String connectionProxyClassName) throws ConnectionException, UserException
-    {
-        createConnection(connectionClassName, connectionProxyClassName);
-        connection.connect(connectionInfo); 
-    }
-    
-    public createSession()
-    {
-        
-    }*/
-    
-    
+
     /**
-     * Creates ans initializes a new shared connection instance
+     * Creates and initializes a new shared connection instance.
+     *
+     * @param   connectionClassName  DOCUMENT ME!
+     * @param   callserverURL        DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
      */
-   /* public void createConnection(Class connectionClass, Class connectionProxyClass) throws ConnectionException
-    {
-        Connection connection = null;
-      
-        try
-        {
-            logger.debug("creating connection class instance '" + connectionClass.getName() + "'");
-            connection = (Connection)connectionClass.newInstance();
-        }
-        catch(Exception e)
-        {
-            logger.fatal("could not instantiate connection class '" + connectionClass.getName() + "'", e);
-            throw new ConnectionException("could not connection proxy class '" + connectionClass.getName() + "'", e);
-        }
-        
-        if(connectionProxyClass != null)
-        {
-            try
-            {
-                logger.debug("creating connection proxy class instance '" + connectionProxyClass.getName() + "'");
-                ConnectionProxy connectionProxy = (ConnectionProxy)connectionProxyClass.getConstructor(new Class[] { Connection.class }).newInstance(new Object[] { connection });
-                this.connection = (Connection)Proxy.newProxyInstance(connection.getClass().getClassLoader(), new Class[] { Connection.class }, connectionProxy);
-            }
-            catch(Exception e)
-            {
-                logger.fatal("could not instantiate connection proxy class '" + connectionProxyClass.getName() + "'", e);
-                throw new ConnectionException("could not instantiate connection proxy class '" + connectionProxyClass.getName() + "'", e);
-            }
-        }
-    }*/
-    
-    /**
-     * Creates ans initializes a new shared connection instance
-     */
-    public Connection createConnection(String connectionClassName, String callserverURL) throws ConnectionException
-    {
-        Connection connection = createConnection(connectionClassName);
+    public Connection createConnection(final String connectionClassName, final String callserverURL)
+            throws ConnectionException {
+        final Connection connection = createConnection(connectionClassName);
         connection.connect(callserverURL);
+
         return connection;
     }
-    
-    public Connection createConnection(String connectionClassName, String callserverURL, String username, String password) throws ConnectionException
-    {
-        Connection connection = createConnection(connectionClassName);
-        connection.connect(callserverURL, username, password);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionClassName  DOCUMENT ME!
+     * @param   callserverURL        DOCUMENT ME!
+     * @param   proxy                DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public Connection createConnection(final String connectionClassName, final String callserverURL, final Proxy proxy)
+            throws ConnectionException {
+        final Connection connection = createConnection(connectionClassName);
+        connection.connect(callserverURL, proxy);
+
         return connection;
     }
-    
-    private Connection createConnection(String connectionClassName) throws ConnectionException
-    {
-        //Class connectionClass = null;
-        //Connection connection = null;
-        
-        try
-        {
-            if(logger.isDebugEnabled())
-                logger.debug("creating connection class instance '" + connectionClassName + "'");   // NOI18N
-            //connectionClass = Class.forName(connectionClassName);   
-            //connection = (Connection)connectionClass.newInstance();
-            //return connection;
-            
-            return (Connection)Class.forName(connectionClassName).newInstance();   
-        }
-        catch(ClassNotFoundException cne)
-        {
-            logger.fatal("connection class '" + connectionClassName + "' not found", cne);  // NOI18N
-            throw new ConnectionException("connection class '" + connectionClassName + "' not found", cne);  // NOI18N
-        }
-        catch(InstantiationException ie)
-        {
-            logger.fatal("could not instantiate connection class '" + connectionClassName + "'", ie);  // NOI18N
-            throw new ConnectionException("could not connection proxy class '" + connectionClassName + "'", ie);  // NOI18N
-        }
-        catch(IllegalAccessException iae)
-        {
-            logger.fatal("could not instantiate connection class '" + connectionClassName + "'", iae);  // NOI18N
-            throw new ConnectionException("could not connection proxy class '" + connectionClassName + "'", iae);  // NOI18N
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionClassName  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    private Connection createConnection(final String connectionClassName) throws ConnectionException {
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("creating connection class instance '" + connectionClassName + "'"); // NOI18N
+            }
+
+            return (Connection)Class.forName(connectionClassName).newInstance();
+        } catch (ClassNotFoundException cne) {
+            final String message = "connection class '" + connectionClassName + "' not found";             // NOI18N
+            LOG.fatal(message, cne);
+            throw new ConnectionException(message, cne);
+        } catch (final InstantiationException ie) {
+            final String message = "could not instantiate connection class '" + connectionClassName + "'"; // NOI18N
+            LOG.fatal(message, ie);
+            throw new ConnectionException(message, ie);
+        } catch (IllegalAccessException iae) {
+            final String message = "could not instantiate connection class '" + connectionClassName + "'"; // NOI18N
+            LOG.fatal(message, iae);
+            throw new ConnectionException(message, iae);
         }
     }
-    
-     public ConnectionSession createSession(Connection connection) throws ConnectionException
-     {
-        try
-        {  
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connection  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  RuntimeException     DOCUMENT ME!
+     */
+    public ConnectionSession createSession(final Connection connection) throws ConnectionException {
+        try {
             return new ConnectionSession(connection);
+        } catch (final UserException ue) {
+            final String message = "could not create connection session for connection"; // NOI18N
+            LOG.fatal(message, ue);
+            throw new RuntimeException(message, ue);
         }
-        catch(UserException ue)
-        {
-            logger.fatal("unexpected Exception");  // NOI18N
-            throw new RuntimeException("unexpected Exception", ue);  // NOI18N
-        }
-     }
-    
-    public ConnectionSession createSession(Connection connection, ConnectionInfo connectionInfo) throws ConnectionException, UserException
-    {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connection      DOCUMENT ME!
+     * @param   connectionInfo  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public ConnectionSession createSession(final Connection connection, final ConnectionInfo connectionInfo)
+            throws ConnectionException, UserException {
         return new ConnectionSession(connection, connectionInfo);
     }
-    
-    public ConnectionSession createSession(Connection connection, ConnectionInfo connectionInfo, boolean autoLogin) throws ConnectionException, UserException
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connection      DOCUMENT ME!
+     * @param   connectionInfo  DOCUMENT ME!
+     * @param   autoLogin       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public ConnectionSession createSession(final Connection connection,
+            final ConnectionInfo connectionInfo,
+            final boolean autoLogin) throws ConnectionException, UserException {
         return new ConnectionSession(connection, connectionInfo, autoLogin);
     }
-    
-    
-    public ConnectionSession createSession(Connection connection, String usergroupDomain, String usergroup, String userDomain, String username, String password)  throws ConnectionException, UserException
-    {
-        ConnectionInfo connectionInfo = new ConnectionInfo();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connection       DOCUMENT ME!
+     * @param   usergroupDomain  DOCUMENT ME!
+     * @param   usergroup        DOCUMENT ME!
+     * @param   userDomain       DOCUMENT ME!
+     * @param   username         DOCUMENT ME!
+     * @param   password         DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public ConnectionSession createSession(final Connection connection,
+            final String usergroupDomain,
+            final String usergroup,
+            final String userDomain,
+            final String username,
+            final String password) throws ConnectionException, UserException {
+        final ConnectionInfo connectionInfo = new ConnectionInfo();
         connectionInfo.setUsername(username);
         connectionInfo.setPassword(password);
         connectionInfo.setUsergroup(usergroup);
         connectionInfo.setUserDomain(userDomain);
         connectionInfo.setUsergroupDomain(usergroupDomain);
-        
-        return new ConnectionSession(connection, connectionInfo); 
-    }
-    
-    public ConnectionProxy createProxy(String connectionProxyHandlerClassName, ConnectionSession connectionSession) throws ConnectionException
-    {
-        ConnectionProxyHandler connectionProxyHandler;
-        
-        try
-        {
-            if(logger.isDebugEnabled())
-                logger.debug("creating connection proxy handler instance '" + connectionProxyHandlerClassName + "'");  // NOI18N
-            connectionProxyHandler = (ConnectionProxyHandler)Class.forName(connectionProxyHandlerClassName).getConstructor(new Class[] {ConnectionSession.class}).newInstance(new Object[] {connectionSession});  
-        }
-        catch(ClassNotFoundException cne)
-        {
-            logger.fatal("connection proxy handler class '" + connectionProxyHandlerClassName + "' not found", cne);  // NOI18N
-            throw new ConnectionException("connection proxy handler class '" + connectionProxyHandlerClassName + "' not found", cne);  // NOI18N
-        }
-        catch(Exception e)
-        {
-            logger.fatal("could not instantiate connection proxy handler class '" + connectionProxyHandlerClassName + "'", e);  // NOI18N
-            throw new ConnectionException("could not connection proxy handler class '" + connectionProxyHandlerClassName + "'", e);  // NOI18N
-        }
-        /*catch(InstantiationException ie)
-        {
-            logger.fatal("could not instantiate connection proxy handler class '" + connectionProxyHandlerClassName + "'", ie);
-            throw new ConnectionException("could not connection proxy handler class '" + connectionProxyHandlerClassName + "'", ie);
-        }
-        catch(NoSuchMethodException nme)
-        {
-            logger.fatal("could not instantiate connection proxy handler class '" + connectionProxyHandlerClassName + "', constructor not found", nme);
-            throw new ConnectionException("could not connection proxy handler proxy class '" + connectionProxyHandlerClassName + "', constructor not found", nme);
-        }
-        catch(IllegalAccessException iae)
-        {
-            logger.fatal("could not instantiate connection proxy handler class '" + connectionProxyHandlerClassName + "'", iae);
-            throw new ConnectionException("could not connection proxy handler class '" + connectionProxyHandlerClassName + "'", iae);
-        }*/
-        
-        
-        try
-        {
-            if(logger.isDebugEnabled())
-                logger.debug("creating the connection proxy");  // NOI18N
-            return (ConnectionProxy)java.lang.reflect.Proxy.newProxyInstance(ConnectionProxy.class.getClassLoader(), new Class[] { ConnectionProxy.class }, connectionProxyHandler);
-            //return (ConnectionProxy)Proxy.newProxyInstance(ConnectionProxy.class.getClassLoader(), ConnectionProxy.class.getInterfaces(), connectionProxyHandler);
-            
-            //logger.debug("connectionProxyHandler: " + connectionProxyHandler);
-            //Object proxy = Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[] { ConnectionProxy.class }, connectionProxyHandler);
-            //logger.debug("connectionProxy: " + proxy);
-            //return (ConnectionProxy)proxy;         
-        }
-        catch(Exception e)
-        {
-            logger.fatal("could not create connection proxy", e);  // NOI18N
-            throw new ConnectionException("could not create connection proxy", e);  // NOI18N
-        }
-    }
-    
-    public ConnectionProxy createProxy(String connectionClassName, String connectionProxyHandlerClassName, ConnectionInfo connectionInfo, boolean autoLogin) throws ConnectionException, UserException
-    {
-        Connection connection = createConnection(connectionClassName, connectionInfo.getCallserverURL());
-        ConnectionSession connectionSession = createSession(connection, connectionInfo, autoLogin);
-        
-        return createProxy(connectionProxyHandlerClassName, connectionSession);
-    }
-    
-    public ConnectionProxy createProxy(String connectionClassName, String connectionProxyHandlerClassName, ConnectionInfo connectionInfo) throws ConnectionException, UserException
-    {
-        return createProxy(connectionClassName, connectionProxyHandlerClassName, connectionInfo, true);
-    }
-        
-       
-    
-    /*private void createConnection(String connectionClassName, String connectionProxyClassName) throws ConnectionException
-    {
-        Class connectionClass = null;
-        Class connectionProxyClass = null;
-        
-        try
-        { 
-            connectionClass = Class.forName(connectionClassName);    
-        }
-        catch(Exception e)
-        {
-            logger.fatal("connection class '" + connectionClassName + "' not found", e);
-            throw new ConnectionException("connection class '" + connectionClassName + "' not found", e);
-        }
-        
-        if(connectionProxyClassName != null)
-        {
-            try
-            { 
-                connectionProxyClass = Class.forName(connectionProxyClassName);    
-            }
-            catch(Exception e)
-            {
-                logger.fatal("connection class '" + connectionProxyClassName + "' not found", e);
-                throw new ConnectionException("connection class '" + connectionProxyClassName + "' not found", e);
-            }
-        }
-        
-        createConnection(connectionClass, connectionProxyClass);
+
+        return new ConnectionSession(connection, connectionInfo);
     }
 
-    
-    
-    public Connection getConnection()
-    {
-        return this.connection;
-    }
-    
     /**
-     * @return the singleton shared instance
+     * DOCUMENT ME!
+     *
+     * @param   connectionProxyHandlerClassName  DOCUMENT ME!
+     * @param   connectionSession                DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
      */
-    /*public static ConnectionManager getInstance()
-    {
-        synchronized(logger)
-        {
-            if(instance == null)
-            {
-                instance = new ConnectionManager();
+    public ConnectionProxy createProxy(final String connectionProxyHandlerClassName,
+            final ConnectionSession connectionSession) throws ConnectionException {
+        final ConnectionProxyHandler connectionProxyHandler;
+
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("creating connection proxy handler instance '" + connectionProxyHandlerClassName + "'");       // NOI18N
             }
+            connectionProxyHandler = (ConnectionProxyHandler)Class.forName(connectionProxyHandlerClassName)
+                        .getConstructor(new Class[] { ConnectionSession.class })
+                        .newInstance(new Object[] { connectionSession });
+        } catch (final ClassNotFoundException cne) {
+            final String message = "connection proxy handler class '" + connectionProxyHandlerClassName + "' not found"; // NOI18N
+            LOG.fatal(message, cne);
+            throw new ConnectionException(message, cne);
+        } catch (final Exception e) {
+            final String message = "could not instantiate connection proxy handler class '"                              // NOI18N
+                        + connectionProxyHandlerClassName + "'";                                                         // NOI18N
+            LOG.fatal(message, e);
+            throw new ConnectionException(message, e);
         }
-        
-        return instance;
-    }*/
-    
-    /*public static void main(String args[])
-    {
-        Logger.getRootLogger().addAppender(new ConsoleAppender(new TTCCLayout() ));
-        
-        ConnectionFactory connectionManager = new ConnectionFactory();
-        
-        try
-        {
-            logger.debug("########################################################################");
-            Connection connection = connectionManager.createConnection("Sirius.navigator.connection.RMIConnection", "rmi://192.168.1.2/callServer");
-            logger.debug("########################################################################");
-            //usergroupDomain, usergroup, userDomain, username, password
-            ConnectionSession connectionSession = connectionManager.createSession(connection, "SYSTEM", "ADMINISTRATOREN", "SYSTEM", "admin", "yxc");
-            logger.debug("########################################################################");
-            ConnectionProxy connectionProxy = connectionManager.createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", connectionSession);
-            logger.debug("########################################################################");
-            
-            logger.debug("connectionProxy.isConnected(): " + connectionProxy.isConnected());
-            //connectionProxy.setProperty("xxx", "yyy");
-            
+
+        try {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("creating the connection proxy"); // NOI18N
+            }
+
+            return (ConnectionProxy)java.lang.reflect.Proxy.newProxyInstance(ConnectionProxy.class.getClassLoader(),
+                    new Class[] { ConnectionProxy.class },
+                    connectionProxyHandler);
+        } catch (final Exception e) {
+            final String message = "could not create connection proxy"; // NOI18N
+            LOG.fatal(message, e);
+            throw new ConnectionException(message, e);
         }
-        catch(Exception e)
-        {
-            System.out.println("------------------------------------------------");
-            e.printStackTrace();
-        }
-    }*/
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionClassName              DOCUMENT ME!
+     * @param   connectionProxyHandlerClassName  DOCUMENT ME!
+     * @param   connectionInfo                   DOCUMENT ME!
+     * @param   autoLogin                        DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public ConnectionProxy createProxy(final String connectionClassName,
+            final String connectionProxyHandlerClassName,
+            final ConnectionInfo connectionInfo,
+            final boolean autoLogin) throws ConnectionException, UserException {
+        final Connection connection = createConnection(connectionClassName, connectionInfo.getCallserverURL());
+        final ConnectionSession connectionSession = createSession(connection, connectionInfo, autoLogin);
+
+        return createProxy(connectionProxyHandlerClassName, connectionSession);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionClassName              DOCUMENT ME!
+     * @param   connectionProxyHandlerClassName  DOCUMENT ME!
+     * @param   connectionInfo                   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public ConnectionProxy createProxy(final String connectionClassName,
+            final String connectionProxyHandlerClassName,
+            final ConnectionInfo connectionInfo) throws ConnectionException, UserException {
+        return createProxy(connectionClassName, connectionProxyHandlerClassName, connectionInfo, true);
+    }
 }

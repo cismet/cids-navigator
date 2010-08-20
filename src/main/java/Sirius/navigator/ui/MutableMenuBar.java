@@ -59,7 +59,7 @@ public class MutableMenuBar extends JMenuBar {
     private final PluginMenuesMap pluginMenues;
     private final EmbeddedContainersMap moveableMenues;
     private Sirius.navigator.plugin.interfaces.LayoutManager layoutManager;
-    private JMenu viewMenu = null;
+    private JMenu viewMenu;
     // Control Stuff
     //private ControlModel model;
     //private MethodManager methodManager;
@@ -68,6 +68,8 @@ public class MutableMenuBar extends JMenuBar {
     //private JMenu navigatorMenu;
     //private JMenu functionsMenu;
     private JMenu pluginMenu;
+    private JMenu searchMenu;
+//    private JMenu windowMenu;
     //private JMenu helpMenu;
 
     /*public MutableMenuBar(ControlModel model)
@@ -239,7 +241,7 @@ public class MutableMenuBar extends JMenuBar {
         item.setIcon(resources.getIcon("searchresultprofiles16.gif"));//NOI18N
         item.setActionCommand("search.profiles");//NOI18N
         item.addActionListener(itemListener);
-
+        searchMenu = menu;
         menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.title"));//NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.mnemonic").charAt(0));//NOI18N
         this.add(menu);
@@ -287,6 +289,15 @@ public class MutableMenuBar extends JMenuBar {
         }
     }
 
+    public JMenu getViewMenu() {
+        return viewMenu;
+    }
+
+    public JMenu getSearchMenu() {
+        return searchMenu;
+    }
+
+    // INNERE KLASSEN ZUM BEARBEITEN DER EREIGNISSE ============================
     private class MenuItemActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {

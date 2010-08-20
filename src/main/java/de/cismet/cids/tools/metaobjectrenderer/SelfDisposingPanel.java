@@ -47,7 +47,6 @@ public class SelfDisposingPanel extends JPanel {
         if (disposableBeanStore == null) {
             checkTimer = null;
         } else {
-            log.fatal("registered: " + disposableBeanStore);
             checkTimer = new Timer();
         }
         setOpaque(false);
