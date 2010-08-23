@@ -99,6 +99,7 @@ public class NavigatorSplashScreen extends JFrame {
         progressBarPlugin = new javax.swing.JProgressBar();
         panConnection = new javax.swing.JPanel();
         panButtons = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
         btnApply = new javax.swing.JButton();
         panProxy = new javax.swing.JPanel();
 
@@ -141,6 +142,15 @@ public class NavigatorSplashScreen extends JFrame {
 
         panConnection.setLayout(new java.awt.BorderLayout());
 
+        jButton1.setText("Abbrechen");
+        jButton1.setPreferredSize(new java.awt.Dimension(100, 29));
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        panButtons.add(jButton1);
+
         btnApply.setText("Anwenden");
         btnApply.setPreferredSize(new java.awt.Dimension(100, 29));
         panButtons.add(btnApply);
@@ -158,6 +168,10 @@ public class NavigatorSplashScreen extends JFrame {
     {
         System.exit(0);
     }//GEN-LAST:event_exitForm
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * Sets the ProxyOption panel by adding it at the CENTER position of the
@@ -200,6 +214,7 @@ public class NavigatorSplashScreen extends JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnApply;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel logoLabel;
     private javax.swing.JPanel panButtons;
     private javax.swing.JPanel panCenter;
