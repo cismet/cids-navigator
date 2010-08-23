@@ -33,7 +33,6 @@ import java.util.Vector;
  */
 public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetListener, DragSourceListener{
     private final Logger logger;
-    private final ResourceManager resources;
     
     private final MetaCatalogueTree metaTree;
     private final DragSource dragSource;
@@ -58,9 +57,10 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     
     public MetaTreeNodeDnDHandler(final MetaCatalogueTree metaTree) {
         this.logger = Logger.getLogger(this.getClass());
-        this.resources = ResourceManager.getManager();
-       
-        logger.info("MetaTreeNodeDnDHandler() creating new instance. Drag Image Support: " + DragSource.isDragImageSupported());
+
+        if (logger.isInfoEnabled()) {
+            logger.info("MetaTreeNodeDnDHandler() creating new instance. Drag Image Support: " + DragSource.isDragImageSupported());//NOI18N
+        }
         
         this.metaTree = metaTree;
         this.dragSource = DragSource.getDefaultDragSource();
@@ -101,7 +101,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 //            metaTree.setSelectionPath(selPath);//DND Fehlverhalten Workaround
 //        }
         
-        if(logger.isDebugEnabled())logger.debug("dragGestureRecognized()");
+        if(logger.isDebugEnabled())logger.debug("dragGestureRecognized()");//NOI18N
         
         metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths); //DND Fehlverhalten Workaround
             TreePath selPath = metaTree.getPathForLocation((int)dge.getDragOrigin().getX(),(int)dge.getDragOrigin().getY());//DND Fehlverhalten Workaround
@@ -131,12 +131,12 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             this.metaTransferable.setTransferAction(dge.getDragAction());
             this.dragSource.startDrag(dge, this.getCursor(dge.getDragAction()), this.getDragImage(), this.dragPoint, this.metaTransferable, this);
         } else if(logger.isDebugEnabled()) {
-            logger.warn("dragGestureRecognized() no valid selection for DnD operation");
+            logger.warn("dragGestureRecognized() no valid selection for DnD operation");//NOI18N
         }
     }
     
     public void drop(DropTargetDropEvent dtde) {
-        if(logger.isDebugEnabled())logger.debug("drop()");
+        if(logger.isDebugEnabled())logger.debug("drop()");//NOI18N
         metaTree.repaint();
         
         
@@ -148,7 +148,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         
         try {
             nodeEditable = this.metaTree.getSelectedNode().isEditable(key, PermissionHolder.WRITEPERMISSION);
-        }catch(Exception e){logger.debug(" Knoten nicht editierbar");}
+        }catch(Exception e){logger.debug(" Node not editable");}//NOI18N
         
         if(this.metaTree.isEditable()&& nodeEditable) {
             Transferable transferable = dtde.getTransferable();
@@ -160,7 +160,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                     DefaultMetaTreeNode sourceNode = (DefaultMetaTreeNode)transferable.getTransferData(MetaTreeNodeTransferable.dataFlavors[0]);
                     TreePath sourcePath = new TreePath(sourceNode.getPath());
                     
-                    logger.debug("drop(): performing dnd operation: " + sourceNode + " -> " + destinationPath);
+                    logger.debug("drop(): performing dnd operation: " + sourceNode + " -> " + destinationPath);//NOI18N
                     if(this.checkDestination(destinationPath, sourcePath, dtde.getDropAction())) {
                         DefaultMetaTreeNode destinationNode = (DefaultMetaTreeNode)destinationPath.getLastPathComponent();
                         
@@ -189,8 +189,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                 }
                                 break;
                                 
-                            default:     logger.error("unsupported dnd operation: " + dtde.getDropAction());
-                            JOptionPane.showMessageDialog(this.metaTree, resources.getString("tree.dnd.error.unsupported.operation"), resources.getString("tree.dnd.error.unsupported.operation.title"), JOptionPane.ERROR_MESSAGE);
+                            default:     logger.error("unsupported dnd operation: " + dtde.getDropAction());//NOI18N
+                            JOptionPane.showMessageDialog(this.metaTree,
+                                    org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.drop().unsupportedOperationError.message"),//NOI18N
+                                    org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.drop().unsupportedOperationError.title"),//NOI18N
+                                    JOptionPane.ERROR_MESSAGE);
                             dtde.rejectDrop();
                         }
                     } else {
@@ -200,20 +203,26 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                     throw new UnsupportedFlavorException(MetaTreeNodeTransferable.dataFlavors[0]);
                 }
             } catch(Throwable t) {
-                logger.warn("data flavour '" + MetaTreeNodeTransferable.dataFlavors[0].getHumanPresentableName() + "' is not supported, rejecting dnd", t);
+                logger.warn("data flavour '" + MetaTreeNodeTransferable.dataFlavors[0].getHumanPresentableName() + "' is not supported, rejecting dnd", t);//NOI18N
                 
-                JOptionPane.showMessageDialog(this.metaTree, resources.getString("tree.dnd.error.unsupported.object"), resources.getString("tree.dnd.error.unsupported.object.title"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this.metaTree,
+                        org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.drop().unsupportedObjectError.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.drop().unsupportedObjectError.title"),//NOI18N
+                        JOptionPane.ERROR_MESSAGE);
                 dtde.rejectDrop();
             }
         } else {
-            logger.error("catalog is not editable");
-            JOptionPane.showMessageDialog(this.metaTree, resources.getString("tree.dnd.error.readonly"), resources.getString("tree.dnd.error.readonly.title"), JOptionPane.ERROR_MESSAGE);
+            logger.error("catalog is not editable");//NOI18N
+            JOptionPane.showMessageDialog(this.metaTree,
+                    org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.drop().notEditableError.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.drop().notEditableError.title"),//NOI18N
+                    JOptionPane.ERROR_MESSAGE);
             dtde.rejectDrop();
         }
     }
     
     public void dragDropEnd(DragSourceDropEvent dsde) {
-        if(logger.isDebugEnabled())logger.debug("dragDropEnd()");
+        if(logger.isDebugEnabled())logger.debug("dragDropEnd()");//NOI18N
         
         // ignorieren, passiert schon in drop() ...
             /*if(dsde.getDropAction() == DnDConstants.ACTION_MOVE)
@@ -334,7 +343,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             graphics.dispose();
             return master;
         } catch (Exception e) {
-            logger.error("Fehler beim Erstellen des DragImages",e);
+            logger.error("Error while creating DragImages",e);//NOI18N
             return null;
         }
 //        try {
@@ -422,13 +431,13 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     }
     
     public void dragEnter(DropTargetDragEvent dtde) {
-        if(logger.isDebugEnabled())logger.debug("dragEnter(DropTargetDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dragEnter(DropTargetDragEvent)");//NOI18N
         logger.info(dtde.getSource());
         //this.thisTarget = true;
     }
     
     public void dragEnter(DragSourceDragEvent dsde) {
-        if(logger.isDebugEnabled())logger.debug("dragEnter(DragSourceDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dragEnter(DragSourceDragEvent)");//NOI18N
         
         DragSourceContext dragSourceContext = dsde.getDragSourceContext();
         dragSourceContext.setCursor(this.getCursor(dsde.getDropAction()));
@@ -452,11 +461,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     }
     
     public void dropActionChanged(DropTargetDragEvent dtde) {
-        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DropTargetDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DropTargetDragEvent)");//NOI18N
     }
     
     public void dropActionChanged(DragSourceDragEvent dsde) {
-        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DragSourceDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DragSourceDragEvent)");//NOI18N
         
         DragSourceContext dragSourceContext = dsde.getDragSourceContext();
         dragSourceContext.setCursor(this.getCursor(dsde.getUserAction()));
@@ -466,13 +475,13 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     private Cursor getCursor(int dragAction) {
         Cursor cursor = DragSource.DefaultCopyNoDrop;
         if((dragAction & DnDConstants.ACTION_MOVE) != 0) {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_MOVE");
+            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_MOVE");//NOI18N
             cursor = DragSource.DefaultMoveDrop;
         } else if((dragAction & DnDConstants.ACTION_COPY) != 0) {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_COPY");
+            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_COPY");//NOI18N
             cursor = DragSource.DefaultCopyDrop;
         } else if((dragAction & DnDConstants.ACTION_LINK) != 0) {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_LINK");
+            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_LINK");//NOI18N
             cursor = DragSource.DefaultLinkDrop;
         }
         
@@ -483,24 +492,36 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         if(destinationPath != null) {
             if(destinationPath.getLastPathComponent() instanceof PureTreeNode || destinationPath.getLastPathComponent() instanceof ObjectTreeNode) {
                 if(destinationPath.equals(sourcePath)) {
-                    logger.warn("destination path equals source path");
-                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.path.equal.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.path.equal.2"), resources.getString("tree.dnd.error.path.equal.title"), JOptionPane.WARNING_MESSAGE);
+                    logger.warn("destination path equals source path");//NOI18N
+                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                            org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().pathsEqualWarning.message", new Object[]{destinationPath.getLastPathComponent(), }), //NOI18N
+                            org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().pathsEqualWarning.title"),//NOI18N
+                            JOptionPane.WARNING_MESSAGE);
                 } else if(sourcePath.isDescendant(destinationPath)) {
-                    logger.warn("destination path can not be a descendant of the source path");
-                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.path.descendant.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.path.descendant.2"), resources.getString("tree.dnd.error.path.descendant.title"), JOptionPane.WARNING_MESSAGE);
+                    logger.warn("destination path can not be a descendant of the source path");//NOI18N
+                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                            org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().pathIsDecendantWarning.message", new Object[]{destinationPath.getLastPathComponent()}), //NOI18N
+                            org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().pathIsDecendantWarning.title"),//NOI18N
+                            JOptionPane.WARNING_MESSAGE);
                 } else if(dropAction != DnDConstants.ACTION_COPY && sourcePath.getParentPath().equals(destinationPath)) {
-                    logger.warn("destination node is the parent of the source node");
-                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.path.parent.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.path.parent.2"), resources.getString("tree.dnd.error.path.parent.title"), JOptionPane.WARNING_MESSAGE);
+                    logger.warn("destination node is the parent of the source node");//NOI18N
+                    JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                            org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().destinationParentOfSourceWarning.message", new Object[]{destinationPath.getLastPathComponent()}), //NOI18N,
+                            org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().destinationParentOfSourceWarning.title"),//NOI18N
+                            JOptionPane.WARNING_MESSAGE);
                 } else {
-                    if(logger.isDebugEnabled())logger.debug("checkDestination() dnd destination ok: " + sourcePath.getLastPathComponent() + " -> " + destinationPath.getLastPathComponent());
+                    if(logger.isDebugEnabled())logger.debug("checkDestination() dnd destination ok: " + sourcePath.getLastPathComponent() + " -> " + destinationPath.getLastPathComponent());//NOI18N
                     return true;
                 }
             } else {
-                logger.warn("destination node '" + destinationPath.getLastPathComponent() + "' is no pure or object node");
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.dnd.error.node.1") + destinationPath.getLastPathComponent() + resources.getString("tree.dnd.error.node.2"), resources.getString("tree.dnd.error.node.title"), JOptionPane.WARNING_MESSAGE);
+                logger.warn("destination node '" + destinationPath.getLastPathComponent() + "' is no pure or object node");//NOI18N
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                        org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().noPureNodeWarning.message", new Object[]{destinationPath.getLastPathComponent()}), //NOI18N
+                        org.openide.util.NbBundle.getMessage(MetaTreeNodeDnDHandler.class, "MetaTreeNodeDnDHandler.checkDestination().noPureNodeWarning.title"),//NOI18N
+                        JOptionPane.WARNING_MESSAGE);
             }
         } else {
-            logger.warn("no node found at this location");
+            logger.warn("no node found at this location");//NOI18N
         }
         
         return false;

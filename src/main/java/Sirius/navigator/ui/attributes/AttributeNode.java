@@ -10,7 +10,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultMutableTreeNode;
 
-import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.iterator.AttributeIterator;
 import Sirius.navigator.types.iterator.AttributeRestriction;
 import Sirius.navigator.types.iterator.SimpleAttributeRestriction;
@@ -67,7 +66,7 @@ public abstract class AttributeNode extends DefaultMutableTreeNode
     public AttributeNode(String name, boolean ignoreSubstitute,  boolean ignoreArrayHelperObjects, boolean ignoreInvisibleAttributes)
     {
         this(name, ignoreSubstitute,  ignoreArrayHelperObjects, ignoreInvisibleAttributes, name);
-        if(logger.isDebugEnabled())logger.debug("AttributeNode(): this must be the root node (" + name + ")");
+        if(logger.isDebugEnabled())logger.debug("AttributeNode(): this must be the root node (" + name + ")");//NOI18N
     }
     
     public AttributeNode(String name)
@@ -84,13 +83,13 @@ public abstract class AttributeNode extends DefaultMutableTreeNode
             // ignorieren (isSubstitute)
             if((this.ignoreSubstitute || !metaAttribute.isSubstitute()) && (this.ignoreInvisibleAttributes || metaAttribute.isVisible()))
             {
-                if(logger.isDebugEnabled())logger.debug("adding new complex object '" + metaAttribute.getName() + "'");
+                if(logger.isDebugEnabled())logger.debug("adding new complex object '" + metaAttribute.getName() + "'");//NOI18N
                 MetaObject childMetaObject = (MetaObject)metaAttribute.getValue();
                 this.add(new ObjectAttributeNode(metaAttribute.getName(), this.ignoreSubstitute, this.ignoreArrayHelperObjects, this.ignoreInvisibleAttributes, metaAttribute.getKey(), childMetaObject));
             }
             else if(logger.isDebugEnabled())
             {
-                logger.warn("ignoring complex object '" + metaAttribute.getName() + "' (isSubstitute or !isVisible)");
+                logger.warn("ignoring complex object '" + metaAttribute.getName() + "' (isSubstitute or !isVisible)");//NOI18N
             }
         }
     }

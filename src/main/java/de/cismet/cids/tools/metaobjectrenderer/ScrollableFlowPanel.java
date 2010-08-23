@@ -16,6 +16,8 @@ import java.awt.Rectangle;
 import javax.swing.JPanel;
 import javax.swing.Scrollable;
 import javax.swing.SwingConstants;
+
+
 public class ScrollableFlowPanel extends JPanel implements Scrollable {
     public void setBounds( int x, int y, int width, int height ) {
         super.setBounds( x, y, getParent().getWidth(), height );

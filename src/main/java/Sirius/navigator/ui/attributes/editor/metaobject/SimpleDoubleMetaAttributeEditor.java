@@ -35,7 +35,7 @@ public class SimpleDoubleMetaAttributeEditor extends DefaultSimpleMetaAttributeE
         }
         catch(NumberFormatException nfe)
         {
-            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid double", nfe);
+            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid double", nfe);//NOI18N
             Double doubleObject = new Double(0);
             this.setComponentValue(doubleObject);
             return doubleObject;
@@ -50,7 +50,7 @@ public class SimpleDoubleMetaAttributeEditor extends DefaultSimpleMetaAttributeE
         public void insertString(final int i, final String s, final AttributeSet attributes) throws BadLocationException
         {  
             super.insertString(i, s, attributes);
-            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))
+            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))//NOI18N
             {
                 try
                 {

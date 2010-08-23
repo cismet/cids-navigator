@@ -43,7 +43,7 @@ public class SearchFormManager extends javax.swing.JPanel
        
         this.searchOptionsMap = searchOptionsMap;
         
-        logger.debug("SearchFormManager initilized with searchOptions :" +searchOptionsMap);
+        logger.debug("SearchFormManager initilized with searchOptions :" +searchOptionsMap);//NOI18N
         
         this.searchFormsMap = new HashMap();
         
@@ -85,7 +85,7 @@ public class SearchFormManager extends javax.swing.JPanel
     {
         if(this.searchFormContainers != null && this.searchFormContainers.size() > 0)
         {
-            if(logger.isDebugEnabled())logger.debug("removing " + this.searchFormContainerPane.getTabCount() + " search categories");
+            if(logger.isDebugEnabled())logger.debug("removing " + this.searchFormContainerPane.getTabCount() + " search categories");//NOI18N
             
             this.searchFormContainers.clear();
             this.searchFormsMap.clear();
@@ -95,7 +95,9 @@ public class SearchFormManager extends javax.swing.JPanel
         this.searchFormContainers = searchFormContainers;
         //this.searchFormContainers.addAll(searchFormContainers);
 
-        logger.info("adding " + this.searchFormContainers.size() + " searchFormContainer");
+        if (logger.isInfoEnabled()) {
+            logger.info("adding " + this.searchFormContainers.size() + " searchFormContainer");//NOI18N
+        }
         Iterator iterator = searchFormContainers.iterator();
         while(iterator.hasNext())
         {
@@ -112,7 +114,7 @@ public class SearchFormManager extends javax.swing.JPanel
             } 
             else if(logger.isDebugEnabled())
             {
-                logger.warn("ignoring invisible search form container '" + searchFormContainer.getName() + "'");
+                logger.warn("ignoring invisible search form container '" + searchFormContainer.getName() + "'");//NOI18N
             }
         }
     }
@@ -181,7 +183,7 @@ public class SearchFormManager extends javax.swing.JPanel
         }
         else
         {
-            logger.error("search form id '" + formId + "' not found in search forms map");
+            logger.error("search form id '" + formId + "' not found in search forms map");//NOI18N
             return null;
         }
     }
@@ -199,7 +201,7 @@ public class SearchFormManager extends javax.swing.JPanel
         }
         else
         {
-            logger.error("search query id '" + queryId + "' not found in search options map");
+            logger.error("search query id '" + queryId + "' not found in search options map");//NOI18N
             return null;
         }
     }
@@ -227,7 +229,7 @@ public class SearchFormManager extends javax.swing.JPanel
             }
             catch(CloneNotSupportedException cnsexp)
             {
-                logger.warn("could not clone form data bean '" + dataBean.getQueryId() + "'", cnsexp);
+                logger.warn("could not clone form data bean '" + dataBean.getQueryId() + "'", cnsexp);//NOI18N
             }
         }
         
@@ -265,7 +267,7 @@ public class SearchFormManager extends javax.swing.JPanel
             }
         }
         
-        if(logger.isDebugEnabled())logger.debug("returning " + selectedSearchForms.size() + " search forms");
+        if(logger.isDebugEnabled())logger.debug("returning " + selectedSearchForms.size() + " search forms");//NOI18N
         return selectedSearchForms;
     }
     
@@ -290,14 +292,14 @@ public class SearchFormManager extends javax.swing.JPanel
             SearchForm searchForm = (SearchForm)iterator.next();
             if(searchForm.isEnabled())
             {
-                if(logger.isDebugEnabled())logger.debug("reading data of form '" + searchForm.getName() + "'");
+                if(logger.isDebugEnabled())logger.debug("reading data of form '" + searchForm.getName() + "'");//NOI18N
                 
                 searchForm.writeFormParameters();
                 formDataList.add(searchForm.getDataBean());
             }
             else if(logger.isDebugEnabled())
             {
-                logger.debug(searchForm.getName() + " is disabled");
+                logger.debug(searchForm.getName() + " is disabled");//NOI18N
             }         
         }
         
@@ -306,7 +308,7 @@ public class SearchFormManager extends javax.swing.JPanel
 
     protected void setSelectedFormData(java.util.List formDataList) //throws FormValidationException
     {
-        if(logger.isDebugEnabled())logger.debug("loading data for " + formDataList.size() + " forms");
+        if(logger.isDebugEnabled())logger.debug("loading data for " + formDataList.size() + " forms");//NOI18N
         
         Iterator iterator = formDataList.iterator();
         while(iterator.hasNext())
@@ -355,7 +357,7 @@ public class SearchFormManager extends javax.swing.JPanel
         }
         else
         {
-            logger.warn("no search option found, disabling search form '" + searchForm.getName() + "'");
+            logger.warn("no search option found, disabling search form '" + searchForm.getName() + "'");//NOI18N
             searchForm.setEnabled(false);
         }
     }
@@ -383,25 +385,23 @@ public class SearchFormManager extends javax.swing.JPanel
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
         statusLabel = new javax.swing.JLabel();
         searchFormContainerPane = new javax.swing.JTabbedPane();
 
-        statusLabel.setFont(new java.awt.Font("Dialog", 1, 10));
+        statusLabel.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
         statusLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        statusLabel.setText("ABC");
-        statusLabel.setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.BevelBorder(javax.swing.border.BevelBorder.LOWERED), new javax.swing.border.EmptyBorder(new java.awt.Insets(0, 2, 0, 2))));
+        statusLabel.setText(org.openide.util.NbBundle.getMessage(SearchFormManager.class, "SearchFormManager.statuslabel.text")); // NOI18N
+        statusLabel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED), javax.swing.BorderFactory.createEmptyBorder(0, 2, 0, 2)));
 
+        setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setLayout(new java.awt.BorderLayout(5, 5));
 
-        setBorder(new javax.swing.border.EmptyBorder(new java.awt.Insets(5, 5, 5, 5)));
         searchFormContainerPane.setTabLayoutPolicy(javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
         add(searchFormContainerPane, java.awt.BorderLayout.CENTER);
-
-    }
-    // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -31,6 +31,7 @@ public class SearchFormFactory
 {   
     private final Logger logger;
     private final Log log;
+    private static final ResourceManager resource = ResourceManager.getManager();
     
     /** Creates a new instance of SearchFormFactory */
     protected SearchFormFactory()
@@ -44,7 +45,7 @@ public class SearchFormFactory
     
     protected java.util.List createSearchForms(String searchFormsPath, String searchFormsDescriptor, SearchContext searchContext) throws IOException, SAXException, URISyntaxException, FileNotFoundException
     {
-        if(logger.isDebugEnabled())logger.debug("loading search forms descriptor '" + searchFormsDescriptor + "' in '"+ searchFormsPath + "'");
+        if(logger.isDebugEnabled())logger.debug("loading search forms descriptor '" + searchFormsDescriptor + "' in '"+ searchFormsPath + "'");//NOI18N
         InputStream inputStream = this.getXMLDescriptorInputStream(searchFormsPath, searchFormsDescriptor);
         
         LinkedList searchFormContainerList = new LinkedList();
@@ -63,18 +64,18 @@ public class SearchFormFactory
     
     private InputStream getXMLDescriptorInputStream(URL searchUrl, String searchFormsDescriptor) throws URISyntaxException, FileNotFoundException, IOException
     {
-        if(logger.isDebugEnabled())logger.debug("loading search forms XML descriptor '" + searchUrl.toString() + "/" + searchFormsDescriptor + "'");
+        if(logger.isDebugEnabled())logger.debug("loading search forms XML descriptor '" + searchUrl.toString() + "/" + searchFormsDescriptor + "'");//NOI18N
         
-        File file = new File(new URI(searchUrl.toString() + "/" + searchFormsDescriptor));
+        File file = new File(new URI(searchUrl.toString() + "/" + searchFormsDescriptor));//NOI18N
         return new BufferedInputStream(new FileInputStream(file), 4096);
     }
     
     private InputStream getXMLDescriptorInputStream(String searchPath, String searchFormsDescriptor) throws FileNotFoundException, MalformedURLException, IOException
     {
-        String searchDescriptorPath = searchPath + "/" + searchFormsDescriptor;
-        if(logger.isDebugEnabled())logger.debug("loading search forms XML descriptor from remote URL '" + searchDescriptorPath + "'");
+        String searchDescriptorPath = searchPath + "/" + searchFormsDescriptor;//NOI18N
+        if(logger.isDebugEnabled())logger.debug("loading search forms XML descriptor from remote URL '" + searchDescriptorPath + "'");//NOI18N
         
-        return new BufferedInputStream(ResourceManager.getManager().getResourceAsStream(searchDescriptorPath), 8192);
+        return new BufferedInputStream(resource.getResourceAsStream(searchDescriptorPath), 8192);
     }
     
     // RuleSet
@@ -84,44 +85,44 @@ public class SearchFormFactory
         public void addRuleInstances(Digester digester)
         {
             // add libraries (jar files) & create classLoader ..................
-            digester.addCallMethod("search/libraries/jar", "addLibrary", 0);
-            digester.addCallMethod("search/libraries", "createClassLoader");
+            digester.addCallMethod("search/libraries/jar", "addLibrary", 0);//NOI18N
+            digester.addCallMethod("search/libraries", "createClassLoader");//NOI18N
             
             // add form properties  ............................................
-            digester.addCallMethod("search/categories/category/forms/form/properties/property", "addProperty", 2);
-            digester.addCallParam("search/categories/category/forms/form/properties/property/name", 0);
-            digester.addCallParam("search/categories/category/forms/form/properties/property/value", 1);
+            digester.addCallMethod("search/categories/category/forms/form/properties/property", "addProperty", 2);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/properties/property/name", 0);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/properties/property/value", 1);//NOI18N
             
             // add the query parameter name <-> form parameter name mapping ....
-            digester.addCallMethod("search/categories/category/forms/form/mappings/queryParameter", "addParameterMapping", 2);
-            digester.addCallParam("search/categories/category/forms/form/mappings/queryParameter/queryName", 0);
-            digester.addCallParam("search/categories/category/forms/form/mappings/queryParameter/formName", 1);
+            digester.addCallMethod("search/categories/category/forms/form/mappings/queryParameter", "addParameterMapping", 2);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/mappings/queryParameter/queryName", 0);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/mappings/queryParameter/formName", 1);//NOI18N
             
             // form i182 .......................................................
             digester.addCallMethod("search/categories/category/forms/form/resourceBundle", "setFormResourceBundle", 0);
             // form visible ....................................................
-            digester.addCallMethod("search/categories/category/forms/form/visible", "setFormVisible", 0, new String[] {"java.lang.Boolean"});
+            digester.addCallMethod("search/categories/category/forms/form/visible", "setFormVisible", 0, new String[] {"java.lang.Boolean"});//NOI18N
             
             // create the search form  .........................................
-            digester.addCallMethod("search/categories/category/forms/form", "createSearchForm", 5);
-            digester.addCallParam("search/categories/category/forms/form/name", 0);
-            digester.addCallParam("search/categories/category/forms/form/formClass", 1);
-            digester.addCallParam("search/categories/category/forms/form/formDataClass", 2);
-            digester.addCallParam("search/categories/category/forms/form/formId", 3);
-            digester.addCallParam("search/categories/category/forms/form/queryId", 4);
+            digester.addCallMethod("search/categories/category/forms/form", "createSearchForm", 5);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/name", 0);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/formClass", 1);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/formDataClass", 2);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/formId", 3);//NOI18N
+            digester.addCallParam("search/categories/category/forms/form/queryId", 4);//NOI18N
             //digester.addCallParam("search/categories/category/forms/form/internationalized", 4);
             
             // category i182 ...................................................
-            digester.addCallMethod("search/categories/category/resourceBundle", "setCategoryResourceBundle", 0);
+            digester.addCallMethod("search/categories/category/resourceBundle", "setCategoryResourceBundle", 0);//NOI18N
             // category visible ................................................
-            digester.addCallMethod("search/categories/category/visible", "setContainerVisible", 0, new String[] {"java.lang.Boolean"});
+            digester.addCallMethod("search/categories/category/visible", "setContainerVisible", 0, new String[] {"java.lang.Boolean"});//NOI18N
             
             // create the search form  container ................................
             //digester.addCallMethod("search/categories/category", "createSearchFormContainer", 3, new String[]
             //{"java.lang.String", "java.lang.String", "java.lang.Boolean"});
-            digester.addCallMethod("search/categories/category", "createSearchFormContainer", 2);
-            digester.addCallParam("search/categories/category/name", 0);
-            digester.addCallParam("search/categories/category/categoryClass", 1);
+            digester.addCallMethod("search/categories/category", "createSearchFormContainer", 2);//NOI18N
+            digester.addCallParam("search/categories/category/name", 0);//NOI18N
+            digester.addCallParam("search/categories/category/categoryClass", 1);//NOI18N
             //digester.addCallParam("search/categories/category/internationalized", 2);
             
             // add all containers to the manager
@@ -167,7 +168,7 @@ public class SearchFormFactory
         
         public void addLibrary(String jar)
         {
-            if(logger.isDebugEnabled())logger.debug("adding library " + jar + "'");
+            if(logger.isDebugEnabled())logger.debug("adding library " + jar + "'");//NOI18N
             librariesList.add(jar);
         }
         
@@ -175,14 +176,14 @@ public class SearchFormFactory
         {
             if(this.librariesList.size() > 0)
             {
-                if(logger.isDebugEnabled())logger.debug("loading libraries @ '" + this.searchFormsPath + "'");
+                if(logger.isDebugEnabled())logger.debug("loading libraries @ '" + this.searchFormsPath + "'");//NOI18N
                 // load jar files
                 URL[] urls = new URL[this.librariesList.size()];
                 //String jarBase = ResourceManager.getManager().pathToIURIString(PropertyManager.getManager().getSearchFormPath() + "lib/");
-                String jarBase = ResourceManager.getManager().pathToIURIString(this.searchFormsPath + "/lib/");
+                String jarBase = resource.pathToIURIString(this.searchFormsPath + "/lib/");//NOI18N
                 for (int i = 0; i < this.librariesList.size(); i++)
                 {
-                    if(logger.isDebugEnabled())logger.debug("loading search form library: '" + jarBase + this.librariesList.get(i).toString() + "'");
+                    if(logger.isDebugEnabled())logger.debug("loading search form library: '" + jarBase + this.librariesList.get(i).toString() + "'");//NOI18N
                     urls[i] = new URL(jarBase + this.librariesList.get(i).toString());
                 }
 
@@ -191,20 +192,20 @@ public class SearchFormFactory
             else
             {
                 
-                logger.warn("no form libraries loaded, using default classloader");
+                logger.warn("no form libraries loaded, using default classloader");//NOI18N
                 this.formClassLoader = this.getClass().getClassLoader();
             }
         }
         
         public void addProperty(String name, String value)
         {
-            if(logger.isDebugEnabled())logger.debug("adding property: '" + name + "' = '" + value + "'");
+            if(logger.isDebugEnabled())logger.debug("adding property: '" + name + "' = '" + value + "'");//NOI18N
             this.formPropertiesMap.put(name, value);
         }
         
         public void addParameterMapping(String queryName, String formName)
         {
-            if(logger.isDebugEnabled())logger.debug("adding parameter mapping: '" + queryName + "' == '" + formName + "'");
+            if(logger.isDebugEnabled())logger.debug("adding parameter mapping: '" + queryName + "' == '" + formName + "'");//NOI18N
             this.parameterMappingMap.put(queryName, formName);
         }
         
@@ -225,8 +226,8 @@ public class SearchFormFactory
         
         public void createSearchForm(String name, String formClass, String formDataClass, String formId, String queryId) throws ClassNotFoundException, InstantiationException, IllegalAccessException
         {
-            logger.info(name + ", " + formClass  + ", " + formDataClass + formId + ", " + ", " + queryId); // + ", " + internationalized);
-            if(logger.isDebugEnabled())logger.debug("creating data bean instance of class '" + formDataClass + "'");
+            logger.info(name + ", " + formClass  + ", " + formDataClass + formId + ", " + ", " + queryId); // + ", " + internationalized);//NOI18N
+            if(logger.isDebugEnabled())logger.debug("creating data bean instance of class '" + formDataClass + "'");//NOI18N
             Class dataBeanClass = this.formClassLoader.loadClass(formDataClass);
             
             FormDataBean dataBean = (FormDataBean)dataBeanClass.newInstance();
@@ -237,7 +238,7 @@ public class SearchFormFactory
             // clear parameter map:
             this.parameterMappingMap.clear();
             
-            if(logger.isDebugEnabled())logger.debug("creating form instance of class '" + formClass + "'");
+            if(logger.isDebugEnabled())logger.debug("creating form instance of class '" + formClass + "'");//NOI18N
             Class searchFormClass = this.formClassLoader.loadClass(formClass);
             
             SearchForm searchForm = (SearchForm)searchFormClass.newInstance();
@@ -255,7 +256,7 @@ public class SearchFormFactory
             }
             else if(logger.isDebugEnabled())
             {
-                logger.warn("form '" + name + "' does not support i182");
+                logger.warn("form '" + name + "' does not support i182");//NOI18N
             }
             if(this.formPropertiesMap.size() > 0)
             {
@@ -271,7 +272,7 @@ public class SearchFormFactory
             searchForm.setSearchContext(this.searchContext);
             
             
-            if(logger.isDebugEnabled())logger.debug("new search form '" + searchForm.getName() + "' created");
+            if(logger.isDebugEnabled())logger.debug("new search form '" + searchForm.getName() + "' created");//NOI18N
             this.searchFormsList.add(searchForm);
         }
         
@@ -282,7 +283,7 @@ public class SearchFormFactory
         
         public void createSearchFormContainer(String name, String categoryClass) throws ClassNotFoundException, InstantiationException, IllegalAccessException
         {
-            if(logger.isDebugEnabled())logger.debug("creating form container instance of class '" + categoryClass + "'");
+            if(logger.isDebugEnabled())logger.debug("creating form container instance of class '" + categoryClass + "'");//NOI18N
             Class searchFormContainerClass = this.formClassLoader.loadClass(categoryClass);
             
             SearchFormContainer searchFormContainer = (SearchFormContainer)searchFormContainerClass.newInstance();
@@ -297,7 +298,7 @@ public class SearchFormFactory
             }
             else if(logger.isDebugEnabled())
             {
-                logger.warn("form container '" + name + "' does not support i182");
+                logger.warn("form container '" + name + "' does not support i182");//NOI18N
             }
             
             searchFormContainer.setVisible(this.containerVisible);
@@ -318,14 +319,14 @@ public class SearchFormFactory
             
             this.searchFormsList.clear();
             
-            if(logger.isDebugEnabled())logger.debug("new search form container '" + searchFormContainer.getName() + "' created");
+            if(logger.isDebugEnabled())logger.debug("new search form container '" + searchFormContainer.getName() + "' created");//NOI18N
             this.searchFormContainerList.add(searchFormContainer);  
         }
         
         private ResourceBundle getResourceBundle(String resourceBundleName)
         {
-            Locale locale = ResourceManager.getManager().getLocale();
-            if(logger.isDebugEnabled())logger.debug("loading resource bundle '" + resourceBundleName + "' for locale '" + locale + "'");
+            Locale locale = resource.getLocale();
+            if(logger.isDebugEnabled())logger.debug("loading resource bundle '" + resourceBundleName + "' for locale '" + locale + "'");//NOI18N
             
             try
             {
@@ -333,7 +334,7 @@ public class SearchFormFactory
             }
             catch(Throwable t)
             {
-                logger.error("could not load resource bundle '" + resourceBundleName + "' for locale '" + locale + "'", t);
+                logger.error("could not load resource bundle '" + resourceBundleName + "' for locale '" + locale + "'", t);//NOI18N
                 return null;
             }
             

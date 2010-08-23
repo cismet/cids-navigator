@@ -65,10 +65,10 @@ public final class RMIConnection implements Connection {
 
     private static final transient Logger LOG = Logger.getLogger(RMIConnection.class);
     private static final boolean IS_LEIGHTWEIGHT_MO_CODE_ENABLED;
-    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo";
+    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo";  // NOI18N
 
     static {
-        final String uHome = System.getProperty("user.home");
+        final String uHome = System.getProperty("user.home");  // NOI18N
         if (uHome != null) {
             final File homeDir = new File(uHome);
             final File disableIndicator = new File(homeDir, DISABLE_MO_FILENAME);
@@ -810,13 +810,13 @@ public final class RMIConnection implements Connection {
     private MetaObject[] getLightweightMetaObjectsFallback(final int classId, final User user)
             throws ConnectionException {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId);
-        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");
-        String orderBy = "";
+        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");  // NOI18N
+        String orderBy = "";  // NOI18N
         if (ca != null) {
             final String value = ca.getValue().toString();
-            orderBy = " order by " + value;
+            orderBy = " order by " + value;  // NOI18N
         }
-        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;
+        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;  // NOI18N
 
         return getMetaObjectByQuery(user, query);
     }

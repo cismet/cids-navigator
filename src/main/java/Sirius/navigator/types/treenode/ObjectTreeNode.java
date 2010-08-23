@@ -37,6 +37,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     protected ImageIcon nodeIcon;
     private MetaClass metaClass;
+    private static final ResourceManager resource = ResourceManager.getManager();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -53,10 +54,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
             if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = ResourceManager.getManager().getIcon("ObjectNodeIcon.gif"); // NOI18N
+                this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
             }
-        } catch (final Exception exp) {
-            this.nodeIcon = ResourceManager.getManager().getIcon("ObjectNodeIcon.gif");     // NOI18N
+        } catch (Exception exp) {
+            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
         }
     }
 

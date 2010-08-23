@@ -35,7 +35,7 @@ public class SimpleByteMetaAttributeEditor extends DefaultSimpleMetaAttributeEdi
         }
         catch(NumberFormatException nfe)
         {
-            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid Byte", nfe);
+            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid Byte", nfe);//NOI18N
             Byte byteObject = new Byte((byte)0);
             this.setComponentValue(byteObject);
             return byteObject;
@@ -50,7 +50,7 @@ public class SimpleByteMetaAttributeEditor extends DefaultSimpleMetaAttributeEdi
         public void insertString(final int i, final String s, final AttributeSet attributes) throws BadLocationException
         {  
             super.insertString(i, s, attributes);
-            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))
+            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))//NOI18N
             {
                 try
                 {

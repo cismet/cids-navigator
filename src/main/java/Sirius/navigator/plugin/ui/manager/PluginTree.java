@@ -19,7 +19,8 @@ import Sirius.navigator.plugin.*;
  * @author  Peter Alzheimer
  */
 public class PluginTree extends JTree
-{   
+{
+    private static final ResourceManager resources = ResourceManager.getManager();
     private final PluginTreeNode rootNode;
     
     /** Holds value of property initialized. (lazy initialization) */
@@ -121,10 +122,10 @@ public class PluginTree extends JTree
         
         public PluginTreeNode()
         {
-            super(ResourceManager.getManager().getString("plugin.tree.rootnode"));
+            super(org.openide.util.NbBundle.getMessage(PluginTree.class, "PluginTree.PluginTreeNode.rootNode"));//NOI18N
             this.pluginDescriptor = null;
             this.methodDescriptor = null;
-            this.icon = ResourceManager.getManager().getIcon("plugin_node_root.gif");
+            this.icon = resources.getIcon("plugin_node_root.gif");
         }
         
         public PluginTreeNode(PluginDescriptor pluginDescriptor)
@@ -132,7 +133,7 @@ public class PluginTree extends JTree
             super(pluginDescriptor.getName());
             this.pluginDescriptor = pluginDescriptor;
             this.methodDescriptor = null;
-            this.icon = ResourceManager.getManager().getIcon("plugin_node_plugin.gif");
+            this.icon = resources.getIcon("plugin_node_plugin.gif");
             
             if(pluginDescriptor.isPluginMethodsAvailable())
             {
@@ -145,7 +146,7 @@ public class PluginTree extends JTree
             super(methodDescriptor.getName());
             this.pluginDescriptor = null;
             this.methodDescriptor = methodDescriptor;
-            this.icon = ResourceManager.getManager().getIcon("plugin_node_method.gif");
+            this.icon = resources.getIcon("plugin_node_method.gif");
         }
         
         protected void addMethods()

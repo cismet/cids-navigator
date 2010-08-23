@@ -72,7 +72,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
     private boolean obeyMinimumSize = false;
     private final MutableToolBar toolBar;
     private final MutableMenuBar menuBar;
-    public final static String DEFAULT_LAYOUT = Navigator.NAVIGATOR_HOME + "navigator.layout";
+    public final static String DEFAULT_LAYOUT = Navigator.NAVIGATOR_HOME + "navigator.layout";//NOI18N
 
     public LayoutedContainer(MutableToolBar toolBar, MutableMenuBar menuBar) {
         this(toolBar, menuBar, false);
@@ -83,7 +83,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
     }
 
     public LayoutedContainer(MutableToolBar toolBar, MutableMenuBar menuBar, boolean continuousLayout, boolean oneTouchExpandable, boolean proportionalResize) {
-        logger.debug("creating LayoutedContainer instance");
+        logger.debug("creating LayoutedContainer instance");//NOI18N
 
         this.toolBar = toolBar;
         this.menuBar = menuBar;
@@ -198,7 +198,9 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
     }
 
     public synchronized void add(final MutableConstraints constraints) {
-        logger.info("adding component '" + constraints.getName() + "' to mutable container at position '" + constraints.getPosition() + "'");
+        if (logger.isInfoEnabled()) {
+            logger.info("adding component '" + constraints.getName() + "' to mutable container at position '" + constraints.getPosition() + "'");//NOI18N
+        }
         if (logger.isDebugEnabled()) {
             logger.debug(constraints.toString());
         }
@@ -207,7 +209,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
             if (!this.rootWindow.isDisplayable() || SwingUtilities.isEventDispatchThread()) {
                 doAdd(constraints);
             } else {
-                logger.debug("add(): synchronizing method");
+                logger.debug("add(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
@@ -220,7 +222,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                 constraints.addPropertyChangeListener(constrainsChangeListener);
             }
         } else {
-            logger.error("a component with the same id '" + constraints.getId() + "' is already in this container");
+            logger.error("a component with the same id '" + constraints.getId() + "' is already in this container");//NOI18N
         }
     }
 
@@ -229,7 +231,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         Vector<View> tabbedPane = this.getViewsAtPosition(constraints.getPosition());
         if (constraints.getPreferredIndex() != -1 && tabbedPane.size() > constraints.getPreferredIndex()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("inserting component at index '" + constraints.getPreferredIndex() + "'");
+                logger.debug("inserting component at index '" + constraints.getPreferredIndex() + "'");//NOI18N
             }
             if (constraints.getContainerType().equals(MutableConstraints.FLOATINGFRAME)) {
                 tabbedPane.add(constraints.getPreferredIndex(), constraints.getView());
@@ -268,7 +270,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
     }
 
     private void addFloatingFrame(MutableConstraints constraints) {
-        logger.debug("adding FloatingFrame");
+        logger.debug("adding FloatingFrame");//NOI18N
         FloatingFrameConfigurator configurator = constraints.getFloatingFrameConfigurator();
         ((FloatingFrame) constraints.getContainer()).setTileBarVisible(false);
         //configurator.setIcon(null);
@@ -279,30 +281,34 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         //logger.info("FloatingFrame configurator '" + configurator + "'");
         //logger.info("FloatingFrame configurator id: '" + configurator.getId() + "'");
         if (!configurator.getId().equals(constraints.getId())) {
-            logger.warn("FloatingFrame constraints id: '" + constraints.getId() + "' != FloatingFrame configurator id: '" + configurator.getId() + "'");
+            logger.warn("FloatingFrame constraints id: '" + constraints.getId() + "' != FloatingFrame configurator id: '" + configurator.getId() + "'");//NOI18N
         }
 
         if (configurator.isSwapMenuBar() || configurator.isSwapToolBar()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("enabling Floating Listener");
+                logger.debug("enabling Floating Listener");//NOI18N
             }
             ((FloatingFrame) constraints.getContainer()).addPropertyChangeListener(FloatingFrame.FLOATING, floatingFrameListener);
             constraints.getView().addListener(dockingWindowListener);
         }
 
         if (configurator.isSwapMenuBar()) {
-            logger.info("adding FloatingFrameMenuBar '" + configurator.getId() + "' to MutableMenuBar");
+            if (logger.isInfoEnabled()) {
+                logger.info("adding FloatingFrameMenuBar '" + configurator.getId() + "' to MutableMenuBar");//NOI18N
+            }
             menuBar.addMoveableMenues(configurator.getId(), configurator.getMenues());
         }
 
         if (configurator.isSwapToolBar()) {
-            logger.info("adding FloatingFrameToolBar '" + configurator.getId() + "' to MutableToolBar");
+            if (logger.isInfoEnabled()) {
+                logger.info("adding FloatingFrameToolBar '" + configurator.getId() + "' to MutableToolBar");//NOI18N
+            }
             toolBar.addMoveableToolBar(((FloatingFrame) constraints.getContainer()).getToolBar());
         }
     }
 
     private void removeFloatingFrame(MutableConstraints constraints) {
-        logger.debug("removing FloatingFrame");
+        logger.debug("removing FloatingFrame");//NOI18N
         FloatingFrameConfigurator configurator = constraints.getFloatingFrameConfigurator();
 
         if (configurator.isSwapMenuBar() || configurator.isSwapToolBar()) {
@@ -310,18 +316,24 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         }
 
         if (configurator.isSwapMenuBar()) {
-            logger.info("removing FloatingFrameMenuBar '" + configurator.getId() + "' from MutableMenuBar");
+            if (logger.isInfoEnabled()) {
+                logger.info("removing FloatingFrameMenuBar '" + configurator.getId() + "' from MutableMenuBar");//NOI18N
+            }
             menuBar.removeMoveableMenues(configurator.getId());
         }
 
         if (configurator.isSwapToolBar()) {
-            logger.info("removing FloatingFrameToolBar '" + configurator.getId() + "' from MutableToolBar");
+            if (logger.isInfoEnabled()) {
+                logger.info("removing FloatingFrameToolBar '" + configurator.getId() + "' from MutableToolBar");//NOI18N
+            }
             toolBar.removeMoveableToolBar(configurator.getId());
         }
     }
 
     public synchronized void remove(String id) {
-        logger.info("removing component '" + id + "'");
+        if (logger.isInfoEnabled()) {
+            logger.info("removing component '" + id + "'");//NOI18N
+        }
         if (components.containsKey(id)) {
             final MutableConstraints constraints = (MutableConstraints) components.remove(id);
             if (constraints.isMutable()) {
@@ -331,7 +343,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
             if (SwingUtilities.isEventDispatchThread()) {
                 doRemove(constraints);
             } else {
-                logger.debug("remove(): synchronizing method");
+                logger.debug("remove(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
@@ -340,13 +352,13 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                 });
             }
         } else {
-            logger.error("component '" + id + "' not found in this container");
+            logger.error("component '" + id + "' not found in this container");//NOI18N
         }
     }
 
     private void doRemove(MutableConstraints constraints) {
         if (logger.isDebugEnabled()) {
-            logger.debug("removing component '" + constraints.getName() + "' at position '" + constraints.getPosition() + "'");
+            logger.debug("removing component '" + constraints.getName() + "' at position '" + constraints.getPosition() + "'");//NOI18N
         }
         Vector<View> tabbedPane = this.getViewsAtPosition(constraints.getPosition());
 
@@ -360,14 +372,14 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
 
     public synchronized void select(String id) {
         if (logger.isDebugEnabled()) {
-            logger.debug("selecting component '" + id + "'");
+            logger.debug("selecting component '" + id + "'");//NOI18N
         }
         if (components.containsKey(id)) {
             final MutableConstraints constraints = (MutableConstraints) components.get(id);
             if (SwingUtilities.isEventDispatchThread()) {
                 doSelect(constraints);
             } else {
-                logger.debug("select(): synchronizing method");
+                logger.debug("select(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
@@ -376,7 +388,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                 });
             }
         } else {
-            logger.error("component '" + id + "' not found in this container");
+            logger.error("component '" + id + "' not found in this container");//NOI18N
         }
     }
 
@@ -410,7 +422,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         } else if (position.equals(MutableConstraints.P3)) {
             return p3Pane;
         } else {
-            logger.warn("unknown position '" + position + "', using default '" + MutableConstraints.P3 + "'");
+            logger.warn("unknown position '" + position + "', using default '" + MutableConstraints.P3 + "'");//NOI18N
             return p3Pane;
         }
     }
@@ -431,14 +443,14 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
 
             if (floatingFrame.getConfigurator().isSwapMenuBar()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("setting floating frame meneus visible: '" + !floatingFrame.isFloating() + "'");
+                    logger.debug("setting floating frame meneus visible: '" + !floatingFrame.isFloating() + "'");//NOI18N
                 }
                 menuBar.setMoveableMenuesVisible(floatingFrame.getConfigurator().getId(), !floatingFrame.isFloating());
             }
 
             if (floatingFrame.getConfigurator().isSwapToolBar()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("setting floating frame toolbar visible: '" + !floatingFrame.isFloating() + "'");
+                    logger.debug("setting floating frame toolbar visible: '" + !floatingFrame.isFloating() + "'");//NOI18N
                 }
                 toolBar.setMoveableToolBarVisible(floatingFrame.getConfigurator().getId(), !floatingFrame.isFloating());
             }
@@ -451,22 +463,22 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
             if (e.getSource() instanceof MutableConstraints) {
                 final MutableConstraints constraints = (MutableConstraints) e.getSource();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("setting new value of property '" + e.getPropertyName() + "' of component '" + constraints.getId() + "'");//                TabWindow tabbedPane = getTabWindowAt(constraints.getPosition());                                
+                    logger.debug("setting new value of property '" + e.getPropertyName() + "' of component '" + constraints.getId() + "'");//                TabWindow tabbedPane = getTabWindowAt(constraints.getPosition());   //NOI18N
 //                int index = tabbedPane.getChildWindowIndex(constraints.getView());                
 
                 }
                 View changedView = constraints.getView();
-                if (e.getPropertyName().equals("name")) {
+                if (e.getPropertyName().equals("name")) {//NOI18N
                     //tabbedPane.seTitleAt(index, constraints.getName());
                     changedView.getViewProperties().setTitle(constraints.getName());
-                } else if (e.getPropertyName().equals("tooltip")) {
+                } else if (e.getPropertyName().equals("tooltip")) {//NOI18N
 //                    tabbedPane.setToolTipTextAt(index, constraints.getToolTip());
 //                    changedView.get
                     //TODO
-                    logger.debug("Tooltip konnte nicht geändert werden, da nicht implementiert");
-                } else if (e.getPropertyName().equals("icon")) {
+                    logger.debug("Tooltip konnte nicht geändert werden, da nicht implementiert");//NOI18N
+                } else if (e.getPropertyName().equals("icon")) {//NOI18N
                     changedView.getViewProperties().setIcon(constraints.getIcon());
-                } else if (e.getPropertyName().equals("position") || e.getPropertyName().equals("preferredIndex")) {
+                } else if (e.getPropertyName().equals("position") || e.getPropertyName().equals("preferredIndex")) {//NOI18N
                     // add() f\u00FChrt automatisch zu einem remove()
                     // doRemove(constraints);
 
@@ -478,11 +490,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                     doAdd(constraints);
                     doSelect(constraints);
                 } else {
-                    logger.warn("unsupported property change of '" + e.getPropertyName() + "'");
+                    logger.warn("unsupported property change of '" + e.getPropertyName() + "'");//NOI18N
                 }
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("unexpected property change event '" + e.getPropertyName() + "'");
+                    logger.debug("unexpected property change event '" + e.getPropertyName() + "'");//NOI18N
                 }
             }
         }
@@ -499,7 +511,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         try {
             //logger.fatal("p1Pane: "+p1Pane);
             //logger.fatal("p1 Childcount"+getTabWindowAt().getChildWindowCount());                
-            logger.debug("entferne alle Listener");
+            logger.debug("remove all listener");//NOI18N
             TabWindow p1 = null;
             if (p1Pane.size() != 0) {
                 p1 = new TabWindow();
@@ -551,7 +563,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
             }
 
         } catch (Exception ex) {
-            logger.warn("Fehler beim Layouten des Navigators", ex);
+            logger.warn("Error while layouting the Navigator", ex);//NOI18N
         }
 
     }
@@ -565,13 +577,15 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                 java.awt.EventQueue.invokeLater(new Runnable() {
 
                     public void run() {
-                        DeveloperUtil.createWindowLayoutFrame("Momentanes Layout", rootWindow).setVisible(true);
+                        DeveloperUtil.createWindowLayoutFrame(
+                                org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.doConfigKeystrokes.rootWindow.title"),//NOI18N
+                                rootWindow).setVisible(true);
                     }
                 });
             }
         };
-        rootWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(showLayoutKeyStroke, "SHOW_LAYOUT");
-        rootWindow.getActionMap().put("SHOW_LAYOUT", showLayoutAction);
+        rootWindow.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(showLayoutKeyStroke, "SHOW_LAYOUT");//NOI18N
+        rootWindow.getActionMap().put("SHOW_LAYOUT", showLayoutAction);//NOI18N
     //rootWindow.registerKeyboardAction(showLayoutAction,showLayoutKeyStroke,JComponent.WHEN_FOCUSED);
     }
 
@@ -581,11 +595,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         fc.setFileFilter(new FileFilter() {
 
             public boolean accept(File f) {
-                return f.getName().toLowerCase().endsWith(".layout");
+                return f.getName().toLowerCase().endsWith(".layout");//NOI18N
             }
 
             public String getDescription() {
-                return "Layout";
+                return "Layout";//NOI18N
             }
         });
         fc.setMultiSelectionEnabled(false);
@@ -594,20 +608,22 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
             File file = fc.getSelectedFile();
             String name = file.getAbsolutePath();
             name = name.toLowerCase();
-            if (name.endsWith(".layout")) {
+            if (name.endsWith(".layout")) {//NOI18N
                 loadLayout(name, false, parent);
             } else {
-                JOptionPane.showMessageDialog(parent, java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.format_failure_message"), java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.message_title"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(parent, org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(Component).JOptionPane.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(Component).JOptionPane.title"), //NOI18N
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         }
     }
 
     public void loadLayout(String file, boolean isInit, Component parent) {
-        logger.debug("Load Layout.. from " + file);
+        logger.debug("Load Layout.. from " + file);//NOI18N
         File layoutFile = new File(file);
 
         if (layoutFile.exists()) {
-            logger.debug("Layout File exists");
+            logger.debug("Layout File exists");//NOI18N
             try {
                 FileInputStream layoutInput = new FileInputStream(layoutFile);
                 ObjectInputStream in = new ObjectInputStream(layoutInput);
@@ -624,20 +640,24 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                         }
                     }
                 }
-                logger.debug("Loading Layout successfull");
+                logger.debug("Loading Layout successfull");//NOI18N
             } catch (IOException ex) {
-                logger.error("Layout File IO Exception --> loading default Layout", ex);
+                logger.error("Layout File IO Exception --> loading default Layout", ex);//NOI18N
                 if (isInit) {
-                    JOptionPane.showMessageDialog(parent, java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.loading_layout_failure_message_init"), java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.message_title"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(String,boolean,Component).message.reset"), //NOI18N
+                            org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(String,boolean,Component).title"),//NOI18N
+                            JOptionPane.INFORMATION_MESSAGE);
                     doLayoutInfoNode();
                 } else {
-                    JOptionPane.showMessageDialog(parent, java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.loading_layout_failure_message"), java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.message_title"), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(parent, org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(String,boolean,Component).message"), //NOI18N
+                            org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(String,boolean,Component).title"), //NOI18N
+                            JOptionPane.INFORMATION_MESSAGE);
                 }
 
             }
         } else {
             if (isInit) {
-                logger.warn("Datei exitstiert nicht --> default layout (init)");
+                logger.warn("Datei exitstiert nicht --> default layout (init)");//NOI18N
                 SwingUtilities.invokeLater(new Runnable() {
 
                     public void run() {
@@ -649,8 +669,10 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                     }
                 });
             } else {
-                logger.warn("Datei exitstiert nicht)");
-                JOptionPane.showMessageDialog(parent, java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.layout_does_not_exist"), java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.message_title"), JOptionPane.INFORMATION_MESSAGE);
+                logger.warn("Datei exitstiert nicht)");//NOI18N
+                JOptionPane.showMessageDialog(parent, org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(String,boolean,Component).message.notFound"), //NOI18N
+                        org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.loadLayout(String,boolean,Component).title"), //NOI18N
+                        JOptionPane.INFORMATION_MESSAGE);
             }
 
         }
@@ -665,48 +687,54 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         fc.setFileFilter(new FileFilter() {
 
             public boolean accept(File f) {
-                return f.getName().toLowerCase().endsWith(".layout");
+                return f.getName().toLowerCase().endsWith(".layout");//NOI18N
             }
 
             public String getDescription() {
-                return "Layout";
+                return "Layout";//NOI18N
             }
         });
         fc.setMultiSelectionEnabled(false);
         int state = fc.showSaveDialog(parent);
-        logger.debug("state:" + state);
+        logger.debug("state:" + state);//NOI18N
         if (state == JFileChooser.APPROVE_OPTION) {
             File file = fc.getSelectedFile();
-            logger.debug("file:" + file);
+            logger.debug("file:" + file);//NOI18N
             String name = file.getAbsolutePath();
             name = name.toLowerCase();
-            if (name.endsWith(".layout")) {
+            if (name.endsWith(".layout")) {//NOI18N
                 saveLayout(name, parent);
             } else {
-                saveLayout(name + ".layout", parent);
+                saveLayout(name + ".layout", parent);//NOI18N
             }
         }
     }
 
     public void saveLayout(String file, Component parent) {
-        logger.debug("Saving Layout.. to " + file);
+        if (logger.isDebugEnabled()) {
+            logger.debug("Saving Layout.. to " + file);//NOI18N
+        }
         File layoutFile = new File(file);
         try {
             if (!layoutFile.exists()) {
-                logger.debug("Saving Layout.. File does not exit");
+                logger.debug("Saving Layout.. File does not exit");//NOI18N
                 layoutFile.createNewFile();
             } else {
-                logger.debug("Saving Layout.. File does exit");
+                logger.debug("Saving Layout.. File does exit");//NOI18N
             }
             FileOutputStream layoutOutput = new FileOutputStream(layoutFile);
             ObjectOutputStream out = new ObjectOutputStream(layoutOutput);
             rootWindow.write(out);
             out.flush();
             out.close();
-            logger.debug("Saving Layout.. to " + file + " successfull");
+            if (logger.isDebugEnabled()) {
+                logger.debug("Saving Layout.. to " + file + " successfull");//NOI18N
+            }
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(parent, java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.saving_layout_failure"), java.util.ResourceBundle.getBundle("de/cismet/cismap/navigatorplugin/Bundle").getString("CismapPlugin.InfoNode.message_title"), JOptionPane.INFORMATION_MESSAGE);
-            logger.error("A failure occured during writing the layout file", ex);
+            JOptionPane.showMessageDialog(parent, org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.saveLayout().message"), //NOI18N
+                    org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "LayoutedContainer.saveLayout().title"), //NOI18N
+                    JOptionPane.INFORMATION_MESSAGE);
+            logger.error("A failure occured during writing the layout file", ex);//NOI18N
         }
     }
     private final DockingWindowListener dockingWindowListener = new DockingWindowListener() {
@@ -755,26 +783,26 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         }
 
         public void windowShown(DockingWindow arg0) {
-            logger.debug("Docking window shown");
+            logger.debug("Docking window shown");//NOI18N
             try {
                 if (arg0 instanceof CustomView) {
                     menuBar.setMoveableMenuesEnabled(((CustomView) arg0).getId(), true);
                     toolBar.setMoveableToolBarEnabled(((CustomView) arg0).getId(), true);
                 }
             } catch (Exception ex) {
-                logger.error("Fehler beim anschalten der MenuBar/Toolbar", ex);
+                logger.error("Error while activating the MenuBar/Toolbar", ex);//NOI18N
             }
         }
 
         public void windowHidden(DockingWindow arg0) {
-            logger.debug("Docking window hidden");
+            logger.debug("Docking window hidden");//NOI18N
             try {
                 if (arg0 instanceof CustomView) {
                     menuBar.setMoveableMenuesEnabled(((CustomView) arg0).getId(), false);
                     toolBar.setMoveableToolBarEnabled(((CustomView) arg0).getId(), false);
                 }
             } catch (Exception ex) {
-                logger.error("Fehler beim auschalten der MenuBar/Toolbar", ex);
+                logger.error("Error while deactivating the MenuBar/Toolbar", ex);//NOI18N
             }
         }
 
@@ -791,12 +819,12 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         }
 
         public void windowUndocked(DockingWindow arg0) {
-            logger.debug("Docking window shown");
+            logger.debug("Docking window shown");//NOI18N
             try {
                 menuBar.setMoveableMenuesEnabled(((CustomView) arg0).getId(), true);
                 toolBar.setMoveableToolBarEnabled(((CustomView) arg0).getId(), true);
             } catch (Exception ex) {
-                logger.error("Fehler beim anschalten der MenuBar/Toolbar", ex);
+                logger.error("Error while activating the MenuBar/Toolbar", ex);//NOI18N
             }
         }
 

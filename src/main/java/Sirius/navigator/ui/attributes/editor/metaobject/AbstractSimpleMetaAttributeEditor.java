@@ -24,17 +24,17 @@ public abstract class AbstractSimpleMetaAttributeEditor extends AbstractSimpleEd
     {
         if (this.getValue() != null && this.getValue() instanceof Attribute && (value == null || !(value instanceof Attribute)))
         {
-            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new value of existing meta attribute");
+            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new value of existing meta attribute");//NOI18N
             ((Attribute)this.getValue()).setValue(value);
         }
         else if(value != null && value instanceof Attribute)
         {
-            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new Meta Attribute no null value");
+            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new Meta Attribute no null value");//NOI18N
             super.setValue(value);
         }
         else
         {
-            logger.error("setValue(" + this + ") old value or new value is not of type Attribute, null values are not permitted in this editor (" + value + ")");
+            logger.error("setValue(" + this + ") old value or new value is not of type Attribute, null values are not permitted in this editor (" + value + ")");//NOI18N
         }
     }
     
@@ -51,7 +51,7 @@ public abstract class AbstractSimpleMetaAttributeEditor extends AbstractSimpleEd
         }
         catch(Exception exp)
         {
-            logger.error("isEditable() could not check permissions of attribute " + this.getValue(), exp);
+            logger.error("isEditable() could not check permissions of attribute " + this.getValue(), exp);//NOI18N
         }
         
         return false;
@@ -94,7 +94,7 @@ public abstract class AbstractSimpleMetaAttributeEditor extends AbstractSimpleEd
     {
         if(this.isStringCreateable(attribute))
         {
-            if(logger.isDebugEnabled())logger.debug("setValueFromString(): setting value from string " + newValue);
+            if(logger.isDebugEnabled())logger.debug("setValueFromString(): setting value from string " + newValue);//NOI18N
             Object newerValue = ((StringCreateable)attribute).fromString(newValue, attribute);
             
             this.setValue(newerValue);
@@ -140,7 +140,7 @@ public abstract class AbstractSimpleMetaAttributeEditor extends AbstractSimpleEd
             AbstractSimpleMetaAttributeEditor.this.setValueChanged(AbstractSimpleMetaAttributeEditor.this.isValueChanged() | this.isChanged());
             if(AbstractSimpleMetaAttributeEditor.this.isValueChanged())
             {
-                if(logger.isDebugEnabled())logger.debug("actionPerformed(" + AbstractSimpleMetaAttributeEditor.this.getId() + "): speichere neue Eingabe");
+                if(logger.isDebugEnabled())logger.debug("actionPerformed(" + AbstractSimpleMetaAttributeEditor.this.getId() + "): save new input");//NOI18N
                 AbstractSimpleMetaAttributeEditor.this.stopEditing();
             }
         }

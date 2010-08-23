@@ -9,7 +9,6 @@ import Sirius.navigator.plugin.*;
 import Sirius.navigator.plugin.interfaces.*;
 import Sirius.navigator.method.*;
 import Sirius.server.localserver.method.*;
-import Sirius.navigator.resource.ResourceManager;
 
 /**
  *
@@ -19,7 +18,7 @@ public class PluginMenuItem extends JMenuItem
 {
     protected PluginMethod pluginMethod = null;
     protected Method method = null;
-    
+
     /** Holds value of property availability. */
     private long availability = 0;
     
@@ -90,18 +89,19 @@ public class PluginMenuItem extends JMenuItem
         {
             try
             {
-                Logger.getLogger(this.getClass()).debug("invoking method " + PluginMenuItem.this.getName());
+                if(Logger.getLogger(this.getClass()).isDebugEnabled())
+                    Logger.getLogger(this.getClass()).debug("invoking method " + PluginMenuItem.this.getName());  // NOI18N
                 PluginMenuItem.this.pluginMethod.invoke();
             }
             catch(Throwable t)
             {
-                Logger.getLogger(this.getClass()).error("invocation of plugin method '" + PluginMenuItem.this.getId() + "' failed", t);
+                Logger.getLogger(this.getClass()).error("invocation of plugin method '" + PluginMenuItem.this.getId() + "' failed", t);  // NOI18N
                 
                 // XXX i18n
                 JOptionPane.showMessageDialog(PluginMenuItem.this,
-                        ResourceManager.getManager().getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed.ErrorMessage1") + t.getMessage() +
-                        ResourceManager.getManager().getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed.ErrorMessage2"),
-                        ResourceManager.getManager().getString("Sirius.navigator.plugin.ui.PluginMenuItem.actionPerformed.ErrorTitle"), JOptionPane.ERROR_MESSAGE);
+                        org.openide.util.NbBundle.getMessage(PluginMenuItem.class,"PluginMenuItem.PluginMethodInvoker.actionPerformed(ActionEvent).JOptionPane_anon.message", t.getMessage()),  // NOI18N
+                        org.openide.util.NbBundle.getMessage(PluginMenuItem.class,"PluginMenuItem.PluginMethodInvoker.actionPerformed(ActionEvent).JOptionPane_anon.title"),  // NOI18N
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

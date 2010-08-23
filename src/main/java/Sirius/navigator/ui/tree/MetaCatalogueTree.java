@@ -50,10 +50,8 @@ import java.awt.image.BufferedImage;
  * DefaultMetaTree ist ein Navigationsbaum
  */
 public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll {
-
     protected final Logger logger = Logger.getLogger(MetaCatalogueTree.class);
     protected final DefaultStatusChangeSupport statusChangeSupport;
-    protected final ResourceManager resources;
     protected final DefaultTreeModel defaultTreeModel;
     protected final boolean useThread;
     protected final int maxThreadCount;
@@ -72,12 +70,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         this.maxThreadCount = maxThreadCount;
 
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
-        this.resources = ResourceManager.getManager();
         this.defaultTreeModel = (DefaultTreeModel) this.getModel();
 
         this.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         this.setCellRenderer(new MetaTreeNodeRenderer());
-        this.putClientProperty("JTree.lineStyle", "Angled");
+        this.putClientProperty("JTree.lineStyle", "Angled");//NOI18N
         this.setShowsRootHandles(true);
         this.setRootVisible(false);
         this.addTreeSelectionListener(new MetaCatalogueSelectionListener());
@@ -87,19 +84,19 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             InputMap inputMap = this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             ActionMap actionMap = this.getActionMap();
 
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteNode()");
-            actionMap.put("deleteNode()", new AbstractAction() {
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), "deleteNode()");//NOI18N
+            actionMap.put("deleteNode()", new AbstractAction() {//NOI18N
 
                 public void actionPerformed(ActionEvent e) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("performing delete node action");
+                        logger.debug("performing delete node action");//NOI18N
                     }
                     DefaultMetaTreeNode selectedNode = MetaCatalogueTree.this.getSelectedNode();
                     if (selectedNode != null && selectedNode.isLeaf()) {
                         if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
                             MethodManager.getManager().deleteNode(MetaCatalogueTree.this, selectedNode);
                         } else if (logger.isDebugEnabled()) {
-                            logger.warn("actionPerformed() deleting not possible, no node selected");
+                            logger.warn("actionPerformed() deleting not possible, no node selected");//NOI18N
                         }
                     }
                 }
@@ -116,7 +113,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                         Vector<DefaultMetaTreeNode> v = new Vector<DefaultMetaTreeNode>();
                         DefaultMetaTreeNode[] resultNodes = getSelectedNodesArray();
                         for (int i = 0; i < resultNodes.length; ++i) {
-                            logger.debug("resultNodes:" + resultNodes[i]);
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("resultNodes:" + resultNodes[i]);//NOI18N
+                            }
                             if (resultNodes[i].getNode() instanceof MetaObjectNode) {
                                 //ObjectTreeNode otn=new ObjectTreeNode((MetaObjectNode)resultNodes[i].getNode());
                                 DefaultMetaTreeNode otn = resultNodes[i];
@@ -129,7 +128,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                         }
 
                     } catch (Throwable t) {
-                        logger.warn("Fehler beim Anzeigen mit der Karte", t);
+                        logger.warn("Error of displaying map", t);//NOI18N
                     }
                 }
             }
@@ -168,13 +167,13 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         final Object rootNode = this.getModel().getRoot();
         if (rootNode != null && nodes != null && nodes.length > 1) {
             if (logger.isDebugEnabled()) {
-                logger.debug("exploring subtree: " + nodes.length);
+                logger.debug("exploring subtree: " + nodes.length);//NOI18N
             }
             final List<?> nodeList = Arrays.asList(nodes);
             for (final Object o : nodeList) {
                 if (!(o instanceof DefaultMetaTreeNode)) {
                     nodeList.remove(o);
-                    logger.error("Node " + o + " is not instance of DefaultMetaTreeNode and hast been removed from the Collection.");
+                    logger.error("Node " + o + " is not instance of DefaultMetaTreeNode and hast been removed from the Collection.");//NOI18N
                 }
             }
             final Iterator<DefaultMetaTreeNode> childrenIterator = (Iterator<DefaultMetaTreeNode>) nodeList.iterator();
@@ -186,7 +185,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             CismetThreadPool.execute(subTreeExploreThread);
 
         } else {
-            logger.warn("could not explore subtree");
+            logger.warn("could not explore subtree");//NOI18N
         }
     }
 
@@ -234,7 +233,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("<TREE> getSelectedNodeCount(): " + j);
+                logger.debug("<TREE> getSelectedNodeCount(): " + j);//NOI18N
             }
             return j;
         }
@@ -269,7 +268,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
     public void setSelectedNodes(Collection<DefaultMutableTreeNode> selectedNodes, boolean expandTree) {
         if (logger.isDebugEnabled()) {
-            logger.info("setSelectedNodes(): selecting " + selectedNodes.size() + " nodes, expanding tree: " + expandTree);
+            logger.info("setSelectedNodes(): selecting " + selectedNodes.size() + " nodes, expanding tree: " + expandTree);//NOI18N
         }
         ArrayList treePaths = new ArrayList();
         this.setExpandsSelectedPaths(expandTree);
@@ -281,7 +280,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         if (treePaths.size() > 0) {
             this.setSelectionPaths((TreePath[]) treePaths.toArray(new TreePath[treePaths.size()]));
         } else if (logger.isDebugEnabled()) {
-            logger.warn("setSelectedNodes(): collections of nodes is empty");
+            logger.warn("setSelectedNodes(): collections of nodes is empty");//NOI18N
         }
         //vor Messe
         if (selectedNodes.size() == 0) {
@@ -322,7 +321,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         return false;
     }
 
-    // INNERE KLASSEN ==========================================================
     /**
      *
      */
@@ -330,7 +328,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public void valueChanged(TreeSelectionEvent e) {
             DefaultMetaTreeNode selectedNode = (DefaultMetaTreeNode) (e.getPath().getLastPathComponent());
-            statusChangeSupport.fireStatusChange(MetaCatalogueTree.this.getSelectionCount() + " " + resources.getString("tree.catalogue.status.selected"), Status.MESSAGE_POSITION_1);
+            statusChangeSupport.fireStatusChange(
+                    org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.valueChanged().objectsSelected", new Object[]{MetaCatalogueTree.this.getSelectionCount()}),//NOI18N
+                    Status.MESSAGE_POSITION_1);
         }
     }
 
@@ -365,13 +365,13 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         public void treeExpanded(TreeExpansionEvent e) {
             final DefaultMetaTreeNode selectedNode = (DefaultMetaTreeNode) (e.getPath().getLastPathComponent());
             if (logger.isDebugEnabled()) {
-                logger.debug("treeExpanded() Expanding Node: " + selectedNode.toString());
+                logger.debug("treeExpanded() Expanding Node: " + selectedNode.toString());//NOI18N
             }
 
             if (!selectedNode.isLeaf() && !selectedNode.isExplored()) // && selectedNode.getChildCount() == 0)
             {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("treeExpanded() Expanding Node: " + selectedNode.toString() + " ok.");
+                    logger.debug("treeExpanded() Expanding Node: " + selectedNode.toString() + " ok.");//NOI18N
                 }
                 if (useThread && threadCount < maxThreadCount - 1) {
                     selectedNode.add(waitNode);
@@ -381,21 +381,29 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     CismetThreadPool.execute(treeExploreThread);
                 } else {
                     try {
-                        statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_IGNORE, Status.ICON_BLINKING);
+                        statusChangeSupport.fireStatusChange(
+                                org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.treeExpanded().loadingObjects"),//NOI18N
+                                Status.MESSAGE_POSITION_1, Status.ICON_IGNORE, Status.ICON_BLINKING);
                         selectedNode.explore();
                         defaultTreeModel.nodeStructureChanged(selectedNode);
-                        statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.server"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                        statusChangeSupport.fireStatusChange(
+                                org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.treeExpanded().dataLoadedFromServer"),//NOI18N
+                                Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                     } catch (Exception exp) {
-                        statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading.error"), Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
-                        logger.fatal("treeExpanded() could not load nodes", exp);
+                        statusChangeSupport.fireStatusChange(
+                                org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.treeExpanded().loadingError"),//NOI18N
+                                Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                        logger.fatal("treeExpanded() could not load nodes", exp);//NOI18N
                         selectedNode.removeChildren();
                     }
                 }
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("treeExpanded() " + selectedNode.getNode() + "'s children loaded from cache");
+                    logger.debug("treeExpanded() " + selectedNode.getNode() + "'s children loaded from cache");//NOI18N
                 }
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.cache"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.treeExpanded().dataLoadedFromCache"), //NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             }
         }
     }
@@ -422,7 +430,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public TreeExploreThread(final DefaultMetaTreeNode selectedNode, DefaultTreeModel defaultTreeModel) {
             if (logger.isDebugEnabled()) {
-                logger.debug("<THREAD>: TreeExploreThread");
+                logger.debug("<THREAD>: TreeExploreThread");//NOI18N
             }
             threadCount++;
             node = selectedNode;
@@ -432,7 +440,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 public void run() {
                     MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
                     if (logger.isDebugEnabled()) {
-                        logger.debug("<THREAD>: TreeExploreThread GUI Update fertig");
+                        logger.debug("<THREAD>: TreeExploreThread GUI update done");//NOI18N
                     }
                 }
             };
@@ -440,7 +448,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public void run() {
             try {
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.TreeExploreThread.loadingObjects"),//NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
                 node.explore();
 
 
@@ -489,7 +499,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 //                                    logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":");
 //                                }
                             } catch (Exception e) {
-                                logger.error("Fehler beim Laden des Namen", e);
+                                logger.error("Error while loading name", e);//NOI18N
                             }
                         }
                     }
@@ -500,18 +510,22 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 // GUI Update asynchron zum EventDispatchThread
                 SwingUtilities.invokeLater(treeUpdateThread);
                 //SwingUtilities.invokeAndWait(runnable);
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.server"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.TreeExploreThread.dataLoadedFromServer"),//NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                 threadCount--;
             } catch (Exception exp) {
-                logger.fatal("could not load nodes", exp);
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading.error"), Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                logger.fatal("could not load nodes", exp);//NOI18N
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.TreeExploreThread.loadingError"),//NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
                 node.removeChildren();
                 SwingUtilities.invokeLater(treeUpdateThread);
                 threadCount--;
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("<THREAD> TreeExploreThread fertig");
+                logger.debug("<THREAD> TreeExploreThread done");//NOI18N
             }
         }
     }
@@ -528,7 +542,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         public void run() {
             try {
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading"), Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.SubTreeExploreThread.loadingObjects"),//NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_BLINKING, Status.ICON_IGNORE);
 
                 TreePath selectionPath = this.node.explore(this.childrenNodes);
 
@@ -536,17 +552,21 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                 SwingUtilities.invokeLater(treeUpdateThread);
 
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loaded.server"), Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.SubTreeExploreThread.dataLoadedFromServer"),//NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             } catch (Exception exp) {
-                logger.fatal("SubTreeExploreThread: could not load nodes", exp);
-                statusChangeSupport.fireStatusChange(resources.getString("tree.catalogue.status.loading.error"), Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                logger.fatal("SubTreeExploreThread: could not load nodes", exp);//NOI18N
+                statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(MetaCatalogueTree.class, "MetaCatalogueTree.SubTreeExploreThread.loadingError"),//NOI18N
+                        Status.MESSAGE_POSITION_1, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
 
                 node.removeChildren();
                 MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("SubTreeExploreThread: fertig");
+                logger.debug("SubTreeExploreThread: done");//NOI18N
             }
         }
 
@@ -566,7 +586,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 MetaCatalogueTree.this.scrollPathToVisible(selectionPath);
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("SubTreeExploreThread: GUI Update fertig");
+                    logger.debug("SubTreeExploreThread: GUI Update done");//NOI18N
                 }
             }
         }

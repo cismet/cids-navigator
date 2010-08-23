@@ -54,7 +54,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
 {
     private final static Logger logger = Logger.getLogger(MutableToolBar.class);
     
-    private final ResourceManager resources;
+    private static final ResourceManager resources = ResourceManager.getManager();
     
     private final JToolBar defaultToolBar;
     private final MoveableToolBarsMap moveableToolBars;
@@ -105,20 +105,20 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         
         this.advancedLayout = advancedLayout;
         
-        resources = ResourceManager.getManager();
-        
         moveableToolBars = new MoveableToolBarsMap();
         pluginToolBars = new PluginToolBarsMap();
         
-        this.defaultToolBar = new JToolBar(resources.getString("toolbar.name"), HORIZONTAL);
+        this.defaultToolBar = new JToolBar(
+                org.openide.util.NbBundle.getMessage(MutableToolBar.class, "MutableToolBar.defaultToolBar.name"),//NOI18N
+                HORIZONTAL);
         this.defaultToolBar.setFloatable(false);
         this.defaultToolBar.setRollover(advancedLayout);
-        defaultToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);
+        defaultToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);//NOI18N
         defaultToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         defaultToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         this.createDefaultButtons();
         this.add(defaultToolBar);
-        putClientProperty("JToolBar.isRollover", Boolean.TRUE);
+        putClientProperty("JToolBar.isRollover", Boolean.TRUE);//NOI18N
         putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         this.setFloatable(false);
@@ -143,8 +143,8 @@ public class MutableToolBar extends JToolBar //implements ActionListener
     
     private void createDefaultButtons() 
     {
-        logger.debug("creating default buttons");
-        ResourceManager resources = ResourceManager.getManager();
+        logger.debug("creating default buttons");//NOI18N
+
         ActionListener toolBarListener = new ToolBarListener();
         JButton button = null;
         
@@ -155,9 +155,9 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);*/
         
-        button = new JButton(resources.getButtonIcon("toolbar.search"));
-        button.setToolTipText(resources.getButtonTooltip("toolbar.search"));
-        button.setActionCommand("search");
+        button = new JButton(resources.getIcon("find24.gif"));//NOI18N
+        button.setToolTipText(org.openide.util.NbBundle.getMessage(MutableToolBar.class, "MutableToolBar.createDefaultButtons().search.tooltip"));//NOI18N
+        button.setActionCommand("search");//NOI18N
         //button.setMargin(new Insets(0,0,0,0));
         button.setMargin(new Insets(4,4,4,4));
         button.addActionListener(toolBarListener);
@@ -170,9 +170,9 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);*/
         
-        button = new JButton(resources.getButtonIcon("toolbar.plugin"));
-        button.setToolTipText(resources.getButtonTooltip("toolbar.plugin"));
-        button.setActionCommand("plugin");
+        button = new JButton(resources.getIcon("plugin24.gif"));//NOI18N
+        button.setToolTipText(org.openide.util.NbBundle.getMessage(MutableToolBar.class, "MutableToolBar.createDefaultButtons().plugin.tooltip"));//NOI18N
+        button.setActionCommand("plugin");//NOI18N
         button.setEnabled(false);//HELL
         //button.setMargin(new Insets(0,0,0,0));
         button.setMargin(new Insets(4,4,4,4));
@@ -255,7 +255,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
     public void addMoveableToolBar(EmbeddedToolBar toolBar)
     {
         toolBar.setRollover(this.advancedLayout);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);
+        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);//NOI18N
         toolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         toolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         this.moveableToolBars.add(toolBar);
@@ -296,7 +296,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
     public void addPluginToolBar(EmbeddedToolBar toolBar)
     {
         toolBar.setRollover(this.advancedLayout);
-        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);
+        toolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE);//NOI18N
         toolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         toolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         this.pluginToolBars.add(toolBar);
@@ -435,16 +435,16 @@ public class MutableToolBar extends JToolBar //implements ActionListener
          */
         public void actionPerformed(ActionEvent e)
         {
-            if(e.getActionCommand().equals("exit"))
+            if(e.getActionCommand().equals("exit"))//NOI18N
             {
                 if(ExceptionManager.getManager().showExitDialog(ComponentRegistry.getRegistry().getMainWindow()))
                 {
-                    logger.info("closing program");
+                    logger.info("closing program");//NOI18N
                     ComponentRegistry.getRegistry().getNavigator().dispose();
                     System.exit(0);
                 }
             }
-            else if(e.getActionCommand().equals("search"))
+            else if(e.getActionCommand().equals("search"))//NOI18N
             {
                 try
                 {
@@ -452,18 +452,18 @@ public class MutableToolBar extends JToolBar //implements ActionListener
                 }
                 catch (Throwable t)
                 {
-                    logger.fatal("Fehler bei der Verarbeitung der Suchmethode", t);
+                    logger.fatal("Error while processing searchmethod", t);//NOI18N
                     
                     //ErrorDialog errorDialog = new ErrorDialog("Fehler bei der Verarbeitung der Suchmethode", t.toString(), ErrorDialog.WARNING);
                     //errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
                     //errorDialog.show();
                 }
             }
-            else if(e.getActionCommand().equals("plugin"))
+            else if(e.getActionCommand().equals("plugin"))//NOI18N
             {
                 MethodManager.getManager().showPluginManager();
             }
-            else if(e.getActionCommand().equals("info"))
+            else if(e.getActionCommand().equals("info"))//NOI18N
             {
                 MethodManager.getManager().showAboutDialog();
             }
@@ -507,14 +507,16 @@ public class MutableToolBar extends JToolBar //implements ActionListener
         
         protected void doAdd(EmbeddedComponent component)
         {
-            logger.debug("adding toolbar: '" + component + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("adding toolbar: '" + component + "'");//NOI18N
+            }
             if(component instanceof EmbeddedToolBar)
             {                
                 MutableToolBar.this.add((EmbeddedToolBar)component);                
             }
             else
             {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");
+                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");//NOI18N
             }
             
             //MutableToolBar.this.validateTree();
@@ -536,7 +538,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
             }
             else
             {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");
+                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");//NOI18N
             }
             
             MutableToolBar.this.invalidate();
@@ -574,7 +576,7 @@ public class MutableToolBar extends JToolBar //implements ActionListener
             }
             else
             {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");
+                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
             }          
         }
     }

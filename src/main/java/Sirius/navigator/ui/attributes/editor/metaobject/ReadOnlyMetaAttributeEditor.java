@@ -6,17 +6,6 @@
 
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.event.*;
-import java.util.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-
-import Sirius.server.localserver.attribute.Attribute;
-import Sirius.server.middleware.types.MetaObject;
-import Sirius.navigator.ui.attributes.editor.*;
 
 import org.apache.log4j.Logger;
 

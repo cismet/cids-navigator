@@ -53,9 +53,6 @@
                   <Image iconType="3" name="/de/cismet/cids/editors/edit_add_mini.png"/>
                 </Property>
                 <Property name="borderPainted" type="boolean" value="false"/>
-                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-                  <Insets value="[0, 0, 0, 0]"/>
-                </Property>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[16, 16]"/>
                 </Property>
@@ -73,9 +70,6 @@
                   <Image iconType="3" name="/de/cismet/cids/editors/edit_remove_mini.png"/>
                 </Property>
                 <Property name="borderPainted" type="boolean" value="false"/>
-                <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
-                  <Insets value="[0, 0, 0, 0]"/>
-                </Property>
                 <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
                   <Dimension value="[16, 16]"/>
                 </Property>
@@ -103,7 +97,9 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="lblTitle">
               <Properties>
-                <Property name="text" type="java.lang.String" value=" Beschreibung"/>
+                <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                  <ResourceString bundle="de/cismet/cids/editors/Bundle.properties" key="ArrayTitleAndControls.lblTitle.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                </Property>
               </Properties>
               <Constraints>
                 <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout" value="org.netbeans.modules.form.compat2.layouts.DesignBorderLayout$BorderConstraintsDescription">

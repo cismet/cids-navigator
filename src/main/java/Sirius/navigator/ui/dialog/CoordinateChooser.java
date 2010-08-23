@@ -27,9 +27,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
-
 import Sirius.navigator.tools.InputValidator;
-import Sirius.navigator.resource.*;
 
 
 public class CoordinateChooser extends JDialog implements ActionListener
@@ -55,7 +53,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     public CoordinateChooser(JFrame parent)
     {
         //_TA_super(new JFrame(), "Interessensbereich angeben", true);
-        super(parent, ResourceManager.getManager().getString("dialog.coordinate.title"), true);
+        super(parent, org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.title"), true);//NOI18N
         
         initCoordinateChooser();
     }
@@ -63,7 +61,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
     public CoordinateChooser(JDialog parent)
     {
         //_TA_super(new JFrame(), "Interessensbereich angeben", true);
-        super(parent, ResourceManager.getManager().getString("dialog.coordinate.title"), true);
+        super(parent, org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.title"), true);//NOI18N
         
         initCoordinateChooser();
     }
@@ -99,7 +97,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridx = 0;
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
-        JLabel infoLabel = new JLabel(ResourceManager.getManager().getString("dialog.coordinate.info"));
+        JLabel infoLabel = new JLabel(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.infoLabel.text"));//NOI18N
         infoLabel.setVerticalAlignment(JLabel.CENTER);
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         infoLabel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -126,7 +124,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.weightx = 0.0;
         constraints.weighty = 0.0;
         //_TA_koordinatenPanel.add(new JLabel("Rechtswert linksunten:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.rwlu")), constraints);
+        koordinatenPanel.add(new JLabel(
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.rwluLabel.text")),//NOI18N
+                constraints);
         
         // Rechtswert 1 Textfield
         constraints.insets = new Insets(5, 0, 8, 5);
@@ -142,7 +142,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridx = 0;
         constraints.gridy = 1;
         //_TA_koordinatenPanel.add(new JLabel("Hochwert linksunten:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.hwlu")), constraints);
+        koordinatenPanel.add(new JLabel(
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.hwluLabel.text")),//NOI18N
+                constraints);
         // Hochwert 1 Textfield
         constraints.insets = new Insets(0, 0, 8, 5);
         constraints.anchor = GridBagConstraints.WEST;
@@ -157,7 +159,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridx = 0;
         constraints.gridy = 2;
         //_TA_koordinatenPanel.add(new JLabel("Rechtswert rechtsoben:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.rwro")), constraints);
+        koordinatenPanel.add(new JLabel(
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.rwroLabel.text")),//NOI18N
+                constraints);
         //  Rechtswert 2 Textfield
         constraints.insets = new Insets(0, 0, 8, 5);
         constraints.anchor = GridBagConstraints.WEST;
@@ -171,7 +175,9 @@ public class CoordinateChooser extends JDialog implements ActionListener
         constraints.gridx = 0;
         constraints.gridy = 3;
         //_TA_koordinatenPanel.add(new JLabel("Hochwert rechtsoben:"), constraints);
-        koordinatenPanel.add(new JLabel(ResourceManager.getManager().getString("dialog.coordinate.hwro")), constraints);
+        koordinatenPanel.add(new JLabel(
+                org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.koordinatenPanel.hwroLabel.text")),//NOI18N
+                constraints);
         // Hochwert 1 Textfield
         constraints.insets = new Insets(0, 0, 5, 5);
         constraints.anchor = GridBagConstraints.WEST;
@@ -189,20 +195,20 @@ public class CoordinateChooser extends JDialog implements ActionListener
         gbc.gridy++;
         gbc.weightx = 1.0;
         gbc.weighty = 0.0;
-        buttonAccept = new JButton(ResourceManager.getManager().getButtonText("accept"));
+        buttonAccept = new JButton(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonAccept.text"));//NOI18N
         //_TA_buttonAccept.setMnemonic('U');
-        buttonAccept.setMnemonic(ResourceManager.getManager().getButtonMnemonic("accept"));
-        buttonAccept.setActionCommand("accept");
+        buttonAccept.setMnemonic(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonAccept.mnemonic").charAt(0));//NOI18N
+        buttonAccept.setActionCommand("accept");//NOI18N
         buttonAccept.addActionListener(this);
         contentPane.add(buttonAccept, gbc);
         
         gbc.insets = new Insets(0, 0, 0, 0);
         gbc.gridx++;
         //_TA_buttonCancel = new JButton("Ignorieren");
-        buttonCancel = new JButton(ResourceManager.getManager().getButtonText("cancel"));
+        buttonCancel = new JButton(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonCancel.text"));//NOI18N
         //_TA_buttonCancel.setMnemonic('I');
-        buttonCancel.setMnemonic(ResourceManager.getManager().getButtonMnemonic("cancel"));
-        buttonCancel.setActionCommand("cancel");
+        buttonCancel.setMnemonic(org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.buttonCancel.mnemonic").charAt(0));//NOI18N
+        buttonCancel.setActionCommand("cancel");//NOI18N
         buttonCancel.addActionListener(this);
         contentPane.add(buttonCancel, gbc);
         
@@ -246,14 +252,17 @@ public class CoordinateChooser extends JDialog implements ActionListener
     
     public void actionPerformed(ActionEvent e)
     {
-        if(e.getActionCommand().equals("accept"))
+        if(e.getActionCommand().equals("accept"))//NOI18N
         {
             accepted = true;
             
             if(koordinatenRW1TextField.getText() == null || koordinatenRW1TextField.getText().length() < 1 || koordinatenRW2TextField.getText() == null || koordinatenRW2TextField.getText().length() < 1)
             {
                 //_TA_JOptionPane.showMessageDialog(this, "Bitte geben Sie alle Rechtswerte an.", "Fehlerhafte Eingabe", JOptionPane.WARNING_MESSAGE);
-                JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.coordinate.missing.rw") ,ResourceManager.getManager().getString("dialog.coordinate.missing"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingRWOptionPane.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingRWOptionPane.title"),//NOI18N
+                        JOptionPane.WARNING_MESSAGE);
                 accepted = false;
             }
             
@@ -261,7 +270,10 @@ public class CoordinateChooser extends JDialog implements ActionListener
             {
                 //_TA_JOptionPane.showMessageDialog(this, "Bitte geben Sie alle Hochwerte an.", "Fehlerhafte Eingabe", JOptionPane.WARNING_MESSAGE);
 
-                JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.coordinate.missing.hw"), ResourceManager.getManager().getString("dialog.coordinate.missing"), JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingHWOptionPane.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(CoordinateChooser.class, "CoordinateChooser.actionPerformed(ActionEvent).missingHWOptionPane.title"),//NOI18N
+                        JOptionPane.WARNING_MESSAGE);
                 accepted = false;
             }
             
@@ -274,7 +286,7 @@ public class CoordinateChooser extends JDialog implements ActionListener
                 dispose();
             }
         }
-        else if(e.getActionCommand().equals("cancel"))
+        else if(e.getActionCommand().equals("cancel"))//NOI18N
         {
             accepted = false;
             dispose();

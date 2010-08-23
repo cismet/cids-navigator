@@ -36,7 +36,7 @@ import Sirius.navigator.resource.PropertyManager;
 /**
  * @version	1.0
  * @author	Annen Thomas
- * @deprecated migrate to ResourceManager
+ * @deprecated migrate to netbeans i18n
  *
  */
 public class StringLoader

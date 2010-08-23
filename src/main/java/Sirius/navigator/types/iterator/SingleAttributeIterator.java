@@ -289,7 +289,7 @@ public class SingleAttributeIterator implements AttributeIterator
         }
         else
         {
-            throw new NoSuchElementException("NoSuchElementException");
+            throw new NoSuchElementException("NoSuchElementException");//NOI18N
         }
     }
     

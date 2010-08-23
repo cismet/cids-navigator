@@ -88,7 +88,7 @@ public final class MutableContainer implements GUIContainer
     
     public MutableContainer (MutableToolBar toolBar, MutableMenuBar menuBar, boolean continuousLayout, boolean oneTouchExpandable, boolean proportionalResize, boolean obeyMinimumSize)
     {
-        logger.debug ("creating MutableContainer instance");
+        logger.debug ("creating MutableContainer instance");//NOI18N
         
         this.toolBar = toolBar;
         this.menuBar = menuBar;
@@ -145,7 +145,9 @@ public final class MutableContainer implements GUIContainer
     
     public synchronized void add(final MutableConstraints constraints)
     {
-        logger.info ("adding component '" + constraints.getName() + "' to mutable container at position '" + constraints.getPosition() + "'");
+        if (logger.isInfoEnabled()) {
+            logger.info ("adding component '" + constraints.getName() + "' to mutable container at position '" + constraints.getPosition() + "'");//NOI18N
+        }
         if(logger.isDebugEnabled())logger.debug(constraints.toString());
         if(!components.containsKey(constraints.getId()))
         {
@@ -156,7 +158,7 @@ public final class MutableContainer implements GUIContainer
             }
             else
             {
-                logger.debug("add(): synchronizing method");
+                logger.debug("add(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -173,7 +175,7 @@ public final class MutableContainer implements GUIContainer
         }
         else
         {
-            logger.error("a component with the same id '" + constraints.getId() + "' is already in this container");
+            logger.error("a component with the same id '" + constraints.getId() + "' is already in this container");//NOI18N
         }
     }
     
@@ -182,7 +184,7 @@ public final class MutableContainer implements GUIContainer
         JTabbedPane tabbedPane = this.getTabbedPaneAt(constraints.getPosition());
         if(constraints.getPreferredIndex() != -1 && tabbedPane.getTabCount() >  constraints.getPreferredIndex())
         {
-            if(logger.isDebugEnabled())logger.debug("inserting component at index '" + constraints.getPreferredIndex() + "'");
+            if(logger.isDebugEnabled())logger.debug("inserting component at index '" + constraints.getPreferredIndex() + "'");//NOI18N
             if(constraints.getContainerType().equals(MutableConstraints.FLOATINGFRAME))
             {
                 tabbedPane.insertTab(constraints.getName(), constraints.getIcon(), ((FloatingFrame)constraints.getContainer()).getFloatingPanel(), constraints.getToolTip(), constraints.getPreferredIndex());
@@ -211,7 +213,7 @@ public final class MutableContainer implements GUIContainer
     
     private void addFloatingFrame(MutableConstraints constraints)
     {
-        logger.debug("adding FloatingFrame");
+        logger.debug("adding FloatingFrame");//NOI18N
         FloatingFrameConfigurator configurator = constraints.getFloatingFrameConfigurator();
         //logger.info("FloatingFrame constraints '" + constraints + "'");
         //logger.info("FloatingFrame constraints id: '" + constraints.getId() + "'");
@@ -219,31 +221,35 @@ public final class MutableContainer implements GUIContainer
         //logger.info("FloatingFrame configurator id: '" + configurator.getId() + "'");
         if(!configurator.getId().equals(constraints.getId()))
         {
-            logger.warn("FloatingFrame constraints id: '" + constraints.getId() + "' != FloatingFrame configurator id: '" + configurator.getId() + "'");
+            logger.warn("FloatingFrame constraints id: '" + constraints.getId() + "' != FloatingFrame configurator id: '" + configurator.getId() + "'");//NOI18N
         }
         
         if(configurator.isSwapMenuBar() || configurator.isSwapToolBar())
         {
-            if(logger.isDebugEnabled())logger.debug("enabling Floating Listener");
+            if(logger.isDebugEnabled())logger.debug("enabling Floating Listener");//NOI18N
             ((FloatingFrame)constraints.getContainer()).addPropertyChangeListener(FloatingFrame.FLOATING, floatingFrameListener);
         }
 
         if(configurator.isSwapMenuBar())
         {
-            logger.info("adding FloatingFrameMenuBar '" + configurator.getId() + "' to MutableMenuBar");
+            if (logger.isInfoEnabled()) {
+                logger.info("adding FloatingFrameMenuBar '" + configurator.getId() + "' to MutableMenuBar");//NOI18N
+            }
             menuBar.addMoveableMenues(configurator.getId(), configurator.getMenues());
         }
         
         if(configurator.isSwapToolBar())
         {
-            logger.info("adding FloatingFrameToolBar '" + configurator.getId() + "' to MutableToolBar");
+            if (logger.isInfoEnabled()) {
+                logger.info("adding FloatingFrameToolBar '" + configurator.getId() + "' to MutableToolBar");//NOI18N
+            }
             toolBar.addMoveableToolBar(((FloatingFrame)constraints.getContainer()).getToolBar());
         } 
     }
     
     private void removeFloatingFrame(MutableConstraints constraints)
     {
-        logger.debug("removing FloatingFrame");
+        logger.debug("removing FloatingFrame");//NOI18N
         FloatingFrameConfigurator configurator = constraints.getFloatingFrameConfigurator();
         
         if(configurator.isSwapMenuBar() || configurator.isSwapToolBar())
@@ -253,20 +259,22 @@ public final class MutableContainer implements GUIContainer
         
         if(configurator.isSwapMenuBar())
         {
-            logger.info("removing FloatingFrameMenuBar '" + configurator.getId() + "' from MutableMenuBar");
+            logger.info("removing FloatingFrameMenuBar '" + configurator.getId() + "' from MutableMenuBar");//NOI18N
             menuBar.removeMoveableMenues(configurator.getId());
         }
         
         if(configurator.isSwapToolBar())
         {
-            logger.info("removing FloatingFrameToolBar '" + configurator.getId() + "' from MutableToolBar");
+            logger.info("removing FloatingFrameToolBar '" + configurator.getId() + "' from MutableToolBar");//NOI18N
             toolBar.removeMoveableToolBar(configurator.getId());
         } 
     }
     
     public synchronized void remove(String id)
     {
-        logger.info ("removing component '" + id + "'");
+        if (logger.isInfoEnabled()) {
+            logger.info ("removing component '" + id + "'");//NOI18N
+        }
         if(components.containsKey(id))
         {
             final MutableConstraints constraints = (MutableConstraints)components.remove(id);
@@ -281,7 +289,7 @@ public final class MutableContainer implements GUIContainer
             }
             else
             {
-                logger.debug("remove(): synchronizing method");
+                logger.debug("remove(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -293,13 +301,13 @@ public final class MutableContainer implements GUIContainer
         }
         else
         {
-            logger.error("component '" + id + "' not found in this container");
+            logger.error("component '" + id + "' not found in this container");//NOI18N
         }
     }
     
     private void doRemove(MutableConstraints constraints)
     {
-        if(logger.isDebugEnabled())logger.debug("removing component '" + constraints.getName() + "' at position '" + constraints.getPosition() + "'");
+        if(logger.isDebugEnabled())logger.debug("removing component '" + constraints.getName() + "' at position '" + constraints.getPosition() + "'");//NOI18N
         JTabbedPane tabbedPane = this.getTabbedPaneAt(constraints.getPosition());
         
         if(constraints.getContainerType().equals(MutableConstraints.FLOATINGFRAME))
@@ -315,7 +323,7 @@ public final class MutableContainer implements GUIContainer
     
     public synchronized void select(String id)
     {
-        if(logger.isDebugEnabled())logger.debug("selecting component '" + id + "'");
+        if(logger.isDebugEnabled())logger.debug("selecting component '" + id + "'");//NOI18N
         if(components.containsKey(id))
         {
             final MutableConstraints constraints = (MutableConstraints)components.get(id);
@@ -325,7 +333,7 @@ public final class MutableContainer implements GUIContainer
             }
             else
             {
-                logger.debug("select(): synchronizing method");
+                logger.debug("select(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -337,7 +345,7 @@ public final class MutableContainer implements GUIContainer
         }
         else
         {
-            logger.error("component '" + id + "' not found in this container");
+            logger.error("component '" + id + "' not found in this container");//NOI18N
         }
     }
     
@@ -372,7 +380,7 @@ public final class MutableContainer implements GUIContainer
         }
         else
         {
-            logger.warn("unknown position '" + position + "', using default '" + MutableConstraints.P3 + "'");
+            logger.warn("unknown position '" + position + "', using default '" + MutableConstraints.P3 + "'");//NOI18N
             return p3Pane;
         }
     }
@@ -396,13 +404,13 @@ public final class MutableContainer implements GUIContainer
             
             if(floatingFrame.getConfigurator().isSwapMenuBar())
             {
-                if(logger.isDebugEnabled())logger.debug("setting floating frame meneus visible: '" + !floatingFrame.isFloating() + "'");
+                if(logger.isDebugEnabled())logger.debug("setting floating frame meneus visible: '" + !floatingFrame.isFloating() + "'");//NOI18N
                 menuBar.setMoveableMenuesVisible(floatingFrame.getConfigurator().getId(), !floatingFrame.isFloating());
             }
             
             if(floatingFrame.getConfigurator().isSwapToolBar())
             {
-                if(logger.isDebugEnabled())logger.debug("setting floating frame toolbar visible: '" + !floatingFrame.isFloating() + "'");
+                if(logger.isDebugEnabled())logger.debug("setting floating frame toolbar visible: '" + !floatingFrame.isFloating() + "'");//NOI18N
                 toolBar.setMoveableToolBarVisible(floatingFrame.getConfigurator().getId(), !floatingFrame.isFloating());
             }
         }  
@@ -415,24 +423,24 @@ public final class MutableContainer implements GUIContainer
             if(e.getSource() instanceof MutableConstraints)
             {
                 final MutableConstraints constraints = (MutableConstraints)e.getSource();
-                if(logger.isDebugEnabled())logger.debug("setting new value of property '" + e.getPropertyName() + "' of component '" + constraints.getId() + "'");
+                if(logger.isDebugEnabled())logger.debug("setting new value of property '" + e.getPropertyName() + "' of component '" + constraints.getId() + "'");//NOI18N
                 
                 JTabbedPane tabbedPane = getTabbedPaneAt(constraints.getPosition());
                 int index = tabbedPane.indexOfComponent(constraints.getContainer());
                 
-                if(e.getPropertyName().equals("name"))
+                if(e.getPropertyName().equals("name"))//NOI18N
                 {
                     tabbedPane.setTitleAt(index, constraints.getName());
                 }
-                else if(e.getPropertyName().equals("tooltip"))
+                else if(e.getPropertyName().equals("tooltip"))//NOI18N
                 {
                     tabbedPane.setToolTipTextAt(index, constraints.getToolTip());
                 }
-                else if(e.getPropertyName().equals("icon"))
+                else if(e.getPropertyName().equals("icon"))//NOI18N
                 {
                     tabbedPane.setIconAt(index, constraints.getIcon());
                 }
-                else if(e.getPropertyName().equals("position") || e.getPropertyName().equals("preferredIndex"))
+                else if(e.getPropertyName().equals("position") || e.getPropertyName().equals("preferredIndex"))//NOI18N
                 {
                     // add() f\u00FChrt automatisch zu einem remove()
                     // doRemove(constraints);
@@ -448,12 +456,12 @@ public final class MutableContainer implements GUIContainer
                 }
                 else
                 {
-                    logger.warn("unsupported property change of '" + e.getPropertyName() + "'");
+                    logger.warn("unsupported property change of '" + e.getPropertyName() + "'");//NOI18N
                 }
             }
             else
             {
-                 if(logger.isDebugEnabled())logger.debug("unexpected property change event '" + e.getPropertyName() + "'");
+                 if(logger.isDebugEnabled())logger.debug("unexpected property change event '" + e.getPropertyName() + "'");//NOI18N
             }
         }
     }

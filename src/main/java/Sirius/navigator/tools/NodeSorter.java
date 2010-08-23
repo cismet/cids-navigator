@@ -27,7 +27,7 @@ public class NodeSorter
     
     public final static boolean DESCENDING=false;
     
-    public final static String DEFAULT_COMPARATOR="Sirius.util.NodeComparator";
+    public final static String DEFAULT_COMPARATOR="Sirius.util.NodeComparator";//NOI18N
     
     
     
@@ -62,18 +62,18 @@ public class NodeSorter
         Comparator comparator = null;
         try
         {
-            logger.info("creating new comparator instance: comparatorClass");
+            logger.info("creating new comparator instance: comparatorClass");//NOI18N
             comparator = (Comparator)Class.forName(comparatorClass).newInstance();
         }
         catch(Throwable t)
         {
-            logger.error("could not create comparator class '" + comparatorClass + "', sorting aborted");
+            logger.error("could not create comparator class '" + comparatorClass + "', sorting aborted");//NOI18N
             return nodes;
         }
 //            }
         
         
-        if(logger.isDebugEnabled())logger.debug("sorting nodes ascending by comparator '" + comparatorClass + "'");
+        if(logger.isDebugEnabled())logger.debug("sorting nodes ascending by comparator '" + comparatorClass + "'");//NOI18N
         
         Arrays.sort(nodes, comparator);
         
@@ -83,7 +83,7 @@ public class NodeSorter
         }
         else
         {
-            if(logger.isDebugEnabled())logger.debug("sorting nodes descending by comparator '" + comparatorClass + "'");
+            if(logger.isDebugEnabled())logger.debug("sorting nodes descending by comparator '" + comparatorClass + "'");//NOI18N
             
             // Arrays.sort(nodes, comparator);
             Node[] tempNodes = new Node[nodes.length];

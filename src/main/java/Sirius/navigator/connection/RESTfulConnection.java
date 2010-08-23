@@ -646,7 +646,7 @@ public final class RESTfulConnection implements Connection {
         try {
             return connector.delete(queryDataId, domain);
         } catch (final Exception e) {
-            final String message = "could not delete querydata for id, domain: "
+            final String message = "could not delete querydata for id, domain: "//NOI18N
                         + queryDataId
                         + " :: "
                         + domain; // NOI18N
@@ -660,7 +660,7 @@ public final class RESTfulConnection implements Connection {
         try {
             return connector.storeQuery(user, data);
         } catch (final Exception e) {
-            final String message = "could not store query data for user, data: "
+            final String message = "could not store query data for user, data: "//NOI18N
                         + user
                         + " :: "
                         + data; // NOI18N
@@ -674,7 +674,7 @@ public final class RESTfulConnection implements Connection {
         try {
             return connector.getQuery(id, domain);
         } catch (final Exception e) {
-            final String message = "could not get query data for id, domain: "
+            final String message = "could not get query data for id, domain: "//NOI18N
                         + id
                         + " :: "
                         + domain; // NOI18N
@@ -688,7 +688,7 @@ public final class RESTfulConnection implements Connection {
         try {
             return connector.getQueryInfos(userGroup);
         } catch (final Exception e) {
-            final String message = "could not get query infos for usergroup: "
+            final String message = "could not get query infos for usergroup: "//NOI18N
                         + userGroup; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
@@ -700,7 +700,7 @@ public final class RESTfulConnection implements Connection {
         try {
             return connector.getQueryInfos(user);
         } catch (final Exception e) {
-            final String message = "could not get query infos for user: "
+            final String message = "could not get query infos for user: "//NOI18N
                         + user; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);

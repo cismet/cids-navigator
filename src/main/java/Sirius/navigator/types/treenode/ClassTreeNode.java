@@ -15,6 +15,7 @@ import Sirius.navigator.resource.*;
 public class ClassTreeNode extends DefaultMetaTreeNode {
 
     protected ImageIcon nodeIcon;
+    private static final ResourceManager resource = ResourceManager.getManager();
 
     public ClassTreeNode(MetaClassNode metaClassNode) {
         super(metaClassNode);
@@ -24,10 +25,10 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
             if (metaClass != null && metaClass.getObjectIconData().length > 0) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = ResourceManager.getManager().getIcon("ClassNodeIcon.gif");
+                this.nodeIcon = resource.getIcon("ClassNodeIcon.gif");//NOI18N
             }
         } catch (Exception exp) {
-            this.nodeIcon = ResourceManager.getManager().getIcon("ClassNodeIcon.gif");
+            this.nodeIcon = resource.getIcon("ClassNodeIcon.gif");//NOI18N
         }
     }
 
@@ -43,7 +44,7 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
     // --------------------------------------------------------------------------
     public final synchronized void explore() throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("[ClassNode] Begin explore()");
+            logger.debug("[ClassNode] Begin explore()");//NOI18N
         }
 
         if (!isExplored() && !getMetaClassNode().isLeaf()) {
@@ -51,7 +52,7 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[ClassNode] End explore()");
+            logger.debug("[ClassNode] End explore()");//NOI18N
         }
     }
 

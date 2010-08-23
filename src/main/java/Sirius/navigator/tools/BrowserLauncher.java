@@ -128,7 +128,7 @@ public class BrowserLauncher {
 	private static Object linkage;
 	
 	/** The framework to reference on Mac OS X */
-	private static final String JDirect_MacOSX = "/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/HIToolbox";
+	private static final String JDirect_MacOSX = "/System/Library/Frameworks/Carbon.framework/Frameworks/HIToolbox.framework/HIToolbox";//NOI18N
 
 	/** JVM constant for MRJ 2.0 */
 	private static final int MRJ_2_0 = 0;
@@ -155,40 +155,40 @@ public class BrowserLauncher {
 	 * The file type of the Finder on a Macintosh.  Hardcoding "Finder" would keep non-U.S. English
 	 * systems from working properly.
 	 */
-	private static final String FINDER_TYPE = "FNDR";
+	private static final String FINDER_TYPE = "FNDR";//NOI18N
 
 	/**
 	 * The creator code of the Finder on a Macintosh, which is needed to send AppleEvents to the
 	 * application.
 	 */
-	private static final String FINDER_CREATOR = "MACS";
+	private static final String FINDER_CREATOR = "MACS";//NOI18N
 
 	/** The name for the AppleEvent type corresponding to a GetURL event. */
-	private static final String GURL_EVENT = "GURL";
+	private static final String GURL_EVENT = "GURL";//NOI18N
 
 	/**
 	 * The first parameter that needs to be passed into Runtime.exec() to open the default web
 	 * browser on Windows.
 	 */
-    private static final String FIRST_WINDOWS_PARAMETER = "/c";
+    private static final String FIRST_WINDOWS_PARAMETER = "/c";//NOI18N
     
     /** The second parameter for Runtime.exec() on Windows. */
-    private static final String SECOND_WINDOWS_PARAMETER = "start";
+    private static final String SECOND_WINDOWS_PARAMETER = "start";//NOI18N
     
     /**
      * The third parameter for Runtime.exec() on Windows.  This is a "title"
      * parameter that the command line expects.  Setting this parameter allows
      * URLs containing spaces to work.
      */
-    private static final String THIRD_WINDOWS_PARAMETER = "\"\"";
+    private static final String THIRD_WINDOWS_PARAMETER = "\"\"";//NOI18N
 	
 	/**
 	 * The shell parameters for Netscape that opens a given URL in an already-open copy of Netscape
 	 * on many command-line systems.
 	 */
-	private static final String NETSCAPE_REMOTE_PARAMETER = "-remote";
-	private static final String NETSCAPE_OPEN_PARAMETER_START = "'openURL(";
-	private static final String NETSCAPE_OPEN_PARAMETER_END = ")'";
+	private static final String NETSCAPE_REMOTE_PARAMETER = "-remote";//NOI18N
+	private static final String NETSCAPE_OPEN_PARAMETER_START = "'openURL(";//NOI18N
+	private static final String NETSCAPE_OPEN_PARAMETER_END = ")'";//NOI18N
 	
 	/**
 	 * The message from any exception thrown throughout the initialization process.
@@ -201,9 +201,9 @@ public class BrowserLauncher {
 	 */
 	static {
 		loadedWithoutErrors = true;
-		String osName = System.getProperty("os.name");
-		if (osName.startsWith("Mac OS")) {
-			String mrjVersion = System.getProperty("mrj.version");
+		String osName = System.getProperty("os.name");//NOI18N
+		if (osName.startsWith("Mac OS")) {//NOI18N
+			String mrjVersion = System.getProperty("mrj.version");//NOI18N
 			String majorMRJVersion = mrjVersion.substring(0, 3);
 			try {
 				double version = Double.valueOf(majorMRJVersion).doubleValue();
@@ -221,14 +221,14 @@ public class BrowserLauncher {
 					jvm = MRJ_3_1;
 				} else {
 					loadedWithoutErrors = false;
-					errorMessage = "Unsupported MRJ version: " + version;
+					errorMessage = "Unsupported MRJ version: " + version;//NOI18N
 				}
 			} catch (NumberFormatException nfe) {
 				loadedWithoutErrors = false;
-				errorMessage = "Invalid MRJ version: " + mrjVersion;
+				errorMessage = "Invalid MRJ version: " + mrjVersion;//NOI18N
 			}
-		} else if (osName.startsWith("Windows")) {
-			if (osName.indexOf("9") != -1) {
+		} else if (osName.startsWith("Windows")) {//NOI18N
+			if (osName.indexOf("9") != -1) {//NOI18N
 				jvm = WINDOWS_9x;
 			} else {
 				jvm = WINDOWS_NT;
@@ -257,25 +257,25 @@ public class BrowserLauncher {
 		switch (jvm) {
 			case MRJ_2_0:
 				try {
-					Class aeTargetClass = Class.forName("com.apple.MacOS.AETarget");
-					Class osUtilsClass = Class.forName("com.apple.MacOS.OSUtils");
-					Class appleEventClass = Class.forName("com.apple.MacOS.AppleEvent");
-					Class aeClass = Class.forName("com.apple.MacOS.ae");
-					aeDescClass = Class.forName("com.apple.MacOS.AEDesc");
+					Class aeTargetClass = Class.forName("com.apple.MacOS.AETarget");//NOI18N
+					Class osUtilsClass = Class.forName("com.apple.MacOS.OSUtils");//NOI18N
+					Class appleEventClass = Class.forName("com.apple.MacOS.AppleEvent");//NOI18N
+					Class aeClass = Class.forName("com.apple.MacOS.ae");//NOI18N
+					aeDescClass = Class.forName("com.apple.MacOS.AEDesc");//NOI18N
 
 					aeTargetConstructor = aeTargetClass.getDeclaredConstructor(new Class [] { int.class });
 					appleEventConstructor = appleEventClass.getDeclaredConstructor(new Class[] { int.class, int.class, aeTargetClass, int.class, int.class });
 					aeDescConstructor = aeDescClass.getDeclaredConstructor(new Class[] { String.class });
 
-					makeOSType = osUtilsClass.getDeclaredMethod("makeOSType", new Class [] { String.class });
-					putParameter = appleEventClass.getDeclaredMethod("putParameter", new Class[] { int.class, aeDescClass });
-					sendNoReply = appleEventClass.getDeclaredMethod("sendNoReply", new Class[] { });
+					makeOSType = osUtilsClass.getDeclaredMethod("makeOSType", new Class [] { String.class });//NOI18N
+					putParameter = appleEventClass.getDeclaredMethod("putParameter", new Class[] { int.class, aeDescClass });//NOI18N
+					sendNoReply = appleEventClass.getDeclaredMethod("sendNoReply", new Class[] { });//NOI18N
 
-					Field keyDirectObjectField = aeClass.getDeclaredField("keyDirectObject");
+					Field keyDirectObjectField = aeClass.getDeclaredField("keyDirectObject");//NOI18N
 					keyDirectObject = (Integer) keyDirectObjectField.get(null);
-					Field autoGenerateReturnIDField = appleEventClass.getDeclaredField("kAutoGenerateReturnID");
+					Field autoGenerateReturnIDField = appleEventClass.getDeclaredField("kAutoGenerateReturnID");//NOI18N
 					kAutoGenerateReturnID = (Integer) autoGenerateReturnIDField.get(null);
-					Field anyTransactionIDField = appleEventClass.getDeclaredField("kAnyTransactionID");
+					Field anyTransactionIDField = appleEventClass.getDeclaredField("kAnyTransactionID");//NOI18N
 					kAnyTransactionID = (Integer) anyTransactionIDField.get(null);
 				} catch (ClassNotFoundException cnfe) {
 					errorMessage = cnfe.getMessage();
@@ -293,13 +293,13 @@ public class BrowserLauncher {
 				break;
 			case MRJ_2_1:
 				try {
-					mrjFileUtilsClass = Class.forName("com.apple.mrj.MRJFileUtils");
-					mrjOSTypeClass = Class.forName("com.apple.mrj.MRJOSType");
-					Field systemFolderField = mrjFileUtilsClass.getDeclaredField("kSystemFolderType");
+					mrjFileUtilsClass = Class.forName("com.apple.mrj.MRJFileUtils");//NOI18N
+					mrjOSTypeClass = Class.forName("com.apple.mrj.MRJOSType");//NOI18N
+					Field systemFolderField = mrjFileUtilsClass.getDeclaredField("kSystemFolderType");//NOI18N
 					kSystemFolderType = systemFolderField.get(null);
-					findFolder = mrjFileUtilsClass.getDeclaredMethod("findFolder", new Class[] { mrjOSTypeClass });
-					getFileCreator = mrjFileUtilsClass.getDeclaredMethod("getFileCreator", new Class[] { File.class });
-					getFileType = mrjFileUtilsClass.getDeclaredMethod("getFileType", new Class[] { File.class });
+					findFolder = mrjFileUtilsClass.getDeclaredMethod("findFolder", new Class[] { mrjOSTypeClass });//NOI18N
+					getFileCreator = mrjFileUtilsClass.getDeclaredMethod("getFileCreator", new Class[] { File.class });//NOI18N
+					getFileType = mrjFileUtilsClass.getDeclaredMethod("getFileType", new Class[] { File.class });//NOI18N
 				} catch (ClassNotFoundException cnfe) {
 					errorMessage = cnfe.getMessage();
 					return false;
@@ -319,7 +319,7 @@ public class BrowserLauncher {
 				break;
 			case MRJ_3_0:
 			    try {
-					Class linker = Class.forName("com.apple.mrj.jdirect.Linker");
+					Class linker = Class.forName("com.apple.mrj.jdirect.Linker");//NOI18N
 					Constructor constructor = linker.getConstructor(new Class[]{ Class.class });
 					linkage = constructor.newInstance(new Object[] { BrowserLauncher.class });
 				} catch (ClassNotFoundException cnfe) {
@@ -341,8 +341,8 @@ public class BrowserLauncher {
 				break;
 			case MRJ_3_1:
 				try {
-					mrjFileUtilsClass = Class.forName("com.apple.mrj.MRJFileUtils");
-					openURL = mrjFileUtilsClass.getDeclaredMethod("openURL", new Class[] { String.class });
+					mrjFileUtilsClass = Class.forName("com.apple.mrj.MRJFileUtils");//NOI18N
+					openURL = mrjFileUtilsClass.getDeclaredMethod("openURL", new Class[] { String.class });//NOI18N
 				} catch (ClassNotFoundException cnfe) {
 					errorMessage = cnfe.getMessage();
 					return false;
@@ -409,7 +409,7 @@ public class BrowserLauncher {
 					return browser;
 				} catch (InvocationTargetException ite) {
 					browser = null;
-					errorMessage = ite.getTargetException().getClass() + ": " + ite.getTargetException().getMessage();
+					errorMessage = ite.getTargetException().getClass() + ": " + ite.getTargetException().getMessage();//NOI18N
 					return browser;
 				}
 				String[] systemFolderFiles = systemFolder.list();
@@ -443,7 +443,7 @@ public class BrowserLauncher {
 						return browser;
 					} catch (InvocationTargetException ite) {
 						browser = null;
-						errorMessage = ite.getTargetException().getClass() + ": " + ite.getTargetException().getMessage();
+						errorMessage = ite.getTargetException().getClass() + ": " + ite.getTargetException().getMessage();//NOI18N
 						return browser;
 					}
 				}
@@ -451,17 +451,17 @@ public class BrowserLauncher {
 				break;
 			case MRJ_3_0:
 			case MRJ_3_1:
-				browser = "";	// Return something non-null
+				browser = "";	// Return something non-null//NOI18N
 				break;
 			case WINDOWS_NT:
-				browser = "cmd.exe";
+				browser = "cmd.exe";//NOI18N
 				break;
 			case WINDOWS_9x:
-				browser = "command.com";
+				browser = "command.com";//NOI18N
 				break;
 			case OTHER:
 			default:
-				browser = "netscape";
+				browser = "netscape";//NOI18N
 				break;
 		}
 		return browser;
@@ -480,11 +480,11 @@ public class BrowserLauncher {
             }
             else {
 		if (!loadedWithoutErrors) {
-			throw new IOException("Exception in finding browser: " + errorMessage);
+			throw new IOException("Exception in finding browser: " + errorMessage);//NOI18N
 		}
 		Object browser = locateBrowser();
 		if (browser == null) {
-			throw new IOException("Unable to locate browser: " + errorMessage);
+			throw new IOException("Unable to locate browser: " + errorMessage);//NOI18N
 		}
 		
 		switch (jvm) {
@@ -495,11 +495,11 @@ public class BrowserLauncher {
 					putParameter.invoke(browser, new Object[] { keyDirectObject, aeDesc });
 					sendNoReply.invoke(browser, new Object[] { });
 				} catch (InvocationTargetException ite) {
-					throw new IOException("InvocationTargetException while creating AEDesc: " + ite.getMessage());
+					throw new IOException("InvocationTargetException while creating AEDesc: " + ite.getMessage());//NOI18N
 				} catch (IllegalAccessException iae) {
-					throw new IOException("IllegalAccessException while building AppleEvent: " + iae.getMessage());
+					throw new IOException("IllegalAccessException while building AppleEvent: " + iae.getMessage());//NOI18N
 				} catch (InstantiationException ie) {
-					throw new IOException("InstantiationException while creating AEDesc: " + ie.getMessage());
+					throw new IOException("InstantiationException while creating AEDesc: " + ie.getMessage());//NOI18N
 				} finally {
 					aeDesc = null;	// Encourage it to get disposed if it was created
 					browser = null;	// Ditto
@@ -523,19 +523,19 @@ public class BrowserLauncher {
 						// regardless of what happens here.
 						ICStop(instance);
 					} else {
-						throw new IOException("Unable to launch URL: " + result);
+						throw new IOException("Unable to launch URL: " + result);//NOI18N
 					}
 				} else {
-					throw new IOException("Unable to create an Internet Config instance: " + result);
+					throw new IOException("Unable to create an Internet Config instance: " + result);//NOI18N
 				}
 				break;
 			case MRJ_3_1:
 				try {
 					openURL.invoke(null, new Object[] { url });
 				} catch (InvocationTargetException ite) {
-					throw new IOException("InvocationTargetException while calling openURL: " + ite.getMessage());
+					throw new IOException("InvocationTargetException while calling openURL: " + ite.getMessage());//NOI18N
 				} catch (IllegalAccessException iae) {
-					throw new IOException("IllegalAccessException while calling openURL: " + iae.getMessage());
+					throw new IOException("IllegalAccessException while calling openURL: " + iae.getMessage());//NOI18N
 				}
 				break;
 		    case WINDOWS_NT:
@@ -553,7 +553,7 @@ public class BrowserLauncher {
 					process.waitFor();
 					process.exitValue();
 				} catch (InterruptedException ie) {
-					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
+					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());//NOI18N
 				}
 				break;
 			case OTHER:
@@ -571,7 +571,7 @@ public class BrowserLauncher {
 						Runtime.getRuntime().exec(new String[] { (String) browser, url });
 					}
 				} catch (InterruptedException ie) {
-					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());
+					throw new IOException("InterruptedException while launching browser: " + ie.getMessage());//NOI18N
 				}
 				break;
 			default:

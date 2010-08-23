@@ -44,7 +44,7 @@ public class DynamicLongField extends JPanel implements AdjustmentListener
 	{
 		super(new GridBagLayout());
 
-		longField = new LongField("0", 3);
+		longField = new LongField("0", 3);//NOI18N
 
 		initDynamicLongField();
 	}
@@ -108,7 +108,7 @@ public class DynamicLongField extends JPanel implements AdjustmentListener
 			//if(Sirius.navigator.NavigatorLogger.DEV)e.printStackTrace();
 			//JOptionPane.showMessageDialog(this, errorString, errorTitle, JOptionPane.ERROR_MESSAGE);
 
-			longField.setText("0");
+			longField.setText("0");//NOI18N
 		}
 	}
 
@@ -123,7 +123,7 @@ public class DynamicLongField extends JPanel implements AdjustmentListener
 			//if(Sirius.navigator.NavigatorLogger.DEV)e.printStackTrace();
 			//JOptionPane.showMessageDialog(this, errorString, errorTitle, JOptionPane.ERROR_MESSAGE);
 
-			longField.setText("0");
+			longField.setText("0");//NOI18N
 			return 0;
 		}
 	}
@@ -218,14 +218,14 @@ class LongField extends JTextField
 	*/
 	static class NumericDocument extends PlainDocument
 	{
-		protected final static String LONG = "0123456789";
+		protected final static String LONG = "0123456789";//NOI18N
 
 		public void insertString(int offs, String str, AttributeSet a) throws BadLocationException
 		{
 			if (str == null)
 			{
 				remove(0, getLength());
-				super.insertString(0, "0", a);
+				super.insertString(0, "0", a);//NOI18N
 				return;
 			}
 
@@ -234,7 +234,7 @@ class LongField extends JTextField
 				if (LONG.indexOf(str.valueOf(str.charAt(i))) == -1)
 				{
 					remove(0, getLength());
-					super.insertString(0, "0", a);
+					super.insertString(0, "0", a);//NOI18N
 					return;
 				}
 			}

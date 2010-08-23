@@ -48,7 +48,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
             @Override
             public final int compare(CidsBean o1, CidsBean o2) {
-                return ("" + o1).compareToIgnoreCase("" + o2);
+                return ("" + o1).compareToIgnoreCase("" + o2);//NOI18N
             }
         };
     }
@@ -92,7 +92,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                         setSelectedItem(cidsBean);
                     } catch (InterruptedException interruptedException) {
                     } catch (ExecutionException executionException) {
-                        log.error("Fehler beim Initialisieren des Models einer referenceCombo", executionException);
+                        log.error("Error while initializing the model of a referenceCombo", executionException);//NOI18N
                     }
 
 
@@ -103,7 +103,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     }
 
     public String getBindingProperty() {
-        return "selectedItem";
+        return "selectedItem";//NOI18N
     }
 
     public Validator getValidator() {
@@ -168,13 +168,13 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     }
 
     public static DefaultComboBoxModel getModelByMetaClass(MetaClass mc, boolean nullable) throws Exception {
-        ClassAttribute ca = mc.getClassAttribute("sortingColumn");
-        String orderBy = "";
+        ClassAttribute ca = mc.getClassAttribute("sortingColumn");//NOI18N
+        String orderBy = "";//NOI18N
         if (ca != null) {
             String value = ca.getValue().toString();
-            orderBy = " order by " + value;
+            orderBy = " order by " + value;//NOI18N
         }
-        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;
+        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;//NOI18N
         final MetaObject[] MetaObjects = SessionManager.getProxy().getMetaObjectByQuery(query, 0);
         final Vector<CidsBean> cbv = new Vector<CidsBean>(MetaObjects.length);
         if (nullable) {

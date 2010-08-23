@@ -28,7 +28,7 @@ public abstract class CidsMetaObjectBreadCrumb extends BreadCrumb {
             ImageIcon i = new ImageIcon(metaObject.getMetaClass().getObjectIcon().getImageData());
             setIcon(i);
         } catch (Exception e) {
-            log.warn("Fehler beim setzen des Icons im BreadCrumb", e);
+            log.warn("Fehler beim setzen des Icons im BreadCrumb", e);//NOI18N
         }
     }
 

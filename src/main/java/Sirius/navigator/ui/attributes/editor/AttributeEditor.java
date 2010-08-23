@@ -43,9 +43,9 @@ import de.cismet.tools.CismetThreadPool;
  * @author  pascal
  */
 public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar {
-    private final Logger logger;
+    private final Logger logger = Logger.getLogger(this.getClass());
     
-    private final ResourceManager resources;
+    private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
     
     private ComplexEditor editor = null;
@@ -54,17 +54,15 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
 
     /** Creates new form AttributeEditor */
     public AttributeEditor() {
-        this.logger = Logger.getLogger(this.getClass());
-        this.resources = ResourceManager.getManager();
         
         initComponents();
-        
+
         ActionListener buttonListener = new ButtonListener();
         this.cancelButton.addActionListener(buttonListener);
         this.commitButton.addActionListener(buttonListener);
         //this.editButton.addActionListener(buttonListener);
         //this.pinButton.addActionListener(buttonListener);
-        
+
         this.attributeTree.addTreeSelectionListener(new MetaObjectListener());
         this.attributeTree.setIgnoreInvisibleAttributes(false);
         
@@ -96,17 +94,17 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         synchronized(this.attributeTree) {
             try {
                 // 10 sec timeout
-                if(logger.isDebugEnabled())logger.debug("waiting for attribute thread to finish");
+                if(logger.isDebugEnabled())logger.debug("waiting for attribute thread to finish");//NOI18N
                 this.attributeTree.wait(10000);
             } catch(Throwable t) {
-                logger.error("thread synchronization failed", t);
+                logger.error("thread synchronization failed", t);//NOI18N
             }
         }
         
         this.treeNode = node;
         
         if(this.attributeTree.getRootNode() != null && this.attributeTree.getRootNode() instanceof ObjectAttributeNode) {
-            logger.info("setTreeNode(): initializing editor ");
+            logger.info("setTreeNode(): initializing editor ");//NOI18N
             
             this.editor = new DefaultComplexMetaAttributeEditor();
             ObjectAttributeNode rootNode = (ObjectAttributeNode)this.attributeTree.getRootNode();
@@ -116,13 +114,13 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                 //HELL
                 if (mael.getEditor(metaObject)!=null){
                     editor=(ComplexEditor)mael.getEditor(metaObject);
-                    logger.debug("Editor :"+((ObjectTreeNode)treeNode).getMetaClass().getComplexEditor());
+                    logger.debug("Editor :"+((ObjectTreeNode)treeNode).getMetaClass().getComplexEditor());//NOI18N
                 } else {
-                    logger.warn("MetaAttributeEditorLocator hat null geliefert f\u00FCr Object:"+metaObject);
+                    logger.warn("MetaAttributeEditorLocator returned null for object:"+metaObject);//NOI18N
                 }
                 
             } catch (Exception e) {
-                logger.info("setTreeNode(): initializing editor EXception", e);
+                logger.info("setTreeNode(): initializing editor EXception", e);//NOI18N
             }
             
             //TimEasy: hier wird das Innere des Editors erzeugt und in die Scrollpane gesetzt
@@ -132,9 +130,9 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
             this.commitButton.setEnabled(true);
             this.cancelButton.setEnabled(true);
             
-            this.titleBar.setTitle(resources.getString("attribute.editor.title") + " (" + rootNode + ")");
+            this.titleBar.setTitle(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.titleBar.title", new Object[]{rootNode}));//NOI18N
         } else if(logger.isDebugEnabled()) {
-            logger.warn("setTreeNode(): node is null or not of type ObjectAttributeNode");
+            logger.warn("setTreeNode(): node is null or not of type ObjectAttributeNode");//NOI18N
             this.clear();
         }
         
@@ -149,7 +147,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         this.commitButton.setEnabled(false);
         this.cancelButton.setEnabled(false);
         
-        this.titleBar.setTitle(resources.getString("attribute.editor.title"));
+        this.titleBar.setTitle(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.titleBar.title"));//NOI18N
     }
     
     public Object getTreeNode() {
@@ -160,7 +158,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         if(editor != null) {
             editor.cancelEditing();
             
-            if(logger.isDebugEnabled())logger.debug("cancel() Verwerfe \u00C4nderungen in Node " + this.treeNode);
+            if(logger.isDebugEnabled())logger.debug("cancel() rejecting changes in node " + this.treeNode);//NOI18N
             //this.clear();
             
             ObjectTreeNode objectTreeNode = (ObjectTreeNode)this.treeNode;
@@ -180,8 +178,9 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     private void commit() {
         synchronized(commitBlocker) {
             editor.stopEditing();
-            
-            logger.info("commit() Speichere \u00E4nderungen in Node " + this.treeNode);
+            if (logger.isInfoEnabled()) {
+                logger.info("commit() saving changes in node " + this.treeNode);//NOI18N
+            }
             this.editor.setValueChanged(false);
             
             final ObjectTreeNode objectTreeNode = (ObjectTreeNode)this.getTreeNode();
@@ -205,17 +204,21 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                 if(parent != null) {
                                     link = new Link(((DefaultMetaTreeNode)parent).getID(), objectTreeNode.getDomain());
                                 } else {
-                                    logger.warn("commit(): node '" + objectTreeNode + "' has no parent node'");
+                                    logger.warn("commit(): node '" + objectTreeNode + "' has no parent node'");//NOI18N
                                     link = new Link(-1, objectTreeNode.getDomain());
                                 }
-                                
-                                logger.info("commit(): insert meta object: " + editedMetaObject.getName());
+
+                                if (logger.isInfoEnabled()) {
+                                    logger.info("commit(): insert meta object: " + editedMetaObject.getName());//NOI18N
+                                }
                                 savedMetaObject = SessionManager.getProxy().insertMetaObject(editedMetaObject, objectTreeNode.getDomain());
                                 
                                 // neues objekt zuweisen
                                 objectTreeNode.setMetaObject(savedMetaObject);
-                                
-                                logger.info("commit(): add node: " + objectTreeNode);
+
+                                if (logger.isInfoEnabled()) {
+                                    logger.info("commit(): add node: " + objectTreeNode);//NOI18N
+                                }
                                 Node node = SessionManager.getProxy().addNode(objectTreeNode.getNode(), link);
                                 
                                 // parent permissions zuweisen...
@@ -230,7 +233,9 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                             }
                             
                             else {
-                                logger.info("commit(): update meta object: " + editedMetaObject.getName());
+                                if (logger.isInfoEnabled()) {
+                                    logger.info("commit(): update meta object: " + editedMetaObject.getName());//NOI18N
+                                }
                                 SessionManager.getProxy().updateMetaObject(editedMetaObject, objectTreeNode.getDomain());
                                 savedMetaObject = editedMetaObject;
                                 
@@ -243,19 +248,19 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                             SwingUtilities.invokeLater(new Runnable() {
                                 public void run() {
                                     // XXX event w\u00E4re besser ...
-                                    if(logger.isDebugEnabled())logger.debug("invokeLater() performing GUI update");
+                                    if(logger.isDebugEnabled())logger.debug("invokeLater() performing GUI update");//NOI18N
                                     AttributeViewer attributeViewer = ComponentRegistry.getRegistry().getAttributeViewer();
                                     
                                     if(attributeViewer.getTreeNode() == AttributeEditor.this.getTreeNode()) {
-                                        if(logger.isDebugEnabled())logger.debug("commit() updating attribute viewer with new tree node");
+                                        if(logger.isDebugEnabled())logger.debug("commit() updating attribute viewer with new tree node");//NOI18N
                                         attributeViewer.setTreeNode(AttributeEditor.this.getTreeNode());
                                     }
                                     
                                     //XXX i18n
                                     JOptionPane.showMessageDialog(AttributeEditor.this,
-                                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorMessage1") + objectTreeNode +
-                                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorMessage2"),
-                                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.invokeLater.ErrorTitle"), JOptionPane.INFORMATION_MESSAGE);
+                                            org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.invokeLater().InfoMessage", new Object[]{objectTreeNode}), //NOI18N
+                                            org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.invokeLater().InfoTitle"),//NOI18N
+                                            JOptionPane.INFORMATION_MESSAGE);
                                     
                                     //AttributeEditor.this.setTreeNodes(objectTreeNode);
                                     AttributeEditor.this.clear();
@@ -266,26 +271,29 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                         ComponentRegistry.getRegistry().getCatalogueTree().scrollPathToVisible(ComponentRegistry.getRegistry().getCatalogueTree().getSelectionPath());
                                         //hier k\u00F6nnte jetzt noch zu dem TAB gewechselt werden das vom User gew\u00FCnscht ist
                                     } catch (Exception e) {
-                                        logger.warn("kann nicht zu selektiertem Objekt scrollen.",e);
+                                        logger.warn("can not scroll to selected object.",e);//NOI18N
                                     }
                                     //((MutableTreeNode)AttributeEditor.this.getTreeNode())
                                 }
                             });
                         } catch(Throwable t) {
-                            logger.error("add / insert of meta object '" + objectTreeNode.getMetaObject() + "' failed", t);
-                            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("attribute.editor.insert.error.title"), resources.getString("attribute.editor.insert.error.message"), t);
+                            logger.error("add / insert of meta object '" + objectTreeNode.getMetaObject() + "' failed", t);//NOI18N
+                            ExceptionManager.getManager().showExceptionDialog(
+                                    ExceptionManager.WARNING,
+                                    org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.commit().insertError.title"),//NOI18N
+                                    org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.commit().insertError.message"), t);//NOI18N
                             ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                         }
                     } else {
                         //XXX i18n
                         JOptionPane.showMessageDialog(AttributeEditor.this,
-                                ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage1") + emptyAttributeName +
-                                ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorMessage2"),
-                                ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editorSirius.navigator.ui.attributes.editor.AttributeEditor.commit.ErrorTitle"), JOptionPane.WARNING_MESSAGE);
+                                org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.commit().ErrorMessage", new Object[]{emptyAttributeName}), //NOI18N
+                                org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.commit().ErrorTitle"),//NOI18N
+                                JOptionPane.WARNING_MESSAGE);
                         ComponentRegistry.getRegistry().getMainWindow().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     }
                 }
-            }, "commitEditThread"));
+            }, "commitEditThread"));//NOI18N
         }
     }
     
@@ -294,21 +302,28 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
      */
     private void confirmEdit() {
         if(this.isChanged()) {
-            if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(AttributeEditor.this, resources.getString("attribute.viewer.edit.message"), resources.getString("attribute.viewer.edit.tooltip"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-            {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit"))) {
+            if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                    AttributeEditor.this,
+                    org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.confirmEdit().JOptionPane.message"), //NOI18N
+                    org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.confirmEdit().JOptionPane.title"), //NOI18N
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                    null, new String[]
+            {org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.confirmEdit().JOptionPane.option1"),//NOI18N
+             org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.confirmEdit().JOptionPane.option2")},//NOI18N
+             org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.confirmEdit().JOptionPane.option1"))) {//NOI18N
                 this.commit();
             } else {
                 this.cancel();
             }
         } else {
-            if(logger.isDebugEnabled())logger.debug("confirmEdit(): no changes detected");
+            if(logger.isDebugEnabled())logger.debug("confirmEdit(): no changes detected");//NOI18N
             this.cancel();
         }
     }
     
     public boolean isChanged() {
-        logger.debug("this.editor: " + this.editor);
-        if(this.editor != null)logger.debug("this.editor.isValueChanged(): " + this.editor.isValueChanged());
+        logger.debug("this.editor: " + this.editor);//NOI18N
+        if(this.editor != null)logger.debug("this.editor.isValueChanged(): " + this.editor.isValueChanged());//NOI18N
         
         if(this.editor != null && (this.editor.isValueChanged() || ((DefaultMetaTreeNode)this.treeNode).isNew())) {
             return true;
@@ -338,38 +353,38 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         javax.swing.JScrollPane treeScrollPane = new javax.swing.JScrollPane();
         attributeTree = new Sirius.navigator.ui.attributes.AttributeTree();
 
-        pinButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon")));
-        pinButton.setToolTipText(resources.getString("attribute.viewer.pin.tooltip"));
-        pinButton.setActionCommand("pin");
+        pinButton.setIcon(resources.getIcon("attr_pin_off.gif"));//NOI18N
+        pinButton.setToolTipText(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.pinButton.tooltip"));//NOI18N
+        pinButton.setActionCommand("pin");//NOI18N
         pinButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pinButton.setContentAreaFilled(false);
         pinButton.setFocusPainted(false);
         pinButton.setMaximumSize(new java.awt.Dimension(16, 16));
         pinButton.setMinimumSize(new java.awt.Dimension(16, 16));
         pinButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        pinButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.rollover")));
-        pinButton.setRolloverSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.selected.rollover")));
-        pinButton.setSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.pin.icon.selected")));
+        pinButton.setRolloverIcon(resources.getIcon("attr_pin_off.gif"));//NOI18N
+        pinButton.setRolloverSelectedIcon(resources.getIcon("attr_pin_on.gif"));//NOI18N
+        pinButton.setSelectedIcon(resources.getIcon("attr_pin_on.gif"));//NOI18N
 
-        editButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon")));
-        editButton.setToolTipText(resources.getString("attribute.viewer.edit.tooltip"));
-        editButton.setActionCommand("edit");
+        editButton.setIcon(resources.getIcon("objekt_bearbeiten.gif"));//NOI18N
+        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.editButton.tooltip"));//NOI18N
+        editButton.setActionCommand("edit");//NOI18N
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
         editButton.setFocusPainted(false);
         editButton.setMaximumSize(new java.awt.Dimension(16, 16));
         editButton.setMinimumSize(new java.awt.Dimension(16, 16));
         editButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        editButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.rollover")));
-        editButton.setRolloverSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.selected.rollover")));
-        editButton.setSelectedIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon.selected")));
+        editButton.setRolloverIcon(resources.getIcon("objekt_bearbeiten.gif"));//NOI18N
+        editButton.setRolloverSelectedIcon(resources.getIcon("objekt_bearbeiten.gif"));//NOI18N
+        editButton.setSelectedIcon(resources.getIcon("objekt_bearbeiten.gif"));//NOI18N
 
         setLayout(new java.awt.BorderLayout());
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
-        titleBar.setIcon(resources.getIcon("floatingframe.gif"));
-        titleBar.setTitle(resources.getString("attribute.editor.title"));
+        titleBar.setIcon(resources.getIcon("floatingframe.gif"));//NOI18N
+        titleBar.setTitle(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.titleBar.title"));//NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -377,9 +392,9 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         gridBagConstraints.weighty = 1.0;
         controlBar.add(titleBar, gridBagConstraints);
 
-        commitButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon")));
-        commitButton.setToolTipText(resources.getString("attribute.viewer.commit.tooltip"));
-        commitButton.setActionCommand("commit");
+        commitButton.setIcon(resources.getIcon("save_objekt.gif"));//NOI18N
+        commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.commitButton.tooltip"));//NOI18N
+        commitButton.setActionCommand("commit");//NOI18N
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
         commitButton.setEnabled(false);
@@ -387,14 +402,14 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         commitButton.setMaximumSize(new java.awt.Dimension(16, 16));
         commitButton.setMinimumSize(new java.awt.Dimension(16, 16));
         commitButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        commitButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.commit.icon.rollover")));
+        commitButton.setRolloverIcon(resources.getIcon("save_objekt.gif"));//NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         controlBar.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon")));
-        cancelButton.setToolTipText(resources.getString("attribute.viewer.cancel.tooltip"));
-        cancelButton.setActionCommand("cancel");
+        cancelButton.setIcon(resources.getIcon("zurueck_objekt.gif"));//NOI18N
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.cancelButton.tooltip"));//NOI18N
+        cancelButton.setActionCommand("cancel");//NOI18N
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
         cancelButton.setEnabled(false);
@@ -402,7 +417,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
         cancelButton.setMaximumSize(new java.awt.Dimension(16, 16));
         cancelButton.setMinimumSize(new java.awt.Dimension(16, 16));
         cancelButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        cancelButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.cancel.icon.rollover")));
+        cancelButton.setRolloverIcon(resources.getIcon("zurueck_objekt.gif"));//NOI18N
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
         add(controlBar, java.awt.BorderLayout.NORTH);
@@ -426,7 +441,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
 
         splitPane.setBottomComponent(treeScrollPane);
 
-        switchPanel.add(splitPane, "table");
+        switchPanel.add(splitPane, "table");//NOI18N
 
         add(switchPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
@@ -452,10 +467,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                 for (int i = 0; i < objects.length; i++) {
                     if(objects[i] instanceof ObjectAttributeNode) {
                         activeChildEditorTree.addLast(((ObjectAttributeNode)objects[i]).getAttributeKey());
-                    } else if(logger.isDebugEnabled())logger.warn("valueChanged(): node '" + objects[i] + "' is no object tree node");
+                    } else if(logger.isDebugEnabled())logger.warn("valueChanged(): node '" + objects[i] + "' is no object tree node");//NOI18N
                 }
                 
-                if(logger.isDebugEnabled())logger.debug("valueChanged(): selection editor for selected object tree node");
+                if(logger.isDebugEnabled())logger.debug("valueChanged(): selection editor for selected object tree node");//NOI18N
                 AttributeEditor.this.editor.setActiveChildEditorTree(activeChildEditorTree);
                 
                 /*if(e.isAddedPath())
@@ -464,33 +479,43 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                 }
                 else if(logger.isDebugEnabled())logger.debug("valueChanged(): ignoring selection event");*/
             } else if(logger.isDebugEnabled()) {
-                logger.warn("editor is null");
+                logger.warn("editor is null");//NOI18N
             }
         }
     }
     
     private class ButtonListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            if(logger.isDebugEnabled())logger.debug("actionPerformed(): action command: " + e.getActionCommand());
-            if(e.getActionCommand().equals("commit")) {
+            if(logger.isDebugEnabled())logger.debug("actionPerformed(): action command: " + e.getActionCommand());//NOI18N
+            if(e.getActionCommand().equals("commit")) {//NOI18N
                 // XXX
                 // Alle \u00C4nderungen im Objekt speichern:
                 editor.stopEditing();
                 
                 if(isChanged() &&
-                        JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(AttributeEditor.this, resources.getString("attribute.viewer.commit.message"), resources.getString("attribute.viewer.commit.tooltip"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+                        JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                        AttributeEditor.this,
+                        org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.ButtonListener.JOptionPane.commit.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.ButtonListener.JOptionPane.commit.title"),//NOI18N
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE,
+                        null, null, null)) {
                     
                     commit();
                 } else {
                     AttributeEditor.this.clear();
                 }
                 
-            } else if(e.getActionCommand().equals("cancel") &&
-                    JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(AttributeEditor.this, resources.getString("attribute.viewer.cancel.message"), resources.getString("attribute.viewer.cancel.tooltip"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null)) {
-                logger.error("unknown action command '" + e.getActionCommand() + "'");
+            } else if(e.getActionCommand().equals("cancel") &&//NOI18N
+                    JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                    AttributeEditor.this,
+                    org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.ButtonListener.JOptionPane.cancel.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(AttributeEditor.class, "AttributeEditor.ButtonListener.JOptionPane.cancel.title"),//NOI18N
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, null, null)) {
+                logger.error("unknown action command '" + e.getActionCommand() + "'");//NOI18N
                 cancel();
             } else {
-                logger.error("unknown action command '" + e.getActionCommand() + "'");
+                logger.error("unknown action command '" + e.getActionCommand() + "'");//NOI18N
             }
             /*else if(e.getActionCommand().equals("edit"))
             {

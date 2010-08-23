@@ -34,7 +34,9 @@ public final class PluginFactory
 {
     /** singleton shared instance*/
     //private static PluginFactory factory = null;
-    
+
+    private static final ResourceManager resource = ResourceManager.getManager();
+
     private final Logger logger;
     private final Log log;
     
@@ -57,7 +59,7 @@ public final class PluginFactory
         preloadRuleSet = new PreloadPluginRuleSet();
         loadRuleSet = new LoadPluginRuleSet();
         
-        schemaLocation = ResourceManager.getManager().pathToIURIString(PropertyManager.getManager().getPluginPath() + "plugin.xsd");
+        schemaLocation = resource.pathToIURIString(PropertyManager.getManager().getPluginPath() + "plugin.xsd");  // NOI18N
         
     }
     
@@ -84,7 +86,8 @@ public final class PluginFactory
         
         if(validating)
         {
-            logger.info("plugin xml schema validation turned off to improve performance");
+            if(logger.isInfoEnabled())
+                logger.info("plugin xml schema validation turned off to improve performance");   // NOI18N
             //if(logger.isDebugEnabled())logger.debug("enabling xml schema validation: '" + this.getSchemaLocation() + "'");
             //digester.setSchema(this.getSchemaLocation());
             //digester.setValidating(validating);
@@ -126,18 +129,18 @@ public final class PluginFactory
      */
     private InputStream getXMLDescriptorInputStream(URL pluginUrl) throws URISyntaxException, FileNotFoundException, IOException
     {
-        if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor '" + pluginUrl.toString() + "/" + PluginDescriptor.XML_DESCRIPTOR + "'");
+        if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor '" + pluginUrl.toString() + "/" + PluginDescriptor.XML_DESCRIPTOR + "'");  // NOI18N
         
-        File file = new File(new URI(pluginUrl.toString() + "/" + PluginDescriptor.XML_DESCRIPTOR));
+        File file = new File(new URI(pluginUrl.toString() + "/" + PluginDescriptor.XML_DESCRIPTOR));  // NOI18N
         return new BufferedInputStream(new FileInputStream(file), 8192);
     }
     
     private InputStream getXMLDescriptorInputStream(String pluginPath) throws FileNotFoundException, MalformedURLException, IOException
     {
         String pluginDescriptorPath = pluginPath + PluginDescriptor.XML_DESCRIPTOR;
-        if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor from remote URL '" + pluginDescriptorPath + "'");
+        if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor from remote URL '" + pluginDescriptorPath + "'");  // NOI18N
         
-        return new BufferedInputStream(ResourceManager.getManager().getResourceAsStream(pluginDescriptorPath), 16384);
+        return new BufferedInputStream(resource.getResourceAsStream(pluginDescriptorPath), 16384);
         
         /*if(pluginPath.indexOf("http://") == 0 || pluginPath.indexOf("https://") == 0)
         {
@@ -161,24 +164,24 @@ public final class PluginFactory
         {
             // <plugin> ........................................................
             // set PluginDescriptor Bean properties (<plugin> attributes -> properties)
-            digester.addSetProperties("plugin");
+            digester.addSetProperties("plugin");  // NOI18N
             
             // <metainfo> ......................................................
             // create PluginMetaInfo object
-            digester.addObjectCreate("plugin/metainfo", "Sirius.navigator.plugin.PluginMetaInfo");
+            digester.addObjectCreate("plugin/metainfo", "Sirius.navigator.plugin.PluginMetaInfo");  // NOI18N
             // add PluginMetaInfo to PluginDescriptor
-            digester.addSetNext("plugin/metainfo","setMetaInfo", "Sirius.navigator.plugin.PluginMetaInfo");
+            digester.addSetNext("plugin/metainfo","setMetaInfo", "Sirius.navigator.plugin.PluginMetaInfo");  // NOI18N
             // set PluginMetaInfo Bean properties (<plugin> attributes -> properties)
             //digester.addSetProperties("plugin/metainfo/properties");
-            digester.addSetProperties("plugin/metainfo");
+            digester.addSetProperties("plugin/metainfo");  // NOI18N
             // set PluginMetaInfo description (<description></description> -> description)
-            digester.addCallMethod("plugin/metainfo/description", "setDescription", 0);
+            digester.addCallMethod("plugin/metainfo/description", "setDescription", 0);  // NOI18N
             
             // <rights> ........................................................
             // set the usernames
-            digester.addCallMethod("plugin/deployment/rights/users/name", "addUser", 0);
+            digester.addCallMethod("plugin/deployment/rights/users/name", "addUser", 0);  // NOI18N
             // set the usergroupnames
-            digester.addCallMethod("plugin/deployment/rights/usergroups/name", "addUsergroup", 0);
+            digester.addCallMethod("plugin/deployment/rights/usergroups/name", "addUsergroup", 0);  // NOI18N
             
             
             
@@ -191,51 +194,51 @@ public final class PluginFactory
         {
             // <properties> section ............................................
             // capabilities
-            digester.addCallMethod("plugin/properties/capabilities", "setCapabilities", 5, new String[] {"java.lang.Boolean", "java.lang.Boolean", "java.lang.Boolean", "java.lang.Boolean", "java.lang.Boolean"});
-            digester.addCallParam("plugin/properties/capabilities/progressobservable", 0);
-            digester.addCallParam("plugin/properties/capabilities/propertyobservable", 1);
-            digester.addCallParam("plugin/properties/capabilities/internationalized", 2);
-            digester.addCallParam("plugin/properties/capabilities/unloadable", 3);
-            digester.addCallParam("plugin/properties/capabilities/deactivateable", 4);
+            digester.addCallMethod("plugin/properties/capabilities", "setCapabilities", 5, new String[] {"java.lang.Boolean", "java.lang.Boolean", "java.lang.Boolean", "java.lang.Boolean", "java.lang.Boolean"});  // NOI18N
+            digester.addCallParam("plugin/properties/capabilities/progressobservable", 0);  // NOI18N
+            digester.addCallParam("plugin/properties/capabilities/propertyobservable", 1);  // NOI18N
+            digester.addCallParam("plugin/properties/capabilities/internationalized", 2);  // NOI18N
+            digester.addCallParam("plugin/properties/capabilities/unloadable", 3);  // NOI18N
+            digester.addCallParam("plugin/properties/capabilities/deactivateable", 4);  // NOI18N
             
             // internationalization
-            digester.addCallMethod("plugin/properties/internationalization/defaultlocale", "setDefaultLocale", 0);
+            digester.addCallMethod("plugin/properties/internationalization/defaultlocale", "setDefaultLocale", 0);  // NOI18N
             // add PluginLocale object
-            digester.addCallMethod("plugin/properties/internationalization/locales/locale", "addLocale", 4);
-            digester.addCallParam("plugin/properties/internationalization/locales/locale/name", 0);
-            digester.addCallParam("plugin/properties/internationalization/locales/locale/language", 1);
-            digester.addCallParam("plugin/properties/internationalization/locales/locale/country", 2);
-            digester.addCallParam("plugin/properties/internationalization/locales/locale/resourcefile", 3);
+            digester.addCallMethod("plugin/properties/internationalization/locales/locale", "addLocale", 4);  // NOI18N
+            digester.addCallParam("plugin/properties/internationalization/locales/locale/name", 0);  // NOI18N
+            digester.addCallParam("plugin/properties/internationalization/locales/locale/language", 1);  // NOI18N
+            digester.addCallParam("plugin/properties/internationalization/locales/locale/country", 2);  // NOI18N
+            digester.addCallParam("plugin/properties/internationalization/locales/locale/resourcefile", 3);  // NOI18N
             
             // <deployment> section ............................................
             // set plugin class name
-            digester.addCallMethod("plugin/deployment/pluginclass", "setClassName", 0);
+            digester.addCallMethod("plugin/deployment/pluginclass", "setClassName", 0);  // NOI18N
             
             // add libraries (jar files)
-            digester.addCallMethod("plugin/deployment/libraries/jar", "addLibrary", 0);
+            digester.addCallMethod("plugin/deployment/libraries/jar", "addLibrary", 0);  // NOI18N
             
             // add the plugin parameters
-            digester.addCallMethod("plugin/deployment/params/param", "addParameter", 2);
-            digester.addCallParam("plugin/deployment/params/param/name", 0);
-            digester.addCallParam("plugin/deployment/params/param/value", 1);
+            digester.addCallMethod("plugin/deployment/params/param", "addParameter", 2);  // NOI18N
+            digester.addCallParam("plugin/deployment/params/param/name", 0);  // NOI18N
+            digester.addCallParam("plugin/deployment/params/param/value", 1);  // NOI18N
             
             // add the attribute id <-> attribute name mappings
-            digester.addCallMethod("plugin/deployment/mappings/attribute", "addAttributeMapping", 2);
-            digester.addCallParam("plugin/deployment/mappings/attribute/name", 0);
-            digester.addCallParam("plugin/deployment/mappings/attribute/id", 1);
+            digester.addCallMethod("plugin/deployment/mappings/attribute", "addAttributeMapping", 2);  // NOI18N
+            digester.addCallParam("plugin/deployment/mappings/attribute/name", 0);  // NOI18N
+            digester.addCallParam("plugin/deployment/mappings/attribute/id", 1);  // NOI18N
             
             // it's time to create the plugin
-            digester.addCallMethod("plugin/deployment", "createPluginInstance");
+            digester.addCallMethod("plugin/deployment", "createPluginInstance");  // NOI18N
             
             // .................................................................
             // add the method
-            digester.addCallMethod("plugin/methods/method", "addMethod", 5, new String[]
-            {"java.lang.String", "java.lang.String", "java.lang.String", "java.lang.Boolean", "java.lang.Long"});
-            digester.addCallParam("plugin/methods/method/id", 0);
-            digester.addCallParam("plugin/methods/method/name", 1);
-            digester.addCallParam("plugin/methods/method/description", 2);
-            digester.addCallParam("plugin/methods/method/multithreaded", 3);
-            digester.addCallParam("plugin/methods/method/availability", 4);
+            digester.addCallMethod("plugin/methods/method", "addMethod", 5, new String[]    // NOI18N
+            {"java.lang.String", "java.lang.String", "java.lang.String", "java.lang.Boolean", "java.lang.Long"});  // NOI18N
+            digester.addCallParam("plugin/methods/method/id", 0);  // NOI18N
+            digester.addCallParam("plugin/methods/method/name", 1);  // NOI18N
+            digester.addCallParam("plugin/methods/method/description", 2);  // NOI18N
+            digester.addCallParam("plugin/methods/method/multithreaded", 3);  // NOI18N
+            digester.addCallParam("plugin/methods/method/availability", 4);  // NOI18N
             // register methods
             //digester.addCallMethod("plugin/methods", "registerMethods");
             //..................................................................
@@ -250,91 +253,91 @@ public final class PluginFactory
             // <ui><widget><component> section ---------------------------------
             
             // create PluginComponentProxy
-            digester.addObjectCreate("plugin/ui/widgets/widget/component", "Sirius.navigator.plugin.PluginUIDescriptor");
-            digester.addSetNext("plugin/ui/widgets/widget/component","addUIDescriptor", "Sirius.navigator.plugin.PluginUIDescriptor");
-            digester.addCallMethod("plugin/ui/widgets/widget/component/id", "setId", 0);
-            digester.addCallMethod("plugin/ui/widgets/widget/component/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/widgets/widget/component/tooltip", "setToolTip", 0);
-            digester.addCallMethod("plugin/ui/widgets/widget/component/icon", "setIconName", 0);
-            digester.addCallMethod("plugin/ui/widgets/widget/component/position", "setPosition", 0);
-            digester.addCallMethod("plugin/ui/widgets/widget/component/preferredindex", "setPreferredIndex", 0, new String[]
-            {"java.lang.Integer"});
-            digester.addCallMethod("plugin/ui/widgets/widget/component/componentevents", "setPluginComponentEventsEnabled", 0, new String[]
-            {"java.lang.Boolean"});
+            digester.addObjectCreate("plugin/ui/widgets/widget/component", "Sirius.navigator.plugin.PluginUIDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/widgets/widget/component","addUIDescriptor", "Sirius.navigator.plugin.PluginUIDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/id", "setId", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/tooltip", "setToolTip", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/icon", "setIconName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/position", "setPosition", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/preferredindex", "setPreferredIndex", 0, new String[]  // NOI18N
+            {"java.lang.Integer"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/component/componentevents", "setPluginComponentEventsEnabled", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
             // <ui><widget><container> section ---------------------------------
             // no container
-            digester.addCallMethod("plugin/ui/widgets/widget/container/none", "addAsComponent");
+            digester.addCallMethod("plugin/ui/widgets/widget/container/none", "addAsComponent");  // NOI18N
             // panel
-            digester.addCallMethod("plugin/ui/widgets/widget/container/panel/layout", "addAsPanel", 0);
+            digester.addCallMethod("plugin/ui/widgets/widget/container/panel/layout", "addAsPanel", 0);  // NOI18N
             // scrollpane
-            digester.addCallMethod("plugin/ui/widgets/widget/container/scrollpane", "addAsScrollPane");
+            digester.addCallMethod("plugin/ui/widgets/widget/container/scrollpane", "addAsScrollPane");  // NOI18N
             // floatingframe
-            digester.addObjectCreate("plugin/ui/widgets/widget/container/floatingframe", "Sirius.navigator.plugin.ui.PluginFloatingFrameConfigurator");
-            digester.addSetNext("plugin/ui/widgets/widget/container/floatingframe","addAsFloatingFrame", "Sirius.navigator.plugin.ui.PluginFloatingFrameConfigurator");
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/menubaravailable", "setMenuBarAvailable", 0, new String[]
-            {"java.lang.Boolean"});
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/swapmenubar", "setSwapMenuBar", 0, new String[]
-            {"java.lang.Boolean"});
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/disablemenubar", "setDisableMenuBar", 0, new String[]
-            {"java.lang.Boolean"});
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/toolbaravailable", "setToolBarAvailable", 0, new String[]
-            {"java.lang.Boolean"});
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/swaptoolbar", "setSwapToolBar", 0, new String[]
-            {"java.lang.Boolean"});
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/disabletoolbar", "setDisableToolBar", 0, new String[]
-            {"java.lang.Boolean"});
-            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/floatingevents", "setFloatingEventsEnabled", 0, new String[]
-            {"java.lang.Boolean"});
+            digester.addObjectCreate("plugin/ui/widgets/widget/container/floatingframe", "Sirius.navigator.plugin.ui.PluginFloatingFrameConfigurator");  // NOI18N
+            digester.addSetNext("plugin/ui/widgets/widget/container/floatingframe","addAsFloatingFrame", "Sirius.navigator.plugin.ui.PluginFloatingFrameConfigurator");  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/menubaravailable", "setMenuBarAvailable", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/swapmenubar", "setSwapMenuBar", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/disablemenubar", "setDisableMenuBar", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/toolbaravailable", "setToolBarAvailable", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/swaptoolbar", "setSwapToolBar", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/disabletoolbar", "setDisableToolBar", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
+            digester.addCallMethod("plugin/ui/widgets/widget/container/floatingframe/floatingevents", "setFloatingEventsEnabled", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
             // <ui><actions><toolbar> section ----------------------------------
-            digester.addObjectCreate("plugin/ui/actions/toolbar/properties", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addSetNext("plugin/ui/actions/toolbar/properties","createPluginToolBar", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addCallMethod("plugin/ui/actions/toolbar/properties/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/actions/toolbar/properties/floatable", "setFloatable", 0, new String[]
-            {"java.lang.Boolean"});
+            digester.addObjectCreate("plugin/ui/actions/toolbar/properties", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/actions/toolbar/properties","createPluginToolBar", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/properties/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/properties/floatable", "setFloatable", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
             
-            digester.addObjectCreate("plugin/ui/actions/toolbar/buttons/button", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addSetNext("plugin/ui/actions/toolbar/buttons/button","addToolBarButton", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/mnemonic", "setMnemonic", 0);
-            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/tooltip", "setTooltip", 0);
-            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/icon", "setIconName", 0);
-            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/method", "setMethodId", 0);
+            digester.addObjectCreate("plugin/ui/actions/toolbar/buttons/button", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/actions/toolbar/buttons/button","addToolBarButton", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/mnemonic", "setMnemonic", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/tooltip", "setTooltip", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/icon", "setIconName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/toolbar/buttons/button/method", "setMethodId", 0);  // NOI18N
             
             // <ui><actions><menubar> section ----------------------------------
-            digester.addObjectCreate("plugin/ui/actions/menu/properties", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addSetNext("plugin/ui/actions/menu/properties","createPluginMenu", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addCallMethod("plugin/ui/actions/menu/properties/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/properties/mnemonic", "setMnemonic", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/properties/icon", "setIconName", 0);
+            digester.addObjectCreate("plugin/ui/actions/menu/properties", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/actions/menu/properties","createPluginMenu", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/properties/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/properties/mnemonic", "setMnemonic", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/properties/icon", "setIconName", 0);  // NOI18N
             
-            digester.addObjectCreate("plugin/ui/actions/menu/items/item", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addSetNext("plugin/ui/actions/menu/items/item","addMenuItem", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/mnemonic", "setMnemonic", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/tooltip", "setTooltip", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/icon", "setIconName", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/method", "setMethodId", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/accelerator", "setAccelerator", 0);
-            digester.addCallMethod("plugin/ui/actions/menu/items/item/separator", "setSeparator", 0, new String[]
-            {"java.lang.Boolean"});
+            digester.addObjectCreate("plugin/ui/actions/menu/items/item", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/actions/menu/items/item","addMenuItem", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/mnemonic", "setMnemonic", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/tooltip", "setTooltip", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/icon", "setIconName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/method", "setMethodId", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/accelerator", "setAccelerator", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/menu/items/item/separator", "setSeparator", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
             
             // <ui><actions><popup> section ----------------------------------
-            digester.addObjectCreate("plugin/ui/actions/popupmenu/properties", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addSetNext("plugin/ui/actions/popupmenu/properties","createPluginPopupMenu", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addCallMethod("plugin/ui/actions/popupmenu/properties/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/properties/mnemonic", "setMnemonic", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/properties/icon", "setIconName", 0);
+            digester.addObjectCreate("plugin/ui/actions/popupmenu/properties", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/actions/popupmenu/properties","createPluginPopupMenu", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/properties/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/properties/mnemonic", "setMnemonic", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/properties/icon", "setIconName", 0);  // NOI18N
             
-            digester.addObjectCreate("plugin/ui/actions/popupmenu/items/item", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addSetNext("plugin/ui/actions/popupmenu/items/item","addPopupMenuItem", "Sirius.navigator.plugin.PluginActionDescriptor");
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/name", "setName", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/mnemonic", "setMnemonic", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/tooltip", "setTooltip", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/icon", "setIconName", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/method", "setMethodId", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/accelerator", "setAccelerator", 0);
-            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/separator", "setSeparator", 0, new String[]
-            {"java.lang.Boolean"});
+            digester.addObjectCreate("plugin/ui/actions/popupmenu/items/item", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addSetNext("plugin/ui/actions/popupmenu/items/item","addPopupMenuItem", "Sirius.navigator.plugin.PluginActionDescriptor");  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/name", "setName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/mnemonic", "setMnemonic", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/tooltip", "setTooltip", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/icon", "setIconName", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/method", "setMethodId", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/accelerator", "setAccelerator", 0);  // NOI18N
+            digester.addCallMethod("plugin/ui/actions/popupmenu/items/item/separator", "setSeparator", 0, new String[]  // NOI18N
+            {"java.lang.Boolean"});  // NOI18N
             
             //@deprecated
             //digester.addCallMethod("plugin/deployment/methods/method/id", "setId", 0);
@@ -401,7 +404,8 @@ public final class PluginFactory
         
         private FactoryCore(PluginDescriptor descriptor)
         {
-            logger.info("new Plugin Factory Core instance created");
+            if(logger.isInfoEnabled())
+                logger.info("new Plugin Factory Core instance created");  // NOI18N
             this.descriptor = descriptor;
         }
         
@@ -414,7 +418,7 @@ public final class PluginFactory
         
         public void setCapabilities(Boolean progressObservable, Boolean propertyObservable, Boolean internationalized, Boolean unloadable, Boolean deactivateable)
         {
-            if(logger.isDebugEnabled())logger.debug("setting plugin capabilities");
+            if(logger.isDebugEnabled())logger.debug("setting plugin capabilities");  // NOI18N
             this.descriptor.setProgressObservable(progressObservable.booleanValue());
             this.descriptor.setPropertyObservable(propertyObservable.booleanValue());
             this.descriptor.setInternationalized(internationalized.booleanValue());
@@ -431,7 +435,7 @@ public final class PluginFactory
         
         public void addLocale(String name, String language, String country, String resourceFile)
         {
-            if(logger.isDebugEnabled())logger.debug("adding new plugin locale '" + name + "'");
+            if(logger.isDebugEnabled())logger.debug("adding new plugin locale '" + name + "'");  // NOI18N
             if(this.pluginLocales == null)
             {
                 this.pluginLocales = new HashMap();
@@ -445,13 +449,13 @@ public final class PluginFactory
         
         public void setClassName(String className)
         {
-            if(logger.isDebugEnabled())logger.debug("setting plugin class name " + className + "'");
+            if(logger.isDebugEnabled())logger.debug("setting plugin class name " + className + "'");  // NOI18N
             this.className = className;
         }
         
         public void addLibrary(String jar)
         {
-            if(logger.isDebugEnabled())logger.debug("adding library " + jar + "'");
+            if(logger.isDebugEnabled())logger.debug("adding library " + jar + "'");  // NOI18N
             libraries.add(jar);
         }
         
@@ -464,10 +468,10 @@ public final class PluginFactory
          */
         public void addAttributeMapping(String attributeName, String attributeId)
         {
-            if(logger.isDebugEnabled())logger.debug("adding attribute mapping '" + attributeName + "' = '" + attributeId + "'");
+            if(logger.isDebugEnabled())logger.debug("adding attribute mapping '" + attributeName + "' = '" + attributeId + "'");  // NOI18N
             if(mappingTable.containsKey(attributeName))
             {
-                if(logger.isDebugEnabled())logger.debug("attribute '" + attributeName + "' already in map, adding id to String array");
+                if(logger.isDebugEnabled())logger.debug("attribute '" + attributeName + "' already in map, adding id to String array");  // NOI18N
                 
                 //String[] currentIds = (String[])mappingTable.get(attributeName);
                 //String[] newIds = new String[currentIds.length + 1];
@@ -493,7 +497,7 @@ public final class PluginFactory
         
         public void addParameter(String paramName, String paramValue)
         {
-            if(logger.isDebugEnabled())logger.debug("adding parameter " + paramName + "' = '" + paramValue + "'");
+            if(logger.isDebugEnabled())logger.debug("adding parameter " + paramName + "' = '" + paramValue + "'");  // NOI18N
             paramTable.put(paramName, paramValue);
         }
         
@@ -501,58 +505,65 @@ public final class PluginFactory
         
         public void createPluginInstance() throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, InterruptedException
         {
-            logger.info("creating new plugin '" + className + "' instance");
+            if(logger.isInfoEnabled())
+                logger.info("creating new plugin '" + className + "' instance");  // NOI18N
             
             PluginProgressObserver progressObserver = null;
             if(descriptor.isProgressObservable())
             {
-                logger.debug("setting plugin progress observer");
+                if(logger.isDebugEnabled())
+                    logger.debug("setting plugin progress observer");  // NOI18N
                 progressObserver = new PluginProgressObserver(this.descriptor.getName());
                 PropertyManager.getManager().getSharedProgressObserver().setSubProgressObserver(progressObserver);
             }
             else if(logger.isDebugEnabled())
             {
-                logger.debug("plugin " + descriptor.getName() + "' is not progressobservable (" + descriptor.isProgressObservable() + ")");
+                if(logger.isDebugEnabled())
+                    logger.debug("plugin " + descriptor.getName() + "' is not progressobservable (" + descriptor.isProgressObservable() + ")");  // NOI18N
             }
                         
             PluginContext context = new PluginContext(this.descriptor, progressObserver, this.paramTable, this.mappingTable, this.pluginLocales, this.defaultLocale);
             descriptor.setContext(context);
             if(descriptor.isInternationalized() && !context.getI18n().isInternationalized())
             {
-                logger.warn("internationalization broken, check plugin descriptor &  resource files");
+                logger.warn("internationalization broken, check plugin descriptor &  resource files");  // NOI18N
                 descriptor.setInternationalized(false);
             }
             
             // load jar files
             URL[] urls = new URL[libraries.size()+1];
-            String jarBase = ResourceManager.getManager().pathToIURIString(descriptor.getPluginPath() + "lib/");
+            String jarBase = resource.pathToIURIString(descriptor.getPluginPath() + "lib/");  // NOI18N
             
             // /res implements classpath ...
-            urls[0] = new URL(ResourceManager.getManager().pathToIURIString(descriptor.getPluginPath() + "res/"));
+            urls[0] = new URL(resource.pathToIURIString(descriptor.getPluginPath() + "res/"));  // NOI18N
             
   
             for (int i = 0; i < libraries.size(); i++)
             {
-                if(logger.isDebugEnabled())logger.debug("loading plugin library: '" + jarBase + libraries.get(i).toString() + "'");
+                if(logger.isDebugEnabled())logger.debug("loading plugin library: '" + jarBase + libraries.get(i).toString() + "'");  // NOI18N
                 urls[i+1] = new URL(jarBase + libraries.get(i).toString());
             }
-            
-            logger.debug("the current classloader is '" + this.getClass().getClassLoader().getClass().getName() + "'");
+
+            if(logger.isDebugEnabled())
+                logger.debug("the current classloader is '" + this.getClass().getClassLoader().getClass().getName() + "'");  // NOI18N
             //URLClassLoader classLoader = new URLClassLoader(urls, this.getClass().getClassLoader());
             Class pluginClass=null;
             if (urls.length>0) { //vorher 1 geht aber trotzdem weil der URLClassLOader den normalen als Fallback hat ///HELL
                 PluginClassLoader classLoader = new PluginClassLoader(urls, this.getClass().getClassLoader());
-                logger.debug("the current url parent classloader is '" + classLoader.getParent().getClass().getName() + "'");
+                if(logger.isDebugEnabled())
+                    logger.debug("the current url parent classloader is '" + classLoader.getParent().getClass().getName() + "'");  // NOI18N
             
                 URL[] jarURLs = classLoader.getURLs();
                 for (int i = 0; i < jarURLs.length; i++)
                 {
-                    logger.debug("loadign jar file at '" + jarURLs[i] + "'");
+                    if(logger.isDebugEnabled())
+                        logger.debug("loadign jar file at '" + jarURLs[i] + "'");  // NOI18N
                 }
             
             
             // create plugin instance
-            logger.info("creating plugin instance of class '" + className + "'");
+            if(logger.isInfoEnabled())
+                logger.info("creating plugin instance of class '" + className + "'");  // NOI18N
             pluginClass = classLoader.loadClass(className);
             }
             else {
@@ -569,7 +580,8 @@ public final class PluginFactory
                 progressObserver.setFinished(true);
             }
             // ..................................................................
-            logger.info("plugin instance created!");
+            if(logger.isInfoEnabled())
+                logger.info("plugin instance created!");  // NOI18N
             descriptor.setPlugin((PluginSupport)pluginObject);
         }
         
@@ -577,7 +589,7 @@ public final class PluginFactory
         
         public void addMethod(String id, String name, String description, Boolean multithreaded, Long availability)
         {
-            if(logger.isDebugEnabled())logger.debug("addingr new plugin method: id='" + id + "', name='" + name + "'");
+            if(logger.isDebugEnabled())logger.debug("addingr new plugin method: id='" + id + "', name='" + name + "'");  // NOI18N
             Object object = descriptor.getPlugin().getMethod(id);
             
             if(object != null && object instanceof PluginMethod)
@@ -593,7 +605,7 @@ public final class PluginFactory
             }
             else
             {
-                logger.error("plugin method '" + id + "' could not be found: '" + object + "'" );
+                logger.error("plugin method '" + id + "' could not be found: '" + object + "'" );  // NOI18N
             }
         }
         
@@ -607,7 +619,7 @@ public final class PluginFactory
         
         public void addUIDescriptor(PluginUIDescriptor uiDescriptor)
         {
-            if(logger.isDebugEnabled())logger.debug("adding plugin ui descriptor " + uiDescriptor.getName() + "'");
+            if(logger.isDebugEnabled())logger.debug("adding plugin ui descriptor " + uiDescriptor.getName() + "'");  // NOI18N
             if(uiDescriptors == null)
             {
                 uiDescriptors = new HashMap();
@@ -635,14 +647,14 @@ public final class PluginFactory
                 }
                 else
                 {
-                    logger.error("plugin ui '" + uiDescriptor.getId() + "' could not be found");
+                    logger.error("plugin ui '" + uiDescriptor.getId() + "' could not be found");  // NOI18N
                     uiDescriptors.remove(uiDescriptor.getId());
                     return null;
                 }
             }
             else
             {
-                logger.fatal("synchronization error: plugin ui descriptor generation failed");
+                logger.fatal("synchronization error: plugin ui descriptor generation failed");  // NOI18N
                 return null;
             }
         }
@@ -693,7 +705,7 @@ public final class PluginFactory
                 }
                 else
                 {
-                    logger.error("wrong plugin ui type'" + pluginUI.getClass().getName() + "',  'Sirius.navigator.plugin.interfaces.FloatingPluginUI' expected");
+                    logger.error("wrong plugin ui type'" + pluginUI.getClass().getName() + "',  'Sirius.navigator.plugin.interfaces.FloatingPluginUI' expected");  // NOI18N
                     uiDescriptors.remove(uiDescriptor.getId());
                 }
             }
@@ -703,7 +715,8 @@ public final class PluginFactory
         
         public void createPluginToolBar(PluginActionDescriptor actionDescriptor)
         {
-            logger.debug("createPluginToolBar, floatable: '" + actionDescriptor.isFloatable() + "'");
+            if(logger.isDebugEnabled())
+                logger.debug("createPluginToolBar, floatable: '" + actionDescriptor.isFloatable() + "'");  // NOI18N
             pluginToolBar = new EmbeddedToolBar(descriptor.getId());
             pluginToolBar.setName(actionDescriptor.getName());
             pluginToolBar.setRollover(PropertyManager.getManager().isAdvancedLayout());
@@ -715,7 +728,7 @@ public final class PluginFactory
         {
             if(descriptor.isPluginMethodAvailable(actionDescriptor.getMethodId()))
             {
-                if(logger.isDebugEnabled())logger.debug("creating new plugin toolbar button: '" + actionDescriptor.getName() + "'");
+                if(logger.isDebugEnabled())logger.debug("creating new plugin toolbar button: '" + actionDescriptor.getName() + "'");  // NOI18N
                 PluginToolBarButton button = new PluginToolBarButton(descriptor.getMethodDescriptor(actionDescriptor.getMethodId()).getMethod());
                 
                 this.setItemProperties(button, actionDescriptor);
@@ -724,13 +737,14 @@ public final class PluginFactory
             }
             else
             {
-                logger.error("plugin toolbar button '" + actionDescriptor.getName() + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'");
+                logger.error("plugin toolbar button '" + actionDescriptor.getName() + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'");  // NOI18N
             }
         }
         
         public void createPluginMenu(PluginActionDescriptor actionDescriptor)
         {
-            logger.debug("createPluginMenu");
+            if(logger.isDebugEnabled())
+                logger.debug("createPluginMenu");  // NOI18N
             pluginMenu = new PluginMenu(descriptor.getId(), actionDescriptor.getName());
             //pluginMenu.setText(actionDescriptor.getName());
             pluginMenu.setMnemonic(actionDescriptor.getMnemonic());
@@ -742,10 +756,10 @@ public final class PluginFactory
         {
             if(descriptor.isPluginMethodAvailable(actionDescriptor.getMethodId()))
             {
-                if(logger.isDebugEnabled())logger.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'");
+                if(logger.isDebugEnabled())logger.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'");  // NOI18N
                 PluginMethodDescriptor methodDescriptor = descriptor.getMethodDescriptor(actionDescriptor.getMethodId());
                 Sirius.server.localserver.method.Method method = null;
-                String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId();
+                String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId();  // NOI18N
                 
                 try
                 {
@@ -772,28 +786,29 @@ public final class PluginFactory
                         }
                         else
                         {
-                            if(logger.isDebugEnabled())logger.warn("no permission to show method '" + method.getKey() + "'");
+                            if(logger.isDebugEnabled())logger.warn("no permission to show method '" + method.getKey() + "'");  // NOI18N
                         }
                     }
                     else
                     {
-                        logger.error("method '" + methodKey + "' is not registered, ignoring method");
+                        logger.error("method '" + methodKey + "' is not registered, ignoring method");  // NOI18N
                     }
                 }
                 catch(Throwable t)
                 {
-                    logger.warn("could not retrieve method '" + methodKey + "'");
+                    logger.warn("could not retrieve method '" + methodKey + "'");  // NOI18N
                 }
             }
             else
             {
-                logger.error("plugin menu item '" + actionDescriptor.getName() + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'");
+                logger.error("plugin menu item '" + actionDescriptor.getName() + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'");  // NOI18N
             }
         }
         
         public void createPluginPopupMenu(PluginActionDescriptor actionDescriptor)
         {
-            logger.debug("createPluginPopupMenu");
+            if(logger.isDebugEnabled())
+                logger.debug("createPluginPopupMenu");  // NOI18N
             pluginPopupMenu = new PluginMenu(descriptor.getId(), actionDescriptor.getName());
             //pluginPopupMenu.setText(actionDescriptor.getName());
             pluginPopupMenu.setMnemonic(actionDescriptor.getMnemonic());
@@ -811,11 +826,11 @@ public final class PluginFactory
                     descriptor.setPluginPopupMenu(pluginPopupMenu);
                 }
                 
-                if(logger.isDebugEnabled())logger.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'");
+                if(logger.isDebugEnabled())logger.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'");  // NOI18N
                 //PluginMenuItem menuItem = new PluginMenuItem(descriptor.getMethodDescriptor(actionDescriptor.getMethodId()).getMethod());
                 PluginMethodDescriptor methodDescriptor = descriptor.getMethodDescriptor(actionDescriptor.getMethodId());
                 Sirius.server.localserver.method.Method method = null;
-                String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId();
+                String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId();  // NOI18N
                 
                 try
                 {
@@ -844,22 +859,22 @@ public final class PluginFactory
                         }
                         else
                         {
-                            if(logger.isDebugEnabled())logger.warn("no permission to show method '" + method.getKey() + "'");
+                            logger.warn("no permission to show method '" + method.getKey() + "'");  // NOI18N
                         }
                     }
                     else
                     {
-                        logger.error("method '" + methodKey  + "' is not available, ignoring method");
+                        logger.error("method '" + methodKey  + "' is not available, ignoring method");  // NOI18N
                     }
                 }
                 catch(Throwable t)
                 {
-                    logger.warn("could not retrieve method '" + methodKey + "'");
+                    logger.warn("could not retrieve method '" + methodKey + "'");  // NOI18N
                 }
             }
             else
             {
-                logger.error("plugin menu item '" + actionDescriptor.getName() + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'");
+                logger.error("plugin menu item '" + actionDescriptor.getName() + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'");  // NOI18N
             }
         }
         
@@ -879,13 +894,13 @@ public final class PluginFactory
         private ImageIcon getImageIcon(String icon)
         {
             String iconURL = null;
-            if(icon.indexOf("/") == 0 || icon.indexOf("\\") == 0)
+            if(icon.indexOf("/") == 0 || icon.indexOf("\\") == 0)  // NOI18N
             {
                 iconURL = descriptor.getContext().getEnvironment().getDocumentBase() + icon;
             }
             else
             {
-                iconURL = descriptor.getContext().getEnvironment().getDocumentBase() + "/" + icon;
+                iconURL = descriptor.getContext().getEnvironment().getDocumentBase() + "/" + icon;  // NOI18N
             }
             
             return descriptor.getContext().getResource().getImageIcon(iconURL);

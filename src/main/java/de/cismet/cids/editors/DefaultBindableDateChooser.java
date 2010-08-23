@@ -27,12 +27,12 @@ public class DefaultBindableDateChooser extends JXDatePicker implements Bindable
     public void inint() {
         setBorder(new EmptyBorder(1, 1, 1, 1));
         setEditable(true);
-        setFormats(new String[]{"dd.MM.yyyy"});
-        setLinkFormat(new MessageFormat("Heute ist der {0,date}"));
+        setFormats(new String[]{org.openide.util.NbBundle.getMessage(DefaultBindableDateChooser.class, "DefaultBindableDateChooser.inint().Formatstring")});//NOI18N
+        setLinkFormat(new MessageFormat(org.openide.util.NbBundle.getMessage(DefaultBindableDateChooser.class, "DefaultBindableDateChooser.inint().Messageformat")));//NOI18N
     }
 
     public String getBindingProperty() {
-        return "date";
+        return "date";//NOI18N
     }
 
     public Converter getConverter() {
@@ -70,7 +70,7 @@ public class DefaultBindableDateChooser extends JXDatePicker implements Bindable
     }
 
     public Validator getValidator() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet.");//NOI18N
     }
 
     @Override

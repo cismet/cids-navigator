@@ -39,9 +39,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     private Date date;
     private Date time;
     Calendar mainC = Calendar.getInstance();
-    public static final String PROP_TIMESTAMP = "timestamp";
-    public static final String CARDS_CHOOSE = "chooseTimestamp";
-    public static final String CARDS_CREATE = "createTimestamp";
+    public static final String PROP_TIMESTAMP = "timestamp";//NOI18N
+    public static final String CARDS_CHOOSE = "chooseTimestamp";//NOI18N
+    public static final String CARDS_CREATE = "createTimestamp";//NOI18N
     private PropertyChangeSupport propertyChangeSupport;
 
     /** Creates new form DefaultBindableTimestampChooser */
@@ -85,7 +85,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
             mainC.set(year, month, day, hour, minute);
             return mainC.getTime();
         } catch (Exception e) {
-            log.debug("Fehler beim Abrufen von Timestamp" + e);
+            log.debug("Error while fetching timestamp" + e);//NOI18N
             return null;
         }
     }
@@ -96,7 +96,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
      * @param timestamp new value of timestamp
      */
     public void setTimestamp(Date timestamp) {
-        log.debug("setTimestamp: " + timestamp);
+        if (log.isDebugEnabled()) {
+            log.debug("setTimestamp: " + timestamp);//NOI18N
+        }
         if (timestamp == null) {
             ((CardLayout) getLayout()).show(this, CARDS_CREATE);
         } else {
@@ -134,7 +136,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
             bindingGroup.unbind();
             bindingGroup.bind();
         } catch (Throwable t) {
-            log.debug("setTimestamp failed", t);
+            log.debug("setTimestamp failed", t);//NOI18N
         }
     }
 
@@ -180,8 +182,8 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
 
         panCreateTimestamp.setLayout(new java.awt.BorderLayout());
 
-        btnCreateTimestamp.setText("kein Datum angelegt");
-        btnCreateTimestamp.setToolTipText("Hier klicken um ein Datum auszuwählen.");
+        btnCreateTimestamp.setText(org.openide.util.NbBundle.getMessage(DefaultBindableTimestampChooser.class, "DefaultBindableTimestampChooser.btnCreateTimestamp.text")); // NOI18N
+        btnCreateTimestamp.setToolTipText(org.openide.util.NbBundle.getMessage(DefaultBindableTimestampChooser.class, "DefaultBindableTimestampChooser.btnCreateTimestamp.toolTipText")); // NOI18N
         btnCreateTimestamp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCreateTimestampActionPerformed(evt);
@@ -233,7 +235,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     // End of variables declaration//GEN-END:variables
 
     public String getBindingProperty() {
-        return "timestamp";
+        return "timestamp";//NOI18N
     }
 
     public Converter getConverter() {
@@ -249,7 +251,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     }
 
     public void setDate(Date date) {
-        log.debug("setDate: " + date);
+        if (log.isDebugEnabled()) {
+            log.debug("setDate: " + date);//NOI18N
+        }
         this.date = date;
         getPropertyChangeSupport().firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
     }
@@ -269,7 +273,9 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
     }
 
     public void setTime(Date time) {
-        log.debug("setTime: " + time);
+        if (log.isDebugEnabled()) {
+            log.debug("setTime: " + time);//NOI18N
+        }
         this.time = time;
         getPropertyChangeSupport().firePropertyChange(PROP_TIMESTAMP, null, getTimestamp());
     }
@@ -284,7 +290,7 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
                 jf.setSize(400, 200);
                 final DefaultBindableTimestampChooser dc = new DefaultBindableTimestampChooser();
                 //dc.setTimestamp(Calendar.getInstance().getTime());
-                JButton cmd = new JButton("TEST (Datum löschen)");
+                JButton cmd = new JButton(org.openide.util.NbBundle.getMessage(DefaultBindableTimestampChooser.class, "DefaultBindableTimestampChooser.main(String).Runnable.run().cmd"));//NOI18N
                 cmd.addActionListener(new ActionListener() {
 
                     @Override
@@ -303,10 +309,12 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
 
         @Override
         public Result validate(Date value) {
-            log.debug("DateValidator validate: " + value);
+            if (log.isDebugEnabled()) {
+                log.debug("DateValidator validate: " + value);//NOI18N
+            }
             if (value == null) {
                 jXDatePicker1.setDate(date);
-                return new Result(null, "Date is null");
+                return new Result(null, "Date is null");//NOI18N
             }
             return null;
         }
@@ -316,9 +324,11 @@ public class DefaultBindableTimestampChooser extends javax.swing.JPanel implemen
 
         @Override
         public Result validate(Date value) {
-            log.debug("TimeValidator validate: " + value);
+            if (log.isDebugEnabled()) {
+                log.debug("TimeValidator validate: " + value);//NOI18N
+            }
             if (value == null) {
-                return new Result(null, "Time is null");
+                return new Result(null, "Time is null");//NOI18N
             }
             return null;
         }

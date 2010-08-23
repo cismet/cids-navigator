@@ -89,7 +89,7 @@ public class ConnectionInfo extends Object implements java.io.Serializable
     public void setUsername(String username) {
         String oldUsername = this.username;
         this.username = username;
-        propertySupport.firePropertyChange("username", oldUsername, username);
+        propertySupport.firePropertyChange("username", oldUsername, username);  // NOI18N
     }
     
     /** Getter for property password.
@@ -107,7 +107,7 @@ public class ConnectionInfo extends Object implements java.io.Serializable
     public void setPassword(String password) {
         String oldPassword = this.password;
         this.password = password;
-        propertySupport.firePropertyChange("password", oldPassword, password);
+        propertySupport.firePropertyChange("password", oldPassword, password);  // NOI18N
     }
     
     /** Getter for property usergroup.
@@ -125,7 +125,7 @@ public class ConnectionInfo extends Object implements java.io.Serializable
     public void setUsergroup(String usergroup) {
         String oldUsergroup = this.usergroup;
         this.usergroup = usergroup;
-        propertySupport.firePropertyChange("usergroup", oldUsergroup, usergroup);
+        propertySupport.firePropertyChange("usergroup", oldUsergroup, usergroup);  // NOI18N
     }
     
     /** Getter for property localserver.
@@ -143,7 +143,7 @@ public class ConnectionInfo extends Object implements java.io.Serializable
     public void setUserDomain(String userDomain) {
         String oldUserDomain = this.userDomain;
         this.userDomain = userDomain;
-        propertySupport.firePropertyChange("userDomain", oldUserDomain, userDomain);
+        propertySupport.firePropertyChange("userDomain", oldUserDomain, userDomain);  // NOI18N
     }
     
     /** Getter for property usergroupDomain.
@@ -161,7 +161,7 @@ public class ConnectionInfo extends Object implements java.io.Serializable
     public void setUsergroupDomain(String usergroupDomain) {
         String oldUsergroupDomain = this.usergroupDomain;
         this.usergroupDomain = usergroupDomain;
-        propertySupport.firePropertyChange("usergroupDomain", oldUsergroupDomain, usergroupDomain);
+        propertySupport.firePropertyChange("usergroupDomain", oldUsergroupDomain, usergroupDomain);  // NOI18N
     }
     
     /** Getter for property callserverURL.
@@ -179,7 +179,7 @@ public class ConnectionInfo extends Object implements java.io.Serializable
     public void setCallserverURL(String callserverURL) {
         String oldCallserverURL = this.callserverURL;
         this.callserverURL = callserverURL;
-        propertySupport.firePropertyChange("callserverURL", oldCallserverURL, callserverURL);
+        propertySupport.firePropertyChange("callserverURL", oldCallserverURL, callserverURL);  // NOI18N
     }
     
 }

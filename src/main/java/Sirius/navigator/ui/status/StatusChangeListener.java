@@ -8,7 +8,7 @@ import java.beans.*;
  */
 public class StatusChangeListener implements PropertyChangeListener
 {
-    public final static String STATUS_CHANGED = "STATUS_CHANGE";
+    public final static String STATUS_CHANGED = "STATUS_CHANGE";//NOI18N
     
     private final MutableStatusBar statusBar;
     
@@ -32,7 +32,7 @@ public class StatusChangeListener implements PropertyChangeListener
         }
         else
         {
-            MutableStatusBar.logger.error("invalid status event '" + evt.getPropertyName() + "' or invalid status object '" + object.getClass().toString() + "'");
+            MutableStatusBar.logger.error("invalid status event '" + evt.getPropertyName() + "' or invalid status object '" + object.getClass().toString() + "'");//NOI18N
         }
     } 
 }

@@ -21,7 +21,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
     
     public synchronized void add(final EmbeddedComponent component)
     {
-        if(logger.isDebugEnabled())logger.debug("adding new component '" + component.getName() + "' : '" + component.getId() + "' (" + component.getClass().getName() + ")");
+        if(logger.isDebugEnabled())logger.debug("adding new component '" + component.getName() + "' : '" + component.getId() + "' (" + component.getClass().getName() + ")");//NOI18N
         
         if(!this.isAvailable(component.getId()))
         {
@@ -33,7 +33,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
             }
             else
             {
-                logger.debug("add(): synchronizing method");
+                logger.debug("add(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -45,7 +45,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("add(): component '" + component.getId() + "' already in map");
+            logger.warn("add(): component '" + component.getId() + "' already in map");//NOI18N
         }
     }
     
@@ -65,7 +65,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("getName(): component '" + id + "' not found");
+            logger.warn("getName(): component '" + id + "' not found");//NOI18N
             return null;
         }
     }
@@ -83,7 +83,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("isEnabled(): component '" + id + "' not found");
+            logger.warn("isEnabled(): component '" + id + "' not found");//NOI18N
             return false;
         }
     }
@@ -101,14 +101,14 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("isVisible(): component '" + id + "' not found");
+            logger.warn("isVisible(): component '" + id + "' not found");//NOI18N
             return false;
         }
     }
     
     public synchronized void remove(String id)
     {
-        if(logger.isDebugEnabled())logger.debug("removing component '" + id + "'");
+        if(logger.isDebugEnabled())logger.debug("removing component '" + id + "'");//NOI18N
         
         if(this.isAvailable(id))
         { 
@@ -119,7 +119,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
             }
             else
             {
-                logger.debug("remove(): synchronizing method");
+                logger.debug("remove(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -131,7 +131,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("remove(): component '" + id + "' not found");
+            logger.warn("remove(): component '" + id + "' not found");//NOI18N
         }
     }
     
@@ -153,7 +153,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
             }
             else
             {
-                logger.debug("setEnabled(): synchronizing method");
+                logger.debug("setEnabled(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -165,7 +165,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("setEnabled(): component '" + id + "' not found");
+            logger.warn("setEnabled(): component '" + id + "' not found");//NOI18N
         }
     }
     
@@ -225,7 +225,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
             }
             else
             {
-                logger.debug("setVisible(): synchronizing method");
+                logger.debug("setVisible(): synchronizing method");//NOI18N
                 SwingUtilities.invokeLater(new Runnable()
                 {
                     public void run()
@@ -237,7 +237,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-            logger.warn("setVisible(): component '" + id + "' not found");
+            logger.warn("setVisible(): component '" + id + "' not found");//NOI18N
         }
     }
     
@@ -248,7 +248,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
     
     public EmbeddedComponent get(String id)
     {
-        if(logger.isDebugEnabled())logger.debug("retrieving component: '" + id + "'");
+        if(logger.isDebugEnabled())logger.debug("retrieving component: '" + id + "'");//NOI18N
         
         if(isAvailable(id))
         {
@@ -256,7 +256,7 @@ public abstract class AbstractEmbeddedComponentsMap extends HashMap implements E
         }
         else
         {
-             logger.warn("get(): component '" + id + "' not found");
+             logger.warn("get(): component '" + id + "' not found");//NOI18N
              return null;
         }
     }

@@ -31,7 +31,7 @@ public class MetaAttributeRendererFactory {
         return instance;
     }
     public JComponent getRenderer(Attribute attr) {
-        return getRenderer(attr,"");
+        return getRenderer(attr,"");//NOI18N
     }
     public JComponent getRenderer(Attribute attr,String title) {
         if (attr!=null) {

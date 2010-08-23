@@ -54,7 +54,9 @@ public class NavigatorApplet extends javax.swing.JApplet
     //private ISFloatingFrameModel isFloatingFrameModel;
     
     private JPanel firstContentPane, secondContentPane;
-    private JProgressBar progressBar, pluginProgressBar;
+    private JProgressBar progressBar;
+    private static final ResourceManager resource = ResourceManager.getManager();
+    private JProgressBar pluginProgressBar;
     private JLabel infoLabel, statusLabel, pluginInfoLabel, pluginStatusLabel;
     private JButton startButton, optionsButton, cancelButton, restartButton;
     private TitledBorder pluginBorder;
@@ -73,7 +75,7 @@ public class NavigatorApplet extends javax.swing.JApplet
     
     public void init()
     {
-        System.out.println("init()");
+        System.out.println("init()"); // NOI18N
         
         try
         {
@@ -84,14 +86,14 @@ public class NavigatorApplet extends javax.swing.JApplet
             // the property file is in the jar!
             try
             {
-                String log4jProperties = this.getParameter("log4j");
+                String log4jProperties = this.getParameter("log4j");  // NOI18N
                 
                 if(log4jProperties == null)
                 {
-                    PropertyConfigurator.configure(new URL(this.getCodeBase().toString() + "/config/log4j.properties"));
+                    PropertyConfigurator.configure(new URL(this.getCodeBase().toString() + "/config/log4j.properties"));  // NOI18N
                     
                     logger = Logger.getLogger(NavigatorApplet.class);
-                    logger.warn("no log4j properties file specified, using default file: /config/log4j.properties");
+                    logger.warn("no log4j properties file specified, using default file: /config/log4j.properties");  // NOI18N
                 }
                 else
                 {
@@ -105,7 +107,7 @@ public class NavigatorApplet extends javax.swing.JApplet
                     }
                     
                     logger = Logger.getLogger(NavigatorApplet.class);
-                    logger.info("using log4j properties file: log4jProperties");
+                    logger.info("using log4j properties file: log4jProperties");  // NOI18N
                         
                 }
                 
@@ -128,18 +130,20 @@ public class NavigatorApplet extends javax.swing.JApplet
             {
                 BasicConfigurator.configure();
                 logger = Logger.getLogger(NavigatorApplet.class);
-                logger.error("could not initialize the logging system", t);
+                logger.error("could not initialize the logging system", t);  // NOI18N
             }
             
             // configure navigator properties
             PropertyManager.getManager().configure(this);
-            ResourceManager.getManager().setLocale(PropertyManager.getManager().getLocale());
+            resource.setLocale(PropertyManager.getManager().getLocale());
             //this.getHtmlParameter();
             
             // look and feel ...................................................
-            logger.info ("current look and feel: '" + UIManager.getLookAndFeel () + "'");
+            if(logger.isInfoEnabled())
+                logger.info ("current look and feel: '" + UIManager.getLookAndFeel () + "'");  // NOI18N
             LAFManager.getManager().changeLookAndFeel(PropertyManager.getManager().getLookAndFeel(), this);
-            logger.info ("current look and feel: '" + UIManager.getLookAndFeel () + "'");
+            if(logger.isInfoEnabled())
+                logger.info ("current look and feel: '" + UIManager.getLookAndFeel () + "'");  // NOI18N
             // look and feel ...................................................
             
             //progressObserver = new ProgressObserver();
@@ -164,7 +168,7 @@ public class NavigatorApplet extends javax.swing.JApplet
         catch(SecurityException sexp)
         {
             sexp.printStackTrace();
-            JLabel accessDenied = new JLabel("<html><center><p><h1>Zugriff verweigert</h1></p><p><b>" + sexp.getMessage() + "</b></p></center></html>");
+            JLabel accessDenied = new JLabel(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.init().accessDenied.text", sexp.getMessage()));  // NOI18N
             accessDenied.setHorizontalTextPosition(JLabel.CENTER);
             JPanel content = new JPanel(new GridLayout(1,1));
             content.add(accessDenied);
@@ -203,12 +207,12 @@ public class NavigatorApplet extends javax.swing.JApplet
         //JLabel welcomeLabel = new JLabel(StringLoader.getString("STL@welcomeTo")++"</h2></center></html>");
         
         // title label
-        String title = this.getParameter("applet_title");
+        String title = this.getParameter("applet_title");  // NOI18N
         if(title == null || title.length() == 0)
         {
-            title = ResourceManager.getManager().getString("navigator.title");
+            title = org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.title");  // NOI18N
         }
-        JLabel welcomeLabel = new JLabel("<html><center>" + ResourceManager.getManager().getString("applet.welcome") + "<h2>" + title + "</h2></center></html>");
+        JLabel welcomeLabel = new JLabel(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.buildFirstContentPane().welcomeLabel.text", title));  // NOI18N
         welcomeLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(welcomeLabel, BorderLayout.CENTER);
         firstContentPane.add(panel, gridBagConstraints);
@@ -222,20 +226,20 @@ public class NavigatorApplet extends javax.swing.JApplet
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         JLabel logoLabel = new JLabel();
-        String logoName = this.getParameter("applet_logo");
+        String logoName = this.getParameter("applet_logo");  // NOI18N
         if(logoName == null || logoName.length() == 0)
         {
-            logoName = "cismet.gif";
+            logoName = "cismet.gif";  // NOI18N
         }
         try
         {
-            if(logger.isDebugEnabled())logger.debug("loading logo '" + this.getCodeBase() + logoName + "'");
+            if(logger.isDebugEnabled())logger.debug("loading logo '" + this.getCodeBase() + logoName + "'");  // NOI18N
             ImageIcon imageIcon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(new URL(this.getCodeBase().toString() + logoName)));
             logoLabel.setIcon(imageIcon);
         }
         catch(Exception exp)
         {
-            logger.error("could not load logo '" + logoName + "'");
+            logger.error("could not load logo '" + logoName + "'");  // NOI18N
         }
         firstContentPane.add(logoLabel, gridBagConstraints);
         
@@ -252,10 +256,10 @@ public class NavigatorApplet extends javax.swing.JApplet
         gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         gridBagConstraints.weightx = 1.0;
         //_TA_startButton = new JButton("Navigator starten");
-        startButton = new JButton(ResourceManager.getManager().getString("navigator.applet.startNavigator"));
+        startButton = new JButton(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.startButton.text"));  // NOI18N
         //_TA_startButton.setMnemonic('s');
-        startButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.SMnemonic").charAt(FIRSTPOS));
-        startButton.setActionCommand("start");
+        startButton.setMnemonic(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.startButton.mnemonic").charAt(0));  // NOI18N
+        startButton.setActionCommand("start");  // NOI18N
         startButton.addActionListener(buttonListener);
         firstContentPane.add(startButton, gridBagConstraints);
         
@@ -273,10 +277,10 @@ public class NavigatorApplet extends javax.swing.JApplet
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
         gridBagConstraints.weightx = 1.0;
-        optionsButton = new JButton(ResourceManager.getManager().getString("navigator.applet.moreOptions"));
-        optionsButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.OMnemonic").charAt(FIRSTPOS));
+        optionsButton = new JButton(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.optionsButton.text"));  // NOI18N
+        optionsButton.setMnemonic(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.optionsButton.mnemonic").charAt(0));  // NOI18N
         
-        optionsButton.setActionCommand("options");
+        optionsButton.setActionCommand("options");  // NOI18N
         optionsButton.addActionListener(buttonListener);
         firstContentPane.add(optionsButton, gridBagConstraints);
     }
@@ -302,7 +306,8 @@ public class NavigatorApplet extends javax.swing.JApplet
         panel.setBorder(new CompoundBorder(new EtchedBorder(), new EmptyBorder(10,10,10,10)));
         //_TA_JLabel infoLabel = new JLabel("CallServer auf " + navigatorModel.getCallServerIP());
         //infoLabel = new JLabel(StringLoader.getString("STL@callServerOn") + navigatorModel.getCallServerIP());
-        infoLabel = new JLabel(ResourceManager.getManager().getString("navigator.applet.callServerOn") + PropertyManager.getManager().getConnectionInfo().getCallserverURL());
+        infoLabel = new JLabel(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.infoLabel.text") +  // NOI18N
+                PropertyManager.getManager().getConnectionInfo().getCallserverURL());
         infoLabel.setHorizontalAlignment(JLabel.CENTER);
         panel.add(infoLabel, BorderLayout.CENTER);
         secondContentPane.add(panel, constraints);
@@ -332,7 +337,7 @@ public class NavigatorApplet extends javax.swing.JApplet
         // plugin progress panel
         JPanel pluginProgressPanel = new JPanel();
         pluginProgressPanel.setLayout(new GridLayout(2,1,5,5));
-        pluginBorder = new TitledBorder("Plugin Fortschritt");
+        pluginBorder = new TitledBorder(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.pluginBorder.text"));  // NOI18N
         pluginBorder.setTitleJustification(TitledBorder.CENTER);
         
         pluginProgressPanel.setBorder(new CompoundBorder(pluginBorder, new EmptyBorder(10,10,10,10)));
@@ -360,9 +365,9 @@ public class NavigatorApplet extends javax.swing.JApplet
                 cancelButton.setMnemonic('A');
                 _TA_
                  */
-        cancelButton = new JButton(ResourceManager.getManager().getString("navigator.applet.cancel"));
-        cancelButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.AMnemonic").charAt(FIRSTPOS));
-        cancelButton.setActionCommand("cancel");
+        cancelButton = new JButton(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.cancelButton.text"));  // NOI18N
+        cancelButton.setMnemonic(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.cancelButton.mnemonic").charAt(0));  // NOI18N
+        cancelButton.setActionCommand("cancel");  // NOI18N
         cancelButton.addActionListener(buttonListener);
         secondContentPane.add(cancelButton, constraints);
         
@@ -375,9 +380,9 @@ public class NavigatorApplet extends javax.swing.JApplet
                 restartButton.setMnemonic('N');
                 _TA_
                  */
-        restartButton = new JButton(ResourceManager.getManager().getString("navigator.applet.restart"));
-        restartButton.setMnemonic(ResourceManager.getManager().getString("navigator.applet.NMnemonic").charAt(FIRSTPOS));
-        restartButton.setActionCommand("restart");
+        restartButton = new JButton(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.restartButton.text"));  // NOI18N
+        restartButton.setMnemonic(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.restartButton.mnemonic").charAt(0));  // NOI18N
+        restartButton.setActionCommand("restart");  // NOI18N
         restartButton.addActionListener(buttonListener);
         secondContentPane.add(restartButton, constraints);
     }
@@ -385,7 +390,7 @@ public class NavigatorApplet extends javax.swing.JApplet
     
     public void start()
     {
-        System.out.println("start()");
+        System.out.println("start()");  // NOI18N
         
         //NavigatorLogger.printMessage("Applet started");
         if (navigator == null)
@@ -408,7 +413,7 @@ public class NavigatorApplet extends javax.swing.JApplet
         else
         {
             //_TA_statusLabel.setText("Es ist ein unbekannter Fehler aufgetreten");
-            statusLabel.setText(ResourceManager.getManager().getString("navigator.applet.unknownError"));
+            statusLabel.setText(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.statusLabel.text"));  // NOI18N
         }
         
         repaint();
@@ -416,7 +421,8 @@ public class NavigatorApplet extends javax.swing.JApplet
     
     protected void cancel()
     {
-        logger.debug("canceling navigator");
+        if(logger.isDebugEnabled())
+            logger.debug("canceling navigator"); // NOI18N
         timer.stop();
         navigatorLoader.interrupt();
         //navigatorLoader.cancel();
@@ -440,7 +446,8 @@ public class NavigatorApplet extends javax.swing.JApplet
     protected void restart()
     {
         progressObserver.reset();
-        logger.debug("restart(): restarting navigator");
+        if(logger.isDebugEnabled())
+            logger.debug("restart(): restarting navigator"); // NOI18N
         if (this.getNavigator() != null)
         {
             this.getNavigator().dispose();
@@ -450,11 +457,11 @@ public class NavigatorApplet extends javax.swing.JApplet
         validate();
         progressBar.setValue(0);
         //statusLabel.setText(navigatorLoader.startMessage);
-        statusLabel.setText("");
+        statusLabel.setText("");  // NOI18N
         
-        pluginBorder.setTitle("");
+        pluginBorder.setTitle("");  // NOI18N
         pluginProgressBar.setValue(0);
-        pluginStatusLabel.setText("");
+        pluginStatusLabel.setText("");  // NOI18N
         
         restartButton.setEnabled(false);
         cancelButton.setEnabled(true);
@@ -501,7 +508,8 @@ public class NavigatorApplet extends javax.swing.JApplet
     {
         invalidate();
         //infoLabel.setText(StringLoader.getString("STL@callServerOn") + navigatorModel.getCallServerIP());
-        infoLabel.setText(ResourceManager.getManager().getString("navigator.applet.callServerOn") + PropertyManager.getManager().getConnectionInfo().getCallserverURL());
+        infoLabel.setText(org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "NavigatorApplet.infoLabel.text") +  // NOI18N
+                PropertyManager.getManager().getConnectionInfo().getCallserverURL());
         setContentPane(secondContentPane);
         firstContentPane = null;
         optionsDialog = null;
@@ -528,21 +536,21 @@ public class NavigatorApplet extends javax.swing.JApplet
     {
         public void actionPerformed(ActionEvent e)
         {
-            if (e.getActionCommand().equals("start"))
+            if (e.getActionCommand().equals("start"))  // NOI18N
             {
                 startAction();
             }
-            else if (e.getActionCommand().equals("options"))
+            else if (e.getActionCommand().equals("options"))  // NOI18N
             {
                 optionsDialog.show();
                 startAction();
             }
-            else if (e.getActionCommand().equals("restart"))
+            else if (e.getActionCommand().equals("restart"))  // NOI18N
             {
                 //cancel();
                 restart();
             }
-            else if (e.getActionCommand().equals("cancel"))
+            else if (e.getActionCommand().equals("cancel"))  // NOI18N
             {
                 cancel();
             }
@@ -574,7 +582,8 @@ public class NavigatorApplet extends javax.swing.JApplet
             
             if (progressObserver.isFinished())
             {
-                logger.info("TimerListener: finished");
+                if(logger.isInfoEnabled())
+                    logger.info("TimerListener: finished");  // NOI18N
                 NavigatorApplet.this.allDone();
                 progressBar.setValue(progressObserver.getMaxProgress());
                 pluginProgressBar.setValue(progressObserver.getMaxProgress());
@@ -618,8 +627,11 @@ public class NavigatorApplet extends javax.swing.JApplet
             }
             catch(Exception exp)
             {
-                logger.fatal("could not create navigator instance", exp);
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, ResourceManager.getManager().getExceptionName("nx01"), ResourceManager.getManager().getExceptionMessage("nx01"), exp);
+                logger.fatal("could not create navigator instance", exp);  // NOI18N
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL,
+                        org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "Navigator.NavigatorLoader.doInvoke().ExceptionManager_anon.name"),  // NOI18N
+                        org.openide.util.NbBundle.getMessage(NavigatorApplet.class, "Navigator.NavigatorLoader.doInvoke().ExceptionManager_anon.message"),  // NOI18N
+                        exp);
             }
         }
     }

@@ -42,13 +42,15 @@ public class MutableStatusBar extends JPanel
     
     private MutableImageLabel greenStatusIcon;
     private MutableImageLabel redStatusIcon;
+
+    private static final ResourceManager resource = ResourceManager.getManager();
     
     public MutableStatusBar()
     {
         super();
-        status_1 = new JLabel("");
-        status_2 = new JLabel("");
-        status_3 = new JLabel("");
+        status_1 = new JLabel("");//NOI18N
+        status_2 = new JLabel("");//NOI18N
+        status_3 = new JLabel("");//NOI18N
         this.init();
     }
     
@@ -78,10 +80,14 @@ public class MutableStatusBar extends JPanel
         status_3.setBorder(new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(0,2,0,2)));
         status_3.setPreferredSize(new Dimension(300, 16));
         
-        greenStatusIcon = new MutableImageLabel(ResourceManager.getManager().getIcon("green_off.gif"), ResourceManager.getManager().getIcon("green_on.gif"));
+        greenStatusIcon = new MutableImageLabel(
+                resource.getIcon("green_off.gif"),
+                resource.getIcon("green_on.gif"));
         greenStatusIcon.setBorder(new EmptyBorder(2,2,2,1));
         
-        redStatusIcon = new MutableImageLabel(ResourceManager.getManager().getIcon("red_off.gif"), ResourceManager.getManager().getIcon("red_on.gif"));
+        redStatusIcon = new MutableImageLabel(
+                resource.getIcon("red_off.gif"),
+                resource.getIcon("red_on.gif"));
         redStatusIcon.setBorder(new EmptyBorder(2,1,2,3));
         // =====================================================================
         

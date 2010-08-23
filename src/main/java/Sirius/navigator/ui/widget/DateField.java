@@ -45,6 +45,7 @@ import java.awt.event.*;
 
 public class DateField extends JTextField implements FocusListener
 {
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Toolkit toolkit;
     //private NumberFormat integerFormatter;
     private boolean checked=false;
@@ -204,7 +205,9 @@ public class DateField extends JTextField implements FocusListener
                     else
                     {
                         toolkit.beep();
-                        System.err.println("insertString: " + source[i]);
+                        if (log.isDebugEnabled()) {
+                            log.debug("insertString: " + source[i]);//NOI18N
+                        }
                     }
                 }
                 super.insertString(offs, new String(result, 0, j), a);

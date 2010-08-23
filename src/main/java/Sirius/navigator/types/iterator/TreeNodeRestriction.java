@@ -41,7 +41,7 @@ public class TreeNodeRestriction implements Restriction
     
     public DefaultMetaTreeNode applyRestriction(Object object)
     {
-        if(logger.isDebugEnabled())logger.debug("apply restriction on '" + object.toString() + "' (" + object.getClass().getName() + ")");
+        if(logger.isDebugEnabled())logger.debug("apply restriction on '" + object.toString() + "' (" + object.getClass().getName() + ")");//NOI18N
         
         DefaultMetaTreeNode node;
         if(!(object instanceof DefaultMetaTreeNode))

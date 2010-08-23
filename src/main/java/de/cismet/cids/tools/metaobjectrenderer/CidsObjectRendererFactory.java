@@ -46,7 +46,7 @@ public class CidsObjectRendererFactory {
     }
 
     public JComponent getSingleRenderer(final MetaObject mo, final String title) {
-        log.debug("getSingleRenderer");
+        log.debug("getSingleRenderer");//NOI18N
 //        final boolean isEDT = EventQueue.isDispatchThread();
         JComponent result = null;
 
@@ -85,7 +85,7 @@ public class CidsObjectRendererFactory {
                         final MetaObjectRenderer mor = (MetaObjectRenderer) o;
                         rendererComp = mor.getSingleRenderer(mo, title);
                     } else {
-                        throw new RuntimeException("Not a valid Renderer. The Renderer should be a CidsBeanRenderer or a MetaObjectRenderer");
+                        throw new RuntimeException("Not a valid Renderer. The Renderer should be a CidsBeanRenderer or a MetaObjectRenderer");//NOI18N
                     }
 
 //                    singleRenderer.put(mo.getMetaClass(), rendererComp);
@@ -99,7 +99,7 @@ public class CidsObjectRendererFactory {
                 }
             }
         } catch (Throwable e) {
-            log.error("Fehler beim Erzeugen des Renderers.", e);
+            log.error("Error during creating the renderer.", e);//NOI18N
         }
 
         result = componentReferenceHolder;
@@ -127,7 +127,7 @@ public class CidsObjectRendererFactory {
 //                }
 
             } catch (Throwable t) {
-                log.error("Fehler im Exceptionhandling ", t);
+                log.error("Error while Exception handling ", t);//NOI18N
             }
             result = componentReferenceHolder;
         }
@@ -166,7 +166,9 @@ public class CidsObjectRendererFactory {
                             final CidsBeanAggregationRenderer rendererComp = (CidsBeanAggregationRenderer) rendererInstanceObject;
                             rendererComp.setTitle(title);
                             rendererComp.setCidsBeans(beans);
-                            log.debug("Will return " + rendererComp);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Will return " + rendererComp);//NOI18N
+                            }
                             if (cw != null && !(rendererComp instanceof DoNotWrap)) {
                                 resultReferenceHolder = (JComponent) cw.wrapComponent((JComponent) rendererComp);
                             } else {
@@ -194,7 +196,7 @@ public class CidsObjectRendererFactory {
 //                }
                 }
             } catch (Exception e) {
-                log.error("Fehler beim Erzeugen des Renderers.", e);
+                log.error("Error while creating the renderer.", e);//NOI18N
             }
             return resultReferenceHolder;
         }

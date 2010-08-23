@@ -67,6 +67,7 @@ import org.jdesktop.beansbinding.Validator;
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
 
+
 /**
  *
  * @author thorsten
@@ -75,17 +76,17 @@ public class CidsObjectEditorFactory {
 
     private static CidsObjectEditorFactory editorFactory;
     private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CidsObjectEditorFactory.class);
-    public static final String NO_VALUE = "kein Wert gesetzt";
-    public static final String PARENT_CIDS_EDITOR = "parentCidsEditor";
-    private static final String CMD_ADD_OBJECT = "cmdAddObject";
-    private static final String CMD_REMOVE_OBJECT = "cmdRemoveObject";
-    public static final String CIDS_BEAN = "cidsBean";
-    public static final String SOURCE_LIST = "sourceList";
+    public static final String NO_VALUE = org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.NO_VALUE");//NOI18N
+    public static final String PARENT_CIDS_EDITOR = "parentCidsEditor";//NOI18N
+    private static final String CMD_ADD_OBJECT = "cmdAddObject";//NOI18N
+    private static final String CMD_REMOVE_OBJECT = "cmdRemoveObject";//NOI18N
+    public static final String CIDS_BEAN = "cidsBean";//NOI18N
+    public static final String SOURCE_LIST = "sourceList";//NOI18N
     private static Converter nullToBackgroundColorConverter = new IsNullToColorConverter();
 //    private boolean lazyClassFetching = true;
-    private static final String EDITOR_PREFIX = "de.cismet.cids.custom.objecteditors.";
-    private static final String EDITOR_SUFFIX = "Editor";
-    private static final String ATTRIBUTE_EDITOR_SUFFIX = "AttributeEditor";
+    private static final String EDITOR_PREFIX = "de.cismet.cids.custom.objecteditors.";//NOI18N
+    private static final String EDITOR_SUFFIX = "Editor";//NOI18N
+    private static final String ATTRIBUTE_EDITOR_SUFFIX = "AttributeEditor";//NOI18N
     private HashMap<String, Converter> defaultConverter = new HashMap<String, Converter>();
     private User user;
     private ComponentWrapper componentWrapper = null;
@@ -98,10 +99,10 @@ public class CidsObjectEditorFactory {
 
 
         try {
-            final Class<?> wrapperClass = BlacklistClassloading.forName("de.cismet.cids.custom.objecteditors.EditorWrapper");
+            final Class<?> wrapperClass = BlacklistClassloading.forName("de.cismet.cids.custom.objecteditors.EditorWrapper");//NOI18N
             componentWrapper = (ComponentWrapper) wrapperClass.newInstance();
         } catch (Exception skip) {
-            log.debug("Fehler beim lAden des EditorWrappers", skip);
+            log.debug("Error while loading the EditorWrapper", skip);//NOI18N
         }
     }
 
@@ -215,11 +216,11 @@ public class CidsObjectEditorFactory {
                 ret = new DefaultBindableJCheckBox();
             } else if (mai.isForeignKey() && mai.isSubstitute()) {
                 MetaClass foreignClass = getMetaClass(metaClass.getDomain(), mai.getForeignKeyClassId());
-                if (foreignClass.getClassAttribute("reasonable_few") != null) {
+                if (foreignClass.getClassAttribute("reasonable_few") != null) {//NOI18N
                     ret = new DefaultBindableReferenceCombo(foreignClass);
                 }
             } else {
-                log.debug("no DefaultEditor for " + attributeClassname + " found. set to textbox ");
+                log.debug("no DefaultEditor for " + attributeClassname + " found. set to textbox ");//NOI18N
                 ret = new DefaultBindableJTextField();
                 ((DefaultBindableJTextField) ret).setConverter(defaultConverter.get(attributeClassname));
 
@@ -308,7 +309,7 @@ public class CidsObjectEditorFactory {
                                     BindingInformationProvider ed = (BindingInformationProvider) cmpEditor;
                                     Set<String> fields = ed.getAllControls().keySet();
                                     for (String key : fields) {
-                                        String newKey = mai.getFieldName().toLowerCase() + "[]." + key;
+                                        String newKey = mai.getFieldName().toLowerCase() + "[]." + key;//NOI18N
                                         cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
                                     }
 
@@ -340,16 +341,16 @@ public class CidsObjectEditorFactory {
                             public Component getListCellRendererComponent(
                                     JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                                 JLabel l = (JLabel) dlcr.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                                if (l.getText() == null || l.getText().trim().equals("") || l.getText().equals("null")) { //TODO Der check auf den String "null" muss wieder raus
+                                if (l.getText() == null || l.getText().trim().equals("") || l.getText().equals("null")) { //TODO Der check auf den String "null" muss wieder raus //NOI18N
                                     CidsBean cb = (CidsBean) value;
                                     if (cb.getMetaObject().getStatus() == MetaObject.NEW) {
-                                        l.setText("neues Element");
+                                        l.setText("neues Element");//NOI18N
                                         if (isSelected) {
                                             l.setBackground(Color.GREEN);
                                         }
 
                                     } else {
-                                        l.setText(cb.getMetaObject().getMetaClass().toString() + " " + cb.getProperty(cb.getMetaObject().getMetaClass().getPrimaryKey().toLowerCase()));
+                                        l.setText(cb.getMetaObject().getMetaClass().toString() + " " + cb.getProperty(cb.getMetaObject().getMetaClass().getPrimaryKey().toLowerCase()));//NOI18N
                                     }
 
                                 }
@@ -361,13 +362,13 @@ public class CidsObjectEditorFactory {
                         ArrayTitleAndControls arrayTitleAndControls = new ArrayTitleAndControls(lblDescription.getText(), detailClass, field, lstArrayMaster);
                         cidsEditor.add(arrayTitleAndControls, gbc);
 
-                        gbc = getCommonConstraints();
-                        modifyForLabel(gbc);
-                        gbc.insets = new java.awt.Insets(4, 25, 0, 0);
-                        gbc.gridy = row;
-                        gbc.fill = java.awt.GridBagConstraints.BOTH;
-                        cidsEditor.addControlInformation(field + "[]", lstArrayMaster);
-                        cidsEditor.add(lstArrayMaster, gbc);
+                                gbc = getCommonConstraints();
+                                modifyForLabel(gbc);
+                                gbc.insets = new java.awt.Insets(4, 25, 0, 0);
+                                gbc.gridy = row;
+                                gbc.fill = java.awt.GridBagConstraints.BOTH;
+                                cidsEditor.addControlInformation(field + "[]", lstArrayMaster);//NOI18N
+                                cidsEditor.add(lstArrayMaster, gbc);
 
                         gbc = getCommonConstraints();
                         modifyForEditor(gbc);
@@ -393,9 +394,9 @@ public class CidsObjectEditorFactory {
                         cmdRemove.setMinimumSize(new Dimension(12, 12));
                         cmdRemove.setPreferredSize(new Dimension(12, 12));
 
-                        cmdRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_remove_mini.png")));
-                        cmdRemove.setVisible(false);
-                        cidsEditor.add(cmdRemove, gbc);
+                                cmdRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_remove_mini.png")));//NOI18N
+                                cmdRemove.setVisible(false);
+                                cidsEditor.add(cmdRemove, gbc);
 
 
                         //Erstellen Button
@@ -406,13 +407,13 @@ public class CidsObjectEditorFactory {
                         gbc.gridx = 3;
                         gbc.gridy = row;
 
-                        JButton cmdAdd = new JButton();
-                        cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_add_mini.png")));
-                        cmdAdd.setBorderPainted(false);
-                        cmdAdd.setMinimumSize(new Dimension(12, 12));
-                        cmdAdd.setPreferredSize(new Dimension(12, 12));
-                        cmdAdd.setVisible(false);
-                        cidsEditor.add(cmdAdd, gbc);
+                                JButton cmdAdd = new JButton();
+                                cmdAdd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/edit_add_mini.png")));//NOI18N
+                                cmdAdd.setBorderPainted(false);
+                                cmdAdd.setMinimumSize(new Dimension(12, 12));
+                                cmdAdd.setPreferredSize(new Dimension(12, 12));
+                                cmdAdd.setVisible(false);
+                                cidsEditor.add(cmdAdd, gbc);
 
                         //Editor
 
@@ -441,7 +442,7 @@ public class CidsObjectEditorFactory {
                             BindingInformationProvider ed = (BindingInformationProvider) cmpEditor;
                             Set<String> fields = ed.getAllControls().keySet();
                             for (String key : fields) {
-                                String newKey = mai.getFieldName().toLowerCase() + "." + key;
+                                String newKey = mai.getFieldName().toLowerCase() + "." + key;//NOI18N
                                 cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
                             }
                         }
@@ -456,7 +457,7 @@ public class CidsObjectEditorFactory {
                             cmpEditor.putClientProperty(CMD_ADD_OBJECT, cmdAdd);
                             cmpEditor.putClientProperty(CMD_REMOVE_OBJECT, cmdRemove);
                         } else {
-                            log.warn("Editor was null. " + metaClass.getTableName() + "." + mai.getFieldName());
+                            log.warn("Editor was null. " + metaClass.getTableName() + "." + mai.getFieldName());//NOI18N
                         }
 
                     }
@@ -474,7 +475,7 @@ public class CidsObjectEditorFactory {
                         cmpEditor = getSimpleAttributeEditor(metaClass, mai);
                     }
 
-                    log.debug("ATTRIBUTE_CLASS_NAME:" + mai.getJavaclassname() + " --> " + cmpEditor.getClass().toString());
+                    log.debug("ATTRIBUTE_CLASS_NAME:" + mai.getJavaclassname() + " --> " + cmpEditor.getClass().toString());//NOI18N
                     cidsEditor.addControlInformation(mai.getFieldName().toLowerCase(), (Bindable) cmpEditor);
                     gbc = getCommonConstraints();
                     modifyForEditor(gbc);
@@ -541,7 +542,7 @@ public class CidsObjectEditorFactory {
 //                }
             }
         } catch (Exception e) {
-            log.error("Error when creating a SimpleAttributeEditor", e);
+            log.error("Error when creating a SimpleAttributeEditor", e);//NOI18N
         }
         return null;
     }
@@ -559,7 +560,7 @@ public class CidsObjectEditorFactory {
 
         //Prefetching all the JLists
         for (final String key : keys) {
-            if (key.endsWith("[]")) {
+            if (key.endsWith("[]")) {//NOI18N
                 final JList lstList = (JList) ed.getControlByName(key);
                 arraylists.put(key, lstList);
             }
@@ -570,7 +571,7 @@ public class CidsObjectEditorFactory {
 
 
         for (final String key : keys) {
-            if (key.endsWith("[]")) {
+            if (key.endsWith("[]")) {//NOI18N
                 //--------------------------------------------------
                 //Array
                 //--------------------------------------------------
@@ -585,18 +586,18 @@ public class CidsObjectEditorFactory {
 
                 final JList lstList = arraylists.get(key);
 
-                if (keyWithoutBrackets.contains("[]")) {
+                if (keyWithoutBrackets.contains("[]")) {//NOI18N
                     //[] mehr als einmal vorhanden
 
-                    String parentListIdentifier = keyWithoutBrackets.substring(0, keyWithoutBrackets.lastIndexOf("[]") + 2);
+                    String parentListIdentifier = keyWithoutBrackets.substring(0, keyWithoutBrackets.lastIndexOf("[]") + 2);//NOI18N
                     bindingSource = arraylists.get(parentListIdentifier);
                     lstList.putClientProperty(SOURCE_LIST, bindingSource);
-                    String subKeyWithoutBrackets = key.substring(key.indexOf(parentListIdentifier) + ".".length() + parentListIdentifier.length(), key.length() - 2);
-                    elProperty = ELProperty.create("${selectedElement." + subKeyWithoutBrackets + "}");
+                    String subKeyWithoutBrackets = key.substring(key.indexOf(parentListIdentifier) + ".".length() + parentListIdentifier.length(), key.length() - 2);//NOI18N
+                    elProperty = ELProperty.create("${selectedElement." + subKeyWithoutBrackets + "}");//NOI18N
                 } else {
                     bindingSource = ed;
                     lstList.putClientProperty(CIDS_BEAN, ed.getCidsBean());
-                    elProperty = ELProperty.create("${cidsBean." + keyWithoutBrackets + "}");
+                    elProperty = ELProperty.create("${cidsBean." + keyWithoutBrackets + "}");//NOI18N
                 }
 
 
@@ -633,7 +634,7 @@ public class CidsObjectEditorFactory {
 
                     // </editor-fold>
                 } catch (Exception e) {
-                    log.debug("Kein observableList update bei Array in Array in ...", e);
+                    log.debug("No observableList update for Array in Array in ...", e);//NOI18N
                 }
 
                 bg.addBinding(jListBinding);
@@ -647,22 +648,22 @@ public class CidsObjectEditorFactory {
 
                 BindingInformationProvider parentCidsEditor = (BindingInformationProvider) jc.getClientProperty(PARENT_CIDS_EDITOR);
 
-                binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, jc, ELProperty.create("${text==null}"), jc, BeanProperty.create("background"));
+                binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, jc, ELProperty.create("${text==null}"), jc, BeanProperty.create("background"));//NOI18N
                 binding.setConverter(nullToBackgroundColorConverter);
 
                 bg.addBinding(binding);
 
 
-                if (key.contains("[]")) {
+                if (key.contains("[]")) {//NOI18N
                     //--------------------------------------------------
                     //Detailattribute
                     //--------------------------------------------------
-                    int whereSubKeyStarts = key.lastIndexOf("[]") + 3;
+                    int whereSubKeyStarts = key.lastIndexOf("[]") + 3;//NOI18N
                     String arrayFieldWithBrackets = key.substring(0, whereSubKeyStarts - 1);
                     final JList list = (JList) ed.getControlByName(arrayFieldWithBrackets);
                     String subkey = key.substring(whereSubKeyStarts);
-                    String exp = "selectedElement." + subkey;
-                    binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, list, ELProperty.create("${" + exp + "}"), jc, BeanProperty.create(bjc.getBindingProperty()));
+                    String exp = "selectedElement." + subkey;//NOI18N
+                    binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, list, ELProperty.create("${" + exp + "}"), jc, BeanProperty.create(bjc.getBindingProperty()));//NOI18N
                     binding.setSourceUnreadableValue(null);
                     Converter c = bjc.getConverter();
                     if (c != null) {
@@ -680,11 +681,11 @@ public class CidsObjectEditorFactory {
                     bg.addBinding(binding);
 
                     //Direktes Detailattribut (oder ein Subobjekt)
-                    if (subkey.contains(".")) {
-                        String[] sa = subkey.split("\\.");
-                        final String object = subkey.substring(0, subkey.lastIndexOf("."));
+                    if (subkey.contains(".")) {//NOI18N
+                        String[] sa = subkey.split("\\.");//NOI18N
+                        final String object = subkey.substring(0, subkey.lastIndexOf("."));//NOI18N
                         //Check ob das Teilobjekt nicht auf null gesetzt ist
-                        String expression = "selectedElement." + object;
+                        String expression = "selectedElement." + object;//NOI18N
                         addDisablingAndNullCheckerBindings(bg, expression, list, jc);
                         addAddRemoveControlVisibilityBinding(bg, (JComponent) parentCidsEditor, list, object, true);
                     }
@@ -694,7 +695,7 @@ public class CidsObjectEditorFactory {
                     //nicht Teil eines Arrays
                     //--------------------------------------------------
 
-                    binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, ed, ELProperty.create("${cidsBean." + key + "}"), jc, BeanProperty.create(bjc.getBindingProperty()));
+                    binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, ed, ELProperty.create("${cidsBean." + key + "}"), jc, BeanProperty.create(bjc.getBindingProperty()));//NOI18N
                     Converter c = bjc.getConverter();
                     if (c != null) {
                         binding.setConverter(c);
@@ -710,20 +711,20 @@ public class CidsObjectEditorFactory {
 
                     bg.addBinding(binding);
 
-                    if (key.contains(".")) {
+                    if (key.contains(".")) {//NOI18N
                         // Subobjekt
-                        String[] sa = key.split("\\.");
+                        String[] sa = key.split("\\.");//NOI18N
                         String attribute = sa[sa.length - 1];
-                        final String object = key.substring(0, key.lastIndexOf("."));
+                        final String object = key.substring(0, key.lastIndexOf("."));//NOI18N
 
                         //Check ob das Teilobjekt nicht auf null gesetzt ist
-                        String expression = "cidsBean." + object;
+                        String expression = "cidsBean." + object;//NOI18N
                         addDisablingAndNullCheckerBindings(bg, expression, ed, jc);
                         addAddRemoveControlVisibilityBinding(bg, (JComponent) parentCidsEditor, (JComponent) ed, object, false);
 
                     } else if (bjc instanceof DisposableCidsBeanStore) {
                         //Subobjekt das nur durch ein Bindable editiert wird
-                        String expression = "cidsBean." + key;
+                        String expression = "cidsBean." + key;//NOI18N
                         addDisablingAndNullCheckerBindings(bg, expression, ed, jc);
                         addAddRemoveControlVisibilityBinding(bg, jc, (JComponent) ed, key, false);
                     }
@@ -739,9 +740,9 @@ public class CidsObjectEditorFactory {
     }
 
     private final void addDisablingAndNullCheckerBindings(BindingGroup bg, String expression, Object sourceObject, JComponent component) {
-        Binding binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, sourceObject, ELProperty.create("${" + expression + "!=null}"), component, BeanProperty.create("enabled"));
+        Binding binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, sourceObject, ELProperty.create("${" + expression + "!=null}"), component, BeanProperty.create("enabled"));//NOI18N
         bg.addBinding(binding);
-        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, sourceObject, ELProperty.create("${" + expression + "==null}"), component, BeanProperty.create("background"));
+        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, sourceObject, ELProperty.create("${" + expression + "==null}"), component, BeanProperty.create("background"));//NOI18N
         binding.setConverter(nullToBackgroundColorConverter);
         //binding.setSourceNullValue(NO_VALUE);//Geht nicht weil ed.cidsBean nicht null ist
         bg.addBinding(binding);
@@ -753,16 +754,16 @@ public class CidsObjectEditorFactory {
             final String attributeName,
             final boolean detailObjectOfAnArray) {
         Binding binding = null;
-        JButton cmdAdd = (JButton) buttonContainer.getClientProperty("cmdAddObject");
-        JButton cmdRemove = (JButton) buttonContainer.getClientProperty("cmdRemoveObject");
+        JButton cmdAdd = (JButton) buttonContainer.getClientProperty("cmdAddObject");//NOI18N
+        JButton cmdRemove = (JButton) buttonContainer.getClientProperty("cmdRemoveObject");//NOI18N
         String objectExpression;
         if (detailObjectOfAnArray) {
-            objectExpression = "selectedElement." + attributeName;
+            objectExpression = "selectedElement." + attributeName;//NOI18N
         } else {
-            objectExpression = "cidsBean." + attributeName;
+            objectExpression = "cidsBean." + attributeName;//NOI18N
         }
         if (cmdAdd != null) {
-            binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, bindingSourceObject, ELProperty.create("${" + objectExpression + "==null}"), cmdAdd, BeanProperty.create("visible"));
+            binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, bindingSourceObject, ELProperty.create("${" + objectExpression + "==null}"), cmdAdd, BeanProperty.create("visible"));//NOI18N
             bg.addBinding(binding);
             cmdAdd.addActionListener(new ActionListener() {
 
@@ -787,7 +788,7 @@ public class CidsObjectEditorFactory {
 
         }
         if (cmdRemove != null) {
-            binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, bindingSourceObject, ELProperty.create("${" + objectExpression + "!=null}"), cmdRemove, BeanProperty.create("visible"));
+            binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_WRITE, bindingSourceObject, ELProperty.create("${" + objectExpression + "!=null}"), cmdRemove, BeanProperty.create("visible"));//NOI18N
             bg.addBinding(binding);
             cmdRemove.addActionListener(new ActionListener() {
 
@@ -821,7 +822,7 @@ public class CidsObjectEditorFactory {
                 try {
                     final JPanel panCommand = new JPanel();
 
-                    final String domain = "WUNDA_DEMO";
+                    final String domain = "WUNDA_DEMO";//NOI18N
                     final int CLASSID = 374;
                     final int OBJECTID = 1;
 //                    final int CLASSID = 47; //Bauvisualisierung
@@ -835,33 +836,33 @@ public class CidsObjectEditorFactory {
                     ConnectionSession session = null;
                     ConnectionProxy proxy = null;
                     ConnectionInfo connectionInfo = new ConnectionInfo();
-                    connectionInfo.setCallserverURL("rmi://localhost/callServer");
-                    connectionInfo.setPassword("demo");
-                    connectionInfo.setUsergroup("Demo");
-                    connectionInfo.setUserDomain("WUNDA_DEMO");
-                    connectionInfo.setUsergroupDomain("WUNDA_DEMO");
-                    connectionInfo.setUsername("demo");
+                    connectionInfo.setCallserverURL("rmi://localhost/callServer");//NOI18N
+                    connectionInfo.setPassword("demo");//NOI18N
+                    connectionInfo.setUsergroup("Demo");//NOI18N
+                    connectionInfo.setUserDomain("WUNDA_DEMO");//NOI18N
+                    connectionInfo.setUsergroupDomain("WUNDA_DEMO");//NOI18N
+                    connectionInfo.setUsername("demo");//NOI18N
 
-                    Connection connection = ConnectionFactory.getFactory().createConnection("Sirius.navigator.connection.RMIConnection", connectionInfo.getCallserverURL());
+                    Connection connection = ConnectionFactory.getFactory().createConnection("Sirius.navigator.connection.RMIConnection", connectionInfo.getCallserverURL());//NOI18N
 
                     //connection.g
 
                     session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
-                    proxy = ConnectionFactory.getFactory().createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    proxy = ConnectionFactory.getFactory().createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);//NOI18N
                     SessionManager.init(proxy);
 
                     MetaObject MetaObject = SessionManager.getConnection().getMetaObject(SessionManager.getSession().getUser(), OBJECTID, CLASSID, domain);//meta.getMetaObject(u, 1, AAPERSON_CLASSID, domain);
 
                     log.fatal(MetaObject.getDebugString());
 
-                    JFrame tester = new JFrame("EditorFactory Tester");
+                    JFrame tester = new JFrame(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.tester.title"));//NOI18N
                     Container cp = tester.getContentPane();
                     cp.setLayout(new BorderLayout());
                     final JComponent ed = CidsObjectEditorFactory.getInstance().getEditor(MetaObject);
                     cp.add(ed);
                     tester.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-                    JButton cmdPersist = new JButton("Persist");
+                    JButton cmdPersist = new JButton(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.cmdPersist.text"));//NOI18N
                     cmdPersist.addActionListener(new ActionListener() {
 
                         public void actionPerformed(ActionEvent e) {
@@ -879,7 +880,7 @@ public class CidsObjectEditorFactory {
 
                         }
                     });
-                    JButton cmdLog = new JButton("Log");
+                    JButton cmdLog = new JButton(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.cmdLog.text"));//NOI18N
                     cmdLog.addActionListener(new ActionListener() {
 
                         public void actionPerformed(ActionEvent e) {
@@ -894,7 +895,7 @@ public class CidsObjectEditorFactory {
                             }
                         }
                     });
-                    JButton cmdReload = new JButton("Reload");
+                    JButton cmdReload = new JButton(org.openide.util.NbBundle.getMessage(CidsObjectEditorFactory.class, "CidsObjectEditorFactory.cmdReload.text"));//NOI18N
                     cmdReload.addActionListener(new ActionListener() {
 
                         public void actionPerformed(ActionEvent e) {
@@ -932,7 +933,6 @@ public class CidsObjectEditorFactory {
 
     }
 }
-
 class ObservableListListenerAdapter implements ObservableListListener {
 
     public void listElementPropertyChanged(ObservableList list, int index) {

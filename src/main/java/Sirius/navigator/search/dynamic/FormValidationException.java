@@ -6,14 +6,13 @@
 
 package Sirius.navigator.search.dynamic;
 
-import Sirius.navigator.resource.ResourceManager;
 
 /**
  *
  * @author  pascal
  */
 public class FormValidationException extends Exception
-{   
+{
     /** Holds value of property formName. */
     private String formName;
     
@@ -100,39 +99,11 @@ public class FormValidationException extends Exception
     
     protected static String makeDefaultMessage(String formName, String parameterName, String expectedType)
     {
-        StringBuffer buffer = new StringBuffer("<html>");
-        
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.message.default"));
-        buffer.append("<p>");
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.form"));
-        buffer.append(' ');
-        buffer.append(formName);
-        buffer.append("</p>");
-        buffer.append("<p>");
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.parameter"));
-        buffer.append(' ');
-        buffer.append(parameterName);
-        buffer.append("</p>");
-        buffer.append("<p>");
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.type"));
-        buffer.append(' ');
-        buffer.append(expectedType);
-        buffer.append("</p>");
-        buffer.append("</html>");
-        
-        return buffer.toString();
+        return org.openide.util.NbBundle.getMessage(FormValidationException.class,"FormValidationException.makeDefaultMessage().defaultMessage", new Object[]{formName, parameterName, expectedType});//NOI18N
     }
     
     protected static String makeCustomMessage(String message)
     {
-        StringBuffer buffer = new StringBuffer("<html>");
-        
-        buffer.append(ResourceManager.getManager().getString("search.forms.exception.validation.message.custom"));
-        buffer.append("<p>");
-        buffer.append(message);
-        buffer.append("</p>");
-        buffer.append("</html>");
-        
-        return buffer.toString();
+        return org.openide.util.NbBundle.getMessage(FormValidationException.class, "FormValidationException.makeCustomMessage().customMessage", new Object[]{message});//NOI18N
     }
 }

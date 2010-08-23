@@ -14,7 +14,7 @@ import java.io.Serializable;
  */
 public class NewBean implements Serializable {
 
-    public static final String PROP_SAMPLE_PROPERTY = "sampleProperty";
+    public static final String PROP_SAMPLE_PROPERTY = "sampleProperty";//NOI18N
 
     private String sampleProperty;
 

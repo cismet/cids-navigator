@@ -14,8 +14,8 @@ import java.util.Map.Entry;
 public class DefaultBeanInitializer implements BeanInitializer {
 
     protected final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultBeanInitializer.class);
-    protected static final String GEOM_TABLE_NAME = "geom";
-    protected static final String GEOM_FIELD_NAME = "geo_field";
+    protected static final String GEOM_TABLE_NAME = "geom";//NOI18N
+    protected static final String GEOM_FIELD_NAME = "geo_field";//NOI18N
     protected final MetaClass metaClass;
     protected final String primaryKeyField;
     protected final Map<String, Object> simpleProperties;

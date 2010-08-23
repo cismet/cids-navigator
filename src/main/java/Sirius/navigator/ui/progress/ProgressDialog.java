@@ -73,11 +73,11 @@ public class ProgressDialog extends JDialog
     {
         public void propertyChange(PropertyChangeEvent evt)
         {
-            if(evt.getPropertyName().equals("finished") || evt.getPropertyName().equals("interrupted"))
+            if(evt.getPropertyName().equals("finished") || evt.getPropertyName().equals("interrupted"))//NOI18N
             {
                 if(((Boolean)evt.getNewValue()).booleanValue())
                 {
-                    progressPanel.logger.debug("closing progress dialog");
+                    progressPanel.logger.debug("closing progress dialog");//NOI18N
                     ProgressDialog.this.setVisible(false);
                     ProgressDialog.this.dispose();
                 }

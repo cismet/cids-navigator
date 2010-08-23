@@ -29,7 +29,8 @@ public class ClassAttributeNode extends AttributeNode
 {
     private final MetaClass metaClass;
     private final Icon icon;
-    
+    private static final ResourceManager resource = ResourceManager.getManager();
+
     private final SingleAttributeIterator attributeIterator;
     
     /** Creates a new instance of ObjectAttributeNode */
@@ -47,7 +48,7 @@ public class ClassAttributeNode extends AttributeNode
         }
         else
         {
-            this.icon = ResourceManager.getManager().getIcon("ClassNodeIcon.gif");
+            this.icon = resource.getIcon("ClassNodeIcon.gif");
         }
         
         // load attributes ...

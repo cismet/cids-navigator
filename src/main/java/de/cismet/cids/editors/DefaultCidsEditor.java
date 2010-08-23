@@ -17,7 +17,6 @@ import org.jdesktop.beansbinding.BindingGroup;
  * @author thorsten
  */
 public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,Titled {
-
     private HashMap<String, Bindable> controls = new HashMap<String, Bindable>();
     private CidsBean cidsBean = null;
     private BindingGroup bindingGroup = new BindingGroup();
@@ -79,7 +78,7 @@ public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,
             return cidsBean.getMetaObject().getMetaClass().getName();
         }
         else {
-            return "Editor";
+            return org.openide.util.NbBundle.getMessage(DefaultCidsEditor.class, "DefaultCidsEditor.getTitle().defaultTitle");//NOI18N
         }
     }
 

@@ -6,7 +6,7 @@
 
 package Sirius.navigator.ui.attributes.editor.metaobject;
 
-import Sirius.navigator.resource.ResourceManager;
+
 import Sirius.server.localserver.attribute.Attribute;
 import java.awt.image.RescaleOp;
 import org.apache.log4j.lf5.util.Resource;
@@ -56,24 +56,23 @@ public class SimpleFromStringMetaAttributeEditor extends SimpleStringMetaAttribu
                     if(SimpleFromStringMetaAttributeEditor.this.isStringCreateable(attribute))
                     {
                         SimpleFromStringMetaAttributeEditor.this.setValueFromString(attribute, this.getNewValue().toString());
-                        if(logger.isDebugEnabled())logger.debug("actionPerformed(" + SimpleFromStringMetaAttributeEditor.this.getId() + "): speichere neue Eingabe");
+                        if(logger.isDebugEnabled())logger.debug("actionPerformed(" + SimpleFromStringMetaAttributeEditor.this.getId() + "): speichere neue Eingabe");//NOI18N
                         SimpleFromStringMetaAttributeEditor.this.stopEditing();
                     }
                     else
                     {
-                        logger.error("actionPerformed(" + SimpleFromStringMetaAttributeEditor.this.getId() + "): value is not from String createable");
+                        logger.error("actionPerformed(" + SimpleFromStringMetaAttributeEditor.this.getId() + "): value is not from String createable");//NOI18N
                     }
                     
                 }
                 catch(Throwable t)
                 {
-                    logger.error("actionPerformed(" + SimpleFromStringMetaAttributeEditor.this.getId() + "): from String creation " + this.getNewValue() + " failed", t);
+                    logger.error("actionPerformed(" + SimpleFromStringMetaAttributeEditor.this.getId() + "): from String creation " + this.getNewValue() + " failed", t);//NOI18N
                     
                     // XXX i18n
                     javax.swing.JOptionPane.showMessageDialog(SimpleFromStringMetaAttributeEditor.this,
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage1") + t.getMessage() + 
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage2"),
-                            ResourceManager.getManager().getString("Sirius.navigator.ui.attributes.editor.metaobject.SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorTitle"), javax.swing.JOptionPane.ERROR_MESSAGE);
+                            org.openide.util.NbBundle.getMessage(SimpleFromStringMetaAttributeEditor.class, "SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorMessage", new Object[]{t.getMessage()}), //NOI18N
+                            org.openide.util.NbBundle.getMessage(SimpleFromStringMetaAttributeEditor.class, "SimpleFromStringMetaAttributeEditor.actionPerformed.ErrorTitle"), javax.swing.JOptionPane.ERROR_MESSAGE);//NOI18N
                     
                     // reset
                     setComponentValue(getValue());

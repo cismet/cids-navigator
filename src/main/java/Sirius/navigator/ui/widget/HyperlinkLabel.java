@@ -96,7 +96,7 @@ public class HyperlinkLabel extends JLabel implements MouseListener {
     }
 
     public void mouseClicked(MouseEvent e) {
-        log.debug("HyperlinkLabelClicked()");
+        log.debug("HyperlinkLabelClicked()");//NOI18N
         if (e.getClickCount() != 1) {
             return;
         }

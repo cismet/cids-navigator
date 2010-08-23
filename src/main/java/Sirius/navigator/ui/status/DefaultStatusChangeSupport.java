@@ -39,13 +39,13 @@ public class DefaultStatusChangeSupport extends PropertyChangeSupport implements
 
     public void addStatusChangeListener(StatusChangeListener listener)
     {
-        if(MutableStatusBar.logger.isDebugEnabled())MutableStatusBar.logger.debug("register new status listener");
+        if(MutableStatusBar.logger.isDebugEnabled())MutableStatusBar.logger.debug("register new status listener");//NOI18N
         this.addPropertyChangeListener(listener);
     }
     
     public void removeStatusChangeListener(StatusChangeListener listener)
     {
-        if(MutableStatusBar.logger.isDebugEnabled())MutableStatusBar.logger.debug("unregister status listener");
+        if(MutableStatusBar.logger.isDebugEnabled())MutableStatusBar.logger.debug("unregister status listener");//NOI18N
         this.removePropertyChangeListener(listener);
     }
     

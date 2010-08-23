@@ -33,7 +33,7 @@ import Sirius.navigator.NavigatorLogger;
 // XXX remove class, migrate to ResourceManager
 
 /**
- * @deprecated migrate to ResourceManager
+ * @deprecated migrate to Netbeans i18n
  */
 public class LingualTest
 {

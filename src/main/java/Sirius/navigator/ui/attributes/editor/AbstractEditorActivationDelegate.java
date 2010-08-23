@@ -23,11 +23,11 @@ import org.apache.log4j.Logger;
  */
 public abstract class AbstractEditorActivationDelegate implements EditorActivationDelegate, ActionListener
 {
-    public final static String START_EDIT_COMMAND = "startEdit";
-    public final static String STOP_EDIT_COMMAND = "stopEdit";
-    public final static String CANCEL_EDIT_COMMAND = "cancelEdit";
-    public final static String SHOW_UI_COMMAND = "showUI";
-    public final static String HIDE_UI_COMMAND = "hideUI";
+    public final static String START_EDIT_COMMAND = "startEdit";//NOI18N
+    public final static String STOP_EDIT_COMMAND = "stopEdit";//NOI18N
+    public final static String CANCEL_EDIT_COMMAND = "cancelEdit";//NOI18N
+    public final static String SHOW_UI_COMMAND = "showUI";//NOI18N
+    public final static String HIDE_UI_COMMAND = "hideUI";//NOI18N
 
     protected Logger logger = null;
     
@@ -119,7 +119,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
                     if(this.isPropertyChangeEnabled() && this.propertyChangeSupport.getPropertyChangeListeners().length > 0)
                     {
                         //System.exit(1);
-                        if(logger.isDebugEnabled())logger.debug("addComplexEditor(" + thisEditor + "): fire property change event");
+                        if(logger.isDebugEnabled())logger.debug("addComplexEditor(" + thisEditor + "): fire property change event");//NOI18N
                         rootContainer =this.getRoot(this.thisContainer);
                         oldActiveChildEditorTree = rootContainer.getActiveChildEditorTree(new LinkedList());
                     }
@@ -127,7 +127,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
                     this.setChildEditor(childEditor);
                     this.thisContainer.getChildEditors().put(childEditor.getId(), childEditor);
                     
-                    if(logger.isDebugEnabled())logger.debug("addComplexEditor(" + thisEditor + "): preparing editor for complex edit action of complex editor '" +  childEditor.getId() + "'");
+                    if(logger.isDebugEnabled())logger.debug("addComplexEditor(" + thisEditor + "): preparing editor for complex edit action of complex editor '" +  childEditor.getId() + "'");//NOI18N
                     
                     // neue Listener erzeugen
                     this.editorListener = this.createEditorListener();
@@ -145,18 +145,18 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
                 }
                 else
                 {
-                    if(logger.isDebugEnabled())logger.debug("addComplexEditor(" + thisEditor + "): id of complex child editor '" + childEditor.getClass().getName() + "' is null -> adding editor lazily");
+                    if(logger.isDebugEnabled())logger.debug("addComplexEditor(" + thisEditor + "): id of complex child editor '" + childEditor.getClass().getName() + "' is null -> adding editor lazily");//NOI18N
                     this.lazyChildEditor = childEditor;
                 }
             }
             else
             {
-                logger.error("addComplexEditor(" + thisEditor + "): unexpected call to addComplexEditor(): A Container can hold only one complex editor at the same time");
+                logger.error("addComplexEditor(" + thisEditor + "): unexpected call to addComplexEditor(): A Container can hold only one complex editor at the same time");//NOI18N
             }
         }
         else
         {
-            logger.warn("addComplexEditor(" + thisEditor + "): addComplexEditor(): child editor is null");
+            logger.warn("addComplexEditor(" + thisEditor + "): addComplexEditor(): child editor is null");//NOI18N
         }
         
         return false;
@@ -174,13 +174,13 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
         {
             if(this.isChildEditorAvailable() && this.thisContainer.getChildEditors().remove(childEditor.getId()) != null && this.editorListener != null)
             {
-                if(logger.isDebugEnabled())logger.debug("removeComplexEditor(" + thisEditor + "): stopping complex edit action of complex editor '" + childEditor.getId() + "'");
+                if(logger.isDebugEnabled())logger.debug("removeComplexEditor(" + thisEditor + "): stopping complex edit action of complex editor '" + childEditor.getId() + "'");//NOI18N
                 
                 LinkedList oldActiveChildEditorTree = null;
                 BasicContainer rootContainer = null;
                 if(this.isPropertyChangeEnabled() && this.propertyChangeSupport.getPropertyChangeListeners().length > 0)
                 {
-                    if(logger.isDebugEnabled())logger.debug("removeComplexEditor(" + thisEditor + "): fire property change event");
+                    if(logger.isDebugEnabled())logger.debug("removeComplexEditor(" + thisEditor + "): fire property change event");//NOI18N
                     rootContainer = this.getRoot(this.thisContainer);
                     oldActiveChildEditorTree = rootContainer.getActiveChildEditorTree(new LinkedList());
                 }
@@ -201,12 +201,12 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
             }
             else if(logger.isDebugEnabled())
             {
-                logger.error("removeComplexEditor(" + thisEditor + "): unexpected call to removeComplexEditor(): no complex editor registered: " + childEditor.getId());
+                logger.error("removeComplexEditor(" + thisEditor + "): unexpected call to removeComplexEditor(): no complex editor registered: " + childEditor.getId());//NOI18N
             }
         }
         else
         {
-            logger.warn("removeComplexEditor(" + thisEditor + "): child editor is null");
+            logger.warn("removeComplexEditor(" + thisEditor + "): child editor is null");//NOI18N
         }
         
         return false;
@@ -219,12 +219,12 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
      */
     public boolean showComplexEditorChildComponentUI()
     {
-        if(logger.isDebugEnabled())logger.debug("showComplexEditorChildComponentUI(" + thisEditor + "): called");
+        if(logger.isDebugEnabled())logger.debug("showComplexEditorChildComponentUI(" + thisEditor + "): called");//NOI18N
         if(this.childEditor != null || this.lazyChildEditor != null)
         {
             if(this.isChildEditorVisible())
             {
-                logger.warn("showComplexEditorChildComponentUI(" + thisEditor + "): child editor still visible");
+                logger.warn("showComplexEditorChildComponentUI(" + thisEditor + "): child editor still visible");//NOI18N
                 if(!this.hideComplexEditorChildComponentUI())
                 {
                     return false;
@@ -237,7 +237,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
                 // thisContainer wird als parent container \u00FCbergeben
                 
                 this.editorComponent = this.lazyChildEditor.getEditorComponent(this.thisContainer, this.thisEditor.getId(), this.thisEditor.getValue());
-                if(logger.isDebugEnabled())logger.debug("showComplexEditorChildComponentUI(" + thisEditor + "): adding now lazily added child editor");
+                if(logger.isDebugEnabled())logger.debug("showComplexEditorChildComponentUI(" + thisEditor + "): adding now lazily added child editor");//NOI18N
                 this.addLazyComplexEditor();
             }
             else
@@ -251,7 +251,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
         }
         else
         {
-            logger.warn("showComplexEditorChildComponentUI(" + thisEditor + "): child editor and lazy cild editor are null");
+            logger.warn("showComplexEditorChildComponentUI(" + thisEditor + "): child editor and lazy cild editor are null");//NOI18N
         }
         
         return false;
@@ -264,7 +264,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
      */
     public boolean hideComplexEditorChildComponentUI()
     {
-        if(logger.isDebugEnabled())logger.debug("hideComplexEditorChildComponentUI(" + thisEditor + "): called");
+        if(logger.isDebugEnabled())logger.debug("hideComplexEditorChildComponentUI(" + thisEditor + "): called");//NOI18N
         if(this.editorComponent != null)
         {
             if(this.getParentContainerForUI().hideComplexEditorComponentUI(this.editorComponent, this.childEditor.getId()))
@@ -275,7 +275,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
         }
         else
         {
-            logger.warn("hideComplexEditorChildComponentUI(" + thisEditor + "): editorComponent is null");
+            logger.warn("hideComplexEditorChildComponentUI(" + thisEditor + "): editorComponent is null");//NOI18N
         }
         
         return false;
@@ -301,7 +301,7 @@ public abstract class AbstractEditorActivationDelegate implements EditorActivati
         }
         else if(logger.isDebugEnabled())
         {
-            logger.warn("actionPerformed(" + thisEditor + "): unrecognized action command '" + e.getActionCommand() + "'");
+            logger.warn("actionPerformed(" + thisEditor + "): unrecognized action command '" + e.getActionCommand() + "'");//NOI18N
         }
     }
     

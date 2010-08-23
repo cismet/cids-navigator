@@ -48,6 +48,6 @@ public class EditorBeanInitializerStore {
                 initializer.initializeBean(toInitialize);
             }
         }
-        throw new IllegalArgumentException("Bean to initialize was null!");
+        throw new IllegalArgumentException("Bean to initialize was null!");//NOI18N
     }
 }

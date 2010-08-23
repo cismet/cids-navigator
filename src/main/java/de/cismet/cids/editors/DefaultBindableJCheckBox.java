@@ -72,7 +72,7 @@ public class DefaultBindableJCheckBox extends JCheckBox implements Bindable {
     }
 
     public String getBindingProperty() {
-        return "selected";
+        return "selected";//NOI18N
     }
 
     public Converter getConverter() {

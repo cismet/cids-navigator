@@ -87,7 +87,7 @@ public class DefaultFormDataBean implements FormDataBean
         }
         else
         {
-            logger.warn("object '" + name + "' not found in data map");
+            logger.warn("object '" + name + "' not found in data map");//NOI18N
             return null;
         }
     }
@@ -100,7 +100,7 @@ public class DefaultFormDataBean implements FormDataBean
         }
         else
         {
-            logger.warn("bean parameter name '" + name + "' not found in data map");
+            logger.warn("bean parameter name '" + name + "' not found in data map");//NOI18N
         }
     }
     
@@ -112,7 +112,7 @@ public class DefaultFormDataBean implements FormDataBean
         }
         else
         {
-            logger.warn("query parameter name '" + name + "' not found in parameter map");
+            logger.warn("query parameter name '" + name + "' not found in parameter map");//NOI18N
         }
     }
     
@@ -130,7 +130,7 @@ public class DefaultFormDataBean implements FormDataBean
         }
         else
         {
-            logger.warn("query parameter '" + name + "' not found in query parameter map");
+            logger.warn("query parameter '" + name + "' not found in query parameter map");//NOI18N
         }
         
         return null;
@@ -212,7 +212,7 @@ public class DefaultFormDataBean implements FormDataBean
     
     public void clear()
     {
-        logger.debug("clearing data map values (" + this.dataMap.size() + ")");
+        logger.debug("clearing data map values (" + this.dataMap.size() + ")");//NOI18N
         
         Iterator parameterNames = this.dataMap.keySet().iterator();
         while(parameterNames.hasNext())
@@ -225,15 +225,15 @@ public class DefaultFormDataBean implements FormDataBean
     {
         StringBuffer buffer = new StringBuffer();
         
-        buffer.append("\nthis.getQueryId():          ").append(this.getQueryId());
-        buffer.append("\nthis.getFormId():           ").append(this.getFormId());
-        buffer.append("\nthis.getParameterCount():  ").append(this.getParameterCount());
+        buffer.append("\nthis.getQueryId():          ").append(this.getQueryId());//NOI18N
+        buffer.append("\nthis.getFormId():           ").append(this.getFormId());//NOI18N
+        buffer.append("\nthis.getParameterCount():  ").append(this.getParameterCount());//NOI18N
         
         Iterator iterator = this.getQueryParameterNames().iterator();
         while(iterator.hasNext())
         {
             String queryParameterName = iterator.next().toString();
-            buffer.append("\nqueryParameterName: '").append(queryParameterName).append("' == beanParameterName: '").append(this.parameterNamesMap.get(queryParameterName)).append("' | value = ").append(this.getQueryParameter(queryParameterName));
+            buffer.append("\nqueryParameterName: '").append(queryParameterName).append("' == beanParameterName: '").append(this.parameterNamesMap.get(queryParameterName)).append("' | value = ").append(this.getQueryParameter(queryParameterName));//NOI18N
   
         }
         

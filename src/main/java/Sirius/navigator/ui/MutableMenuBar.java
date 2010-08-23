@@ -53,6 +53,8 @@ import javax.swing.tree.TreePath;
 
 public class MutableMenuBar extends JMenuBar {
 
+    ResourceManager resources = ResourceManager.getManager();
+
     private final static Logger logger = Logger.getLogger(MutableMenuBar.class);
     private final PluginMenuesMap pluginMenues;
     private final EmbeddedContainersMap moveableMenues;
@@ -124,7 +126,7 @@ public class MutableMenuBar extends JMenuBar {
         if (menu.getItemCount() > 0) {
             this.pluginMenues.add(menu);
         } else if (logger.isDebugEnabled()) {
-            logger.warn("menu '" + menu.getId() + "' does not contain any items, ignoring menu");
+            logger.warn("menu '" + menu.getId() + "' does not contain any items, ignoring menu");//NOI18N
         }
     }
 
@@ -161,137 +163,123 @@ public class MutableMenuBar extends JMenuBar {
      */
     private void makeDefaultMenues() {
         if (logger.isDebugEnabled()) {
-            logger.debug("creating default menues");
+            logger.debug("creating default menues");//NOI18N
         }
 
         JMenu menu = null;
         JMenuItem item = null;
         MenuItemActionListener itemListener = new MenuItemActionListener();
-        ResourceManager resources = ResourceManager.getManager();
 
-        // NAVIGATOR MENU ======================================================
-        menu = new JMenu(resources.getMenuText("navigator"));
-        menu.setMnemonic(resources.getMenuMnemonic("navigator"));
+
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.title"));//NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.mnemonic").charAt(0));//NOI18N
         this.add(menu);
 
         //LayoutControls
         //Gegenwärtiges Layout Speichern
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.save.current.layout")));
-        item.setIcon(resources.getMenuIcon("navigator.save.current.layout"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.save.current.layout"));
-        item.setActionCommand("navigator.save.current.layout");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.saveCurrentLayout.title"))); //NOI18N
+        item.setIcon(resources.getIcon("layout.png"));//NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));//NOI18N
+
+        item.setActionCommand("navigator.save.current.layout");//NOI18N
         item.addActionListener(itemListener);
         //Layout öffnen
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.open.layout")));
-        item.setIcon(resources.getMenuIcon("navigator.open.layout"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.open.layout"));
-        item.setActionCommand("navigator.open.layout");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.openLayout.title")));//NOI18N
+        item.setIcon(resources.getIcon("layout.png"));//NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl O"));//NOI18N
+        item.setActionCommand("navigator.open.layout");//NOI18N
         item.addActionListener(itemListener);
         //Layout reseten
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.reset.layout")));
-        item.setIcon(resources.getMenuIcon("navigator.reset.layout"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.reset.layout"));
-        item.setActionCommand("navigator.reset.layout");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.resetLayout.title")));//NOI18N
+        item.setIcon(resources.getIcon("layout.png"));//NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("strg R"));//NOI18N
+        item.setActionCommand("navigator.reset.layout");//NOI18N
         item.addActionListener(itemListener);
         menu.add(new JSeparator());
         //Hell
-        menu.add(item = new JMenuItem("Katalog neu laden"));
-        item.setMnemonic('K');
-        //item.setIcon();
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
-        item.setActionCommand("tree.refresh");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.reloadCatalogue.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.reloadCatalogue.mnemonic").charAt(0));//NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("F5"));//NOI18N
+        item.setActionCommand("tree.refresh");//NOI18N
         item.addActionListener(itemListener);
         menu.add(new JSeparator());
         // Beenden .............................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("navigator.exit")));
-        item.setMnemonic(resources.getMenuMnemonic("navigator.exit"));
-        item.setIcon(resources.getMenuIcon("navigator.exit"));
-        item.setAccelerator(resources.getMenuAccelerator("navigator.exit"));
-        item.setActionCommand("navigator.exit");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.exit.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.navigatorMenu.exit.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("stop16.gif"));//NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("alt X"));//NOI18N
+        item.setActionCommand("navigator.exit");//NOI18N
         item.addActionListener(itemListener);
 
-        // SEARCH MENU =========================================================
-        menu = new JMenu(resources.getMenuText("search"));
-        menu.setMnemonic(resources.getMenuMnemonic("search"));
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.title"));//NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.mnemonic").charAt(0));//NOI18N
         this.add(menu);
         // Suche ...............................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("search.search")));
-        item.setMnemonic(resources.getMenuMnemonic("search.search"));
-        item.setIcon(resources.getMenuIcon("search.search"));
-        item.setAccelerator(resources.getMenuAccelerator("search.search"));
-        item.setActionCommand("search.search");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.search.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.search.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("find16.gif"));//NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("alt S"));//NOI18N
+        item.setActionCommand("search.search");//NOI18N
         item.addActionListener(itemListener);
         menu.addSeparator();
         // show search results .................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("search.show")));
-        item.setMnemonic(resources.getMenuMnemonic("search.show"));
-        item.setIcon(resources.getMenuIcon("search.show"));
-        ;
-        //item.setAccelerator(resources.getMenuAccelerator("search.show"));
-        item.setActionCommand("search.show");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.showResults.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.showResults.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("searchresults16.gif"));//NOI18N
+        item.setActionCommand("search.show");//NOI18N
         item.addActionListener(itemListener);
         // search result profiles .....................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("search.profiles.result")));
-        item.setMnemonic(resources.getMenuMnemonic("search.profiles.result"));
-        item.setIcon(resources.getMenuIcon("search.profiles.result"));
-        //item.setAccelerator(resources.getMenuAccelerator("search.profiles.result"));
-        item.setActionCommand("search.profiles.result");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.searchResultProfiles.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.searchResultProfiles.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("searchresultprofiles16.gif"));//NOI18N
+        item.setActionCommand("search.profiles.result");//NOI18N
         item.addActionListener(itemListener);
         // search profiles .....................................................
         menu.addSeparator();
-        menu.add(item = new JMenuItem(resources.getMenuText("search.profiles")));
-        item.setMnemonic(resources.getMenuMnemonic("search.profiles"));
-        item.setIcon(resources.getMenuIcon("search.profiles"));
-        //item.setAccelerator(resources.getMenuAccelerator("search.profiles"));
-        item.setActionCommand("search.profiles");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.searchProfiles.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.searchProfiles.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("searchresultprofiles16.gif"));//NOI18N
+        item.setActionCommand("search.profiles");//NOI18N
         item.addActionListener(itemListener);
         searchMenu = menu;
-        // TOOLS MENU ==========================================================
-        menu = new JMenu(resources.getMenuText("tools"));
-        menu.setMnemonic(resources.getMenuMnemonic("tools"));
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.title"));//NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.mnemonic").charAt(0));//NOI18N
         this.add(menu);
         // password  ...............................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("tools.password")));
-        item.setMnemonic(resources.getMenuMnemonic("tools.password"));
-        //item.setIcon(resources.getMenuIcon("tools.password"));
-        //item.setAccelerator(resources.getMenuAccelerator("tools.password"));
-        item.setActionCommand("tools.password");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.password.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.password.mnemonic").charAt(0));//NOI18N
+        item.setActionCommand("tools.password");//NOI18N
         item.addActionListener(itemListener);
 
         //this.add(new JSeparator(SwingConstants.HORIZONTAL));
 
-        // Plugin Menu =========================================================
-        menu = new JMenu(resources.getMenuText("plugin"));
-        menu.setMnemonic(resources.getMenuMnemonic("plugin"));
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.pluginMenu.title"));//NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.pluginMenu.mnemonic").charAt(0));//NOI18N
         menu.setEnabled(false); //HELL
         this.add(menu);
         this.pluginMenu = menu;
         // plugin manager ......................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("plugin.manager")));
-        item.setMnemonic(resources.getMenuMnemonic("plugin.manager"));
-        item.setIcon(resources.getMenuIcon("plugin.manager"));
-        //item.setAccelerator(resources.getMenuAccelerator("plugin.manager"));
-        item.setActionCommand("plugin.manager");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.pluginMenu.pluginManager.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.pluginMenu.pluginManager.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("plugin_node_root.gif"));//NOI18N
+        item.setActionCommand("plugin.manager");//NOI18N
         item.addActionListener(itemListener);
         menu.addSeparator();
 
-        // Fenster Menu ======================================================
-        menu = new JMenu(resources.getMenuText("window"));
-        menu.setMnemonic(resources.getMenuMnemonic("window"));
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.windowMenu.title"));//NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.windowMenu.mnemonic").charAt(0));//NOI18N
         this.add(menu);
         viewMenu = menu;
 
 
-        // Help Menu ===========================================================
-        menu = new JMenu(resources.getMenuText("help"));
-        menu.setMnemonic(resources.getMenuMnemonic("help"));
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.title"));//NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.mnemonic").charAt(0));//NOI18N
         this.add(menu);
         // plugin manager ......................................................
-        menu.add(item = new JMenuItem(resources.getMenuText("help.info")));
-        item.setMnemonic(resources.getMenuMnemonic("help.info"));
-        item.setIcon(resources.getMenuIcon("help.info"));
-        //item.setAccelerator(resources.getMenuAccelerator("help.info"));
-        item.setActionCommand("help.info");
+        menu.add(item = new JMenuItem(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.info.title")));//NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.info.mnemonic").charAt(0));//NOI18N
+        item.setIcon(resources.getIcon("information16.gif"));//NOI18N
+        item.setActionCommand("help.info");//NOI18N
         item.addActionListener(itemListener);
     }
 
@@ -313,17 +301,19 @@ public class MutableMenuBar extends JMenuBar {
     private class MenuItemActionListener implements ActionListener {
 
         public void actionPerformed(ActionEvent e) {
-            if (e.getActionCommand().equals("search.search")) {
+            if (e.getActionCommand().equals("search.search")) {//NOI18N
                 try {
                     MethodManager.getManager().showSearchDialog();
                 } catch (Throwable t) {
-                    logger.fatal("Fehler bei der Verarbeitung der Suchmethode", t);
+                    logger.fatal("Error while processing search method", t);//NOI18N
 
-                    ErrorDialog errorDialog = new ErrorDialog("Fehler bei der Verarbeitung der Suchmethode", t.toString(), ErrorDialog.WARNING);
+                    ErrorDialog errorDialog = new ErrorDialog(
+                            org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.MenuItemActionListener.actionPerformed(ActionEvent).ErrorDialog.message"),//NOI18N
+                            t.toString(), ErrorDialog.WARNING);
                     errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
                     errorDialog.show();
                 }
-            } else if (e.getActionCommand().equals("tools.password")) {
+            } else if (e.getActionCommand().equals("tools.password")) {//NOI18N
                 MethodManager.getManager().showPasswordDialog();
             } /*else if (e.getActionCommand().equals("navigator_logout"))
             {
@@ -332,23 +322,23 @@ public class MutableMenuBar extends JMenuBar {
             logger.info("closing program");
             System.exit(0);
             }
-            }*/ else if (e.getActionCommand().equals("navigator.exit")) {
+            }*/ else if (e.getActionCommand().equals("navigator.exit")) {//NOI18N
                 if (ExceptionManager.getManager().showExitDialog(ComponentRegistry.getRegistry().getMainWindow())) {
-                    logger.info("closing program");
+                    logger.info("closing program");//NOI18N
                     ComponentRegistry.getRegistry().getNavigator().dispose();
                     System.exit(0);
                 }
-            } else if (e.getActionCommand().equals("search.show")) {
+            } else if (e.getActionCommand().equals("search.show")) {//NOI18N
                 MethodManager.getManager().showSearchResults();
-            } else if (e.getActionCommand().equals("search.profiles.result")) {
+            } else if (e.getActionCommand().equals("search.profiles.result")) {//NOI18N
                 MethodManager.getManager().showQueryResultProfileManager();
-            } else if (e.getActionCommand().equals("search.profiles")) {
+            } else if (e.getActionCommand().equals("search.profiles")) {//NOI18N
                 MethodManager.getManager().showQueryProfilesManager();
-            } else if (e.getActionCommand().equals("plugin.manager")) {
+            } else if (e.getActionCommand().equals("plugin.manager")) {//NOI18N
                 MethodManager.getManager().showPluginManager();
-            } else if (e.getActionCommand().equals("help.info")) {
+            } else if (e.getActionCommand().equals("help.info")) {//NOI18N
                 MethodManager.getManager().showAboutDialog();
-            } else if (e.getActionCommand().equals("tree.refresh")) {
+            } else if (e.getActionCommand().equals("tree.refresh")) {//NOI18N
                 try {
                     final TreePath selectionPath = ComponentRegistry.getRegistry().getCatalogueTree().getSelectionPath();
                     if (selectionPath != null && selectionPath.getPath().length > 0) {
@@ -358,26 +348,26 @@ public class MutableMenuBar extends JMenuBar {
                         ComponentRegistry.getRegistry().getCatalogueTree().exploreSubtree(selectionPath);
                     }
                 } catch (ConnectionException ex) {
-                    logger.error("Fehler beim Baumrefresh", ex);
+                    logger.error("Error while refreshing the tree", ex);//NOI18N
                 } catch (RuntimeException ex) {
-                    logger.error("Fehler beim Baumrefresh", ex);
+                    logger.error("Error while refreshing the tree", ex);//NOI18N
                 }
-            } else if (e.getActionCommand().equals("navigator.reset.layout")) {
-                logger.debug("reseten des Layouts");
+            } else if (e.getActionCommand().equals("navigator.reset.layout")) {//NOI18N
+                logger.debug("reset layout");//NOI18N
                 if (layoutManager != null) {
                     layoutManager.resetLayout();
                 } else {
                     //TODO Meldung Benutzer
                 }
-            } else if (e.getActionCommand().equals("navigator.open.layout")) {
-                logger.debug("öffnen eines Layouts");
+            } else if (e.getActionCommand().equals("navigator.open.layout")) {//NOI18N
+                logger.debug("open layout");//NOI18N
                 if (layoutManager != null) {
                     layoutManager.loadLayout((java.awt.Component) StaticSwingTools.getParentFrame(MutableMenuBar.this));
                 } else {
                     //TODO Meldung Benutzer
                 }
-            } else if (e.getActionCommand().equals("navigator.save.current.layout")) {
-                logger.debug("Speichern eines Layouts");
+            } else if (e.getActionCommand().equals("navigator.save.current.layout")) {//NOI18N
+                logger.debug("save layout");//NOI18N
                 if (layoutManager != null) {
                     layoutManager.saveCurrentLayout((java.awt.Component) StaticSwingTools.getParentFrame(MutableMenuBar.this));
                 } else {
@@ -534,7 +524,7 @@ public class MutableMenuBar extends JMenuBar {
             if (component instanceof EmbeddedMenu) {
                 MutableMenuBar.this.pluginMenu.add((EmbeddedMenu) component);
             } else {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");
+                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");//NOI18N
             }
         }
 
@@ -542,7 +532,7 @@ public class MutableMenuBar extends JMenuBar {
             if (component instanceof EmbeddedMenu) {
                 MutableMenuBar.this.pluginMenu.remove((EmbeddedMenu) component);
             } else {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");
+                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedMenu' expected");//NOI18N
             }
         }
     }
@@ -564,7 +554,7 @@ public class MutableMenuBar extends JMenuBar {
                     this.removeComponents();
                 }
             } else {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");
+                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
             }
         }
 
@@ -581,7 +571,7 @@ public class MutableMenuBar extends JMenuBar {
                     if (component instanceof JMenu) {
                         MutableMenuBar.this.add((JMenu) component);
                     } else {
-                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");
+                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");//NOI18N
                     }
                 }
             }
@@ -606,7 +596,7 @@ public class MutableMenuBar extends JMenuBar {
                     if (component instanceof JMenu) {
                         MutableMenuBar.this.remove(component);
                     } else {
-                        this.logger.error("removeComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");
+                        this.logger.error("removeComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");//NOI18N
                     }
                 }
             }

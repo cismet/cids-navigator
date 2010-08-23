@@ -29,12 +29,12 @@ public interface SimpleEditor extends BasicEditor, TableCellEditor
     /**
      * Eigenschaft f\u00FCr den Klassenenamen eines komplexen Editors
      */
-    public final static String PROPERTY_COMLPEX_EDTIOR = "complexEditor";
+    public final static String PROPERTY_COMLPEX_EDTIOR = "complexEditor";//NOI18N
     
     /**
      * Eigenschaft f\u00FCr den Klassenenamen eines komplexen Editors
      */
-    public final static String PROPERTY_READ_ONLY = "readOnly";
+    public final static String PROPERTY_READ_ONLY = "readOnly";//NOI18N
     
     /**
      * Initialisiert die Komponente (z.B. ein JPanel) um das einfache Object

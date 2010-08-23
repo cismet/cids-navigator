@@ -43,7 +43,8 @@ public class SearchResultsTreePanel extends JPanel
     {
         super(new BorderLayout());
         this.searchResultsTree = searchResultsTree;
-        this.toolBar = new JToolBar(ResourceManager.getManager().getString("searchresultstreepanel.toolbar.name"), JToolBar.HORIZONTAL) ;
+        this.toolBar = new JToolBar(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.toolbar.name"),//NOI18N
+                JToolBar.HORIZONTAL) ;
         this.toolBar.setRollover(advancedLayout);
         this.toolBar.setFloatable(advancedLayout);
         
@@ -61,7 +62,7 @@ public class SearchResultsTreePanel extends JPanel
         
         ButtonEnablingListener buttonEnablingListener = new ButtonEnablingListener();
         this.searchResultsTree.addTreeSelectionListener(buttonEnablingListener);
-        this.searchResultsTree.addPropertyChangeListener("browse", buttonEnablingListener);
+        this.searchResultsTree.addPropertyChangeListener("browse", buttonEnablingListener);//NOI18N
         this.addComponentListener(new ComponentEventForwarder());
     }
     
@@ -70,33 +71,33 @@ public class SearchResultsTreePanel extends JPanel
         ResourceManager resources = ResourceManager.getManager();
         ActionListener toolBarListener = new ToolBarListener();
         
-        browseBackButton = new JButton(resources.getIcon("back24.gif"));
-        browseBackButton.setToolTipText(resources.getButtonTooltip("back"));
-        browseBackButton.setActionCommand("back");
+        browseBackButton = new JButton(resources.getIcon("back24.gif"));//NOI18N
+        browseBackButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.backButton.tooltip"));//NOI18N
+        browseBackButton.setActionCommand("back");//NOI18N
         browseBackButton.setMargin(new Insets(4,4,4,4));
         browseBackButton.addActionListener(toolBarListener);
         toolBar.add(browseBackButton);
         //toolBar.addSeparator();
         
-        browseForwardButton = new JButton(resources.getIcon("forward24.gif"));
-        browseForwardButton.setToolTipText(resources.getButtonTooltip("forward"));
-        browseForwardButton.setActionCommand("forward");
+        browseForwardButton = new JButton(resources.getIcon("forward24.gif"));//NOI18N
+        browseForwardButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.browseForwardButton.tooltip"));//NOI18N
+        browseForwardButton.setActionCommand("forward");//NOI18N
         browseForwardButton.setMargin(new Insets(4,4,4,4));
         browseForwardButton.addActionListener(toolBarListener);
         toolBar.add(browseForwardButton);
         toolBar.addSeparator();
         
-        removeButton = new JButton(resources.getIcon("remove24.gif"));
-        removeButton.setToolTipText(resources.getButtonTooltip("remove"));
-        removeButton.setActionCommand("remove");
+        removeButton = new JButton(resources.getIcon("remove24.gif"));//NOI18N
+        removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.removeButton.tooltip"));//NOI18N
+        removeButton.setActionCommand("remove");//NOI18N
         removeButton.setMargin(new Insets(4,4,4,4));
         removeButton.addActionListener(toolBarListener);
         toolBar.add(removeButton);
         //toolBar.addSeparator();
         
-        clearButton = new JButton(resources.getIcon("delete24.gif"));
-        clearButton.setToolTipText(resources.getButtonTooltip("clear"));
-        clearButton.setActionCommand("clear");
+        clearButton = new JButton(resources.getIcon("delete24.gif"));//NOI18N
+        clearButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.clearButton.tooltip"));//NOI18N
+        clearButton.setActionCommand("clear");//NOI18N
         clearButton.setMargin(new Insets(4,4,4,4));
         clearButton.addActionListener(toolBarListener);
         toolBar.add(clearButton);
@@ -105,9 +106,9 @@ public class SearchResultsTreePanel extends JPanel
         //saveAllButton = new JButton(resources.getIcon("saveall24.gif"));
         saveAllButton = new JPopupMenuButton();
         saveAllButton.setPopupMenu(new HistoryPopupMenu());
-        saveAllButton.setIcon(resources.getIcon("saveall24.gif"));
-        saveAllButton.setToolTipText(resources.getButtonTooltip("saveall"));
-        saveAllButton.setActionCommand("saveall");
+        saveAllButton.setIcon(resources.getIcon("saveall24.gif"));//NOI18N
+        saveAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.saveAllButton.tooltip"));//NOI18N
+        saveAllButton.setActionCommand("saveall");//NOI18N
         saveAllButton.setMargin(new Insets(4,4,4,4));
         saveAllButton.addActionListener(toolBarListener);
         toolBar.add(saveAllButton);
@@ -121,7 +122,7 @@ public class SearchResultsTreePanel extends JPanel
         });
         showDirectlyInMap.setSelected(false);
         toolBar.add(showDirectlyInMap);
-        JLabel showDirectlyInMapLabel= new JLabel(resources.getIcon("map.png"));
+        JLabel showDirectlyInMapLabel= new JLabel(resources.getIcon("saveall24.gif"));//NOI18N
         showDirectlyInMapLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -132,7 +133,7 @@ public class SearchResultsTreePanel extends JPanel
 
         });
         
-        showDirectlyInMapLabel.setToolTipText("Suchergebnisse direkt in die Karte \u00FCbernehmen");
+        showDirectlyInMapLabel.setToolTipText(org.openide.util.NbBundle.getMessage(SearchResultsTreePanel.class, "SearchResultsTreePanel.showDirectInMapLabel.tooltipText"));//NOI18N
         toolBar.add(showDirectlyInMapLabel);
     }
     
@@ -188,27 +189,27 @@ public class SearchResultsTreePanel extends JPanel
          */
         public void actionPerformed(ActionEvent e)
         {
-            if(e.getActionCommand().equals("back"))
+            if(e.getActionCommand().equals("back"))//NOI18N
             {
                 searchResultsTree.browseBack();
             }
-            else if(e.getActionCommand().equals("forward"))
+            else if(e.getActionCommand().equals("forward"))//NOI18N
             {
                 searchResultsTree.browseForward();
             }
-            else if(e.getActionCommand().equals("remove"))
+            else if(e.getActionCommand().equals("remove"))//NOI18N
             {
                 searchResultsTree.removeSelectedResultNodes();
             }
-            else if(e.getActionCommand().equals("clear"))
+            else if(e.getActionCommand().equals("clear"))//NOI18N
             {
                 searchResultsTree.clear();
             }
-            else if(e.getActionCommand().equals("save"))
+            else if(e.getActionCommand().equals("save"))//NOI18N
             {
                 //logger.warn("command 'save' not implemented");
             }
-            else if(e.getActionCommand().equals("saveall"))
+            else if(e.getActionCommand().equals("saveall"))//NOI18N
             {
                 MethodManager.getManager().showQueryResultProfileManager();
             }
@@ -247,32 +248,32 @@ public class SearchResultsTreePanel extends JPanel
         
         public HistoryPopupMenu()
         {
-            if(logger.isDebugEnabled())logger.debug("HistoryPopupMenu(): creating new instance");
+            if(logger.isDebugEnabled())logger.debug("HistoryPopupMenu(): creating new instance");//NOI18N
             this.addPopupMenuListener(this);
             
             // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme"));
+            this.add(new JMenuItem("shouldnotseeme"));//NOI18N
         }
  
         public void popupMenuCanceled(PopupMenuEvent e) 
         {
-             if(logger.isDebugEnabled())logger.debug("popupMenuCanceled()");
+             if(logger.isDebugEnabled())logger.debug("popupMenuCanceled()");//NOI18N
              
              // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme"));
+            this.add(new JMenuItem("shouldnotseeme"));//NOI18N
         }
         
         public void popupMenuWillBecomeInvisible(PopupMenuEvent e)
         {
-            if(logger.isDebugEnabled())logger.debug("popupMenuWillBecomeInvisible()");
+            if(logger.isDebugEnabled())logger.debug("popupMenuWillBecomeInvisible()");//NOI18N
             
             // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme"));
+            this.add(new JMenuItem("shouldnotseeme"));//NOI18N
         }
         
         public void popupMenuWillBecomeVisible(PopupMenuEvent e)
         {
-            if(logger.isDebugEnabled())logger.debug("popupMenuWillBecomeVisible(): showing popup meu");
+            if(logger.isDebugEnabled())logger.debug("popupMenuWillBecomeVisible(): showing popup meu");//NOI18N
             
             if(this.queryResultProfileManager == null)
             {
@@ -300,14 +301,16 @@ public class SearchResultsTreePanel extends JPanel
             }
             else if(logger.isDebugEnabled())
             {
-                logger.warn("HistoryPopupMenu: no query result profiles found");
+                logger.warn("HistoryPopupMenu: no query result profiles found");//NOI18N
             }
         }
         
         public void actionPerformed (ActionEvent e)
         {
-             logger.info("HistoryPopupMenu: loading query result profile '" + e.getActionCommand() + "'");
-             this.queryResultProfileManager.loadSearchResults(e.getActionCommand());
+            if (logger.isInfoEnabled()) {
+                logger.info("HistoryPopupMenu: loading query result profile '" + e.getActionCommand() + "'");//NOI18N
+            }
+            this.queryResultProfileManager.loadSearchResults(e.getActionCommand());
         }
     }
 }

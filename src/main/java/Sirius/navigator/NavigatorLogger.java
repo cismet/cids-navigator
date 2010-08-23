@@ -49,6 +49,7 @@ public final class NavigatorLogger
     public static final boolean PLUGIN_VERBOSE = false;
     public static final boolean METHOD_VERBOSE = false;
     
+    
     //private static final Calendar calendar = new GregorianCalendar();
     
     

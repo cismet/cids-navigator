@@ -35,7 +35,8 @@ public class AttributeTable extends JXTable //implements ComplexContainer
     
     public AttributeTable()
     {
-        this(ResourceManager.getManager().getString("attribute.table.name"), ResourceManager.getManager().getString("attribute.table.value"));
+        this(org.openide.util.NbBundle.getMessage(AttributeTable.class, "AttributeTable.AttributeTable().nameColumnName"),//NOI18N
+                org.openide.util.NbBundle.getMessage(AttributeTable.class, "AttributeTable.AttributeTable().valueColumnName"));//NOI18N
     }
     
     
@@ -128,7 +129,7 @@ public class AttributeTable extends JXTable //implements ComplexContainer
                     }
                     catch(Throwable exp)
                     {
-                        logger.debug("getCellRenderer() attribute " + attribute.getName() + " is no valid url");
+                        logger.debug("getCellRenderer() attribute " + attribute.getName() + " is no valid url");//NOI18N
                     }
                 }
             }
@@ -187,7 +188,7 @@ public class AttributeTable extends JXTable //implements ComplexContainer
         
         public void mouseClicked(MouseEvent event)
         {
-           logger.debug("mouseClick");
+           logger.debug("mouseClick");//NOI18N
             this.translateMouseEvent(event);
         }
         

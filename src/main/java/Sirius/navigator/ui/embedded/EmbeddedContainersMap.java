@@ -27,7 +27,7 @@ public class EmbeddedContainersMap extends AbstractEmbeddedComponentsMap
         }
         else
         {
-            logger.error("doAdd(): object '" + component + "' is not of type 'Sirius.navigator.ui.embedded.EmbeddedContainer' but '" + component.getClass().getName() + "'");
+            logger.error("doAdd(): object '" + component + "' is not of type 'Sirius.navigator.ui.embedded.EmbeddedContainer' but '" + component.getClass().getName() + "'");//NOI18N
         }
     }
     
@@ -39,7 +39,7 @@ public class EmbeddedContainersMap extends AbstractEmbeddedComponentsMap
         }
         else
         {
-            logger.error("doRemove(): object '" + component + "' is not of type 'Sirius.navigator.ui.embedded.EmbeddedContainer' but '" + component.getClass().getName() + "'");
+            logger.error("doRemove(): object '" + component + "' is not of type 'Sirius.navigator.ui.embedded.EmbeddedContainer' but '" + component.getClass().getName() + "'");//NOI18N
         }
     }   
 }

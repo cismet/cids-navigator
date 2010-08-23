@@ -27,7 +27,7 @@ public class ClassCacheMultiple {
                 addInstance(domain);
                 ret = allClassCaches.get(domain);
             } catch (Exception e) {
-                log.debug("Fehler in setInstance vom ClassCacheMultiple", e);
+                log.debug("Error in setInstance of ClassCacheMultiple", e);//NOI18N
             }
         }
         return ret;
@@ -40,7 +40,7 @@ public class ClassCacheMultiple {
                 addInstance(domain);
                 ret = allTableNameClassCaches.get(domain);
             } catch (Exception e) {
-                log.debug("Fehler in setInstance vom ClassCacheMultiple", e);
+                log.debug("Error in setInstance of ClassCacheMultiple", e);//NOI18N
             }
         }
         return ret;
@@ -51,7 +51,7 @@ public class ClassCacheMultiple {
             final Hashtable ht = getTableNameHashtableOfClassesForOneDomain(domain);
             return (MetaClass) ht.get(tableName.toLowerCase());
         } catch (Exception e) {
-            log.warn("Couldn't get Class for Table " + tableName + "@" + domain, e);
+            log.warn("Couldn't get Class for Table " + tableName + "@" + domain, e);//NOI18N
             return null;
         }
     }
@@ -66,7 +66,7 @@ public class ClassCacheMultiple {
             allClassCaches.put(domain, getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
-            log.error("Fehler in setInstance vom ClassCacheMultiple", connectionException);
+            log.error("Error in setInstance of ClassCacheMultiple", connectionException);//NOI18N
         }
     }
 
@@ -76,7 +76,7 @@ public class ClassCacheMultiple {
             allClassCaches.put(domain, getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
-            log.error("Fehler in setInstance vom ClassCacheMultiple", connectionException);
+            log.error("Error in setInstance of ClassCacheMultiple", connectionException);//NOI18N
         }
     }
 

@@ -27,7 +27,7 @@ import Sirius.navigator.plugin.*;
  */
 public class MetaAttributeEditorLocator implements EditorLocator
 {
-    public final static String EDITOR_JAR_PATH = "/editor/editor.jar";
+    public final static String EDITOR_JAR_PATH = "/editor/editor.jar";//NOI18N
     public final static Class DEFAULT_COMPLEX_EDITOR = DefaultComplexMetaAttributeEditor.class;
     public final static Class DEFAULT_COMPLEX_ARRAY_EDITOR = DefaultComplexMetaAttributeArrayEditor.class;
     public final static Class DEFAULT_READONLY_EDITOR = ReadOnlyMetaAttributeEditor.class;
@@ -47,13 +47,15 @@ public class MetaAttributeEditorLocator implements EditorLocator
             
             try
             {
-                logger.info("MetaAttributeEditorLocator(): initializing and loading editor jar: "  + editorJARPath);
+                if (logger.isInfoEnabled()) {
+                    logger.info("MetaAttributeEditorLocator(): initializing and loading editor jar: "  + editorJARPath);//NOI18N
+                }
                 URL[] urls = new URL[]{new URL(editorJARPath)};
                 this.classLoader = new PluginClassLoader(urls, this.getClass().getClassLoader());
             }
             catch(Throwable t)
             {
-                logger.error("MetaAttributeEditorLocator(): could not load editor jar: " + editorJARPath);
+                logger.error("MetaAttributeEditorLocator(): could not load editor jar: " + editorJARPath);//NOI18N
                 this.classLoader = this.getClass().getClassLoader();
             }
         }
@@ -63,20 +65,20 @@ public class MetaAttributeEditorLocator implements EditorLocator
     {
         if(value instanceof Attribute)
         {
-            if(logger.isDebugEnabled())logger.debug("getEditors(value) value is a meta attribute, retrieving meta object");
+            if(logger.isDebugEnabled())logger.debug("getEditors(value) value is a meta attribute, retrieving meta object");//NOI18N
             Attribute metaAttribute = (Attribute)value;
             return this.getEditors(metaAttribute.getValue());
         }
         else if(value instanceof MetaObject)
         {
             MetaObject MetaObject = (MetaObject)value;
-            if(logger.isDebugEnabled())logger.debug("getEditors(value) value is a meta object (" + MetaObject.getName() + ")");
+            if(logger.isDebugEnabled())logger.debug("getEditors(value) value is a meta object (" + MetaObject.getName() + ")");//NOI18N
             
             return this.getEditors(MetaObject.getAttributes());
         }
         else
         {
-            logger.error("getEditor(value): " + value.getClass().getName() + " is not supported by this editor locator");
+            logger.error("getEditor(value): " + value.getClass().getName() + " is not supported by this editor locator");//NOI18N
             return new HashMap();
         }
     }
@@ -91,29 +93,29 @@ public class MetaAttributeEditorLocator implements EditorLocator
             Object key = iterator.next();
             Attribute attribute = (Attribute)metaAttributes.get(key);
             
-            if(logger.isDebugEnabled())logger.debug("hash map key: " + key + " | attribute key: " + attribute.getKey());
+            if(logger.isDebugEnabled())logger.debug("hash map key: " + key + " | attribute key: " + attribute.getKey());//NOI18N
             BasicEditor editor = this.getEditor(attribute);
             
             if(editor != null)
             {
-                if(logger.isDebugEnabled())logger.debug("getEditors(MetaObject): adding new editor with id " + key);
+                if(logger.isDebugEnabled())logger.debug("getEditors(MetaObject): adding new editor with id " + key);//NOI18N
                 editorsMap.put(key, editor);
             }
             else
             {
-                logger.warn("no editor found for '" + attribute.getName() + "' using default read only editor");
+                logger.warn("no editor found for '" + attribute.getName() + "' using default read only editor");//NOI18N
                 BasicEditor readOnlyEditor = this.createEditor(ReadOnlyMetaAttributeEditor.class);
                 editorsMap.put(key, readOnlyEditor);
             }
         }
         
-        if(editorsMap.size() == 0)logger.warn("getEditors(metaAttributes): no attributes / editors found");
+        if(editorsMap.size() == 0)logger.warn("getEditors(metaAttributes): no attributes / editors found");//NOI18N
         return editorsMap;
     }
     
     protected Class createEditorClass(String editorClassName)
     {
-        if(logger.isDebugEnabled())logger.debug("createEditorClass(): creating new editor '" + editorClassName + "'");
+        if(logger.isDebugEnabled())logger.debug("createEditorClass(): creating new editor '" + editorClassName + "'");//NOI18N
         if(editorClassName != null)
         {
             try
@@ -123,7 +125,7 @@ public class MetaAttributeEditorLocator implements EditorLocator
             }
             catch(Throwable t)
             {
-                logger.error("createEditorClass(): could not create editor '" + editorClassName + "' instance", t);
+                logger.error("createEditorClass(): could not create editor '" + editorClassName + "' instance", t);//NOI18N
             }
         }
         
@@ -141,7 +143,7 @@ public class MetaAttributeEditorLocator implements EditorLocator
             }
             catch(Throwable t)
             {
-                logger.error("createEditor(): could not create editor '" + editorClass.getName() + "' instance", t);
+                logger.error("createEditor(): could not create editor '" + editorClass.getName() + "' instance", t);//NOI18N
             }
         }
         
@@ -153,21 +155,22 @@ public class MetaAttributeEditorLocator implements EditorLocator
         if(value instanceof Attribute)
         {
             Sirius.server.localserver.attribute.ObjectAttribute objectAttribute = (Sirius.server.localserver.attribute.ObjectAttribute)value;
-            logger.info("getEditor(): searching editor for meta attribute '" + objectAttribute.getName() + "' (" + objectAttribute.getID() + ")");
-            
-            logger.info("objectAttribute.getName() .is Visible: " + objectAttribute.isVisible());
+            if (logger.isInfoEnabled()) {
+                logger.info("getEditor(): searching editor for meta attribute '" + objectAttribute.getName() + "' (" + objectAttribute.getID() + ")");//NOI18N
+                logger.info("objectAttribute.getName() .is Visible: " + objectAttribute.isVisible());//NOI18N
+            }
             if(objectAttribute.isVisible() || !this.isIgnoreInvisibleAttributes())
             {
                 BasicEditor simpleEditor = this.createEditor(this.createEditorClass(objectAttribute.getSimpleEditor()));
                 if(simpleEditor != null && objectAttribute.referencesObject())// && objectAttribute.isSubstitute())
                 {
-                    if(logger.isDebugEnabled())logger.debug("getEditor(): attribute '" + objectAttribute.getName() + "' is complex (references object)");
+                    if(logger.isDebugEnabled())logger.debug("getEditor(): attribute '" + objectAttribute.getName() + "' is complex (references object)");//NOI18N
                     Class complexEditorClass = null;
                     
                     // xxx
                     if(objectAttribute.isArray())
                     {
-                        if(logger.isDebugEnabled())logger.debug("getEditor(): attribute is an array, using " + MetaAttributeEditorLocator.DEFAULT_COMPLEX_ARRAY_EDITOR);
+                        if(logger.isDebugEnabled())logger.debug("getEditor(): attribute is an array, using " + MetaAttributeEditorLocator.DEFAULT_COMPLEX_ARRAY_EDITOR);//NOI18N
                         
                         /*try
                         {
@@ -197,7 +200,7 @@ public class MetaAttributeEditorLocator implements EditorLocator
                     
                     if(complexEditorClass == null || !ComplexEditor.class.isAssignableFrom(complexEditorClass))
                     {
-                        logger.error(complexEditorClass + " is no complax editor, selecting DefaultComplexEditor");
+                        logger.error(complexEditorClass + " is no complax editor, selecting DefaultComplexEditor");//NOI18N
                         complexEditorClass = DEFAULT_COMPLEX_EDITOR;
                     }
                     
@@ -206,16 +209,18 @@ public class MetaAttributeEditorLocator implements EditorLocator
                 
                 return simpleEditor;
             }
-            else if(logger.isDebugEnabled())
+            else 
             {
-                logger.warn("getEditor(): attribute '" + objectAttribute.getName() + "' is invisible, ignoring attribute");
+                logger.warn("getEditor(): attribute '" + objectAttribute.getName() + "' is invisible, ignoring attribute");//NOI18N
             }
         }
         else if(value instanceof MetaObject)
         {
             
             MetaObject MetaObject = (MetaObject)value;
-            logger.info("getEditor(): searching editor for meta object editorname=" + MetaObject.getComplexEditor() + " ");
+            if (logger.isInfoEnabled()) {
+                logger.info("getEditor(): searching editor for meta object editorname=" + MetaObject.getComplexEditor() + " ");//NOI18N
+            }
             /*BasicEditor simpleEditor = this.createEditor(this.createEditorClass(MetaObject.getSimpleEditor()));
             Class complexEditor = this.createEditorClass(MetaObject.getComplexEditor());
              
@@ -233,7 +238,7 @@ public class MetaAttributeEditorLocator implements EditorLocator
                     return editor;
                 }
                 catch (Exception e) {
-                    logger.fatal("MetaObjectEditorsuche Exception",e);
+                    logger.fatal("MetaObjectEditorsuche Exception",e);//NOI18N
                     return null;
                 }
                 
@@ -242,7 +247,7 @@ public class MetaAttributeEditorLocator implements EditorLocator
         }
         else
         {
-            logger.error("getEditor(): " + value.getClass().getName() + " is not supported by this editor locator");
+            logger.error("getEditor(): " + value.getClass().getName() + " is not supported by this editor locator");//NOI18N
         }
         
         return null;
@@ -250,7 +255,7 @@ public class MetaAttributeEditorLocator implements EditorLocator
     
     public java.util.Map getEditors(java.util.Collection collection)
     {
-        logger.error("the method 'getEditors(java.util.Collection collection)' ist not supported by this implementation");
+        logger.error("the method 'getEditors(java.util.Collection collection)' ist not supported by this implementation");//NOI18N
         return new java.util.HashMap();
     }
 

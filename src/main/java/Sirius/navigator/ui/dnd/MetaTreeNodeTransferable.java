@@ -51,7 +51,7 @@ public class MetaTreeNodeTransferable implements MetaTransferable
             }
             else
             {
-                Logger.getLogger(MetaTreeNodeTransferable.class).warn("getTransferData(): UnsupportedFlavorException");
+                Logger.getLogger(MetaTreeNodeTransferable.class).warn("getTransferData(): UnsupportedFlavorException");//NOI18N
                 throw new UnsupportedFlavorException(flavor);
             }
         }
@@ -70,20 +70,20 @@ public class MetaTreeNodeTransferable implements MetaTransferable
             try
             {
                 // MetaTreeNode
-                String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + DefaultMetaTreeNode.class.getName();
+                String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + DefaultMetaTreeNode.class.getName();//NOI18N
                 DataFlavor dataFlavor = new DataFlavor(mimeType);
-                dataFlavor.setHumanPresentableName("a DefaultMetaTreeNode");
+                dataFlavor.setHumanPresentableName("a DefaultMetaTreeNode");//NOI18N
                 dataFlavors[0] = dataFlavor;
                 
                 // Collection of nodes
-                mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + java.util.Collection.class.getName();
+                mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + java.util.Collection.class.getName();//NOI18N
                 dataFlavor = new DataFlavor(mimeType);
-                dataFlavor.setHumanPresentableName("a java.util.Collection of Sirius.navigator.types.treenode.DefaultMetaTreeNode objects");
+                dataFlavor.setHumanPresentableName("a java.util.Collection of Sirius.navigator.types.treenode.DefaultMetaTreeNode objects");//NOI18N
                 dataFlavors[1] = dataFlavor;
             }
             catch (ClassNotFoundException cnfe)
             {
-                Logger.getLogger(MetaTreeNodeTransferable.class).error("getTransferDataFlavors() could not create DnD data flavours", cnfe);
+                Logger.getLogger(MetaTreeNodeTransferable.class).error("getTransferDataFlavors() could not create DnD data flavours", cnfe);//NOI18N
                 dataFlavors = new DataFlavor[0];
             }
         }

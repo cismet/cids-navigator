@@ -87,9 +87,9 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
         // FUSE initialisieren
         FuseLoader.load();
         // Ressourcen hierarchisch rekursiv nach oben einfuegen
-        ResourceInjector.get("coolpanel.style").inject(true, getInstance());
-        gradientColorTop = javax.swing.UIManager.getDefaults().getColor("Button.shadow");
-        gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");
+        ResourceInjector.get("coolpanel.style").inject(true, getInstance());//NOI18N
+        gradientColorTop = javax.swing.UIManager.getDefaults().getColor("Button.shadow");//NOI18N
+        gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");//NOI18N
         mapBounds = null;
         cacheImage = null;
         noTitlePanel = true;
@@ -105,7 +105,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
         gradientImage = null;
         try {
             final SAXBuilder builder = new SAXBuilder(false);
-            final Document doc = builder.build(getClass().getResource("/coolobjectrenderer/backgroundWMS.xml"));
+            final Document doc = builder.build(getClass().getResource("/coolobjectrenderer/backgroundWMS.xml"));//NOI18N
             final Element prefs = doc.getRootElement();
 
             swms = new SimpleWMS(prefs);
@@ -130,13 +130,13 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
                             getSpinner().setVisible(false);
                         }
                         createBackground(erg);
-                        log.debug("MapRetrieval FERTIG");
+                        log.debug("MapRetrieval completed");//NOI18N
                     } else {
                         if (getSpinner() != null) {
                             getSpinner().setVisible(false);
                         }
 
-                        log.warn("kein image");
+                        log.warn("no image");//NOI18N
                     }
                 }
 
@@ -150,11 +150,11 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
                 }
 
                 public void retrievalStarted(final RetrievalEvent retrievalEvent) {
-                    log.debug("retrievalStarted");
+                    log.debug("retrievalStarted");//NOI18N
                 }
             });
         } catch (Exception e) {
-            log.error("Fehler beim Laden der KartenInfo", e);
+            log.error("Error while loading the map info", e);//NOI18N
             if (getSpinner() != null) {
                 getSpinner().setVisible(false);
             }
@@ -278,7 +278,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
 
                     // Karte in Ausschnitt zeichnen
                     if (getMap() != null) {
-                        log.info("CoolPanel: Zeichne kleine Karte");
+                        log.info("CoolPanel: draw small map");//NOI18N
                         bg.setColor(colorMapBorder);
                         bg.setComposite(AlphaComposite.Clear);
                         if (b.width < getMap().getWidth()) {
@@ -422,7 +422,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
      * Interne Methode die den WMS-Server anstoesst eine neue Karte zu liefern.
      */
     private void mapIt() {
-        log.debug("MAPIT");
+        log.debug("MAPIT");//NOI18N
         try {
             if (getSpinner() != null && !getSpinner().isVisible()) {
                 getSpinner().setVisible(true);
@@ -504,7 +504,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
                 swms.retrieve(true);
 
             } else {
-                log.debug("Kein Geometry-Object vor  handen.");
+                log.debug("No geometry object available.");//NOI18N
                 if (getSpinner() != null) {
                     getSpinner().setVisible(false);
                 }
@@ -512,7 +512,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
 
             }
         } catch (Exception e) {
-            log.warn("Fehler beim Darstellen der Karte.", e);
+            log.warn("Error while displaying the map.", e);//NOI18N
             if (getSpinner() != null) {
                 getSpinner().setVisible(false);
             }

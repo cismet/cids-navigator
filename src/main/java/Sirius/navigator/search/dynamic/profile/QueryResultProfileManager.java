@@ -52,7 +52,7 @@ public class QueryResultProfileManager extends ProfileManager
     {
         super(dialog, profileType);
         this.searchTree = searchTree;
-        this.setTitle(ResourceManager.getManager().getString("dialog.profile.search.results.title"));
+        this.setTitle(org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.title"));//NOI18N
         
         this.initQueryResultProfileManager();
     }
@@ -61,7 +61,7 @@ public class QueryResultProfileManager extends ProfileManager
     {
         super(frame, profileType);
         this.searchTree = searchTree;
-        this.setTitle(ResourceManager.getManager().getString("dialog.profile.search.results.title"));
+        this.setTitle(org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.title"));//NOI18N
         
         this.initQueryResultProfileManager();
     }
@@ -90,15 +90,17 @@ public class QueryResultProfileManager extends ProfileManager
         try
         {
             userInfo = this.getQueryInfos();
-            logger.debug("updateQueryResultProfileManager(): userInfo.length: " + userInfo.length);
+            logger.debug("updateQueryResultProfileManager(): userInfo.length: " + userInfo.length);//NOI18N
         }
         catch(Exception exp)
         {
             exp.printStackTrace();
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.error.message") ,
-                    ResourceManager.getManager().getString("dialog.profile.search.results.error"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.updateQueryResultProfileManager().searchResultsWarning.message") ,//NOI18N
+                    org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.updateQueryResultProfileManager().searchResultsWarning.title"),//NOI18N
+                    JOptionPane.WARNING_MESSAGE);
             
-            logger.error("could not load user info", exp);
+            logger.error("could not load user info", exp);//NOI18N
         }
         
         updateProfileTree();
@@ -146,7 +148,9 @@ public class QueryResultProfileManager extends ProfileManager
     {
         try
         {
-            logger.debug("loading query result'" + filename + "'");
+            if (logger.isDebugEnabled()) {
+                logger.debug("loading query result'" + filename + "'");//NOI18N
+            }
             String path=PropertyManager.getManager().getProfilesPath();
            
             File inputFile = new File(path, filename);
@@ -157,17 +161,18 @@ public class QueryResultProfileManager extends ProfileManager
             searchTree.setResultNodes((Node[])ois.readObject());
             ois.close();
             
-            updateQueryResultProfileManager(); ;
-            logger.debug("<SEARCH PROFILE> Load QueryResult");
+            updateQueryResultProfileManager();
+            logger.debug("<SEARCH PROFILE> Load QueryResult");//NOI18N
             
             newNodesLoaded = true;
             
         }
         catch(Throwable t)
         {
-            logger.error("Fehler beim laden der profile:", t);
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.load.error.message"),
-                    ResourceManager.getManager().getString("dialog.profile.search.results.load.error"),
+            logger.error("Error while loading profiles:", t);//NOI18N
+            JOptionPane.showMessageDialog(this,
+                    org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.loadSearchResults().loadSearchResultsError.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.loadSearchResults().loadSearchResultsError.title"),//NOI18N
                     JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -175,20 +180,22 @@ public class QueryResultProfileManager extends ProfileManager
     public void actionPerformed(ActionEvent e)
     {
         QueryInfo selectedQueryResultInfo = (QueryInfo)getSelectedInfo();
-        if(logger.isDebugEnabled())logger.debug("selectedQueryResultInfo: '" + getSelectedInfo() + "'");
+        if(logger.isDebugEnabled())logger.debug("selectedQueryResultInfo: '" + getSelectedInfo() + "'");//NOI18N
         
-        if(e.getActionCommand().equals("close"))
+        if(e.getActionCommand().equals("close"))//NOI18N
         {
             dispose();
         }
-        else if(e.getActionCommand().equals("save"))
+        else if(e.getActionCommand().equals("save"))//NOI18N
         {
             try
             {
                 if(searchTree.getResultNodes() == null)
                 {
-                    JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.error.message") ,
-                            ResourceManager.getManager().getString("dialog.profile.search.results.error"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).searchResultsWarning.message"), //NOI18N
+                            org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).searchResultsWarning.title"),//NOI18N
+                            JOptionPane.WARNING_MESSAGE);
                     return;
                 }
                 
@@ -204,7 +211,9 @@ public class QueryResultProfileManager extends ProfileManager
                 
                 if(profileSaveDialog.isAccepted())
                 {
-                    logger.debug("saving query result as '" + this.profileSaveDialog.getSelectedProfileName() + "'");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("saving query result as '" + this.profileSaveDialog.getSelectedProfileName() + "'");//NOI18N
+                    }
                     File profilesPath = new File(PropertyManager.getManager().getProfilesPath());
                     if(profilesPath.exists() || profilesPath.mkdirs())
                     {
@@ -219,8 +228,9 @@ public class QueryResultProfileManager extends ProfileManager
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.save.nodir.message"),
-                                ResourceManager.getManager().getString("dialog.profile.search.results.save.error"),
+                        JOptionPane.showMessageDialog(this,
+                                org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).noDirError.message"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).noDirError.title"),//NOI18N
                                 JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -228,19 +238,20 @@ public class QueryResultProfileManager extends ProfileManager
             catch(Throwable t)
             {
                 // TODO display error dialog
-                logger.error("Fehler beim speichern der profile:", t);
+                logger.error("Error while saving profiles:", t);//NOI18N
             }
         }
         else if(selectedQueryResultInfo != null)
         {
-            if(e.getActionCommand().equals("load"))
+            if(e.getActionCommand().equals("load"))//NOI18N
             {
                 loadSearchResults(selectedQueryResultInfo.getFileName());
             }
-            else if(e.getActionCommand().equals("delete"))
+            else if(e.getActionCommand().equals("delete"))//NOI18N
             {
-                logger.debug("deleting query result'" + selectedQueryResultInfo.getFileName() + "'");
-                
+                if (logger.isDebugEnabled()) {
+                    logger.debug("deleting query result'" + selectedQueryResultInfo.getFileName() + "'");//NOI18N
+                }
                 try
                 {
                     File inputFile = new File(PropertyManager.getManager().getProfilesPath(), selectedQueryResultInfo.getFileName());
@@ -248,9 +259,10 @@ public class QueryResultProfileManager extends ProfileManager
                 }
                 catch(Throwable t)
                 {
-                    logger.error("Fehler beim l\u00F6schen der profile:", t);
-                    JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.delete.error.message"),
-                            ResourceManager.getManager().getString("dialog.profile.search.results.delete.error"),
+                    logger.error("Error while deleting profiles:", t);//NOI18N
+                    JOptionPane.showMessageDialog(this,
+                            org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).deleteError.message"),//NOI18N
+                            org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).deleteError.title"),//NOI18N
                             JOptionPane.ERROR_MESSAGE);
                 }
                 
@@ -260,8 +272,9 @@ public class QueryResultProfileManager extends ProfileManager
         else
         {
             //_TA_JOptionPane.showMessageDialog(this, "Bitte waehlen Sie zuerst ein "+profileTypeName+" aus.", "Keine Selektion", JOptionPane.WARNING_MESSAGE);
-            JOptionPane.showMessageDialog(this, ResourceManager.getManager().getString("dialog.profile.search.results.noprofile.message"),
-                    ResourceManager.getManager().getString("dialog.profile.search.results.noprofile"),
+            JOptionPane.showMessageDialog(this,
+                    org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).noProfileWarning.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(QueryResultProfileManager.class, "QueryResultProfileManager.actionPerformed(ActionEvent).noProfileWarning.title"),//NOI18N
                     JOptionPane.WARNING_MESSAGE);
         }
     }
@@ -282,12 +295,16 @@ public class QueryResultProfileManager extends ProfileManager
             
             if(profiles != null)
             {
-                logger.debug(profiles.length + " profiles found in '" + PropertyManager.getManager().getProfilesPath() + "'");
+                if (logger.isDebugEnabled()) {
+                    logger.debug(profiles.length + " profiles found in '" + PropertyManager.getManager().getProfilesPath() + "'");//NOI18N
+                }
                 QueryInfo[] infos = new QueryInfo[profiles.length];
                 for(int i = 0; i < profiles.length; i++)
                 {
                     // omg
-                    logger.debug("filename: '" + profiles[i].getName() + "'");
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("filename: '" + profiles[i].getName() + "'");//NOI18N
+                    }
                     QueryInfo info = new QueryInfo(i,profiles[i].getName(),profiles[i].getName(),profiles[i].getName());
                     infos[i] = info;
                 }
@@ -296,12 +313,12 @@ public class QueryResultProfileManager extends ProfileManager
             }
             else
             {
-                logger.warn("no profiles found!");
+                logger.warn("no profiles found!");//NOI18N
             }
         }
         catch(Exception exp)
         {
-            logger.error("could not load search results", exp);
+            logger.error("could not load search results", exp);//NOI18N
         }
         
         return new QueryInfo[0];

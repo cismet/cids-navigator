@@ -52,7 +52,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
     /** Creates new form SearchProgressDialog */
     public SearchProgressDialog(JDialog parent, DefaultStatusChangeSupport statusChangeSupport)
     {
-        super(parent, ResourceManager.getManager().getString("search.dialog.progress.title"), true);
+        super(parent, 
+                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.title"),//NOI18N
+                true);
         
         this.logger = Logger.getLogger(this.getClass());
         
@@ -61,7 +63,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
         
         initComponents();
         
-        this.animationLabel = new MutableImageLabel(ResourceManager.getManager().getIcon("SearchIcon01.gif"),  ResourceManager.getManager().getIcon("SearchIcon02.gif"));
+        this.animationLabel = new MutableImageLabel(
+                resources.getIcon("SearchIcon01.gif"),//NOI18N
+                resources.getIcon("SearchIcon02.gif"));//NOI18N
         this.iconPanel.add(this.animationLabel, BorderLayout.CENTER);        
         this.cancelButton.addActionListener(new ButtonListener());
         
@@ -74,13 +78,13 @@ public class SearchProgressDialog extends javax.swing.JDialog
     {
         if(this.searchThread != null && this.searchThread.isAlive())
         {
-            logger.warn("search thread is still running");
+            logger.warn("search thread is still running");//NOI18N
             
             try
             {
                 // TODO display warning message
                 this.searchThread.join();
-                logger.debug("searchThread.join() successfull");
+                logger.debug("searchThread.join() successfull");//NOI18N
             }
             catch(InterruptedException iexp)
             {
@@ -88,7 +92,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
             }
         }
         
-        this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.running"), Status.MESSAGE_POSITION_2, Status.ICON_IGNORE, Status.ICON_BLINKING);
+        this.statusChangeSupport.fireStatusChange(
+                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.show(Collection,Collection).status.running"),//NOI18N
+                Status.MESSAGE_POSITION_2, Status.ICON_IGNORE, Status.ICON_BLINKING);
         this.animationLabel.switchOn(true);
         //this.setResultNodes(null);
         this.setSearchResult(null);
@@ -98,7 +104,7 @@ public class SearchProgressDialog extends javax.swing.JDialog
 //        searchThread.start();
         CismetThreadPool.execute(searchThread);
         
-        if(logger.isDebugEnabled())logger.debug("waiting for search thread to finish");
+        if(logger.isDebugEnabled())logger.debug("waiting for search thread to finish");//NOI18N
         //this.pack();
         super.show();
     }
@@ -148,7 +154,9 @@ public class SearchProgressDialog extends javax.swing.JDialog
     {
         public void actionPerformed(ActionEvent e)
         {
-            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.canceld"), Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
+            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+                    org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.ButtonListener.actionPerformed(ActionEvent).status.canceled"),//NOI18N
+                    Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
             SearchProgressDialog.this.animationLabel.switchOff(true);
             SearchProgressDialog.this.setCanceld(true);
             //SearchProgressDialog.this.setResultNodes(null);
@@ -176,7 +184,7 @@ public class SearchProgressDialog extends javax.swing.JDialog
         
         private SearchThread(Collection classNodeKeys, Collection searchOptions)
         {
-            super("SearchThread");
+            super("SearchThread");//NOI18N
             
             this.logger = Logger.getLogger(this.getClass());
             
@@ -186,8 +194,8 @@ public class SearchProgressDialog extends javax.swing.JDialog
         
         public void run()
         {
-            logger.info("starting new search with ");
-            if(logger.isDebugEnabled())logger.debug("# classNodeKeys: " + classNodeKeys.size() + ", #  searchOptions: " + searchOptions.size());
+            logger.info("starting new search with ");//NOI18N
+            if(logger.isDebugEnabled())logger.debug("# classNodeKeys: " + classNodeKeys.size() + ", #  searchOptions: " + searchOptions.size());//NOI18N
             
             if(!SearchProgressDialog.this.isCanceld())
             {
@@ -195,12 +203,12 @@ public class SearchProgressDialog extends javax.swing.JDialog
                 {
                     if(this.classNodeKeys != null && this.classNodeKeys.size() > 0)
                     {
-                        logger.debug("performing search with class ids");
+                        logger.debug("performing search with class ids");//NOI18N
                         this.searchResult = SessionManager.getProxy().search(this.classNodeKeys, this.searchOptions);
                     }
                     else
                     {
-                        logger.debug("performing search without class ids");
+                        logger.debug("performing search without class ids");//NOI18N
                         this.searchResult = SessionManager.getProxy().search(this.searchOptions);
                     }
                     
@@ -210,22 +218,28 @@ public class SearchProgressDialog extends javax.swing.JDialog
                         
                         if(this.searchResult.isNode() && this.searchResult.getNodes() != null && this.searchResult.getNodes().length > 0)
                         {
-                            logger.info(this.searchResult.getNodes().length + " nodes found");
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(this.searchResult.getNodes().length + SearchProgressDialog.this.resources.getString("search.dialog.progress.status.results"), Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                            if (logger.isInfoEnabled()) {
+                                logger.info(this.searchResult.getNodes().length + " nodes found");//NOI18N
+                            }
+                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(this.searchResult.getNodes().length +
+                                    org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.SearchThread.run().status.results"),//NOI18N
+                                    Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                         }
                         else if(this.searchResult.isObject())
                         {
-                            logger.info(this.searchResult.getObjects().length + " meta objects found");
+                            logger.info(this.searchResult.getObjects().length + " meta objects found");//NOI18N
                         }
                         else if(this.searchResult.isSearchParameter())
                         {
-                            logger.debug("searchParameter found");
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange("", Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                            logger.debug("searchParameter found");//NOI18N
+                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange("", Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);//NOI18N
                         }
                         else if(logger.isDebugEnabled())
                         {
-                            logger.warn("no search results found: " + this.searchResult.getResult() + "(" + this.searchResult.getResult().getClass() + ")");                            
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.noresults"), Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                            logger.warn("no search results found: " + this.searchResult.getResult() + "(" + this.searchResult.getResult().getClass() + ")");//NOI18N
+                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+                                    org.openide.util.NbBundle.getMessage(SearchProgressDialog.class,"SearchProgressDialog.SearchThread.run().status.noresults"),//NOI18N
+                                    Status.MESSAGE_POSITION_2, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
                         }
                         
                         SearchProgressDialog.this.dispose();
@@ -233,14 +247,19 @@ public class SearchProgressDialog extends javax.swing.JDialog
                 }
                 catch(Throwable t)
                 {
-                    logger.error("could not perform search", t);
+                    logger.error("could not perform search", t);//NOI18N
                     SearchProgressDialog.this.setSearchResult(null);
                     SearchProgressDialog.this.animationLabel.switchOff(true);
 
                     if(!SearchProgressDialog.this.isCanceld())
                     {
-                        SearchProgressDialog.this.statusChangeSupport.fireStatusChange(SearchProgressDialog.this.resources.getString("search.dialog.progress.status.error"), Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
-                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR, ResourceManager.getManager().getExceptionName("sx02"), ResourceManager.getManager().getExceptionMessage("sx02"), t);
+                        SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+                                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class,"SearchProgressDialog.SearchThread.run().status.error"),//NOI18N
+                                Status.MESSAGE_POSITION_2, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.ERROR,
+                                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.SearchThread.run().name"),//NOI18N
+                                org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.SearchThread.run().message"),//NOI18N
+                                t);
                         SearchProgressDialog.this.dispose();
                     }    
                 }
@@ -253,34 +272,27 @@ public class SearchProgressDialog extends javax.swing.JDialog
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
-        javax.swing.JPanel buttonPanel;
-        javax.swing.JPanel contentPanel;
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
-        javax.swing.JLabel infoLabel;
 
-        contentPanel = new javax.swing.JPanel();
+        javax.swing.JPanel contentPanel = new javax.swing.JPanel();
         iconPanel = new javax.swing.JPanel();
-        infoLabel = new javax.swing.JLabel();
-        buttonPanel = new javax.swing.JPanel();
+        javax.swing.JLabel infoLabel = new javax.swing.JLabel();
+        javax.swing.JPanel buttonPanel = new javax.swing.JPanel();
         cancelButton = new javax.swing.JButton();
 
-        addWindowListener(new java.awt.event.WindowAdapter()
-        {
-            public void windowClosing(java.awt.event.WindowEvent evt)
-            {
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
                 closeDialog(evt);
             }
         });
 
+        contentPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 0, 5));
         contentPanel.setLayout(new java.awt.GridBagLayout());
 
-        contentPanel.setBorder(new javax.swing.border.EmptyBorder(new java.awt.Insets(5, 5, 0, 5)));
+        iconPanel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(25, 25, 25, 25)));
         iconPanel.setLayout(new java.awt.BorderLayout());
-
-        iconPanel.setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.EtchedBorder(), new javax.swing.border.EmptyBorder(new java.awt.Insets(25, 25, 25, 25))));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -288,8 +300,8 @@ public class SearchProgressDialog extends javax.swing.JDialog
         gridBagConstraints.weighty = 1.0;
         contentPanel.add(iconPanel, gridBagConstraints);
 
-        infoLabel.setText(resources.getString("search.dialog.progress.message"));
-        infoLabel.setBorder(new javax.swing.border.CompoundBorder(new javax.swing.border.EtchedBorder(), new javax.swing.border.EmptyBorder(new java.awt.Insets(25, 25, 25, 25))));
+        infoLabel.setText(org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.infoLabel.text")); // NOI18N
+        infoLabel.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(25, 25, 25, 25)));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -300,18 +312,16 @@ public class SearchProgressDialog extends javax.swing.JDialog
 
         getContentPane().add(contentPanel, java.awt.BorderLayout.CENTER);
 
+        buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         buttonPanel.setLayout(new java.awt.BorderLayout());
 
-        buttonPanel.setBorder(new javax.swing.border.EmptyBorder(new java.awt.Insets(5, 5, 5, 5)));
-        cancelButton.setMnemonic(resources.getButtonMnemonic("cancel"));
-        cancelButton.setText(resources.getButtonText("cancel"));
-        cancelButton.setToolTipText(resources.getButtonTooltip("cancel"));
+        cancelButton.setMnemonic(org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.cancelButton.mnemonic").charAt(0));
+        cancelButton.setText(org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.cancelButton.text")); // NOI18N
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(SearchProgressDialog.class, "SearchProgressDialog.cancelButton.tooltip")); // NOI18N
         buttonPanel.add(cancelButton, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(buttonPanel, java.awt.BorderLayout.SOUTH);
-
-    }
-    // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
     
     /** Closes the dialog */
     private void closeDialog(java.awt.event.WindowEvent evt)//GEN-FIRST:event_closeDialog

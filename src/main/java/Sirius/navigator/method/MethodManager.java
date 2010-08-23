@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import Sirius.server.middleware.types.*;
 import Sirius.server.newuser.permission.*;
 import Sirius.navigator.tools.*;
-import Sirius.navigator.resource.ResourceManager;
+
 import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
@@ -58,6 +58,7 @@ public class MethodManager
     public final static long CLASS_MULTIPLE = 16;
     // public final static long OBJECT_NODE_MULTIPLE = 32;
     // public final static long DOMAIN_MULTIPLE = 64;
+
     
     private final static Logger logger = Logger.getLogger(MethodManager.class);
     
@@ -71,13 +72,12 @@ public class MethodManager
     protected Vector methodVector = new Vector(5,1);
     
     protected boolean wrongParameters = false;
-    
-    private ResourceManager resources;
+  
     
     
     private MethodManager()
     {
-        this.resources = ResourceManager.getManager();
+        
     }
     private final static Object blocker=new Object();
     public final static MethodManager getManager()
@@ -97,7 +97,7 @@ public class MethodManager
     {
         synchronized(blocker)
         {
-            logger.warn("destroying singelton MethodManager instance");
+            logger.warn("destroying singelton MethodManager instance");  // NOI18N
             manager = null;
         }
     }
@@ -423,7 +423,10 @@ public class MethodManager
         {
             if(!((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeResultNodes(ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNodes()))
             {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.special.command.onerootnodeselected"), ResourceManager.getManager().getString("tree.special.command.couldnotdeletenode"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.title"),//NOI18N
+                        JOptionPane.INFORMATION_MESSAGE);
                 //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Bitte stellen Sie sicher, dass sie mindestens einen Knoten selektiert haben,</p><p>und dass es sicht dabei um einen Root-Knoten handelt.</p></html>", "Knoten konnten nicht geloescht werden", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -444,7 +447,10 @@ public class MethodManager
             }
             else
             {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.special.command.onenodeselected"), ResourceManager.getManager().getString("tree.special.command.couldnottransfernode"), JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon2.message"),//NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.callSpecialTreeCommand().JOptionPane_anon2.title"),//NOI18N
+                        JOptionPane.INFORMATION_MESSAGE);
                 //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Bitte stellen Sie sicher, dass sie mindestens einen Knoten selektiert haben.</p></html>", "Knoten konnten nicht uebertragen werden", JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -769,7 +775,7 @@ public class MethodManager
         }
         catch(Throwable t)
         {
-            logger.error("getAvailability() could not comute availabilty",  t);
+            logger.error("getAvailability() could not comute availabilty",  t);  // NOI18N
             availability = 0;
         }
         
@@ -795,7 +801,10 @@ public class MethodManager
     {
         if(resultNodes == null || resultNodes.length < 1)
         {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(), ResourceManager.getManager().getString("search.dialog.noresults"), ResourceManager.getManager().getString("search.dialog.noresults.title"), JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"),//NOI18N
+                    JOptionPane.WARNING_MESSAGE);
         }
         else
         {
@@ -813,7 +822,8 @@ public class MethodManager
     {
         try
         {
-            logger.info("updateNode() updating node " + sourceNode);
+            if(logger.isInfoEnabled())
+                logger.info("updateNode() updating node " + sourceNode);  // NOI18N
             // zuerst l\u00F6schen
             SessionManager.getProxy().deleteNode(sourceNode.getNode());
             
@@ -824,12 +834,12 @@ public class MethodManager
         }
         catch(Exception exp)
         {
-            logger.error("deleteNode() could not update node " + sourceNode, exp);
+            logger.error("deleteNode() could not update node " + sourceNode, exp);  // NOI18N
             // XXX i18n
             ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.updateNode.updateError"),
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.updateNode.updateErrorText1") + sourceNode +
-                    ResourceManager.getManager().getString("Sirius.navigator.method.MethodManager.updateNode.updateErrorText2"), exp);
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.updateNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.title"),  // NOI18N
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.updateNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.message", sourceNode),  // NOI18N
+                    exp);
         }
         
         return false;
@@ -838,18 +848,24 @@ public class MethodManager
     
     public boolean deleteNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode sourceNode)
     {
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.delete.1") + sourceNode + resources.getString("tree.method.node.delete.2"), resources.getString("tree.method.node.delete.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message", sourceNode),  // NOI18N
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"),  // NOI18N
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"),  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")},  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit")))  // NOI18N
         {
             try
             {
-                logger.info("deleteNode() deleting node " + sourceNode);
+                if(logger.isInfoEnabled())
+                    logger.info("deleteNode() deleting node " + sourceNode);  // NOI18N
                 
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
                 SessionManager.getProxy().deleteNode(sourceNode.getNode());
                 if(sourceNode.isObjectNode())
                 {
-                    if(logger.isDebugEnabled())logger.debug("deleting object node's meta object");
+                    if(logger.isDebugEnabled())logger.debug("deleting object node's meta object");  // NOI18N
                     MetaObject MetaObject = ((ObjectTreeNode)sourceNode).getMetaObject();
                     SessionManager.getProxy().deleteMetaObject(MetaObject, MetaObject.getDomain());
                 }
@@ -860,10 +876,13 @@ public class MethodManager
             }
             catch(Exception exp)
             {
-                logger.error("deleteNode() could not delete node " + sourceNode, exp);
+                logger.error("deleteNode() could not delete node " + sourceNode, exp);  // NOI18N
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.delete.error.title"), resources.getString("tree.method.node.delete.error.1") + sourceNode + resources.getString("tree.method.node.delete.error.2"), exp);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.title"),  // NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.message", sourceNode),  // NOI18N
+                        exp);
             }
         }
         
@@ -877,9 +896,16 @@ public class MethodManager
     
     public boolean copyNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode destinationNode,  DefaultMetaTreeNode sourceNode)
     {
-        logger.info("copy node " + sourceNode + " -> " + destinationNode);
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.copy.1") + sourceNode + resources.getString("tree.method.node.copy.2") + destinationNode + resources.getString("tree.method.node.copy.3"), resources.getString("tree.method.node.copy.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(logger.isInfoEnabled())
+            logger.info("copy node " + sourceNode + " -> " + destinationNode);  // NOI18N
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                ComponentRegistry.getRegistry().getMainWindow(),
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.message", sourceNode, destinationNode),  // NOI18N
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.title"),  // NOI18N
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.commit"),  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")},  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.commit")))  // NOI18N
         {
             try
             {
@@ -891,8 +917,9 @@ public class MethodManager
                     MetaObject oldMetaObject = ((ObjectTreeNode)sourceNodeCopy).getMetaObject();
                     //oldMetaObject.setPrimaryKey(new Integer(-1));
                     oldMetaObject.setPrimaryKeysNull();
-                    
-                    logger.info("copy node(): copy meta object: " + oldMetaObject.getName());
+
+                    if(logger.isInfoEnabled())
+                        logger.info("copy node(): copy meta object: " + oldMetaObject.getName());  // NOI18N
                     MetaObject newMetaObject = SessionManager.getProxy().insertMetaObject(oldMetaObject, sourceNodeCopy.getDomain());
                     
                     // neues objekt zuweisen
@@ -907,8 +934,11 @@ public class MethodManager
             }
             catch(Exception exp)
             {
-                logger.error("could not create copy of node " + sourceNode, exp);
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.clone.error.title"), resources.getString("tree.method.node.clone.error.1") + sourceNode + resources.getString("tree.method.node.clone.title"), exp);
+                logger.error("could not create copy of node " + sourceNode, exp);  // NOI18N
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.title"),  // NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.copyNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.message", sourceNode),  // NOI18N
+                        exp);
             }
         }
         
@@ -917,9 +947,16 @@ public class MethodManager
     
     public boolean moveNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode destinationNode,  DefaultMetaTreeNode sourceNode)
     {
-        logger.info("move node " + sourceNode + " -> " + destinationNode);
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.move.1") + sourceNode + resources.getString("tree.method.node.move.2") + destinationNode + resources.getString("tree.method.node.move.3"), resources.getString("tree.method.node.move.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(logger.isInfoEnabled())
+            logger.info("move node " + sourceNode + " -> " + destinationNode);  // NOI18N
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(
+                ComponentRegistry.getRegistry().getMainWindow(),
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.message", sourceNode, destinationNode),  // NOI18N
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.title"),  // NOI18N
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.commit"),  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")},  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.commit")))  // NOI18N
         {
             try
             {
@@ -936,10 +973,13 @@ public class MethodManager
             }
             catch(Exception exp)
             {
-                logger.error("addNode() could not add node");
+                logger.error("addNode() could not add node");  // NOI18N
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
                 
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.add.error.title"), resources.getString("tree.method.node.add.error.1") + sourceNode + resources.getString("tree.method.node.add.error.2"), exp);
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.title"),  // NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.moveNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.message", sourceNode),  // NOI18N
+                        exp);
             }
         }
         
@@ -951,7 +991,7 @@ public class MethodManager
     {
         if(destinationNode.isLeaf())
         {
-            if(logger.isDebugEnabled())logger.debug("addTreeNode() destinationNode " + destinationNode + " is leaf");
+            if(logger.isDebugEnabled())logger.debug("addTreeNode() destinationNode " + destinationNode + " is leaf");  // NOI18N
             destinationNode.setLeaf(false);
         }
         
@@ -974,7 +1014,7 @@ public class MethodManager
         Object[] removedChildren = new Object[]
         {sourceNode};
         
-        if(logger.isDebugEnabled())logger.debug("removing child node '" + sourceNode + "' from parent node '" + sourceParentNode + "'");
+        if(logger.isDebugEnabled())logger.debug("removing child node '" + sourceNode + "' from parent node '" + sourceParentNode + "'");  // NOI18N
         int[] childIndices = this.getChildIndices(sourceParentNode, sourceNode);
         sourceNode.removeFromParent();
         
@@ -990,7 +1030,8 @@ public class MethodManager
         {
             if(linkOnly)
             {
-                logger.debug("addOrLinkNode(): linking  node: " + sourceNode);
+                if(logger.isDebugEnabled())
+                    logger.debug("addOrLinkNode(): linking  node: " + sourceNode);  // NOI18N
                 
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
                 SessionManager.getProxy().addLink(destinationNode.getNode(), sourceNode.getNode());
@@ -1005,11 +1046,12 @@ public class MethodManager
                 }
                 else
                 {
-                    logger.warn("addNode(): node '" + sourceNode + "' has no parent node'");
+                    logger.warn("addNode(): node '" + sourceNode + "' has no parent node'");  // NOI18N
                     link = new Link(-1, sourceNode.getDomain());
                 }
-                
-                logger.debug("addOrLinkNode(): adding node: " + sourceNode);
+
+                if(logger.isDebugEnabled())
+                    logger.debug("addOrLinkNode(): adding node: " + sourceNode);  // NOI18N
                 
                 ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
                 Node node = SessionManager.getProxy().addNode(sourceNode.getNode(), link);
@@ -1023,10 +1065,13 @@ public class MethodManager
         }
         catch(ConnectionException cexp)
         {
-            logger.error("addOrLinkNode() could not add node " + sourceNode, cexp);
+            logger.error("addOrLinkNode() could not add node " + sourceNode, cexp);  // NOI18N
             ComponentRegistry.getRegistry().getMainWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
             
-            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.add.error.title"), resources.getString("tree.method.node.add.error.1") + sourceNode + resources.getString("tree.method.node.add.error.2"), cexp);
+            ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.addOrLinkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode,boolean).ExceptionManager_anon.title"),  // NOI18N
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.addOrLinkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode,boolean).ExceptionManager_anon.message", sourceNode),  // NOI18N
+                    cexp);
         }
         
         return false;
@@ -1034,9 +1079,15 @@ public class MethodManager
     
     public boolean linkNode(MetaCatalogueTree metaTree, DefaultMetaTreeNode destinationNode,  DefaultMetaTreeNode sourceNode)
     {
-        logger.info("link node " + sourceNode + " -> " + destinationNode);
-        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(), resources.getString("tree.method.node.link.1") + sourceNode + resources.getString("tree.method.node.link.2") + destinationNode + resources.getString("tree.method.node.link.3"), resources.getString("tree.method.node.link.title"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
-        {resources.getString("attribute.viewer.commit"), resources.getString("attribute.viewer.cancel")}, resources.getString("attribute.viewer.commit")))
+        if(logger.isInfoEnabled())
+            logger.info("link node " + sourceNode + " -> " + destinationNode);  // NOI18N
+        if(JOptionPane.YES_NO_OPTION == JOptionPane.showOptionDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.message", sourceNode, destinationNode),  // NOI18N
+                org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.title"),  // NOI18N
+                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, new String[]
+        {org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.commit"),  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")},  // NOI18N
+         org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).JOptionPane_anon.option.commit")))  // NOI18N
         {
             try
             {
@@ -1050,8 +1101,11 @@ public class MethodManager
             }
             catch(CloneNotSupportedException cnse)
             {
-                logger.error("could not create copy of linked node " + sourceNode, cnse);
-                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING, resources.getString("tree.method.node.clone.error.title"), resources.getString("tree.method.node.clone.error.1") + sourceNode + resources.getString("tree.method.node.clone.title"), cnse);
+                logger.error("could not create copy of linked node " + sourceNode, cnse);  // NOI18N
+                ExceptionManager.getManager().showExceptionDialog(ExceptionManager.WARNING,
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.title"),  // NOI18N
+                        org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.linkNode(MetaCatalogueTree,DefaultMetaTreeNode,DefaultMetaTreeNode).ExceptionManager_anon.message", sourceNode),  // NOI18N
+                        cnse);
             }
         }
         
@@ -1069,7 +1123,7 @@ public class MethodManager
             }
         }
         
-        logger.warn("getChildIndices() child index of node " + sourceNode + " not found in parent node " + sourceParentNode);
+        logger.warn("getChildIndices() child index of node " + sourceNode + " not found in parent node " + sourceParentNode);  // NOI18N
         return new int[]
         {-1};
     }
@@ -1082,18 +1136,22 @@ public class MethodManager
         {
             String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
             hasPermission = node.getPermissions().hasPermission(key, permission);
-            
-            logger.debug("Permissins f\u00FCr node"+node+"   "+node.getPermissions()+ "  mit key"+key);
+
+            if(logger.isDebugEnabled())
+                logger.debug("Permissions for node"+node+"   "+node.getPermissions()+ "  with key"+key);  // NOI18N
         }
         catch(Exception exp)
         {
-            logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node + "'", exp);
+            logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node + "'", exp);  // NOI18N
             hasPermission = false;
         }
         
         if(!hasPermission)
         {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.method.node.nopermission"), ResourceManager.getManager().getString("tree.method.node.nopermission.title"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.checkPermission(Node,Permission).JOptionPane_anon.message"),  // NOI18N
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.checkPermission(Node,Permission).JOptionPane_anon.title"),  // NOI18N
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         
         return hasPermission;
@@ -1113,18 +1171,21 @@ public class MethodManager
             hasPermission = c.getPermissions().hasPermission(key, permission);
             hasPermission &= node.getPermissions().hasPermission(key, permission);
             
-            
-            logger.debug("Check ClassPermissions f\u00FCr node"+node+"   "+c.getPermissions()+ "  mit key"+key);
+            if(logger.isDebugEnabled())
+                logger.debug("Check ClassPermissions for node"+node+"   "+c.getPermissions()+ "  with key"+key);  // NOI18N
         }
         catch(Exception exp)
         {
-            logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node + "'", exp);
+            logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node + "'", exp);  // NOI18N
             hasPermission = false;
         }
         
         if(!hasPermission)
         {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(), ResourceManager.getManager().getString("tree.method.object.nopermission"), ResourceManager.getManager().getString("tree.method.node.nopermission.title"), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.checkPermission(MetaObjectNode,Permission).JOptionPane_anon.message"),  // NOI18N
+                    org.openide.util.NbBundle.getMessage(MethodManager.class, "MethodManager.checkPermission(MetaObjectNode,Permission).JOptionPane_anon.title"),  // NOI18N
+                    JOptionPane.INFORMATION_MESSAGE);
         }
         
         return hasPermission;
@@ -1162,14 +1223,15 @@ public class MethodManager
                 {
                     try
                     {
-                        if(logger.isDebugEnabled())logger.debug("looking for default value for mandantory attribute '" + attribute.getName() + "'");
+                        if(logger.isDebugEnabled())logger.debug("looking for default value for mandantory attribute '" + attribute.getName() + "'");  // NOI18N
                         
                         //String ck =attribute.getClassKey(); //BUG muss attribute.getParentClassKey(); sein
                         
                         //Woraround Anfang
                         if (attribute.isOptional())
                                 {
-                                    logger.debug(attribute.getName() + "is optional. Set it to null");
+                                    if(logger.isDebugEnabled())
+                                        logger.debug(attribute.getName() + "is optional. Set it to null");  // NOI18N
                                     attribute.setValue(null);
                                     attributeName = null;
                                 }
@@ -1214,7 +1276,7 @@ public class MethodManager
                     }
                     catch(Exception exp)
                     {
-                        logger.error("could net set default value of attribute '" + attribute.getName() + "'", exp);
+                        logger.error("could net set default value of attribute '" + attribute.getName() + "'", exp);  // NOI18N
                         attributeName = attribute.getName();
                     }
                 }

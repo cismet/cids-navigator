@@ -183,12 +183,12 @@ class AttributeTableModel extends AbstractTableModel
         
         if(this.showInvisibleAttributes)
         {
-            if(logger.isDebugEnabled())logger.warn("showing invisible attributes");
+            logger.warn("showing invisible attributes");//NOI18N
             this.metaAttributes.addAll(metaAttributes);
         }
         else
         {
-            if(logger.isDebugEnabled())logger.warn("ignoring invisible attributes");
+            logger.warn("ignoring invisible attributes");//NOI18N
             Iterator iterator = metaAttributes.iterator();
             while(iterator.hasNext())
             {

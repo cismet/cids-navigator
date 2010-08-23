@@ -16,7 +16,7 @@ import java.awt.*;
  */
 public interface EditorUIDelegate
 {
-    public final static String ACTIVE_CHILD_EDITOR = "ActiveChildEditor";
+    public final static String ACTIVE_CHILD_EDITOR = "ActiveChildEditor";//NOI18N
     
     /**
      * Zeigt das komplexe Editor UI in diesem Editor an.<p>

@@ -3,7 +3,6 @@ package Sirius.navigator.types.treenode;
 import javax.swing.ImageIcon;
 
 import Sirius.server.middleware.types.*;
-import Sirius.navigator.resource.*;
 
 public class WaitTreeNode extends DefaultMetaTreeNode {
 
@@ -58,50 +57,50 @@ public class WaitTreeNode extends DefaultMetaTreeNode {
 
     //----------------------------------------------------------------------------
     public String toString() {
-        return ResourceManager.getManager().getString("node.wait.name");
+        return org.openide.util.NbBundle.getMessage(WaitTreeNode.class, "WaitTreeNode.toString().returnValue");//NOI18N
     }
 
     public String getDescription() {
-        return ResourceManager.getManager().getString("node.wait.description");
+        return org.openide.util.NbBundle.getMessage(WaitTreeNode.class, "WaitTreeNode.getDescription().returnValue");//NOI18N
     }
 
     public String[][] getAttributes() {
-        logger.warn("method 'getAttributes()' should not be called on WaitNode");
+        logger.warn("method 'getAttributes()' should not be called on WaitNode");//NOI18N
         return null;
     }
 
     public boolean equalsNode(Node node) {
-        logger.warn("method 'equalsNode()' should not be called on WaitNode");
+        logger.warn("method 'equalsNode()' should not be called on WaitNode");//NOI18N
         return false;
     }
 
     public boolean equals(DefaultMetaTreeNode node) {
-        logger.warn("method 'equals()' should not be called on WaitNode");
+        logger.warn("method 'equals()' should not be called on WaitNode");//NOI18N
         return false;
     }
 
     public ImageIcon getOpenIcon() {
-        logger.warn("method 'getOpenIcon()' should not be called on WaitNode");
+        logger.warn("method 'getOpenIcon()' should not be called on WaitNode");//NOI18N
         return null;
     }
 
     public ImageIcon getClosedIcon() {
-        logger.warn("method 'getClosedIcon()' should not be called on WaitNode");
+        logger.warn("method 'getClosedIcon()' should not be called on WaitNode");//NOI18N
         return null;
     }
 
     public ImageIcon getLeafIcon() {
-        logger.warn("method 'getLeafIcon()' should not be called on WaitNode");
+        logger.warn("method 'getLeafIcon()' should not be called on WaitNode");//NOI18N
         return null;
     }
 
     public int getID() {
-        logger.warn("method 'getID()' should not be called on WaitNode");
+        logger.warn("method 'getID()' should not be called on WaitNode");//NOI18N
         return -1;
     }
 
     public String getDomain() {
-        logger.warn("method 'getDomain()' should not be called on WaitNode");
+        logger.warn("method 'getDomain()' should not be called on WaitNode");//NOI18N
         return null;
     }
 

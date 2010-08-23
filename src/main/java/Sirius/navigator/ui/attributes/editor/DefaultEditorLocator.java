@@ -45,7 +45,7 @@ public class DefaultEditorLocator implements EditorLocator
     public Map getEditors(java.util.Collection collection)
     {
         LinkedHashMap editorsMap = new LinkedHashMap();
-        if(logger.isDebugEnabled())logger.debug("value is a list, inspecting elements");
+        if(logger.isDebugEnabled())logger.debug("value is a list, inspecting elements");//NOI18N
         
         int i = 0;
         Iterator iterator = collection.iterator();
@@ -54,12 +54,12 @@ public class DefaultEditorLocator implements EditorLocator
             BasicEditor basicEditor = this.getEditor(iterator.next());
             if(basicEditor != null)
             {
-                if(logger.isDebugEnabled())logger.debug("editor '" + basicEditor.getClass().getName() +  "' found for object '" + i + "'");
+                if(logger.isDebugEnabled())logger.debug("editor '" + basicEditor.getClass().getName() +  "' found for object '" + i + "'");//NOI18N
                 editorsMap.put(new Integer(i), basicEditor);
             }
             else if(logger.isDebugEnabled())
             {
-                logger.warn("no editor found for object '" + i + "'");
+                logger.warn("no editor found for object '" + i + "'");//NOI18N
             }
             
             i++;
@@ -71,7 +71,7 @@ public class DefaultEditorLocator implements EditorLocator
     public Map getEditors(java.util.Map map)
     {
         LinkedHashMap editorsMap = new LinkedHashMap();
-        if(logger.isDebugEnabled())logger.debug("value is a map, inspecting elements");
+        if(logger.isDebugEnabled())logger.debug("value is a map, inspecting elements");//NOI18N
         
         Iterator iterator = map.keySet().iterator();
         while(iterator.hasNext())
@@ -80,12 +80,12 @@ public class DefaultEditorLocator implements EditorLocator
             BasicEditor basicEditor = this.getEditor(map.get(key));
             if(basicEditor != null)
             {
-                if(logger.isDebugEnabled())logger.debug("editor '" + basicEditor.getClass().getName() +  "' found for object '" + key + "'");
+                if(logger.isDebugEnabled())logger.debug("editor '" + basicEditor.getClass().getName() +  "' found for object '" + key + "'");//NOI18N
                 editorsMap.put(key, basicEditor);
             }
-            else if(logger.isDebugEnabled())
+            else
             {
-                logger.warn("no editor found for object '" + key + "'");
+                logger.warn("no editor found for object '" + key + "'");//NOI18N
             }
         }
         
@@ -127,7 +127,7 @@ public class DefaultEditorLocator implements EditorLocator
             }
             catch(Throwable t)
             {
-                logger.error("could not create editor instance of '" + editorClass.getName() + "'", t);
+                logger.error("could not create editor instance of '" + editorClass.getName() + "'", t);//NOI18N
             }
         }
         

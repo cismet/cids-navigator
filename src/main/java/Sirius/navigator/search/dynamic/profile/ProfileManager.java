@@ -26,20 +26,17 @@ package Sirius.navigator.search.dynamic.profile;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.tree.*;
 import javax.swing.border.*;
 
 import org.apache.log4j.Logger;
 
-import Sirius.server.newuser.*;
 import Sirius.server.search.store.QueryInfo;
-import Sirius.navigator.resource.*;
 
 public abstract class ProfileManager extends JDialog implements ActionListener
 {
     protected Logger logger;
-    
+
     public final static int PROFILE = 0;
     public final static int QUERY_PROFILE = 1;
     public final static int QUERY_RESULT_PROFILE = 2;
@@ -78,14 +75,14 @@ public abstract class ProfileManager extends JDialog implements ActionListener
     
     protected void initProfileManager ()
     {
-        String profileTypeName = ResourceManager.getManager ().getString ("dialog.profile.title");
+        String profileTypeName = org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.initProfileManager().profileTypeName.profile");//NOI18N
         
         switch (profileType)
         {
-            case 1:     profileTypeName = ResourceManager.getManager ().getString ("dialog.profile.search.title");
+            case 1:     profileTypeName = org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.initProfileManager().profileTypeName.search");//NOI18N
             break;
             
-            case 2:     profileTypeName = ResourceManager.getManager ().getString ("dialog.profile.search.results.title");
+            case 2:     profileTypeName = org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.initProfileManager().profileTypeName.searchresult");//NOI18N
             break;
         }
         
@@ -109,7 +106,8 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.weightx = 1.0;
         gbc.weighty = 0.1;
         //_TA_JLabel infoLabel = new JLabel("Verwaltung der " + profileTypeName);
-        JLabel infoLabel = new JLabel (ResourceManager.getManager ().getString ("dialog.profile.admin") + ' ' + profileTypeName + '.');
+        JLabel infoLabel = new JLabel (
+                org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.initProfileManager().infoLabel.text", new Object[]{profileTypeName}));//NOI18N
         infoLabel.setVerticalAlignment (JLabel.CENTER);
         infoLabel.setHorizontalAlignment (JLabel.CENTER);
         infoLabel.setBorder (new EmptyBorder (5, 5, 5, 5));
@@ -126,8 +124,10 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         {
             rootNode = new DefaultMutableTreeNode (profileTypeName);
             
-            rootNode.add (userGroupNode = new DefaultMutableTreeNode (ResourceManager.getManager ().getString ("dialog.profile.usergroup")));
-            rootNode.add (userNode = new DefaultMutableTreeNode (ResourceManager.getManager ().getString ("dialog.profile.user")));
+            rootNode.add (userGroupNode = new DefaultMutableTreeNode (
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.initProfileManager().userGroupNode.userObject")));//NOI18N
+            rootNode.add (userNode = new DefaultMutableTreeNode (
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.initProfileManager().userNode.userObject")));//NOI18N
             
             profileTree = new JTree (rootNode, false);
         }
@@ -140,7 +140,7 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.weighty = 1.0;
         
         profileTree.getSelectionModel ().setSelectionMode (TreeSelectionModel.SINGLE_TREE_SELECTION);
-        profileTree.putClientProperty ("JTree.lineStyle", "Angled");
+        profileTree.putClientProperty ("JTree.lineStyle", "Angled");//NOI18N
         profileTree.setShowsRootHandles (true);
         profileTree.setEditable (false);
         contentPane.add (new JScrollPane (profileTree), gbc);
@@ -154,23 +154,23 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.weightx = 0.1;
         gbc.weighty = 0.1;
         
-        buttonLoad = new JButton (ResourceManager.getManager ().getButtonText ("load"));
-        buttonLoad.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("load"));
-        buttonLoad.setActionCommand ("load");
+        buttonLoad = new JButton (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonLoad.text"));//NOI18N
+        buttonLoad.setMnemonic (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonLoad.mnemonic").charAt(0));//NOI18N
+        buttonLoad.setActionCommand ("load");//NOI18N
         buttonLoad.addActionListener (this);
         contentPane.add (buttonLoad, gbc);
         
         gbc.gridy++;
-        buttonSave = new JButton (ResourceManager.getManager ().getButtonText ("save"));
-        buttonSave.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("save"));
-        buttonSave.setActionCommand ("save");
+        buttonSave = new JButton (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonSave.text"));//NOI18N
+        buttonSave.setMnemonic (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonSave.mnemonic").charAt(0));//NOI18N
+        buttonSave.setActionCommand ("save");//NOI18N
         buttonSave.addActionListener (this);
         contentPane.add (buttonSave, gbc);
         
         gbc.gridy++;
-        buttonDelete = new JButton (ResourceManager.getManager ().getButtonText ("delete"));
-        buttonDelete.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("delete"));
-        buttonDelete.setActionCommand ("delete");
+        buttonDelete = new JButton (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonDelete.text"));//NOI18N
+        buttonDelete.setMnemonic (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonDelete.mnemonic").charAt(0));//NOI18N
+        buttonDelete.setActionCommand ("delete");//NOI18N
         buttonDelete.addActionListener (this);
         contentPane.add (buttonDelete, gbc);
         
@@ -178,9 +178,9 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         gbc.gridy++;
         gbc.weighty = 1.0;
         
-        buttonClose = new JButton (ResourceManager.getManager ().getButtonText ("close"));
-        buttonClose.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("close"));
-        buttonClose.setActionCommand ("close");
+        buttonClose = new JButton (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonClose.text"));//NOI18N
+        buttonClose.setMnemonic (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.buttonClose.mnemonic").charAt(0));//NOI18N
+        buttonClose.setActionCommand ("close");//NOI18N
         buttonClose.addActionListener (this);
         contentPane.add (buttonClose, gbc);
         
@@ -275,7 +275,8 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         
         public ProfileSaveDialog (String profileTypeName)
         {
-            super (ProfileManager.this, profileTypeName + ' ' + ResourceManager.getManager ().getString ("dialog.profile.save.title") + '.', true);
+            super (ProfileManager.this, profileTypeName + ' ' +
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.title"), true);//NOI18N
             
             this.profileTypeName = profileTypeName;
             
@@ -300,7 +301,8 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             gbc.weightx = 1.0;
             gbc.weighty = 1.0;
             //_TA_JLabel infoLabel = new JLabel("<html><p>Bitte geben Sie einen Namen ein, </p><p>unter dem Sie die "+profileTypeName+" speichern wollen.");
-            JLabel infoLabel = new JLabel (ResourceManager.getManager ().getString ("dialog.profile.save.name.1") + ' ' + profileTypeName + ' ' + ResourceManager.getManager ().getString ("dialog.profile.save.name.2"));
+            JLabel infoLabel = new JLabel (
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.initProfileSaveDialog().infoLabel.text", new Object[]{profileTypeName}));//NOI18N
             infoLabel.setVerticalAlignment (JLabel.CENTER);
             infoLabel.setHorizontalAlignment (JLabel.CENTER);
             infoLabel.setBorder (new EmptyBorder (5, 5, 5, 5));
@@ -309,17 +311,21 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             // RADIO BUTTONS =======================================================
             ButtonGroup buttonGroup = new ButtonGroup ();
             JPanel optionsPanel = new JPanel (new GridLayout (2,1));
-            optionsPanel.setBorder (new CompoundBorder (new TitledBorder (null, ResourceManager.getManager ().getString ("dialog.profile.save.message"), TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder (5,5,5,5)));
+            optionsPanel.setBorder (new CompoundBorder (new TitledBorder (null,
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.initProfileSaveDialog().optionsPanel.border.title"),//NOI18N
+                    TitledBorder.LEFT, TitledBorder.TOP), new EmptyBorder (5,5,5,5)));
             
             
             
-            optionUserGroup = new JRadioButton (ResourceManager.getManager ().getString ("dialog.profile.usergroup"));
-            optionUserGroup.setActionCommand ("userGroupProfile");
+            optionUserGroup = new JRadioButton (
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.initProfileSaveDialog().optionUserGroup.text"));//NOI18N
+            optionUserGroup.setActionCommand ("userGroupProfile");//NOI18N
             buttonGroup.add (optionUserGroup);
             optionsPanel.add (optionUserGroup);
             
             gbc.gridy++;
-            optionUser = new JRadioButton (ResourceManager.getManager ().getString ("dialog.profile.user"));
+            optionUser = new JRadioButton (
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.initProfileSaveDialog().optionUser.text"));//NOI18N
             optionUser.setSelected (true);
             buttonGroup.add (optionUser);
             optionsPanel.add (optionUser);
@@ -341,17 +347,17 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             gbc.insets = new Insets (0, 0, 0, 20);
             gbc.gridwidth = 1;
             gbc.gridy++;
-            buttonSave = new JButton (ResourceManager.getManager ().getButtonText ("save"));
-            buttonSave.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("save"));
-            buttonSave.setActionCommand ("save");
+            buttonSave = new JButton (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.buttonSave.text"));//NOI18N
+            buttonSave.setMnemonic (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.buttonSave.mnemonic").charAt(0));//NOI18N
+            buttonSave.setActionCommand ("save");//NOI18N
             buttonSave.addActionListener (this);
             contentPane.add (buttonSave, gbc);
             
             gbc.insets = new Insets (0, 0, 0, 0);
             gbc.gridx++;
-            buttonCancel = new JButton (ResourceManager.getManager ().getButtonText ("cancel"));
-            buttonCancel.setMnemonic (ResourceManager.getManager ().getButtonMnemonic ("cancel"));
-            buttonCancel.setActionCommand ("cancel");
+            buttonCancel = new JButton (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.buttonCancel.text"));//NOI18N
+            buttonCancel.setMnemonic (org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.buttonCancel.mnemonic").charAt(0));//NOI18N
+            buttonCancel.setActionCommand ("cancel");//NOI18N
             buttonCancel.addActionListener (this);
             contentPane.add (buttonCancel, gbc);
             
@@ -361,8 +367,10 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         
         protected boolean confirmOverwrite (String entry)
         {
-            String message = ResourceManager.getManager ().getString ("dialog.profile.save.overwrite.1") + "' " +  entry +  "' " + ResourceManager.getManager ().getString ("dialog.profile.save.overwrite.1");
-            int result = JOptionPane.showConfirmDialog (this, message, ResourceManager.getManager ().getString ("dialog.profile.save.overwrite"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            String message = org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.confirmOverwrite().confirmOptionPane.message", new Object[]{entry});//NOI18N
+            int result = JOptionPane.showConfirmDialog (this, message,
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.confirmOverwrite().confirmOptionPane.title"),//NOI18N
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             
             if(result == JOptionPane.YES_OPTION)
             {
@@ -407,7 +415,7 @@ public abstract class ProfileManager extends JDialog implements ActionListener
             groupProfile = groupProfileEnabled;
             accepted = false;
             
-            entryField.setText ("");
+            entryField.setText ("");//NOI18N
             entryField.requestFocus ();
             optionUserGroup.setEnabled (groupProfileEnabled);
             optionUserGroup.setSelected (groupProfileEnabled & groupProfileSelected);
@@ -433,7 +441,7 @@ public abstract class ProfileManager extends JDialog implements ActionListener
         // FIXME inner class
         public void actionPerformed (ActionEvent e)
         {
-            if(e.getActionCommand ().equals ("save"))
+            if(e.getActionCommand ().equals ("save"))//NOI18N
             {
                 //NavigatorLogger.printMessage("<ProfileManager> SAVE:" + entryField.getText());
                 
@@ -480,10 +488,13 @@ public abstract class ProfileManager extends JDialog implements ActionListener
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog (this, ResourceManager.getManager ().getString ("dialog.profile.save.error.message"), ResourceManager.getManager ().getString ("dialog.profile.save.error"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog (this,
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.actionPerformed().saveErrorOptionPane.message"),//NOI18N
+                    org.openide.util.NbBundle.getMessage(ProfileManager.class, "ProfileManager.ProfileSaveDialog.actionPerformed().saveErrorOptionPane.title"),//NOI18N
+                    JOptionPane.WARNING_MESSAGE);
                 }
             }
-            else if(e.getActionCommand ().equals ("cancel"))
+            else if(e.getActionCommand ().equals ("cancel"))//NOI18N
             {
                 selectedProfileName = null;
                 selectedProfileID = -1;

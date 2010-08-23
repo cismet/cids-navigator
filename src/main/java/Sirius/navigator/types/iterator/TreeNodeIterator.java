@@ -53,13 +53,15 @@ public class TreeNodeIterator
         this.nextElement = null;
         if(collection != null && collection.size() > 0)
         {
-            logger.debug(" init collection size: " + collection.size());
+            if (logger.isDebugEnabled()) {
+                logger.debug(" init collection size: " + collection.size());//NOI18N
+            }
             this.iterator = collection.iterator();
             return true;
         }
         else
         {
-            logger.warn("could not create iterator");
+            logger.warn("could not create iterator");//NOI18N
             this.iterator = null;
             return false;
         }
@@ -67,8 +69,9 @@ public class TreeNodeIterator
        
     public boolean init(Enumeration enumeration)
     {
-        logger.debug(" init enumeration hasMoreElements: " + enumeration.hasMoreElements());
-        
+        if (logger.isDebugEnabled()) {
+            logger.debug(" init enumeration hasMoreElements: " + enumeration.hasMoreElements());//NOI18N
+        }
         this.nextElement = null;
         if(enumeration != null && enumeration.hasMoreElements())
         {
@@ -77,7 +80,7 @@ public class TreeNodeIterator
         }
         else
         {
-            logger.warn("could not create iterator");
+            logger.warn("could not create iterator");//NOI18N
             this.iterator = null;
             return false;
         }
@@ -134,7 +137,7 @@ public class TreeNodeIterator
         
         public void remove()
         {
-            throw new UnsupportedOperationException("this method is not implemented");
+            throw new UnsupportedOperationException("this method is not implemented");//NOI18N
         }
         
     }

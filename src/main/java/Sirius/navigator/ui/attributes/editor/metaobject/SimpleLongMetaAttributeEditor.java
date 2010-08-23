@@ -35,7 +35,7 @@ public class SimpleLongMetaAttributeEditor extends DefaultSimpleMetaAttributeEdi
         }
         catch(NumberFormatException nfe)
         {
-            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid long", nfe);
+            logger.warn("string '" + this.simpleValueField.getText() + "' is no valid long", nfe);//NOI18N
             Long longObject = new Long(0);
             this.setComponentValue(longObject);
             return longObject;
@@ -50,7 +50,7 @@ public class SimpleLongMetaAttributeEditor extends DefaultSimpleMetaAttributeEdi
         public void insertString(final int i, final String s, final AttributeSet attributes) throws BadLocationException
         {  
             super.insertString(i, s, attributes);
-            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))
+            if (s != null && (!s.equals("-") || i != 0 || s.length() >= 2))//NOI18N
             {
                 try
                 {

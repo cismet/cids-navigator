@@ -70,11 +70,11 @@ public class MutablePanel extends JPanel
             super.setEnabled(enabled);
             if(enabled)
             {
-                ((CardLayout)this.getLayout()).show(this, "enabledPanel");
+                ((CardLayout)this.getLayout()).show(this, "enabledPanel");//NOI18N
             }
             else
             {
-                ((CardLayout)this.getLayout()).show(this, "disabledPanel");
+                ((CardLayout)this.getLayout()).show(this, "disabledPanel");//NOI18N
             }
         }
         else
@@ -105,7 +105,7 @@ public class MutablePanel extends JPanel
     public void setEnabledPanel(JPanel enabledPanel)
     {
         this.remove(this.enabledPanel);
-        this.add(enabledPanel, "enabledPanel");
+        this.add(enabledPanel, "enabledPanel");//NOI18N
         this.enabledPanel = enabledPanel; 
     }
     
@@ -125,7 +125,7 @@ public class MutablePanel extends JPanel
     public void setDisabledPanel(JPanel disabledPanel)
     {
         this.remove(this.disabledPanel);
-        this.add(disabledPanel, "disabledPanel");
+        this.add(disabledPanel, "disabledPanel");//NOI18N
         this.disabledPanel = disabledPanel; 
     }  
     

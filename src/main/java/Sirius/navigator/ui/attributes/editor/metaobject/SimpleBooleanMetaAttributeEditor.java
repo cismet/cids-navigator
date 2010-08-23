@@ -97,19 +97,19 @@ public class SimpleBooleanMetaAttributeEditor extends AbstractSimpleMetaAttribut
     
     protected void setComponentValue(Object value)
     { 
-        if(logger.isDebugEnabled())logger.debug("setting boolean value: " + value);
+        if(logger.isDebugEnabled())logger.debug("setting boolean value: " + value);//NOI18N
 
         if(value != null)
         {
             Object attributeValue = this.getAttributeValue(value);
             if(attributeValue != null && attributeValue instanceof Boolean)
             {
-                if(logger.isDebugEnabled())logger.debug("this.booleanCheckBox.setSelected(((Boolean)value).booleanValue()): " + ((Boolean)attributeValue).booleanValue());
+                if(logger.isDebugEnabled())logger.debug("this.booleanCheckBox.setSelected(((Boolean)value).booleanValue()): " + ((Boolean)attributeValue).booleanValue());//NOI18N
                 this.booleanCheckBox.setSelected(((Boolean)value).booleanValue());
             }
             else
             {
-                logger.warn("new value (" + attributeValue + ") is null or not of type Boolean, setting value to 'FALSE'");
+                logger.warn("new value (" + attributeValue + ") is null or not of type Boolean, setting value to 'FALSE'");//NOI18N
                 this.setValue(new Boolean(false));
                 this.booleanCheckBox.setSelected(false);
             }

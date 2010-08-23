@@ -23,7 +23,7 @@ import javax.swing.JPanel;
  * @author hell
  */
 public abstract class MetaObjectRenderer extends JPanel{
-    public static final String WIDTH_RATIO="WIDTH_RATIO";
+    public static final String WIDTH_RATIO="WIDTH_RATIO";//NOI18N
     /** Creates a new instance of MetaObjectRenderer */
     public MetaObjectRenderer() {
     }

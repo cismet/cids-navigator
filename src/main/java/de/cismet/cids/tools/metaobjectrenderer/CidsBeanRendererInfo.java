@@ -20,6 +20,6 @@ public interface CidsBeanRendererInfo {
     @Deprecated
     public abstract double getWidthRatio();
     @Deprecated
-    public static final String WIDTH_RATIO="WIDTH_RATIO";
+    public static final String WIDTH_RATIO="WIDTH_RATIO";//NOI18N
 
 }

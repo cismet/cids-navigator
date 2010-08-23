@@ -25,6 +25,7 @@ import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import de.cismet.tools.CismetThreadPool;
 
+import java.beans.Beans;
 
 /**
  *
@@ -32,7 +33,7 @@ import de.cismet.tools.CismetThreadPool;
  */
 public class AttributeTree extends JTree
 {
-    private final Logger logger;
+    private final Logger logger = Logger.getLogger(this.getClass());;
     
     private AttributeNode rootNode = null;
     
@@ -50,8 +51,6 @@ public class AttributeTree extends JTree
     public AttributeTree()
     {
         super(new DefaultTreeModel(null));
-        
-        this.logger = Logger.getLogger(this.getClass());
         this.setCellRenderer(new IconRenderer());
     }
     
@@ -60,27 +59,27 @@ public class AttributeTree extends JTree
         this.setNewAttributeRequest(true);
         if(node != null && node instanceof DefaultMetaTreeNode)
         {
-            if(logger.isDebugEnabled())logger.debug("creating new AttributeTreeThread");
+            if(logger.isDebugEnabled())logger.debug("creating new AttributeTreeThread");//NOI18N
             this.clear();
             
-            CismetThreadPool.execute(new Thread("AttributeTreeThread")
+            CismetThreadPool.execute(new Thread("AttributeTreeThread")//NOI18N
             {
                 public void run()
                 {
                     AttributeTree.this.setNewAttributeRequest(false);
-                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread started");
+                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread started");//NOI18N
                     synchronized(AttributeTree.this)
                     {
                         try
                         {
                             if(AttributeTree.this.isNewAttributeRequest())
                             {
-                                if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: new request, aborting thread (1)");
+                                if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: new request, aborting thread (1)");//NOI18N
                                 AttributeTree.this.notifyAll();
                                 return;
                             }
                             
-                            if(logger.isDebugEnabled())logger.debug("AttributeTreeThread running");
+                            if(logger.isDebugEnabled())logger.debug("AttributeTreeThread running");//NOI18N
                             if(((DefaultMetaTreeNode)node).isClassNode())
                             {
                                 AttributeTree.this.rootNode = new ClassAttributeNode(node.toString(), AttributeTree.this.isIgnoreSubsitute(), AttributeTree.this.ignoreArrayHelperObjects, AttributeTree.this.ignoreInvisibleAttributes, ((ClassTreeNode)node).getMetaClass());
@@ -96,25 +95,25 @@ public class AttributeTree extends JTree
                             
                             if(AttributeTree.this.isNewAttributeRequest())
                             {
-                                if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: new request, aborting thread (2)");
+                                if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: new request, aborting thread (2)");//NOI18N
                                 AttributeTree.this.notifyAll();
                                 return;
                             }
                             
-                            if(logger.isDebugEnabled())logger.debug("AttributeTreeThread performing GUI update");
+                            if(logger.isDebugEnabled())logger.debug("AttributeTreeThread performing GUI update");//NOI18N
                             SwingUtilities.invokeLater(new Runnable()
                             {
                                 public void run()
                                 {
-                                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: setting new root node '" + rootNode + "'");
+                                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: setting new root node '" + rootNode + "'");//NOI18N
                                     if(AttributeTree.this.isNewAttributeRequest())
                                     {
-                                        if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: new request, aborting thread (1)");
+                                        if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: new request, aborting thread (1)");//NOI18N
                                         return;
                                     }
                                     
                                     ((DefaultTreeModel)AttributeTree.this.getModel()).setRoot(rootNode);
-                                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread GUI update in progress");
+                                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread GUI update in progress");//NOI18N
                                     ((DefaultTreeModel)AttributeTree.this.getModel()).reload();
                                     AttributeTree.this.setSelectionRow(0);
                                 }
@@ -122,14 +121,14 @@ public class AttributeTree extends JTree
                         }
                         catch(Exception exp)
                         {
-                            logger.error("could not update attribute tree", exp);
+                            logger.error("could not update attribute tree", exp);//NOI18N
                             AttributeTree.this.clear();
                         }
                         
-                        if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: notifiy waiting threads");
+                        if(logger.isDebugEnabled())logger.debug("AttributeTreeThread: notifiy waiting threads");//NOI18N
                         AttributeTree.this.notifyAll();
                     }
-                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread finished");
+                    if(logger.isDebugEnabled())logger.debug("AttributeTreeThread finished");//NOI18N
                 }
             });
         }

@@ -30,28 +30,28 @@ import Sirius.navigator.tools.StringParameterizer;
 public class URLParameterizer extends StringParameterizer
 {
  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(URLParameterizer.class);
-    public static char OPEN_TAG = '$';
-	public static char CLOSE_TAG = '§';
+    public static char OPEN_TAG = '$';//NOI18N
+	public static char CLOSE_TAG = '§';//NOI18N
 	public static char ARRAY_SEPARATOR = ';';
 	
-	public static String CLASS_ID = "c.id";
-	public static String CLASS_NAME = "c.name";
-	public static String CLASS_ATTRIBUTE_ID = "c_a.";
-	public  static String CLASS_ATTRIBUTE_NAME = "c_a_name.";
+	public static String CLASS_ID = "c.id";//NOI18N
+	public static String CLASS_NAME = "c.name";//NOI18N
+	public static String CLASS_ATTRIBUTE_ID = "c_a.";//NOI18N
+	public  static String CLASS_ATTRIBUTE_NAME = "c_a_name.";//NOI18N
 	
-	public static String OBJECT_ID = "o.id";
-	public static String OBJECT_NAME = "o.name";
-	public static String OBJECT_ATTRIBUTE_ID = "o_a.";
-	public static String OBJECT_ATTRIBUTE_NAME = "o_a_name.";
+	public static String OBJECT_ID = "o.id";//NOI18N
+	public static String OBJECT_NAME = "o.name";//NOI18N
+	public static String OBJECT_ATTRIBUTE_ID = "o_a.";//NOI18N
+	public static String OBJECT_ATTRIBUTE_NAME = "o_a_name.";//NOI18N
 	
-	public static String USER_ID = "u.id";
-	public static String USER_NAME = "u.name";
-	public static String USER_LS_NAME = "u.ls_name";
-	public static String USER_ORDER_NUM = "u.order";	
+	public static String USER_ID = "u.id";//NOI18N
+	public static String USER_NAME = "u.name";//NOI18N
+	public static String USER_LS_NAME = "u.ls_name";//NOI18N
+	public static String USER_ORDER_NUM = "u.order";//NOI18N
 	
-	public static String USERGROUP_ID = "g.id";
-	public static String USERGROUP_NAME = "g.name";
-	public static String USERGROUP_LS_NAME = "g.ls_name";
+	public static String USERGROUP_ID = "g.id";//NOI18N
+	public static String USERGROUP_NAME = "g.name";//NOI18N
+	public static String USERGROUP_LS_NAME = "g.ls_name";//NOI18N
 	
 	public static String parameterizeURL(String url, MetaClass[] classArray, MetaObject[] objectArray, User user) throws Exception
 	{	
@@ -266,7 +266,7 @@ public class URLParameterizer extends StringParameterizer
 				for(int k = 0; k < attributeArray.length; k++)
 				{
 					int id = Integer.parseInt(objectToken.substring(OBJECT_ATTRIBUTE_ID.length(), objectToken.length()));
-					if( attributeArray[k].getID().equalsIgnoreCase(id+"" ) )
+					if( attributeArray[k].getID().equalsIgnoreCase(id+"" ) )//NOI18N
 					{
 						//if(value == null)
 							value = attributeArray[k].getValue().toString();

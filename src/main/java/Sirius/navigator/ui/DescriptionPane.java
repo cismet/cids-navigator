@@ -54,6 +54,7 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
+import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
@@ -64,7 +65,7 @@ import org.openide.util.WeakListeners;
  * @author  thorsten.hell@cismet.de
  */
 public class DescriptionPane extends JPanel implements StatusChangeSupport {
-
+    private static final ResourceManager resource = ResourceManager.getManager();
 //    private final transient Map<Component, PropertyChangeListener> strongReferencesOnWeakListenerMap = TypeSafeCollections.newHashMap();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final DefaultStatusChangeSupport statusChangeSupport;
@@ -85,12 +86,15 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             super.statusUpdate(calHTMLPane, status, uRL, i0, string);
             // log.debug("DescriptionPane.log.StatusUpdate: Status:"+status+"  Url:"+uRL);
             if (status == 1) {
-                htmlPane.showHTMLDocument("");
-                statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.error"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+                htmlPane.showHTMLDocument("");//NOI18N
+                statusChangeSupport.fireStatusChange(org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.statusUpdate(CalHTMLPane,int,URL,int,String).status.error"), //NOI18N
+                        Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
             } else if (status == 10 || status == 11) {
-                statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.loading"), Status.MESSAGE_POSITION_3, Status.ICON_BLINKING, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.statusUpdate(CalHTMLPane,int,URL,int,String).status.loading"), //NOI18N
+                        Status.MESSAGE_POSITION_3, Status.ICON_BLINKING, Status.ICON_DEACTIVATED);
             } else if (status == 14) {
-                statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.loaded"), Status.MESSAGE_POSITION_3, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
+                statusChangeSupport.fireStatusChange(org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.statusUpdate(CalHTMLPane,int,URL,int,String).status.loaded"), //NOI18N
+                        Status.MESSAGE_POSITION_3, Status.ICON_ACTIVATED, Status.ICON_DEACTIVATED);
             }
         }
 
@@ -127,7 +131,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         try {
             StringBuffer buffer = new StringBuffer();
             String string = null;
-            reader = new BufferedReader(new InputStreamReader(ResourceManager.getManager().getNavigatorResourceAsStream(ResourceManager.getManager().getString("descriptionpane.html.welcome"))));
+            reader = new BufferedReader(new InputStreamReader(
+                    resource.getNavigatorResourceAsStream("doc/welcome.html")));//NOI18N
 
             while ((string = reader.readLine()) != null) {
                 buffer.append(string);
@@ -177,7 +182,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
         jButton1.setForeground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
-        jButton1.setText("jButton1");
+        jButton1.setText(org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.JButton1")); // NOI18N
 
         setLayout(new java.awt.CardLayout());
 
@@ -211,7 +216,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             @Override
             public void run() {
-                ((CardLayout) getLayout()).show(DescriptionPane.this, "html");
+                ((CardLayout) getLayout()).show(DescriptionPane.this, "html");//NOI18N
             }
         };
         if (EventQueue.isDispatchThread()) {
@@ -226,7 +231,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             @Override
             public void run() {
-                ((CardLayout) getLayout()).show(DescriptionPane.this, "objects");
+                ((CardLayout) getLayout()).show(DescriptionPane.this, "objects");//NOI18N
             }
         };
         if (EventQueue.isDispatchThread()) {
@@ -268,13 +273,17 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     public void setPage(String page) {
         try {
-            log.info("setPage:" + page);
+            if (log.isInfoEnabled()) {
+                log.info("setPage:" + page);//NOI18N
+            }
             htmlPane.stopAll();
             htmlPane.showHTMLDocument(new URL(page));
         } catch (Exception e) {
-            log.info("Fehler bei setPage", e);
-            htmlPane.showHTMLDocument("");
-            statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.error"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
+            log.info("Error in setPage()", e);//NOI18N
+            htmlPane.showHTMLDocument("");//NOI18N
+            statusChangeSupport.fireStatusChange(
+                    org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.setPage(String).status.error"),//NOI18N
+                    Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_ACTIVATED);
 
         }
     }
@@ -306,7 +315,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                                 ObjectTreeNode n = (ObjectTreeNode) object;
                                 objectsByClass.put(n.getMetaClass(), n);
                             } catch (Throwable t) {
-                                log.warn("Fehler beim Vorbereiten der Darstellung der Objekte", t);
+                                log.warn("Fehler beim Vorbereiten der Darstellung der Objekte", t);//NOI18N
                             }
                         }
                     }
@@ -332,10 +341,10 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                         if (l.size() > 1) {
                             //aggrRendererTester = MetaObjectrendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");
-                            aggrRendererTester = CidsObjectRendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");
+                            aggrRendererTester = CidsObjectRendererFactory.getInstance().getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")");//NOI18N
                         }
                         if (aggrRendererTester == null) {
-                            log.warn("AggregationRenderer was null. Will use SingleRenderer");
+                            log.warn("AggregationRenderer was null. Will use SingleRenderer");//NOI18N
                             for (Object object : l) {
                                 ObjectTreeNode otn = (ObjectTreeNode) object;
                                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
@@ -399,7 +408,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
                             y++;
                         } catch (Throwable t) {
-                            log.error("Fehler beim Rendern des MetaObjectrenderer", t);
+                            log.error("Error while rendering MetaObjectrenderer", t);//NOI18N
                         }
                     }
                     all.addAll(chunks);
@@ -482,7 +491,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     MetaObject result = get();
                     gotoMetaObject(result, optionalTitle);
                 } catch (Exception e) {
-                    log.error("Exception in Background Thread", e);
+                    log.error("Exception in Background Thread", e);//NOI18N
                 }
             }
         }.execute();
@@ -544,7 +553,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
 
                         if (sdp instanceof RequestsFullSizeComponent) {
-                            log.info("Renderer is FullSize Component!");
+                            log.info("Renderer is FullSize Component!");//NOI18N
                             panRenderer.setLayout(new BorderLayout());
                             panRenderer.add(sdp, BorderLayout.CENTER);
                         } else {
@@ -557,7 +566,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         repaint();
                     } else {
                         if (log.isDebugEnabled()) {
-                            log.debug("Worker canceled!");
+                            log.debug("Worker canceled!");//NOI18N
                         }
 //                        if (comp instanceof DisposableCidsBeanStore) {
 //                            ((DisposableCidsBeanStore) comp).dispose();
@@ -565,10 +574,10 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     }
                 } catch (InterruptedException iex) {
                     if (log.isDebugEnabled()) {
-                        log.debug("Worker canceled!");
+                        log.debug("Worker canceled!");//NOI18N
                     }
                 } catch (Exception e) {
-                    log.error("Error during Renderer creation", e);
+                    log.error("Error during Renderer creation", e);//NOI18N
                 }
                 if (worker == this) {
                     worker = null;
@@ -618,7 +627,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 //            }
 
         if (log.isDebugEnabled()) {
-            log.debug("loading description from url '" + descriptionURL + "'");
+            log.debug("loading description from url '" + descriptionURL + "'");//NOI18N
         }
 
         this.setPage(descriptionURL);
@@ -638,10 +647,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             performSetNode(n);
         } else {
             //if(logger.isDebugEnabled())logger.debug("no description url available");
-            statusChangeSupport.fireStatusChange(ResourceManager.getManager().getString("descriptionpane.status.nodescription"), Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
+            statusChangeSupport.fireStatusChange(
+                    org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.setNodeDescription(Object).status.nodescription"),//NOI18N
+                    Status.MESSAGE_POSITION_3, Status.ICON_DEACTIVATED, Status.ICON_DEACTIVATED);
 
             //this.setText("<html><body><h3>" + ResourceManager.getManager().getString("descriptionpane.welcome") + "</h3></body></html>");
-            htmlPane.showHTMLDocument(welcomePage);
+            htmlPane.showHTMLDocument(welcomePage); 
         }
     }
 

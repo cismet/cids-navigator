@@ -40,10 +40,10 @@ public class HyperlinkRenderer implements TableCellRenderer {
         this.hyperlinkLabel.setHyperlinkListener(new HyperlinkListener() {
 
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                log.debug("hyperlinkUpdate");
+                log.debug("hyperlinkUpdate");//NOI18N
                 if (e.getEventType().equals(HyperlinkEvent.EventType.ACTIVATED)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("following link '" + e.getURL() + "'");
+                        logger.debug("following link '" + e.getURL() + "'");//NOI18N
                     }
                 //Sirius.navigator.resource.PropertyManager.getManager().getAppletContext().showDocument(e.getURL(), "_blank");
                 //  BrowserLauncher.openURL(e.getURL().toString());
@@ -69,7 +69,7 @@ public class HyperlinkRenderer implements TableCellRenderer {
             try {
                 this.hyperlinkLabel.setUrl(new URL(value.toString()));
             } catch (Throwable t) {
-                logger.warn("no valid url: " + value + "(" + value.getClass() + ")");
+                logger.warn("no valid url: " + value + "(" + value.getClass() + ")");//NOI18N
             }
         }
 

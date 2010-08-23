@@ -43,7 +43,7 @@ public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetL
     
     public void dragGestureRecognized(DragGestureEvent dge)
     {
-        if(logger.isDebugEnabled())logger.debug("dragGestureRecognized()");
+        if(logger.isDebugEnabled())logger.debug("dragGestureRecognized()");//NOI18N
         Object selectedNode = this.attributeTree.getSelectionPath().getLastPathComponent();
         if(selectedNode != null && selectedNode instanceof ObjectAttributeNode)
         {
@@ -53,13 +53,13 @@ public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetL
         }
         else if(logger.isDebugEnabled())
         {
-            logger.warn("dragGestureRecognized() no valid selection for DnD operation");
+            logger.warn("dragGestureRecognized() no valid selection for DnD operation");//NOI18N
         }
     }
     
     public void dragEnter(DropTargetDragEvent dtde)
     {
-        if(logger.isDebugEnabled())logger.debug("dragEnter(DropTargetDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dragEnter(DropTargetDragEvent)");//NOI18N
         dtde.rejectDrag();
     }
     
@@ -85,7 +85,7 @@ public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetL
     
     public void dragEnter(DragSourceDragEvent dsde)
     {
-        if(logger.isDebugEnabled())logger.debug("dragEnter(DragSourceDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dragEnter(DragSourceDragEvent)");//NOI18N
   
         DragSourceContext dragSourceContext = dsde.getDragSourceContext();
         dragSourceContext.setCursor(this.getCursor(dsde.getDropAction()));
@@ -102,7 +102,7 @@ public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetL
     
     public void dropActionChanged(DragSourceDragEvent dsde)
     {
-        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DragSourceDragEvent)");
+        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DragSourceDragEvent)");//NOI18N
         
         DragSourceContext dragSourceContext = dsde.getDragSourceContext();
         dragSourceContext.setCursor(this.getCursor(dsde.getUserAction()));
@@ -114,17 +114,17 @@ public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetL
         Cursor cursor = DragSource.DefaultCopyNoDrop;
         if((dragAction & DnDConstants.ACTION_MOVE) != 0)
         {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_MOVE");
+            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_MOVE");//NOI18N
             cursor = DragSource.DefaultMoveDrop;
         }
         else if((dragAction & DnDConstants.ACTION_COPY) != 0)
         {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_COPY");
+            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_COPY");//NOI18N
             cursor = DragSource.DefaultCopyDrop;
         }
         else if((dragAction & DnDConstants.ACTION_LINK) != 0)
         {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_LINK");
+            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_LINK");//NOI18N
             cursor = DragSource.DefaultLinkDrop;
         }
         

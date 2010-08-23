@@ -66,10 +66,10 @@ public class NavigatorX extends javax.swing.JFrame {
     private View vRessort;
     
     //Icons & Image
-    private Icon icoDescr = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/descriptionpane_icon.gif"));
-    private Icon icoCatalogue = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/catalogue_tree_icon.gif"));
-    private Icon icoAttributetable = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/attributetable_icon.gif"));
-    private Icon icoSearchresults = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/searchresults_tree_icon.gif"));
+    private Icon icoDescr = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/descriptionpane_icon.gif"));  // NOI18N
+    private Icon icoCatalogue = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/catalogue_tree_icon.gif"));  // NOI18N
+    private Icon icoAttributetable = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/attributetable_icon.gif"));  // NOI18N
+    private Icon icoSearchresults = new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/imgx/searchresults_tree_icon.gif"));  // NOI18N
     
     
     
@@ -104,7 +104,7 @@ public class NavigatorX extends javax.swing.JFrame {
                
             }
             public void windowAdded(DockingWindow dockingWindow, DockingWindow dockingWindow0) {
-                log.debug("windowAdded");
+                log.debug("windowAdded");  // NOI18N
             }
             public void windowClosed(DockingWindow dockingWindow) {
                 
@@ -112,11 +112,11 @@ public class NavigatorX extends javax.swing.JFrame {
             public void windowClosing(DockingWindow dockingWindow) throws OperationAbortedException {
             }
             public void windowDocked(DockingWindow dockingWindow) {
-                log.debug("windowDocked");
+                log.debug("windowDocked");  // NOI18N
                 
             }
             public void windowDocking(DockingWindow dockingWindow) throws OperationAbortedException {
-                log.debug("windowDocking");
+                log.debug("windowDocking");  // NOI18N
             }
             public void windowHidden(DockingWindow dockingWindow) {
             }
@@ -131,14 +131,18 @@ public class NavigatorX extends javax.swing.JFrame {
             public void windowRemoved(DockingWindow dockingWindow, DockingWindow dockingWindow0) {
             }
             public void windowRestored(DockingWindow dockingWindow) {
-                log.debug("windowRestored");
+                if(log.isDebugEnabled())
+                    log.debug("windowRestored");  // NOI18N
             }
             public void windowRestoring(DockingWindow dockingWindow) throws OperationAbortedException {
-                log.debug("windowRestoring");
+                if(log.isDebugEnabled())
+                    log.debug("windowRestoring");  // NOI18N
             }
             public void windowShown(DockingWindow dockingWindow) {
-                log.debug("windowShown");
-               log.info("dockingWindow.getParent().getBounds().getY():"+dockingWindow.getParent().getBounds().getY());
+                if(log.isDebugEnabled())
+                    log.debug("windowShown");   // NOI18N
+                if(log.isInfoEnabled())
+                    log.info("dockingWindow.getParent().getBounds().getY():"+dockingWindow.getParent().getBounds().getY());   // NOI18N
             }
             public void windowUndocked(DockingWindow dockingWindow) {
             }
@@ -160,22 +164,22 @@ public class NavigatorX extends javax.swing.JFrame {
     }
     
     private void initInfoNode(){
-        vCatalogue = new View("Katalog",icoCatalogue,null);
+        vCatalogue = new View(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.vCatalogue.title"),icoCatalogue,null);  // NOI18N
         
-        viewMap.addView("Katalog",vCatalogue);
+        viewMap.addView("Katalog",vCatalogue);  // NOI18N
         
-        vObjectInfo= new View("Informationen zum Objekt",icoAttributetable,null);
-        viewMap.addView("Informationene zum Objekt",vObjectInfo);
+        vObjectInfo= new View(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.vObjectInfo.title"),icoAttributetable,null);  // NOI18N
+        viewMap.addView("Informationene zum Objekt",vObjectInfo);  // NOI18N
         
         
-        vDescription= new View("Beschreibung",icoDescr,null);
-        viewMap.addView("Beschreibung",vDescription);
+        vDescription= new View(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.vDescription.title"),icoDescr,null);  // NOI18N
+        viewMap.addView("Beschreibung",vDescription);  // NOI18N
         
-        vEditor= new View("Attributeditor",icoAttributetable,null);
-        viewMap.addView("Attributeditor",vEditor);
+        vEditor= new View(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.vEditor.title"),icoAttributetable,null);  // NOI18N
+        viewMap.addView("Attributeditor",vEditor);  // NOI18N
         
-        vSearchResults= new View("Suchergebnisse",icoSearchresults,null);
-        viewMap.addView("Suchergebnisse",vSearchResults);
+        vSearchResults= new View(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.vSearchResults.title"),icoSearchresults,null);  // NOI18N
+        viewMap.addView("Suchergebnisse",vSearchResults);  // NOI18N
         
 //        vNKF= new View("Nutzung",null,null);
 //        viewMap.addView("Nutzung",vNKF);
@@ -237,15 +241,16 @@ public class NavigatorX extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        DeveloperUtil.createWindowLayoutFrame("Momentanes Layout", rootWindow).setVisible(true);
+                        DeveloperUtil.createWindowLayoutFrame(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.doConfigKeystrokes().JFrame_anon1.title"),  // NOI18N
+                                rootWindow).setVisible(true);
                     }
                 });
             }
         };
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(configLoggerKeyStroke, "SHOW_LAYOUT");
-        getRootPane().getActionMap().put("SHOW_LAYOUT", configAction);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(configLoggerKeyStroke, "SHOW_LAYOUT");  // NOI18N
+        getRootPane().getActionMap().put("SHOW_LAYOUT", configAction);  // NOI18N
         
-        KeyStroke layoutKeyStroke = KeyStroke.getKeyStroke('S',InputEvent.CTRL_MASK);
+        KeyStroke layoutKeyStroke = KeyStroke.getKeyStroke('S',InputEvent.CTRL_MASK);  // NOI18N
         Action layoutAction = new AbstractAction(){
             public void actionPerformed(ActionEvent e) {
                 java.awt.EventQueue.invokeLater(new Runnable() {
@@ -255,8 +260,8 @@ public class NavigatorX extends javax.swing.JFrame {
                 });
             }
         };
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(layoutKeyStroke, "RESET_LAYOUT");
-        getRootPane().getActionMap().put("RESET_LAYOUT", layoutAction);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(layoutKeyStroke, "RESET_LAYOUT");  // NOI18N
+        getRootPane().getActionMap().put("RESET_LAYOUT", layoutAction);  // NOI18N
     }
     
     
@@ -267,8 +272,9 @@ public class NavigatorX extends javax.swing.JFrame {
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         jToolBar3 = new javax.swing.JToolBar();
         jButton16 = new javax.swing.JButton();
         panAll = new javax.swing.JPanel();
@@ -281,7 +287,7 @@ public class NavigatorX extends javax.swing.JFrame {
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
 
-        jButton16.setText("jButton16");
+        jButton16.setText(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.jButton16.text")); // NOI18N
         jButton16.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton16ActionPerformed(evt);
@@ -289,12 +295,13 @@ public class NavigatorX extends javax.swing.JFrame {
         });
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("WuNDa");
+        setTitle(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.title")); // NOI18N
+
         panAll.setLayout(new java.awt.BorderLayout());
 
         panMain.setLayout(new java.awt.BorderLayout());
 
-        jButton1.setText("jButton1");
+        jButton1.setText(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.jButton1.text")); // NOI18N
         jToolBar1.add(jButton1);
 
         panMain.add(jToolBar1, java.awt.BorderLayout.PAGE_START);
@@ -303,18 +310,17 @@ public class NavigatorX extends javax.swing.JFrame {
 
         panStatusbar.setLayout(new java.awt.BorderLayout());
 
-        jLabel1.setText("Statusbar");
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.jLabel1.text")); // NOI18N
         panStatusbar.add(jLabel1, java.awt.BorderLayout.CENTER);
 
         panAll.add(panStatusbar, java.awt.BorderLayout.SOUTH);
 
         panToolbar.setLayout(new java.awt.BorderLayout());
-
         panAll.add(panToolbar, java.awt.BorderLayout.NORTH);
 
         getContentPane().add(panAll, java.awt.BorderLayout.CENTER);
 
-        jMenu1.setText("Menu");
+        jMenu1.setText(org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.jMenu1.text")); // NOI18N
         jMenuBar1.add(jMenu1);
 
         setJMenuBar(jMenuBar1);
@@ -376,5 +382,6 @@ public class NavigatorX extends javax.swing.JFrame {
             g.setColor(oldColor);
         }
     };
+    
     
 }

@@ -27,13 +27,13 @@ import javax.swing.AbstractButton;
  */
 public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar {
 
-    private final ResourceManager resources;
+    private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
     private final Logger logger;
 
     /** Creates new form AttributeViewer */
     public AttributeViewer() {
-        this.resources = ResourceManager.getManager();
+//        this.resources = ResourceManager.getManager();
         this.logger = Logger.getLogger(this.getClass());
 
         initComponents();
@@ -123,7 +123,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         titleBar.setIcon(resources.getIcon("floatingframe.gif"));
-        titleBar.setTitle(resources.getString("attribute.viewer.title"));
+        titleBar.setTitle(org.openide.util.NbBundle.getMessage(AttributeViewer.class, "AttributeViewer.titleBar.title")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -131,8 +131,8 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         gridBagConstraints.weighty = 1.0;
         controlBar.add(titleBar, gridBagConstraints);
 
-        editButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.edit.icon")));
-        editButton.setToolTipText(resources.getString("attribute.viewer.edit.tooltip"));
+        editButton.setIcon(resources.getIcon("objekt_bearbeiten.gif"));
+        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(AttributeViewer.class, "AttributeViewer.editButton.toolTipText")); // NOI18N
         editButton.setActionCommand("edit");
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
@@ -158,7 +158,6 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
 
         tableScrollPane.setPreferredSize(new java.awt.Dimension(250, 150));
 
-        attributeTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
         attributeTable.setMinimumSize(new java.awt.Dimension(100, 50));
         attributeTable.setPreferredSize(null);
         tableScrollPane.setViewportView(attributeTable);
@@ -182,12 +181,12 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
     {//GEN-HEADEREND:event_editButtonActionPerformed
         if (this.getTreeNode() != null && this.getTreeNode() instanceof ObjectTreeNode && ComponentRegistry.getRegistry().getAttributeEditor() != null) {
             ObjectTreeNode selectedNode = (ObjectTreeNode) this.getTreeNode();
-            logger.info("evt.getModifiers():" + evt.getModifiers());
+            logger.info("evt.getModifiers():" + evt.getModifiers());//NOI18N
 
             MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
 
             if ((java.awt.event.ActionEvent.CTRL_MASK & evt.getModifiers()) > 0) {
-                logger.warn("performing unauthorized edit action");
+                logger.warn("performing unauthorized edit action");//NOI18N
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
                 if (ComponentRegistry.getRegistry().getActiveCatalogue() == metaCatalogueTree) {
                     ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
@@ -207,7 +206,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
 
 
             } else {
-                logger.warn("insufficient permission to edit node " + selectedNode);
+                logger.warn("insufficient permission to edit node " + selectedNode);//NOI18N
             }
         }
     }//GEN-LAST:event_editButtonActionPerformed

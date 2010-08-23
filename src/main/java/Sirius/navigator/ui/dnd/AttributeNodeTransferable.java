@@ -59,14 +59,14 @@ public class AttributeNodeTransferable implements MetaTransferable
             try
             {
                 // ObjectAttributeNode
-                String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + ObjectAttributeNode.class.getName();
+                String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=" + ObjectAttributeNode.class.getName();//NOI18N
                 DataFlavor dataFlavor = new DataFlavor(mimeType);
-                dataFlavor.setHumanPresentableName("a ObjectAttributeNode");
+                dataFlavor.setHumanPresentableName("a ObjectAttributeNode");//NOI18N
                 dataFlavors[0] = dataFlavor;
             }
             catch (ClassNotFoundException cnfe)
             {
-                Logger.getLogger(AttributeNodeTransferable.class).error("getTransferDataFlavors() could not create DnD data flavours", cnfe);
+                Logger.getLogger(AttributeNodeTransferable.class).error("getTransferDataFlavors() could not create DnD data flavours", cnfe);//NOI18N
                 dataFlavors = new DataFlavor[0];
             }
         }

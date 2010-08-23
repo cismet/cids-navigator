@@ -90,7 +90,7 @@ public class ComponentRegistry {
             if (isRegistred()) {
                 return registry;
             } else {
-                throw new RuntimeException("unexpected call to getRegistry(): ComponentRegistry not yet initialized");
+                throw new RuntimeException("unexpected call to getRegistry(): ComponentRegistry not yet initialized");//NOI18N
             }
         }
     }
@@ -107,7 +107,7 @@ public class ComponentRegistry {
 
     public final static void destroy() {
         synchronized (blocker) {
-            Logger.getLogger(ComponentRegistry.class).warn("destroying singelton ComponentRegistry instance");
+            Logger.getLogger(ComponentRegistry.class).warn("destroying singelton ComponentRegistry instance");//NOI18N
             registred = false;
             registry = null;
         }

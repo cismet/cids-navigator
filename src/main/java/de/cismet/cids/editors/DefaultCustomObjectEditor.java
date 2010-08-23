@@ -73,7 +73,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
             bindingGroup.bind();
             boundAndReadyNotify();
         } catch (Exception e) {
-            throw new RuntimeException("Bindingproblems occur", e);
+            throw new RuntimeException("Bindingproblems occur", e);//NOI18N
         }
     }
 
@@ -83,7 +83,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
             bindingGroup = ((BindingGroupStore) this).getBindingGroup();
         } else {
 
-            Field bindingGroupField = getClass().getDeclaredField("bindingGroup");
+            Field bindingGroupField = getClass().getDeclaredField("bindingGroup");//NOI18N
 
             bindingGroupField.setAccessible(true);
 
@@ -102,7 +102,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
                     MetaClassStore mcs = (MetaClassStore) binding.getTargetObject();
                     ELProperty p = (ELProperty) binding.getSourceProperty();
                     String expr = getPropertyStringOutOfELProperty(p);
-                    expr = expr.substring(expr.indexOf(".") + 1);
+                    expr = expr.substring(expr.indexOf(".") + 1);//NOI18N
                     expr = expr.substring(0, expr.length() - 1);
 
                     //in expr steckt in den allermeisten faellen ein feldname
@@ -132,7 +132,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
     }
 
     private static String getPropertyStringOutOfELProperty(ELProperty p) throws Exception {
-        Field expressionField = p.getClass().getDeclaredField("expression");
+        Field expressionField = p.getClass().getDeclaredField("expression");//NOI18N
         expressionField.setAccessible(true);
 
         ValueExpressionImpl valueExpression = (ValueExpressionImpl) expressionField.get(p);
@@ -149,7 +149,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
             BindingGroup bindingGroup = getBindingGroupFormChildClass();
             bindingGroup.unbind();
         } catch (Exception ex) {
-            throw new RuntimeException("Binding Problem!", ex);
+            throw new RuntimeException("Binding Problem!", ex);//NOI18N
         }
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables

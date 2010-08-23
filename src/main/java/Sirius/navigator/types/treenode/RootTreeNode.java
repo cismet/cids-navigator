@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.tree.*;
 
 import Sirius.server.middleware.types.*;
-import Sirius.navigator.resource.*;
+
 
 public class RootTreeNode extends DefaultMetaTreeNode
 {
@@ -54,7 +54,7 @@ public class RootTreeNode extends DefaultMetaTreeNode
         }
         catch(Exception exp)
         {
-            logger.error("could not add children", exp);
+            logger.error("could not add children", exp);//NOI18N
         }   
     }
     
@@ -100,12 +100,12 @@ public class RootTreeNode extends DefaultMetaTreeNode
     
     public String toString()
     { 
-        return ResourceManager.getManager().getString("node.root.name");
+        return org.openide.util.NbBundle.getMessage(RootTreeNode.class, "RootTreeNode.toString().returnValue");//NOI18N
     }
     
     public String getDescription()
     {
-        return ResourceManager.getManager().getString("node.root.description");
+        return org.openide.util.NbBundle.getMessage(RootTreeNode.class, "RootTreeNode.getDescription().returnValue");//NOI18N
     }
     
     /**
@@ -143,13 +143,13 @@ public class RootTreeNode extends DefaultMetaTreeNode
     
     public int getID()
     {
-        logger.warn("method 'getID()' should not be called on RootNode");
+        logger.warn("method 'getID()' should not be called on RootNode");//NOI18N
         return -1;
     }
     
     public String getDomain()
     {
-        logger.warn("method 'getDomain()' should not be called on RootNode");
+        logger.warn("method 'getDomain()' should not be called on RootNode");//NOI18N
         return null;
     }
 
@@ -205,8 +205,8 @@ public class RootTreeNode extends DefaultMetaTreeNode
                 }
                 else
                 {
-                    logger.fatal("[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");
-                    throw new Exception("[DDefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");
+                    logger.fatal("[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");//NOI18N
+                    throw new Exception("[DDefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");//NOI18N
                 }
             }
             

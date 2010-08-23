@@ -11,7 +11,6 @@ import org.apache.log4j.Logger;
 
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MultithreadedMethod;
-import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.ui.progress.ProgressObserver;
 import de.cismet.tools.CismetThreadPool;
 import java.awt.BorderLayout;
@@ -32,7 +31,7 @@ import javax.swing.Timer;
  * @author  pascal
  */
 public class NavigatorSplashScreen extends JFrame {
-
+    
     private final ProgressObserver progressObserver;
     private final NavigatorLoader navigatorLoader;
     private final Logger logger;
@@ -131,7 +130,7 @@ public class NavigatorSplashScreen extends JFrame {
         progressBarPlugin.setBorderPainted(false);
         progressBarPlugin.setDoubleBuffered(true);
         progressBarPlugin.setFocusable(false);
-        progressBarPlugin.setString("Plugins");
+        progressBarPlugin.setString(org.openide.util.NbBundle.getMessage(NavigatorSplashScreen.class, "NavigatorSplashSceen.progressBarPlugin.string")); // NOI18N
         progressBarPlugin.setStringPainted(true);
         progressBarPlugin.setVerifyInputWhenFocusTarget(false);
         panProgress.add(progressBarPlugin, java.awt.BorderLayout.SOUTH);
@@ -260,9 +259,11 @@ public class NavigatorSplashScreen extends JFrame {
 
                 public void run() {
                     try {
-                        logger.info("creating navigator instance");
+                        if(logger.isInfoEnabled())
+                            logger.info("creating navigator instance"); // NOI18N
                         final Navigator navigator = new Navigator(NavigatorLoader.this.progressObserver, NavigatorSplashScreen.this);
-                        logger.info("new navigator instance created");
+                        if(logger.isInfoEnabled())
+                            logger.info("new navigator instance created"); // NOI18N
                         SwingUtilities.invokeLater(new Runnable() {
 
                             public void run() {
@@ -270,8 +271,11 @@ public class NavigatorSplashScreen extends JFrame {
                             }
                         });
                     } catch (Throwable t) {
-                        logger.fatal("could not create navigator instance", t);
-                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL, ResourceManager.getManager().getExceptionName("nx01"), ResourceManager.getManager().getExceptionMessage("nx01"), t);
+                        logger.fatal("could not create navigator instance", t);  // NOI18N
+                        ExceptionManager.getManager().showExceptionDialog(ExceptionManager.FATAL,
+                                org.openide.util.NbBundle.getMessage(NavigatorSplashScreen.class, "NavigatorSplashScreen.NavigatorLoader.doInvoke().ExceptionManager_anon.name"),  // NOI18N
+                                org.openide.util.NbBundle.getMessage(NavigatorSplashScreen.class, "NavigatorSplashScreen.NavigatorLoader.doInvoke().ExceptionManager_anon.message"),  // NOI18N
+                                t);
                         System.exit(1);
                     }
                 }
@@ -293,7 +297,7 @@ public class NavigatorSplashScreen extends JFrame {
                 }
 
                 progressBarPlugin.setValue(pluginPogressObserver.getProgress());
-                String msg = "";
+                String msg = "";  // NOI18N
                 if (pluginPogressObserver.getMessage() != null) {
                     msg = pluginPogressObserver.getMessage();
                 }

@@ -78,7 +78,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
         {
             if(this.getChildEditors() != null && this.getChildEditors().size() > 0 && this.editorHandler != null)
             {
-                if(logger.isDebugEnabled())logger.debug("initUI(" + this.getId() + "): removing editor listeners from previous session");
+                if(logger.isDebugEnabled())logger.debug("initUI(" + this.getId() + "): removing editor listeners from previous session");//NOI18N
                 Iterator iterator = this.getChildEditors().values().iterator();
                 while(iterator.hasNext())
                 {
@@ -88,11 +88,11 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
 
             // Objekt nach editoren untersuchen
             this.childrenMap = this.editorLocator.getEditors(this.getValue());
-            if(logger.isDebugEnabled())logger.debug("initUI(): " + this.childrenMap.size() + " child editors initialized");
+            if(logger.isDebugEnabled())logger.debug("initUI(): " + this.childrenMap.size() + " child editors initialized");//NOI18N
         }
         else
         {
-            logger.warn("initUI(): value is null, no child editors available");
+            logger.warn("initUI(): value is null, no child editors available");//NOI18N
             this.childrenMap = new HashMap();
         }
     }
@@ -149,8 +149,8 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
      */
     protected class ComplexEditorUIDelegate extends JPanel implements EditorUIDelegate
     {
-        public final static String PARENT_EDITOR = "rootComplexEditorUI";
-        public final static String CHILD_EDITOR = "childComplexEditorUI";
+        public final static String PARENT_EDITOR = "rootComplexEditorUI";//NOI18N
+        public final static String CHILD_EDITOR = "childComplexEditorUI";//NOI18N
         
         protected Logger logger;
         protected Object complexChildEditorId = null;
@@ -170,7 +170,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
             {
                 if(complexChildEditorComponent != null && complexChildEditorId != null)
                 {
-                    if(logger.isDebugEnabled())logger.debug("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): showing complex editor UI '" + complexChildEditorComponent.getClass().getName() + "' (" + complexChildEditorId + ") in complex editor UI");
+                    if(logger.isDebugEnabled())logger.debug("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): showing complex editor UI '" + complexChildEditorComponent.getClass().getName() + "' (" + complexChildEditorId + ") in complex editor UI");//NOI18N
                     
                     if(AbstractComplexEditor.this.getChildEditors().containsKey(complexChildEditorId))
                     {
@@ -183,17 +183,17 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
                     }
                     else
                     {
-                        logger.warn("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): complex child editor to be shown is no child of this editor");
+                        logger.warn("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): complex child editor to be shown is no child of this editor");//NOI18N
                     }
                 }
                 else
                 {
-                    logger.warn("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): schild component or id is null");
+                    logger.warn("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): schild component or id is null");//NOI18N
                 }
             }
             else
             {
-                logger.error("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): unexpected call to showComplexEditorComponentUI(): A Container can show only one complex editor at the same time (" + this.complexChildEditorId + ")");
+                logger.error("showComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): unexpected call to showComplexEditorComponentUI(): A Container can show only one complex editor at the same time (" + this.complexChildEditorId + ")");//NOI18N
             }
             
             return false;
@@ -207,7 +207,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
                 {
                     if(this.complexChildEditorId.equals(complexChildEditorId))
                     {
-                        if(logger.isDebugEnabled())logger.debug("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): hiding complex editor UI '" + complexChildEditorComponent.getClass().getName() + "' in complex editor UI");
+                        if(logger.isDebugEnabled())logger.debug("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): hiding complex editor UI '" + complexChildEditorComponent.getClass().getName() + "' in complex editor UI");//NOI18N
                         this.remove(complexChildEditorComponent);
 
                         if(this.getComponentCount() == 1)
@@ -219,22 +219,22 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
                         }
                         else
                         {
-                            logger.error("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): removal of complex child editor UI'" + complexChildEditorComponent.getClass().getName() + "' not sucessfull");
+                            logger.error("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): removal of complex child editor UI'" + complexChildEditorComponent.getClass().getName() + "' not sucessfull");//NOI18N
                         }  
                     }
                     else
                     {
-                        logger.error("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): removed id '" + complexChildEditorId + "' does not match current active child editor id '" + this.complexChildEditorId + "'");
+                        logger.error("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): removed id '" + complexChildEditorId + "' does not match current active child editor id '" + this.complexChildEditorId + "'");//NOI18N
                     }
                 }
                 else
                 {
-                    logger.warn("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): showComplexEditorComponentUI(): child component or id is null");
+                    logger.warn("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): showComplexEditorComponentUI(): child component or id is null");//NOI18N
                 }
             }
             else
             {
-                logger.error("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): unexpected call to hideComplexEditorComponentUIr(): no complex editor shown (" + complexChildEditorId + ")");
+                logger.error("hideComplexEditorComponentUI(" + AbstractComplexEditor.this.getId() + "): unexpected call to hideComplexEditorComponentUIr(): no complex editor shown (" + complexChildEditorId + ")");//NOI18N
             }
             
             return false;
@@ -278,7 +278,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
         }
         else
         {
-            if(logger.isDebugEnabled())logger.debug("setActiveChildEditorTree(" + this + "):  this must be the leaf editor");
+            if(logger.isDebugEnabled())logger.debug("setActiveChildEditorTree(" + this + "):  this must be the leaf editor");//NOI18N
             return true;
         }
     }
@@ -298,7 +298,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
         public void editingCanceled(ChangeEvent e)
         {
             BasicEditor basicEditor = (BasicEditor)e.getSource();
-            if(logger.isDebugEnabled())logger.debug("editingCanceled(" + AbstractComplexEditor.this.getId() + "): cancelEditing() on child editor '" + basicEditor.getId() + "' called, ignoring input");
+            if(logger.isDebugEnabled())logger.debug("editingCanceled(" + AbstractComplexEditor.this.getId() + "): cancelEditing() on child editor '" + basicEditor.getId() + "' called, ignoring input");//NOI18N
             
             this.checkComplexChildVisibility(basicEditor);
             this.checkComplexChildRegistration(basicEditor); 
@@ -314,7 +314,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
             
             if(basicEditor.isValueChanged())
             {
-                if(logger.isDebugEnabled())logger.debug("editingStopped(" + AbstractComplexEditor.this.getId() + "): changes in child editor '" + basicEditor.getId() + "', setting new value");
+                if(logger.isDebugEnabled())logger.debug("editingStopped(" + AbstractComplexEditor.this.getId() + "): changes in child editor '" + basicEditor.getId() + "', setting new value");//NOI18N
                 // der neue Wert aus dem Editor ...
                 Object value = basicEditor.getValue();
                 
@@ -328,7 +328,7 @@ public abstract class AbstractComplexEditor extends AbstractSimpleEditor impleme
             }
             else if(logger.isDebugEnabled())
             {
-                logger.debug("editingStopped(" + AbstractComplexEditor.this.getId() + "): no changes in child editor '" + basicEditor.getId() + "' detected");
+                logger.debug("editingStopped(" + AbstractComplexEditor.this.getId() + "): no changes in child editor '" + basicEditor.getId() + "' detected");//NOI18N
             }
         } 
     }

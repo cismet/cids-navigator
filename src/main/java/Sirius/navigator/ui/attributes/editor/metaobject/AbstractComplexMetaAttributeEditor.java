@@ -21,7 +21,7 @@ import Sirius.server.localserver.attribute.ObjectAttribute;
  */
 public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplexEditor
 {
-    protected String PROPERTY_SHOW_ONLY_VISIBLE_ATTRIBUTES = "showOnlyVisibleAttributes";
+    protected String PROPERTY_SHOW_ONLY_VISIBLE_ATTRIBUTES = "showOnlyVisibleAttributes";//NOI18N
     
     protected boolean showOnlyVisibleAttributes = false;
     
@@ -29,33 +29,33 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
     
     protected void setValue(Object value)
     {
-        if(logger.isDebugEnabled())logger.debug("setValue(" + this + "):" + value);
+        if(logger.isDebugEnabled())logger.debug("setValue(" + this + "):" + value);//NOI18N
         if (this.getValue() != null && this.getValue() instanceof Attribute && (value == null || !(value instanceof Attribute)))
         {
-            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new value of existing meta attribute");
+            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new value of existing meta attribute");//NOI18N
             ((Attribute)this.getValue()).setValue(value);
         }
         else if(value != null && value instanceof MetaObject)
         {
-            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new meta object (this must be the root editor)");
+            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new meta object (this must be the root editor)");//NOI18N
             super.setValue(value);
         }
         else if(value != null && value instanceof Attribute)
         {
-            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new meta attribute");
+            if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting new meta attribute");//NOI18N
             MetaObject MetaObject = this.getMetaObject(value);
             
             if(MetaObject == null)
             {
-                if(logger.isDebugEnabled())logger.warn("setValue(" + this + ") the value of this attribute is null, creating new empty meta object");
+                if(logger.isDebugEnabled())logger.warn("setValue(" + this + ") the value of this attribute is null, creating new empty meta object");//NOI18N
                 if (((Attribute)value).isArray()) {
-                    String domain=((Attribute)value).getClassKey().split("@")[1];
+                    String domain=((Attribute)value).getClassKey().split("@")[1];//NOI18N
                     try {
                         MetaObject = new DefaultMetaObject(new Sirius.server.localserver.object.DefaultObject(-1,((ObjectAttribute)value).getClassID()),domain);
                         MetaObject.setDummy(true);
                     }
                     catch (Exception e) {
-                        logger.error("Fehler beim Anlegen eines ArrayDummyObjektes",e);
+                        logger.error("Error while creating a ArrayDummyObjektes",e);//NOI18N
                     }
                 }else {
                     MetaObject = this.getMetaObjectInstance(((Attribute)value).getClassKey());
@@ -67,7 +67,7 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
         }
         else
         {
-            logger.error("setValue(" + this + ") old value or new value is not of type Attribute or MetaObject (" + value + ")");
+            logger.error("setValue(" + this + ") old value or new value is not of type Attribute or MetaObject (" + value + ")");//NOI18N
         }
     }
     
@@ -80,7 +80,7 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
         }
         else
         {
-            logger.error("getValue(" + this + ") no meta attributes in this meta object found, or unknown attribute key: '" + key + "'");
+            logger.error("getValue(" + this + ") no meta attributes in this meta object found, or unknown attribute key: '" + key + "'");//NOI18N
         }
         
         return null;
@@ -96,10 +96,10 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
                 Attribute metaAttribute = (Attribute)metaAttributes.get(key);
                 Object attributeValue = this.getAttributeValue(value);
                 
-                if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting attribute '" + key + "' value: " + value);
+                if(logger.isDebugEnabled())logger.debug("setValue(" + this + ") setting attribute '" + key + "' value: " + value);//NOI18N
                 if(this.showOnlyVisibleAttributes && !metaAttribute.isVisible())
                 {
-                    logger.warn("setting the value of an invisible attribute");
+                    logger.warn("setting the value of an invisible attribute");//NOI18N
                 }
                 
                 metaAttribute.setValue(attributeValue);
@@ -107,23 +107,23 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
             }
             else if(value != null && value instanceof Attribute)
             {
-                if(logger.isDebugEnabled())logger.warn("adding new attribute '" + key + "' to the list of attributes");
+                if(logger.isDebugEnabled())logger.warn("adding new attribute '" + key + "' to the list of attributes");//NOI18N
                 metaAttributes.put(key, value);
             }
             else
             {
-                logger.error("setValue(" + this + ") attribute '" + key + "' not found in map of attributes (" + value + ")");
+                logger.error("setValue(" + this + ") attribute '" + key + "' not found in map of attributes (" + value + ")");//NOI18N
             }
         }
         else
         {
-            logger.error("getValue(" + this + ") no meta attributes in this meta object found ("+ key + ")");
+            logger.error("getValue(" + this + ") no meta attributes in this meta object found ("+ key + ")");//NOI18N
         }
     }
     
     public void setValueChanged(boolean valueChanged)
     {
-         logger.debug("setValueChanged");
+         logger.debug("setValueChanged");//NOI18N
         super.setValueChanged(valueChanged);
         if(this.getValue() instanceof Attribute)
         {
@@ -134,7 +134,9 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
         MetaObject.setChanged(MetaObject.isChanged() | valueChanged);
         if(MetaObject.isChanged() &&(!MetaObject.isDummy()))
         {
-            logger.debug("Objekt:"+MetaObject+" wurde veraendert und hat den status "+MetaObject.getStatus());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Object: "+MetaObject+" was modified and has the state "+MetaObject.getStatus());//NOI18N
+            }
             if (MetaObject.getStatus() == MetaObject.NO_STATUS ||MetaObject.getStatus() == MetaObject.MODIFIED) { 
                 MetaObject.setStatus(MetaObject.MODIFIED);
             }
@@ -226,12 +228,12 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
                 }
                 else
                 {
-                    logger.error("getMetaObject(" + this + ") value of Attribute '" + ((Attribute)value).getName() + "' is not of type MetaObject (" + attributeValue.getClass().getName() + ")");
+                    logger.error("getMetaObject(" + this + ") value of Attribute '" + ((Attribute)value).getName() + "' is not of type MetaObject (" + attributeValue.getClass().getName() + ")");//NOI18N
                 }
             }
             else
             {
-                logger.error("getMetaObject(" + this + ") value is not of type Attribute or MetaObject (" + value.getClass().getName() + ")");
+                logger.error("getMetaObject(" + this + ") value is not of type Attribute or MetaObject (" + value.getClass().getName() + ")");//NOI18N
             }
         }
         
@@ -248,7 +250,7 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
     {
         try
         {
-            if(logger.isDebugEnabled())logger.debug("getMetaObjectInstance(): try to retrive ObjectTemplate for Class '" + classKey + "'");
+            if(logger.isDebugEnabled())logger.debug("getMetaObjectInstance(): try to retrive ObjectTemplate for Class '" + classKey + "'");//NOI18N
             MetaClass metaClass = SessionManager.getProxy().getMetaClass(classKey.toString());
             
             MetaObject MetaObject = SessionManager.getProxy().getInstance(metaClass);
@@ -257,7 +259,7 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
         }
         catch(Throwable t)
         {
-            logger.error("setValue(" + this + ") could not create new empty meta object of type '" + classKey + "'", t);
+            logger.error("setValue(" + this + ") could not create new empty meta object of type '" + classKey + "'", t);//NOI18N
             return null;
         }
     }

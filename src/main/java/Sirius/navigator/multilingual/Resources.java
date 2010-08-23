@@ -31,7 +31,7 @@ import java.util.*;
  * German (de_DE) ResourceBundle
  * @author 	<h2>Thomas Annen</h2>
  * @version <h2>Version 1.0</h2>
- * @deprecated migrate to ResourceManager
+ * @deprecated migrate to Netbeans i18n
  */
 public class Resources extends ListResourceBundle implements Serializable
 {

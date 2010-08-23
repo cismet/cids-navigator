@@ -89,7 +89,7 @@ public class ProgressObserver
     {
         if(this.isInterrupted())
         {
-            throw new InterruptedException("the thread '" + Thread.currentThread().getName() + "'has been interrupted");
+            throw new InterruptedException("the thread '" + Thread.currentThread().getName() + "'has been interrupted");//NOI18N
         }
         
         if(progress >= this.maxProgress)
@@ -102,7 +102,7 @@ public class ProgressObserver
             int oldProgress = this.progress;
             this.progress = progress;
         
-            this.propertyChangeSupport.firePropertyChange("progress", new Integer(oldProgress), new Integer(progress)); 
+            this.propertyChangeSupport.firePropertyChange("progress", new Integer(oldProgress), new Integer(progress)); //NOI18N
         }
     }
     
@@ -177,7 +177,7 @@ public class ProgressObserver
     {
         if(this.isInterrupted())
         {
-            throw new InterruptedException("the thread '" + Thread.currentThread().getName() + "'has been interrupted");
+            throw new InterruptedException("the thread '" + Thread.currentThread().getName() + "'has been interrupted");//NOI18N
         }
         
         this.message = message;

@@ -36,7 +36,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
 
         @Override
         public final int compare(MetaObject o1, MetaObject o2) {
-            return String.CASE_INSENSITIVE_ORDER.compare(o1 != null ? o1.toString() : "", o2 != null ? o2.toString() : "");
+            return String.CASE_INSENSITIVE_ORDER.compare(o1 != null ? o1.toString() : "", o2 != null ? o2.toString() : "");//NOI18N
         }
     };
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FastBindableReferenceCombo.class);
@@ -48,14 +48,14 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     private String[] representationFields;
     private CidsBean cidsBean = null;
     private MetaClass metaClass = null;
-    private String nullValueRepresentation = "-";
+    private String nullValueRepresentation = "-";//NOI18N
 
     public FastBindableReferenceCombo() {
         this("%1$2s", new String[]{"NAME"});
     }
 
     public FastBindableReferenceCombo(String representation, String[] representationFields) {
-        this("", representation, representationFields);
+        this("", representation, representationFields);//NOI18N
     }
 
     public FastBindableReferenceCombo(String query, String representation, String[] representationFields) {
@@ -115,7 +115,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
 
     @Override
     public String getBindingProperty() {
-        return "selectedItem";
+        return "selectedItem";//NOI18N
     }
 
     @Override
@@ -218,7 +218,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     public final MetaObject[] receiveLightweightMetaObjects() throws Exception {
         final MetaClass mc = metaClass;
         if (mc == null) {
-            log.error("MetaClass is null!", new Exception());
+            log.error("MetaClass is null!", new Exception());//NOI18N
             return new MetaObject[0];
         }
         MetaObject[] lwmos;
@@ -313,7 +313,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
         if (tabname != null && tabname.length() > 0) {
             this.metaClass = ClassCacheMultiple.getMetaClass(domain, tabname);
             if (metaClass == null) {
-                log.error("Could not find MetaClass for Table " + tabname + " in domain " + domain);
+                log.error("Could not find MetaClass for Table " + tabname + " in domain " + domain);//NOI18N
             }
             init();
         }
