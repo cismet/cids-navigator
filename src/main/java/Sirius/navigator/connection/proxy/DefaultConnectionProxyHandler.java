@@ -499,7 +499,6 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             MetaObject MetaObject = connection.getMetaObject(session.getUser(), objectID, classID, domain);
             log.debug(" MetaObject: " + MetaObject + " MetaObject.getName(): " + MetaObject.getName() + " MetaObject.getEditor(): " + MetaObject.getEditor() + " MetaObject.getComplexEditor(): " + MetaObject.getComplexEditor());
 
-            MetaObject.setLogger();
 
 //            if(MetaObject.getMetaClass()==null)
 //            {
