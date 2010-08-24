@@ -214,7 +214,7 @@ public class Navigator extends JFrame {
             initPlugins();
             initEvents();
             initWindow();
-            initSearch();
+//            initSearch();
             //Not in EDT
             if (container instanceof LayoutedContainer) {
                 SwingUtilities.invokeLater(new Runnable() {
