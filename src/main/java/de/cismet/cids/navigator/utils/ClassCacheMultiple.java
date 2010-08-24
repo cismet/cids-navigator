@@ -8,7 +8,6 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaClass;
 import java.util.HashMap;
-import java.util.Hashtable;
 
 /**
  *
@@ -16,12 +15,12 @@ import java.util.Hashtable;
  */
 public class ClassCacheMultiple {
 
-    private static HashMap<String, Hashtable> allClassCaches = new HashMap<String, Hashtable>();
-    private static HashMap<String, Hashtable> allTableNameClassCaches = new HashMap<String, Hashtable>();
+    private static HashMap<String, HashMap> allClassCaches = new HashMap<String, HashMap>();
+    private static HashMap<String, HashMap> allTableNameClassCaches = new HashMap<String, HashMap>();
     private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ClassCacheMultiple.class);
 
-    public static Hashtable getClassKeyHashtableOfClassesForOneDomain(String domain) {
-        Hashtable ret = allClassCaches.get(domain);
+    public static HashMap getClassKeyHashtableOfClassesForOneDomain(String domain) {
+        HashMap ret = allClassCaches.get(domain);
         if (ret == null) {
             try {
                 addInstance(domain);
@@ -33,8 +32,8 @@ public class ClassCacheMultiple {
         return ret;
     }
 
-    public static Hashtable getTableNameHashtableOfClassesForOneDomain(String domain) {
-        Hashtable ret = allTableNameClassCaches.get(domain);
+    public static HashMap getTableNameHashtableOfClassesForOneDomain(String domain) {
+        HashMap ret = allTableNameClassCaches.get(domain);
         if (ret == null) {
             try {
                 addInstance(domain);
@@ -48,7 +47,7 @@ public class ClassCacheMultiple {
 
     public static MetaClass getMetaClass(String domain, String tableName) {
         try {
-            final Hashtable ht = getTableNameHashtableOfClassesForOneDomain(domain);
+            final HashMap ht = getTableNameHashtableOfClassesForOneDomain(domain);
             return (MetaClass) ht.get(tableName.toLowerCase());
         } catch (Exception e) {
             log.warn("Couldn't get Class for Table " + tableName + "@" + domain, e);//NOI18N
@@ -80,10 +79,10 @@ public class ClassCacheMultiple {
         }
     }
 
-    private static Hashtable getClassHashtable(MetaClass[] classes, String localServerName) {
-        Hashtable classHash = new Hashtable();
+    private static HashMap getClassHashtable(MetaClass[] classes, String localServerName) {
+        HashMap classHash = new HashMap();
         for (int i = 0; i < classes.length; i++) {
-            String key = new String(localServerName + classes[i].getID());
+            String key = localServerName + classes[i].getID();
             if (!classHash.containsKey(key)) {
                 classHash.put(key, classes[i]);
             }
@@ -91,8 +90,8 @@ public class ClassCacheMultiple {
         return classHash;
     }
 
-    private static Hashtable getClassByTableNameHashtable(MetaClass[] classes) {
-        Hashtable classHash = new Hashtable();
+    private static HashMap getClassByTableNameHashtable(MetaClass[] classes) {
+        HashMap classHash = new HashMap();
         for (MetaClass mc : classes) {
             String key = mc.getTableName().toLowerCase();
             if (!classHash.containsKey(key)) {

@@ -32,6 +32,7 @@ import Sirius.server.search.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.connection.*;
 import Sirius.navigator.exception.ConnectionException;
+import java.util.ArrayList;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -48,7 +49,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
     // protected HashMap comparatorCache = new HashMap();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
-    public Hashtable getClassHash() {
+    public HashMap getClassHash() {
         return classAndMethodCache.getClassHash();
     }
 
@@ -116,9 +117,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
     class ClassAndMethodCache {
 
-        private Hashtable classHash = null;
-        private Hashtable methodHash = null;
-        private Vector lsNames = null;
+        private HashMap classHash = null;
+        private HashMap methodHash = null;
+        private List lsNames = null;
         //private MetaService metaServiceRef;
 
         /*
@@ -129,9 +130,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
          */
         public ClassAndMethodCache() //MetaService metaService)
         {
-            classHash = new Hashtable(25, 0.5f);
-            methodHash = new Hashtable(25, 0.5f);
-            lsNames = new Vector(5, 1);
+            classHash = new HashMap(25, 0.5f);
+            methodHash = new HashMap(25, 0.5f);
+            lsNames = new ArrayList(5);
             //metaServiceRef = metaService;
         }
 
@@ -144,9 +145,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
          * @param LocalServer des User
          */
         public ClassAndMethodCache(User user, String[] localServerNames) {
-            classHash = new Hashtable(50, 0.5f);
-            methodHash = new Hashtable(25, 0.5f);
-            lsNames = new Vector((localServerNames.length + 1), 1);
+            classHash = new HashMap(50, 0.5f);
+            methodHash = new HashMap(25, 0.5f);
+            lsNames = new ArrayList((localServerNames.length + 1));
             //metaServiceRef = metaService;
             try {
                 MethodMap methodMap = connection.getMethods(user);
@@ -182,7 +183,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             }
         }
 
-        public Hashtable getClassHash() {
+        public HashMap getClassHash() {
             return classHash;
         }
 
@@ -265,7 +266,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         protected void putClasses(MetaClass[] classes, String localServerName) {
             lsNames.add(localServerName);
             for (int i = 0; i < classes.length; i++) {
-                String key = new String(localServerName + classes[i].getID());
+                String key = localServerName + classes[i].getID();
                 if (!classHash.containsKey(key)) {
                     classHash.put(key, classes[i]);
                 }
@@ -454,13 +455,12 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
             }
 
-            log.debug("getgetMetaClass(): classID=" + classID + ", domain=" + domain);
 
             MetaClass metaClass = classAndMethodCache.getCachedClass(session.getUser(), classID, domain);
-
-            log.debug("MetaClass: " + metaClass + "\nMetaClass.getName(): " + metaClass.getName() + "\nMetaClass.getEditor(): " + metaClass.getEditor() + "\nMetaClass.getComplexEditor(): " + metaClass.getComplexEditor());
-
-
+            if (log.isDebugEnabled()) {
+                log.debug("getgetMetaClass(): classID=" + classID + ", domain=" + domain);
+                log.debug("MetaClass: " + metaClass + "\nMetaClass.getName(): " + metaClass.getName() + "\nMetaClass.getEditor(): " + metaClass.getEditor() + "\nMetaClass.getComplexEditor(): " + metaClass.getComplexEditor());
+            }
             return metaClass;
 
             //return classAndMethodCache.getCachedClass(session.getUser(), classID, domain);

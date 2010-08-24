@@ -7,7 +7,7 @@ package de.cismet.cids.navigator.utils;
 
 import Sirius.server.middleware.types.MetaClass;
 import de.cismet.cids.utils.MetaClassCacheService;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 /**
  *
@@ -20,7 +20,7 @@ public class NavigatorMetaClassService implements MetaClassCacheService{
         log.debug("inited");//NOI18N
     }
 
-    public Hashtable getAllClasses(String domain) {
+    public HashMap getAllClasses(String domain) {
         return ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain);
     }
 

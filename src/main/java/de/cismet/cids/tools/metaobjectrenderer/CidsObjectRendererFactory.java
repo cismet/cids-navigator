@@ -12,9 +12,7 @@ import de.cismet.cids.utils.ClassloadingHelper;
 import de.cismet.tools.collections.TypeSafeCollections;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import javax.swing.JComponent;
 
 /**
