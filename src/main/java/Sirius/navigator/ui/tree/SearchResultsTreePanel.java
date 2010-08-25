@@ -122,7 +122,7 @@ public class SearchResultsTreePanel extends JPanel
         });
         showDirectlyInMap.setSelected(false);
         toolBar.add(showDirectlyInMap);
-        JLabel showDirectlyInMapLabel= new JLabel(resources.getIcon("saveall24.gif"));//NOI18N
+        JLabel showDirectlyInMapLabel= new JLabel(resources.getIcon("map.png"));//NOI18N
         showDirectlyInMapLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
