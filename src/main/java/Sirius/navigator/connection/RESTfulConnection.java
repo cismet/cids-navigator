@@ -8,6 +8,7 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import de.cismet.reconnector.Reconnector;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
@@ -39,8 +40,8 @@ import java.util.Vector;
 import javax.swing.Icon;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+import de.cismet.cids.server.CallServerService;
 
-import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 import de.cismet.security.Proxy;
 
 /**
@@ -49,7 +50,7 @@ import de.cismet.security.Proxy;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public final class RESTfulConnection implements Connection {
+public final class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -60,7 +61,8 @@ public final class RESTfulConnection implements Connection {
 
     private final transient boolean isLWMOEnabled;
 
-    private transient RESTfulSerialInterfaceConnector connector;
+    private transient CallServerService connector;
+    private Reconnector<CallServerService> reconnector;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -84,13 +86,25 @@ public final class RESTfulConnection implements Connection {
     //~ Methods ----------------------------------------------------------------
 
     @Override
+    public Reconnector<CallServerService> getReconnector() {
+        return reconnector;
+    }
+
+    @Override
     public boolean connect(final String callserverURL) throws ConnectionException {
         return connect(callserverURL, null);
     }
 
+    private Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
+        reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
+        reconnector.useDialog(true, null);
+        return reconnector;
+    }
+
     @Override
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException{
-        connector = new RESTfulSerialInterfaceConnector(callserverURL, proxy);
+        connector = createReconnector(callserverURL, proxy).getProxy();
+        //connector = new RESTfulSerialInterfaceConnector(callserverURL, proxy);
 
         try
         {

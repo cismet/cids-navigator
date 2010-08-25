@@ -41,7 +41,7 @@ public class NavigatorSplashScreen extends JFrame {
     /** Creates new form JWindow */
     public NavigatorSplashScreen(ProgressObserver progressObserver, Icon logo) {
         this.setUndecorated(true);
-        this.setAlwaysOnTop(true);
+        //this.setAlwaysOnTop(true);
         this.initComponents();
 
         this.logger = Logger.getLogger(this.getClass());

@@ -8,6 +8,8 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import de.cismet.reconnector.Reconnector;
+import de.cismet.reconnector.rmi.RmiReconnector;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -50,6 +52,7 @@ import java.util.Vector;
 import javax.swing.Icon;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+import de.cismet.cids.server.CallServerService;
 
 import de.cismet.security.Proxy;
 
@@ -59,7 +62,7 @@ import de.cismet.security.Proxy;
  * @author   Pascal
  * @version  1.0 12/22/2002
  */
-public final class RMIConnection implements Connection {
+public final class RMIConnection implements Connection, Reconnectable<CallServerService> {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -86,27 +89,40 @@ public final class RMIConnection implements Connection {
     protected String callserverURL = null;
     protected boolean connected = false;
     protected java.lang.Object callserver;
+    protected Reconnector<CallServerService> reconnector;
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public Reconnector<CallServerService> getReconnector() {
+        return reconnector;
+    }
+
+    private Reconnector<CallServerService> createReconnector() {
+        reconnector = new RmiReconnector<CallServerService>(CallServerService.class, callserverURL);
+        reconnector.useDialog(true, null);
+        return reconnector;
+    }
 
     @Override
     public boolean connect(final String callserverURL) throws ConnectionException {
         this.callserverURL = null;
         this.connected = false;
 
-        try {
+//        try {
             LOG.info("creating network connection to callserver '" + callserverURL + "'");
-            callserver = Naming.lookup(callserverURL);
-        } catch (MalformedURLException mue) {
-            LOG.fatal("'" + callserverURL + "' is not a valid URL", mue);
-            throw new ConnectionException("'" + callserverURL + "' is not a valid URL", mue);
-        } catch (NotBoundException nbe) {
-            LOG.fatal("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
-            throw new ConnectionException("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
-        } catch (RemoteException re) {
-            LOG.fatal("[ServerError] could not connect to '" + callserverURL + "'", re);
-            throw new ConnectionException("[ServerError] could not connect to '" + callserverURL + "'", re);
-        }
+            callserver = createReconnector().getProxy();
+            //callserver = Naming.lookup(callserverURL);
+//        } catch (MalformedURLException mue) {
+//            LOG.fatal("'" + callserverURL + "' is not a valid URL", mue);
+//            throw new ConnectionException("'" + callserverURL + "' is not a valid URL", mue);
+//        } catch (NotBoundException nbe) {
+//            LOG.fatal("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
+//            throw new ConnectionException("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
+//        } catch (RemoteException re) {
+//            LOG.fatal("[ServerError] could not connect to '" + callserverURL + "'", re);
+//            throw new ConnectionException("[ServerError] could not connect to '" + callserverURL + "'", re);
+//        }
 
         if (LOG.isDebugEnabled()) {
             final StringBuffer buffer = new StringBuffer("remote interfaces of '").append(callserver.getClass()

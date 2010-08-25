@@ -178,14 +178,16 @@ public class Navigator extends JFrame {
 
                 if (inSplashScreen) { // das ProxyOptions panel soll im SplashScreen integriert werden
 
-                    // ProxyOptions panel anzeigen
-                    splashScreen.setProxyOptionsVisible(true);
+                    proxyOptions.setProxy(Proxy.fromPreferences());
 
-                    // Solange nicht "Anwenden" gedrückt wurde
-                    while (splashScreen.isProxyOptionsVisible()) {
-                        // warten
-                        Thread.sleep(100);
-                    }
+                    // ProxyOptions panel anzeigen
+//                    splashScreen.setProxyOptionsVisible(true);
+//
+//                    // Solange nicht "Anwenden" gedrückt wurde
+//                    while (splashScreen.isProxyOptionsVisible()) {
+//                        // warten
+//                        Thread.sleep(100);
+//                    }
 
                 } else { // das ProxyOptions panel soll als Dialog angezeigt werden
                     final JOptionPane pane = new JOptionPane(
