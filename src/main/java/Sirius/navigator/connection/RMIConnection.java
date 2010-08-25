@@ -98,7 +98,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         return reconnector;
     }
 
-    private Reconnector<CallServerService> createReconnector() {
+    private Reconnector<CallServerService> createReconnector(final String callserverURL) {
         reconnector = new RmiReconnector<CallServerService>(CallServerService.class, callserverURL);
         reconnector.useDialog(true, null);
         return reconnector;
@@ -111,7 +111,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
 
 //        try {
             LOG.info("creating network connection to callserver '" + callserverURL + "'");
-            callserver = createReconnector().getProxy();
+            callserver = createReconnector(callserverURL).getProxy();
             //callserver = Naming.lookup(callserverURL);
 //        } catch (MalformedURLException mue) {
 //            LOG.fatal("'" + callserverURL + "' is not a valid URL", mue);
