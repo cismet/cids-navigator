@@ -496,6 +496,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
+        setLayout(new java.awt.BorderLayout());
+
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         commitButton.setIcon(resources.getIcon("save_objekt.gif"));
@@ -526,8 +528,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         cancelButton.setRolloverIcon(resources.getIcon("zurueck_objekt.gif"));
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
-        copyButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.copy.icon")));
-        copyButton.setToolTipText(resources.getString("attribute.viewer.copy.tooltip"));
+        copyButton.setIcon(resources.getIcon("document-copy.png"));
+        copyButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.copyButton.tooltip")); // NOI18N
         copyButton.setActionCommand("cancel");
         copyButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         copyButton.setContentAreaFilled(false);
@@ -536,7 +538,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         copyButton.setMaximumSize(new java.awt.Dimension(16, 16));
         copyButton.setMinimumSize(new java.awt.Dimension(16, 16));
         copyButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        copyButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.copy.icon.rollover")));
+        copyButton.setRolloverIcon(resources.getIcon("document-copy.png"));
         copyButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 copyButtonActionPerformed(evt);
@@ -544,8 +546,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         });
         controlBar.add(copyButton, new java.awt.GridBagConstraints());
 
-        pasteButton.setIcon(resources.getIcon(resources.getString("attribute.viewer.paste.icon")));
-        pasteButton.setToolTipText(resources.getString("attribute.viewer.paste.tooltip"));
+        pasteButton.setIcon(resources.getIcon("clipboard-paste.png"));
+        pasteButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.pasteButton.tooltip")); // NOI18N
         pasteButton.setActionCommand("paste");
         pasteButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pasteButton.setContentAreaFilled(false);
@@ -554,7 +556,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         pasteButton.setMaximumSize(new java.awt.Dimension(16, 16));
         pasteButton.setMinimumSize(new java.awt.Dimension(16, 16));
         pasteButton.setPreferredSize(new java.awt.Dimension(16, 16));
-        pasteButton.setRolloverIcon(resources.getIcon(resources.getString("attribute.viewer.paste.icon.rollover")));
+        pasteButton.setRolloverIcon(resources.getIcon("clipboard-paste.png"));
         pasteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pasteButtonActionPerformed(evt);

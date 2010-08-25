@@ -198,10 +198,10 @@
         <Component class="javax.swing.JButton" name="copyButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.copy.icon&quot;))" type="code"/>
+              <Connection code="resources.getIcon(&quot;document-copy.png&quot;)" type="code"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;attribute.viewer.copy.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="de/cismet/cids/editors/Bundle.properties" key="NavigatorAttributeEditorGui.copyButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="cancel"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -222,7 +222,7 @@
               <Dimension value="[16, 16]"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.copy.icon.rollover&quot;))" type="code"/>
+              <Connection code="resources.getIcon(&quot;document-copy.png&quot;)" type="code"/>
             </Property>
           </Properties>
           <Events>
@@ -237,10 +237,10 @@
         <Component class="javax.swing.JButton" name="pasteButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.paste.icon&quot;))" type="code"/>
+              <Connection code="resources.getIcon(&quot;clipboard-paste.png&quot;)" type="code"/>
             </Property>
-            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getString(&quot;attribute.viewer.paste.tooltip&quot;)" type="code"/>
+            <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+              <ResourceString bundle="de/cismet/cids/editors/Bundle.properties" key="NavigatorAttributeEditorGui.pasteButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="actionCommand" type="java.lang.String" value="paste"/>
             <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
@@ -261,7 +261,7 @@
               <Dimension value="[16, 16]"/>
             </Property>
             <Property name="rolloverIcon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resources.getIcon(resources.getString(&quot;attribute.viewer.paste.icon.rollover&quot;))" type="code"/>
+              <Connection code="resources.getIcon(&quot;clipboard-paste.png&quot;)" type="code"/>
             </Property>
           </Properties>
           <Events>
