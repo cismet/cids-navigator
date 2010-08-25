@@ -31,29 +31,28 @@ public class RmiReconnector <R extends Remote> extends Reconnector<R> {
     }
 
     @Override
-    protected ReconnectorException getReconnectorException(final Throwable exception) {
+    protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
         if (exception instanceof UnmarshalException) {
             return new ReconnectorException(WRONG_VERSION);
         } else if (exception instanceof RemoteException) {
             return new ReconnectorException(CONNECTION_LOST);
         } else  {
-            return new ReconnectorException(UNKNOWN);
+            throw exception;
         }
     }
 
     @Override
     protected R connectService() throws ReconnectorException {
         try {
-            //TODO ab hier entfernen !!! nur zum Testen !
-            try {
-
-                Thread.sleep(500);
-            } catch (InterruptedException ex) {
-                log.debug("Sleep interrupted", ex);
-            }
-            //TODO bis hier entfernen !!! nur zum Testen !
+//            //TODO ab hier entfernen !!! nur zum Testen !
+//            try {
+//
+//                Thread.sleep(500);
+//            } catch (InterruptedException ex) {
+//                log.debug("Sleep interrupted", ex);
+//            }
+//            //TODO bis hier entfernen !!! nur zum Testen !
             return (R) Naming.lookup(serviceUrl);
-
         } catch (NotBoundException nbe) {
             log.fatal("[NetworkError] could not connect to '" + serviceUrl + "'", nbe);
             throw new ReconnectorException(LOOKUP_FAILED);

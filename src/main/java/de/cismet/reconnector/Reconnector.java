@@ -40,7 +40,7 @@ public abstract class Reconnector<S extends Object> {
 
     protected abstract S connectService() throws ReconnectorException;
 
-    protected abstract ReconnectorException getReconnectorException(final Throwable throwable);
+    protected abstract ReconnectorException getReconnectorException(final Throwable throwable) throws Throwable;
 
     /*
      * Verbindungsaufbau über Swingworker

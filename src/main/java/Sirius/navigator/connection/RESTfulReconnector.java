@@ -1,5 +1,7 @@
 package Sirius.navigator.connection;
 
+import Sirius.navigator.exception.ConnectionException;
+import Sirius.server.newuser.UserException;
 import de.cismet.reconnector.ReconnectorException;
 import de.cismet.reconnector.Reconnector;
 import de.cismet.cids.server.CallServerService;
@@ -35,7 +37,10 @@ public class RESTfulReconnector <R extends CallServerService> extends Reconnecto
     }
 
     @Override
-    protected ReconnectorException getReconnectorException(final Throwable exception) {
+    protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
+        if (exception instanceof ConnectionException || exception instanceof UserException ) {
+            throw exception;
+        }
         String errormessage = org.openide.util.NbBundle.getMessage(RESTfulReconnector.class, "RESTfulReconnector.errormessage");
         errorPanel.setErrorMessage(errormessage);
         return new ReconnectorException(errorPanel);
@@ -43,14 +48,14 @@ public class RESTfulReconnector <R extends CallServerService> extends Reconnecto
 
     @Override
     protected R connectService() {
-        //TODO ab hier entfernen !!! nur zum Testen !
-        try {
-
-            Thread.sleep(500);
-        } catch (InterruptedException ex) {
-            log.debug("Sleep interrupted", ex);
-        }
-        //TODO bis hier entfernen !!! nur zum Testen !
+//        //TODO ab hier entfernen !!! nur zum Testen !
+//        try {
+//
+//            Thread.sleep(500);
+//        } catch (InterruptedException ex) {
+//            log.debug("Sleep interrupted", ex);
+//        }
+//        //TODO bis hier entfernen !!! nur zum Testen !
         return (R) new RESTfulSerialInterfaceConnector(callserverURL, proxy);
     }
 
