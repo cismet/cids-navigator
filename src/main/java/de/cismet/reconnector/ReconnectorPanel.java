@@ -75,8 +75,10 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         btnCancel = new javax.swing.JButton();
         labTryingToConnect = new javax.swing.JLabel();
         panRetry = new javax.swing.JPanel();
-        btnRetry = new javax.swing.JButton();
         panError = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        btnAbort = new javax.swing.JButton();
+        btnRetry = new javax.swing.JButton();
 
         panProgress.setMinimumSize(new java.awt.Dimension(200, 88));
         panProgress.setLayout(new java.awt.GridBagLayout());
@@ -116,24 +118,34 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panRetry.setMinimumSize(new java.awt.Dimension(200, 53));
         panRetry.setLayout(new java.awt.GridBagLayout());
 
-        btnRetry.setText(bundle.getString("retry")); // NOI18N
-        btnRetry.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnRetryActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTH;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        panRetry.add(btnRetry, gridBagConstraints);
-
         panError.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         panRetry.add(panError, gridBagConstraints);
+
+        btnAbort.setText("Abbrechen");
+        btnAbort.setPreferredSize(new java.awt.Dimension(125, 29));
+        btnAbort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbortActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnAbort);
+
+        btnRetry.setText(bundle.getString("retry")); // NOI18N
+        btnRetry.setPreferredSize(new java.awt.Dimension(125, 29));
+        btnRetry.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRetryActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnRetry);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        panRetry.add(jPanel1, gridBagConstraints);
 
         setLayout(new java.awt.BorderLayout());
     }// </editor-fold>//GEN-END:initComponents
@@ -145,11 +157,17 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
     private void btnRetryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetryActionPerformed
         reconnector.doReconnect();
     }//GEN-LAST:event_btnRetryActionPerformed
+
+    private void btnAbortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbortActionPerformed
+        reconnector.doAbbort();
+    }//GEN-LAST:event_btnAbortActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAbort;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnRetry;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labTryingToConnect;
     private javax.swing.JPanel panError;
     private javax.swing.JPanel panProgress;

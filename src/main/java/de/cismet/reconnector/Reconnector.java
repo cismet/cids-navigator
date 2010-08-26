@@ -43,6 +43,14 @@ public abstract class Reconnector<S extends Object> {
     protected abstract ReconnectorException getReconnectorException(final Throwable throwable) throws Throwable;
 
     /*
+     * Abbrechen
+     */
+    public void doAbbort() {
+        reconnectorDialog.setVisible(false);
+        isReconnecting = false;
+    }
+
+    /*
      * Verbindungsaufbau über Swingworker
      */
     public void doReconnect() {
@@ -107,8 +115,7 @@ public abstract class Reconnector<S extends Object> {
 
                 @Override
                 public void windowClosing(WindowEvent we) {
-                    reconnectorDialog.setVisible(false);
-                    isReconnecting = false;
+                    doAbbort();
                 }
 
             });
