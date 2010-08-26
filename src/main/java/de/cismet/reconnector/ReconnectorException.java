@@ -1,7 +1,6 @@
 package de.cismet.reconnector;
 
 import java.awt.Component;
-import javax.swing.JLabel;
 
 /**
  *
@@ -12,7 +11,7 @@ public class ReconnectorException extends Exception {
     private Component component;
 
     public ReconnectorException(final String errorMsg) {
-        component = new JLabel(errorMsg);
+        component = new DefaultReconnectorErrorPanel(errorMsg);
     }
 
     public ReconnectorException(final Component component) {

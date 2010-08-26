@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.JLabel;
+import javax.swing.UIManager;
 
 /**
  *
@@ -120,6 +121,8 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
 
         panError.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         panRetry.add(panError, gridBagConstraints);
@@ -144,7 +147,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridy = 1;
         panRetry.add(jPanel1, gridBagConstraints);
 
         setLayout(new java.awt.BorderLayout());
