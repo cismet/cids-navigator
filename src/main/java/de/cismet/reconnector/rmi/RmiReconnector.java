@@ -9,6 +9,7 @@ import java.rmi.NotBoundException;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.rmi.ServerException;
 import java.rmi.UnmarshalException;
 
 /**
@@ -33,9 +34,12 @@ public class RmiReconnector <R extends Remote> extends Reconnector<R> {
 
     @Override
     protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
-        if (exception instanceof ConnectException) {
+        if (exception instanceof ConnectException || exception instanceof ServerException) {
             return new ReconnectorException(CONNECTION_LOST);
-        } else  {
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(exception, exception);
+            }
             throw exception;
         }
     }
