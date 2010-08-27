@@ -1,7 +1,7 @@
 package Sirius.navigator.connection;
 
-import Sirius.navigator.exception.ConnectionException;
-import Sirius.server.newuser.UserException;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import de.cismet.reconnector.ReconnectorException;
 import de.cismet.reconnector.Reconnector;
 import de.cismet.cids.server.CallServerService;
@@ -16,7 +16,7 @@ import de.cismet.security.Proxy;
  */
 public class RESTfulReconnector <R extends CallServerService> extends Reconnector<R> {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
+    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
 
     private String callserverURL;
     private Proxy proxy;
@@ -38,12 +38,19 @@ public class RESTfulReconnector <R extends CallServerService> extends Reconnecto
 
     @Override
     protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
-        if (exception instanceof ConnectionException || exception instanceof UserException ) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(exception);
+        }
+        if (exception instanceof UniformInterfaceException || exception instanceof ClientHandlerException) {
+            String errormessage = org.openide.util.NbBundle.getMessage(RESTfulReconnector.class, "RESTfulReconnector.errormessage");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(errormessage);
+            }
+            errorPanel.setErrorMessage(errormessage);
+            return new ReconnectorException(errorPanel);
+        } else  {
             throw exception;
         }
-        String errormessage = org.openide.util.NbBundle.getMessage(RESTfulReconnector.class, "RESTfulReconnector.errormessage");
-        errorPanel.setErrorMessage(errormessage);
-        return new ReconnectorException(errorPanel);
     }
 
     @Override
