@@ -3,6 +3,7 @@ package de.cismet.reconnector.rmi;
 import de.cismet.reconnector.Reconnector;
 import de.cismet.reconnector.ReconnectorException;
 import java.net.MalformedURLException;
+import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 
@@ -16,7 +17,7 @@ import java.rmi.UnmarshalException;
  */
 public class RmiReconnector <R extends Remote> extends Reconnector<R> {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RmiReconnector.class);
+    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RmiReconnector.class);
 
     public static final String WRONG_VERSION = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle").getString("wrong_version");
     public static final String CONNECTION_LOST = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle").getString("connection_lost");
@@ -32,9 +33,7 @@ public class RmiReconnector <R extends Remote> extends Reconnector<R> {
 
     @Override
     protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
-        if (exception instanceof UnmarshalException) {
-            return new ReconnectorException(WRONG_VERSION);
-        } else if (exception instanceof RemoteException) {
+        if (exception instanceof ConnectException) {
             return new ReconnectorException(CONNECTION_LOST);
         } else  {
             throw exception;
@@ -49,18 +48,26 @@ public class RmiReconnector <R extends Remote> extends Reconnector<R> {
 //
 //                Thread.sleep(500);
 //            } catch (InterruptedException ex) {
-//                log.debug("Sleep interrupted", ex);
+//                if (LOG.isDebugEnabled()) {
+//                  log.debug("Sleep interrupted", ex);
+//                }
 //            }
 //            //TODO bis hier entfernen !!! nur zum Testen !
             return (R) Naming.lookup(serviceUrl);
         } catch (NotBoundException nbe) {
-            log.fatal("[NetworkError] could not connect to '" + serviceUrl + "'", nbe);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("[NetworkError] could not connect to '" + serviceUrl + "'", nbe);
+            }
             throw new ReconnectorException(LOOKUP_FAILED);
         } catch (MalformedURLException mue) {
-            log.fatal("'" + serviceUrl + "' is not a valid URL", mue);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("'" + serviceUrl + "' is not a valid URL", mue);
+            }
             throw new ReconnectorException(LOOKUP_FAILED);
         } catch (RemoteException re) {
-            log.fatal("[ServerError] could not connect to '" + serviceUrl + "'", re);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("[ServerError] could not connect to '" + serviceUrl + "'", re);
+            }
             throw new ReconnectorException(LOOKUP_FAILED);
         }
     }
