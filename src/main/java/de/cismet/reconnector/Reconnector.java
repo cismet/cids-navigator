@@ -196,7 +196,7 @@ public abstract class Reconnector<S extends Object> {
                 }
             }
             isReconnecting = true;
-            throw new Exception("Aborted");
+            throw new AbortException();
         }
     }
 
