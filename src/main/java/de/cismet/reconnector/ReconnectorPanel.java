@@ -6,7 +6,6 @@ import java.awt.Container;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.JLabel;
-import javax.swing.UIManager;
 
 /**
  *
@@ -14,7 +13,7 @@ import javax.swing.UIManager;
  */
 public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorListener {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ReconnectorPanel.class);
+    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ReconnectorPanel.class);
     
     private final static String CONNECTION_CANCELED = java.util.ResourceBundle.getBundle("de/cismet/reconnector/Bundle").getString("connection_canceled");
 
@@ -78,7 +77,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panRetry = new javax.swing.JPanel();
         panError = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        btnAbort = new javax.swing.JButton();
+        btnExit = new javax.swing.JButton();
         btnRetry = new javax.swing.JButton();
 
         panProgress.setMinimumSize(new java.awt.Dimension(200, 88));
@@ -127,14 +126,14 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         panRetry.add(panError, gridBagConstraints);
 
-        btnAbort.setText("Abbrechen");
-        btnAbort.setPreferredSize(new java.awt.Dimension(125, 29));
-        btnAbort.addActionListener(new java.awt.event.ActionListener() {
+        btnExit.setText("Beenden");
+        btnExit.setPreferredSize(new java.awt.Dimension(125, 29));
+        btnExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAbortActionPerformed(evt);
+                btnExitActionPerformed(evt);
             }
         });
-        jPanel1.add(btnAbort);
+        jPanel1.add(btnExit);
 
         btnRetry.setText(bundle.getString("retry")); // NOI18N
         btnRetry.setPreferredSize(new java.awt.Dimension(125, 29));
@@ -161,14 +160,14 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         reconnector.doReconnect();
     }//GEN-LAST:event_btnRetryActionPerformed
 
-    private void btnAbortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbortActionPerformed
-        reconnector.doAbbort();
-    }//GEN-LAST:event_btnAbortActionPerformed
+    private void btnExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+        System.exit(1);
+    }//GEN-LAST:event_btnExitActionPerformed
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAbort;
     private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnExit;
     private javax.swing.JButton btnRetry;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labTryingToConnect;
