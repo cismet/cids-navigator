@@ -881,6 +881,8 @@ public class Navigator extends JFrame {
             navigatorSplashScreen.toFront();
             navigatorSplashScreen.show();
 
+            Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
+
             // run .............................................................
         } catch (Throwable t) {
             // error .............................................................
