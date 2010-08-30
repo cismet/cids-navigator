@@ -39,18 +39,28 @@ public class RESTfulReconnector <R extends CallServerService> extends Reconnecto
     @Override
     protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
         if (LOG.isDebugEnabled()) {
-            LOG.debug(exception);
+            LOG.debug("getReconnectorException(exception) invoked", exception);
         }
-        if (exception instanceof UniformInterfaceException || exception instanceof ClientHandlerException) {
+        boolean error = false;
+        if (exception instanceof UniformInterfaceException) {
+            if (exception instanceof UniformInterfaceException) {
+                int status = ((UniformInterfaceException) exception).getResponse().getStatus();                
+                error = (status == 503 || status == 404);
+            }
+        } else if (exception instanceof ClientHandlerException) {
+            error = true;
+        }
+
+        if (error) {
             String errormessage = org.openide.util.NbBundle.getMessage(RESTfulReconnector.class, "RESTfulReconnector.errormessage");
             if (LOG.isDebugEnabled()) {
                 LOG.debug(errormessage);
             }
             errorPanel.setErrorMessage(errormessage);
             return new ReconnectorException(errorPanel);
-        } else  {
-            throw exception;
         }
+
+        throw exception;
     }
 
     @Override
