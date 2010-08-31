@@ -20,7 +20,7 @@ import javax.swing.SwingWorker;
  */
 public abstract class Reconnector<S extends Object> {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Reconnector.class);
+    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Reconnector.class);
 
     private Class serviceClass;
     private ConnectorWorker connectorWorker;
@@ -74,10 +74,13 @@ public abstract class Reconnector<S extends Object> {
         if (connectorWorker != null && !connectorWorker.isDone()) {
             connectorWorker.cancel(true);
             connectorWorker = null;
-            log.debug("Verbindungsvorgang abgebrochen");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Verbindungsvorgang abgebrochen");
+            }
         } else {
-            log.debug("nichts zum Abbrechen");
-
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("nichts zum Abbrechen");
+            }
         }
     }
 
@@ -175,6 +178,7 @@ public abstract class Reconnector<S extends Object> {
 
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
+            Throwable targetEx = null;
             while (isReconnecting) {
                 try {
                     // service wieder verbinden
@@ -190,13 +194,18 @@ public abstract class Reconnector<S extends Object> {
                     // Fehler anzeigen und neuverbindung anfragen
                     serviceFailed(ex);
                 } catch (final InvocationTargetException ex) {
-                    log.debug("Exception while invocation", ex);
-                    final Throwable targetEx = ex.getTargetException();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Exception while invocation", ex);
+                    }
+                    targetEx = ex.getTargetException();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Wrapped Exception", targetEx);
+                    }
                     serviceFailed(getReconnectorException(targetEx));
                 }
             }
             isReconnecting = true;
-            throw new AbortException();
+            throw targetEx;
         }
     }
 
