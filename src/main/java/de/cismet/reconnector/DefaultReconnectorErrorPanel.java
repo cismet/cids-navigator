@@ -31,10 +31,21 @@ import javax.swing.UIManager;
  */
 public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
 
+    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DefaultReconnectorErrorPanel.class);
+
     /** Creates new form DefaultReconnectorErrorPanel */
-    public DefaultReconnectorErrorPanel(String message) {
+    public DefaultReconnectorErrorPanel(String message, Throwable exception) {
         initComponents();
+
+        StackTraceElement[] elements = exception.getStackTrace();
+        StringBuilder buffer = new StringBuilder();
+        for(int i = 0; i < elements.length; i++) {
+            buffer.append(elements[i].toString()).append('\n');
+        }
+
         labMessage.setText(message);
+        txtDetails.setText(buffer.toString());
+        panDetails.setVisible(false);
     }
 
     /** This method is called from within the constructor to
@@ -48,7 +59,10 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         labIco = new javax.swing.JLabel();
+        btnDetails = new javax.swing.JToggleButton();
         labMessage = new javax.swing.JLabel();
+        panDetails = new javax.swing.JScrollPane();
+        txtDetails = new javax.swing.JTextArea();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -57,19 +71,57 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(labIco, gridBagConstraints);
+
+        btnDetails.setText(org.openide.util.NbBundle.getMessage(DefaultReconnectorErrorPanel.class, "DefaultReconnectorErrorPanel.btnDetails.text")); // NOI18N
+        btnDetails.setPreferredSize(new java.awt.Dimension(75, 30));
+        btnDetails.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDetailsActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        add(btnDetails, gridBagConstraints);
 
         labMessage.setText(org.openide.util.NbBundle.getMessage(DefaultReconnectorErrorPanel.class, "DefaultReconnectorErrorPanel.labMessage.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         add(labMessage, gridBagConstraints);
+
+        txtDetails.setColumns(20);
+        txtDetails.setEditable(false);
+        txtDetails.setRows(5);
+        panDetails.setViewportView(txtDetails);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
+        add(panDetails, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDetailsActionPerformed
+        panDetails.setVisible(btnDetails.isSelected());
+        revalidate();
+    }//GEN-LAST:event_btnDetailsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToggleButton btnDetails;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel labIco;
     private javax.swing.JLabel labMessage;
+    private javax.swing.JScrollPane panDetails;
+    private javax.swing.JTextArea txtDetails;
     // End of variables declaration//GEN-END:variables
 
 }

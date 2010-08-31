@@ -24,9 +24,9 @@
 package Sirius.navigator.connection;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
+import de.cismet.reconnector.DefaultReconnectorErrorPanel;
 import de.cismet.security.Proxy;
 import java.awt.BorderLayout;
-import javax.swing.UIManager;
 
 /**
  *
@@ -34,10 +34,11 @@ import javax.swing.UIManager;
  */
 public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
+    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
 
     private ProxyOptionsPanel panProxyOptions;
     private RESTfulReconnector reconnector;
+    private DefaultReconnectorErrorPanel errPan;
 
     /** Creates new form RESTfulReconnectorErrorPanel */
     public RESTfulReconnectorErrorPanel(ProxyOptionsPanel panProxyOptions, RESTfulReconnector reconnector) {
@@ -48,8 +49,10 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         panProxyOptionsWrapper.setVisible(false);
     }
 
-    public void setErrorMessage(String message) {
-        labError.setText(message);
+    public void setError(String message, Throwable exception) {
+        errPan = new DefaultReconnectorErrorPanel(message, exception);
+        errPanWrapper.removeAll();
+        errPanWrapper.add(errPan);
     }
 
     /** This method is called from within the constructor to
@@ -62,24 +65,15 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        labError = new javax.swing.JLabel();
         panProxyOptionsWrapper = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         cbProxy = new javax.swing.JCheckBox();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
-        labIcon = new javax.swing.JLabel();
+        errPanWrapper = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
-
-        labError.setText(org.openide.util.NbBundle.getMessage(RESTfulReconnectorErrorPanel.class, "RESTfulReconnectorErrorPanel.labError.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
-        add(labError, gridBagConstraints);
 
         panProxyOptionsWrapper.setLayout(new java.awt.BorderLayout());
 
@@ -98,7 +92,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(panProxyOptionsWrapper, gridBagConstraints);
 
@@ -111,30 +104,26 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(cbProxy, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
         add(jSeparator1, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
         add(jSeparator2, gridBagConstraints);
 
-        labIcon.setIcon(UIManager.getIcon("OptionPane.errorIcon"));
-        labIcon.setText(org.openide.util.NbBundle.getMessage(RESTfulReconnectorErrorPanel.class, "RESTfulReconnectorErrorPanel.labIcon.text")); // NOI18N
+        errPanWrapper.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        add(labIcon, gridBagConstraints);
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(errPanWrapper, gridBagConstraints);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbProxyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProxyActionPerformed
@@ -152,12 +141,11 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cbProxy;
+    private javax.swing.JPanel errPanWrapper;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JLabel labError;
-    private javax.swing.JLabel labIcon;
     private javax.swing.JPanel panProxyOptionsWrapper;
     // End of variables declaration//GEN-END:variables
 

@@ -11,7 +11,7 @@ public class ReconnectorException extends Exception {
     private Component component;
 
     public ReconnectorException(final String errorMsg) {
-        component = new DefaultReconnectorErrorPanel(errorMsg);
+        component = new DefaultReconnectorErrorPanel(errorMsg, this);
     }
 
     public ReconnectorException(final Component component) {
