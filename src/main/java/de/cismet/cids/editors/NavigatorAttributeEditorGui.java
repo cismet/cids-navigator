@@ -21,14 +21,11 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.WrappedComponent;
-import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractButton;
@@ -48,17 +45,20 @@ import org.openide.util.WeakListeners;
  */
 public class NavigatorAttributeEditorGui extends AttributeEditor {
     //do not remove!
+
     private transient PropertyChangeListener strongReferenceOnWeakListener = null;
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private Object treeNode = null;
     private MetaObject backupObject = null;
     private MetaObject editorObject = null;
-    private static final ResourceManager resources = ResourceManager.getManager();;
+    private static final ResourceManager resources = ResourceManager.getManager();
+
+    ;
     private JComponent wrappedWaitingPanel;
 
     /** Creates new form AttributeEditor */
     public NavigatorAttributeEditorGui() {
-        
+
         initComponents();
         if (!StaticDebuggingTools.checkHomeForFile("cidsNavigatorGuiHiddenDebugControls")) {//NOI18N
             panDebug.setVisible(false);
@@ -85,9 +85,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
                     if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
                         int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this,
-                            org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), //NOI18N
-                            org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"),//NOI18N
-                            JOptionPane.YES_NO_CANCEL_OPTION);
+                                org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), //NOI18N
+                                org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"),//NOI18N
+                                JOptionPane.YES_NO_CANCEL_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
                             saveIt();
                         } else if (answer == JOptionPane.CANCEL_OPTION) {
@@ -111,7 +111,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (backupObject != null && !(backupObject.propertyEquals(editorObject)) || backupObject == null) {
-                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this, 
+                    int answer = JOptionPane.showConfirmDialog(NavigatorAttributeEditorGui.this,
                             org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().cancelButton.JOptionPane.message"), //NOI18N
                             org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().cancelButton.JOptionPane.title"), //NOI18N
                             JOptionPane.YES_NO_OPTION);
@@ -206,6 +206,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     null, null, e, Level.SEVERE, null);
             JXErrorPane.showDialog(this, ei);
         }
+        if (currentBeanStore instanceof EditorSaveListener) {
+            ((EditorSaveListener) currentBeanStore).editorClosed(EditorSaveListener.EditorSaveStatus.CANCELED);
+        }
     }
 
     private void saveIt() {
@@ -216,6 +219,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         ObjectTreeNode otn = (ObjectTreeNode) treeNode;
         MetaObject mo = otn.getMetaObject();
         CidsBean oldBean = mo.getBean();
+        final EditorSaveListener editorSaveListener;
+        if (currentBeanStore instanceof EditorSaveListener) {
+            editorSaveListener = (EditorSaveListener) currentBeanStore;
+            editorSaveListener.prepareForSave();
+        } else {
+            editorSaveListener = null;
+        }
         try {
             CidsBean savedInstance = oldBean.persist();
             if (closeEditor) {
@@ -223,8 +233,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().jop.message"),//NOI18N
                         JOptionPane.INFORMATION_MESSAGE);
 
-            final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this,
-                    org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().dialog.title"));//NOI18N
+                final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this,
+                        org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().dialog.title"));//NOI18N
 
                 Timer t = new Timer(900, new ActionListener() {
 
@@ -241,8 +251,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 clear();
             } else {
 
-                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
-                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
+//                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
+//                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
                 ((ObjectTreeNode) treeNode).setMetaObject(savedInstance.getMetaObject());
                 editorObject = savedInstance.getMetaObject();
                 createBackup(editorObject);
@@ -280,7 +290,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             }
             refreshTree();
+            if (editorSaveListener != null) {
+                editorSaveListener.editorClosed(EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS);
+            }
         } catch (Exception ex) {
+            if (editorSaveListener != null) {
+                editorSaveListener.editorClosed(EditorSaveListener.EditorSaveStatus.SAVE_ERROR);
+            }
             log.error("Error while saving", ex);//NOI18N
             ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),//NOI18N
                     org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),//NOI18N
@@ -638,4 +654,3 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private javax.swing.JPanel switchPanel;
     // End of variables declaration//GEN-END:variables
 }
-

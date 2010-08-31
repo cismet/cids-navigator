@@ -13,10 +13,10 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.tools.CismetThreadPool;
 import java.awt.Component;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Vector;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
@@ -37,9 +37,10 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultBindableReferenceCombo.class);
     private CidsBean cidsBean = null;
     private MetaClass metaClass = null;
-    private String fieldname = null;
+//    private String fieldname = null;
     private boolean fakeModel = false;
     private boolean nullable = false;
+    private boolean onlyUsed = false;
     private String nullValueRepresentation = null;
     private static final Comparator<CidsBean> beanToStringComparator;
 
@@ -58,6 +59,13 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         init(mc);
     }
 
+    public DefaultBindableReferenceCombo(final MetaClass mc, boolean nullable, boolean onlyUsed) {
+        this();
+        this.nullable = nullable;
+        this.onlyUsed = onlyUsed;
+        init(mc);
+    }
+
     public DefaultBindableReferenceCombo() {
         String[] s = new String[]{null};
 
@@ -65,6 +73,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         final DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
         setRenderer(new ListCellRenderer() {
 
+            @Override
             public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 Component ret = dlcr.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value == null) {
@@ -81,7 +90,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
                 @Override
                 protected DefaultComboBoxModel doInBackground() throws Exception {
-                    return getModelByMetaClass(mc, nullable);
+                    return getModelByMetaClass(mc, nullable, onlyUsed);
                 }
 
                 @Override
@@ -102,32 +111,37 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         }
     }
 
+    @Override
     public String getBindingProperty() {
         return "selectedItem";//NOI18N
     }
 
+    @Override
     public Validator getValidator() {
         return null;
     }
 
+    @Override
     public Converter getConverter() {
         return null;
     }
 
     @Override
-    public void setSelectedItem(Object anObject) {
+    public void setSelectedItem(final Object anObject) {
         if (isFakeModel()) {
-            setModel(new DefaultComboBoxModel(new Vector(Arrays.asList(anObject))));
+            setModel(new DefaultComboBoxModel(new Object[]{anObject}));
         }
         super.setSelectedItem(anObject);
         cidsBean = (CidsBean) anObject;
 
     }
 
+    @Override
     public MetaClass getMetaClass() {
         return metaClass;
     }
 
+    @Override
     public void setMetaClass(MetaClass metaClass) {
         this.metaClass = metaClass;
         init(metaClass);
@@ -153,6 +167,14 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         return nullable;
     }
 
+    public void setOnlyUsed(boolean onlyUsed) {
+        this.onlyUsed = onlyUsed;
+    }
+
+    public boolean isOnlyUsed() {
+        return onlyUsed;
+    }
+
     public void setNullable(boolean nullable) {
         this.nullable = nullable;
     }
@@ -167,16 +189,20 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         return null;
     }
 
-    public static DefaultComboBoxModel getModelByMetaClass(MetaClass mc, boolean nullable) throws Exception {
+    public static DefaultComboBoxModel getModelByMetaClass(MetaClass mc, boolean nullable, boolean onlyUsed) throws Exception {
         ClassAttribute ca = mc.getClassAttribute("sortingColumn");//NOI18N
         String orderBy = "";//NOI18N
         if (ca != null) {
             String value = ca.getValue().toString();
             orderBy = " order by " + value;//NOI18N
         }
-        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;//NOI18N
+        String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName();//NOI18N
+        if (onlyUsed) {
+            query += "where used = true";
+        }
+        query += orderBy;
         final MetaObject[] MetaObjects = SessionManager.getProxy().getMetaObjectByQuery(query, 0);
-        final Vector<CidsBean> cbv = new Vector<CidsBean>(MetaObjects.length);
+        final List<CidsBean> cbv = new ArrayList<CidsBean>(MetaObjects.length);
         if (nullable) {
             cbv.add(null);
         }
@@ -187,9 +213,10 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             //Sorts the model using String comparison on the bean's toString()
             Collections.sort(cbv, beanToStringComparator);
         }
-        return new DefaultComboBoxModel(cbv);
+        return new DefaultComboBoxModel(cbv.toArray());
+    }
+
+    public static DefaultComboBoxModel getModelByMetaClass(MetaClass mc, boolean nullable) throws Exception {
+        return getModelByMetaClass(mc, nullable, false);
     }
 }
-
-
-
