@@ -28,7 +28,7 @@ public class RESTfulReconnector <R extends CallServerService> extends Reconnecto
         this.callserverURL = callserverURL;
         this.proxy = proxy;
         ProxyOptionsPanel pop = new ProxyOptionsPanel();
-        pop.setProxy(Proxy.fromPreferences());
+        pop.setProxy(proxy);
         this.errorPanel = new RESTfulReconnectorErrorPanel(pop, this);
     }
 

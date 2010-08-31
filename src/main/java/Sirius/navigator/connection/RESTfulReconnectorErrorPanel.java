@@ -136,7 +136,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
             proxy = null;
         }
         reconnector.setProxy(proxy);
-        Proxy.toPreferences(proxy);
+        proxy.toPreferences();
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
