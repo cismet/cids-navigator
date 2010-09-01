@@ -1,7 +1,6 @@
 
 package Sirius.navigator;
 
-import de.cismet.cids.server.DefaultServerExceptionHandler;
 import org.apache.log4j.Logger;
 
 /**
@@ -12,7 +11,7 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final transient Logger LOG = Logger.getLogger(DefaultServerExceptionHandler.class);
+    private static final transient Logger LOG = Logger.getLogger(DefaultNavigatorExceptionHandler.class);
 
     //~ Methods ----------------------------------------------------------------
 
