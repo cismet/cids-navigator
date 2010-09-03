@@ -50,6 +50,7 @@ import java.awt.image.BufferedImage;
  * DefaultMetaTree ist ein Navigationsbaum
  */
 public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll {
+
     protected final Logger logger = Logger.getLogger(MetaCatalogueTree.class);
     protected final DefaultStatusChangeSupport statusChangeSupport;
     protected final DefaultTreeModel defaultTreeModel;
@@ -274,7 +275,10 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         this.setExpandsSelectedPaths(expandTree);
 
         for (Iterator<DefaultMutableTreeNode> iterator = selectedNodes.iterator(); iterator.hasNext();) {
-            treePaths.add(new TreePath(iterator.next().getPath()));
+            DefaultMutableTreeNode next = iterator.next();
+            if (next != null) {
+                treePaths.add(new TreePath(next.getPath()));
+            }
         }
 
         if (treePaths.size() > 0) {

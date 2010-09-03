@@ -48,9 +48,11 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
         final JTree t = (JTree) e.getSource();
         final TreePath[] treePaths = t.getSelectionPaths();
 
-        final List<Object> objects = TypeSafeCollections.newArrayList(treePaths.length);
-        for (int i = 0; i < treePaths.length; i++) {
-            objects.add(treePaths[i].getLastPathComponent());
+        final List<Object> objects = TypeSafeCollections.newArrayList();
+        if (treePaths != null) {
+            for (int i = 0; i < treePaths.length; i++) {
+                objects.add(treePaths[i].getLastPathComponent());
+            }
         }
         CatalogueSelectionListener.this.attributeViewer.setTreeNodes(objects);
         CatalogueSelectionListener.this.descriptionPane.setNodesDescriptions(objects);

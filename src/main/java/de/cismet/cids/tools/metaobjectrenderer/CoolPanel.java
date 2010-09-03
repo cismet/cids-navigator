@@ -12,6 +12,7 @@ import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -46,28 +47,30 @@ import org.jdom.input.SAXBuilder;
  * @author srichter
  * @author nhaffke
  */
-public class CoolPanel extends CustomMetaObjectRenderer implements ComponentListener,DoNotWrap {
+public class CoolPanel extends CustomMetaObjectRenderer implements ComponentListener, DoNotWrap {
 
     // Lumbermill Logger initialisieren
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     @InjectedResource()
-    public int offset,  offsetRight,  offsetTop,  offsetBetween,  arcSize,  shadowLength,  blurFactor;
+    public int offset, offsetRight, offsetTop, offsetBetween, arcSize, shadowLength, blurFactor;
     @InjectedResource()
-    public float borderWidth,  shadowIntensity,  titlePanelOpacity,  titleLinesOpacity,  interPanelOpacity,  interLinesOpacity,  blurredMapOpacity,  cutOutMapOpacity,  glossyOpacity;
+    public float borderWidth, shadowIntensity, titlePanelOpacity, titleLinesOpacity, interPanelOpacity, interLinesOpacity, blurredMapOpacity, cutOutMapOpacity, glossyOpacity;
     @InjectedResource()
-    public Color shadowColor,  colorBorder,  colorMapBorder,  colorTitle,  colorInter,  colorDarkLine,  colorBrightLine,  colorGlossy,  gradientColorTop,  gradientColorBottom;
+    public Color shadowColor, colorBorder, colorMapBorder, colorTitle, colorInter, colorDarkLine, colorBrightLine, colorGlossy, gradientColorTop, gradientColorBottom;
     private static final int IMAGE_TYPE = BufferedImage.TYPE_4BYTE_ABGR;
-    private boolean noTitlePanel,  mustBlur;
+    private boolean mustBlur;
     private double geoBuffer;
-    private int lastX,  lastWidth,  panelWidth;
+    private int lastX, lastWidth, panelWidth;
     private ImageIcon icons;
     private Image map;
-    private BufferedImage cacheImage,  gradientImage,  blurredMap,  cachedBlurredMap,  orgMap;
+    private BufferedImage cacheImage, gradientImage, blurredMap, cachedBlurredMap, orgMap;
     private Geometry geometry;
     private SimpleWMS swms;
     private JPanel spinner;
-    private JComponent panTitle,  panMap,  panInter,  panContent;
+    private JComponent panTitle, panMap, panInter, panContent;
     private Rectangle mapBounds;
+//    private static final Dimension MAX_SIZE = new Dimension(512, 512);
+//    private static final Dimension MAX_SIZE = new Dimension(2048, 1024);
 
     /**
      * Kontruktor des CoolPanels mit einer Puffergroesse. Diese wird dazu verwendet,
@@ -92,7 +95,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
         gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");//NOI18N
         mapBounds = null;
         cacheImage = null;
-        noTitlePanel = true;
+//        noTitlePanel = true;
         mustBlur = true;
         geoBuffer = 40d;
         lastX = 0;
@@ -161,6 +164,11 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
         }
         addComponentListener(this);
     }
+
+//    @Override
+//    public Dimension getMaximumSize() {
+//        return MAX_SIZE;
+//    }
 
     /**
      * Legt das Icon fest, die spaeter in die rechte obere Ecke des CoolPanels
@@ -240,7 +248,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
 
             // Falls TitlePanel existiert, speziell zeichnen
             if (getPanTitle() != null) {
-                noTitlePanel = false;
+//                noTitlePanel = false;
                 Rectangle bounds = getPanTitle().getBounds();
                 bg.setComposite(AlphaComposite.SrcAtop.derive(titlePanelOpacity));
                 bg.setColor(colorTitle);
@@ -629,7 +637,6 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
     public void setSpinner(final JPanel spinner) {
         this.spinner = spinner;
     }
-
 
     /** This method is called from within the constructor to
      * initialize the form.

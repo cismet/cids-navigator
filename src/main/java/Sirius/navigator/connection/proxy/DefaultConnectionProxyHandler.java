@@ -79,10 +79,11 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             if (method.getDeclaringClass().equals(Sirius.navigator.connection.Connection.class)) {
                 //if(log.isDebugEnabled()log.debug("[ConnectionProxy] invoking connection method '" + method.getName() + "'");
                 // icon cache --------------------------------------------------
-                if(method.getName().equals("getDefaultIcons")) {  // NOI18N
-                    if(iconCache == null) {
-                        if(log.isInfoEnabled())
+                if (method.getName().equals("getDefaultIcons")) {  // NOI18N
+                    if (iconCache == null) {
+                        if (log.isInfoEnabled()) {
                             log.info("[ConnectionProxy] filling icon cache");  // NOI18N
+                        }
                         iconCache = (ImageHashMap) method.invoke(connection, args);
                     }
 
@@ -450,8 +451,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
         public MetaClass getMetaClass(int classID, String domain) throws ConnectionException {
             if (classAndMethodCache == null) {
-                if(log.isInfoEnabled())
+                if (log.isInfoEnabled()) {
                     log.info("[ConnectionProxy] filling meta class cache");  // NOI18N
+                }
                 classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
             }
 
@@ -484,8 +486,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
         public Sirius.server.localserver.method.Method getMethod(String methodKey) throws ConnectionException {
             if (classAndMethodCache == null) {
-                if(log.isInfoEnabled())
+                if (log.isInfoEnabled()) {
                     log.info("[ConnectionProxy] filling meta class cache");  // NOI18N
+                }
                 classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
             }
 
@@ -494,10 +497,13 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
         public MetaObject getMetaObject(int objectID, int classID, String domain) throws ConnectionException {
 
-            if(log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("getMetaObject(): objectID=" + objectID + ", classID=" + classID + ", domain=" + domain);  // NOI18N
-            MetaObject MetaObject = connection.getMetaObject(session.getUser(), objectID, classID, domain);
-            log.debug(" MetaObject: " + MetaObject + " MetaObject.getName(): " + MetaObject.getName() + " MetaObject.getEditor(): " + MetaObject.getEditor() + " MetaObject.getComplexEditor(): " + MetaObject.getComplexEditor());
+            }
+            MetaObject metaObject = connection.getMetaObject(session.getUser(), objectID, classID, domain);
+            if (metaObject != null) {
+                log.debug(" MetaObject: " + metaObject + " MetaObject.getName(): " + metaObject.getName() + " MetaObject.getEditor(): " + metaObject.getEditor() + " MetaObject.getComplexEditor(): " + metaObject.getComplexEditor());
+            }
 
 
 //            if(MetaObject.getMetaClass()==null)
@@ -514,9 +520,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 //            }
 //
             //set Classes in SubObjects as well
-            MetaObject.setAllClasses(classAndMethodCache.getClassHash());
+            metaObject.setAllClasses(classAndMethodCache.getClassHash());
 
-            return MetaObject;
+            return metaObject;
 
             //return connection.getMetaObject(session.getUser(), objectID, classID, domain);
         }
@@ -556,8 +562,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             if (classAndMethodCache == null) {
                 initClassAndMethodCache();
             }
-           if(log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("getMetaObjectByQuery");  // NOI18N
+            }
             try {
                 MetaObject[] obs = connection.getMetaObjectByQuery(session.getUser(), query);
 
