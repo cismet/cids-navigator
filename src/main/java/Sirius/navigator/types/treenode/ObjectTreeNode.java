@@ -28,8 +28,6 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    /** Use serialVersionUID for interoperability. */
-    private static final long serialVersionUID = 2948703976584112759L;
 
     private static final transient Logger LOG = Logger.getLogger(ObjectTreeNode.class);
 

@@ -67,8 +67,6 @@ public class ConnectionTester extends javax.swing.JFrame {
 
     private static final transient Logger LOG = Logger.getLogger(ConnectionTester.class);
 
-    /** Use serialVersionUID for interoperability. */
-    private static final long serialVersionUID = 2529660521464415037L;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
