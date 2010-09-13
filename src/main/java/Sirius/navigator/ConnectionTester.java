@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.openide.util.NbBundle;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -205,30 +204,22 @@ public class ConnectionTester extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel1.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jLabel1.text")); // NOI18N
+        jLabel1.setText("Proxy:"); // NOI18N
 
-        txtProxy.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.txtProxy.text")); // NOI18N
+        jLabel2.setText("Username:"); // NOI18N
 
-        jLabel2.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jLabel2.text")); // NOI18N
+        jLabel3.setText("Password:"); // NOI18N
 
-        txtUsername.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.txtUsername.text")); // NOI18N
+        jLabel4.setText("Domain:"); // NOI18N
 
-        jLabel3.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jLabel3.text")); // NOI18N
-
-        pwdPassword.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.pwdPassword.text")); // NOI18N
-
-        jLabel4.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jLabel4.text")); // NOI18N
-
-        txtDomain.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.txtDomain.text")); // NOI18N
-
-        btnTest.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.btnTest.text")); // NOI18N
+        btnTest.setText("Test"); // NOI18N
         btnTest.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnTestActionPerformed(evt);
             }
         });
 
-        btnStore.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.btnStore.text")); // NOI18N
+        btnStore.setText("Store"); // NOI18N
         btnStore.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnStoreActionPerformed(evt);
@@ -239,18 +230,16 @@ public class ConnectionTester extends javax.swing.JFrame {
         txaOut.setRows(5);
         jScrollPane1.setViewportView(txaOut);
 
-        jTabbedPane1.addTab(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jScrollPane1.TabConstraints.tabTitle"), jScrollPane1); // NOI18N
+        jTabbedPane1.addTab("Out", jScrollPane1); // NOI18N
 
         txaLog.setColumns(20);
         txaLog.setRows(5);
         txaLog.setAutoscrolls(false);
         jScrollPane4.setViewportView(txaLog);
 
-        jLabel5.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jLabel5.text")); // NOI18N
+        jLabel5.setText("Regex:"); // NOI18N
 
-        txtRegex.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.txtRegex.text")); // NOI18N
-
-        btnClear.setText(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.btnClear.text")); // NOI18N
+        btnClear.setText("Clear"); // NOI18N
         btnClear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClearActionPerformed(evt);
@@ -266,9 +255,9 @@ public class ConnectionTester extends javax.swing.JFrame {
                 .add(jLabel5)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(txtRegex, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 221, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 212, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 370, Short.MAX_VALUE)
                 .add(btnClear))
-            .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 663, Short.MAX_VALUE)
+            .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 739, Short.MAX_VALUE)
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -281,7 +270,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab(NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.jPanel1.TabConstraints.tabTitle"), jPanel1); // NOI18N
+        jTabbedPane1.addTab("Log", jPanel1); // NOI18N
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -290,30 +279,31 @@ public class ConnectionTester extends javax.swing.JFrame {
             .add(layout.createSequentialGroup()
                 .addContainerGap()
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
+                    .add(jTabbedPane1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 760, Short.MAX_VALUE)
                     .add(layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel2)
+                            .add(jLabel1))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(txtProxy, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 607, Short.MAX_VALUE))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, layout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(txtUsername, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(18, 18, 18)
-                        .add(jLabel3)
-                        .add(18, 18, 18)
-                        .add(pwdPassword, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
-                        .add(18, 18, 18)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(txtProxy, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 684, Short.MAX_VALUE)
                             .add(layout.createSequentialGroup()
+                                .add(txtUsername, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 193, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                                 .add(18, 18, 18)
-                                .add(btnTest)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                                .add(btnStore))
-                            .add(layout.createSequentialGroup()
-                                .add(jLabel4)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                                .add(txtDomain)))))
+                                .add(jLabel3)
+                                .add(18, 18, 18)
+                                .add(pwdPassword, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 205, Short.MAX_VALUE)
+                                .add(18, 18, 18)
+                                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                                    .add(layout.createSequentialGroup()
+                                        .add(18, 18, 18)
+                                        .add(btnTest)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                        .add(btnStore))
+                                    .add(layout.createSequentialGroup()
+                                        .add(jLabel4)
+                                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                        .add(txtDomain)))))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
