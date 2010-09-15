@@ -45,7 +45,7 @@ public class RESTfulReconnector <R extends CallServerService> extends Reconnecto
         if (exception instanceof UniformInterfaceException) {
             if (exception instanceof UniformInterfaceException) {
                 int status = ((UniformInterfaceException) exception).getResponse().getStatus();                
-                error = (status == 503);
+                error = (status == 503) || (status == 407);
             }
         } else if (exception instanceof ClientHandlerException) {
             error = true;

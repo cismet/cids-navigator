@@ -37,7 +37,6 @@ public class RmiReconnector <R extends Remote> extends Reconnector<R> {
             return new ReconnectorException(CONNECTION_LOST);
         } else if (exception instanceof ServerException) {
             if (exception.getCause().getClass().equals(RemoteException.class)) {
-                LOG.fatal("blatest", exception.getCause());
                 return new ReconnectorException(CONNECTION_LOST);
             }
         }
