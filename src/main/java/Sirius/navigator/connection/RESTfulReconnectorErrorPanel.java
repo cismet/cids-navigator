@@ -68,10 +68,10 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         panProxyOptionsWrapper = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
-        cbProxy = new javax.swing.JCheckBox();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         errPanWrapper = new javax.swing.JPanel();
+        tbProxy = new javax.swing.JToggleButton();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -80,6 +80,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
         jButton1.setText(org.openide.util.NbBundle.getMessage(RESTfulReconnectorErrorPanel.class, "RESTfulReconnectorErrorPanel.jButton1.text")); // NOI18N
+        jButton1.setPreferredSize(new java.awt.Dimension(80, 30));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
@@ -94,18 +95,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(panProxyOptionsWrapper, gridBagConstraints);
-
-        cbProxy.setText(org.openide.util.NbBundle.getMessage(RESTfulReconnectorErrorPanel.class, "RESTfulReconnectorErrorPanel.cbProxy.text")); // NOI18N
-        cbProxy.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbProxyActionPerformed(evt);
-            }
-        });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        add(cbProxy, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -124,11 +113,20 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(errPanWrapper, gridBagConstraints);
-    }// </editor-fold>//GEN-END:initComponents
 
-    private void cbProxyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbProxyActionPerformed
-        panProxyOptionsWrapper.setVisible(cbProxy.isSelected());
-    }//GEN-LAST:event_cbProxyActionPerformed
+        tbProxy.setText(org.openide.util.NbBundle.getMessage(RESTfulReconnectorErrorPanel.class, "RESTfulReconnectorErrorPanel.tbProxy.text")); // NOI18N
+        tbProxy.setPreferredSize(new java.awt.Dimension(140, 30));
+        tbProxy.setRolloverEnabled(false);
+        tbProxy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tbProxyActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        add(tbProxy, gridBagConstraints);
+    }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Proxy proxy = panProxyOptions.getProxy();
@@ -139,15 +137,19 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         proxy.toPreferences();
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void tbProxyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbProxyActionPerformed
+        panProxyOptionsWrapper.setVisible(tbProxy.isSelected());
+    }//GEN-LAST:event_tbProxyActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox cbProxy;
     private javax.swing.JPanel errPanWrapper;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JPanel panProxyOptionsWrapper;
+    private javax.swing.JToggleButton tbProxy;
     // End of variables declaration//GEN-END:variables
 
 }
