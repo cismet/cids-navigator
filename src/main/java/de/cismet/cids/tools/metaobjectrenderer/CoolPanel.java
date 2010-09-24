@@ -58,7 +58,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
     @InjectedResource()
     public Color shadowColor, colorBorder, colorMapBorder, colorTitle, colorInter, colorDarkLine, colorBrightLine, colorGlossy, gradientColorTop, gradientColorBottom;
     private static final int IMAGE_TYPE = BufferedImage.TYPE_4BYTE_ABGR;
-    private boolean mustBlur;
+    private boolean noTitlePanel, mustBlur;
     private double geoBuffer;
     private int lastX, lastWidth, panelWidth;
     private ImageIcon icons;
@@ -69,8 +69,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
     private JPanel spinner;
     private JComponent panTitle, panMap, panInter, panContent;
     private Rectangle mapBounds;
-//    private static final Dimension MAX_SIZE = new Dimension(512, 512);
-//    private static final Dimension MAX_SIZE = new Dimension(2048, 1024);
+    private static final Dimension MAX_SIZE = new Dimension(2048, 1024);
 
     /**
      * Kontruktor des CoolPanels mit einer Puffergroesse. Diese wird dazu verwendet,
@@ -95,7 +94,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
         gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");//NOI18N
         mapBounds = null;
         cacheImage = null;
-//        noTitlePanel = true;
+        noTitlePanel = true;
         mustBlur = true;
         geoBuffer = 40d;
         lastX = 0;
@@ -165,10 +164,10 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
         addComponentListener(this);
     }
 
-//    @Override
-//    public Dimension getMaximumSize() {
-//        return MAX_SIZE;
-//    }
+    @Override
+    public Dimension getMaximumSize() {
+        return MAX_SIZE;
+    }
 
     /**
      * Legt das Icon fest, die spaeter in die rechte obere Ecke des CoolPanels
@@ -248,7 +247,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
 
             // Falls TitlePanel existiert, speziell zeichnen
             if (getPanTitle() != null) {
-//                noTitlePanel = false;
+                noTitlePanel = false;
                 Rectangle bounds = getPanTitle().getBounds();
                 bg.setComposite(AlphaComposite.SrcAtop.derive(titlePanelOpacity));
                 bg.setColor(colorTitle);

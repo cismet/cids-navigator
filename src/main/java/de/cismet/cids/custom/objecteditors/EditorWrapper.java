@@ -54,7 +54,10 @@ public class EditorWrapper implements ComponentWrapper {
         }
 
         if (component instanceof FooterComponentProvider) {
-            ced.getPanFooter().add(((FooterComponentProvider) component).getFooterComponent());
+            JComponent comp = ((FooterComponentProvider) component).getFooterComponent();
+            if (comp != null) {
+                ced.getPanFooter().add(comp);
+            }
         }
         return ced;
 

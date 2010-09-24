@@ -49,7 +49,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
             @Override
             public final int compare(CidsBean o1, CidsBean o2) {
-                return ("" + o1).compareToIgnoreCase("" + o2);//NOI18N
+                return (String.valueOf(o1)).compareToIgnoreCase(String.valueOf(o2));//NOI18N
             }
         };
     }
@@ -198,7 +198,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         }
         String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName();//NOI18N
         if (onlyUsed) {
-            query += "where used = true";
+            query += " where used is true";//NOI18N
         }
         query += orderBy;
         final MetaObject[] MetaObjects = SessionManager.getProxy().getMetaObjectByQuery(query, 0);
