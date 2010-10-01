@@ -29,18 +29,20 @@
 package Sirius.navigator;
 
 import Sirius.navigator.resource.PropertyManager;
-import java.net.MalformedURLException;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import java.awt.EventQueue;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.net.ProxySelector;
 import java.net.URI;
+import java.net.URL;
 
 import java.util.Iterator;
 import java.util.List;
@@ -49,10 +51,10 @@ import java.util.Properties;
 import javax.swing.JFileChooser;
 
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
+
 import de.cismet.security.Proxy;
 
 import de.cismet.tools.gui.TextAreaAppender;
-import java.net.URL;
 
 /**
  * DOCUMENT ME!
@@ -65,7 +67,6 @@ public class ConnectionTester extends javax.swing.JFrame {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(ConnectionTester.class);
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
@@ -230,7 +231,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         txaOut.setRows(5);
         jScrollPane1.setViewportView(txaOut);
 
-        jTabbedPane1.addTab("Out", jScrollPane1); // NOI18N
+        jTabbedPane1.addTab("Out", jScrollPane1);
 
         txaLog.setColumns(20);
         txaLog.setRows(5);
@@ -270,7 +271,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 .add(jScrollPane4, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 351, Short.MAX_VALUE))
         );
 
-        jTabbedPane1.addTab("Log", jPanel1); // NOI18N
+        jTabbedPane1.addTab("Log", jPanel1);
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -336,7 +337,9 @@ public class ConnectionTester extends javax.swing.JFrame {
     /**
      * DOCUMENT ME!
      *
-     * @param  evt  DOCUMENT ME!
+     * @param   evt  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
      */
     private void btnTestActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnTestActionPerformed
     {//GEN-HEADEREND:event_btnTestActionPerformed
@@ -346,33 +349,78 @@ public class ConnectionTester extends javax.swing.JFrame {
             proxy = null;
         } else {
             proxy = new Proxy();
-            try
-            {
+            try {
                 final URL url = new URL(txtProxy.getText());
                 proxy.setHost(url.getHost());
                 proxy.setPort(url.getPort());
-            }catch(final MalformedURLException ex)
-            {
+            } catch (final MalformedURLException ex) {
                 throw new IllegalStateException("illegal proxy url", ex);
             }
             proxy.setUsername(txtUsername.getText());
             proxy.setPassword(String.valueOf(pwdPassword.getPassword()));
             proxy.setDomain(txtDomain.getText());
         }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("system properties: " + System.getProperties());
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("system env: " + System.getenv());
+        }
 
         final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
-                "http://callserver-lung.cismet.de/callserver/binary", proxy);
-        try {
-            txaOut.setText(connector.getUser("WRRL-DB-MV", "Administratoren", "WRRL-DB-MV", "admin", "cismet")
-                        .toString() + "\n\nSUCCESS");
-        } catch (final Exception e) {
-            txaOut.append(e.getMessage() + "\n");
-            txaOut.append("STACKTRACE: \n");
-            for (final StackTraceElement ste : e.getStackTrace()) {
-                txaOut.append(ste.toString() + "\n");
-            }
-            txaOut.append("\nFAILURE");
-        }
+                "http://callserver-lung.cismet.de/callserver/binary",
+                proxy);
+
+        final Thread establisher = new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            final String ret = connector.getUser(
+                                        "WRRL_DB_MV",
+                                        "Administratoren",
+                                        "WRRL_DB_MV",
+                                        "admin",
+                                        "cismet")
+                                        .toString() + "\n\nSUCCESS";
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        txaOut.setText(ret);
+                                    }
+                                });
+                        } catch (final Exception e) {
+                            EventQueue.invokeLater(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        txaOut.append(e.getMessage() + "\n");
+                                        txaOut.append("STACKTRACE: \n");
+                                        for (final StackTraceElement ste : e.getStackTrace()) {
+                                            txaOut.append(ste.toString() + "\n");
+                                        }
+
+                                        Throwable cause = e.getCause();
+                                        while (cause != null) {
+                                            txaOut.append("\n\n");
+                                            txaOut.append("CAUSE: ");
+                                            txaOut.append(cause.getMessage());
+                                            txaOut.append("\n");
+                                            txaOut.append("STACKTRACE: \n");
+                                            for (final StackTraceElement ste : cause.getStackTrace()) {
+                                                txaOut.append(ste.toString() + "\n");
+                                            }
+
+                                            cause = cause.getCause();
+                                        }
+                                        txaOut.append("\nFAILURE");
+                                    }
+                                });
+                        }
+                    }
+                });
+        establisher.start();
     }//GEN-LAST:event_btnTestActionPerformed
 
     /**

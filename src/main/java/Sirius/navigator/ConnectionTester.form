@@ -171,7 +171,7 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Out">
-                <Property name="tabTitle" type="java.lang.String" value="Out" noResource="true"/>
+                <Property name="tabTitle" type="java.lang.String" value="Out"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
@@ -190,7 +190,7 @@
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Log">
-                <Property name="tabTitle" type="java.lang.String" value="Log" noResource="true"/>
+                <Property name="tabTitle" type="java.lang.String" value="Log"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>
