@@ -8,7 +8,6 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
-import de.cismet.reconnector.Reconnector;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
@@ -34,13 +33,18 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 
+import java.rmi.RemoteException;
+
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
 import de.cismet.cids.server.CallServerService;
+
+import de.cismet.reconnector.Reconnector;
 
 import de.cismet.security.Proxy;
 
@@ -70,7 +74,7 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
      * Creates a new RESTfulConnection object.
      */
     public RESTfulConnection() {
-        final String uHome = System.getProperty("user.home"); // NOI18N
+        final String uHome = System.getProperty("user.home");                                       // NOI18N
         if (uHome != null) {
             final File homeDir = new File(uHome);
             final File disableIndicator = new File(homeDir, DISABLE_MO_FILENAME);
@@ -95,6 +99,14 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
         return connect(callserverURL, null);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverURL  DOCUMENT ME!
+     * @param   proxy          DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
         reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
         reconnector.useDialog(true, null);
@@ -102,15 +114,12 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
     }
 
     @Override
-    public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException{
+    public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
         connector = createReconnector(callserverURL, proxy).getProxy();
-        //connector = new RESTfulSerialInterfaceConnector(callserverURL, proxy);
 
-        try
-        {
+        try {
             connector.getDomains();
-        }catch(final Exception e)
-        {
+        } catch (final Exception e) {
             final String message = "no connection to restful interface"; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
@@ -660,10 +669,10 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
         try {
             return connector.delete(queryDataId, domain);
         } catch (final Exception e) {
-            final String message = "could not delete querydata for id, domain: "//NOI18N
+            final String message = "could not delete querydata for id, domain: " // NOI18N
                         + queryDataId
                         + " :: "
-                        + domain; // NOI18N
+                        + domain;                                                // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -674,10 +683,10 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
         try {
             return connector.storeQuery(user, data);
         } catch (final Exception e) {
-            final String message = "could not store query data for user, data: "//NOI18N
+            final String message = "could not store query data for user, data: " // NOI18N
                         + user
                         + " :: "
-                        + data; // NOI18N
+                        + data;                                                  // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -688,10 +697,10 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
         try {
             return connector.getQuery(id, domain);
         } catch (final Exception e) {
-            final String message = "could not get query data for id, domain: "//NOI18N
+            final String message = "could not get query data for id, domain: " // NOI18N
                         + id
                         + " :: "
-                        + domain; // NOI18N
+                        + domain;                                              // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -702,8 +711,8 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
         try {
             return connector.getQueryInfos(userGroup);
         } catch (final Exception e) {
-            final String message = "could not get query infos for usergroup: "//NOI18N
-                        + userGroup; // NOI18N
+            final String message = "could not get query infos for usergroup: " // NOI18N
+                        + userGroup;                                           // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -714,8 +723,8 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
         try {
             return connector.getQueryInfos(user);
         } catch (final Exception e) {
-            final String message = "could not get query infos for user: "//NOI18N
-                        + user; // NOI18N
+            final String message = "could not get query infos for user: " // NOI18N
+                        + user;                                           // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -921,5 +930,23 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                     + orderBy;
 
         return getMetaObjectByQuery(user, query);
+    }
+
+    @Override
+    public String getConfigAttr(final User user, final String key) throws ConnectionException {
+        try {
+            return connector.getConfigAttr(user, key);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could not get config attr for user: " + user, e); // NOI18N
+        }
+    }
+
+    @Override
+    public boolean hasConfigAttr(final User user, final String key) throws ConnectionException {
+        try {
+            return connector.hasConfigAttr(user, key);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could not check config attr for user: " + user, e); // NOI18N
+        }
     }
 }

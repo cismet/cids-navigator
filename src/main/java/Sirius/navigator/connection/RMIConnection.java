@@ -8,8 +8,6 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
-import de.cismet.reconnector.Reconnector;
-import de.cismet.reconnector.rmi.RmiReconnector;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -40,10 +38,6 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 
-import java.net.MalformedURLException;
-
-import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
 import java.util.HashMap;
@@ -52,7 +46,12 @@ import java.util.Vector;
 import javax.swing.Icon;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
 import de.cismet.cids.server.CallServerService;
+
+import de.cismet.reconnector.Reconnector;
+
+import de.cismet.reconnector.rmi.RmiReconnector;
 
 import de.cismet.security.Proxy;
 
@@ -68,10 +67,10 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
 
     private static final transient Logger LOG = Logger.getLogger(RMIConnection.class);
     private static final boolean IS_LEIGHTWEIGHT_MO_CODE_ENABLED;
-    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo";  // NOI18N
+    private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo"; // NOI18N
 
     static {
-        final String uHome = System.getProperty("user.home");  // NOI18N
+        final String uHome = System.getProperty("user.home"); // NOI18N
         if (uHome != null) {
             final File homeDir = new File(uHome);
             final File disableIndicator = new File(homeDir, DISABLE_MO_FILENAME);
@@ -98,6 +97,13 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         return reconnector;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverURL  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private Reconnector<CallServerService> createReconnector(final String callserverURL) {
         reconnector = new RmiReconnector<CallServerService>(CallServerService.class, callserverURL);
         reconnector.useDialog(true, null);
@@ -109,20 +115,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         this.callserverURL = null;
         this.connected = false;
 
-//        try {
-            LOG.info("creating network connection to callserver '" + callserverURL + "'");
-            callserver = createReconnector(callserverURL).getProxy();
-            //callserver = Naming.lookup(callserverURL);
-//        } catch (MalformedURLException mue) {
-//            LOG.fatal("'" + callserverURL + "' is not a valid URL", mue);
-//            throw new ConnectionException("'" + callserverURL + "' is not a valid URL", mue);
-//        } catch (NotBoundException nbe) {
-//            LOG.fatal("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
-//            throw new ConnectionException("[NetworkError] could not connect to '" + callserverURL + "'", nbe);
-//        } catch (RemoteException re) {
-//            LOG.fatal("[ServerError] could not connect to '" + callserverURL + "'", re);
-//            throw new ConnectionException("[ServerError] could not connect to '" + callserverURL + "'", re);
-//        }
+        LOG.info("creating network connection to callserver '" + callserverURL + "'");
+        callserver = createReconnector(callserverURL).getProxy();
 
         if (LOG.isDebugEnabled()) {
             final StringBuffer buffer = new StringBuffer("remote interfaces of '").append(callserver.getClass()
@@ -826,13 +820,13 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     private MetaObject[] getLightweightMetaObjectsFallback(final int classId, final User user)
             throws ConnectionException {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId);
-        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");  // NOI18N
-        String orderBy = "";  // NOI18N
+        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                                 // NOI18N
+        String orderBy = "";                                                                                             // NOI18N
         if (ca != null) {
             final String value = ca.getValue().toString();
-            orderBy = " order by " + value;  // NOI18N
+            orderBy = " order by " + value;                                                                              // NOI18N
         }
-        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy;  // NOI18N
+        final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy; // NOI18N
 
         return getMetaObjectByQuery(user, query);
     }
@@ -876,5 +870,25 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             }
         }
         return lwmos;
+    }
+
+    @Override
+    public String getConfigAttr(final User user, final String key) throws ConnectionException {
+        try {
+            final UserService service = (UserService)callserver;
+            return service.getConfigAttr(user, key);
+        } catch (final RemoteException ex) {
+            throw new ConnectionException("could not get config attr for user: " + user, ex); // NOI18N
+        }
+    }
+
+    @Override
+    public boolean hasConfigAttr(final User user, final String key) throws ConnectionException {
+        try {
+            final UserService service = (UserService)callserver;
+            return service.hasConfigAttr(user, key);
+        } catch (final RemoteException ex) {
+            throw new ConnectionException("could not check config attr for user: " + user, ex); // NOI18N
+        }
     }
 }

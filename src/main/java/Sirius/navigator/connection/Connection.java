@@ -667,4 +667,18 @@ public interface Connection {
             String query,
             String[] representationFields,
             AbstractAttributeRepresentationFormater formater) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user  DOCUMENT ME!
+     * @param   key   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    String getConfigAttr(final User user, final String key) throws ConnectionException;
+
+    boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
 }
