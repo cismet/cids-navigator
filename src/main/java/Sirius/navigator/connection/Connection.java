@@ -669,16 +669,12 @@ public interface Connection {
             AbstractAttributeRepresentationFormater formater) throws ConnectionException;
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param   user  DOCUMENT ME!
-     * @param   key   DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @see  Sirius.server.middleware.interfaces.proxy.UserService#getConfigAttr(Sirius.server.newuser.User, java.lang.String)
      */
     String getConfigAttr(final User user, final String key) throws ConnectionException;
 
+    /**
+     * @see  Sirius.server.middleware.interfaces.proxy.UserService#hasConfigAttr(Sirius.server.newuser.User, java.lang.String)
+     */
     boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
 }
