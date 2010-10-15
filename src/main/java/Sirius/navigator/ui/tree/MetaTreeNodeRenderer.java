@@ -131,7 +131,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                     closedIco = base;
                 }
             } catch (Exception e) {
-                log.error("Error during Iconstuff", e);//NOI18N
+                log.error("Error during Iconstuff" + metaNode.getIconString(), e);//NOI18N
             }
         }
 

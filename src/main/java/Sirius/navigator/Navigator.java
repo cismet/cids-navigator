@@ -216,7 +216,9 @@ public class Navigator extends JFrame {
             initPlugins();
             initEvents();
             initWindow();
-//            initSearch();
+            if (StaticDebuggingTools.checkHomeForFile("cismetNewCidsSearch")) {
+                initSearch();
+            }
             //Not in EDT
             if (container instanceof LayoutedContainer) {
                 SwingUtilities.invokeLater(new Runnable() {

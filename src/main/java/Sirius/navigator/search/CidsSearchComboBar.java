@@ -1,5 +1,7 @@
 package Sirius.navigator.search;
 
+import Sirius.navigator.search.CidsSearchExecutor;
+import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -315,7 +317,7 @@ public class CidsSearchComboBar extends javax.swing.JPanel implements ActionList
             startProgressAnimation();
             //TODO threading!
             currentSearch.setSearchParameter(searchString);
-            CidsSearchExecutor.executeCidsSearch(currentSearch, new PropertyChangeListener() {
+            CidsSearchExecutor.executeCidsSearchAndDisplayResults(currentSearch.getServerSearch(), new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {

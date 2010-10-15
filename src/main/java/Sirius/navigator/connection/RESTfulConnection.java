@@ -8,6 +8,8 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.server.search.CidsServerSearch;
+import de.cismet.reconnector.Reconnector;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
@@ -28,6 +30,7 @@ import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
@@ -873,6 +876,19 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
             throw new ConnectionException(message, e);
         }
     }
+
+    @Override
+    public Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException {
+        try {
+            return connector.customServerSearch(user, serverSearch);
+        } catch (final Exception e) {
+            final String message = "error during custom search";
+            throw new ConnectionException(message, e);
+        }
+    }
+
+   
+
 
     /**
      * Initializes LWMOs with the appropriate metaservice and string formatter.

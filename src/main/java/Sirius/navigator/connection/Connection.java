@@ -18,6 +18,7 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
+import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
@@ -32,6 +33,7 @@ import java.util.Vector;
 import javax.swing.Icon;
 
 import de.cismet.security.Proxy;
+import java.util.Collection;
 
 /**
  * A singleton factory class that creates and manages connections.
@@ -677,4 +679,11 @@ public interface Connection {
      * @see  Sirius.server.middleware.interfaces.proxy.UserService#hasConfigAttr(Sirius.server.newuser.User, java.lang.String)
      */
     boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
+
+
+
+
+    Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException;
+
+
 }

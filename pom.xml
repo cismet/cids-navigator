@@ -48,6 +48,11 @@
             <artifactId>jetty</artifactId>
             <version>6.1.16</version>
         </dependency>
+        <dependency>
+            <groupId>com.explodingpixels</groupId>
+            <artifactId>mac_widgets</artifactId>
+            <version>0.9.5</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -8,6 +8,9 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.server.search.CidsServerSearch;
+import de.cismet.reconnector.Reconnector;
+import de.cismet.reconnector.rmi.RmiReconnector;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -33,6 +36,7 @@ import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
@@ -806,6 +810,21 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                 ex);
         }
     }
+
+    @Override
+    public Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException{
+        try {
+            return ((SearchService)callserver).customServerSearch(user, serverSearch);
+        } catch (RemoteException re) {
+            LOG.error("[ServerError] error during custom search ", re);
+            throw new ConnectionException("[ServerError] [ServerError] error during custom search "
+                        + re.getMessage(),
+                ConnectionException.ERROR);
+        }
+    }
+
+
+
 
     /**
      * !For debugging purpose only. Do not use!
