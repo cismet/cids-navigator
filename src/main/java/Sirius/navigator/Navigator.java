@@ -216,7 +216,7 @@ public class Navigator extends JFrame {
             initPlugins();
             initEvents();
             initWindow();
-            if (StaticDebuggingTools.checkHomeForFile("cismetNewCidsSearch")) {
+            if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
                 initSearch();
             }
             //Not in EDT
