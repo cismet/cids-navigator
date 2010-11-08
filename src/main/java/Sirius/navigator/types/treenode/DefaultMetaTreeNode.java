@@ -249,8 +249,13 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode //imple
                             return thisChildNode.explore(childrenIterator);
                         }
                     } else {
-                        if (thisChildNode.toString().equals(childNode.toString())) {
-                            return thisChildNode.explore(childrenIterator);
+                        String thisChildNodeString = thisChildNode.toString();
+                        if (thisChildNodeString != null) {
+                            if (thisChildNodeString.equals(childNode.toString())) {
+                                return thisChildNode.explore(childrenIterator);
+                            }
+                        } else {
+                            logger.warn("Fixme: thisChildNodeString is null!");
                         }
                     }
                 }
