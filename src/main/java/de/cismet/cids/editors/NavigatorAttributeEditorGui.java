@@ -222,7 +222,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         final EditorSaveListener editorSaveListener;
         if (currentBeanStore instanceof EditorSaveListener) {
             editorSaveListener = (EditorSaveListener) currentBeanStore;
-            editorSaveListener.prepareForSave();
+            if(!editorSaveListener.prepareForSave()) {
+                //editor is not ready for safe? then stop save procedure...
+                return;
+            }
         } else {
             editorSaveListener = null;
         }
@@ -236,7 +239,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 final JDialog dialog = jop.createDialog(NavigatorAttributeEditorGui.this,
                         org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.saveIt().dialog.title"));//NOI18N
 
-                Timer t = new Timer(900, new ActionListener() {
+                Timer t = new Timer(2000, new ActionListener() {
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -289,10 +292,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 }
 
             }
-            refreshTree();
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS);
             }
+            refreshTree();
         } catch (Exception ex) {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(EditorSaveListener.EditorSaveStatus.SAVE_ERROR);

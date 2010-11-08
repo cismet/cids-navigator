@@ -12,5 +12,5 @@ public interface EditorSaveListener {
     }
 
     void editorClosed(EditorSaveStatus status);
-    void prepareForSave();
+    boolean prepareForSave();
 }
