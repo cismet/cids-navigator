@@ -543,7 +543,7 @@ public class MutablePopupMenu extends JPopupMenu {
 
         public void invoke() throws Exception {
             DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
-            if (selectedNode != null && selectedNode.isLeaf()) {
+            if (selectedNode != null) {
                 if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
                     boolean deleted = MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
                     if (deleted) {
@@ -589,7 +589,7 @@ public class MutablePopupMenu extends JPopupMenu {
 
         public void invoke() throws Exception {
             DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
-            if (selectedNode != null && selectedNode.isLeaf()) {
+            if (selectedNode != null) {
                 if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
 
                     boolean deleted = MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
