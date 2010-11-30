@@ -166,9 +166,10 @@ public class MutablePopupMenu extends JPopupMenu {
         //Method[] methodIDs = null;
 
         public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-            if (metaCatalogueTree == null) {
-                metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
-            }
+//            if (metaCatalogueTree == null) {
+                //metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
+                metaCatalogueTree = ComponentRegistry.getRegistry().getActiveCatalogue();
+//            }
 
             // edit mbrill: now private static final variable
 //            if (resources == null) {
