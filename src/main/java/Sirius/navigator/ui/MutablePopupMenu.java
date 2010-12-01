@@ -64,7 +64,7 @@ public class MutablePopupMenu extends JPopupMenu {
     protected JMenuItem newObject;
     private TreeEditorMenu treeEditorMenu = null;
 
-    private MetaCatalogueTree metaCatalogueTree = null;
+    private MetaCatalogueTree currentTree = null;
     private TreeNodeEditor treeNodeEditor;
     private static final ResourceManager resources = ResourceManager.getManager();
 
@@ -168,8 +168,10 @@ public class MutablePopupMenu extends JPopupMenu {
         public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
 //            if (metaCatalogueTree == null) {
                 //metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
-                metaCatalogueTree = ComponentRegistry.getRegistry().getActiveCatalogue();
+                currentTree = ComponentRegistry.getRegistry().getActiveCatalogue();
 //            }
+
+
 
             // edit mbrill: now private static final variable
 //            if (resources == null) {
@@ -190,7 +192,7 @@ public class MutablePopupMenu extends JPopupMenu {
                 }
 //                treeEditorMenu = new TreeEditorMenu(ComponentRegistry.getRegistry().getMainWindow(), ComponentRegistry.getRegistry().getCatalogueTree());
 //                addPluginMenu(treeEditorMenu);
-                Node node = metaCatalogueTree.getSelectedNode().getNode();
+                Node node = currentTree.getSelectedNode().getNode();
                 if (node.getId() != -1 && node.getDynamicChildrenStatement() == null) {
                     //Kein dynamischer Knoten, keine dynamischen Kinder
                     newNode.setVisible(true);
@@ -339,7 +341,7 @@ public class MutablePopupMenu extends JPopupMenu {
         }
 
         public void invoke() throws Exception {
-            DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
+            DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
 
             if (logger.isDebugEnabled()) {
                 logger.debug("NewNodeMethod: creating new node as parent of " + selectedNode);//NOI18N
@@ -355,7 +357,7 @@ public class MutablePopupMenu extends JPopupMenu {
                             logger.debug("NewNodeMethod: parent node is not explored");//NOI18N
                         }
                         try {
-                            metaCatalogueTree.expandPath(new TreePath(selectedNode.getPath()));
+                            currentTree.expandPath(new TreePath(selectedNode.getPath()));
                             //selectedNode.explore();
                             //((DefaultTreeModel)metaCatalogueTree.getModel()).nodeStructureChanged(selectedNode);
                         } catch (Exception exp) {
@@ -375,10 +377,10 @@ public class MutablePopupMenu extends JPopupMenu {
                         // das endg\u00FCltige Hinzuf\u00FCgen erledigt der Attribut Editor
                         if (metaTreeNode.isObjectNode()) {
                             if (!ComponentRegistry.getRegistry().getAttributeEditor().isChanged()) {
-                                MethodManager.getManager().addTreeNode(metaCatalogueTree, selectedNode, metaTreeNode);
+                                MethodManager.getManager().addTreeNode(currentTree, selectedNode, metaTreeNode);
 
                                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
-                                ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), metaTreeNode);
+                                ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(currentTree.getSelectionPath(), metaTreeNode);
                             } else {
                                 logger.warn("could not create new object node: edited object still unsaved");//NOI18N
                                 JOptionPane.showMessageDialog(
@@ -388,8 +390,8 @@ public class MutablePopupMenu extends JPopupMenu {
                                         JOptionPane.INFORMATION_MESSAGE);
                             }
                         } else {
-                            if (MethodManager.getManager().addNode(metaCatalogueTree, selectedNode, metaTreeNode)) {
-                                MethodManager.getManager().addTreeNode(metaCatalogueTree, selectedNode, metaTreeNode);
+                            if (MethodManager.getManager().addNode(currentTree, selectedNode, metaTreeNode)) {
+                                MethodManager.getManager().addTreeNode(currentTree, selectedNode, metaTreeNode);
                                 metaTreeNode.setNew(false);
                             } else if (logger.isDebugEnabled()) {
                                 logger.warn("addNode failed, omitting addTreeNode");//NOI18N
@@ -444,7 +446,7 @@ public class MutablePopupMenu extends JPopupMenu {
 
         public void invoke() throws Exception {
 
-            DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
+            DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser().getUserGroup())) {
 
                 MetaObject MetaObject = metaClass.getEmptyInstance();
@@ -452,7 +454,7 @@ public class MutablePopupMenu extends JPopupMenu {
                 MetaObjectNode MetaObjectNode = new MetaObjectNode(-1, SessionManager.getSession().getUser().getDomain(), MetaObject, null, null, true, Policy.createWIKIPolicy(), -1, null, false);
                 DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(MetaObjectNode);
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
-                ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), metaTreeNode);
+                ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(currentTree.getSelectionPath(), metaTreeNode);
             }
 
         }
@@ -476,15 +478,15 @@ public class MutablePopupMenu extends JPopupMenu {
         }
 
         public void invoke() throws Exception {
-            DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
+            DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
                 if (selectedNode.getParent() != null && !(selectedNode.getParent() instanceof RootTreeNode)) {
                     treeNodeEditor.editTreeNode(selectedNode);
                     if (selectedNode.isChanged()) {
-                        MethodManager.getManager().updateNode(metaCatalogueTree, (DefaultMetaTreeNode) selectedNode.getParent(), selectedNode);
+                        MethodManager.getManager().updateNode(currentTree, (DefaultMetaTreeNode) selectedNode.getParent(), selectedNode);
 
                         selectedNode.setChanged(false);
-                        ((DefaultTreeModel) metaCatalogueTree.getModel()).nodeChanged(selectedNode);
+                        ((DefaultTreeModel) currentTree.getModel()).nodeChanged(selectedNode);
                     }
                 } else {
                     logger.warn("can not rename top node " + selectedNode);//NOI18N
@@ -512,7 +514,7 @@ public class MutablePopupMenu extends JPopupMenu {
         }
 
         public void invoke() throws Exception {
-            DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
+            DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
 
             MetaObjectNode mon = (MetaObjectNode) selectedNode.getNode();
 //             SessionManager.getSession().getConnection().getMetaObject()
@@ -520,7 +522,7 @@ public class MutablePopupMenu extends JPopupMenu {
 //            if()
             if (MethodManager.getManager().checkPermission(mon, PermissionHolder.WRITEPERMISSION)) {
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
-                ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
+                ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(currentTree.getSelectionPath(), selectedNode);
             } else {
                 logger.warn("insufficient permission to edit node " + selectedNode);//NOI18N
             }
@@ -543,10 +545,10 @@ public class MutablePopupMenu extends JPopupMenu {
         }
 
         public void invoke() throws Exception {
-            DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
+            DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (selectedNode != null) {
                 if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
-                    boolean deleted = MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
+                    boolean deleted = MethodManager.getManager().deleteNode(currentTree, selectedNode);
                     if (deleted) {
                         try {
                             MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
@@ -589,11 +591,11 @@ public class MutablePopupMenu extends JPopupMenu {
         }
 
         public void invoke() throws Exception {
-            DefaultMetaTreeNode selectedNode = metaCatalogueTree.getSelectedNode();
+            DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (selectedNode != null) {
                 if (MethodManager.getManager().checkPermission(selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
 
-                    boolean deleted = MethodManager.getManager().deleteNode(metaCatalogueTree, selectedNode);
+                    boolean deleted = MethodManager.getManager().deleteNode(currentTree, selectedNode);
 
                     if (deleted) {
                         try {
@@ -638,13 +640,13 @@ public class MutablePopupMenu extends JPopupMenu {
 
         public void invoke() throws Exception {
 
-            final TreePath selectionPath = metaCatalogueTree.getSelectionPath();
+            final TreePath selectionPath = currentTree.getSelectionPath();
             if (selectionPath != null && selectionPath.getPath().length > 0) {
                 RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
 
-                ((DefaultTreeModel) metaCatalogueTree.getModel()).setRoot(rootTreeNode);
-                ((DefaultTreeModel) metaCatalogueTree.getModel()).reload();
-                metaCatalogueTree.exploreSubtree(selectionPath);
+                ((DefaultTreeModel) currentTree.getModel()).setRoot(rootTreeNode);
+                ((DefaultTreeModel) currentTree.getModel()).reload();
+                currentTree.exploreSubtree(selectionPath);
             }
         }
     }
