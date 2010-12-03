@@ -8,13 +8,12 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.server.search.CidsServerSearch;
-import de.cismet.reconnector.Reconnector;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
+import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
@@ -23,6 +22,7 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
+import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
@@ -30,7 +30,6 @@ import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
@@ -38,6 +37,7 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -878,7 +878,8 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
     }
 
     @Override
-    public Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException {
+    public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
+            throws ConnectionException {
         try {
             return connector.customServerSearch(user, serverSearch);
         } catch (final Exception e) {
@@ -886,9 +887,6 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
             throw new ConnectionException(message, e);
         }
     }
-
-   
-
 
     /**
      * Initializes LWMOs with the appropriate metaservice and string formatter.
@@ -963,6 +961,22 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
             return connector.hasConfigAttr(user, key);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not check config attr for user: " + user, e); // NOI18N
+        }
+    }
+
+    @Override
+    public HistoryObject[] getHistory(final int classId,
+            final int objectId,
+            final String domain,
+            final User user,
+            final int elements) throws ConnectionException {
+        try {
+            return connector.getHistory(classId, objectId, domain, user, elements);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could not get history: classId: " + classId + " || objectId: " // NOI18N
+                        + objectId
+                        + " || domain: " + domain + " || user: " + user + " || elements: " + elements, // NOI18N
+                e);
         }
     }
 }

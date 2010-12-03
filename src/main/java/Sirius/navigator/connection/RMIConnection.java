@@ -8,9 +8,6 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.server.search.CidsServerSearch;
-import de.cismet.reconnector.Reconnector;
-import de.cismet.reconnector.rmi.RmiReconnector;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -22,6 +19,7 @@ import Sirius.server.middleware.interfaces.proxy.SearchService;
 import Sirius.server.middleware.interfaces.proxy.SystemService;
 import Sirius.server.middleware.interfaces.proxy.UserService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
+import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
@@ -30,13 +28,13 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
+import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
 import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 
@@ -44,6 +42,7 @@ import java.io.File;
 
 import java.rmi.RemoteException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -812,7 +811,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException{
+    public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
+            throws ConnectionException {
         try {
             return ((SearchService)callserver).customServerSearch(user, serverSearch);
         } catch (RemoteException re) {
@@ -822,9 +822,6 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                 ConnectionException.ERROR);
         }
     }
-
-
-
 
     /**
      * !For debugging purpose only. Do not use!
@@ -908,6 +905,24 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return service.hasConfigAttr(user, key);
         } catch (final RemoteException ex) {
             throw new ConnectionException("could not check config attr for user: " + user, ex); // NOI18N
+        }
+    }
+
+    @Override
+    public HistoryObject[] getHistory(final int classId,
+            final int objectId,
+            final String domain,
+            final User user,
+            final int elements) throws ConnectionException {
+        try {
+            final MetaService service = (MetaService)callserver;
+
+            return service.getHistory(classId, objectId, domain, user, elements);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could not get history: classId: " + classId + " || objectId: " // NOI18N
+                        + objectId
+                        + " || domain: " + domain + " || user: " + user + " || elements: " + elements, // NOI18N
+                e);
         }
     }
 }

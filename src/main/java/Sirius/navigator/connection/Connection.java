@@ -10,7 +10,9 @@ package Sirius.navigator.connection;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.method.MethodMap;
+import Sirius.server.middleware.interfaces.proxy.MetaService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
+import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -27,13 +29,13 @@ import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
 
 import de.cismet.security.Proxy;
-import java.util.Collection;
 
 /**
  * A singleton factory class that creates and manages connections.
@@ -680,10 +682,25 @@ public interface Connection {
      */
     boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
 
+    /**
+     * @see  Sirius.server.middleware.interfaces.proxy.MetaService#getHistory(int, int, java.lang.String,
+     *       Sirius.server.newuser.User, int)
+     */
+    HistoryObject[] getHistory(final int classId,
+            final int objectId,
+            final String domain,
+            final User user,
+            final int elements) throws ConnectionException;
 
-
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user          DOCUMENT ME!
+     * @param   serverSearch  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
     Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException;
-
-
 }
