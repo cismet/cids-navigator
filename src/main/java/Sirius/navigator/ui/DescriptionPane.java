@@ -48,16 +48,17 @@ import java.awt.print.PrinterException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
 
-import java.util.Vector;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import org.apache.commons.io.FileUtils;
 import org.openide.util.WeakListeners;
 
 /**
@@ -348,7 +349,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                             for (Object object : l) {
                                 ObjectTreeNode otn = (ObjectTreeNode) object;
                                 //final JComponent comp = MetaObjectrendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn);
-                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(CidsObjectRendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn));
+                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(CidsObjectRendererFactory.getInstance().getSingleRenderer(otn.getMetaObject(), otn.getMetaClass().getName() + ": " + otn));                                
                                 final CidsBean bean = otn.getMetaObject().getBean();
                                 final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
 
@@ -523,6 +524,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                     ((MetaTreeNodeStore) originalComponent).setMetaTreeNode(node);
                 }
                 final CidsBean bean = o.getBean();
+                log.fatal(bean.toJSONString());
                 PropertyChangeListener localListener = new PropertyChangeListener() {
 
                     @Override
