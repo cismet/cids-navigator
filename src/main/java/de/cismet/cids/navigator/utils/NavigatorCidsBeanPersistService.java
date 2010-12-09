@@ -20,17 +20,17 @@ import de.cismet.cids.utils.CidsBeanPersistService;
 public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
 
     public CidsBean persistCidsBean(CidsBean cidsBean) throws Exception {
-        MetaObject MetaObject=cidsBean.getMetaObject();
-        String domain = MetaObject.getDomain();
+        MetaObject metaObject=cidsBean.getMetaObject();
+        String domain = metaObject.getDomain();
         User user = SessionManager.getSession().getUser();
-        if (MetaObject.getStatus() == MetaObject.MODIFIED) {
-            SessionManager.getConnection().updateMetaObject(user, MetaObject, domain);
-            return SessionManager.getConnection().getMetaObject(user, MetaObject.getID(), MetaObject.getClassID(), domain).getBean();
-        } else if (MetaObject.getStatus() == MetaObject.TO_DELETE) {
-            SessionManager.getConnection().deleteMetaObject(user, MetaObject, domain);
+        if (metaObject.getStatus() == metaObject.MODIFIED) {
+            SessionManager.getConnection().updateMetaObject(user, metaObject, domain);
+            return SessionManager.getConnection().getMetaObject(user, metaObject.getID(), metaObject.getClassID(), domain).getBean();
+        } else if (metaObject.getStatus() == metaObject.TO_DELETE) {
+            SessionManager.getConnection().deleteMetaObject(user, metaObject, domain);
             return null;
-        } else if (MetaObject.getStatus() == MetaObject.NEW) {
-            MetaObject mo = SessionManager.getConnection().insertMetaObject(user, MetaObject, domain);
+        } else if (metaObject.getStatus() == metaObject.NEW) {
+            MetaObject mo = SessionManager.getConnection().insertMetaObject(user, metaObject, domain);
             if (mo != null) {
                 return mo.getBean();
             }
