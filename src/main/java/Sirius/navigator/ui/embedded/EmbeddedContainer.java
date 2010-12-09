@@ -1,149 +1,197 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.ui.embedded;
-
-import java.util.*;
-import javax.swing.*;
 
 import org.apache.log4j.Logger;
 
+import java.util.*;
+
+import javax.swing.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public abstract class EmbeddedContainer implements EmbeddedComponent
-{
-    protected final static Logger logger = Logger.getLogger(EmbeddedContainer.class);
-    
-    private final String id ;
+public abstract class EmbeddedContainer implements EmbeddedComponent {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    protected static final Logger logger = Logger.getLogger(EmbeddedContainer.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final String id;
     private final Collection components;
     private boolean enabled = false;
     private boolean visible = false;
-    
+
     /** Holds value of property name. */
     private String name;
-    
-    public EmbeddedContainer(String id, Collection components)
-    {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new EmbeddedContainer object.
+     *
+     * @param  id          DOCUMENT ME!
+     * @param  components  DOCUMENT ME!
+     */
+    public EmbeddedContainer(final String id, final Collection components) {
         this.id = id;
         this.components = components;
     }
-    
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
     protected abstract void addComponents();
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     protected abstract void removeComponents();
-    
-    protected ComponentIterator iterator()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected ComponentIterator iterator() {
         return new ComponentIterator(components.iterator());
     }
-    
-    public void setEnabled(boolean enabled)
-    {
-        ComponentIterator iterator = this.iterator();
-        while(iterator.hasNext())
-        {
-            JComponent component = iterator.next();
-            if(component != null)
-            {
+
+    @Override
+    public void setEnabled(final boolean enabled) {
+        final ComponentIterator iterator = this.iterator();
+        while (iterator.hasNext()) {
+            final JComponent component = iterator.next();
+            if (component != null) {
                 component.setEnabled(enabled);
             }
         }
-        
+
         this.enabled = enabled;
     }
-    
-    public boolean isEnabled()
-    {
+
+    @Override
+    public boolean isEnabled() {
         return this.enabled;
     }
-    
-    public void setVisible(boolean visible)
-    {
-        if(this.isVisible() != visible)
-        {
-            ComponentIterator iterator = this.iterator();
-            while(iterator.hasNext())
-            {
-                JComponent component = iterator.next();
-                if(component != null)
-                {
+
+    @Override
+    public void setVisible(final boolean visible) {
+        if (this.isVisible() != visible) {
+            final ComponentIterator iterator = this.iterator();
+            while (iterator.hasNext()) {
+                final JComponent component = iterator.next();
+                if (component != null) {
                     component.setVisible(visible);
                 }
             }
-            
+
             this.visible = visible;
-        }
-        else
-        {
-            this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
+        } else {
+            this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
         }
     }
-    
-    public boolean isVisible()
-    {
+
+    @Override
+    public boolean isVisible() {
         return this.visible;
     }
 
-    /** Getter for property name.
-     * @return Value of property name.
+    /**
+     * Getter for property name.
      *
+     * @return  Value of property name.
      */
-    public String getName()
-    {
+    @Override
+    public String getName() {
         return this.name;
     }
-    
-    /** Setter for property name.
-     * @param name New value of property name.
+
+    /**
+     * Setter for property name.
      *
+     * @param  name  New value of property name.
      */
-    public void setName(String name)
-    {
+    @Override
+    public void setName(final String name) {
         this.name = name;
     }
-    
-    /** Getter for property id.
-     * @return Value of property id.
+
+    /**
+     * Getter for property id.
      *
+     * @return  Value of property id.
      */
-    public String getId()
-    {
+    @Override
+    public String getId() {
         return this.id;
     }
-    
-    /** Setter for property id.
-     * @param id New value of property id.
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * Setter for property id.
      *
+     * @param    id  New value of property id.
+     *
+     * @version  $Revision$, $Date$
      */
-   /*public void setId(String id)
-    {
-        this.id = id;
-    }*/
-    
-    protected final class ComponentIterator
-    {
+    /*public void setId(String id)
+     * {  this.id = id; }*/
+
+    protected final class ComponentIterator {
+
+        //~ Instance fields ----------------------------------------------------
+
         Iterator iterator;
-        
-        private ComponentIterator(Iterator iterator)
-        {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ComponentIterator object.
+         *
+         * @param  iterator  DOCUMENT ME!
+         */
+        private ComponentIterator(final Iterator iterator) {
             this.iterator = iterator;
         }
-        
-        public boolean hasNext()
-        {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public boolean hasNext() {
             return iterator.hasNext();
         }
-        
-        public JComponent next()
-        {
-            Object next = iterator.next();
-            
-            if(JComponent.class.isAssignableFrom(next.getClass()))
-            {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public JComponent next() {
+            final Object next = iterator.next();
+
+            if (JComponent.class.isAssignableFrom(next.getClass())) {
                 return (JComponent)next;
-            }
-            else
-            {
-                logger.error("object '" + next  + "' is not of type 'javax.swing.JComponent' but '" + next.getClass().getName() + "'");//NOI18N
+            } else {
+                logger.error("object '" + next + "' is not of type 'javax.swing.JComponent' but '"
+                            + next.getClass().getName() + "'"); // NOI18N
                 iterator.remove();
                 return null;
             }

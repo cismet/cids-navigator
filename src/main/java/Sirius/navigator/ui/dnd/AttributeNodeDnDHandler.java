@@ -1,133 +1,168 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * AttributeNodeDnDHandler.java
  *
  * Created on 15. September 2004, 11:21
  */
-
 package Sirius.navigator.ui.dnd;
-
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
-import java.awt.dnd.peer.*;
-import java.awt.*;
-import java.io.*;
-
-import org.apache.log4j.Logger;
 
 import Sirius.navigator.ui.attributes.*;
 
+import org.apache.log4j.Logger;
+
+import java.awt.*;
+import java.awt.datatransfer.*;
+import java.awt.dnd.*;
+import java.awt.dnd.peer.*;
+
+import java.io.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetListener, DragSourceListener
-{
+public class AttributeNodeDnDHandler implements DragGestureListener, DropTargetListener, DragSourceListener {
+
+    //~ Instance fields --------------------------------------------------------
+
     private Logger logger;
-    
+
     private AttributeTree attributeTree;
     private DragSource dragSource;
-    private DragSourceContext dragSourceContext;    
-    
+    private DragSourceContext dragSourceContext;
+
     private MetaTransferable metaTransferable;
-    
-    public AttributeNodeDnDHandler(AttributeTree attributeTree)
-    {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AttributeNodeDnDHandler object.
+     *
+     * @param  attributeTree  DOCUMENT ME!
+     */
+    public AttributeNodeDnDHandler(final AttributeTree attributeTree) {
         this.logger = Logger.getLogger(this.getClass());
-        
+
         this.attributeTree = attributeTree;
         this.dragSource = DragSource.getDefaultDragSource();
-        
-        DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(this.attributeTree, DnDConstants.ACTION_COPY + DnDConstants.ACTION_LINK, this);
-        DropTarget dropTarget = new DropTarget(this.attributeTree, this);
+
+        final DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(
+                this.attributeTree,
+                DnDConstants.ACTION_COPY
+                        + DnDConstants.ACTION_LINK,
+                this);
+        final DropTarget dropTarget = new DropTarget(this.attributeTree, this);
     }
-    
-    public void dragGestureRecognized(DragGestureEvent dge)
-    {
-        if(logger.isDebugEnabled())logger.debug("dragGestureRecognized()");//NOI18N
-        Object selectedNode = this.attributeTree.getSelectionPath().getLastPathComponent();
-        if(selectedNode != null && selectedNode instanceof ObjectAttributeNode)
-        {
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void dragGestureRecognized(final DragGestureEvent dge) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dragGestureRecognized()");                                     // NOI18N
+        }
+        final Object selectedNode = this.attributeTree.getSelectionPath().getLastPathComponent();
+        if ((selectedNode != null) && (selectedNode instanceof ObjectAttributeNode)) {
             this.metaTransferable = new AttributeNodeTransferable((ObjectAttributeNode)selectedNode);
             this.metaTransferable.setTransferAction(dge.getDragAction());
             this.dragSource.startDrag(dge, this.getCursor(dge.getDragAction()), metaTransferable, this);
-        }
-        else if(logger.isDebugEnabled())
-        {
-            logger.warn("dragGestureRecognized() no valid selection for DnD operation");//NOI18N
+        } else if (logger.isDebugEnabled()) {
+            logger.warn("dragGestureRecognized() no valid selection for DnD operation"); // NOI18N
         }
     }
-    
-    public void dragEnter(DropTargetDragEvent dtde)
-    {
-        if(logger.isDebugEnabled())logger.debug("dragEnter(DropTargetDragEvent)");//NOI18N
+
+    @Override
+    public void dragEnter(final DropTargetDragEvent dtde) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dragEnter(DropTargetDragEvent)"); // NOI18N
+        }
         dtde.rejectDrag();
     }
-    
-    public void dragExit(DropTargetEvent dte)
-    {
+
+    @Override
+    public void dragExit(final DropTargetEvent dte) {
     }
-    
-    public void dragOver(DropTargetDragEvent dtde)
-    {
+
+    @Override
+    public void dragOver(final DropTargetDragEvent dtde) {
     }
-    
-    public void drop(DropTargetDropEvent dtde)
-    {
+
+    @Override
+    public void drop(final DropTargetDropEvent dtde) {
     }
-    
-    public void dropActionChanged(DropTargetDragEvent dtde)
-    {
+
+    @Override
+    public void dropActionChanged(final DropTargetDragEvent dtde) {
     }
-    
-    public void dragDropEnd(DragSourceDropEvent dsde)
-    {
+
+    @Override
+    public void dragDropEnd(final DragSourceDropEvent dsde) {
     }
-    
-    public void dragEnter(DragSourceDragEvent dsde)
-    {
-        if(logger.isDebugEnabled())logger.debug("dragEnter(DragSourceDragEvent)");//NOI18N
-  
-        DragSourceContext dragSourceContext = dsde.getDragSourceContext();
+
+    @Override
+    public void dragEnter(final DragSourceDragEvent dsde) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dragEnter(DragSourceDragEvent)"); // NOI18N
+        }
+
+        final DragSourceContext dragSourceContext = dsde.getDragSourceContext();
         dragSourceContext.setCursor(this.getCursor(dsde.getDropAction()));
     }
-    
-    public void dragExit(DragSourceEvent dse)
-    {
+
+    @Override
+    public void dragExit(final DragSourceEvent dse) {
         dse.getDragSourceContext().setCursor(DragSource.DefaultCopyNoDrop);
     }
-    
-    public void dragOver(DragSourceDragEvent dsde)
-    {
+
+    @Override
+    public void dragOver(final DragSourceDragEvent dsde) {
     }
-    
-    public void dropActionChanged(DragSourceDragEvent dsde)
-    {
-        if(logger.isDebugEnabled())logger.debug("dropActionChanged(DragSourceDragEvent)");//NOI18N
-        
-        DragSourceContext dragSourceContext = dsde.getDragSourceContext();
+
+    @Override
+    public void dropActionChanged(final DragSourceDragEvent dsde) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("dropActionChanged(DragSourceDragEvent)"); // NOI18N
+        }
+
+        final DragSourceContext dragSourceContext = dsde.getDragSourceContext();
         dragSourceContext.setCursor(this.getCursor(dsde.getUserAction()));
         this.metaTransferable.setTransferAction(dsde.getUserAction());
-    } 
-    
-    private Cursor getCursor(int dragAction)
-    {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   dragAction  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Cursor getCursor(final int dragAction) {
         Cursor cursor = DragSource.DefaultCopyNoDrop;
-        if((dragAction & DnDConstants.ACTION_MOVE) != 0)
-        {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_MOVE");//NOI18N
+        if ((dragAction & DnDConstants.ACTION_MOVE) != 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getCursor(): ACTION_MOVE"); // NOI18N
+            }
             cursor = DragSource.DefaultMoveDrop;
-        }
-        else if((dragAction & DnDConstants.ACTION_COPY) != 0)
-        {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_COPY");//NOI18N
+        } else if ((dragAction & DnDConstants.ACTION_COPY) != 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getCursor(): ACTION_COPY"); // NOI18N
+            }
             cursor = DragSource.DefaultCopyDrop;
-        }
-        else if((dragAction & DnDConstants.ACTION_LINK) != 0)
-        {
-            if(logger.isDebugEnabled())logger.debug("getCursor(): ACTION_LINK");//NOI18N
+        } else if ((dragAction & DnDConstants.ACTION_LINK) != 0) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("getCursor(): ACTION_LINK"); // NOI18N
+            }
             cursor = DragSource.DefaultLinkDrop;
         }
-        
+
         return cursor;
     }
 }

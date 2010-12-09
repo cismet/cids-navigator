@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * TreeCommands.java
  *
@@ -5,42 +12,51 @@
  */
 package Sirius.navigator.ui.tree.editor;
 
-import javax.swing.*;
-import javax.swing.tree.*;
-import java.awt.event.*;
-
-import Sirius.navigator.plugin.ui.*;
-import Sirius.navigator.plugin.interfaces.PluginMethod;
-import Sirius.navigator.ui.tree.*;
-import Sirius.navigator.resource.*;
-import Sirius.navigator.ui.*;
-import Sirius.navigator.method.*;
-import Sirius.navigator.types.treenode.*;
-import Sirius.server.middleware.types.*;
 import Sirius.navigator.connection.*;
-import Sirius.server.newuser.permission.PermissionHolder;
+import Sirius.navigator.method.*;
+import Sirius.navigator.plugin.interfaces.PluginMethod;
+import Sirius.navigator.plugin.ui.*;
+import Sirius.navigator.resource.*;
+import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.ui.*;
+import Sirius.navigator.ui.tree.*;
 
+import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.permission.PermissionHolder;
 import Sirius.server.newuser.permission.Policy;
+
 import org.apache.log4j.Logger;
 
+import java.awt.event.*;
+
+import javax.swing.*;
+import javax.swing.tree.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
 public class TreeEditorMenu extends PluginMenu {
 
+    //~ Constructors -----------------------------------------------------------
 
-    //Funktionalitaet wurde in MutablepopupMenu umgelagert
-    //Diese Klasse kann gelöscht werden
+    // Funktionalitaet wurde in MutablepopupMenu umgelagert
+    // Diese Klasse kann gelöscht werden
 
+// private final MetaCatalogueTree metaCatalogueTree;
+// private final TreeNodeEditor treeNodeEditor;
+// private final ResourceManager resources;
+// private final Logger logger;
 
-//    private final MetaCatalogueTree metaCatalogueTree;
-//    private final TreeNodeEditor treeNodeEditor;
-//    private final ResourceManager resources;
-//    private final Logger logger;
-
-    /** Creates a new instance of TreeCommands */
-    public TreeEditorMenu(JFrame mainWindow, MetaCatalogueTree metaCatalogueTree) {
+    /**
+     * Creates a new instance of TreeCommands.
+     *
+     * @param  mainWindow         DOCUMENT ME!
+     * @param  metaCatalogueTree  DOCUMENT ME!
+     */
+    public TreeEditorMenu(final JFrame mainWindow, final MetaCatalogueTree metaCatalogueTree) {
         super(TreeEditorMenu.class.getName());
 //
 //        this.logger = Logger.getLogger(this.getClass());

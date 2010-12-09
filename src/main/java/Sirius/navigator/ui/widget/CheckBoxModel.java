@@ -1,56 +1,47 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.ui.widget;
 
-/*******************************************************************************
- *
- * Copyright (c)	:	EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
- *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
- *
- * Programmers		:	Pascal
- *
- * Project			:	WuNDA 2
- * Filename		:
- * Version			:	1.0
- * Purpose			:
- * Created			:	01.10.1999
- * History			:
- *
- *******************************************************************************/
-import javax.swing.*;
-
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JCheckBox;
 
 /**
- * Ein neues ComboBoxModel.
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
  */
+public class CheckBoxModel extends DefaultComboBoxModel {
 
-public class CheckBoxModel extends DefaultComboBoxModel
-{
+    //~ Instance fields --------------------------------------------------------
+
     protected boolean allSelected = false;
     protected int firstSelectedIndex = 0;
-    
-    public CheckBoxModel()
-    {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new CheckBoxModel object.
+     */
+    public CheckBoxModel() {
         super();
     }
-    
-    public CheckBoxModel(String[] names, boolean selectAll)
-    {
-        
-        //_TA_JCheckBox checkBox = new JCheckBox("Alle", selectAll);
-        // XXX fixme
-        JCheckBox checkBox = new JCheckBox("all", selectAll);
-        //_TA_checkBox.setToolTipText("alle selektieren");
-        //checkBox.setToolTipText(StringLoader.getString("STL@selectAll"));
+
+    /**
+     * Creates a new CheckBoxModel object.
+     *
+     * @param  names      DOCUMENT ME!
+     * @param  selectAll  DOCUMENT ME!
+     */
+    public CheckBoxModel(final String[] names, final boolean selectAll) {
+        final JCheckBox checkBox = new JCheckBox("all", selectAll);
         this.addElement(checkBox);
-        for(int i = 0; i < names.length; i++)
+        for (int i = 0; i < names.length; i++) {
             this.addElement(new JCheckBox(names[i], selectAll));
+        }
     }
 }
-

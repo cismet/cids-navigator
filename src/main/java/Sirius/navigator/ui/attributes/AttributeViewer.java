@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * AttributeViewer.java
  *
@@ -7,103 +14,132 @@ package Sirius.navigator.ui.attributes;
 
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
-import javax.swing.event.*;
-import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.resource.*;
+import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.dnd.*;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
+
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
-import org.apache.log4j.Logger;
 import Sirius.server.newuser.permission.PermissionHolder;
+
+import org.apache.log4j.Logger;
+
 import java.util.List;
 import java.util.Vector;
+
 import javax.swing.AbstractButton;
+import javax.swing.event.*;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
 public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar {
+
+    //~ Instance fields --------------------------------------------------------
 
     private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
     private final Logger logger;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private Sirius.navigator.ui.attributes.AttributeTable attributeTable;
+    private Sirius.navigator.ui.attributes.AttributeTree attributeTree;
+    private javax.swing.JPanel controlBar;
+    private javax.swing.JButton editButton;
+    private Sirius.navigator.ui.widget.TitleBar titleBar;
+    // End of variables declaration//GEN-END:variables
 
-    /** Creates new form AttributeViewer */
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form AttributeViewer.
+     */
     public AttributeViewer() {
 //        this.resources = ResourceManager.getManager();
         this.logger = Logger.getLogger(this.getClass());
 
         initComponents();
 
-        //this.attributeTree.setTransferHandler(new AttributeTree.MetaObjectTransferHandler());
+        // this.attributeTree.setTransferHandler(new AttributeTree.MetaObjectTransferHandler());
 
         this.attributeTree.addTreeSelectionListener(new AttributeListener());
         this.attributeTree.setIgnoreInvisibleAttributes(true);
-        AttributeNodeDnDHandler attributeNodeDnDHandler = new AttributeNodeDnDHandler(this.attributeTree);
+        final AttributeNodeDnDHandler attributeNodeDnDHandler = new AttributeNodeDnDHandler(this.attributeTree);
 
         // XXX test ...
         // this.attributeTree.setIgnoreSubsitute(false);
         // this.attributeTree.setIgnoreArrayHelperObjects(false);
     }
 
-    public void setTreeNodes(List<Object> treeNode) {
-        if (treeNode != null && treeNode.size() == 1) {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  treeNode  DOCUMENT ME!
+     */
+    public void setTreeNodes(final List<Object> treeNode) {
+        if ((treeNode != null) && (treeNode.size() == 1)) {
             setTreeNode(treeNode.get(0));
         } else {
             clear();
         }
-
     }
 
-    public void setTreeNode(Object treeNode) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  treeNode  DOCUMENT ME!
+     */
+    public void setTreeNode(final Object treeNode) {
         this.treeNode = treeNode;
         this.attributeTable.clear();
         this.attributeTree.setTreeNode(treeNode);
 
-        if (treeNode != null && treeNode instanceof ObjectTreeNode && PropertyManager.getManager().isEditable()) {
+        if ((treeNode != null) && (treeNode instanceof ObjectTreeNode) && PropertyManager.getManager().isEditable()) {
             this.editButton.setEnabled(true);
-            MetaObject mo = ((ObjectTreeNode) treeNode).getMetaObject();
+            final MetaObject mo = ((ObjectTreeNode)treeNode).getMetaObject();
         } else {
             this.editButton.setEnabled(false);
         }
-
-
-
     }
 
-    public void setControlBarVisible(boolean isVisible) {
+    @Override
+    public void setControlBarVisible(final boolean isVisible) {
         controlBar.setVisible(isVisible);
     }
 
+    @Override
     public Vector<AbstractButton> getControlBarButtons() {
-        Vector<AbstractButton> buttons = new Vector<AbstractButton>();
+        final Vector<AbstractButton> buttons = new Vector<AbstractButton>();
         buttons.add(editButton);
         return buttons;
     }
 
     /**
      * Getter for property treeNode.
-     * @return Value of property treeNode.
+     *
+     * @return  Value of property treeNode.
      */
     public Object getTreeNode() {
         return this.treeNode;
     }
 
     /**
-     * Clears the table an the tree
+     * Clears the table an the tree.
      */
     public void clear() {
         this.attributeTree.clear();
         this.attributeTable.clear();
     }
 
-    /** This method is called from within the constructor to
-     * initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is
-     * always regenerated by the Form Editor.
+    /**
+     * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
+     * content of this method is always regenerated by the Form Editor.
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -112,10 +148,10 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         controlBar = new javax.swing.JPanel();
         titleBar = new Sirius.navigator.ui.widget.TitleBar();
         editButton = new javax.swing.JButton();
-        javax.swing.JSplitPane splitPane = new javax.swing.JSplitPane();
-        javax.swing.JScrollPane tableScrollPane = new javax.swing.JScrollPane();
+        final javax.swing.JSplitPane splitPane = new javax.swing.JSplitPane();
+        final javax.swing.JScrollPane tableScrollPane = new javax.swing.JScrollPane();
         attributeTable = new Sirius.navigator.ui.attributes.AttributeTable();
-        javax.swing.JScrollPane treeScrollPane = new javax.swing.JScrollPane();
+        final javax.swing.JScrollPane treeScrollPane = new javax.swing.JScrollPane();
         attributeTree = new Sirius.navigator.ui.attributes.AttributeTree();
 
         setLayout(new java.awt.BorderLayout());
@@ -123,7 +159,9 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         titleBar.setIcon(resources.getIcon("floatingframe.gif"));
-        titleBar.setTitle(org.openide.util.NbBundle.getMessage(AttributeViewer.class, "AttributeViewer.titleBar.title")); // NOI18N
+        titleBar.setTitle(org.openide.util.NbBundle.getMessage(
+                AttributeViewer.class,
+                "AttributeViewer.titleBar.title")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
@@ -132,7 +170,9 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         controlBar.add(titleBar, gridBagConstraints);
 
         editButton.setIcon(resources.getIcon("objekt_bearbeiten.gif"));
-        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(AttributeViewer.class, "AttributeViewer.editButton.toolTipText")); // NOI18N
+        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                AttributeViewer.class,
+                "AttributeViewer.editButton.toolTipText")); // NOI18N
         editButton.setActionCommand("edit");
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
@@ -142,10 +182,12 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         editButton.setMinimumSize(new java.awt.Dimension(16, 16));
         editButton.setPreferredSize(new java.awt.Dimension(16, 16));
         editButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                editButtonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    editButtonActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         controlBar.add(editButton, gridBagConstraints);
@@ -175,59 +217,70 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         splitPane.setBottomComponent(treeScrollPane);
 
         add(splitPane, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
-    private void editButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_editButtonActionPerformed
-    {//GEN-HEADEREND:event_editButtonActionPerformed
-        if (this.getTreeNode() != null && this.getTreeNode() instanceof ObjectTreeNode && ComponentRegistry.getRegistry().getAttributeEditor() != null) {
-            ObjectTreeNode selectedNode = (ObjectTreeNode) this.getTreeNode();
-            logger.info("evt.getModifiers():" + evt.getModifiers());//NOI18N
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void editButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_editButtonActionPerformed
+    {                                                                            //GEN-HEADEREND:event_editButtonActionPerformed
+        if ((this.getTreeNode() != null) && (this.getTreeNode() instanceof ObjectTreeNode)
+                    && (ComponentRegistry.getRegistry().getAttributeEditor() != null)) {
+            final ObjectTreeNode selectedNode = (ObjectTreeNode)this.getTreeNode();
+            logger.info("evt.getModifiers():" + evt.getModifiers());             // NOI18N
 
-            MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
+            final MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
 
             if ((java.awt.event.ActionEvent.CTRL_MASK & evt.getModifiers()) > 0) {
-                logger.warn("performing unauthorized edit action");//NOI18N
+                logger.warn("performing unauthorized edit action"); // NOI18N
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
                 if (ComponentRegistry.getRegistry().getActiveCatalogue() == metaCatalogueTree) {
-                    ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
+                    ComponentRegistry.getRegistry()
+                            .getAttributeEditor()
+                            .setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
                 } else {
                     ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(selectedNode);
                 }
-
-            } else if (MethodManager.getManager().checkPermission((MetaObjectNode) selectedNode.getNode(), PermissionHolder.WRITEPERMISSION)) {
+            } else if (MethodManager.getManager().checkPermission(
+                            (MetaObjectNode)selectedNode.getNode(),
+                            PermissionHolder.WRITEPERMISSION)) {
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
 
                 if (ComponentRegistry.getRegistry().getActiveCatalogue() == metaCatalogueTree) {
-                    ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
+                    ComponentRegistry.getRegistry()
+                            .getAttributeEditor()
+                            .setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
                 } else {
                     ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(selectedNode);
                 }
-
-
-
             } else {
-                logger.warn("insufficient permission to edit node " + selectedNode);//NOI18N
+                logger.warn("insufficient permission to edit node " + selectedNode); // NOI18N
             }
         }
-    }//GEN-LAST:event_editButtonActionPerformed
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private Sirius.navigator.ui.attributes.AttributeTable attributeTable;
-    private Sirius.navigator.ui.attributes.AttributeTree attributeTree;
-    private javax.swing.JPanel controlBar;
-    private javax.swing.JButton editButton;
-    private Sirius.navigator.ui.widget.TitleBar titleBar;
-    // End of variables declaration//GEN-END:variables
+    }                                                                                //GEN-LAST:event_editButtonActionPerformed
 
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     private class AttributeListener implements TreeSelectionListener {
 
-        public void valueChanged(TreeSelectionEvent e) {
-            Object object = e.getPath().getLastPathComponent();
+        //~ Methods ------------------------------------------------------------
 
-            if (e.isAddedPath() && object != null) {
-                //AttributePanel.this.setAttributes(((AttributeNode)object).getMetaAttributes());
-                attributeTable.setAttributes(((AttributeNode) object).getAttributes());
+        @Override
+        public void valueChanged(final TreeSelectionEvent e) {
+            final Object object = e.getPath().getLastPathComponent();
+
+            if (e.isAddedPath() && (object != null)) {
+                // AttributePanel.this.setAttributes(((AttributeNode)object).getMetaAttributes());
+                attributeTable.setAttributes(((AttributeNode)object).getAttributes());
             } else {
-                //AttributePanel.this.tableModel.clear();
+                // AttributePanel.this.tableModel.clear();
                 attributeTable.clear();
             }
         }

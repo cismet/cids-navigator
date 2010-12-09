@@ -1,92 +1,141 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.types.iterator;
+
+import Sirius.navigator.types.treenode.*;
+
+import Sirius.server.middleware.types.*;
 
 import java.util.*;
 
-import Sirius.navigator.types.treenode.*;
-import Sirius.server.middleware.types.*;
-
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class AttributeIteratorIterator
-{
-    private TreeNodeIterator treeNodeIterator = null;   
+public class AttributeIteratorIterator {
+
+    //~ Instance fields --------------------------------------------------------
+
+    private TreeNodeIterator treeNodeIterator = null;
     private final SingleAttributeIterator attributeIterator;
-    
-    public AttributeIteratorIterator(TreeNodeIterator treeNodeIterator)
-    {
-        //this.treeNodeIterator = treeNodeIterator;
-        //this.attributeIterator = new SingleAttributeIterator();
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new AttributeIteratorIterator object.
+     *
+     * @param  treeNodeIterator  DOCUMENT ME!
+     */
+    public AttributeIteratorIterator(final TreeNodeIterator treeNodeIterator) {
+        // this.treeNodeIterator = treeNodeIterator;
+        // this.attributeIterator = new SingleAttributeIterator();
         this(treeNodeIterator, new SimpleAttributeRestriction(), false);
     }
-    
-    public AttributeIteratorIterator(AttributeRestriction restriction, boolean distinct)
-    {
+
+    /**
+     * Creates a new AttributeIteratorIterator object.
+     *
+     * @param  restriction  DOCUMENT ME!
+     * @param  distinct     DOCUMENT ME!
+     */
+    public AttributeIteratorIterator(final AttributeRestriction restriction, final boolean distinct) {
         this(null, restriction, distinct);
     }
-    
-    public AttributeIteratorIterator(TreeNodeIterator treeNodeIterator, AttributeRestriction restriction, boolean distinct)
-    {
-        //this.treeNodeIterator = treeNodeIterator;
+
+    /**
+     * Creates a new AttributeIteratorIterator object.
+     *
+     * @param  treeNodeIterator  DOCUMENT ME!
+     * @param  restriction       DOCUMENT ME!
+     * @param  distinct          DOCUMENT ME!
+     */
+    public AttributeIteratorIterator(final TreeNodeIterator treeNodeIterator,
+            final AttributeRestriction restriction,
+            final boolean distinct) {
+        // this.treeNodeIterator = treeNodeIterator;
         this.attributeIterator = new SingleAttributeIterator(restriction, distinct);
         this.init(treeNodeIterator);
     }
-    
-    public boolean init(Object object)
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   object  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean init(final Object object) {
         this.treeNodeIterator = null;
-        
-        if(object != null && object instanceof TreeNodeIterator)
-        {
+
+        if ((object != null) && (object instanceof TreeNodeIterator)) {
             return this.init((TreeNodeIterator)object);
         }
-        
+
         return false;
     }
-    
-    public boolean init(TreeNodeIterator treeNodeIterator)
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   treeNodeIterator  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean init(TreeNodeIterator treeNodeIterator) {
         this.treeNodeIterator = treeNodeIterator;
-        
-        if(treeNodeIterator != null && treeNodeIterator.hasNext())
-        {
+
+        if ((treeNodeIterator != null) && treeNodeIterator.hasNext()) {
             return true;
-        }
-        else
-        {
+        } else {
             treeNodeIterator = null;
             return false;
-        } 
+        }
     }
 
-    public boolean hasNext()
-    {
-        if(treeNodeIterator != null)
-        {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean hasNext() {
+        if (treeNodeIterator != null) {
             return treeNodeIterator.hasNext();
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
-    
-    public AttributeIterator next() throws NoSuchElementException
-    {
-        if(this.hasNext())
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  NoSuchElementException  DOCUMENT ME!
+     */
+    public AttributeIterator next() throws NoSuchElementException {
+        if (this.hasNext()) {
             attributeIterator.init(treeNodeIterator.next());
             return attributeIterator;
-        }
-        else
-        {
+        } else {
             throw new NoSuchElementException();
         }
     }
-    
-    public boolean isDistinct()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isDistinct() {
         return attributeIterator.isDistinct();
     }
 }

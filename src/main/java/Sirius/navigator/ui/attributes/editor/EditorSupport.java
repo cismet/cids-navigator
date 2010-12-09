@@ -1,39 +1,52 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * EditorSupport.java
  *
  * Created on 10. August 2004, 17:02
  */
-
 package Sirius.navigator.ui.attributes.editor;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public interface EditorSupport
-{
-    
+public interface EditorSupport {
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
      * Getter for property complexEditor.
-     * @return Value of property complexEditor.
+     *
+     * @return  Value of property complexEditor.
      */
-    public ComplexEditor getComplexEditor();
-    
+    ComplexEditor getComplexEditor();
+
     /**
      * Getter for property complexEditorSupported.
-     * @return Value of property complexEditorSupported.
+     *
+     * @return  Value of property complexEditorSupported.
      */
-    public boolean isComplexEditorSupported();
-    
+    boolean isComplexEditorSupported();
+
     /**
      * Getter for property simpleEditor.
-     * @return Value of property simpleEditor.
+     *
+     * @return  Value of property simpleEditor.
      */
-    public SimpleEditor getSimpleEditor();
-    
+    SimpleEditor getSimpleEditor();
+
     /**
      * Getter for property simpleEditorSupported.
-     * @return Value of property simpleEditorSupported.
+     *
+     * @return  Value of property simpleEditorSupported.
      */
-    public boolean isSimpleEditorSupported();
+    boolean isSimpleEditorSupported();
 }

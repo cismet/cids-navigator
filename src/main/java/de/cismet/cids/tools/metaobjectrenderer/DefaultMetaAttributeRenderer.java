@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * DefaultMetaAttributeRenderer.java
  *
@@ -6,49 +13,67 @@
  * To change this template, choose Tools | Template Manager
  * and open the template in the editor.
  */
-
 package de.cismet.cids.tools.metaobjectrenderer;
 
 import Sirius.server.localserver.attribute.Attribute;
+
 import java.awt.Color;
+
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
 
 /**
+ * DOCUMENT ME!
  *
- * @author hell 
+ * @author   hell
+ * @version  $Revision$, $Date$
  */
-public class DefaultMetaAttributeRenderer{
-   private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+public class DefaultMetaAttributeRenderer {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static final Color FOREGROUND_COLOR = new TitledBorder("X").getTitleColor(); // NOI18N
+
+    //~ Instance fields --------------------------------------------------------
+
     Attribute attr; //
-    public final static Color FOREGROUND_COLOR=new TitledBorder("X").getTitleColor();//NOI18N
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * Creates a new instance of DefaultMetaAttributeRenderer
+     * Creates a new instance of DefaultMetaAttributeRenderer.
+     *
+     * @param  attr  DOCUMENT ME!
      */
-    public DefaultMetaAttributeRenderer(Attribute attr) {
-       this.attr=attr;
+    public DefaultMetaAttributeRenderer(final Attribute attr) {
+        this.attr = attr;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public JComponent getMetaAttributeRenderer() {
-        if (false)  {
+        if (false) {
             return null;
-        }
-        else {
-            JLabel ret=new JLabel();
-            String value="";//NOI18N
-            if (attr!=null&&attr.getValue()!=null){
+        } else {
+            final JLabel ret = new JLabel();
+            final String value = "";                                // NOI18N
+            if ((attr != null) && (attr.getValue() != null)) {
                 try {
-                    ret.setText(attr.toString());    
-                }
-                catch(Throwable e){
-                    log.fatal("Error in MetaAttributeRenderer",e);//NOI18N
+                    ret.setText(attr.toString());
+                } catch (Throwable e) {
+                    log.fatal("Error in MetaAttributeRenderer", e); // NOI18N
                 }
             }
-            
+
             ret.setForeground(FOREGROUND_COLOR);
             return ret;
         }
     }
-    
 }

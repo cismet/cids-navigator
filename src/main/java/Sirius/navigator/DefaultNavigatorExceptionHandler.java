@@ -1,11 +1,19 @@
-
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator;
 
 import org.apache.log4j.Logger;
 
 /**
+ * DOCUMENT ME!
  *
- * @author martin.scholl@cismet.de
+ * @author   martin.scholl@cismet.de
+ * @version  $Revision$, $Date$
  */
 public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtExceptionHandler {
 

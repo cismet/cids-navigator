@@ -1,26 +1,42 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.reconnector;
 
 import java.awt.Component;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
 public abstract class Reconnector<S extends Object> {
 
-    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Reconnector.class);
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Reconnector.class);
+
+    //~ Instance fields --------------------------------------------------------
 
     private Class serviceClass;
     private ConnectorWorker connectorWorker;
@@ -32,26 +48,49 @@ public abstract class Reconnector<S extends Object> {
     private final ReconnectorListener dispatcher = new ListenerDispatcher();
     private List<ReconnectorListener> listeners = new LinkedList<ReconnectorListener>();
     private List<ReconnectorPanel> reconnectorPanels = new LinkedList<ReconnectorPanel>();
-    //private List<ReconnectorWrapperPanel> wrapperPanels = new LinkedList<ReconnectorWrapperPanel>();
+    // private List<ReconnectorWrapperPanel> wrapperPanels = new LinkedList<ReconnectorWrapperPanel>();
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new Reconnector object.
+     *
+     * @param  serviceClass  DOCUMENT ME!
+     */
     protected Reconnector(final Class serviceClass) {
         this.serviceClass = serviceClass;
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ReconnectorException  DOCUMENT ME!
+     */
     protected abstract S connectService() throws ReconnectorException;
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   throwable  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Throwable  DOCUMENT ME!
+     */
     protected abstract ReconnectorException getReconnectorException(final Throwable throwable) throws Throwable;
-
-    /*
-     * Abbrechen
+    /**
+     * Abbrechen.
      */
     public void doAbbort() {
         reconnectorDialog.setVisible(false);
         isReconnecting = false;
     }
-
-    /*
-     * Verbindungsaufbau über Swingworker
+    /**
+     * Verbindungsaufbau über Swingworker.
      */
     public void doReconnect() {
         // Worker schon vorhanden?
@@ -66,12 +105,11 @@ public abstract class Reconnector<S extends Object> {
             connectorWorker.execute();
         }
     }
-
-    /*
-     * Verbindungsaufbau abbrechen
+    /**
+     * Verbindungsaufbau abbrechen.
      */
     public void doCancel() {
-        if (connectorWorker != null && !connectorWorker.isDone()) {
+        if ((connectorWorker != null) && !connectorWorker.isDone()) {
             connectorWorker.cancel(true);
             connectorWorker = null;
             if (LOG.isDebugEnabled()) {
@@ -84,25 +122,39 @@ public abstract class Reconnector<S extends Object> {
         }
     }
 
-    public void addListener(ReconnectorListener listener) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
+    public void addListener(final ReconnectorListener listener) {
         listeners.add(listener);
     }
-
-    /*
-     * Service Proxy
+    /**
+     * Service Proxy.
+     *
+     * @return  DOCUMENT ME!
      */
     public S getProxy() {
-        return (S) Proxy.newProxyInstance(
+        return (S)Proxy.newProxyInstance(
                 serviceClass.getClassLoader(),
                 new Class[] { serviceClass },
-                new ReconnectorInvocationHandler()
-        );
+                new ReconnectorInvocationHandler());
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     void pack() {
         reconnectorDialog.pack();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  useDialog    DOCUMENT ME!
+     * @param  parentFrame  DOCUMENT ME!
+     */
     public void useDialog(final boolean useDialog, final JFrame parentFrame) {
         if (useDialog) {
             if (parentFrame != null) {
@@ -116,18 +168,17 @@ public abstract class Reconnector<S extends Object> {
             reconnectorDialog.setContentPane(createReconnectorPanel());
             reconnectorDialog.addWindowListener(new WindowAdapter() {
 
-                @Override
-                public void windowClosing(WindowEvent we) {
-                    doAbbort();
-                }
-
-            });
+                    @Override
+                    public void windowClosing(final WindowEvent we) {
+                        doAbbort();
+                    }
+                });
             reconnectorDialog.setLocationRelativeTo(null);
             reconnectorDialog.setAlwaysOnTop(true);
         } else {
-            //TODO reconnectorPanel des Dialogs aus der Liste entfernen
+            // TODO reconnectorPanel des Dialogs aus der Liste entfernen
             if (reconnectorDialog != null) {
-                ReconnectorPanel panel = (ReconnectorPanel) reconnectorDialog.getContentPane();
+                final ReconnectorPanel panel = (ReconnectorPanel)reconnectorDialog.getContentPane();
                 reconnectorPanels.remove(panel);
                 listeners.remove(panel);
             }
@@ -135,37 +186,37 @@ public abstract class Reconnector<S extends Object> {
             reconnectorDialog = null;
         }
     }
-
-//    public JPanel registerFrame(final JPanel panel) {
-//        final ReconnectorWrapperPanel reconnectorWrapperPanel = new ReconnectorWrapperPanel(panel, createReconnectorPanel());
-//        addListener(reconnectorWrapperPanel);
-//        //wrapperPanels.add(reconnectorWrapperPanel);
-//        return reconnectorWrapperPanel;
-//    }
-
-    /*
-     * Die Nutzung des services ist Fehlgeschlagen.
+    /**
+     * public JPanel registerFrame(final JPanel panel) { final ReconnectorWrapperPanel reconnectorWrapperPanel = new
+     * ReconnectorWrapperPanel(panel, createReconnectorPanel()); addListener(reconnectorWrapperPanel);
+     * //wrapperPanels.add(reconnectorWrapperPanel); return reconnectorWrapperPanel; } Die Nutzung des services ist
+     * Fehlgeschlagen. Je nach Modus (attended / unattend) wird die Verbindung entweder sofort wieder hergestellt, oder
+     * es wird eine Fehlermeldung angezeigt und darauf gewartet, dass der User die Verbindung wieder anstößt.
      *
-     * Je nach Modus (attended / unattend) wird die Verbindung entweder sofort
-     * wieder hergestellt, oder es wird eine Fehlermeldung angezeigt und
-     * darauf gewartet, dass der User die Verbindung wieder anstößt.
+     * @param  exception  DOCUMENT ME!
      */
     private void serviceFailed(final ReconnectorException exception) {
-        Component component = exception.getComponent();
+        final Component component = exception.getComponent();
         if (isUnattended()) {
             doReconnect();
         } else {
             dispatcher.connectionFailed(new ReconnectorEvent(component));
         }
     }
-
-    /*
+    /**
      * mit GUI oder ohne?
+     *
+     * @return  DOCUMENT ME!
      */
     private boolean isUnattended() {
-        return (reconnectorDialog == null/* && wrapperPanels.isEmpty()*/);
+        return (reconnectorDialog == null /* && wrapperPanels.isEmpty()*/);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private ReconnectorPanel createReconnectorPanel() {
         final ReconnectorPanel reconnectorPanel = new ReconnectorPanel(this);
 
@@ -174,7 +225,16 @@ public abstract class Reconnector<S extends Object> {
         return reconnectorPanel;
     }
 
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     class ReconnectorInvocationHandler implements InvocationHandler {
+
+        //~ Methods ------------------------------------------------------------
 
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
@@ -189,7 +249,7 @@ public abstract class Reconnector<S extends Object> {
                     // Methodenaufruf durchreichen
                     return method.invoke(service, args);
 
-                 // wieder verbinden fehlgeschlagen
+                    // wieder verbinden fehlgeschlagen
                 } catch (final ReconnectorException ex) {
                     // Fehler anzeigen und neuverbindung anfragen
                     serviceFailed(ex);
@@ -209,7 +269,14 @@ public abstract class Reconnector<S extends Object> {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     class ConnectorWorker extends SwingWorker<S, Void> {
+
+        //~ Methods ------------------------------------------------------------
 
         @Override
         protected S doInBackground() throws Exception {
@@ -230,7 +297,7 @@ public abstract class Reconnector<S extends Object> {
             // abgebrochen ?
             if (isCancelled()) {
                 dispatcher.connectionCanceled();
-            // abgeschlossen ?
+                // abgeschlossen ?
             } else {
                 try {
                     // neuen service setzen
@@ -238,7 +305,7 @@ public abstract class Reconnector<S extends Object> {
                     // panels verstecken
                     dispatcher.connectionCompleted();
 
-                // Fehler beim Verbinden?
+                    // Fehler beim Verbinden?
                 } catch (final Exception ex) {
                     // Neuverbindung in Gang setzen
                     if (ex instanceof ExecutionException) {
@@ -250,7 +317,14 @@ public abstract class Reconnector<S extends Object> {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     class ListenerDispatcher implements ReconnectorListener {
+
+        //~ Methods ------------------------------------------------------------
 
         @Override
         public void connecting() {
@@ -268,7 +342,7 @@ public abstract class Reconnector<S extends Object> {
         }
 
         @Override
-        public void connectionFailed(ReconnectorEvent event) {
+        public void connectionFailed(final ReconnectorEvent event) {
             for (final ReconnectorListener listener : listeners) {
                 listener.connectionFailed(event);
             }

@@ -1,29 +1,73 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * PluginProperties.java
  *
  * Created on 21. September 2004, 10:40
  */
-
 package Sirius.navigator.plugin.interfaces;
 
 import java.beans.*;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public interface PluginProperties
-{
-    public void setProperty(String propertyName, Object value);
-    
-    public Object getProperty(String propertyName);
-    
-    
-    public void addPropertyChangeListener(PropertyChangeListener listener);
-    
-    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
-    
-    public void removePropertyChangeListener(PropertyChangeListener listener);
-    
-    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
+public interface PluginProperties {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  propertyName  DOCUMENT ME!
+     * @param  value         DOCUMENT ME!
+     */
+    void setProperty(String propertyName, Object value);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   propertyName  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    Object getProperty(String propertyName);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
+    void addPropertyChangeListener(PropertyChangeListener listener);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  propertyName  DOCUMENT ME!
+     * @param  listener      DOCUMENT ME!
+     */
+    void addPropertyChangeListener(String propertyName, PropertyChangeListener listener);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
+    void removePropertyChangeListener(PropertyChangeListener listener);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  propertyName  DOCUMENT ME!
+     * @param  listener      DOCUMENT ME!
+     */
+    void removePropertyChangeListener(String propertyName, PropertyChangeListener listener);
 }

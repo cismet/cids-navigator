@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.plugin.interfaces;
 
 /*******************************************************************************
@@ -19,47 +26,53 @@ package Sirius.navigator.plugin.interfaces;
   Version           :       1.0
   Purpose           :
   Created           :       02/15/2003
-  History           :       
+  History           :
 
 
 *******************************************************************************/
-
 
 //import Sirius.navigator.plugin.exceptions.*;
 import java.util.ArrayList;
 
 /**
- * blah<p>
+ * blah.
  *
- * @version 1.0 02/15/2003
- * @author Pascal
- * @see FloatingFrame
+ * @author   Pascal
+ * @version  1.0 02/15/2003
+ * @see      FloatingFrame
  */
-public interface FloatingPluginUI extends PluginUI
-{
+public interface FloatingPluginUI extends PluginUI {
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * Callback Method.<p>
-     * The <i>Plugin Manager</i> calls this method <b>after</b> the plugin ui 
-     * component has started floating. See the <code>FloatingFrame</code>
-     * documentation for further details.
-     */
-    public void floatingStarted();
-    
-    /**
-     * Callback Method.<p>
-     * The <i>Plugin Manager</i> calls this method <b>after</b> the plugin ui 
-     * component has stopped floating. See the <code>FloatingFrame</code>
-     * documentation for further details. <i>Plugin Descriptor</i>
-     */
-    public void floatingStopped();
-    
-    /**
-     * this method should return null
+     * Callback Method.
      *
-     * @return a list containg the <code>JComponents</code> (buttons & separators) to be added to the navigator toolbar, or null
+     * <p>The <i>Plugin Manager</i> calls this method <b>after</b> the plugin ui component has started floating. See the
+     * <code>FloatingFrame</code> documentation for further details.</p>
      */
-    public java.util.Collection getButtons();
-    
-    public java.util.Collection getMenus();
-   
+    void floatingStarted();
+
+    /**
+     * Callback Method.
+     *
+     * <p>The <i>Plugin Manager</i> calls this method <b>after</b> the plugin ui component has stopped floating. See the
+     * <code>FloatingFrame</code> documentation for further details. <i>Plugin Descriptor</i></p>
+     */
+    void floatingStopped();
+
+    /**
+     * this method should return null.
+     *
+     * @return  a list containg the <code>JComponents</code> (buttons & separators) to be added to the navigator
+     *          toolbar, or null
+     */
+    java.util.Collection getButtons();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    java.util.Collection getMenus();
 }

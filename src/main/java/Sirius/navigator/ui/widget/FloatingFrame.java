@@ -1,8 +1,15 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.ui.widget;
 
 /*******************************************************************************
  *
- * Copyright (c)	:	EIG (Environmental Informatics Group)
+ * Copyright (c)        :       EIG (Environmental Informatics Group)
  * http://www.htw-saarland.de/eig
  * Prof. Dr. Reiner Guettler
  * Prof. Dr. Ralf Denzer
@@ -13,19 +20,27 @@ package Sirius.navigator.ui.widget;
  * 66117 Saarbruecken
  * Germany
  *
- * Programmers		:	Pascal
+ * Programmers          :       Pascal
  *
- * Project			:	WuNDA 2
- * Version			:	3.2
- * Purpose			:
- * Created			:	01.02.2000
- * History			:
+ * Project                      :       WuNDA 2
+ * Version                      :       3.2
+ * Purpose                      :
+ * Created                      :       01.02.2000
+ * History                      :
  *
  *******************************************************************************/
-import java.util.*;
-import java.beans.*;
+import Sirius.navigator.resource.*;
+import Sirius.navigator.ui.embedded.*;
+
+import org.apache.log4j.Logger;
+
 import java.awt.*;
 import java.awt.event.*;
+
+import java.beans.*;
+
+import java.util.*;
+
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.*;
@@ -33,394 +48,410 @@ import javax.swing.plaf.ToolBarUI;
 import javax.swing.plaf.basic.BasicToolBarUI;
 import javax.swing.plaf.metal.MetalToolBarUI;
 
-import org.apache.log4j.Logger;
-
-import Sirius.navigator.resource.*;
-import Sirius.navigator.ui.embedded.*;
-
-
 /**
- * FloatingFrame ist ein von JToolBar abgeleiter Container, der wie ein JPanel
- * bzw. JFrame verwendet werden kann. Mann kann ihn aus seinem Parent-Container
- * herauszuziehen und in einem separaten Fenster anzuzeigen.
- * Somit besitzt er die gleiche Funktionalitaet wie eine JToolBar, bei der
- * <b>setFloatable(boolean b)</b> auf <b>true</b> gesetzt wurde.
- * Er verwendet ein angepasstes ToolBarUI, dass das BaiscToolBarUI um eineige
- * Funktionen erweitert.<br><br>
+ * FloatingFrame ist ein von JToolBar abgeleiter Container, der wie ein JPanel bzw. JFrame verwendet werden kann. Mann
+ * kann ihn aus seinem Parent-Container herauszuziehen und in einem separaten Fenster anzuzeigen. Somit besitzt er die
+ * gleiche Funktionalitaet wie eine JToolBar, bei der <b>setFloatable(boolean b)</b> auf <b>true</b> gesetzt wurde. Er
+ * verwendet ein angepasstes ToolBarUI, dass das BaiscToolBarUI um eineige Funktionen erweitert.<br>
+ * <br>
  *
- * Der FloatingFrame kann auch eine MenuBar und eine ToolBar enthalten.
- * Menu- und Toolbar werden ausgeblendet, sobald sich der Frame im Zustand
- * "floating" befindet, d.h. wenn er in einem eigenen Fenster angezeigt wird.<br>
- * Die einzelen Elemente der Tool- und MenuBar (JButtons und JMenus) koennen
- * dann zu der Tool- und MenuBar des Parent-Frames hinzugefuegt werden. Hierzu
- * muessen aber erst die beiden abstrakten Methoden getMenus unf  getToolBarButtons
- * implementiert werden.
+ * <p>Der FloatingFrame kann auch eine MenuBar und eine ToolBar enthalten. Menu- und Toolbar werden ausgeblendet, sobald
+ * sich der Frame im Zustand "floating" befindet, d.h. wenn er in einem eigenen Fenster angezeigt wird.<br>
+ * Die einzelen Elemente der Tool- und MenuBar (JButtons und JMenus) koennen dann zu der Tool- und MenuBar des
+ * Parent-Frames hinzugefuegt werden. Hierzu muessen aber erst die beiden abstrakten Methoden getMenus unf
+ * getToolBarButtons implementiert werden.</p>
  *
- * Damit das Herausziehen auch korrekt funktioniert, sollte der Parent-Container
- * des FloatingFrames (z.B. ein JPanel oder ein JFrame) den LayoutManager
- * "GridLayout" mit nur einer Zelle verwenden und keine weiteren Children haben.<br><br>
+ * <p>Damit das Herausziehen auch korrekt funktioniert, sollte der Parent-Container des FloatingFrames (z.B. ein JPanel
+ * oder ein JFrame) den LayoutManager "GridLayout" mit nur einer Zelle verwenden und keine weiteren Children haben.<br>
+ * <br>
+ * </p>
  *
- *
- * @see javax.swing.JToolBar
- * @see javax.swing.plaf.basic.BasicToolBarUI
+ * @version  $Revision$, $Date$
+ * @see      javax.swing.JToolBar
+ * @see      javax.swing.plaf.basic.BasicToolBarUI
  */
-public class FloatingFrame extends JToolBar
-{
-    private final static Logger logger = Logger.getLogger(FloatingFrame.class);
+public class FloatingFrame extends JToolBar {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger logger = Logger.getLogger(FloatingFrame.class);
     private static final ResourceManager resource = ResourceManager.getManager();
-    
+
     // Moegliche Positionen der ToolBar
     public static final String NORTH = BorderLayout.NORTH;
     public static final String SOUTH = BorderLayout.SOUTH;
     public static final String EAST = BorderLayout.EAST;
     public static final String WEST = BorderLayout.WEST;
-    
-    public static final String FLOATING = "floating";//NOI18N
-    
-    //public static final String START_FLOATING = "floating started";
-    //public static final String STOP_FLOATING = "floating stopped";
-    
-    private JRootPane rootPane = null;
-    //private JPanel contentPane = new JPanel();
-    
-    //protected JPanel contentPanel = new JPanel();
-    
+
+    public static final String FLOATING = "floating"; // NOI18N
+
+    //~ Instance fields --------------------------------------------------------
+
+    // protected JPanel contentPanel = new JPanel();
+
+    // NOI18N
+
+    // protected JPanel contentPanel = new JPanel();
+
     protected JMenuBar menuBar = null;
     protected EmbeddedToolBar toolBar = null;
-    
-    private FloatingFrameToolBar floatingFrameToolBar;
-    private FloatingFrameMenuBar floatingFrameMenuBar;
-    
-    //protected Dimension menuBarSize;
-    //protected Dimension toolBarSize;
-    
+
+    // protected Dimension menuBarSize;
+    // protected Dimension toolBarSize;
+
     protected boolean frameResizable = true;
-    //protected String toolBarPosition = NORTH;
+    // protected String toolBarPosition = NORTH;
     protected Dimension frameSize = null;
     protected Dimension panelSize = null;
-    
-    //protected Vector dynamicButtons = null;
-    //protected Vector dynamicMenus = null;
-    
+
+    // protected Vector dynamicButtons = null;
+    // protected Vector dynamicMenus = null;
+
     protected FloatingFrameUI floatingFrameUI = new FloatingFrameUI();
     protected MetalFloatingFrameUI metalFloatingFrameUI = new MetalFloatingFrameUI();
-    
+
+    // public static final String START_FLOATING = "floating started";
+    // public static final String STOP_FLOATING = "floating stopped";
+
+    private JRootPane rootPane = null;
+    // private JPanel contentPane = new JPanel();
+
+    private FloatingFrameToolBar floatingFrameToolBar;
+    private FloatingFrameMenuBar floatingFrameMenuBar;
+
     /** Holds value of property configurator. */
     private final FloatingFrameConfigurator configurator;
-    
+
     private boolean allEnabled = false;
-    
+
     private EnablingListener enablingListener = null;
     private final Component content;
-    
+
     private boolean floating = false;
-    
+
     private FloatingPanel floatingPanel = null;
-    
+
     private TitleBar titleBar;
-    
-    
-    // KONSTRUKTOREN ===========================================================
-    
-    
-    public FloatingFrame(Component content, FloatingFrameConfigurator configurator)
-    {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * KONSTRUKTOREN ===========================================================.
+     *
+     * @param  content       DOCUMENT ME!
+     * @param  configurator  DOCUMENT ME!
+     */
+    public FloatingFrame(final Component content, final FloatingFrameConfigurator configurator) {
         super(configurator.getName());
         this.configurator = configurator;
         this.content = content;
         this.init();
     }
-    
-    private void init()
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void init() {
         this.updateUI();
         this.setLayout(new BorderLayout());
-        
+
         rootPane = new JRootPane();
         rootPane.setContentPane(new JPanel(new BorderLayout()));
         this.add(rootPane, BorderLayout.CENTER);
-        
-        if(configurator.isTitleBarEnabled())
-        {
-            titleBar= new TitleBar(configurator.getName(), 
+
+        if (configurator.isTitleBarEnabled()) {
+            titleBar = new TitleBar(configurator.getName(),
                     resource.getIcon("floatingframe.gif"));
             this.add(titleBar, BorderLayout.NORTH);
-        
         }
-        
-        if(configurator.getMenues() != null)
-        {
+
+        if (configurator.getMenues() != null) {
             menuBar = new JMenuBar();
-            if(configurator.isSwapMenuBar() || configurator.isDisableMenuBar())
-            {
+            if (configurator.isSwapMenuBar() || configurator.isDisableMenuBar()) {
                 floatingFrameMenuBar = new FloatingFrameMenuBar(configurator.getId(), configurator.getMenues());
-                
-                if(configurator.isDisableMenuBar());
+
+                if (configurator.isDisableMenuBar()) {
+                    ;
+                }
                 {
                     enablingListener = new EnablingListener();
                     this.addComponentListener(enablingListener);
                 }
-            }
-            else
-            {
-                Iterator iterator = configurator.getMenues().iterator();
-                while(iterator.hasNext())
-                {
-                    Object object = iterator.next();
-                    if(object instanceof JMenu)
-                    {
+            } else {
+                final Iterator iterator = configurator.getMenues().iterator();
+                while (iterator.hasNext()) {
+                    final Object object = iterator.next();
+                    if (object instanceof JMenu) {
                         menuBar.add((JMenu)object);
-                    }
-                    else
-                    {
-                        logger.error("invalid object type '" + object.getClass().getName() + "', 'javax.swing.JMenu' expected");//NOI18N
+                    } else {
+                        logger.error("invalid object type '" + object.getClass().getName()
+                                    + "', 'javax.swing.JMenu' expected"); // NOI18N
                     }
                 }
-                
+
                 rootPane.setJMenuBar(menuBar);
             }
-            
-            
         }
-        
-        if(configurator.getButtons() != null)
-        {
+
+        if (configurator.getButtons() != null) {
             toolBar = new EmbeddedToolBar(configurator.getId(), configurator.getButtons());
             toolBar.setName(configurator.getName());
             toolBar.setRollover(configurator.isAdvancedLayout());
             toolBar.setFloatable(false);
-            
-            if(configurator.isSwapToolBar() || configurator.isDisableToolBar())
-            {
+
+            if (configurator.isSwapToolBar() || configurator.isDisableToolBar()) {
                 floatingFrameToolBar = new FloatingFrameToolBar(toolBar);
-                
-                if(configurator.isDisableToolBar() && enablingListener == null);
+
+                if (configurator.isDisableToolBar() && (enablingListener == null)) {
+                    ;
+                }
                 {
                     enablingListener = new EnablingListener();
                     this.addComponentListener(enablingListener);
                 }
-            }
-            else
-            {
+            } else {
                 rootPane.getContentPane().add(toolBar, BorderLayout.NORTH);
-                
+
                 /*if(rootPane != null)
-                {
-                    logger.info("rootPane.getContentPane().add(toolBar, BorderLayout.N O R T H)");
-                    rootPane.getContentPane().add(toolBar, BorderLayout.NORTH);
-                }
-                else
-                {
-                    logger.info("this.add(toolBar, BorderLayout.NORTH)");
-                    this.add(toolBar, BorderLayout.NORTH);
-                }*/
+                 * { logger.info("rootPane.getContentPane().add(toolBar, BorderLayout.N O R T H)");
+                 * rootPane.getContentPane().add(toolBar, BorderLayout.NORTH); } else { logger.info("this.add(toolBar,
+                 * BorderLayout.NORTH)"); this.add(toolBar, BorderLayout.NORTH);}*/
             }
         }
-        
+
         /*if(rootPane != null)
-        {
-            //rootPane.getContentPane().add(new JButton("tt"), BorderLayout.SOUTH);
-            rootPane.getContentPane().add(this.content, BorderLayout.CENTER);
-        }
-        else
-        {
-            this.add(this.content, BorderLayout.CENTER);
-        }*/
-        
+         * { //rootPane.getContentPane().add(new JButton("tt"), BorderLayout.SOUTH);
+         * rootPane.getContentPane().add(this.content, BorderLayout.CENTER); } else { this.add(this.content,
+         * BorderLayout.CENTER);}*/
+
         rootPane.getContentPane().add(this.content, BorderLayout.CENTER);
-        
-        this.addPropertyChangeListener("ancestor", new FloatingListener());//NOI18N
+
+        this.addPropertyChangeListener("ancestor", new FloatingListener()); // NOI18N
     }
-    
-    public void setTileBarVisible(boolean isVisible){
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  isVisible  DOCUMENT ME!
+     */
+    public void setTileBarVisible(final boolean isVisible) {
         configurator.setTitleBarEnabled(isVisible);
-        if(titleBar != null){
+        if (titleBar != null) {
             titleBar.setVisible(false);
         }
     }
-    
-    public EmbeddedToolBar getToolBar()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public EmbeddedToolBar getToolBar() {
         return this.toolBar;
     }
-    
+
     /**
      * Setzt das Fenster des FloatingFrames auf eine fixe Groesse.
      *
-     * @param size Die Groesse des Fensters.
+     * @param  size  Die Groesse des Fensters.
      */
-    public void setFixedFrameSize(Dimension size)
-    {
+    public void setFixedFrameSize(final Dimension size) {
         frameSize = size;
         frameResizable = false;
     }
-    
-    public FloatingPanel getFloatingPanel()
-    {
-        if(this.floatingPanel == null)
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public FloatingPanel getFloatingPanel() {
+        if (this.floatingPanel == null) {
             this.floatingPanel = new FloatingPanel();
         }
-        
+
         return this.floatingPanel;
     }
-    
+
     /**
      * Wird der FloatingFrame in einem eigenen Fenster angezeigt?
+     *
+     * @return  DOCUMENT ME!
      */
-    public boolean isFloating()
-    {
-        if(this.getUI() instanceof FloatingFrameUI)
+    public boolean isFloating() {
+        if (this.getUI() instanceof FloatingFrameUI) {
             return ((FloatingFrameUI)this.getUI()).isFloating();
-        else if(this.getUI() instanceof MetalFloatingFrameUI)
+        } else if (this.getUI() instanceof MetalFloatingFrameUI) {
             return ((MetalFloatingFrameUI)this.getUI()).isFloating();
-        
+        }
+
         return false;
     }
-    
-    public boolean isFrameResizable()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isFrameResizable() {
         return frameResizable;
     }
-    
-    
-    public int getOrientation()
-    {
+
+    @Override
+    public int getOrientation() {
         return HORIZONTAL;
     }
-    
-    public Dimension getSize()
-    {
-        if(!isFrameResizable() && isFloating())
+
+    @Override
+    public Dimension getSize() {
+        if (!isFrameResizable() && isFloating()) {
             return frameSize;
-        
+        }
+
         return super.getSize();
     }
-    
-    public Dimension getPreferredSize()
-    {
-        if(this.isFloating())
+
+    @Override
+    public Dimension getPreferredSize() {
+        if (this.isFloating()) {
             return this.getSize();
-        
+        }
+
         return super.getPreferredSize();
     }
-    
+
     /**
-     * Ueberschreibt updateUI() in JToolBar und passt das UI fuer den
-     * FloatingFrame an.
+     * Ueberschreibt updateUI() in JToolBar und passt das UI fuer den FloatingFrame an.
      */
-    public void updateUI()
-    {
-        ComponentUI ui = UIManager.getUI(this);
-        //if(logger.isDebugEnabled())logger.debug"<FF> (1) updateUI() currentUI: " + ui);
-        //if(logger.isDebugEnabled())logger.debug"<FF> (1) updateUI() UIClassID: " +getUIClassID());
-        //if(logger.isDebugEnabled())logger.debug"<FF> (1) updateUI() UIManager UIClass: " + UIManager.getDefaults().getUIClass(this.getUIClassID()).getName());
-        
-        if(ui instanceof MetalToolBarUI)
-        {
+    @Override
+    public void updateUI() {
+        final ComponentUI ui = UIManager.getUI(this);
+        // if(logger.isDebugEnabled())logger.debug"<FF> (1) updateUI() currentUI: " + ui);
+        // if(logger.isDebugEnabled())logger.debug"<FF> (1) updateUI() UIClassID: " +getUIClassID());
+        // if(logger.isDebugEnabled())logger.debug"<FF> (1) updateUI() UIManager UIClass: " +
+        // UIManager.getDefaults().getUIClass(this.getUIClassID()).getName());
+
+        if (ui instanceof MetalToolBarUI) {
             this.setUI(new MetalFloatingFrameUI());
-        }
-        else if(ui instanceof BasicToolBarUI)
-        {
+        } else if (ui instanceof BasicToolBarUI) {
             this.setUI(new FloatingFrameUI());
-        }
-        else
-        {
-            //this.setUI(new MetalFloatingFrameUI());
+        } else {
+            // this.setUI(new MetalFloatingFrameUI());
             super.updateUI();
         }
-        
-        //if(logger.isDebugEnabled())logger.debug"<FF> (2) updateUI() newUI: " + UIManager.getUI(this));
-        //if(logger.isDebugEnabled())logger.debug"<FF> (2) updateUI() UIClassID: " +getUIClassID());
-        //if(logger.isDebugEnabled())logger.debug"<FF> (2) updateUI() UIManager UIClass: " + UIManager.getDefaults().getUIClass(this.getUIClassID()).getName());
+
+        // if(logger.isDebugEnabled())logger.debug"<FF> (2) updateUI() newUI: " + UIManager.getUI(this));
+        // if(logger.isDebugEnabled())logger.debug"<FF> (2) updateUI() UIClassID: " +getUIClassID());
+        // if(logger.isDebugEnabled())logger.debug"<FF> (2) updateUI() UIManager UIClass: " +
+        // UIManager.getDefaults().getUIClass(this.getUIClassID()).getName());
     }
-    
-    public void setUI(MetalFloatingFrameUI newUI)
-    {
-        //if(logger.isDebugEnabled())logger.debug"<FF> setMetalFloatingFrameUI(): " + newUI);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  newUI  DOCUMENT ME!
+     */
+    public void setUI(final MetalFloatingFrameUI newUI) {
+        // if(logger.isDebugEnabled())logger.debug"<FF> setMetalFloatingFrameUI(): " + newUI);
         super.setUI(newUI);
     }
-    
-    public void setUI(FloatingFrameUI newUI)
-    {
-        //if(logger.isDebugEnabled())logger.debug"<FF> setFloatingFrameUI(): " + newUI);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  newUI  DOCUMENT ME!
+     */
+    public void setUI(final FloatingFrameUI newUI) {
+        // if(logger.isDebugEnabled())logger.debug"<FF> setFloatingFrameUI(): " + newUI);
         super.setUI(newUI);
     }
-    
-    public MetalFloatingFrameUI getMetalFloatingFrameUI()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetalFloatingFrameUI getMetalFloatingFrameUI() {
         return metalFloatingFrameUI;
     }
-    
-    public FloatingFrameUI getFloatingFrameUI()
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public FloatingFrameUI getFloatingFrameUI() {
         return floatingFrameUI;
     }
-    
-    /** Getter for property configurator.
-     * @return Value of property configurator.
+
+    /**
+     * Getter for property configurator.
      *
+     * @return  Value of property configurator.
      */
-    public FloatingFrameConfigurator getConfigurator()
-    {
+    public FloatingFrameConfigurator getConfigurator() {
         return this.configurator;
     }
-    
+
     // =========================================================================
-    
+
+    //~ Inner Classes ----------------------------------------------------------
+
     /**
-     * PropertyChangeListener, der auf eine Zustandveraenderung des FloatingFrames
-     * reagiert. Blendet Menu- und ToolBar ein und aus.
+     * PropertyChangeListener, der auf eine Zustandveraenderung des FloatingFrames reagiert. Blendet Menu- und ToolBar
+     * ein und aus.
+     *
+     * @version  $Revision$, $Date$
      */
-    class FloatingListener implements PropertyChangeListener
-    {
-        public void propertyChange( PropertyChangeEvent e )
-        {
-            if(/*e.getPropertyName().equals("ancestor") && */ isFloatable() && (isFloating() != floating))
-            {
+    class FloatingListener implements PropertyChangeListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void propertyChange(final PropertyChangeEvent e) {
+            if ( /*e.getPropertyName().equals("ancestor") && */isFloatable() && (isFloating() != floating)) {
                 floating = isFloating();
-                
+
                 // Groe\u00DFe des Panels merken
-                if (panelSize == null)
-                {
+                if (panelSize == null) {
                     panelSize = getPreferredSize();
                 }
-                
+
                 // Das Panel wurde "herausgezogen"
-                if (isFloating())
-                {
-                    logger.debug("isFloating() == true");//NOI18N
+                if (isFloating()) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("isFloating() == true"); // NOI18N
+                    }
                     // Loest einen neunen PropertyChangeEvent aus
                     // Der PropertyChangeEvent "anchestor" sollte von anderen
                     // Widgets nicht mehr benutzt werden (um herauszufinden ob der
                     // Frame herausgezogen wird oder nicht), da es sonst zu
                     // Synchronistionsproblemen mit diesem Event kommt!
                     firePropertyChange(FLOATING, false, true);
-                    
-                    if(configurator.isSwapMenuBar())
-                    {
+
+                    if (configurator.isSwapMenuBar()) {
                         floatingFrameMenuBar.setVisible(isFloating());
                     }
-                    
-                    if(configurator.isSwapToolBar())
-                    {
+
+                    if (configurator.isSwapToolBar()) {
                         floatingFrameToolBar.setVisible(isFloating());
                     }
                 }
                 // Das Fenster wurde geschlossen bzw. wieder "hereingezogen"
-                else
-                {
-                    logger.debug("isFloating() == false");//NOI18N
+                else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("isFloating() == false"); // NOI18N
+                    }
                     // Urspruengliche Groesse des Panels wiederherstellen
                     setPreferredSize(panelSize);
-                    
-                    if(configurator.isSwapMenuBar())
-                    {
+
+                    if (configurator.isSwapMenuBar()) {
                         floatingFrameMenuBar.setVisible(isFloating());
                     }
-                    
-                    if(configurator.isSwapToolBar())
-                    {
+
+                    if (configurator.isSwapToolBar()) {
                         floatingFrameToolBar.setVisible(isFloating());
                     }
                     // Loest einen neunen PropertyChangeEvent aus
@@ -433,738 +464,676 @@ public class FloatingFrame extends JToolBar
             }
         }
     }
-    
-    private class EnablingListener extends ComponentAdapter
-    {
-        
-        public void componentShown(ComponentEvent ce)
-        {
-            //NavigatorLogger.printMessage("ISF SHOWN");
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class EnablingListener extends ComponentAdapter {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void componentShown(final ComponentEvent ce) {
+            // NavigatorLogger.printMessage("ISF SHOWN");
             allEnabled = true;
-            
+
             // Wenn der FloatingFrame sich nicht im Navigator befindet,
             // mussen auch die Buttons + Menues in der Navigator ToolBar
             // nicht disabled werden.
-            if(!isFloating())
-            {
-                if(logger.isDebugEnabled())logger.debug("setting floating frame menu/toolbar enabled to 'true'");//NOI18N
-                if(configurator.isDisableToolBar())
-                {
+            if (!isFloating()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("setting floating frame menu/toolbar enabled to 'true'"); // NOI18N
+                }
+                if (configurator.isDisableToolBar()) {
                     floatingFrameToolBar.setEnabled(allEnabled);
                 }
-                
-                if(configurator.isSwapMenuBar())
-                {
+
+                if (configurator.isSwapMenuBar()) {
                     floatingFrameMenuBar.setEnabled(allEnabled);
                 }
             }
         }
-        
-        public void componentHidden(ComponentEvent ce)
-        {
+
+        @Override
+        public void componentHidden(final ComponentEvent ce) {
             allEnabled = false;
-            
+
             // Wenn der FloatingFrame sich nicht im Navigator befindet,
             // mussen auch die Buttons + Menues in der Navigator ToolBar
             // nicht disabled werden.
-            if(!isFloating())
-            {
-                if(logger.isDebugEnabled())logger.debug("setting floating frame menu/toolbar enabled to 'false'");//NOI18N
-                if(configurator.isDisableToolBar())
-                {
+            if (!isFloating()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("setting floating frame menu/toolbar enabled to 'false'"); // NOI18N
+                }
+                if (configurator.isDisableToolBar()) {
                     floatingFrameToolBar.setEnabled(allEnabled);
                 }
-                
-                if(configurator.isSwapMenuBar())
-                {
+
+                if (configurator.isSwapMenuBar()) {
                     floatingFrameMenuBar.setEnabled(allEnabled);
                 }
             }
         }
     }
-    
-    // -------------------------------------------------------------------------
-    
-    private class FloatingFrameMenuBar extends EmbeddedContainer
-    {
-        public FloatingFrameMenuBar(String id, Collection components)
-        {
+
+    /**
+     * -------------------------------------------------------------------------.
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class FloatingFrameMenuBar extends EmbeddedContainer {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new FloatingFrameMenuBar object.
+         *
+         * @param  id          DOCUMENT ME!
+         * @param  components  DOCUMENT ME!
+         */
+        public FloatingFrameMenuBar(final String id, final Collection components) {
             super(id, components);
             this.addComponents();
         }
-        
-        public void setVisible(final boolean visible)
-        {
-            logger.debug("FloatingFrameMenuBar:setVisible(" + visible + ")");//NOI18N
-            if(SwingUtilities.isEventDispatchThread())
-            {
-                doSetVisible(visible);
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void setVisible(final boolean visible) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameMenuBar:setVisible(" + visible + ")"); // NOI18N
             }
-            else
-            {
-                logger.debug("setVisible(): synchronizing method");//NOI18N
-                SwingUtilities.invokeLater(new Runnable()
-                {
-                    public void run()
-                    {
-                        doSetVisible(visible);
-                    }
-                });
+            if (SwingUtilities.isEventDispatchThread()) {
+                doSetVisible(visible);
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("setVisible(): synchronizing method");           // NOI18N
+                }
+                SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            doSetVisible(visible);
+                        }
+                    });
             }
         }
-        
-        private void doSetVisible(boolean visible)
-        {
-            logger.debug("FloatingFrameMenuBar:doSetVisible(" + visible + ")");//NOI18N
-            if(this.isVisible() != visible)
-            {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  visible  DOCUMENT ME!
+         */
+        private void doSetVisible(final boolean visible) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameMenuBar:doSetVisible(" + visible + ")"); // NOI18N
+            }
+            if (this.isVisible() != visible) {
                 super.setVisible(visible);
-                
-                if(visible)
-                {
+
+                if (visible) {
                     this.addComponents();
-                }
-                else
-                {
+                } else {
                     this.removeComponents();
                 }
-            }
-            else
-            {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
+            } else {
+                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
             }
         }
-        
-        protected void addComponents()
-        {
-            logger.debug("FloatingFrameMenuBar:addComponents()");//NOI18N
-            ComponentIterator iterator = this.iterator();
-            while(iterator.hasNext())
-            {
-                JComponent component = iterator.next();
-                if(component != null)
-                {
-                    if(component instanceof JMenu)
-                    {
+
+        @Override
+        protected void addComponents() {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameMenuBar:addComponents()");     // NOI18N
+            }
+            final ComponentIterator iterator = this.iterator();
+            while (iterator.hasNext()) {
+                final JComponent component = iterator.next();
+                if (component != null) {
+                    if (component instanceof JMenu) {
                         FloatingFrame.this.menuBar.add((JMenu)component);
-                    }
-                    else
-                    {
-                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName() + "', 'javax.swing.JMenu' expected");//NOI18N
+                    } else {
+                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName()
+                                    + "', 'javax.swing.JMenu' expected"); // NOI18N
                     }
                 }
             }
-            
+
             FloatingFrame.this.rootPane.setJMenuBar(FloatingFrame.this.menuBar);
         }
-        
-        protected void removeComponents()
-        {
-            logger.debug("FloatingFrameMenuBar:removeComponents()");//NOI18N
+
+        @Override
+        protected void removeComponents() {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameMenuBar:removeComponents()"); // NOI18N
+            }
             FloatingFrame.this.menuBar.removeAll();
             FloatingFrame.this.rootPane.setJMenuBar(null);
         }
     }
-    
-    private class FloatingFrameToolBar extends AbstractEmbeddedComponentsMap
-    {
-        public FloatingFrameToolBar(EmbeddedToolBar toolBar)
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class FloatingFrameToolBar extends AbstractEmbeddedComponentsMap {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new FloatingFrameToolBar object.
+         *
+         * @param  toolBar  DOCUMENT ME!
+         */
+        public FloatingFrameToolBar(final EmbeddedToolBar toolBar) {
             super();
             this.add(toolBar);
         }
-        
-        public void setVisible(boolean visible)
-        {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  visible  DOCUMENT ME!
+         */
+        public void setVisible(final boolean visible) {
             if (logger.isDebugEnabled()) {
-                logger.debug("FloatingFrameToolBar:setVisible(" + visible + ")");//NOI18N
+                logger.debug("FloatingFrameToolBar:setVisible(" + visible + ")"); // NOI18N
             }
             this.setVisible(toolBar.getId(), visible);
         }
-        
-        public void setEnabled(boolean enabled)
-        {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  enabled  DOCUMENT ME!
+         */
+        public void setEnabled(final boolean enabled) {
             if (logger.isDebugEnabled()) {
-                logger.debug("FloatingFrameToolBar:setEnabled(" + enabled + ")");//NOI18N
+                logger.debug("FloatingFrameToolBar:setEnabled(" + enabled + ")"); // NOI18N
             }
             this.setEnabled(toolBar.getId(), enabled);
         }
-        
-        protected void doAdd(EmbeddedComponent component)
-        {
-            logger.debug("FloatingFrameToolBar:doAdd()");//NOI18N
-            if(component instanceof EmbeddedToolBar)
-            {
-                if(FloatingFrame.this.rootPane != null)
-                {
-                    logger.info("rootPane");//NOI18N
+
+        @Override
+        protected void doAdd(final EmbeddedComponent component) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameToolBar:doAdd()");                    // NOI18N
+            }
+            if (component instanceof EmbeddedToolBar) {
+                if (FloatingFrame.this.rootPane != null) {
+                    logger.info("rootPane");                                     // NOI18N
                     FloatingFrame.this.rootPane.getContentPane().add((JToolBar)component, BorderLayout.NORTH);
-                }
-                else
-                {
-                    logger.info(component);//NOI18N
+                } else {
+                    logger.info(component);                                      // NOI18N
                     FloatingFrame.this.add((JToolBar)component, BorderLayout.NORTH);
                 }
-            }
-            else
-            {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");//NOI18N
+            } else {
+                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName()
+                            + "', 'Sirius.navigator.EmbeddedToolBar' expected"); // NOI18N
             }
         }
-        
-        protected void doRemove(EmbeddedComponent component)
-        {
-            logger.debug("FloatingFrameToolBar:doRemove()");//NOI18N
-            if(component instanceof EmbeddedToolBar)
-            {
+
+        @Override
+        protected void doRemove(final EmbeddedComponent component) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameToolBar:doRemove()"); // NOI18N
+            }
+            if (component instanceof EmbeddedToolBar) {
                 /*if(FloatingFrame.this.rootPane != null)
-                {
-                    FloatingFrame.this.rootPane.getContentPane().remove((JToolBar)component);
-                }
-                else
-                {
-                    FloatingFrame.this.remove((JToolBar)component);
-                }*/
-                
+                 * { FloatingFrame.this.rootPane.getContentPane().remove((JToolBar)component); } else {
+                 * FloatingFrame.this.remove((JToolBar)component);}*/
+
                 FloatingFrame.this.rootPane.getContentPane().remove((JToolBar)component);
-            }
-            else
-            {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() + "', 'Sirius.navigator.EmbeddedToolBar' expected");//NOI18N
+            } else {
+                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName()
+                            + "', 'Sirius.navigator.EmbeddedToolBar' expected"); // NOI18N
             }
         }
-        
-        protected void doSetVisible(EmbeddedComponent component, boolean visible)
-        {
-            logger.debug("FloatingFrameToolBar:doSetVisible()");//NOI18N
-            if(component.isVisible() != visible)
-            {
+
+        @Override
+        protected void doSetVisible(final EmbeddedComponent component, final boolean visible) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("FloatingFrameToolBar:doSetVisible()"); // NOI18N
+            }
+            if (component.isVisible() != visible) {
                 super.doSetVisible(component, visible);
-                
-                if(visible)
-                {
+
+                if (visible) {
                     this.doAdd(component);
-                }
-                else
-                {
+                } else {
                     this.doRemove(component);
                 }
-            }
-            else
-            {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'");//NOI18N
+            } else {
+                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
             }
         }
     }
-    
-    private class FloatingPanel extends JPanel implements ComponentListener
-    {
-        public FloatingPanel()
-        {
-            super(new GridLayout(1,1));
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class FloatingPanel extends JPanel implements ComponentListener {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new FloatingPanel object.
+         */
+        public FloatingPanel() {
+            super(new GridLayout(1, 1));
             this.add(FloatingFrame.this);
             this.addComponentListener(this);
         }
-        
-        /** Invoked when the component has been made invisible.
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * Invoked when the component has been made invisible.
          *
+         * @param  e  DOCUMENT ME!
          */
-        public void componentHidden(ComponentEvent e)
-        {
-            //logger.debug("dispatching event: " + e);
+        @Override
+        public void componentHidden(final ComponentEvent e) {
+            // logger.debug("dispatching event: " + e);
             FloatingFrame.this.dispatchEvent(e);
         }
-        
-        /** Invoked when the component's position changes.
+
+        /**
+         * Invoked when the component's position changes.
          *
+         * @param  e  DOCUMENT ME!
          */
-        public void componentMoved(ComponentEvent e)
-        {
-            //logger.debug("ignoring event: " + e);
+        @Override
+        public void componentMoved(final ComponentEvent e) {
+            // logger.debug("ignoring event: " + e);
         }
-        
-        /** Invoked when the component's size changes.
+
+        /**
+         * Invoked when the component's size changes.
          *
+         * @param  e  DOCUMENT ME!
          */
-        public void componentResized(ComponentEvent e)
-        {
-            //logger.debug("ignoring event: " + e);
+        @Override
+        public void componentResized(final ComponentEvent e) {
+            // logger.debug("ignoring event: " + e);
         }
-        
-        /** Invoked when the component has been made visible.
+
+        /**
+         * Invoked when the component has been made visible.
          *
+         * @param  e  DOCUMENT ME!
          */
-        public void componentShown(ComponentEvent e)
-        {
-            //logger.debug("dispatching event: " + e);
+        @Override
+        public void componentShown(final ComponentEvent e) {
+            // logger.debug("dispatching event: " + e);
             FloatingFrame.this.dispatchEvent(e);
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     // UI CLASSES
     // #############################################################################
-    
+
     /**
      * FloatingFrameUI ist eine L&F Implementation fuer den FloatingFrame.
-     * @author Pascal Dihe
+     *
+     * @author   Pascal Dihe
+     * @version  $Revision$, $Date$
      */
-    class FloatingFrameUI extends BasicToolBarUI
-    {
+    class FloatingFrameUI extends BasicToolBarUI {
+
+        //~ Methods ------------------------------------------------------------
+
         /**
-         * Diese Funktion wurde ueberschrieben um bestimmte Eigenschaften des
-         * FloatingFrames zu aendern z.B. Groesse, Titel, etc.
-         * @param toolBar
-         * @return
+         * Diese Funktion wurde ueberschrieben um bestimmte Eigenschaften des FloatingFrames zu aendern z.B. Groesse,
+         * Titel, etc.
+         *
+         * @param   toolBar  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
          */
-        protected JFrame createFloatingFrame(JToolBar toolBar)
-        {
-            //if(logger.isDebugEnabled())logger.debug"<FF> (BasicToolBarUI) createFloatingFrame: " + toolBar.getClass().getName());
-            
-            WindowListener wl = createFrameListener();
-            JFrame frame = new JFrame(toolBar.getName());
-            FloatingFrame ff;
-            
-            if(toolBar instanceof FloatingFrame)
-            {
+        @Override
+        protected JFrame createFloatingFrame(final JToolBar toolBar) {
+            // if(logger.isDebugEnabled())logger.debug"<FF> (BasicToolBarUI) createFloatingFrame: " +
+            // toolBar.getClass().getName());
+
+            final WindowListener wl = createFrameListener();
+            final JFrame frame = new JFrame(toolBar.getName());
+            final FloatingFrame ff;
+
+            if (toolBar instanceof FloatingFrame) {
                 ff = (FloatingFrame)toolBar;
                 frame.setTitle(ff.getName());
                 frame.setSize(ff.getSize());
                 frame.setResizable(ff.isFrameResizable());
                 frame.setIconImage(ff.getConfigurator().getIcon().getImage());
-            }
-            else
-            {
+            } else {
                 frame.setTitle(toolBar.getName());
                 frame.setResizable(false);
             }
-            
+
             frame.setResizable(true);
-            
+
             frame.addWindowListener(wl);
             return frame;
         }
-        
+
         /**
-         * Diese Funktion wurde ueberschrieben um das DragWindow (wird beim
-         * Herauszeihen des Frame angezeigt) korrekt darzustellen. Das DragWindow
-         * hat nun die gleiche Groesse wie der FloatingFrame.
+         * Diese Funktion wurde ueberschrieben um das DragWindow (wird beim Herauszeihen des Frame angezeigt) korrekt
+         * darzustellen. Das DragWindow hat nun die gleiche Groesse wie der FloatingFrame.
+         *
+         * @param  position  DOCUMENT ME!
+         * @param  origin    DOCUMENT ME!
          */
-        protected void dragTo(Point position, Point origin)
-        {
+        @Override
+        protected void dragTo(final Point position, final Point origin) {
             super.dragTo(position, origin);
-            if(toolBar instanceof FloatingFrame && dragWindow != null)
+            if ((toolBar instanceof FloatingFrame) && (dragWindow != null)) {
                 dragWindow.setSize(toolBar.getSize());
+            }
         }
-        
-        protected RootPaneContainer createFloatingWindow(JToolBar toolbar)
-        {
-            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName());//NOI18N
-            
-            FloatingFrame ff;
-            class FloatingDialog extends JFrame //JDialog
+
+        @Override
+        protected RootPaneContainer createFloatingWindow(final JToolBar toolbar) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName()); // NOI18N
+            }
+
+            final FloatingFrame ff;
+
+            /**
+             * DOCUMENT ME!
+             *
+             * @version  $Revision$, $Date$
+             */
+            class FloatingDialog extends JFrame // JDialog
             {
-                public FloatingDialog()
-                {
+
+                /**
+                 * Creates a new FloatingDialog object.
+                 */
+                public FloatingDialog() {
                     super();
                 }
-                
+
                 /*public FloatingDialog(Frame owner, String title, boolean modal)
-                {
-                    super(owner, title, modal);
-                }
-                 
-                public FloatingDialog(Dialog owner, String title, boolean modal)
-                {
-                    super(owner, title, modal);
-                }*/
-                
+                 * { super(owner, title, modal); } public FloatingDialog(Dialog owner, String title, boolean modal) {
+                 * super(owner, title, modal);}*/
+
                 // Override createRootPane() to automatically resize
                 // the frame when contents change
-                protected JRootPane createRootPane()
-                {
-                    JRootPane rootPane = new JRootPane()
-                    {
-                        private boolean packing = false;
-                        
-                        public void validate()
-                        {
-                            super.validate();
-                            if (!packing)
-                            {
-                                packing = true;
-                                pack();
-                                packing = false;
+                @Override
+                protected JRootPane createRootPane() {
+                    final JRootPane rootPane = new JRootPane() {
+
+                            private boolean packing = false;
+
+                            @Override
+                            public void validate() {
+                                super.validate();
+                                if (!packing) {
+                                    packing = true;
+                                    pack();
+                                    packing = false;
+                                }
                             }
-                        }
-                    };
-                    
+                        };
+
                     rootPane.setOpaque(true);
-                    
+
                     return rootPane;
                 }
             }
-            
-            //JDialog floatingDialog;
-            
-            JFrame floatingDialog;
-            
-        /*Window window = SwingUtilities.getWindowAncestor(toolbar);
-         
-        if (window instanceof Frame)
-        {
-            floatingDialog = new FloatingDialog((Frame)window, toolbar.getName(), false);
-        }
-        else if (window instanceof Dialog)
-        {
-            floatingDialog = new FloatingDialog((Dialog)window, toolbar.getName(), false);
-        }
-        else
-        {
-            floatingDialog = new FloatingDialog((Frame)null, toolbar.getName(), false);
-        }*/
-            
+
+            // JDialog floatingDialog;
+
+            final JFrame floatingDialog;
+
+            /*Window window = SwingUtilities.getWindowAncestor(toolbar);
+             * if (window instanceof Frame) { floatingDialog = new FloatingDialog((Frame)window, toolbar.getName(),
+             * false); } else if (window instanceof Dialog) { floatingDialog = new FloatingDialog((Dialog)window,
+             * toolbar.getName(), false); } else { floatingDialog = new FloatingDialog((Frame)null, toolbar.getName(),
+             * false);}*/
+
             floatingDialog = new FloatingDialog();
-            
-            if(toolBar instanceof FloatingFrame)
-            {
+
+            if (toolBar instanceof FloatingFrame) {
                 ff = (FloatingFrame)toolbar;
                 floatingDialog.setTitle(ff.getName());
                 floatingDialog.setSize(ff.getSize());
                 floatingDialog.setResizable(ff.isFrameResizable());
-            }
-            else
-            {
+            } else {
                 floatingDialog.setTitle(toolBar.getName());
                 floatingDialog.setResizable(false);
             }
-            
-            WindowListener wl = createFrameListener();
+
+            final WindowListener wl = createFrameListener();
             floatingDialog.addWindowListener(wl);
-            
+
             return floatingDialog;
         }
     }
-    
+
     /**
      * MetalFloatingFrameUI ist eine L&F Implementation fuer den FloatingFrame.
+     *
+     * @version  $Revision$, $Date$
      */
-    class MetalFloatingFrameUI extends MetalToolBarUI
-    {
+    class MetalFloatingFrameUI extends MetalToolBarUI {
+
+        //~ Methods ------------------------------------------------------------
+
         /**
-         * Diese Funktion wurde ueberschrieben um bestimmte Eigenschaften des
-         * FloatingFrames zu aendern z.B. Groesse, Titel, etc.
-         * @param toolBar
-         * @return
+         * Diese Funktion wurde ueberschrieben um bestimmte Eigenschaften des FloatingFrames zu aendern z.B. Groesse,
+         * Titel, etc.
+         *
+         * @param   toolBar  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
          */
-        protected JFrame createFloatingFrame(JToolBar toolBar)
-        {
-            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingFrame: " + toolBar.getClass().getName());//NOI18N
-            
-            WindowListener wl = createFrameListener();
-            JFrame frame = new JFrame(toolBar.getName());
-            FloatingFrame ff;
-            
-            if(toolBar instanceof FloatingFrame)
-            {
+        @Override
+        protected JFrame createFloatingFrame(final JToolBar toolBar) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("<FF> () createFloatingFrame: " + toolBar.getClass().getName()); // NOI18N
+            }
+
+            final WindowListener wl = createFrameListener();
+            final JFrame frame = new JFrame(toolBar.getName());
+            final FloatingFrame ff;
+
+            if (toolBar instanceof FloatingFrame) {
                 ff = (FloatingFrame)toolBar;
                 frame.setTitle(ff.getName());
                 frame.setSize(ff.getSize());
                 frame.setResizable(ff.isFrameResizable());
                 frame.setIconImage(ff.getConfigurator().getIcon().getImage());
-            }
-            else
-            {
+            } else {
                 frame.setTitle(toolBar.getName());
                 frame.setResizable(false);
             }
-            
+
             frame.addWindowListener(wl);
             return frame;
         }
-        
+
         /**
-         * Diese Funktion wurde ueberschrieben um das DragWindow (wird beim
-         * Herauszeihen des Frame angezeigt) korrekt darzustellen. Das DragWindow
-         * hat nun die gleiche Groesse wie der FloatingFrame.
+         * Diese Funktion wurde ueberschrieben um das DragWindow (wird beim Herauszeihen des Frame angezeigt) korrekt
+         * darzustellen. Das DragWindow hat nun die gleiche Groesse wie der FloatingFrame.
+         *
+         * @param  position  DOCUMENT ME!
+         * @param  origin    DOCUMENT ME!
          */
-        protected void dragTo(Point position, Point origin)
-        {
+        @Override
+        protected void dragTo(final Point position, final Point origin) {
             super.dragTo(position, origin);
-            if(toolBar instanceof FloatingFrame && dragWindow != null)
+            if ((toolBar instanceof FloatingFrame) && (dragWindow != null)) {
                 dragWindow.setSize(toolBar.getSize());
+            }
         }
-        
-        protected MouseInputListener createDockingListener()
-        {
+
+        @Override
+        protected MouseInputListener createDockingListener() {
             return new FloatingFrameDockingListener(toolBar);
         }
-        
+
+        @Override
+        protected RootPaneContainer createFloatingWindow(final JToolBar toolbar) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName()); // NOI18N
+            }
+
+            final FloatingFrame ff;
+
+            /**
+             * DOCUMENT ME!
+             *
+             * @version  $Revision$, $Date$
+             */
+            class FloatingDialog extends JFrame // JDialog
+            {
+
+                /**
+                 * Creates a new FloatingDialog object.
+                 */
+                public FloatingDialog() {
+                    super();
+                }
+
+                /*public FloatingDialog(Frame owner, String title, boolean modal)
+                 * { super(owner, title, modal); } public FloatingDialog(Dialog owner, String title, boolean modal) {
+                 * super(owner, title, modal);}*/
+
+                /**
+                 * Override createRootPane() to automatically resize the frame when contents change.
+                 *
+                 * @return  DOCUMENT ME!
+                 */
+                @Override
+                protected JRootPane createRootPane() {
+                    final JRootPane rootPane = new JRootPane() {
+
+                            private boolean packing = false;
+
+                            @Override
+                            public void validate() {
+                                super.validate();
+                                if (!packing) {
+                                    packing = true;
+                                    pack();
+                                    packing = false;
+                                }
+                            }
+                        };
+
+                    rootPane.setOpaque(true);
+
+                    return rootPane;
+                }
+            }
+
+            // JDialog floatingDialog;
+
+            final JFrame floatingDialog;
+
+            /*Window window = SwingUtilities.getWindowAncestor(toolbar);
+             * if (window instanceof Frame) { floatingDialog = new FloatingDialog((Frame)window, toolbar.getName(),
+             * false); } else if (window instanceof Dialog) { floatingDialog = new FloatingDialog((Dialog)window,
+             * toolbar.getName(), false); } else { floatingDialog = new FloatingDialog((Frame)null, toolbar.getName(),
+             * false);}*/
+
+            floatingDialog = new FloatingDialog();
+
+            if (toolBar instanceof FloatingFrame) {
+                ff = (FloatingFrame)toolbar;
+                floatingDialog.setTitle(ff.getName());
+                floatingDialog.setSize(ff.getSize());
+                floatingDialog.setResizable(ff.isFrameResizable());
+            } else {
+                floatingDialog.setTitle(toolBar.getName());
+                floatingDialog.setResizable(false);
+            }
+
+            final WindowListener wl = createFrameListener();
+            floatingDialog.addWindowListener(wl);
+
+            return floatingDialog;
+        }
+
+        //~ Inner Classes ------------------------------------------------------
+
         /**
          * Ein neuer DockingListener fuer den FloatingFrame.
+         *
+         * @version  $Revision$, $Date$
          */
-        protected class FloatingFrameDockingListener extends DockingListener
-        {
+        protected class FloatingFrameDockingListener extends DockingListener {
+
+            //~ Instance fields ------------------------------------------------
+
             private boolean pressedInBumps = false;
-            
-            public FloatingFrameDockingListener(JToolBar t)
-            {
+
+            //~ Constructors ---------------------------------------------------
+
+            /**
+             * Creates a new FloatingFrameDockingListener object.
+             *
+             * @param  t  DOCUMENT ME!
+             */
+            public FloatingFrameDockingListener(final JToolBar t) {
                 super(t);
             }
-            
-            public void mousePressed( MouseEvent e )
-            {
-                super.mousePressed( e );
-                
-                if (!toolBar.isEnabled())
-                {
+
+            //~ Methods --------------------------------------------------------
+
+            @Override
+            public void mousePressed(final MouseEvent e) {
+                super.mousePressed(e);
+
+                if (!toolBar.isEnabled()) {
                     return;
                 }
-                
+
                 pressedInBumps = false;
-                
+
                 // Zeichnet ein unsichtbares Rechteck ueber den Anfasser
                 // auf der linken Seite des FloatingFrames. Nur wenn sich der
                 // MousePointer innerhalb dieses Rechtecks befindet, werden die
                 // <b>mouseDragged</b> Events verarbeitet.
-                Rectangle bumpRect = new Rectangle();
-                bumpRect.setBounds( 0, 0, 14, toolBar.getSize().height );
-                
-                if ( bumpRect.contains( e.getPoint()))
-                {
+                final Rectangle bumpRect = new Rectangle();
+                bumpRect.setBounds(0, 0, 14, toolBar.getSize().height);
+
+                if (bumpRect.contains(e.getPoint())) {
                     pressedInBumps = true;
-                    Point dragOffset = e.getPoint();
+                    final Point dragOffset = e.getPoint();
                     setDragOffset(dragOffset);
                 }
             }
-            
-            public void mouseDragged( MouseEvent e )
-            {
-                if ( pressedInBumps )
-                    super.mouseDragged( e );
-            }
-        }
-        
-        protected RootPaneContainer createFloatingWindow(JToolBar toolbar)
-        {
-            if(logger.isDebugEnabled())logger.debug("<FF> () createFloatingWindow(): " + toolBar.getClass().getName());//NOI18N
-            
-            FloatingFrame ff;
-            class FloatingDialog extends JFrame //JDialog
-            {
-                public FloatingDialog()
-                {
-                    super();
-                }
-                
-                /*public FloatingDialog(Frame owner, String title, boolean modal)
-                {
-                    super(owner, title, modal);
-                }
-                 
-                public FloatingDialog(Dialog owner, String title, boolean modal)
-                {
-                    super(owner, title, modal);
-                }*/
-                
-                // Override createRootPane() to automatically resize
-                // the frame when contents change
-                protected JRootPane createRootPane()
-                {
-                    JRootPane rootPane = new JRootPane()
-                    {
-                        private boolean packing = false;
-                        
-                        public void validate()
-                        {
-                            super.validate();
-                            if (!packing)
-                            {
-                                packing = true;
-                                pack();
-                                packing = false;
-                            }
-                        }
-                    };
-                    
-                    rootPane.setOpaque(true);
-                    
-                    return rootPane;
+
+            @Override
+            public void mouseDragged(final MouseEvent e) {
+                if (pressedInBumps) {
+                    super.mouseDragged(e);
                 }
             }
-            
-            //JDialog floatingDialog;
-            
-            JFrame floatingDialog;
-            
-        /*Window window = SwingUtilities.getWindowAncestor(toolbar);
-         
-        if (window instanceof Frame)
-        {
-            floatingDialog = new FloatingDialog((Frame)window, toolbar.getName(), false);
-        }
-        else if (window instanceof Dialog)
-        {
-            floatingDialog = new FloatingDialog((Dialog)window, toolbar.getName(), false);
-        }
-        else
-        {
-            floatingDialog = new FloatingDialog((Frame)null, toolbar.getName(), false);
-        }*/
-            
-            floatingDialog = new FloatingDialog();
-            
-            if(toolBar instanceof FloatingFrame)
-            {
-                ff = (FloatingFrame)toolbar;
-                floatingDialog.setTitle(ff.getName());
-                floatingDialog.setSize(ff.getSize());
-                floatingDialog.setResizable(ff.isFrameResizable());
-            }
-            else
-            {
-                floatingDialog.setTitle(toolBar.getName());
-                floatingDialog.setResizable(false);
-            }
-            
-            WindowListener wl = createFrameListener();
-            floatingDialog.addWindowListener(wl);
-            
-            return floatingDialog;
         }
     }
-    
-    /*public static void main(String args[])
-    {
-        org.apache.log4j.BasicConfigurator.configure();
-     
-        JFrame jf = new JFrame("FloatingFrameTest");
-        jf.setSize(640,480);
-        jf.setLocationRelativeTo(null);
-        jf.setContentPane(new JPanel(new BorderLayout()));
-        jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-     
-        FloatingFrameConfigurator ffc = new FloatingFrameConfigurator();
-        ffc.setName("FloatingFrame");
-     
-        JPanel content = new JPanel(new GridLayout(1,1));
-        content.add(new JButton("FLOATING FRAME"));
-     
-        JButton jb = new JButton("Button");
-        JToolBar jtb = new JToolBar("ToolBar");
-        jtb.add(jb);
-        jf.getContentPane().add(jtb, BorderLayout.SOUTH);
-     
-        ArrayList buttons = new ArrayList();
-        buttons.add(jb);
-        ffc.setButtons(buttons);
-        ffc.setSwapToolBar(true);
-     
-        JMenu jm = new JMenu("Menu");
-        JMenuBar jmb= new JMenuBar();
-        jmb.add(jm);
-        jf.setJMenuBar(jmb);
-     
-        ArrayList menues = new ArrayList();
-        menues.add(jm);
-        ffc.setMenues(menues);
-        ffc.setSwapMenuBar(true);
-     
-        FloatingFrame ff = new FloatingFrame(content, ffc);
-        JPanel jp = new JPanel(new GridLayout(1,1));
-        jp.add(ff);
-        jf.getContentPane().add(jp, BorderLayout.CENTER);
-        jf.setVisible(true);
-    }*/
-}
 
+    /*public static void main(String args[])
+     * { org.apache.log4j.BasicConfigurator.configure();  JFrame jf = new JFrame("FloatingFrameTest");
+     * jf.setSize(640,480); jf.setLocationRelativeTo(null); jf.setContentPane(new JPanel(new BorderLayout()));
+     * jf.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  FloatingFrameConfigurator ffc = new
+     * FloatingFrameConfigurator(); ffc.setName("FloatingFrame");  JPanel content = new JPanel(new GridLayout(1,1));
+     * content.add(new JButton("FLOATING FRAME"));  JButton jb = new JButton("Button"); JToolBar jtb = new
+     * JToolBar("ToolBar"); jtb.add(jb); jf.getContentPane().add(jtb, BorderLayout.SOUTH);  ArrayList buttons = new
+     * ArrayList(); buttons.add(jb); ffc.setButtons(buttons); ffc.setSwapToolBar(true);  JMenu jm = new JMenu("Menu");
+     * JMenuBar jmb= new JMenuBar(); jmb.add(jm); jf.setJMenuBar(jmb);  ArrayList menues = new ArrayList();
+     * menues.add(jm); ffc.setMenues(menues); ffc.setSwapMenuBar(true);  FloatingFrame ff = new FloatingFrame(content,
+     * ffc); JPanel jp = new JPanel(new GridLayout(1,1)); jp.add(ff); jf.getContentPane().add(jp, BorderLayout.CENTER);
+     * jf.setVisible(true);}*/
+}

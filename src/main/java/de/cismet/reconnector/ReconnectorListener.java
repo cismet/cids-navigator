@@ -1,17 +1,41 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.reconnector;
 
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
 public interface ReconnectorListener {
 
-    public void connecting();
+    //~ Methods ----------------------------------------------------------------
 
-    public void connectionFailed(ReconnectorEvent event);
+    /**
+     * DOCUMENT ME!
+     */
+    void connecting();
 
-    public void connectionCanceled();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  event  DOCUMENT ME!
+     */
+    void connectionFailed(ReconnectorEvent event);
 
-    public void connectionCompleted();
-    
+    /**
+     * DOCUMENT ME!
+     */
+    void connectionCanceled();
+
+    /**
+     * DOCUMENT ME!
+     */
+    void connectionCompleted();
 }

@@ -1,48 +1,77 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.plugin.ui;
-
-
-import java.awt.event.*;
-import javax.swing.*;
 
 import Sirius.navigator.plugin.*;
 import Sirius.navigator.plugin.interfaces.*;
 
+import java.awt.event.*;
+
+import javax.swing.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class PluginToolBarButton extends JButton
-{
-    
-    private final PluginMethod method;   
-    
-    /** Creates a new instance of PluginToolbarButton */
-    public PluginToolBarButton(PluginMethod method)
-    {
+public class PluginToolBarButton extends JButton {
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final PluginMethod method;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of PluginToolbarButton.
+     *
+     * @param  method  DOCUMENT ME!
+     */
+    public PluginToolBarButton(final PluginMethod method) {
         this.method = method;
         this.addActionListener(new PluginMethodInvoker());
     }
-    
-    public String getId()
-    {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getId() {
         return method.getId();
     }
-    
-    private class PluginMethodInvoker implements ActionListener
-    {
-        /** 
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class PluginMethodInvoker implements ActionListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
          * Invoked when an method occurs.
+         *
+         * @param  e  DOCUMENT ME!
          */
-        public void actionPerformed(ActionEvent e)
-        {
-            try
-            {
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            try {
                 PluginToolBarButton.this.method.invoke();
-            }
-            catch(Exception exp)
-            {
+            } catch (Exception exp) {
                 exp.printStackTrace();
             }
-        }  
-    } 
+        }
+    }
 }

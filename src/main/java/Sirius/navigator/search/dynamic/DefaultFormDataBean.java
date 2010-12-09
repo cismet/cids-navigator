@@ -1,264 +1,268 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * FormDataBean.java
  *
  * Created on 11. November 2003, 15:52
  */
-
 package Sirius.navigator.search.dynamic;
-
-import java.util.*;
 
 import org.apache.log4j.Logger;
 
+import java.util.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class DefaultFormDataBean implements FormDataBean
-{
+public class DefaultFormDataBean implements FormDataBean {
+
+    //~ Instance fields --------------------------------------------------------
+
     protected final Logger logger;
-    
+
     /** Holds value of property queryId. */
     private String queryId;
-    
+
     /** Holds value of property formId. */
     private String formId;
-    
+
     /** Holds value of property dataMap. */
     private java.util.LinkedHashMap dataMap;
-    
+
     /** Holds value of property parameterNamesMap. */
     private java.util.LinkedHashMap parameterNamesMap;
-    
-    /** Creates a new instance of FormDataBean */
-    public DefaultFormDataBean()
-    {
-       this.logger = Logger.getLogger(this.getClass());
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of FormDataBean.
+     */
+    public DefaultFormDataBean() {
+        this.logger = Logger.getLogger(this.getClass());
     }
-    
-    public DefaultFormDataBean(Map parameterNamesMap)
-    {
+
+    /**
+     * Creates a new DefaultFormDataBean object.
+     *
+     * @param  parameterNamesMap  DOCUMENT ME!
+     */
+    public DefaultFormDataBean(final Map parameterNamesMap) {
         this();
         this.setParameterNamesMap(parameterNamesMap);
     }
-    
-    
-    /** Getter for property name.
-     * @return Value of property name.
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Getter for property name.
      *
+     * @return  Value of property name.
      */
-    public String getFormId()
-    {
+    @Override
+    public String getFormId() {
         return this.formId;
     }
-    
-    /** Setter for property name.
-     * @param name New value of property name.
+
+    /**
+     * Setter for property name.
      *
+     * @param  formId  name New value of property name.
      */
-    public void setFormId(String formId)
-    {
+    @Override
+    public void setFormId(final String formId) {
         this.formId = formId;
     }
-    
-    /** Getter for property dataMap.
-     * @return Value of property dataMap.
+
+    /**
+     * Getter for property dataMap.
      *
+     * @return  Value of property dataMap.
      */
-    public java.util.LinkedHashMap getDataMap()
-    {
+    @Override
+    public java.util.LinkedHashMap getDataMap() {
         return this.dataMap;
     }
-    
-    /** Setter for property dataMap.
-     * @param dataMap New value of property dataMap.
+
+    /**
+     * Setter for property dataMap.
      *
+     * @param  dataMap  New value of property dataMap.
      */
-    public void setDataMap(java.util.LinkedHashMap dataMap)
-    {
+    @Override
+    public void setDataMap(final java.util.LinkedHashMap dataMap) {
         this.dataMap = dataMap;
     }
-    
-    public Object getBeanParameter(String name)
-    {
-        if(this.getDataMap().containsKey(name))
-        {
+
+    @Override
+    public Object getBeanParameter(final String name) {
+        if (this.getDataMap().containsKey(name)) {
             return this.getDataMap().get(name);
-        }
-        else
-        {
-            logger.warn("object '" + name + "' not found in data map");//NOI18N
+        } else {
+            logger.warn("object '" + name + "' not found in data map"); // NOI18N
             return null;
         }
     }
-    
-    public void setBeanParameter(String name, Object value)
-    {
-        if(this.getDataMap().containsKey(name))
-        {
+
+    @Override
+    public void setBeanParameter(final String name, final Object value) {
+        if (this.getDataMap().containsKey(name)) {
             this.getDataMap().put(name, value);
-        }
-        else
-        {
-            logger.warn("bean parameter name '" + name + "' not found in data map");//NOI18N
+        } else {
+            logger.warn("bean parameter name '" + name + "' not found in data map"); // NOI18N
         }
     }
-    
-    public void setQueryParameter(String name, Object value)
-    {
-        if(this.parameterNamesMap.containsKey(name))
-        {
+
+    @Override
+    public void setQueryParameter(final String name, final Object value) {
+        if (this.parameterNamesMap.containsKey(name)) {
             this.setBeanParameter(this.parameterNamesMap.get(name).toString(), value);
-        }
-        else
-        {
-            logger.warn("query parameter name '" + name + "' not found in parameter map");//NOI18N
+        } else {
+            logger.warn("query parameter name '" + name + "' not found in parameter map"); // NOI18N
         }
     }
-    
-    public Object getQueryParameter(String name)
-    {
-        if(this.parameterNamesMap.containsKey(name))
-        {
+
+    @Override
+    public Object getQueryParameter(final String name) {
+        if (this.parameterNamesMap.containsKey(name)) {
             return this.getBeanParameter(this.parameterNamesMap.get(name).toString());
-            
+
             /*Object value = this.getBeanParameter(this.parameterNamesMap.get(name).toString());
-            if(value != null)
-            {
-                return String.valueOf(value);
-            }*/
+             * if(value != null) { return String.valueOf(value);}*/
+        } else {
+            logger.warn("query parameter '" + name + "' not found in query parameter map"); // NOI18N
         }
-        else
-        {
-            logger.warn("query parameter '" + name + "' not found in query parameter map");//NOI18N
-        }
-        
+
         return null;
     }
-    
-    public Collection getBeanParameterNames()
-    {
+
+    @Override
+    public Collection getBeanParameterNames() {
         return this.getDataMap().keySet();
-    } 
-    
-    public Collection getQueryParameterNames()
-    {
+    }
+
+    @Override
+    public Collection getQueryParameterNames() {
         return this.parameterNamesMap.keySet();
-    } 
-    
-    public Map getParameterNamesMap()
-    {
+    }
+
+    @Override
+    public Map getParameterNamesMap() {
         return this.parameterNamesMap;
     }
-        
-    /** Setter for property parameterMap.
-     * name = queryParameterId
-     * value = beanParameterId
+
+    /**
+     * Setter for property parameterMap. name = queryParameterId value = beanParameterId
      *
-     * @param parameterMap New value of property parameterMap.
-     *
+     * @param  parameterNamesMap  New value of property parameterMap.
      */
-    public void setParameterNamesMap(java.util.Map parameterNamesMap)
-    {
-        if(this.parameterNamesMap == null)
-        {
+    @Override
+    public void setParameterNamesMap(final java.util.Map parameterNamesMap) {
+        if (this.parameterNamesMap == null) {
             this.parameterNamesMap = new LinkedHashMap(parameterNamesMap.size());
-        }
-        else
-        {
+        } else {
             this.parameterNamesMap.clear();
         }
-        
+
         this.parameterNamesMap.putAll(parameterNamesMap);
-        
-        if(this.dataMap == null)
-        {
+
+        if (this.dataMap == null) {
             this.dataMap = new LinkedHashMap(parameterNamesMap.size());
 
-            Iterator iterator = this.parameterNamesMap.values().iterator();
-            while(iterator.hasNext())
-            {
+            final Iterator iterator = this.parameterNamesMap.values().iterator();
+            while (iterator.hasNext()) {
                 this.dataMap.put(iterator.next(), null);
             }
         }
         /*else if(this.dataMap.size() != this.parameterNamesMap.size())
-        {
-            throw new RuntimeException("size of dataMap and parameterNamesMap unequal: " + this.dataMap.size() + " != " + this.parameterNamesMap.size());
-        }*/
+         * { throw new RuntimeException("size of dataMap and parameterNamesMap unequal: " + this.dataMap.size() + " != "
+         * + this.parameterNamesMap.size());}*/
     }
-    
-    public int getParameterCount()
-    {
+
+    @Override
+    public int getParameterCount() {
         return this.dataMap.size();
     }
-    
-    /** Getter for property queryId.
-     * @return Value of property queryId.
+
+    /**
+     * Getter for property queryId.
      *
+     * @return  Value of property queryId.
      */
-    public String getQueryId()
-    {
+    @Override
+    public String getQueryId() {
         return this.queryId;
     }
-    
-    /** Setter for property queryId.
-     * @param queryId New value of property queryId.
+
+    /**
+     * Setter for property queryId.
      *
+     * @param  queryId  New value of property queryId.
      */
-    public void setQueryId(String queryId)
-    {
+    @Override
+    public void setQueryId(final String queryId) {
         this.queryId = queryId;
     }
-    
-    public void clear()
-    {
-        logger.debug("clearing data map values (" + this.dataMap.size() + ")");//NOI18N
-        
-        Iterator parameterNames = this.dataMap.keySet().iterator();
-        while(parameterNames.hasNext())
-        {
+
+    @Override
+    public void clear() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("clearing data map values (" + this.dataMap.size() + ")"); // NOI18N
+        }
+
+        final Iterator parameterNames = this.dataMap.keySet().iterator();
+        while (parameterNames.hasNext()) {
             this.dataMap.put(parameterNames.next(), null);
         }
     }
-    
-    public String toString()
-    {
-        StringBuffer buffer = new StringBuffer();
-        
-        buffer.append("\nthis.getQueryId():          ").append(this.getQueryId());//NOI18N
-        buffer.append("\nthis.getFormId():           ").append(this.getFormId());//NOI18N
-        buffer.append("\nthis.getParameterCount():  ").append(this.getParameterCount());//NOI18N
-        
-        Iterator iterator = this.getQueryParameterNames().iterator();
-        while(iterator.hasNext())
-        {
-            String queryParameterName = iterator.next().toString();
-            buffer.append("\nqueryParameterName: '").append(queryParameterName).append("' == beanParameterName: '").append(this.parameterNamesMap.get(queryParameterName)).append("' | value = ").append(this.getQueryParameter(queryParameterName));//NOI18N
-  
+
+    @Override
+    public String toString() {
+        final StringBuffer buffer = new StringBuffer();
+
+        buffer.append("\nthis.getQueryId():          ").append(this.getQueryId());       // NOI18N
+        buffer.append("\nthis.getFormId():           ").append(this.getFormId());        // NOI18N
+        buffer.append("\nthis.getParameterCount():  ").append(this.getParameterCount()); // NOI18N
+
+        final Iterator iterator = this.getQueryParameterNames().iterator();
+        while (iterator.hasNext()) {
+            final String queryParameterName = iterator.next().toString();
+            buffer.append("\nqueryParameterName: '")
+                    .append(queryParameterName)
+                    .append("' == beanParameterName: '")
+                    .append(this.parameterNamesMap.get(queryParameterName))
+                    .append("' | value = ")
+                    .append(this.getQueryParameter(queryParameterName)); // NOI18N
         }
-        
+
         return buffer.toString();
     }
-    
-    public Object clone() throws CloneNotSupportedException
-    {
-        FormDataBean formDataBean = new DefaultFormDataBean();
-                
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        final FormDataBean formDataBean = new DefaultFormDataBean();
+
         formDataBean.setParameterNamesMap(this.getParameterNamesMap());
-        //formDataBean.setDataMap(this.getDataMap());
+        // formDataBean.setDataMap(this.getDataMap());
         formDataBean.setQueryId(this.getQueryId());
         formDataBean.setFormId(this.getFormId());
 
         return formDataBean;
     }
-    
-    public boolean equals(Object obj)
-    {
-        if(obj != null && FormDataBean.class.isInstance(obj))
-        {
+
+    @Override
+    public boolean equals(final Object obj) {
+        if ((obj != null) && FormDataBean.class.isInstance(obj)) {
             return this.getQueryId().equals(((FormDataBean)obj).getQueryId());
         }
-        
+
         return false;
     }
 }

@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.connection.SessionManager;
@@ -7,17 +14,17 @@ import Sirius.navigator.types.iterator.TreeNodeIterator;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
+
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
-import de.cismet.tools.CismetThreadPool;
-import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
+
 import java.awt.EventQueue;
 
 
 /*******************************************************************************
  *
- * Copyright (c)	:	EIG (Environmental Informatics Group)
+ * Copyright (c)        :       EIG (Environmental Informatics Group)
  * http://www.htw-saarland.de/eig
  * Prof. Dr. Reiner Guettler
  * Prof. Dr. Ralf Denzer
@@ -28,27 +35,36 @@ import java.awt.EventQueue;
  * 66117 Saarbruecken
  * Germany
  *
- * Programmers		:	Pascal
+ * Programmers          :       Pascal
  *
- * Project			:	WuNDA 2
- * Filename		:
- * Version			:	1.0
- * Purpose			:
- * Created			:	27.04.2000
- * History			:
+ * Project                      :       WuNDA 2
+ * Filename             :
+ * Version                      :       1.0
+ * Purpose                      :
+ * Created                      :       27.04.2000
+ * History                      :
  *
  *******************************************************************************/
 import java.util.*;
+
 import javax.swing.tree.DefaultTreeModel;
 
+import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
+
+import de.cismet.tools.CismetThreadPool;
+
 /**
- * Der SearchTree dient zum Anzeigen von Suchergebnissen. Neben der Funktionalit\u00E4t,
- * die er von GenericMetaTree erbt, bietet er zusaetzlich noch die Moeglichkeit,
- * die Suchergebnisse schrittweise anzuzeigen. D.h. es wird immer nur ein kleiner
- * Ausschnitt fester Groesse aus der gesamten Ergebissmenge angezeigt. Um durch die
- * Ergebnissmenge zu navigieren stellt der SearchTree spezielle Methoden bereit.
+ * Der SearchTree dient zum Anzeigen von Suchergebnissen. Neben der Funktionalit\u00E4t, die er von GenericMetaTree
+ * erbt, bietet er zusaetzlich noch die Moeglichkeit, die Suchergebnisse schrittweise anzuzeigen. D.h. es wird immer nur
+ * ein kleiner Ausschnitt fester Groesse aus der gesamten Ergebissmenge angezeigt. Um durch die Ergebnissmenge zu
+ * navigieren stellt der SearchTree spezielle Methoden bereit.
+ *
+ * @version  $Revision$, $Date$
  */
 public class SearchResultsTree extends MetaCatalogueTree {
+
+    //~ Instance fields --------------------------------------------------------
+
     private boolean empty = true;
     private boolean browseBack = false;
     private boolean browseForward = false;
@@ -63,42 +79,56 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private Thread runningNameLoader = null;
     private boolean syncWithMap = false;
 
+    //~ Constructors -----------------------------------------------------------
+
     /**
-     * Erzeugt einen neuen, leeren, SearchTree. Es werden jeweils
-     * 50 Objekte angezeigt.
+     * Erzeugt einen neuen, leeren, SearchTree. Es werden jeweils 50 Objekte angezeigt.
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     public SearchResultsTree() throws Exception {
         this(50, true, 2);
     }
 
-    public SearchResultsTree(int visibleNodes, boolean useThread, int maxThreadCount) throws Exception {
+    /**
+     * Creates a new SearchResultsTree object.
+     *
+     * @param   visibleNodes    DOCUMENT ME!
+     * @param   useThread       DOCUMENT ME!
+     * @param   maxThreadCount  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public SearchResultsTree(final int visibleNodes, final boolean useThread, final int maxThreadCount)
+            throws Exception {
         super(new RootTreeNode(), false, useThread, maxThreadCount);
-        this.rootNode = (RootTreeNode) this.defaultTreeModel.getRoot();
+        this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         this.visibleNodes = visibleNodes;
         defaultTreeModel.setAsksAllowsChildren(true);
         this.defaultTreeModel.setAsksAllowsChildren(true);
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * Blaettert in der Ergebnissmenge einen Schritt vor. Loest einen
-     * PropertyChange Event ("browse") aus.
+     * Blaettert in der Ergebnissmenge einen Schritt vor. Loest einen PropertyChange Event ("browse") aus.
      *
-     * @return true, bis das Ende der Ergebnissmenge erreicht wurde.
+     * @return  true, bis das Ende der Ergebnissmenge erreicht wurde.
      */
     public boolean browseForward() {
-        logger.info("[SearchResultsTree] browsing forward");//NOI18N
+        logger.info("[SearchResultsTree] browsing forward"); // NOI18N
         if (resultNodes != null) {
             boolean full = true;
 
-            if (pos + 1 > max) {
+            if ((pos + 1) > max) {
                 browseForward = false;
                 browseBack = true;
-                //logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
-                //return full;
+                // logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
+                // return full;
             } else if (visibleNodes >= max) {
                 browseBack = false;
                 browseForward = false;
-                //logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
+                // logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
 
                 visibleResultNodes = new Node[max];
                 visibleResultNodes = resultNodes;
@@ -117,13 +147,12 @@ public class SearchResultsTree extends MetaCatalogueTree {
                     browseBack = false;
                 }
                 browseForward = true;
-                //logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
-            } else //if ((pos + visibleNodes) > max)
+                // logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
+            } else // if ((pos + visibleNodes) > max)
             {
-
                 browseForward = false;
                 browseBack = true;
-                //logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
+                // logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
 
                 rest = max - pos;
                 visibleResultNodes = new Node[rest];
@@ -136,17 +165,16 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 full = true;
             }
 
-            //logger.debug("pos: " + pos + " max: " + max);
+            // logger.debug("pos: " + pos + " max: " + max);
             rootNode.removeChildren();
 
             try {
                 rootNode.addChildren(visibleResultNodes);
             } catch (Exception exp) {
-                logger.fatal("[SearchResultsTree] could not browse forward", exp);//NOI18N
+                logger.fatal("[SearchResultsTree] could not browse forward", exp); // NOI18N
             }
 
-
-            firePropertyChange("browse", 0, 1);//NOI18N
+            firePropertyChange("browse", 0, 1); // NOI18N
             defaultTreeModel.nodeStructureChanged(rootNode);
             checkForDynamicNodes();
             return full;
@@ -157,13 +185,12 @@ public class SearchResultsTree extends MetaCatalogueTree {
     }
 
     /**
-     * Blaettert in der Ergebnissmenge einen Schritt zurueck. Loest einen
-     * PropertyChange Event ("browse") aus.
+     * Blaettert in der Ergebnissmenge einen Schritt zurueck. Loest einen PropertyChange Event ("browse") aus.
      *
-     * @return true, bis der Anfang der Ergebnissmenge erreicht wurde.
+     * @return  true, bis der Anfang der Ergebnissmenge erreicht wurde.
      */
     public boolean browseBack() {
-        logger.info("[SearchResultsTree] browsing back");//NOI18N
+        logger.info("[SearchResultsTree] browsing back"); // NOI18N
         if (resultNodes != null) {
             boolean full = true;
 
@@ -171,21 +198,21 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 browseForward = false;
                 browseBack = true;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);//NOI18N
-                    logger.debug("visibleNodes: " + visibleNodes + " >= max: " + max);//NOI18N
+                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack); // NOI18N
+                    logger.debug("visibleNodes: " + visibleNodes + " >= max: " + max);              // NOI18N
                 }
                 visibleResultNodes = new Node[max];
                 visibleResultNodes = resultNodes;
-            } else if (pos < max && (pos - visibleNodes) >= visibleNodes) {
+            } else if ((pos < max) && ((pos - visibleNodes) >= visibleNodes)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("pos: " + pos + " - visibleNodes: " + visibleNodes + " >= 0");//NOI18N
+                    logger.debug("pos: " + pos + " - visibleNodes: " + visibleNodes + " >= 0");     // NOI18N
                 }
                 pos -= visibleNodes;
                 int j = 0;
                 visibleResultNodes = new Node[visibleNodes];
 
                 for (int i = (pos - visibleNodes); i < pos; i++) {
-                    //logger.debug("i: " + i + "j: " + j);
+                    // logger.debug("i: " + i + "j: " + j);
                     visibleResultNodes[j] = resultNodes[i];
                     j++;
                 }
@@ -198,14 +225,14 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 }
                 browseForward = true;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);//NOI18N
+                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack); // NOI18N
                 }
             } else if (pos == max) {
                 browseForward = true;
                 browseBack = true;
                 if (logger.isDebugEnabled()) {
-                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);//NOI18N
-                    logger.debug("pos: " + pos + " == max" + max);//NOI18N
+                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack); // NOI18N
+                    logger.debug("pos: " + pos + " == max" + max);                                  // NOI18N
                 }
                 pos -= rest;
                 int j = 0;
@@ -213,33 +240,32 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                 for (int i = (pos - visibleNodes); i < pos; i++) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("i: " + i + "j: " + j);//NOI18N
+                        logger.debug("i: " + i + "j: " + j); // NOI18N
                     }
                     visibleResultNodes[j] = resultNodes[i];
                     j++;
                 }
                 full = false;
-
             }
 
             if (pos == visibleNodes) {
                 browseBack = false;
-                //logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
-                //logger.debug("pos: " + pos + " == visibleNodes" + visibleNodes);
+                // logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack);
+                // logger.debug("pos: " + pos + " == visibleNodes" + visibleNodes);
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug("pos: " + pos + " max: " + max);//NOI18N
+                logger.debug("pos: " + pos + " max: " + max); // NOI18N
             }
             rootNode.removeChildren();
 
             try {
                 rootNode.addChildren(visibleResultNodes);
             } catch (Exception exp) {
-                logger.fatal("[SearchResultsTree] could not browse back", exp);//NOI18N
+                logger.fatal("[SearchResultsTree] could not browse back", exp); // NOI18N
             }
 
-            firePropertyChange("browse", 0, 1);//NOI18N
+            firePropertyChange("browse", 0, 1); // NOI18N
             defaultTreeModel.nodeStructureChanged(rootNode);
             checkForDynamicNodes();
             return full;
@@ -252,19 +278,19 @@ public class SearchResultsTree extends MetaCatalogueTree {
     /**
      * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.
      *
-     * @param nodes Ergebnisse, die im SearchTree angezeigt werden sollen.
+     * @param  nodes  Ergebnisse, die im SearchTree angezeigt werden sollen.
      */
-    public void setResultNodes(Node[] nodes) {
+    public void setResultNodes(final Node[] nodes) {
         if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] filling tree with '" + nodes.length + "' nodes");//NOI18N
+            logger.info("[SearchResultsTree] filling tree with '" + nodes.length + "' nodes"); // NOI18N
         }
         pos = 0;
 
-        if (nodes == null || nodes.length < 1) {
+        if ((nodes == null) || (nodes.length < 1)) {
             empty = true;
             browseBack = false;
             browseForward = false;
-            firePropertyChange("browse", 0, 1);//NOI18N
+            firePropertyChange("browse", 0, 1); // NOI18N
         } else {
             resultNodes = nodes;
             max = resultNodes.length;
@@ -273,60 +299,69 @@ public class SearchResultsTree extends MetaCatalogueTree {
             empty = false;
         }
 
-        firePropertyChange("browse", 0, 1);//NOI18N
+        firePropertyChange("browse", 0, 1); // NOI18N
         syncWithMap();
         checkForDynamicNodes();
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     public void syncWithMap() {
         syncWithMap(isSyncWithMap());
     }
 
-    public void syncWithMap(boolean sync) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sync  DOCUMENT ME!
+     */
+    public void syncWithMap(final boolean sync) {
         if (sync) {
-            logger.debug("syncWithMap");//NOI18N
+            if (logger.isDebugEnabled()) {
+                logger.debug("syncWithMap");                                                // NOI18N
+            }
             try {
-                PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap");//NOI18N
-                Vector<DefaultMetaTreeNode> v = new Vector<DefaultMetaTreeNode>();
-                final DefaultTreeModel defaultTreeModel = (DefaultTreeModel) getModel();
+                final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
+                final Vector<DefaultMetaTreeNode> v = new Vector<DefaultMetaTreeNode>();
+                final DefaultTreeModel defaultTreeModel = (DefaultTreeModel)getModel();
 
-
-                for (int i = 0; i < ((DefaultMetaTreeNode) defaultTreeModel.getRoot()).getChildCount(); ++i) {
+                for (int i = 0; i < ((DefaultMetaTreeNode)defaultTreeModel.getRoot()).getChildCount(); ++i) {
 //                    logger.debug("resultNodes:"+resultNodes[i]);
                     if (resultNodes[i] instanceof MetaObjectNode) {
-                        //ObjectTreeNode otn=new ObjectTreeNode((MetaObjectNode)resultNodes[i]);
-                        DefaultMetaTreeNode otn = (DefaultMetaTreeNode) ((DefaultMetaTreeNode) defaultTreeModel.getRoot()).getChildAt(i);
+                        // ObjectTreeNode otn=new ObjectTreeNode((MetaObjectNode)resultNodes[i]);
+                        final DefaultMetaTreeNode otn = (DefaultMetaTreeNode)
+                            ((DefaultMetaTreeNode)defaultTreeModel.getRoot()).getChildAt(i);
                         v.add(otn);
                     }
                 }
 
-                //((de.cismet.cismap.navigatorplugin.CismapPlugin) map).showInMap(v, false);
+                // ((de.cismet.cismap.navigatorplugin.CismapPlugin) map).showInMap(v, false);
                 MetaTreeNodeVisualization.getInstance().addVisualization(v);
             } catch (Throwable t) {
-                logger.warn("Fehler beim synchronisieren der Suchergebnisse mit der Karte", t);//NOI18N
+                logger.warn("Fehler beim synchronisieren der Suchergebnisse mit der Karte", t); // NOI18N
             }
         }
     }
 
     /**
      * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.<br>
-     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt
-     *werden
+     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt werden
      *
-     * @param nodes Ergebnisse, die im SearchTree angezeigt werden sollen.
-     * @param append Ergebnisse anhaengen.
+     * @param  nodes   Ergebnisse, die im SearchTree angezeigt werden sollen.
+     * @param  append  Ergebnisse anhaengen.
      */
-    public void setResultNodes(Node[] nodes, boolean append) {
+    public void setResultNodes(final Node[] nodes, final boolean append) {
         if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] appending '" + nodes.length + "' nodes");//NOI18N
+            logger.info("[SearchResultsTree] appending '" + nodes.length + "' nodes"); // NOI18N
         }
-        if (append == true && (nodes == null || nodes.length < 1)) {
+        if ((append == true) && ((nodes == null) || (nodes.length < 1))) {
             return;
-        } else if (append == false && (nodes == null || nodes.length < 1)) {
+        } else if ((append == false) && ((nodes == null) || (nodes.length < 1))) {
             this.clear();
             return;
-        } else if (append == true && empty == false) {
-            Node[] tmpNodes = new Node[resultNodes.length + nodes.length];
+        } else if ((append == true) && (empty == false)) {
+            final Node[] tmpNodes = new Node[resultNodes.length + nodes.length];
             int j = resultNodes.length;
 
             for (int i = 0; i < resultNodes.length; i++) {
@@ -344,8 +379,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
             this.clear();
             resultNodes = nodes;
 
-            //logger.debug("nodes.length      : " + nodes.length);
-            //logger.debug("resultNodes.length: " + resultNodes.length);
+            // logger.debug("nodes.length      : " + nodes.length);
+            // logger.debug("resultNodes.length: " + resultNodes.length);
         }
 
         max = resultNodes.length;
@@ -353,172 +388,184 @@ public class SearchResultsTree extends MetaCatalogueTree {
         visibleResultNodes = new Node[visibleNodes];
         this.browseForward();
         empty = false;
-        firePropertyChange("browse", 0, 1);//NOI18N
+        firePropertyChange("browse", 0, 1); // NOI18N
         syncWithMap();
         checkForDynamicNodes();
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     private void checkForDynamicNodes() {
-        final DefaultTreeModel defaultTreeModel = (DefaultTreeModel) getModel();
-        final DefaultMetaTreeNode node = (DefaultMetaTreeNode) defaultTreeModel.getRoot();
+        final DefaultTreeModel defaultTreeModel = (DefaultTreeModel)getModel();
+        final DefaultMetaTreeNode node = (DefaultMetaTreeNode)defaultTreeModel.getRoot();
         if (runningNameLoader != null) {
             runningNameLoader.interrupt();
         }
 
-        Thread t = new Thread() {
+        final Thread t = new Thread() {
 
-            public void run() {
-                final Thread parentThread = this;
-                runningNameLoader = this;
-                for (int i = 0; i < defaultTreeModel.getChildCount(node); ++i) {
+                @Override
+                public void run() {
+                    final Thread parentThread = this;
+                    runningNameLoader = this;
+                    for (int i = 0; i < defaultTreeModel.getChildCount(node); ++i) {
 //                                    try {
 //                                        Thread.sleep(100);
 //                                    } catch (InterruptedException ex) {
 //                                        ex.printStackTrace();
 //                                    }
-                    if (interrupted()) {
-                        break;
-                    }
-                    try {
-                        final DefaultMetaTreeNode n = (DefaultMetaTreeNode) defaultTreeModel.getChild(node, i);
-
-                        if (n != null && n.getNode().getName() == null && n.isObjectNode()) {
-
-                            try {
-                                final ObjectTreeNode on = ((ObjectTreeNode) n);
-                                EventQueue.invokeLater(new Runnable() {
-
-                                    public void run() {
-
-                                        n.getNode().setName( org.openide.util.NbBundle.getMessage(SearchResultsTree.class, "SearchResultsTree.checkForDynamicNodes().loadName"));//NOI18N
-                                        defaultTreeModel.nodeChanged(on);
-
-                                    }
-                                });
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("caching object node");//NOI18N
-                                }
-                                final MetaObject MetaObject = SessionManager.getProxy().getMetaObject(on.getMetaObjectNode().getObjectId(), on.getMetaObjectNode().getClassId(), on.getMetaObjectNode().getDomain());
-                                on.getMetaObjectNode().setObject(MetaObject);
-                                EventQueue.invokeLater(new Runnable() {
-
-                                    public void run() {
-
-                                        n.getNode().setName(MetaObject.toString());
-                                        defaultTreeModel.nodeChanged(on);
-
-                                    }
-                                });
-
-                            } catch (Throwable t) {
-                                logger.error("could not retrieve meta object of node '" + this + "'", t);//NOI18N
-                            }
-                        } else {
-                            logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":");//NOI18N
+                        if (interrupted()) {
+                            break;
                         }
-                    } catch (Exception e) {
-                        logger.error("Error while loading the name", e);//NOI18N
+                        try {
+                            final DefaultMetaTreeNode n = (DefaultMetaTreeNode)defaultTreeModel.getChild(node, i);
+
+                            if ((n != null) && (n.getNode().getName() == null) && n.isObjectNode()) {
+                                try {
+                                    final ObjectTreeNode on = ((ObjectTreeNode)n);
+                                    EventQueue.invokeLater(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                n.getNode()
+                                                        .setName(
+                                                            org.openide.util.NbBundle.getMessage(
+                                                                SearchResultsTree.class,
+                                                                "SearchResultsTree.checkForDynamicNodes().loadName")); // NOI18N
+                                                defaultTreeModel.nodeChanged(on);
+                                            }
+                                        });
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug("caching object node");                                           // NOI18N
+                                    }
+                                    final MetaObject MetaObject = SessionManager.getProxy()
+                                                .getMetaObject(on.getMetaObjectNode().getObjectId(),
+                                                    on.getMetaObjectNode().getClassId(),
+                                                    on.getMetaObjectNode().getDomain());
+                                    on.getMetaObjectNode().setObject(MetaObject);
+                                    EventQueue.invokeLater(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                n.getNode().setName(MetaObject.toString());
+                                                defaultTreeModel.nodeChanged(on);
+                                            }
+                                        });
+                                } catch (Throwable t) {
+                                    logger.error("could not retrieve meta object of node '" + this + "'", t); // NOI18N
+                                }
+                            } else {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":"); // NOI18N
+                                }
+                            }
+                        } catch (Exception e) {
+                            logger.error("Error while loading the name", e);                                  // NOI18N
+                        }
                     }
+                    runningNameLoader = null;
                 }
-                runningNameLoader = null;
-            }
-        };
+            };
 
         CismetThreadPool.execute(t);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Node[] getResultNodes() {
         return resultNodes;
     }
 
     /**
-     * Diese Funktion dient dazu, eine Selektion von Knoten aus
-     * dem SearchTree zu loeschen.
+     * Diese Funktion dient dazu, eine Selektion von Knoten aus dem SearchTree zu loeschen.
      *
-     * @param selectedNodes Die Knoten, die geloescht werden sollen.
-     * @return true, wenn mindestens ein Knoten geloescht wurde.
+     * @param   selectedNodes  Die Knoten, die geloescht werden sollen.
+     *
+     * @return  true, wenn mindestens ein Knoten geloescht wurde.
      */
-    public boolean removeResultNodes(DefaultMetaTreeNode[] selectedNodes) {
+    public boolean removeResultNodes(final DefaultMetaTreeNode[] selectedNodes) {
         if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes");//NOI18N
+            logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
 
-        if (selectedNodes == null || selectedNodes.length < 1) {
+        if ((selectedNodes == null) || (selectedNodes.length < 1)) {
             return deleted;
         }
 
-        Vector tmpNodeVector = new Vector();
+        final Vector tmpNodeVector = new Vector();
 
         for (int i = 0; i < resultNodes.length; i++) {
             tmpNodeVector.addElement(resultNodes[i]);
         }
 
         for (int i = 0; i < tmpNodeVector.size(); i++) {
-            //logger.debug("(1) tmpNodeVector.size(): " + tmpNodeVector.size());
+            // logger.debug("(1) tmpNodeVector.size(): " + tmpNodeVector.size());
 
             for (int j = 0; j < selectedNodes.length;) {
-                //logger.debug("i: " + i + " j: " + j + " -------------------");
+                // logger.debug("i: " + i + " j: " + j + " -------------------");
 
-                if (i < tmpNodeVector.size() && selectedNodes[j].equalsNode((Node) tmpNodeVector.elementAt(i))) {
+                if ((i < tmpNodeVector.size()) && selectedNodes[j].equalsNode((Node)tmpNodeVector.elementAt(i))) {
                     tmpNodeVector.removeElementAt(i);
                     deleted = true;
-                    //logger.debug("Knoten " + i + " geloescht!");
+                    // logger.debug("Knoten " + i + " geloescht!");
                 } else {
                     ++j;
                 }
             }
 
-            //logger.debug("(2) tmpNodeVector.size(): " + tmpNodeVector.size());
+            // logger.debug("(2) tmpNodeVector.size(): " + tmpNodeVector.size());
         }
 
         if (deleted) {
-            this.setResultNodes((Node[]) tmpNodeVector.toArray(new Node[tmpNodeVector.size()]), false);
+            this.setResultNodes((Node[])tmpNodeVector.toArray(new Node[tmpNodeVector.size()]), false);
         }
 
         return deleted;
     }
-
-    /*public void removeSelectedResultNodes()
-    {
-    Collection selectedNodes = this.getSelectedNodes();
-    if(selectedNodes != null)
-    {
-    this.removeResultNodes((DefaultMetaTreeNode[])selectedNodes.toArray(new DefaultMetaTreeNode[selectedNodes.size()]));
-    }
-    }*/
+    /**
+     * public void removeSelectedResultNodes() { Collection selectedNodes = this.getSelectedNodes(); if(selectedNodes !=
+     * null) { this.removeResultNodes((DefaultMetaTreeNode[])selectedNodes.toArray(new
+     * DefaultMetaTreeNode[selectedNodes.size()])); } }.
+     */
     public void removeSelectedResultNodes() {
-        Collection selectedNodes = this.getSelectedNodes();
+        final Collection selectedNodes = this.getSelectedNodes();
         if (selectedNodes != null) {
             this.removeResultNodes(selectedNodes);
         }
     }
 
-    public boolean removeResultNodes(Collection selectedNodes) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   selectedNodes  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean removeResultNodes(final Collection selectedNodes) {
         if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes");//NOI18N
+            logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
-        ArrayList tempList = new ArrayList(Arrays.asList(resultNodes));
-        //java.util.List tempList = Arrays.asList(resultNodes);
-        TreeNodeIterator iterator = new TreeNodeIterator(selectedNodes);
+        final ArrayList tempList = new ArrayList(Arrays.asList(resultNodes));
+        // java.util.List tempList = Arrays.asList(resultNodes);
+        final TreeNodeIterator iterator = new TreeNodeIterator(selectedNodes);
 
         while (iterator.hasNext()) {
             /*for (int i = 0; i < tempList.size(); i++)
-            {
-            if (i < tempList.size() && iterator.next().equalsNode((Node)tempList.get(i)))
-            {
-            tempList.remove(i);
-            deleted = true;
-            }
-            }*/
+             * { if (i < tempList.size() && iterator.next().equalsNode((Node)tempList.get(i))) { tempList.remove(i);
+             * deleted = true; }}*/
 
-            //logger.debug("iterator" + iterator);
-            DefaultMetaTreeNode nextNode = iterator.next();
-            Iterator nodeIterator = tempList.iterator();
+            // logger.debug("iterator" + iterator);
+            final DefaultMetaTreeNode nextNode = iterator.next();
+            final Iterator nodeIterator = tempList.iterator();
             while (nodeIterator.hasNext()) {
-                //logger.debug("nodeIterator" + nodeIterator);
-                if (nextNode.equalsNode(((Node) nodeIterator.next()))) {
+                // logger.debug("nodeIterator" + nodeIterator);
+                if (nextNode.equalsNode(((Node)nodeIterator.next()))) {
                     nodeIterator.remove();
                     deleted = true;
                 }
@@ -526,17 +573,17 @@ public class SearchResultsTree extends MetaCatalogueTree {
         }
 
         if (deleted) {
-            this.setResultNodes((Node[]) tempList.toArray(new Node[tempList.size()]), false);
+            this.setResultNodes((Node[])tempList.toArray(new Node[tempList.size()]), false);
         }
 
         return deleted;
     }
 
     /**
-     * Setzt den SearchTree komplett zurueck und entfernt alle Knoten
+     * Setzt den SearchTree komplett zurueck und entfernt alle Knoten.
      */
     public void clear() {
-        logger.info("[SearchResultsTree] removing all nodes");//NOI18N
+        logger.info("[SearchResultsTree] removing all nodes"); // NOI18N
         resultNodes = null;
         pos = 0;
         max = 0;
@@ -544,7 +591,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         browseBack = false;
         browseForward = false;
         rootNode.removeAllChildren();
-        firePropertyChange("browse", 0, 1);//NOI18N
+        firePropertyChange("browse", 0, 1);                    // NOI18N
         defaultTreeModel.nodeStructureChanged(rootNode);
         System.gc();
     }
@@ -552,7 +599,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     /**
      * Liefert true, wenn im SearchTree zurueck geblaettert werden kann.
      *
-     * @return true/false
+     * @return  true/false
      */
     public boolean isBrowseBack() {
         return this.browseBack;
@@ -561,25 +608,45 @@ public class SearchResultsTree extends MetaCatalogueTree {
     /**
      * Liefert true, wenn im SearchTree vorwaerts geblaettert werden kann.
      *
-     * @return true/false
+     * @return  true/false
      */
     public boolean isBrowseForward() {
         return this.browseForward;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public int getVisibleNodes() {
         return this.visibleNodes;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isEmpty() {
         return this.empty;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public boolean isSyncWithMap() {
         return syncWithMap;
     }
 
-    public void setSyncWithMap(boolean syncWithMap) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  syncWithMap  DOCUMENT ME!
+     */
+    public void setSyncWithMap(final boolean syncWithMap) {
         this.syncWithMap = syncWithMap;
     }
 }

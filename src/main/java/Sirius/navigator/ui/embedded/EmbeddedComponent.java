@@ -1,65 +1,80 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * EmbeddedComponent.java
  *
  * Created on 27. M\u00E4rz 2003, 09:39
  */
-
 package Sirius.navigator.ui.embedded;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public interface EmbeddedComponent
-{   
-    /** Getter for property visible.
-     * @return Value of property visible.
+public interface EmbeddedComponent {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Getter for property visible.
      *
+     * @return  Value of property visible.
      */
-    public boolean isVisible();
-    
-    /** Setter for property visible.
-     * @param visible New value of property visible.
+    boolean isVisible();
+
+    /**
+     * Setter for property visible.
      *
+     * @param  visible  New value of property visible.
      */
-    public void setVisible(boolean visible);
-    
-    
-   
-    /** Getter for property enabled.
-     * @return Value of property enabled.
+    void setVisible(boolean visible);
+
+    /**
+     * Getter for property enabled.
      *
+     * @return  Value of property enabled.
      */
-    public boolean isEnabled();
-    
-    /** Setter for property enabled.
-     * @param enabled New value of property enabled.
+    boolean isEnabled();
+
+    /**
+     * Setter for property enabled.
      *
+     * @param  enabled  New value of property enabled.
      */
-    public void setEnabled(boolean enabled);
-    
-    /** Getter for property id.
-     * @return Value of property id.
+    void setEnabled(boolean enabled);
+
+    /**
+     * Getter for property id.
      *
+     * @return  Value of property id.
      */
-    public String getId();
-    
-    /** Setter for property id.
-     * @param id New value of property id.
+    String getId();
+
+    /**
+     * Setter for property id.
      *
+     * @return  DOCUMENT ME!
      */
-    //public void setId(String id);
-    
-    /** Getter for property name.
-     * @return Value of property name.
+    // public void setId(String id);
+
+    /**
+     * Getter for property name.
      *
+     * @return  Value of property name.
      */
-    public String getName();
-    
-    /** Setter for property name.
-     * @param name New value of property name.
+    String getName();
+
+    /**
+     * Setter for property name.
      *
+     * @param  name  New value of property name.
      */
-    public void setName(String name);
-    
+    void setName(String name);
 }

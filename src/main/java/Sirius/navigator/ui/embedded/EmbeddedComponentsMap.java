@@ -1,61 +1,115 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * EmbeddedComponentsMap.java
  *
  * Created on 27. M\u00E4rz 2003, 09:43
  */
-
 package Sirius.navigator.ui.embedded;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public interface EmbeddedComponentsMap
-{
-    
-    /** Getter for property name.
-     * @return Value of property name.
+public interface EmbeddedComponentsMap {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Getter for property name.
      *
-     */
-    public String getName(String id);
-    
-    /** Setter for property name.
-     * @param name New value of property name.
+     * @param   id  DOCUMENT ME!
      *
+     * @return  Value of property name.
      */
-    //public void setName(String id, String name);
-    
-    /** Getter for property visible.
-     * @return Value of property visible.
+    String getName(String id);
+
+    /**
+     * Setter for property name.
      *
-     */
-    public boolean isVisible(String id);
-    
-    /** Setter for property visible.
-     * @param visible New value of property visible.
+     * @param   id  name New value of property name.
      *
+     * @return  DOCUMENT ME!
      */
-    public void setVisible(String id, boolean visible);
-    
-    /** Getter for property enabled.
-     * @return Value of property enabled.
+    // public void setName(String id, String name);
+
+    /**
+     * Getter for property visible.
      *
-     */
-    public boolean isEnabled(String id);
-    
-    /** Setter for property enabled.
-     * @param enabled New value of property enabled.
+     * @param   id  DOCUMENT ME!
      *
+     * @return  Value of property visible.
      */
-    public void setEnabled(String id, boolean enabled);
-    
-    public boolean isAvailable(String id);
-    
-    public void add(EmbeddedComponent component);
-    
-    public void remove(String id);
-    
-    public EmbeddedComponent get(String id);
-    
-    public java.util.Iterator getEmbeddedComponents();
+    boolean isVisible(String id);
+
+    /**
+     * Setter for property visible.
+     *
+     * @param  id       DOCUMENT ME!
+     * @param  visible  New value of property visible.
+     */
+    void setVisible(String id, boolean visible);
+
+    /**
+     * Getter for property enabled.
+     *
+     * @param   id  DOCUMENT ME!
+     *
+     * @return  Value of property enabled.
+     */
+    boolean isEnabled(String id);
+
+    /**
+     * Setter for property enabled.
+     *
+     * @param  id       DOCUMENT ME!
+     * @param  enabled  New value of property enabled.
+     */
+    void setEnabled(String id, boolean enabled);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   id  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    boolean isAvailable(String id);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  component  DOCUMENT ME!
+     */
+    void add(EmbeddedComponent component);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  id  DOCUMENT ME!
+     */
+    void remove(String id);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   id  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    EmbeddedComponent get(String id);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    java.util.Iterator getEmbeddedComponents();
 }

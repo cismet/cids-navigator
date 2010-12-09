@@ -1,89 +1,152 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.cids.editors;
 
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JCheckBox;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
+import javax.swing.Action;
+import javax.swing.Icon;
+import javax.swing.JCheckBox;
+
 /**
+ * DOCUMENT ME!
  *
- * @author thorsten
+ * @author   thorsten
+ * @version  $Revision$, $Date$
  */
 public class DefaultBindableJCheckBox extends JCheckBox implements Bindable {
 
-    private final static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultBindableJCheckBox.class);
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
+            DefaultBindableJCheckBox.class);
     private static final Converter<Boolean, Boolean> NULL_CONVERTER = new Converter<Boolean, Boolean>() {
 
-        @Override
-        public Boolean convertForward(Boolean s) {
-            if (s == null) {
-                return Boolean.FALSE;
-            } else {
-                return s;
+            @Override
+            public Boolean convertForward(final Boolean s) {
+                if (s == null) {
+                    return Boolean.FALSE;
+                } else {
+                    return s;
+                }
             }
-        }
 
-        @Override
-        public Boolean convertReverse(Boolean t) {
-            if (t == null) {
-                return Boolean.FALSE;
-            } else {
-                return t;
+            @Override
+            public Boolean convertReverse(final Boolean t) {
+                if (t == null) {
+                    return Boolean.FALSE;
+                } else {
+                    return t;
+                }
             }
-        }
-    };
+        };
 
-    public DefaultBindableJCheckBox(String text, Icon icon, boolean selected) {
-        super(text, icon, selected);
-    }
+    //~ Constructors -----------------------------------------------------------
 
-    public DefaultBindableJCheckBox(String text, Icon icon) {
-        super(text, icon);
-    }
-
-    public DefaultBindableJCheckBox(String text, boolean selected) {
-        super(text, selected);
-    }
-
-    public DefaultBindableJCheckBox(Action a) {
-        super(a);
-    }
-
-    public DefaultBindableJCheckBox(String text) {
-        super(text);
-    }
-
-    public DefaultBindableJCheckBox(Icon icon, boolean selected) {
-        super(icon, selected);
-    }
-
-    public DefaultBindableJCheckBox(Icon icon) {
-        super(icon);
-    }
-
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     */
     public DefaultBindableJCheckBox() {
         super();
         setOpaque(false);
     }
 
-    public String getBindingProperty() {
-        return "selected";//NOI18N
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  a  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final Action a) {
+        super(a);
     }
 
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  text  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final String text) {
+        super(text);
+    }
+
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  icon  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final Icon icon) {
+        super(icon);
+    }
+
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  text  DOCUMENT ME!
+     * @param  icon  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final String text, final Icon icon) {
+        super(text, icon);
+    }
+
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  text      DOCUMENT ME!
+     * @param  selected  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final String text, final boolean selected) {
+        super(text, selected);
+    }
+
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  icon      DOCUMENT ME!
+     * @param  selected  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final Icon icon, final boolean selected) {
+        super(icon, selected);
+    }
+
+    /**
+     * Creates a new DefaultBindableJCheckBox object.
+     *
+     * @param  text      DOCUMENT ME!
+     * @param  icon      DOCUMENT ME!
+     * @param  selected  DOCUMENT ME!
+     */
+    public DefaultBindableJCheckBox(final String text, final Icon icon, final boolean selected) {
+        super(text, icon, selected);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public String getBindingProperty() {
+        return "selected"; // NOI18N
+    }
+
+    @Override
     public Converter getConverter() {
         return NULL_CONVERTER;
     }
 
+    @Override
     public Validator getValidator() {
         return null;
     }
 
-        @Override
+    @Override
     public Object getNullSourceValue() {
         return Boolean.FALSE;
     }

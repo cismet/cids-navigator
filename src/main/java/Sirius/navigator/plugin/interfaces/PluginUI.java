@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.plugin.interfaces;
 
 /*******************************************************************************
@@ -19,7 +26,7 @@ package Sirius.navigator.plugin.interfaces;
   Version           :       1.0
   Purpose           :
   Created           :       02/15/2003
-  History           :       
+  History           :
 
 
 *******************************************************************************/
@@ -27,57 +34,63 @@ package Sirius.navigator.plugin.interfaces;
 import javax.swing.JComponent;
 
 /**
- * blah<p>
+ * blah.
  *
- * @version 1.0 02/15/2003
- * @author Pascal
+ * @author   Pascal
+ * @version  1.0 02/15/2003
  */
-public interface PluginUI
-{
-    
+public interface PluginUI {
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * Callback Method<p>
-     * This method call indicates that the plugin ui component was made visible.
-     * To recieve this event, 
+     * Callback Method.
+     *
+     * <p>This method call indicates that the plugin ui component was made visible. To recieve this event,</p>
      */
-    public void shown();
-    
+    void shown();
+
     /**
-     * Callback Method<p>
-     * This method call indicates that the component was rendered invisible.
+     * Callback Method.
+     *
+     * <p>This method call indicates that the component was rendered invisible.</p>
      */
-    public void hidden();
-    
+    void hidden();
+
     /**
-     * Callback Method<p>
-     * This method call indicates that the plugin ui component's size changed.
+     * Callback Method.
+     *
+     * <p>This method call indicates that the plugin ui component's size changed.</p>
      */
-    public void resized();
-    
+    void resized();
+
     /**
-     * Callback Method<p>
-     * This method call indicates that the plugin ui component's position changed.
+     * Callback Method.
+     *
+     * <p>This method call indicates that the plugin ui component's position changed.</p>
      */
-    public void moved();
-    
+    void moved();
+
     /**
-     * Callback Method, is called only once<p>
-     * This method call indicates that the plugin ui component was made visible
-     * for the first time.
+     * Callback Method, is called only once.
+     *
+     * <p>This method call indicates that the plugin ui component was made visible for the first time.</p>
+     *
+     * @param  visible  DOCUMENT ME!
      */
-    public void setVisible(boolean visible);
-    
+    void setVisible(boolean visible);
+
     /**
      * Should return a reference of the plugin ui component.
      *
-     * @return a reference of the plugin ui component.
+     * @return  a reference of the plugin ui component.
      */
-    public JComponent getComponent();
-    
-    /** Getter for property id.
-     * @return Value of property id.
+    JComponent getComponent();
+
+    /**
+     * Getter for property id.
      *
+     * @return  Value of property id.
      */
-    public String getId();
-        
+    String getId();
 }

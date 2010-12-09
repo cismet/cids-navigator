@@ -1,3 +1,10 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.exception;
 
 /*
@@ -8,26 +15,52 @@ package Sirius.navigator.exception;
 
 import java.io.*;
 
-public class ConnectionException extends NavigatorException
-{
-    public ConnectionException(String message)
-    {
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+public class ConnectionException extends NavigatorException {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ConnectionException object.
+     *
+     * @param  message  DOCUMENT ME!
+     */
+    public ConnectionException(final String message) {
         super(message);
     }
-    
-    public ConnectionException(String message, int level)
-    {
+
+    /**
+     * Creates a new ConnectionException object.
+     *
+     * @param  message  DOCUMENT ME!
+     * @param  level    DOCUMENT ME!
+     */
+    public ConnectionException(final String message, final int level) {
         super(message, level);
     }
-    
-    public ConnectionException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }  
-    
-    public ConnectionException(String message, int level, Throwable cause)
-    {
-        super(message, level, cause);
-    } 
-}
 
+    /**
+     * Creates a new ConnectionException object.
+     *
+     * @param  message  DOCUMENT ME!
+     * @param  cause    DOCUMENT ME!
+     */
+    public ConnectionException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Creates a new ConnectionException object.
+     *
+     * @param  message  DOCUMENT ME!
+     * @param  level    DOCUMENT ME!
+     * @param  cause    DOCUMENT ME!
+     */
+    public ConnectionException(final String message, final int level, final Throwable cause) {
+        super(message, level, cause);
+    }
+}

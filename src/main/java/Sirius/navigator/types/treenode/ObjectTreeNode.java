@@ -28,14 +28,13 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     //~ Static fields/initializers ---------------------------------------------
 
-
     private static final transient Logger LOG = Logger.getLogger(ObjectTreeNode.class);
+    private static final ResourceManager resource = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
 
     protected ImageIcon nodeIcon;
     private MetaClass metaClass;
-    private static final ResourceManager resource = ResourceManager.getManager();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -52,10 +51,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
             if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
+                this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif"); // NOI18N
             }
         } catch (Exception exp) {
-            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");//NOI18N
+            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");     // NOI18N
         }
     }
 

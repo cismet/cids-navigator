@@ -1,144 +1,208 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.types.iterator;
-
-import java.util.*;
-
-import org.apache.log4j.Logger;
 
 import Sirius.navigator.types.treenode.*;
 
+import org.apache.log4j.Logger;
+
+import java.util.*;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class TreeNodeIterator
-{
+public class TreeNodeIterator {
+
+    //~ Instance fields --------------------------------------------------------
+
     private final Logger logger = Logger.getLogger(TreeNodeIterator.class);
-    
+
     private Iterator iterator;
     private final TreeNodeRestriction restriction;
-    
+
     private DefaultMetaTreeNode nextElement = null;
-    
-    public TreeNodeIterator(Collection collection)
-    {
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new TreeNodeIterator object.
+     *
+     * @param  collection  DOCUMENT ME!
+     */
+    public TreeNodeIterator(final Collection collection) {
         this(collection, new TreeNodeRestriction());
     }
-    
-    public TreeNodeIterator(Enumeration enumeration)
-    {
+
+    /**
+     * Creates a new TreeNodeIterator object.
+     *
+     * @param  enumeration  DOCUMENT ME!
+     */
+    public TreeNodeIterator(final Enumeration enumeration) {
         this(enumeration, new TreeNodeRestriction());
     }
-    
-    public TreeNodeIterator(TreeNodeRestriction restriction)
-    {
+
+    /**
+     * Creates a new TreeNodeIterator object.
+     *
+     * @param  restriction  DOCUMENT ME!
+     */
+    public TreeNodeIterator(final TreeNodeRestriction restriction) {
         this.restriction = restriction;
         this.iterator = null;
     }
-    
-    /** Creates a new instance of MetaIterator */
-    public TreeNodeIterator(Collection collection, TreeNodeRestriction restriction)
-    {
+
+    /**
+     * Creates a new instance of MetaIterator.
+     *
+     * @param  collection   DOCUMENT ME!
+     * @param  restriction  DOCUMENT ME!
+     */
+    public TreeNodeIterator(final Collection collection, final TreeNodeRestriction restriction) {
         this.restriction = restriction;
         this.init(collection);
     }
-    
-    public TreeNodeIterator(Enumeration enumeration, TreeNodeRestriction restriction)
-    {
+
+    /**
+     * Creates a new TreeNodeIterator object.
+     *
+     * @param  enumeration  DOCUMENT ME!
+     * @param  restriction  DOCUMENT ME!
+     */
+    public TreeNodeIterator(final Enumeration enumeration, final TreeNodeRestriction restriction) {
         this.restriction = restriction;
         this.init(enumeration);
     }
-    
-    public boolean init(Collection collection)
-    { 
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   collection  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean init(final Collection collection) {
         this.nextElement = null;
-        if(collection != null && collection.size() > 0)
-        {
+        if ((collection != null) && (collection.size() > 0)) {
             if (logger.isDebugEnabled()) {
-                logger.debug(" init collection size: " + collection.size());//NOI18N
+                logger.debug(" init collection size: " + collection.size()); // NOI18N
             }
             this.iterator = collection.iterator();
             return true;
-        }
-        else
-        {
-            logger.warn("could not create iterator");//NOI18N
+        } else {
+            logger.warn("could not create iterator");                        // NOI18N
             this.iterator = null;
             return false;
         }
     }
-       
-    public boolean init(Enumeration enumeration)
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   enumeration  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean init(final Enumeration enumeration) {
         if (logger.isDebugEnabled()) {
-            logger.debug(" init enumeration hasMoreElements: " + enumeration.hasMoreElements());//NOI18N
+            logger.debug(" init enumeration hasMoreElements: " + enumeration.hasMoreElements()); // NOI18N
         }
         this.nextElement = null;
-        if(enumeration != null && enumeration.hasMoreElements())
-        {
+        if ((enumeration != null) && enumeration.hasMoreElements()) {
             this.iterator = new EnumerationIterator(enumeration);
             return true;
-        }
-        else
-        {
-            logger.warn("could not create iterator");//NOI18N
+        } else {
+            logger.warn("could not create iterator");                                            // NOI18N
             this.iterator = null;
             return false;
         }
     }
-    
-    public boolean hasNext()
-    {
-        if(nextElement != null)
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean hasNext() {
+        if (nextElement != null) {
             return true;
+        } else if ((iterator != null) && iterator.hasNext()) {
+            while (iterator.hasNext() && ((nextElement = restriction.applyRestriction(iterator.next())) == null)) {
+                ;
+            }
+
+            return (nextElement != null) ? true : false;
         }
-        else if(iterator != null && iterator.hasNext())
-        {
-            while(iterator.hasNext() && (nextElement = restriction.applyRestriction(iterator.next())) == null);
-            
-            return nextElement != null ? true : false;
-        }
-        
+
         return false;
     }
-    
-    public DefaultMetaTreeNode next() throws NoSuchElementException
-    {
-        if(this.hasNext())
-        {
-            DefaultMetaTreeNode next = nextElement;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  NoSuchElementException  DOCUMENT ME!
+     */
+    public DefaultMetaTreeNode next() throws NoSuchElementException {
+        if (this.hasNext()) {
+            final DefaultMetaTreeNode next = nextElement;
             nextElement = null;
             return next;
-        }
-        else
-        {
+        } else {
             throw new NoSuchElementException();
         }
     }
-    
-    private final class EnumerationIterator implements Iterator
-    {
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private final class EnumerationIterator implements Iterator {
+
+        //~ Instance fields ----------------------------------------------------
+
         private final Enumeration enumeration;
-        
-        private EnumerationIterator(Enumeration enumeration)
-        {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new EnumerationIterator object.
+         *
+         * @param  enumeration  DOCUMENT ME!
+         */
+        private EnumerationIterator(final Enumeration enumeration) {
             this.enumeration = enumeration;
         }
-        
-        public boolean hasNext()
-        {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public boolean hasNext() {
             return this.enumeration.hasMoreElements();
         }
-        
-        public Object next()
-        {
+
+        @Override
+        public Object next() {
             return this.enumeration.nextElement();
         }
-        
-        public void remove()
-        {
-            throw new UnsupportedOperationException("this method is not implemented");//NOI18N
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("this method is not implemented"); // NOI18N
         }
-        
     }
 }

@@ -1,18 +1,42 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package Sirius.navigator.plugin.interfaces;
 
 import java.awt.Component;
 
 /**
+ * DOCUMENT ME!
  *
- * @author spuhl
+ * @author   spuhl
+ * @version  $Revision$, $Date$
  */
 public interface LayoutManager {
-    public void saveCurrentLayout(Component parent);
-    public void loadLayout(Component parent);
-    public void resetLayout();
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  parent  DOCUMENT ME!
+     */
+    void saveCurrentLayout(Component parent);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  parent  DOCUMENT ME!
+     */
+    void loadLayout(Component parent);
+    /**
+     * DOCUMENT ME!
+     */
+    void resetLayout();
 }

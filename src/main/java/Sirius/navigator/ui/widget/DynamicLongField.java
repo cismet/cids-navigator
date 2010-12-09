@@ -1,8 +1,15 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.ui.widget;
 
 /*******************************************************************************
 
-Copyright (c)	:	EIG (Environmental Informatics Group)
+Copyright (c)   :       EIG (Environmental Informatics Group)
 http://www.enviromatics.net
 Prof. Dr. Reiner Guettler
 Prof. Dr. Ralf Denzer
@@ -13,233 +20,312 @@ Goebenstr. 40
 66117 Saarbruecken
 Germany
 
-Programmers		:	Pascal
+Programmers             :       Pascal
 
-Project			:	WuNDA 2
-Version			:	1.0
-Purpose			:
-Created			:	12.01.2001
-History			:
+Project                 :       WuNDA 2
+Version                 :       1.0
+Purpose                 :
+Created                 :       12.01.2001
+History                 :
 
 *******************************************************************************/
 
 import java.awt.*;
 import java.awt.event.*;
+
 import javax.swing.*;
 import javax.swing.text.*;
 
-public class DynamicLongField extends JPanel implements AdjustmentListener
-{
-	protected int initialValue = 0;
-	protected int changeValue = 1;
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+public class DynamicLongField extends JPanel implements AdjustmentListener {
 
-	// fuer die Multilingualitaet
-	// protected String errorTitle = "Eingabefehler";
-	// protected String errorString = "<html><p>Dieser Wert liegt ausserhalb</p><p>des gueltigen Bereichs!</p></html>";
+    //~ Instance fields --------------------------------------------------------
 
-	protected LongField longField;
-	protected JScrollBar scrollBar;
+    protected int initialValue = 0;
+    protected int changeValue = 1;
 
-	public DynamicLongField()
-	{
-		super(new GridBagLayout());
+    // fuer die Multilingualitaet
+    // protected String errorTitle = "Eingabefehler";
+    // protected String errorString = "<html><p>Dieser Wert liegt ausserhalb</p><p>des gueltigen Bereichs!</p></html>";
 
-		longField = new LongField("0", 3);//NOI18N
+    protected LongField longField;
+    protected JScrollBar scrollBar;
 
-		initDynamicLongField();
-	}
+    //~ Constructors -----------------------------------------------------------
 
-	public DynamicLongField(long initialValue, int changeValue)
-	{
-		super(new GridBagLayout());
+    /**
+     * Creates a new DynamicLongField object.
+     */
+    public DynamicLongField() {
+        super(new GridBagLayout());
 
-		this.changeValue = changeValue;
-		longField = new LongField(String.valueOf(initialValue), 3);
+        longField = new LongField("0", 3); // NOI18N
 
-		initDynamicLongField();
-	}
+        initDynamicLongField();
+    }
 
-	public DynamicLongField(long initialValue, int changeValue, int columns)
-	{
-		super(new GridBagLayout());
+    /**
+     * Creates a new DynamicLongField object.
+     *
+     * @param  initialValue  DOCUMENT ME!
+     * @param  changeValue   DOCUMENT ME!
+     */
+    public DynamicLongField(final long initialValue, final int changeValue) {
+        super(new GridBagLayout());
 
-		this.changeValue = changeValue;
-		longField = new LongField(String.valueOf(initialValue), columns);
+        this.changeValue = changeValue;
+        longField = new LongField(String.valueOf(initialValue), 3);
 
-		initDynamicLongField();
-	}
+        initDynamicLongField();
+    }
 
-	protected void initDynamicLongField()
-	{
-		scrollBar = new JScrollBar(JScrollBar.VERTICAL, 1, 0, 0, 2);
-		scrollBar.setPreferredSize(new Dimension((int)scrollBar.getPreferredSize().getWidth(), (int)longField.getPreferredSize().getHeight()));
-		scrollBar.addAdjustmentListener(this);
+    /**
+     * Creates a new DynamicLongField object.
+     *
+     * @param  initialValue  DOCUMENT ME!
+     * @param  changeValue   DOCUMENT ME!
+     * @param  columns       DOCUMENT ME!
+     */
+    public DynamicLongField(final long initialValue, final int changeValue, final int columns) {
+        super(new GridBagLayout());
 
-		GridBagConstraints gbc = new GridBagConstraints();
+        this.changeValue = changeValue;
+        longField = new LongField(String.valueOf(initialValue), columns);
 
-		gbc.anchor = GridBagConstraints.EAST;
-		gbc.fill = GridBagConstraints.NONE;
-		gbc.gridheight = 1;
-		gbc.gridwidth = 1;
-		gbc.gridy = 0;
-		gbc.gridx = 0;
-		gbc.weightx = 1.0;
-		gbc.weighty = 1.0;
+        initDynamicLongField();
+    }
 
-		this.add(longField, gbc);
+    //~ Methods ----------------------------------------------------------------
 
-		gbc.anchor = GridBagConstraints.WEST;
-		//gbc.fill = GridBagConstraints.NONE;
-		gbc.gridx++;
-		gbc.weightx = 0.0;
-		gbc.weighty = 0.0;
+    /**
+     * DOCUMENT ME!
+     */
+    protected void initDynamicLongField() {
+        scrollBar = new JScrollBar(JScrollBar.VERTICAL, 1, 0, 0, 2);
+        scrollBar.setPreferredSize(new Dimension(
+                (int)scrollBar.getPreferredSize().getWidth(),
+                (int)longField.getPreferredSize().getHeight()));
+        scrollBar.addAdjustmentListener(this);
 
-		this.add(scrollBar, gbc);
-	}
+        final GridBagConstraints gbc = new GridBagConstraints();
 
-	public void setValue(long value)
-	{
-		try
-		{
-			longField.setText(String.valueOf(value));
-		}
-		catch(Exception e)
-		{
-			//if(Sirius.navigator.NavigatorLogger.DEV)e.printStackTrace();
-			//JOptionPane.showMessageDialog(this, errorString, errorTitle, JOptionPane.ERROR_MESSAGE);
+        gbc.anchor = GridBagConstraints.EAST;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridheight = 1;
+        gbc.gridwidth = 1;
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
 
-			longField.setText("0");//NOI18N
-		}
-	}
+        this.add(longField, gbc);
 
-	public long getValue()
-	{
-		try
-		{
-			return Long.parseLong(longField.getText());
-		}
-		catch(Exception e)
-		{
-			//if(Sirius.navigator.NavigatorLogger.DEV)e.printStackTrace();
-			//JOptionPane.showMessageDialog(this, errorString, errorTitle, JOptionPane.ERROR_MESSAGE);
+        gbc.anchor = GridBagConstraints.WEST;
+        // gbc.fill = GridBagConstraints.NONE;
+        gbc.gridx++;
+        gbc.weightx = 0.0;
+        gbc.weighty = 0.0;
 
-			longField.setText("0");//NOI18N
-			return 0;
-		}
-	}
+        this.add(scrollBar, gbc);
+    }
 
-	public void setChangeValue(int changeValue)
-	{
-		this.changeValue = changeValue;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  value  DOCUMENT ME!
+     */
+    public void setValue(final long value) {
+        try {
+            longField.setText(String.valueOf(value));
+        } catch (Exception e) {
+            // if(Sirius.navigator.NavigatorLogger.DEV)e.printStackTrace(); JOptionPane.showMessageDialog(this,
+            // errorString, errorTitle, JOptionPane.ERROR_MESSAGE);
 
-	public int getChangeValue()
-	{
-		return this.changeValue;
-	}
+            longField.setText("0"); // NOI18N
+        }
+    }
 
-	protected synchronized long incrementValue(int increment)
-	{
-		long inc = this.getValue();
-		inc += increment;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public long getValue() {
+        try {
+            return Long.parseLong(longField.getText());
+        } catch (Exception e) {
+            // if(Sirius.navigator.NavigatorLogger.DEV)e.printStackTrace(); JOptionPane.showMessageDialog(this,
+            // errorString, errorTitle, JOptionPane.ERROR_MESSAGE);
 
-		//NavigatorLogger.printMessage("<DLF> incremented: " + inc);
+            longField.setText("0"); // NOI18N
+            return 0;
+        }
+    }
 
-		this.setValue(inc);
-		return inc;
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  changeValue  DOCUMENT ME!
+     */
+    public void setChangeValue(final int changeValue) {
+        this.changeValue = changeValue;
+    }
 
-	protected synchronized long decrementValue(int decrement)
-	{
-		long dec = this.getValue();
-		dec -= (dec >= decrement) ? decrement : 0;
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int getChangeValue() {
+        return this.changeValue;
+    }
 
-		//NavigatorLogger.printMessage("<DLF> decremented: " + dec);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   increment  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized long incrementValue(final int increment) {
+        long inc = this.getValue();
+        inc += increment;
 
-		this.setValue(dec);
-		return dec;
-	}
+        // NavigatorLogger.printMessage("<DLF> incremented: " + inc);
 
-	public long incrementValue()
-	{
-		return incrementValue(changeValue);
-	}
+        this.setValue(inc);
+        return inc;
+    }
 
-	public long decrementValue()
-	{
-		return decrementValue(changeValue);
-	}
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   decrement  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized long decrementValue(final int decrement) {
+        long dec = this.getValue();
+        dec -= (dec >= decrement) ? decrement : 0;
 
-	public void adjustmentValueChanged(AdjustmentEvent e)
-	{
-		if(scrollBar.getValue() == 0)
-		{
-			//NavigatorLogger.printMessage("<DLF> increment: " + changeValue);
-			incrementValue(changeValue);
-		}
-		if(scrollBar.getValue() == 2)
-		{
-			//NavigatorLogger.printMessage("<DLF> decrement: " + changeValue);
-			decrementValue(changeValue);
-		}
+        // NavigatorLogger.printMessage("<DLF> decremented: " + dec);
 
-		// Reset the BoundedRangeModel
-		scrollBar.setValue(1);
-	}
+        this.setValue(dec);
+        return dec;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public long incrementValue() {
+        return incrementValue(changeValue);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public long decrementValue() {
+        return decrementValue(changeValue);
+    }
+
+    @Override
+    public void adjustmentValueChanged(final AdjustmentEvent e) {
+        if (scrollBar.getValue() == 0) {
+            // NavigatorLogger.printMessage("<DLF> increment: " + changeValue);
+            incrementValue(changeValue);
+        }
+        if (scrollBar.getValue() == 2) {
+            // NavigatorLogger.printMessage("<DLF> decrement: " + changeValue);
+            decrementValue(changeValue);
+        }
+
+        // Reset the BoundedRangeModel
+        scrollBar.setValue(1);
+    }
 }
 
 /**
-* Ein JTextField, dass nur die Eingabe von ganzen Zahlen erlaubt.
-*/
-class LongField extends JTextField
-{
-	public LongField()
-	{
-		super();
-	}
+ * Ein JTextField, dass nur die Eingabe von ganzen Zahlen erlaubt.
+ *
+ * @version  $Revision$, $Date$
+ */
+class LongField extends JTextField {
 
-	public LongField(int cols)
-	{
-		super(cols);
-	}
+    //~ Constructors -----------------------------------------------------------
 
-	public LongField(String text, int cols)
-	{
-		super(text, cols);
+    /**
+     * Creates a new LongField object.
+     */
+    public LongField() {
+        super();
     }
 
-	protected Document createDefaultModel()
-	{
-		return new NumericDocument();
-	}
+    /**
+     * Creates a new LongField object.
+     *
+     * @param  cols  DOCUMENT ME!
+     */
+    public LongField(final int cols) {
+        super(cols);
+    }
 
-	/**
-	* Dieses PlainDocument nimmt nur Ganzzahlen.
-	*/
-	static class NumericDocument extends PlainDocument
-	{
-		protected final static String LONG = "0123456789";//NOI18N
+    /**
+     * Creates a new LongField object.
+     *
+     * @param  text  DOCUMENT ME!
+     * @param  cols  DOCUMENT ME!
+     */
+    public LongField(final String text, final int cols) {
+        super(text, cols);
+    }
 
-		public void insertString(int offs, String str, AttributeSet a) throws BadLocationException
-		{
-			if (str == null)
-			{
-				remove(0, getLength());
-				super.insertString(0, "0", a);//NOI18N
-				return;
-			}
+    //~ Methods ----------------------------------------------------------------
 
-			for (int i = 0; i < str.length(); i++)
-			{
-				if (LONG.indexOf(str.valueOf(str.charAt(i))) == -1)
-				{
-					remove(0, getLength());
-					super.insertString(0, "0", a);//NOI18N
-					return;
-				}
-			}
+    @Override
+    protected Document createDefaultModel() {
+        return new NumericDocument();
+    }
 
-			super.insertString(offs, str, a);
-		}
-	}
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * Dieses PlainDocument nimmt nur Ganzzahlen.
+     *
+     * @version  $Revision$, $Date$
+     */
+    static class NumericDocument extends PlainDocument {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        protected static final String LONG = "0123456789"; // NOI18N
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void insertString(final int offs, final String str, final AttributeSet a) throws BadLocationException {
+            if (str == null) {
+                remove(0, getLength());
+                super.insertString(0, "0", a); // NOI18N
+                return;
+            }
+
+            for (int i = 0; i < str.length(); i++) {
+                if (LONG.indexOf(str.valueOf(str.charAt(i))) == -1) {
+                    remove(0, getLength());
+                    super.insertString(0, "0", a); // NOI18N
+                    return;
+                }
+            }
+
+            super.insertString(offs, str, a);
+        }
+    }
 }

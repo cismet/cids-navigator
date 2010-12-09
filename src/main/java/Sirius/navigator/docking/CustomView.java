@@ -1,70 +1,131 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package Sirius.navigator.docking;
 
+import net.infonode.docking.View;
+
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
-import net.infonode.docking.View;
 
 /**
+ * DOCUMENT ME!
  *
- * @author spuhl
+ * @author   spuhl
+ * @version  $Revision$, $Date$
  */
 public class CustomView extends View {
+
+    //~ Instance fields --------------------------------------------------------
 
     private String id;
     private String viewName;
     private Icon viewIcon;
     private JMenuItem item;
 
-    public CustomView(String id, String viewName, Icon viewIcon, Component comp) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new CustomView object.
+     *
+     * @param  id        DOCUMENT ME!
+     * @param  viewName  DOCUMENT ME!
+     * @param  viewIcon  DOCUMENT ME!
+     * @param  comp      DOCUMENT ME!
+     */
+    public CustomView(final String id, final String viewName, final Icon viewIcon, final Component comp) {
         super(viewName, viewIcon, comp);
         this.id = id;
         this.viewName = viewName;
         this.viewIcon = viewIcon;
         item = new JMenuItem(viewName, viewIcon);
         item.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (CustomView.this.isClosable()) {
-                    CustomView.this.close();
-                } else {
-                    CustomView.this.restore();
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    if (CustomView.this.isClosable()) {
+                        CustomView.this.close();
+                    } else {
+                        CustomView.this.restore();
+                    }
                 }
-            }
-        });
+            });
     }
 
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  id  DOCUMENT ME!
+     */
+    public void setId(final String id) {
         this.id = id;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Icon getViewIcon() {
         return viewIcon;
     }
 
-    public void setViewIcon(Icon viewIcon) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  viewIcon  DOCUMENT ME!
+     */
+    public void setViewIcon(final Icon viewIcon) {
         this.viewIcon = viewIcon;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getViewName() {
         return viewName;
     }
 
-    public void setViewName(String viewName) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  viewName  DOCUMENT ME!
+     */
+    public void setViewName(final String viewName) {
         this.viewName = viewName;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public JMenuItem getMenuItem() {
         return item;
     }
-    
 }

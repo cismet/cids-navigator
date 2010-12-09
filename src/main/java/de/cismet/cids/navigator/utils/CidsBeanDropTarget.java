@@ -1,38 +1,72 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
 package de.cismet.cids.navigator.utils;
 
-import de.cismet.cids.dynamics.CidsBean;
 import java.awt.Component;
 import java.awt.HeadlessException;
+
 import java.util.ArrayList;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 /**
+ * DOCUMENT ME!
  *
- * @author thorsten
+ * @author   thorsten
+ * @version  $Revision$, $Date$
  */
 public class CidsBeanDropTarget extends AbstractCidsBeanDropTarget {
+
+    //~ Instance fields --------------------------------------------------------
+
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private CidsBeanDropListener dropListener;
 
-    public CidsBeanDropTarget(CidsBeanDropListenerComponent c) throws HeadlessException {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new CidsBeanDropTarget object.
+     *
+     * @param   c  DOCUMENT ME!
+     *
+     * @throws  HeadlessException  DOCUMENT ME!
+     */
+    public CidsBeanDropTarget(final CidsBeanDropListenerComponent c) throws HeadlessException {
         super(c);
         dropListener = c;
     }
 
-    public CidsBeanDropTarget(Component c) throws HeadlessException {
+    /**
+     * Creates a new CidsBeanDropTarget object.
+     *
+     * @param   c  DOCUMENT ME!
+     *
+     * @throws  HeadlessException         DOCUMENT ME!
+     * @throws  IllegalArgumentException  DOCUMENT ME!
+     */
+    public CidsBeanDropTarget(final Component c) throws HeadlessException {
         super(c);
         if (c instanceof CidsBeanDropListener) {
-            dropListener = (CidsBeanDropListener) c;
+            dropListener = (CidsBeanDropListener)c;
         } else {
-            throw new IllegalArgumentException("Cosntructor-Parameter has to be a CidsBeanDropListener and a Component");//NOI18N
+            throw new IllegalArgumentException(
+                "Cosntructor-Parameter has to be a CidsBeanDropListener and a Component"); // NOI18N
         }
     }
 
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    public void beansDropped(ArrayList<CidsBean> beans) {
+    public void beansDropped(final ArrayList<CidsBean> beans) {
         dropListener.beansDropped(beans);
     }
 }

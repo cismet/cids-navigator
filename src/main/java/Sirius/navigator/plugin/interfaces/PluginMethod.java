@@ -1,18 +1,33 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.plugin.interfaces;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public interface PluginMethod
-{
+public interface PluginMethod {
+
+    //~ Methods ----------------------------------------------------------------
+
     /**
-     * Returns the unique id of this action
+     * Returns the unique id of this action.
+     *
+     * @return  DOCUMENT ME!
      */
-    public String getId();
-    
+    String getId();
+
     /**
-     * Performs the plugin action
+     * Performs the plugin action.
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    public void invoke() throws Exception;   
+    void invoke() throws Exception;
 }

@@ -1,34 +1,41 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.cismet.cids.editors.converters;
 
-import java.sql.Date;
 import org.jdesktop.beansbinding.Converter;
 
+import java.sql.Date;
+
 /**
+ * DOCUMENT ME!
  *
- * @author thorsten
+ * @author   thorsten
+ * @version  $Revision$, $Date$
  */
-public class SqlDateToStringConverter extends Converter<java.sql.Date,String>{
+public class SqlDateToStringConverter extends Converter<java.sql.Date, String> {
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
-    public String convertForward(Date value) {
-        
-        if (value!=null){
+    public String convertForward(final Date value) {
+        if (value != null) {
             return value.toString();
-        }
-        else {
+        } else {
             return null;
         }
     }
 
     @Override
-    public Date convertReverse(String value) {
+    public Date convertReverse(final String value) {
         return Date.valueOf(value);
     }
-    
-
 }

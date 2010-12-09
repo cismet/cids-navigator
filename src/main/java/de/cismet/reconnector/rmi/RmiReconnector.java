@@ -1,35 +1,63 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.reconnector.rmi;
 
-import de.cismet.reconnector.Reconnector;
-import de.cismet.reconnector.ReconnectorException;
 import java.net.MalformedURLException;
+
 import java.rmi.ConnectException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
-
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.ServerException;
 
+import de.cismet.reconnector.Reconnector;
+import de.cismet.reconnector.ReconnectorException;
+
 /**
+ * DOCUMENT ME!
  *
- * @author jruiz
+ * @author   jruiz
+ * @version  $Revision$, $Date$
  */
-public class RmiReconnector <R extends Remote> extends Reconnector<R> {
+public class RmiReconnector<R extends Remote> extends Reconnector<R> {
 
-    private final static org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RmiReconnector.class);
+    //~ Static fields/initializers ---------------------------------------------
 
-    public static final String WRONG_VERSION = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle").getString("wrong_version");
-    public static final String CONNECTION_LOST = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle").getString("connection_lost");
-    public static final String LOOKUP_FAILED = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle").getString("lookup_failed");
-    public static final String UNKNOWN = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle").getString("unknown_error");
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RmiReconnector.class);
+
+    public static final String WRONG_VERSION = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
+                .getString("wrong_version");
+    public static final String CONNECTION_LOST = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
+                .getString("connection_lost");
+    public static final String LOOKUP_FAILED = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
+                .getString("lookup_failed");
+    public static final String UNKNOWN = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
+                .getString("unknown_error");
+
+    //~ Instance fields --------------------------------------------------------
 
     private String serviceUrl;
 
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new RmiReconnector object.
+     *
+     * @param  serviceClass  DOCUMENT ME!
+     * @param  serviceUrl    DOCUMENT ME!
+     */
     public RmiReconnector(final Class serviceClass, final String serviceUrl) {
-        super(serviceClass);        
+        super(serviceClass);
         this.serviceUrl = serviceUrl;
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
@@ -59,7 +87,7 @@ public class RmiReconnector <R extends Remote> extends Reconnector<R> {
 //                }
 //            }
 //            //TODO bis hier entfernen !!! nur zum Testen !
-            return (R) Naming.lookup(serviceUrl);
+            return (R)Naming.lookup(serviceUrl);
         } catch (NotBoundException nbe) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("[NetworkError] could not connect to '" + serviceUrl + "'", nbe);

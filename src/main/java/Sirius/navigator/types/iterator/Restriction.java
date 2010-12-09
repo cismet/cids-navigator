@@ -1,20 +1,36 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.types.iterator;
 
-
-
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public interface Restriction
-{
-    public final static long PURE = 1;
-    public final static long OBJECT = 2;
-    public final static long CLASS = 4;
-    
-    public final static int TRUE = 1;
-    public final static int FALSE = 0;
-    public final static int IGNORE = -1;
-    
-    public long getTypeRestriction();
+public interface Restriction {
+
+    //~ Instance fields --------------------------------------------------------
+
+    long PURE = 1;
+    long OBJECT = 2;
+    long CLASS = 4;
+
+    int TRUE = 1;
+    int FALSE = 0;
+    int IGNORE = -1;
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    long getTypeRestriction();
 }

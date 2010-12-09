@@ -1,240 +1,413 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.exception;
 
 import Sirius.navigator.resource.PropertyManager;
-import java.util.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import Sirius.navigator.resource.ResourceManager;
 
 import org.apache.log4j.Logger;
 
-import Sirius.navigator.resource.ResourceManager;
+import java.awt.*;
+import java.awt.event.*;
+
+import java.util.*;
+
+import javax.swing.*;
+import javax.swing.border.*;
 
 //import Sirius.navigator.NavigatorLogger;
 //import Sirius.navigator.connection.ConnectionHandler;
 
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
-public class ExceptionManager
-{
-    
-    private final static Logger logger = Logger.getLogger(ExceptionManager.class);
+public class ExceptionManager {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger logger = Logger.getLogger(ExceptionManager.class);
     private static ExceptionManager manager = null;
     private static final ResourceManager resource = ResourceManager.getManager();
-    
-    public final static int WARNING = 1;
-    public final static int ERROR = 2;
-    public final static int FATAL = 4;
-    
-    public final static int PLUGIN_WARNING = 8;
-    public final static int PLUGIN_ERROR = 16;
-    public final static int PLUGIN_FATAL = 32;
-    
+
+    public static final int WARNING = 1;
+    public static final int ERROR = 2;
+    public static final int FATAL = 4;
+
+    public static final int PLUGIN_WARNING = 8;
+    public static final int PLUGIN_ERROR = 16;
+    public static final int PLUGIN_FATAL = 32;
+
+    //~ Instance fields --------------------------------------------------------
+
     private final JOptionPane exitOption;
     private ExceptionPane exceptionPane = null;
-    
-    /** Creates a new instance of ExceptionManager */
-    private ExceptionManager()
-    {
-        if(logger.isInfoEnabled())
-            logger.info("creating singleton exception manager instance"); //NOI18N
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of ExceptionManager.
+     */
+    private ExceptionManager() {
+        if (logger.isInfoEnabled()) {
+            logger.info("creating singleton exception manager instance");                                            // NOI18N
+        }
         exitOption = new JOptionPane(
-                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.message"), //NOI18N
+                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.message"), // NOI18N
                 JOptionPane.QUESTION_MESSAGE,
                 JOptionPane.YES_NO_OPTION,
                 null,
                 new String[] {
-                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm"), //NOI18N
-                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.cancel")}, //NOI18N
-                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")); //NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.exitOption.option.confirm"),                                               // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.exitOption.option.cancel")
+                },                                                                                                   // NOI18N
+                org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.exitOption.option.confirm"));                                                  // NOI18N
     }
-    
-    public final static ExceptionManager getManager()
-    {
-        if(manager == null)
-        {
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static final ExceptionManager getManager() {
+        if (manager == null) {
             manager = new ExceptionManager();
         }
-        
+
         return manager;
     }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    
-    public void showExceptionDialog(JFrame owner, NavigatorException exception)
-    {
-        showExceptionDialog(owner, exception.getLevel(), exception.getName(), exception.getMessage(), exception.getCause());
+
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     *
+     * @param  owner      DOCUMENT ME!
+     * @param  exception  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final JFrame owner, final NavigatorException exception) {
+        showExceptionDialog(
+            owner,
+            exception.getLevel(),
+            exception.getName(),
+            exception.getMessage(),
+            exception.getCause());
     }
-    
-    public void showExceptionDialog(JDialog owner, NavigatorException exception)
-    {
-        showExceptionDialog(owner, exception.getLevel(), exception.getName(), exception.getMessage(), exception.getCause());
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  owner      DOCUMENT ME!
+     * @param  exception  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final JDialog owner, final NavigatorException exception) {
+        showExceptionDialog(
+            owner,
+            exception.getLevel(),
+            exception.getName(),
+            exception.getMessage(),
+            exception.getCause());
     }
-    
-    public void showExceptionDialog(NavigatorException exception)
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  exception  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final NavigatorException exception) {
         showExceptionDialog(exception.getLevel(), exception.getName(), exception.getMessage(), exception.getCause());
     }
 
     /**
-     * @deprecated
+     * DOCUMENT ME!
      *
-     * @param owner
-     * @param level
-     * @param errorcode
-     * @param exception
+     * @param       owner      DOCUMENT ME!
+     * @param       level      DOCUMENT ME!
+     * @param       errorcode  DOCUMENT ME!
+     * @param       exception  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
-    public void showExceptionDialog(JFrame owner, int level, String errorcode, Throwable exception)
-    {
-        JDialog exceptionDialog = new JDialog(owner, true);
+    public void showExceptionDialog(final JFrame owner,
+            final int level,
+            final String errorcode,
+            final Throwable exception) {
+        final JDialog exceptionDialog = new JDialog(owner, true);
         exceptionDialog.setLocationRelativeTo(owner);
-        showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
+        showExceptionDialog(
+            exceptionDialog,
+            level,
+            resource.getExceptionName(errorcode),
+            resource.getExceptionMessage(errorcode),
+            exception);
     }
 
     /**
-     * @deprecated
+     * DOCUMENT ME!
      *
-     * @param owner
-     * @param level
-     * @param errorcode
-     * @param exception
+     * @param       owner      DOCUMENT ME!
+     * @param       level      DOCUMENT ME!
+     * @param       errorcode  DOCUMENT ME!
+     * @param       exception  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
-    public void showExceptionDialog(JDialog owner, int level, String errorcode, Throwable exception)
-    {
-        JDialog exceptionDialog = new JDialog(owner, true);
+    public void showExceptionDialog(final JDialog owner,
+            final int level,
+            final String errorcode,
+            final Throwable exception) {
+        final JDialog exceptionDialog = new JDialog(owner, true);
         exceptionDialog.setLocationRelativeTo(owner);
-        showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
+        showExceptionDialog(
+            exceptionDialog,
+            level,
+            resource.getExceptionName(errorcode),
+            resource.getExceptionMessage(errorcode),
+            exception);
     }
 
     /**
-     * @deprecated
-     * @param level
-     * @param errorcode
-     * @param exception
+     * DOCUMENT ME!
+     *
+     * @param       level      DOCUMENT ME!
+     * @param       errorcode  DOCUMENT ME!
+     * @param       exception  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
-    public void showExceptionDialog(int level, String errorcode, Throwable exception)
-    {
-        JDialog exceptionDialog = new JDialog(new JFrame(), true);
+    public void showExceptionDialog(final int level, final String errorcode, final Throwable exception) {
+        final JDialog exceptionDialog = new JDialog(new JFrame(), true);
         exceptionDialog.setLocationRelativeTo(null);
-        showExceptionDialog(exceptionDialog, level, resource.getExceptionName(errorcode), resource.getExceptionMessage(errorcode), exception);
+        showExceptionDialog(
+            exceptionDialog,
+            level,
+            resource.getExceptionName(errorcode),
+            resource.getExceptionMessage(errorcode),
+            exception);
     }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    
-    public void showExceptionDialog(JFrame owner, int level, String name, String message, Throwable exception)
-    {
-        JDialog exceptionDialog = new JDialog(owner, true);
-        doShowExceptionDialog(exceptionDialog, level, name, message, exception);
-    }
-    
-    public void showExceptionDialog(JDialog owner, int level, String name, String message, Throwable exception)
-    {
-        JDialog exceptionDialog = new JDialog(owner, true);
-        doShowExceptionDialog(exceptionDialog, level, name, message, exception);
-    }
-    
-    public void showExceptionDialog(int level, String name, String message, Throwable exception)
-    {
-        JDialog exceptionDialog = new JDialog(new JFrame(), true);
-        doShowExceptionDialog(exceptionDialog, level, name, message, exception);
-    }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    
-    public void showExceptionDialog(JFrame owner, int level, String name, String message, Collection detailMessages)
-    {
-        JDialog exceptionDialog = new JDialog(owner, true);
-        doShowExceptionDialog(exceptionDialog, level, name, message, detailMessages);
-    }
-    
-    public void showExceptionDialog(JDialog owner, int level, String name, String message, Collection detailMessages)
-    {
-        JDialog exceptionDialog = new JDialog(owner, true);
-        doShowExceptionDialog(exceptionDialog, level, name, message, detailMessages);
-    }
-    
-    public void showExceptionDialog(int level, String name, String message, Collection detailMessages)
-    {
-        JDialog exceptionDialog = new JDialog(new JFrame(), true);
-        doShowExceptionDialog(exceptionDialog, level, name, message, detailMessages);
-    }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    
-    public boolean showExitDialog(JFrame owner)
-    {
-        if (PropertyManager.getManager().isAutoClose()){
-            return true;
-        }
-        else {
-        JDialog exitDialog = exitOption.createDialog(owner,
-                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.showExitDialog(JFrame).exitDialog.title"));  // NOI18N
-        return doShowExitDialog(exitDialog);
-        }
-    }
-    
-    public boolean showExitDialog(JDialog owner)
-    {
-        if (PropertyManager.getManager().isAutoClose()){
-            return true;
-        }
-        else {
-        JDialog exitDialog = exitOption.createDialog(owner,
-                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.showExitDialog(JDialog).exitDialog.title"));  // NOI18N
-        return doShowExitDialog(exitDialog);
-        }
 
-        }
-    
-    public boolean showExitDialog()
-    {
-        if (PropertyManager.getManager().isAutoClose()){
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     *
+     * @param  owner      DOCUMENT ME!
+     * @param  level      DOCUMENT ME!
+     * @param  name       DOCUMENT ME!
+     * @param  message    DOCUMENT ME!
+     * @param  exception  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final JFrame owner,
+            final int level,
+            final String name,
+            final String message,
+            final Throwable exception) {
+        final JDialog exceptionDialog = new JDialog(owner, true);
+        doShowExceptionDialog(exceptionDialog, level, name, message, exception);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  owner      DOCUMENT ME!
+     * @param  level      DOCUMENT ME!
+     * @param  name       DOCUMENT ME!
+     * @param  message    DOCUMENT ME!
+     * @param  exception  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final JDialog owner,
+            final int level,
+            final String name,
+            final String message,
+            final Throwable exception) {
+        final JDialog exceptionDialog = new JDialog(owner, true);
+        doShowExceptionDialog(exceptionDialog, level, name, message, exception);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  level      DOCUMENT ME!
+     * @param  name       DOCUMENT ME!
+     * @param  message    DOCUMENT ME!
+     * @param  exception  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final int level,
+            final String name,
+            final String message,
+            final Throwable exception) {
+        final JDialog exceptionDialog = new JDialog(new JFrame(), true);
+        doShowExceptionDialog(exceptionDialog, level, name, message, exception);
+    }
+
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     *
+     * @param  owner           DOCUMENT ME!
+     * @param  level           DOCUMENT ME!
+     * @param  name            DOCUMENT ME!
+     * @param  message         DOCUMENT ME!
+     * @param  detailMessages  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final JFrame owner,
+            final int level,
+            final String name,
+            final String message,
+            final Collection detailMessages) {
+        final JDialog exceptionDialog = new JDialog(owner, true);
+        doShowExceptionDialog(exceptionDialog, level, name, message, detailMessages);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  owner           DOCUMENT ME!
+     * @param  level           DOCUMENT ME!
+     * @param  name            DOCUMENT ME!
+     * @param  message         DOCUMENT ME!
+     * @param  detailMessages  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final JDialog owner,
+            final int level,
+            final String name,
+            final String message,
+            final Collection detailMessages) {
+        final JDialog exceptionDialog = new JDialog(owner, true);
+        doShowExceptionDialog(exceptionDialog, level, name, message, detailMessages);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  level           DOCUMENT ME!
+     * @param  name            DOCUMENT ME!
+     * @param  message         DOCUMENT ME!
+     * @param  detailMessages  DOCUMENT ME!
+     */
+    public void showExceptionDialog(final int level,
+            final String name,
+            final String message,
+            final Collection detailMessages) {
+        final JDialog exceptionDialog = new JDialog(new JFrame(), true);
+        doShowExceptionDialog(exceptionDialog, level, name, message, detailMessages);
+    }
+
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     *
+     * @param   owner  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean showExitDialog(final JFrame owner) {
+        if (PropertyManager.getManager().isAutoClose()) {
             return true;
-        }
-        else {
-        JDialog exitDialog = exitOption.createDialog(null,
-                    org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.showExitDialog().exitDialog.title"));  // NOI18N
-        return doShowExitDialog(exitDialog);
+        } else {
+            final JDialog exitDialog = exitOption.createDialog(
+                    owner,
+                    org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.showExitDialog(JFrame).exitDialog.title")); // NOI18N
+            return doShowExitDialog(exitDialog);
         }
     }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    
-    private boolean doShowExitDialog(JDialog exitDialog)
-    {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   owner  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean showExitDialog(final JDialog owner) {
+        if (PropertyManager.getManager().isAutoClose()) {
+            return true;
+        } else {
+            final JDialog exitDialog = exitOption.createDialog(
+                    owner,
+                    org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.showExitDialog(JDialog).exitDialog.title")); // NOI18N
+            return doShowExitDialog(exitDialog);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean showExitDialog() {
+        if (PropertyManager.getManager().isAutoClose()) {
+            return true;
+        } else {
+            final JDialog exitDialog = exitOption.createDialog(
+                    null,
+                    org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.showExitDialog().exitDialog.title")); // NOI18N
+            return doShowExitDialog(exitDialog);
+        }
+    }
+
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     *
+     * @param   exitDialog  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean doShowExitDialog(final JDialog exitDialog) {
         SwingUtilities.updateComponentTreeUI(exitDialog);
         exitDialog.setLocationRelativeTo(exitDialog.getOwner());
         exitDialog.show();
-        
-        if(exitOption.getValue().equals(
-                org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitOption.option.confirm")))  // NOI18N
+
+        if (exitOption.getValue().equals(
+                        org.openide.util.NbBundle.getMessage(
+                            ExceptionManager.class,
+                            "ExceptionManager.exitOption.option.confirm"))) // NOI18N
         {
-            if(logger.isDebugEnabled())
-                logger.debug("user wants to close program"); // NOI18N
-            //System.exit(0);
+            if (logger.isDebugEnabled()) {
+                logger.debug("user wants to close program");                // NOI18N
+            }
+            // System.exit(0);
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-                    
-    private void doShowExceptionDialog(JDialog exceptionDialog, int level, String name, String message, Throwable exception)
-    {
+
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     *
+     * @param  exceptionDialog  DOCUMENT ME!
+     * @param  level            DOCUMENT ME!
+     * @param  name             DOCUMENT ME!
+     * @param  message          DOCUMENT ME!
+     * @param  exception        DOCUMENT ME!
+     */
+    private void doShowExceptionDialog(final JDialog exceptionDialog,
+            final int level,
+            final String name,
+            final String message,
+            final Throwable exception) {
         exceptionDialog.setAlwaysOnTop(true);
-        if(exceptionPane == null)
-        {
+        if (exceptionPane == null) {
             exceptionPane = new ExceptionPane();
         }
-        
-        synchronized(exceptionPane)
-        {
+
+        synchronized (exceptionPane) {
             exceptionPane.init(exceptionDialog, level, message, exception);
             exceptionDialog.setTitle(name);
             exceptionDialog.setResizable(false);
@@ -245,16 +418,26 @@ public class ExceptionManager
             exceptionDialog.show();
         }
     }
-    
-    private void doShowExceptionDialog(JDialog exceptionDialog, int level, String name, String message, Collection detailMessages)
-    {
-        if(exceptionPane == null)
-        {
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  exceptionDialog  DOCUMENT ME!
+     * @param  level            DOCUMENT ME!
+     * @param  name             DOCUMENT ME!
+     * @param  message          DOCUMENT ME!
+     * @param  detailMessages   DOCUMENT ME!
+     */
+    private void doShowExceptionDialog(final JDialog exceptionDialog,
+            final int level,
+            final String name,
+            final String message,
+            final Collection detailMessages) {
+        if (exceptionPane == null) {
             exceptionPane = new ExceptionPane();
         }
-        
-        synchronized(exceptionPane)
-        {
+
+        synchronized (exceptionPane) {
             exceptionPane.init(exceptionDialog, level, message, detailMessages);
             exceptionDialog.setTitle(name);
             exceptionDialog.setResizable(false);
@@ -265,35 +448,50 @@ public class ExceptionManager
             exceptionDialog.show();
         }
     }
-    
-    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-    
-    // #########################################################################
-    
-    private class ExceptionPane extends JPanel
-    {
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+     * #########################################################################
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class ExceptionPane extends JPanel {
+
+        //~ Instance fields ----------------------------------------------------
+
         private JDialog parent = null;
-        
-        private JLabel messageLabel, exceptionIconLabel;
+
+        private JLabel messageLabel;
+        private JLabel exceptionIconLabel;
         private JPanel detailsPanel;
         private JTextArea detailsTextArea;
-        private JButton ignoreButton, exitButton;
+        private JButton ignoreButton;
+        private JButton exitButton;
         private JToggleButton detailsButton;
 
-        private ExceptionPane()
-        {
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ExceptionPane object.
+         */
+        private ExceptionPane() {
             super(new GridBagLayout());
             init();
         }
-        
-        private void init()
-        {
-            ActionListener buttonListener = new ButtonListener();
-           
-            
-            this.setBorder(new EmptyBorder(10,10,10,10));
-            GridBagConstraints constraints = new GridBagConstraints();
-            
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         */
+        private void init() {
+            final ActionListener buttonListener = new ButtonListener();
+
+            this.setBorder(new EmptyBorder(10, 10, 10, 10));
+            final GridBagConstraints constraints = new GridBagConstraints();
+
             // ICON ================================================================
             constraints.anchor = GridBagConstraints.CENTER;
             constraints.fill = GridBagConstraints.NONE;
@@ -303,236 +501,259 @@ public class ExceptionManager
             constraints.weighty = 0.0;
             constraints.gridy = 0;
             constraints.gridx = 0;
-            
+
             exceptionIconLabel = new JLabel();
-            exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
-            exceptionIconLabel.setBorder(new CompoundBorder(new SoftBevelBorder(SoftBevelBorder.LOWERED), new EmptyBorder(10,10,10,10)));
+            exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon")); // NOI18N
+            exceptionIconLabel.setBorder(new CompoundBorder(
+                    new SoftBevelBorder(SoftBevelBorder.LOWERED),
+                    new EmptyBorder(10, 10, 10, 10)));
             this.add(exceptionIconLabel, constraints);
-            
+
             // MESSAGE =============================================================
             constraints.fill = GridBagConstraints.BOTH;
             constraints.weightx = 0.5;
             constraints.gridx++;
             messageLabel = new JLabel();
-            messageLabel.setBorder(new EmptyBorder(20,20,20,20));
+            messageLabel.setBorder(new EmptyBorder(20, 20, 20, 20));
             this.add(messageLabel, constraints);
-            
+
             // BUTTONS =============================================================
             constraints.insets = new Insets(20, 0, 10, 0);
             constraints.gridwidth = 2;
             constraints.gridy = 1;
             constraints.gridx = 0;
-            JPanel buttonPanel = new JPanel(new GridLayout(1,3,10,10));
-            
-            ignoreButton = new JButton(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.ignoreButton.text"));  // NOI18N
-            ignoreButton.setMnemonic(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.ignoreButton.mnemonic").charAt(0));  // NOI18N
-            ignoreButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.ignoreButton.tooltip"));  // NOI18N
-            ignoreButton.setActionCommand("ignore");  // NOI18N
+            final JPanel buttonPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+
+            ignoreButton = new JButton(org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.ignoreButton.text"));           // NOI18N
+            ignoreButton.setMnemonic(org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.ignoreButton.mnemonic").charAt(0)); // NOI18N
+            ignoreButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.ignoreButton.tooltip"));            // NOI18N
+            ignoreButton.setActionCommand("ignore");                      // NOI18N
             ignoreButton.addActionListener(buttonListener);
             buttonPanel.add(ignoreButton);
-            
-            exitButton = new JButton(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitButton.text"));  // NOI18N
-            exitButton.setMnemonic(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitButton.mnemonic").charAt(0));  // NOI18N
-            exitButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.exitButton.tooltip"));  // NOI18N
-            exitButton.setActionCommand("exit");  // NOI18N
+
+            exitButton = new JButton(org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.exitButton.text"));           // NOI18N
+            exitButton.setMnemonic(org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.exitButton.mnemonic").charAt(0)); // NOI18N
+            exitButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.exitButton.tooltip"));            // NOI18N
+            exitButton.setActionCommand("exit");                        // NOI18N
             exitButton.addActionListener(buttonListener);
             buttonPanel.add(exitButton);
-            
-            detailsButton = new JToggleButton(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.detailsButton.text"));  // NOI18N
-            detailsButton.setMnemonic(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.detailsButton.mnemonic").charAt(0));  // NOI18N
-            detailsButton.setToolTipText(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.detailsButton.tooltip"));  // NOI18N
-            detailsButton.setActionCommand("details");  // NOI18N
+
+            detailsButton = new JToggleButton(org.openide.util.NbBundle.getMessage(
+                        ExceptionManager.class,
+                        "ExceptionManager.detailsButton.text"));           // NOI18N
+            detailsButton.setMnemonic(org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.detailsButton.mnemonic").charAt(0)); // NOI18N
+            detailsButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                    ExceptionManager.class,
+                    "ExceptionManager.detailsButton.tooltip"));            // NOI18N
+            detailsButton.setActionCommand("details");                     // NOI18N
             detailsButton.addActionListener(buttonListener);
             buttonPanel.add(detailsButton);
-            
+
             this.add(buttonPanel, constraints);
-            
+
             constraints.insets = new Insets(0, 0, 0, 0);
             constraints.gridy++;
             constraints.weightx = 1.0;
             constraints.weighty = 1.0;
             detailsTextArea = new JTextArea(4, 20);
             detailsTextArea.setEditable(false);
-            detailsPanel = new JPanel(new GridLayout(1,1));
+            detailsPanel = new JPanel(new GridLayout(1, 1));
             detailsPanel.add(new JScrollPane(detailsTextArea));
             detailsPanel.setVisible(false);
             this.add(detailsPanel, constraints);
         }
-        
-        private void init(JDialog parent, int level, String message)
-        {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  parent   DOCUMENT ME!
+         * @param  level    DOCUMENT ME!
+         * @param  message  DOCUMENT ME!
+         */
+        private void init(final JDialog parent, final int level, final String message) {
             this.parent = parent;
             this.exitButton.setEnabled(true);
-            
-            if(level == FATAL)
-            {
+
+            if (level == FATAL) {
                 ignoreButton.setEnabled(false);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
-                if(parent.getTitle() == null)
-                {
-                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.fatal"));  // NOI18N
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));   // NOI18N
+                if (parent.getTitle() == null) {
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(
+                            ExceptionManager.class,
+                            "ExceptionManager.title.fatal"));                            // NOI18N
                 }
-            }
-            else if(level == ERROR)
-            {
+            } else if (level == ERROR) {
                 ignoreButton.setEnabled(true);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
-                if(parent.getTitle() == null)
-                {
-                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.error"));  // NOI18N
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));   // NOI18N
+                if (parent.getTitle() == null) {
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(
+                            ExceptionManager.class,
+                            "ExceptionManager.title.error"));                            // NOI18N
                 }
-            
-            }
-            else if(level == WARNING)
-            {
+            } else if (level == WARNING) {
                 ignoreButton.setEnabled(true);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));  // NOI18N
-                if(parent.getTitle() == null)
-                {
-                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.warning"));  // NOI18N
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon")); // NOI18N
+                if (parent.getTitle() == null) {
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(
+                            ExceptionManager.class,
+                            "ExceptionManager.title.warning"));                          // NOI18N
                 }
-            }
-            else if(level == PLUGIN_ERROR)
-            {
+            } else if (level == PLUGIN_ERROR) {
                 ignoreButton.setEnabled(true);
                 exitButton.setEnabled(false);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));  // NOI18N
-                if(parent.getTitle() == null)
-                {
-                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.error"));  // NOI18N
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.errorIcon"));   // NOI18N
+                if (parent.getTitle() == null) {
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(
+                            ExceptionManager.class,
+                            "ExceptionManager.title.error"));                            // NOI18N
                 }
-            
-            }
-            else if(level == PLUGIN_WARNING)
-            {
+            } else if (level == PLUGIN_WARNING) {
                 ignoreButton.setEnabled(true);
                 exitButton.setEnabled(false);
-                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon"));  // NOI18N
-                if(parent.getTitle() == null)
-                {
-                    parent.setTitle(org.openide.util.NbBundle.getMessage(ExceptionManager.class, "ExceptionManager.title.warning"));  // NOI18N
+                exceptionIconLabel.setIcon(UIManager.getIcon("OptionPane.warningIcon")); // NOI18N
+                if (parent.getTitle() == null) {
+                    parent.setTitle(org.openide.util.NbBundle.getMessage(
+                            ExceptionManager.class,
+                            "ExceptionManager.title.warning"));                          // NOI18N
                 }
             }
-            
-            
+
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
             messageLabel.setText(message);
         }
-        
-        private void init(JDialog parent, int level, String message, Throwable exception)
-        {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  parent     DOCUMENT ME!
+         * @param  level      DOCUMENT ME!
+         * @param  message    DOCUMENT ME!
+         * @param  exception  DOCUMENT ME!
+         */
+        private void init(final JDialog parent, final int level, final String message, final Throwable exception) {
             this.init(parent, level, message);
-            
-            if(exception != null)
-            {
+
+            if (exception != null) {
                 detailsButton.setEnabled(true);
-                StackTraceElement[] elements = exception.getStackTrace();
-                StringBuffer buffer = new StringBuffer();
-                for(int i = 0; i < elements.length; i++)
-                {
+                final StackTraceElement[] elements = exception.getStackTrace();
+                final StringBuffer buffer = new StringBuffer();
+                for (int i = 0; i < elements.length; i++) {
                     buffer.append(elements[i].toString()).append('\n');
                 }
 
                 detailsTextArea.setText(buffer.toString());
-            }
-            else
-            {
+            } else {
                 detailsButton.setEnabled(false);
-                detailsTextArea.setText("");  // NOI18N
+                detailsTextArea.setText(""); // NOI18N
             }
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
             messageLabel.setText(message);
         }
-        
-        private void init(JDialog parent, int level, String message, Collection detailMessages)
-        {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  parent          DOCUMENT ME!
+         * @param  level           DOCUMENT ME!
+         * @param  message         DOCUMENT ME!
+         * @param  detailMessages  DOCUMENT ME!
+         */
+        private void init(final JDialog parent,
+                final int level,
+                final String message,
+                final Collection detailMessages) {
             this.init(parent, level, message);
 
-            if(detailMessages != null && detailMessages.size() > 0)
-            {
-                try
-                {
-                    StringBuffer stringBuffer = new StringBuffer();
-                    Iterator iterator = detailMessages.iterator();
-                    
-                    while(iterator.hasNext())
-                    {
+            if ((detailMessages != null) && (detailMessages.size() > 0)) {
+                try {
+                    final StringBuffer stringBuffer = new StringBuffer();
+                    final Iterator iterator = detailMessages.iterator();
+
+                    while (iterator.hasNext()) {
                         stringBuffer.append(iterator.next().toString());
-                        stringBuffer.append("\n");  // NOI18N
+                        stringBuffer.append("\n"); // NOI18N
                     }
 
                     detailsButton.setEnabled(true);
                     detailsTextArea.setText(stringBuffer.toString());
+                } catch (Exception exp) {
+                    logger.error("error initializing exception pane: " + exp.getMessage() + "'"); // NOI18N
                 }
-                catch(Exception exp)
-                {
-                    logger.error("error initializing exception pane: " + exp.getMessage() + "'");  // NOI18N
-                }
-            }
-            else
-            {
+            } else {
                 detailsButton.setEnabled(false);
-                detailsTextArea.setText("");  // NOI18N
+                detailsTextArea.setText("");                                                      // NOI18N
             }
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
             messageLabel.setText(message);
         }
-        
-        private class ButtonListener implements ActionListener
-        {
-            public void actionPerformed(ActionEvent e)
-            {
-                if(e.getActionCommand().equals("exit"))  // NOI18N
+
+        //~ Inner Classes ------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @version  $Revision$, $Date$
+         */
+        private class ButtonListener implements ActionListener {
+
+            //~ Methods --------------------------------------------------------
+
+            @Override
+            public void actionPerformed(final ActionEvent e) {
+                if (e.getActionCommand().equals("exit"))                          // NOI18N
                 {
-                    if(ExceptionManager.this.showExitDialog(parent))
-                    {
-                        if(logger.isInfoEnabled())
-                            logger.info("closing program");  // NOI18N
+                    if (ExceptionManager.this.showExitDialog(parent)) {
+                        if (logger.isInfoEnabled()) {
+                            logger.info("closing program");                       // NOI18N
+                        }
                         System.exit(1);
                     }
-                }
-                else if(e.getActionCommand().equals("ignore"))  // NOI18N
+                } else if (e.getActionCommand().equals("ignore"))                 // NOI18N
                 {
                     parent.dispose();
-                    //parent = null;
-                }
-                else if(e.getActionCommand().equals("details"))  // NOI18N
+                    // parent = null;
+                } else if (e.getActionCommand().equals("details"))                // NOI18N
                 {
-                    if(detailsButton.isSelected())
-                    {
+                    if (detailsButton.isSelected()) {
                         detailsPanel.setVisible(true);
-                        parent.pack();  
-                    }
-                    else
-                    {
+                        parent.pack();
+                    } else {
                         detailsPanel.setVisible(false);
                         parent.pack();
                     }
-                }
-                else
-                {
-                    logger.warn("unknown action '" + e.getActionCommand() + "'");  // NOI18N
+                } else {
+                    logger.warn("unknown action '" + e.getActionCommand() + "'"); // NOI18N
                 }
             }
         }
     }
 
     // TEST ....................................................................
-    
+
     /*public static void main(String args[])
-    {
-       org.apache.log4j.BasicConfigurator.configure();
-        
-        ExceptionManager manager = ExceptionManager.getManager();
-        manager.showExceptionDialog(ExceptionManager.WARNING, "Warnung!", "Warnung, alles Unsinn!", new Exception("(T)ERROR"));
-        //manager.showExceptionDialog(ExceptionManager.FATAL, "FATAL!", "Warnung, alles im A....!", new Exception("xxxxxxxxxxx xxxxxxxxxxxxxxxxxxx xxxxxxxxx xxxxxxx xxxxxxxxxxx xxxxx"));
-        manager.showExceptionDialog(ExceptionManager.ERROR, "lx01", null);
-        NavigatorException exception = new NavigatorException("Holla");
-        manager.showExceptionDialog(exception);
-    }*/
+     * { org.apache.log4j.BasicConfigurator.configure();  ExceptionManager manager = ExceptionManager.getManager();
+     * manager.showExceptionDialog(ExceptionManager.WARNING, "Warnung!", "Warnung, alles Unsinn!", new
+     * Exception("(T)ERROR")); //manager.showExceptionDialog(ExceptionManager.FATAL, "FATAL!", "Warnung, alles im
+     * A....!", new Exception("xxxxxxxxxxx xxxxxxxxxxxxxxxxxxx xxxxxxxxx xxxxxxx xxxxxxxxxxx xxxxx"));
+     * manager.showExceptionDialog(ExceptionManager.ERROR, "lx01", null); NavigatorException exception = new
+     * NavigatorException("Holla"); manager.showExceptionDialog(exception);}*/
 }

@@ -1,51 +1,83 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.event;
 
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.attributes.AttributeViewer;
-import de.cismet.tools.collections.TypeSafeCollections;
+
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.JTree;
 import javax.swing.Timer;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
+import de.cismet.tools.collections.TypeSafeCollections;
+
 /**
+ * DOCUMENT ME!
  *
- * @author  pascal
+ * @author   pascal
+ * @version  $Revision$, $Date$
  */
 public class CatalogueSelectionListener implements TreeSelectionListener {
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final int SELECTION_CADENCE_TIME = 300;
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final AttributeViewer attributeViewer;
     private final DescriptionPane descriptionPane;
+    private final Timer timer;
+    private final SelectionActionListener timerListener;
 
-    /** Creates a new instance of CatalogueSelectionListener */
-    public CatalogueSelectionListener(AttributeViewer attributeViewer, DescriptionPane descriptionPane) {
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new instance of CatalogueSelectionListener.
+     *
+     * @param  attributeViewer  DOCUMENT ME!
+     * @param  descriptionPane  DOCUMENT ME!
+     */
+    public CatalogueSelectionListener(final AttributeViewer attributeViewer, final DescriptionPane descriptionPane) {
         this.attributeViewer = attributeViewer;
         this.descriptionPane = descriptionPane;
         timerListener = new SelectionActionListener();
         timer = new Timer(SELECTION_CADENCE_TIME, timerListener);
         timer.setRepeats(false);
-        // class attributes only
-        //this.classAttributeIterator = new SingleAttributeIterator(new SimpleAttributeRestriction(AttributeRestriction.CLASS, AttributeRestriction.TRUE, AttributeRestriction.IGNORE, null, null), false);
-        // object attributes only
-        //this.objectAttributeIterator = new SingleAttributeIterator();
+        // class attributes only this.classAttributeIterator = new SingleAttributeIterator(new
+        // SimpleAttributeRestriction(AttributeRestriction.CLASS, AttributeRestriction.TRUE,
+        // AttributeRestriction.IGNORE, null, null), false); object attributes only this.objectAttributeIterator = new
+        // SingleAttributeIterator();
     }
-    private final Timer timer;
-    private final SelectionActionListener timerListener;
 
-    private final void performValueChanged(final TreeSelectionEvent e) {
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
+    private void performValueChanged(final TreeSelectionEvent e) {
 //        final Runnable r = new Runnable() {
 //
 //            @Override
 //            public void run() {
-        final JTree t = (JTree) e.getSource();
+        final JTree t = (JTree)e.getSource();
         final TreePath[] treePaths = t.getSelectionPaths();
 
         final List<Object> objects = TypeSafeCollections.newArrayList();
@@ -64,8 +96,8 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
 
     /**
      * Called whenever the value of the selection changes.
-     * @param e the event that characterizes the change.
      *
+     * @param  e  the event that characterizes the change.
      */
     @Override
     public void valueChanged(final TreeSelectionEvent e) {
@@ -75,29 +107,48 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
         timer.start();
     }
 
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     final class SelectionActionListener extends AbstractAction {
+
+        //~ Instance fields ----------------------------------------------------
 
         private TreeSelectionEvent evt;
 
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(final ActionEvent e) {
             if (evt != null) {
                 performValueChanged(evt);
             }
-
         }
 
         /**
-         * @return the evt
+         * DOCUMENT ME!
+         *
+         * @return  the evt
          */
         public TreeSelectionEvent getEvt() {
             return evt;
         }
 
         /**
-         * @param evt the evt to set
+         * DOCUMENT ME!
+         *
+         * @param  evt  the evt to set
          */
-        public void setEvt(TreeSelectionEvent evt) {
+        public void setEvt(final TreeSelectionEvent evt) {
             this.evt = evt;
         }
     }

@@ -1,50 +1,91 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.connection;
-
-import org.apache.log4j.*;
 
 import Sirius.navigator.connection.proxy.*;
 
+import org.apache.log4j.*;
+
 import de.cismet.tools.CurrentStackTrace;
 
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
 public final class SessionManager {
 
-    private final static Logger logger = Logger.getLogger(SessionManager.class);
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger logger = Logger.getLogger(SessionManager.class);
     private static SessionManager manager = null;
-    private ConnectionProxy proxy;
     private static double nonce = Math.random();
+    private static final Object blocker = new Object();
 
-    private SessionManager(ConnectionProxy proxy) {
+    //~ Instance fields --------------------------------------------------------
+
+    private ConnectionProxy proxy;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new SessionManager object.
+     *
+     * @param  proxy  DOCUMENT ME!
+     */
+    private SessionManager(final ConnectionProxy proxy) {
         this.proxy = proxy;
-        if(logger.isInfoEnabled())
-            logger.info("singleton shared instance of SessionManager created");  // NOI18N
+        if (logger.isInfoEnabled()) {
+            logger.info("singleton shared instance of SessionManager created"); // NOI18N
+        }
     }
-    private final static Object blocker = new Object();
 
-    public final static void init(ConnectionProxy proxy) {
-        if(logger.isDebugEnabled())
-            logger.debug("init SessionManager " + nonce, new CurrentStackTrace());  // NOI18N
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  proxy  DOCUMENT ME!
+     */
+    public static void init(final ConnectionProxy proxy) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("init SessionManager " + nonce, new CurrentStackTrace()); // NOI18N
+        }
         synchronized (blocker) {
             if (manager == null) {
                 manager = new SessionManager(proxy);
-
             } else {
                 manager.proxy = proxy;
-                logger.warn("SessionManager has already been initialized");  // NOI18N
-                //throw new RuntimeException("SessionManager has alreadyt been initialized");
+                logger.warn("SessionManager has already been initialized");        // NOI18N
+                // throw new RuntimeException("SessionManager has alreadyt been initialized");
             }
         }
     }
 
-    public final static void destroy() {
-        if(logger.isInfoEnabled())
-            logger.info("destroy SessionManager" + manager, new CurrentStackTrace());  // NOI18N
+    /**
+     * DOCUMENT ME!
+     */
+    public static void destroy() {
+        if (logger.isInfoEnabled()) {
+            logger.info("destroy SessionManager" + manager, new CurrentStackTrace()); // NOI18N
+        }
         synchronized (blocker) {
-            logger.warn("destroying singelton SessionManager instance");  // NOI18N
+            logger.warn("destroying singelton SessionManager instance");              // NOI18N
 //            manager = null;
         }
     }
 
-    public final static boolean isConnected() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static boolean isConnected() {
         if (manager == null) {
             return false;
         } else {
@@ -52,34 +93,61 @@ public final class SessionManager {
         }
     }
 
-    public final static boolean onClientSide() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static boolean onClientSide() {
         return isConnected();
     }
 
-    private final static SessionManager getManager() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  RuntimeException  DOCUMENT ME!
+     */
+    private static SessionManager getManager() {
         if (manager == null) {
-            Throwable t = new CurrentStackTrace();
-            logger.warn("SessionManager has not been initialized", t);  // NOI18N
-            throw new RuntimeException("SessionManager has not been initialized", t);  // NOI18N
+            final Throwable t = new CurrentStackTrace();
+            logger.warn("SessionManager has not been initialized", t);                // NOI18N
+            throw new RuntimeException("SessionManager has not been initialized", t); // NOI18N
         }
 
         return manager;
     }
 
-    public final static Connection getConnection() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static Connection getConnection() {
         try {
             return getManager().proxy.getSession().getConnection();
         } catch (Exception e) {
-            logger.error("Error in getConnection()\nmaybe the manager is null" + getManager(), e);  // NOI18N
+            logger.error("Error in getConnection()\nmaybe the manager is null" + getManager(), e); // NOI18N
         }
         return null;
     }
 
-    public final static ConnectionSession getSession() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ConnectionSession getSession() {
         return getManager().proxy.getSession();
     }
 
-    public final static ConnectionProxy getProxy() {
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ConnectionProxy getProxy() {
         return getManager().proxy;
     }
 }
