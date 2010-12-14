@@ -24,14 +24,9 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
-import calpa.html.CalCons;
-import calpa.html.CalHTMLPane;
-import calpa.html.CalHTMLPreferences;
-import calpa.html.DefaultCalHTMLObserver;
-
-import org.apache.commons.io.FileUtils;
-
 import org.openide.util.WeakListeners;
+
+import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -51,11 +46,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-
-import java.net.URL;
 
 import java.util.Iterator;
 import java.util.List;
@@ -101,73 +93,24 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final DefaultStatusChangeSupport statusChangeSupport;
-    // private SimplestBreadCrumbGui breadCrumbGui ;
-    DefaultCalHTMLObserver htmlObserver = new DefaultCalHTMLObserver() {
-
-            @Override
-            public void statusUpdate(final CalHTMLPane calHTMLPane,
-                    final int status,
-                    final URL uRL,
-                    final int i0,
-                    final String string) {
-                super.statusUpdate(calHTMLPane, status, uRL, i0, string);
-                // log.debug("DescriptionPane.log.StatusUpdate: Status:"+status+"  Url:"+uRL);
-                if (status == 1) {
-                    htmlPane.showHTMLDocument("");                                                          // NOI18N
-                    statusChangeSupport.fireStatusChange(org.openide.util.NbBundle.getMessage(
-                            DescriptionPane.class,
-                            "DescriptionPane.statusUpdate(CalHTMLPane,int,URL,int,String).status.error"),   // NOI18N
-                        Status.MESSAGE_POSITION_3,
-                        Status.ICON_DEACTIVATED,
-                        Status.ICON_ACTIVATED);
-                } else if ((status == 10) || (status == 11)) {
-                    statusChangeSupport.fireStatusChange(org.openide.util.NbBundle.getMessage(
-                            DescriptionPane.class,
-                            "DescriptionPane.statusUpdate(CalHTMLPane,int,URL,int,String).status.loading"), // NOI18N
-                        Status.MESSAGE_POSITION_3,
-                        Status.ICON_BLINKING,
-                        Status.ICON_DEACTIVATED);
-                } else if (status == 14) {
-                    statusChangeSupport.fireStatusChange(org.openide.util.NbBundle.getMessage(
-                            DescriptionPane.class,
-                            "DescriptionPane.statusUpdate(CalHTMLPane,int,URL,int,String).status.loaded"),  // NOI18N
-                        Status.MESSAGE_POSITION_3,
-                        Status.ICON_ACTIVATED,
-                        Status.ICON_DEACTIVATED);
-                }
-            }
-
-            @Override
-            public void linkActivatedUpdate(final CalHTMLPane calHTMLPane,
-                    final URL uRL,
-                    final String string,
-                    final String string0) {
-                super.linkActivatedUpdate(calHTMLPane, uRL, string, string0);
-            }
-
-            @Override
-            public void linkFocusedUpdate(final CalHTMLPane calHTMLPane, final URL uRL) {
-                super.linkFocusedUpdate(calHTMLPane, uRL);
-            }
-        };
-
-    private final CalHTMLPreferences htmlPrefs = new CalHTMLPreferences();
     private final JPanel panRenderer = new JPanel();
     private final JComponent wrappedWaitingPanel;
     private SwingWorker worker = null;
     private GridBagConstraints gridBagConstraints;
     private String welcomePage;
+    private String blankPage;
     private boolean showsWaitScreen = false;
     private DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     private LinkStyleBreadCrumbGui breadCrumbGui;
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private calpa.html.CalHTMLPane htmlPane;
+    private org.xhtmlrenderer.simple.FSScrollPane fSScrollPane1;
     private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblRendererCreationWaitingLabel;
     private javax.swing.JPanel panBreadCrump;
     private javax.swing.JPanel panObjects;
     private javax.swing.JScrollPane scpRenderer;
+    private org.xhtmlrenderer.simple.XHTMLPanel xHTMLPanel1;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -176,25 +119,21 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      * Creates new form DescriptionPane.
      */
     public DescriptionPane() {
-        htmlPrefs.setAutomaticallyFollowHyperlinks(true);
-        htmlPrefs.setOptimizeDisplay(CalCons.OPTIMIZE_ALL);
-        htmlPrefs.setDisplayErrorDialogs(false);
-        htmlPrefs.setLoadImages(true);
 //        timerAction = new TimerAction();
 //        cadenceTimer = new Timer(300, timerAction);
 //        cadenceTimer.setRepeats(false);
 
-        // htmlPrefs.setDisplayErrorDialogs(true);
         initComponents();
+
+        xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
 
         showHTML();
         breadCrumbGui = new LinkStyleBreadCrumbGui(breadCrumbModel);
-        // breadCrumbGui= new SimplestBreadCrumbGui(breadCrumbModel);
         panBreadCrump.add(breadCrumbGui, BorderLayout.CENTER);
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
         BufferedReader reader = null;
         try {
-            final StringBuffer buffer = new StringBuffer();
+            StringBuffer buffer = new StringBuffer();
             String string = null;
             reader = new BufferedReader(new InputStreamReader(
                         resource.getNavigatorResourceAsStream("doc/welcome.html"))); // NOI18N
@@ -204,6 +143,18 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             }
 
             this.welcomePage = buffer.toString();
+
+            buffer = new StringBuffer();
+            string = null;
+            reader = new BufferedReader(new InputStreamReader(
+                        resource.getNavigatorResourceAsStream("doc/blank.xhtml"),
+                        "UTF-8")); // NOI18N
+
+            while ((string = reader.readLine()) != null) {
+                buffer.append(string);
+            }
+
+            this.blankPage = buffer.toString();
         } catch (IOException ioexp) {
             if (log.isDebugEnabled()) {
                 log.debug(ioexp, ioexp);
@@ -238,11 +189,12 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     private void initComponents() {
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
-        htmlPane = new CalHTMLPane(htmlPrefs, htmlObserver, "cismap");
         panObjects = new javax.swing.JPanel();
         scpRenderer = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         panBreadCrump = new javax.swing.JPanel();
+        fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
+        xHTMLPanel1 = new org.xhtmlrenderer.simple.XHTMLPanel();
 
         lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
@@ -252,9 +204,6 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         jButton1.setText(org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.JButton1")); // NOI18N
 
         setLayout(new java.awt.CardLayout());
-
-        htmlPane.setDoubleBuffered(true);
-        add(htmlPane, "html");
 
         panObjects.setLayout(new java.awt.BorderLayout());
 
@@ -267,6 +216,10 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         panObjects.add(panBreadCrump, java.awt.BorderLayout.PAGE_START);
 
         add(panObjects, "objects");
+
+        fSScrollPane1.setViewportView(xHTMLPanel1);
+
+        add(fSScrollPane1, "html");
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -314,7 +267,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                 @Override
                 public void run() {
                     // release the strong references on the listeners, so that the weak listeners can be GCed.
-                    htmlPane.showHTMLDocument("");
+                    // xHTMLPanel1.setDocument((Document) null);
+                    xHTMLPanel1.setDocumentFromString(blankPage, "", new XhtmlNamespaceHandler());
                     removeAndDisposeAllRendererFromPanel();
                     repaint();
                 }
@@ -345,13 +299,18 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     public void setPage(final String page) {
         try {
             if (log.isInfoEnabled()) {
-                log.info("setPage:" + page);                         // NOI18N
+                log.info("setPage:" + page); // NOI18N
             }
-            htmlPane.stopAll();
-            htmlPane.showHTMLDocument(new URL(page));
+            if ((page == null) || (page.trim().length() <= 0)) {
+                // TODO: Following call raises a NPE in Flying Saucer
+                // xHTMLPanel1.setDocument((Document) null);
+                xHTMLPanel1.setDocumentFromString(blankPage, "", new XhtmlNamespaceHandler());
+            } else {
+                xHTMLPanel1.setDocument(page);
+            }
         } catch (Exception e) {
-            log.info("Error in setPage()", e);                       // NOI18N
-            htmlPane.showHTMLDocument("");                           // NOI18N
+            log.info("Error in setPage()", e); // NOI18N
+
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
                     DescriptionPane.class,
@@ -792,7 +751,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             // this.setText("<html><body><h3>" + ResourceManager.getManager().getString("descriptionpane.welcome") +
             // "</h3></body></html>");
-            htmlPane.showHTMLDocument(welcomePage);
+            xHTMLPanel1.setDocumentFromString(welcomePage, "", new XhtmlNamespaceHandler());
         }
     }
 

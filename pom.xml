@@ -53,6 +53,11 @@
             <artifactId>mac_widgets</artifactId>
             <version>0.9.5</version>
         </dependency>
+        <dependency>
+            <groupId>de.huxhorn.lilith</groupId>
+            <artifactId>de.huxhorn.lilith.3rdparty.flyingsaucer.core-renderer</artifactId>
+            <version>8RC1</version>
+        </dependency>
     </dependencies>
 
     <build>
