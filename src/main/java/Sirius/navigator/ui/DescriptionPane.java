@@ -122,6 +122,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 //        timerAction = new TimerAction();
 //        cadenceTimer = new Timer(300, timerAction);
 //        cadenceTimer.setRepeats(false);
+        System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
 
         initComponents();
 
@@ -299,17 +300,15 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     public void setPage(final String page) {
         try {
             if (log.isInfoEnabled()) {
-                log.info("setPage:" + page); // NOI18N
+                log.info("setPage: '" + page + "'."); // NOI18N
             }
             if ((page == null) || (page.trim().length() <= 0)) {
-                // TODO: Following call raises a NPE in Flying Saucer
-                // xHTMLPanel1.setDocument((Document) null);
                 xHTMLPanel1.setDocumentFromString(blankPage, "", new XhtmlNamespaceHandler());
             } else {
                 xHTMLPanel1.setDocument(page);
             }
         } catch (Exception e) {
-            log.info("Error in setPage()", e); // NOI18N
+            log.error("Error in setPage()", e);       // NOI18N
 
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
