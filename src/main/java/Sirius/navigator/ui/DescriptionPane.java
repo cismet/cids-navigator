@@ -5,11 +5,6 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * DescriptionPane.java
- *
- * Created on 20. Oktober 2006, 11:06
- */
 package Sirius.navigator.ui;
 
 import Sirius.navigator.connection.SessionManager;
@@ -24,15 +19,12 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
-import org.apache.log4j.Logger;
-
 import org.openide.util.WeakListeners;
-
-import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -82,38 +74,35 @@ import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
 /**
  * DOCUMENT ME!
  *
- * @author   thorsten.hell@cismet.de
+ * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class DescriptionPane extends JPanel implements StatusChangeSupport {
+public abstract class DescriptionPane extends JPanel implements StatusChangeSupport {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final ResourceManager RESOURCE = ResourceManager.getManager();
-
-    private static final Logger LOG = Logger.getLogger(DescriptionPane.class);
+    protected static final ResourceManager RESOURCE = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
 
-    private final DefaultStatusChangeSupport statusChangeSupport;
-    private final JPanel panRenderer = new JPanel();
-    private final JComponent wrappedWaitingPanel;
-    private SwingWorker worker = null;
-    private GridBagConstraints gridBagConstraints;
-    private String welcomePage;
-    private String blankPage;
-    private boolean showsWaitScreen = false;
-    private DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
-    private LinkStyleBreadCrumbGui breadCrumbGui;
+    protected final DefaultStatusChangeSupport statusChangeSupport;
+    protected final JPanel panRenderer = new JPanel();
+    protected final JComponent wrappedWaitingPanel;
+    protected SwingWorker worker = null;
+    protected GridBagConstraints gridBagConstraints;
+    protected String welcomePage;
+    protected String blankPage;
+    protected boolean showsWaitScreen = false;
+    protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
+    protected LinkStyleBreadCrumbGui breadCrumbGui;
+    private final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPane.class);
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.xhtmlrenderer.simple.FSScrollPane fSScrollPane1;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JLabel lblRendererCreationWaitingLabel;
-    private javax.swing.JPanel panBreadCrump;
-    private javax.swing.JPanel panObjects;
-    private javax.swing.JScrollPane scpRenderer;
-    private org.xhtmlrenderer.simple.XHTMLPanel xHTMLPanel1;
+    protected javax.swing.JPanel jPanel2;
+    protected javax.swing.JLabel lblRendererCreationWaitingLabel;
+    protected javax.swing.JPanel panBreadCrump;
+    protected javax.swing.JPanel panObjects;
+    protected javax.swing.JScrollPane scpRenderer;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -122,13 +111,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      * Creates new form DescriptionPane.
      */
     public DescriptionPane() {
-        System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser"); // NOI18N
-
         initComponents();
 
-        xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
-
-        showHTML();
         breadCrumbGui = new LinkStyleBreadCrumbGui(breadCrumbModel);
         panBreadCrump.add(breadCrumbGui, BorderLayout.CENTER);
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
@@ -157,16 +141,15 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
 
             this.blankPage = buffer.toString();
         } catch (final IOException ioexp) {
-            // TODO what happens here and why is the exception ignored
             if (LOG.isDebugEnabled()) {
-                LOG.debug("I am ignored, but why...", ioexp); // NOI18N
+                LOG.debug("Couldn't read default pages.", ioexp); // NOI18N
             }
         } finally {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (final IOException ex) {
-                    LOG.warn("cannot close reader", ex);      // NOI18N
+                } catch (IOException ex) {
+                    LOG.warn("Can't close reader.", ex);          // NOI18N
                 }
             }
         }
@@ -187,30 +170,25 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
      */
+    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         panObjects = new javax.swing.JPanel();
         scpRenderer = new javax.swing.JScrollPane();
-        jPanel1 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
         panBreadCrump = new javax.swing.JPanel();
-        fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
-        xHTMLPanel1 = new org.xhtmlrenderer.simple.XHTMLPanel();
 
         lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
-
-        jButton1.setForeground(javax.swing.UIManager.getDefaults().getColor("Button.background"));
-        jButton1.setText(org.openide.util.NbBundle.getMessage(DescriptionPane.class, "DescriptionPane.JButton1")); // NOI18N
 
         setLayout(new java.awt.CardLayout());
 
         panObjects.setLayout(new java.awt.BorderLayout());
 
         scpRenderer.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        scpRenderer.setViewportView(jPanel1);
+        scpRenderer.setViewportView(jPanel2);
 
         panObjects.add(scpRenderer, java.awt.BorderLayout.CENTER);
 
@@ -218,23 +196,14 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
         panObjects.add(panBreadCrump, java.awt.BorderLayout.PAGE_START);
 
         add(panObjects, "objects");
-
-        fSScrollPane1.setViewportView(xHTMLPanel1);
-
-        add(fSScrollPane1, "html");
     } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      */
-    private void showHTML() {
-        final Runnable htmlRunnable = new Runnable() {
+    protected void showHTML() {
+        final Runnable htmlRunnable = new ShowCardRunnable(this, "html"); // NOI18N
 
-                @Override
-                public void run() {
-                    ((CardLayout)getLayout()).show(DescriptionPane.this, "html"); // NOI18N
-                }
-            };
         if (EventQueue.isDispatchThread()) {
             htmlRunnable.run();
         } else {
@@ -245,14 +214,9 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     /**
      * DOCUMENT ME!
      */
-    private void showObjects() {
-        final Runnable showObjRunnable = new Runnable() {
+    protected void showObjects() {
+        final Runnable showObjRunnable = new ShowCardRunnable(this, "objects"); // NOI18N
 
-                @Override
-                public void run() {
-                    ((CardLayout)getLayout()).show(DescriptionPane.this, "objects"); // NOI18N
-                }
-            };
         if (EventQueue.isDispatchThread()) {
             showObjRunnable.run();
         } else {
@@ -263,24 +227,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     /**
      * DOCUMENT ME!
      */
-    public void clear() {
-        final Runnable clearRunnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    // release the strong references on the listeners, so that the weak listeners can be GCed.
-                    xHTMLPanel1.setDocumentFromString(blankPage, "", new XhtmlNamespaceHandler()); // NOI18N
-                    removeAndDisposeAllRendererFromPanel();
-                    repaint();
-                }
-            };
-
-        if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(clearRunnable);
-        } else {
-            clearRunnable.run();
-        }
-    }
+    public abstract void clear();
 
     @Override
     public void addStatusChangeListener(final StatusChangeListener listener) {
@@ -297,28 +244,13 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      *
      * @param  page  DOCUMENT ME!
      */
-    public void setPage(final String page) {
-        try {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("setPage: '" + page + "'.");                                          // NOI18N
-            }
-            if ((page == null) || (page.trim().length() <= 0)) {
-                xHTMLPanel1.setDocumentFromString(blankPage, "", new XhtmlNamespaceHandler()); // NOI18N
-            } else {
-                xHTMLPanel1.setDocument(page);
-            }
-        } catch (final Exception e) {
-            LOG.error("Error in setPage()", e);                                                // NOI18N
-
-            statusChangeSupport.fireStatusChange(
-                org.openide.util.NbBundle.getMessage(
-                    DescriptionPane.class,
-                    "DescriptionPane.setPage(String).status.error"), // NOI18N
-                Status.MESSAGE_POSITION_3,
-                Status.ICON_DEACTIVATED,
-                Status.ICON_ACTIVATED);
-        }
-    }
+    public abstract void setPageFromURI(final String page);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  page  DOCUMENT ME!
+     */
+    public abstract void setPageFromContent(final String page);
 
     /**
      * Multiple Objects.
@@ -446,7 +378,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      *
      * @return  DOCUMENT ME!
      */
-    private SelfDisposingPanel encapsulateInSelfDisposingPanel(final JComponent renderer) {
+    protected SelfDisposingPanel encapsulateInSelfDisposingPanel(final JComponent renderer) {
         JComponent originalComponent = renderer;
         if (renderer instanceof WrappedComponent) {
             originalComponent = ((WrappedComponent)renderer).getOriginalComponent();
@@ -460,7 +392,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
     /**
      * DOCUMENT ME!
      */
-    private void showWaitScreen() {
+    protected void showWaitScreen() {
         if (!showsWaitScreen) {
             showsWaitScreen = true;
             final Runnable run = new Runnable() {
@@ -543,7 +475,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      *
      * @param  node  DOCUMENT ME!
      */
-    private void startSingleRendererWorker(final DefaultMetaTreeNode node) {
+    protected void startSingleRendererWorker(final DefaultMetaTreeNode node) {
         final MetaObject o = ((ObjectTreeNode)node).getMetaObject();
 
         startSingleRendererWorker(o, node, node.toString());
@@ -555,7 +487,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      * @param  o      DOCUMENT ME!
      * @param  title  DOCUMENT ME!
      */
-    private void startSingleRendererWorker(final MetaObject o, final String title) {
+    protected void startSingleRendererWorker(final MetaObject o, final String title) {
         startSingleRendererWorker(o, null, title);
     }
 
@@ -566,7 +498,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      * @param  node   DOCUMENT ME!
      * @param  title  DOCUMENT ME!
      */
-    private void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node, final String title) {
+    protected void startSingleRendererWorker(final MetaObject o, final DefaultMetaTreeNode node, final String title) {
         worker = new javax.swing.SwingWorker<SelfDisposingPanel, Void>() {
 
                 @Override
@@ -629,7 +561,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                         }
                     } catch (final InterruptedException iex) {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Worker canceled!", iex);                  // NOI18N
+                            LOG.debug("Worker canceled!");                       // NOI18N
                         }
                     } catch (final ExecutionException e) {
                         LOG.error("Error during Renderer creation", e);          // NOI18N
@@ -647,7 +579,7 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
      *
      * @param  n  DOCUMENT ME!
      */
-    private void performSetNode(final DefaultMetaTreeNode n) {
+    protected void performSetNode(final DefaultMetaTreeNode n) {
         final String descriptionURL = n.getDescription();
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
@@ -672,9 +604,8 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
             LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
         }
 
-        this.setPage(descriptionURL);
+        this.setPageFromURI(descriptionURL);
     }
-
     /**
      * Single Object.
      *
@@ -701,14 +632,14 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                 Status.ICON_DEACTIVATED,
                 Status.ICON_DEACTIVATED);
 
-            xHTMLPanel1.setDocumentFromString(welcomePage, "", new XhtmlNamespaceHandler()); // NOI18N
+            setPageFromContent(welcomePage);
         }
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void removeAndDisposeAllRendererFromPanel() {
+    protected void removeAndDisposeAllRendererFromPanel() {
         panRenderer.removeAll();
     }
 
@@ -754,6 +685,41 @@ public class DescriptionPane extends JPanel implements StatusChangeSupport {
                 paint(g2d);
                 // Turn double buffering back on
                 return (PAGE_EXISTS);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    class ShowCardRunnable implements Runnable {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private Container parent;
+        private String cardToShow;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ShowCardRunnable object.
+         *
+         * @param  parent      DOCUMENT ME!
+         * @param  cardToShow  DOCUMENT ME!
+         */
+        public ShowCardRunnable(final Container parent, final String cardToShow) {
+            this.parent = parent;
+            this.cardToShow = cardToShow;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void run() {
+            if (parent.getLayout() instanceof CardLayout) {
+                ((CardLayout)parent.getLayout()).show(parent, cardToShow);
             }
         }
     }

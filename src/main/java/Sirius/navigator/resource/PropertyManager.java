@@ -106,6 +106,7 @@ public final class PropertyManager {
     private java.util.Locale locale;
     private boolean editable;
     private boolean autoClose = false;
+    private boolean useFlyingSaucer = false;
 
     private transient String proxyURL;
     private transient String proxyUsername;
@@ -143,6 +144,8 @@ public final class PropertyManager {
         setLoadable(true);
         setSaveable(false);
         setConnectionInfoSaveable(false);
+
+        setUseFlyingSaucer(false);
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
         connectionInfo.setPassword("");                                   // NOI18N
@@ -753,6 +756,44 @@ public final class PropertyManager {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param  useFlyingSaucer  loadable DOCUMENT ME!
+     */
+    public void setUseFlyingSaucer(final String useFlyingSaucer) {
+        if ((useFlyingSaucer != null) && (useFlyingSaucer.equalsIgnoreCase(TRUE) || useFlyingSaucer.equals("1"))) {
+            this.setUseFlyingSaucer(true);
+        } else if ((useFlyingSaucer != null)
+                    && (useFlyingSaucer.equalsIgnoreCase(FALSE) || useFlyingSaucer.equals("0"))) {
+            this.setUseFlyingSaucer(false);
+        } else {
+            this.setUseFlyingSaucer(false);
+            logger.warn("useFlyingSaucer(): invalid property 'useFlyingSaucer': '" + useFlyingSaucer
+                        + "', setting default value to '"
+                        + this.useFlyingSaucer + "'");
+        }
+    }
+
+    /**
+     * Setter for property useFlyingSaucer.
+     *
+     * @param  useFlyingSaucer  loadable New value of property useFlyingSaucer.
+     */
+    public void setUseFlyingSaucer(final boolean useFlyingSaucer) {
+        this.useFlyingSaucer = useFlyingSaucer;
+        properties.setProperty("useFlyingSaucer", String.valueOf(this.useFlyingSaucer)); // NOI18N
+    }
+
+    /**
+     * Getter for property useFlyingSaucer.
+     *
+     * @return  Value of property useFlyingSaucer.
+     */
+    public boolean isUseFlyingSaucer() {
+        return this.useFlyingSaucer;
+    }
+
+    /**
      * .........................................................................
      *
      * @return  DOCUMENT ME!
@@ -830,6 +871,8 @@ public final class PropertyManager {
             this.connectionInfo.setUsergroupDomain(value);
         } else if (property.equalsIgnoreCase("username")) {               // NOI18N
             this.connectionInfo.setUsername(value);
+        } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
+            this.setUseFlyingSaucer(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
         } else if (property.equals("navigator.proxy.username")) {

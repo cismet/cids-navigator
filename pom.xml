@@ -58,6 +58,11 @@
             <artifactId>de.huxhorn.lilith.3rdparty.flyingsaucer.core-renderer</artifactId>
             <version>8RC1</version>
         </dependency>
+        <dependency>
+            <groupId>calpa.html</groupId>
+            <artifactId>calpahtml</artifactId>
+            <version>2_04</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -122,6 +127,13 @@
             </dependencies>
         </profile>
     </profiles>
+    <repositories>
+        <repository>
+            <id>unknown-jars-temp-repo</id>
+            <name>A temporary repository created by NetBeans for libraries and jars it could not identify. Please replace the dependencies in this repository with correct ones and delete this repository.</name>
+            <url>file:${project.basedir}/lib</url>
+        </repository>
+    </repositories>
 </project>
 
 
