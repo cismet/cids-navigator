@@ -536,7 +536,7 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
      * Calendar.FEBRUARY: return "Februar";                 case Calendar.MARCH: return "Maerz";  case Calendar.APRIL:
      * return "April";                 case Calendar.MAY: return "May";                 case Calendar.JUNE: return
      * "Juni";                 case Calendar.JULY: return "Juli";                 case Calendar.AUGUST: return "August";
-     *                case Calendar.SEPTEMBER: return "September"; case Calendar.OCTOBER: return "Oktober";    case
+     *               case Calendar.SEPTEMBER: return "September"; case Calendar.OCTOBER: return "Oktober";    case
      * Calendar.NOVEMBER: return "November";  case Calendar.DECEMBER: return "Dezember";                 case
      * Calendar.UNDECIMBER: return "Undecimber";
      *           default: return "Unknown";*/

@@ -401,7 +401,7 @@ public class MutableToolBar extends JToolBar // implements ActionListener
      * = new ErrorDialog(StringLoader.getString("STL@transferErrorMapToNav"), t.toString(), ErrorDialog.WARNING);
      * errorDialog.setLocationRelativeTo(model.navigator);     errorDialog.show(); } } else if
      * (e.getActionCommand().equals("toSIMS")) { try {     methodManager.callToSIMS(activeTree); } catch (Throwable t) {
-     *   if(NavigatorLogger.DEV)     {         NavigatorLogger.printMessage("Fehler bei der Verarbeitung der Abfrage
+     *  if(NavigatorLogger.DEV)     {         NavigatorLogger.printMessage("Fehler bei der Verarbeitung der Abfrage
      * Navigator->Karte");         t.printStackTrace();     }          ErrorDialog errorDialog = new
      * ErrorDialog(StringLoader.getString("STL@transferErrorNavToMap"), t.toString(), ErrorDialog.WARNING);
      * errorDialog.setLocationRelativeTo(model.navigator);     errorDialog.show(); }}*/

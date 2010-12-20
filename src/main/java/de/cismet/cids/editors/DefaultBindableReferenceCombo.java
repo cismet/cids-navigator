@@ -62,7 +62,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
                 @Override
                 public final int compare(final CidsBean o1, final CidsBean o2) {
-                    return (String.valueOf(o1)).compareToIgnoreCase(String.valueOf(o2)); // NOI18N
+                    final String s1 = (o1 == null) ? "" : o1.toString();
+                    final String s2 = (o2 == null) ? "" : o2.toString();
+                    return (s1).compareToIgnoreCase(s2); // NOI18N
                 }
             };
     }

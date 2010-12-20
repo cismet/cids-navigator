@@ -319,8 +319,8 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
      *
      * if(!this.searchProgressDialog.isCanceld())         { if(logger.isDebugEnabled())logger.debug("returning search
      * result nodes");             return this.searchProgressDialog.getResultNodes(); SearchDialog.this.dispose();  }
-     *      else if(logger.isDebugEnabled())         { logger.debug("search canceld, don't do anything"); } }     else
-     *   {         logger.warn("could not perform search: incomplete data");     } }
+     *  else if(logger.isDebugEnabled())         { logger.debug("search canceld, don't do anything"); } }     else  {
+     *      logger.warn("could not perform search: incomplete data");     } }
      * catch(FormValidationException fvexp) {     this.handleFormValidationException(fvexp); }  return null;}*/
 
     /**

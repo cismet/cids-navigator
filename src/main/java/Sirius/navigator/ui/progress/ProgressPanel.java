@@ -448,7 +448,7 @@ public class ProgressPanel extends javax.swing.JPanel {
      * JFrame("ProgressPanel"); jf.getContentPane().setLayout(new GridLayout()); jf.getContentPane().add(this);
      * jf.setLocationRelativeTo(null); jf.setUndecorated(true);  jf.pack(); jf.setVisible(true);
      * SwingUtilities.invokeLater(new Runnable()  {     public void run()     {         try         { invokeMethod(ttm);
-     *        }         catch(Exception exp)         {             exp.printStackTrace();         }   } }); }
+     *       }         catch(Exception exp)         {             exp.printStackTrace();         }   } }); }
      *
      * public static void main(String args[]) { org.apache.log4j.BasicConfigurator.configure();  ProgressPanel pp = new
      * ProgressPanel(); pp.test(); }
@@ -457,12 +457,12 @@ public class ProgressPanel extends javax.swing.JPanel {
      * progressObserver) {     super(progressObserver);    }  int i = 0; String message = "Fortschritt ";  protected
      * void doInvoke() {     progressObserver.setInterruptible(true);          while(i <
      * progressObserver.getMaxProgress())     {         try         {             if(progressObserver.isInterrupted())
-     *     {                 throw new InterruptedException();             } logger.info("warte 1000 ms");
+     *  {                 throw new InterruptedException();             } logger.info("warte 1000 ms");
      * Thread.currentThread().sleep(100); progressObserver.setProgress((i += 50), (message += "."));         }
      * catch(InterruptedException iexp)    {             this.interrupt();                          try             {
      * progressObserver.setMessage("unterbrochen");                 progressObserver.setInterrupted(true);             }
-     *           catch(InterruptedException irexp) {}                          i = progressObserver.getMaxProgress();
-     *     logger.warn("interrupted");             //iexp.printStackTrace();         }     }          try     {
+     *          catch(InterruptedException irexp) {}                          i = progressObserver.getMaxProgress();
+     * logger.warn("interrupted");             //iexp.printStackTrace();         }     }          try     {
      * progressObserver.setMessage("fertig"); progressObserver.setProgress(progressObserver.getMaxProgress());
      * progressObserver.setFinished(true);
      * }     catch(InterruptedException iexp) {}          }  }*/

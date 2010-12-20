@@ -940,7 +940,7 @@ public class PluginContext {
          * + "'");         if(theme.indexOf("@") != -1)         {             int classId =
          * Integer.parseInt(theme.substring(0, theme.indexOf("@")));             String domain =
          * theme.substring(theme.indexOf("@")+1, theme.length()); if(!classSelectionMap.containsKey(domain)) {
-         *       LsClassSelection lsClassSelection = new LsClassSelection(domain); lsClassSelection.addClassID(classId);
+         * LsClassSelection lsClassSelection = new LsClassSelection(domain); lsClassSelection.addClassID(classId);
          * classSelectionMap.put(domain, lsClassSelection);             }   else             {
          * ((LsClassSelection)classSelectionMap.get(domain)).addClassID(classId);             }     }     }
          * catch(Exception exp)     {         logger.error("could not create ls class selection from string '" + theme +

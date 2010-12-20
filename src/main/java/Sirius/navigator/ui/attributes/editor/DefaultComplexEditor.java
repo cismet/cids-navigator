@@ -386,7 +386,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
      * jf.setDefaultCloseOperation(jf.DO_NOTHING_ON_CLOSE);     jf.setLocationRelativeTo(null);
      *
      * final ArrayList value = new ArrayList();     value.add(new String("ein String"));     value.add(new Boolean(true));
-     *     value.add(new Integer(1));
+     *    value.add(new Integer(1));
      *
      * LinkedHashMap map = new LinkedHashMap();     map.put(String.class, new String("noch ein String"));
      * map.put(Boolean.class, new Boolean(false));     map.put(Integer.class, new Integer(2));     map.put(Double.class,
@@ -410,10 +410,10 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
      * propertyChange(PropertyChangeEvent e)         {             dce.logger.info(e.getPropertyName());
      * if(e.getPropertyName().equals(EditorActivationDelegate.ACTIVE_CHILD_EDITOR_TREE))             {       LinkedList
      * oldlist = (LinkedList)e.getOldValue();                 LinkedList newlist = (LinkedList)e.getNewValue();
-     *               dce.logger.info("propertyChange: old list");         Iterator iterator = oldlist.iterator();
-     *          while(iterator.hasNext())                 { dce.logger.info(iterator.next());                 }
-     * dce.logger.info("propertyChange: new list"); iterator = newlist.iterator(); while(iterator.hasNext())
-     *     { dce.logger.info(iterator.next());
+     *     dce.logger.info("propertyChange: old list");         Iterator iterator = oldlist.iterator();
+     * while(iterator.hasNext())                 { dce.logger.info(iterator.next());                 }
+     * dce.logger.info("propertyChange: new list"); iterator = newlist.iterator(); while(iterator.hasNext())    {
+     * dce.logger.info(iterator.next());
      * }             }         }     });*/
 
     /* jf.addWindowListener(new WindowAdapter()

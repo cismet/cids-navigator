@@ -459,10 +459,10 @@ public class SearchFormManager extends javax.swing.JPanel {
      * jf.pack();          JButton jb = new JButton("Suche");     jb.addActionListener(new ActionListener()     { public
      * void actionPerformed(ActionEvent e)         {             try             { java.util.List formData =
      * sfcm.getSelectedFormData();                   XMLEncoder xmlEncoder = new XMLEncoder(new BufferedOutputStream(new
-     * FileOutputStream("c:\\formData.xml"))); xmlEncoder.writeObject(formData);                 xmlEncoder.close();
-     *    } catch(FormValidationException fve)             {                 sfcm.logger.error(fve.getMessage(), fve);
-     *       JOptionPane.showMessageDialog(sfcm, fve.getMessage(), fve.getFormName(), JOptionPane.ERROR_MESSAGE);
-     *  }             catch(Exception exp)             { sfcm.logger.error(exp);             }
+     * FileOutputStream("c:\\formData.xml"))); xmlEncoder.writeObject(formData);                 xmlEncoder.close();   }
+     * catch(FormValidationException fve)             {                 sfcm.logger.error(fve.getMessage(), fve);
+     * JOptionPane.showMessageDialog(sfcm, fve.getMessage(), fve.getFormName(), JOptionPane.ERROR_MESSAGE); }
+     *  catch(Exception exp)             { sfcm.logger.error(exp);             }
      *       }     });          jf.getContentPane().add(jb, BorderLayout.NORTH);*/
 
     /*DefaultSearchFormContainer dsfc = new DefaultSearchFormContainer();

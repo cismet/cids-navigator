@@ -16,6 +16,7 @@ import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.MetaClass;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**

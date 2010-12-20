@@ -165,8 +165,8 @@ public class MethodManager {
      * objectArray = ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedObjects();  methodVector.clear();
      * String methodID = null;   if(evaluateMethods())  {      for(int i = 0; i < methodVector.size(); i++)      { char
      * type = ((Method)methodVector.elementAt(i)).getType();           if(type == 'O' || type == 'L' || type == 'M')
-     *          methodID = String.valueOf(((Method)methodVector.elementAt(i)).getID());      } if(methodID != null)
-     * {          callMethod(methodID);      }      else      {
+     *     methodID = String.valueOf(((Method)methodVector.elementAt(i)).getID());      } if(methodID != null) {
+     *  callMethod(methodID);      }      else      {
      * JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
      * StringLoader.getString("STL@methodNotAvailable"), StringLoader.getString("STL@navigatorToMap"),
      * JOptionPane.WARNING_MESSAGE);          //_TA_JOptionPane.showMessageDialog(model.navigator, "<html><p>Diese
@@ -399,9 +399,9 @@ public class MethodManager {
      * mtnArray[0].getAttributes(DefaultMetaTreeNode.ANY_NODES);      if(attrArray != null)     { String[]
      * tmpKoordinaten = new String[attrArray.length];         int j = 0;          for(int i = 0; i < attrArray.length;
      * i++)         {             //NavigatorLogger.printMessage("attrArray[i].getName():" + attrArray[i].getName());
-     *      if(attrArray[i].isCoordinate())             { //NavigatorLogger.printMessage("attrArray[i].getValue():" +
-     * attrArray[i].getValue()); tmpKoordinaten[j] = attrArray[i].getValue().toString();                 j++;   }
-     *  } if(j > 0)         {             koordinatenKatalog = new String[j]; System.arraycopy(tmpKoordinaten, 0,
+     *  if(attrArray[i].isCoordinate())             { //NavigatorLogger.printMessage("attrArray[i].getValue():" +
+     * attrArray[i].getValue()); tmpKoordinaten[j] = attrArray[i].getValue().toString();                 j++;   } } if(j
+     * > 0)         {             koordinatenKatalog = new String[j]; System.arraycopy(tmpKoordinaten, 0,
      * koordinatenKatalog, 0, j); //NavigatorLogger.printMessage("koordinatenKatalog[0].getValue():" +
      * koordinatenKatalog[0]);         }     } }*/
 
