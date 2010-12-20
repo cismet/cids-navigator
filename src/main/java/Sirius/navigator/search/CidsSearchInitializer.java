@@ -1,10 +1,10 @@
 /***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.search;
 
 import Sirius.navigator.actiontag.ActionTagProtected;
@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 import javax.swing.JDialog;
 import javax.swing.JMenu;
@@ -31,8 +32,8 @@ import javax.swing.JSeparator;
 import de.cismet.cids.tools.search.clientstuff.CidsDialogSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
+
 import de.cismet.tools.StaticDebuggingTools;
-import java.util.Iterator;
 
 /**
  * This class is responsibility is to lookup all relevant search components, to initialize and to plug them into the
@@ -44,6 +45,7 @@ import java.util.Iterator;
 public class CidsSearchInitializer {
 
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates a new CidsSearchInitializer object.
      */
@@ -52,13 +54,17 @@ public class CidsSearchInitializer {
     }
 
     //~ Methods ----------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      */
     private void initializeSearch() {
-        final Collection<? extends CidsToolbarSearch> toolbarSearches = Lookup.getDefault().lookupAll(CidsToolbarSearch.class);
-        final Collection<? extends CidsDialogSearch> dialogeSearches = Lookup.getDefault().lookupAll(CidsDialogSearch.class);
-        final Collection<? extends CidsWindowSearch> windowSearches = Lookup.getDefault().lookupAll(CidsWindowSearch.class);
+        final Collection<? extends CidsToolbarSearch> toolbarSearches = Lookup.getDefault()
+                    .lookupAll(CidsToolbarSearch.class);
+        final Collection<? extends CidsDialogSearch> dialogeSearches = Lookup.getDefault()
+                    .lookupAll(CidsDialogSearch.class);
+        final Collection<? extends CidsWindowSearch> windowSearches = Lookup.getDefault()
+                    .lookupAll(CidsWindowSearch.class);
         //
         final MutableMenuBar menuBar = ComponentRegistry.getRegistry().getMutableMenuBar();
         final MutableToolBar toolBar = ComponentRegistry.getRegistry().getMutableToolBar();
@@ -67,7 +73,7 @@ public class CidsSearchInitializer {
         if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
             if (!toolbarSearches.isEmpty()) {
                 final CidsSearchComboBar searchBar = new CidsSearchComboBar();
-                Iterator<? extends CidsToolbarSearch> itTS = toolbarSearches.iterator();
+                final Iterator<? extends CidsToolbarSearch> itTS = toolbarSearches.iterator();
                 while (itTS.hasNext()) {
                     if (!checkActionTag(itTS.next())) {
                         itTS.remove();
@@ -99,27 +105,35 @@ public class CidsSearchInitializer {
                     final MutableConstraints mutableConstraints = new MutableConstraints();
                     final String name = windowSearch.getName();
                     mutableConstraints.addAsComponent(windowSearch.getClass().getName(),
-                            windowSearch.getSearchWindowComponent(),
-                            name,
-                            name,
-                            windowSearch.getIcon(),
-                            MutableConstraints.P1,
-                            MutableConstraints.ANY_INDEX);
+                        windowSearch.getSearchWindowComponent(),
+                        name,
+                        name,
+                        windowSearch.getIcon(),
+                        MutableConstraints.P1,
+                        MutableConstraints.ANY_INDEX);
                     guiContainer.add(mutableConstraints);
                 }
             }
         }
     }
 
-    private boolean checkActionTag(Object toCheck) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   toCheck  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean checkActionTag(final Object toCheck) {
         if (toCheck instanceof ActionTagProtected) {
-            ActionTagProtected atp = (ActionTagProtected) toCheck;
+            final ActionTagProtected atp = (ActionTagProtected)toCheck;
             return atp.checkActionTag();
         }
         return true;
     }
 
     //~ Inner Classes ----------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *
@@ -128,9 +142,11 @@ public class CidsSearchInitializer {
     static final class DialogActionListener implements ActionListener {
 
         //~ Instance fields ----------------------------------------------------
+
         private final JDialog dialoge;
 
         //~ Constructors -------------------------------------------------------
+
         /**
          * Creates a new DialogActionListener object.
          *
@@ -141,12 +157,13 @@ public class CidsSearchInitializer {
         }
 
         //~ Methods ------------------------------------------------------------
+
         @Override
         public void actionPerformed(final ActionEvent e) {
             final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
             dialoge.setLocation((screenSize.width - dialoge.getWidth()) / 2,
-                    (screenSize.height - dialoge.getHeight())
-                    / 2);
+                (screenSize.height - dialoge.getHeight())
+                        / 2);
             dialoge.setVisible(true);
         }
     }
