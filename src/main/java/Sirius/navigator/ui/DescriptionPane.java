@@ -251,6 +251,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param  page  DOCUMENT ME!
      */
     public abstract void setPageFromContent(final String page);
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  page     DOCUMENT ME!
+     * @param  baseURL  DOCUMENT ME!
+     */
+    public abstract void setPageFromContent(final String page, final String baseURL);
 
     /**
      * Multiple Objects.
@@ -632,7 +639,9 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 Status.ICON_DEACTIVATED,
                 Status.ICON_DEACTIVATED);
 
-            setPageFromContent(welcomePage);
+            setPageFromContent(
+                welcomePage,
+                getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/welcome.html").toString());
         }
     }
 

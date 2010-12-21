@@ -70,7 +70,10 @@ public class DescriptionPaneFS extends DescriptionPane {
 
                 @Override
                 public void run() {
-                    xHTMLPanel1.setDocumentFromString(blankPage, "", new XhtmlNamespaceHandler());
+                    setPageFromContent(
+                        blankPage,
+                        getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml")
+                                    .toString());
                     removeAndDisposeAllRendererFromPanel();
                     repaint();
                 }
@@ -99,7 +102,9 @@ public class DescriptionPaneFS extends DescriptionPane {
 
         try {
             if ((page == null) || (page.trim().length() <= 0)) {
-                setPageFromContent(blankPage);
+                setPageFromContent(
+                    blankPage,
+                    getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml").toString());
             } else {
                 xHTMLPanel1.setDocument(page);
             }
@@ -126,23 +131,30 @@ public class DescriptionPaneFS extends DescriptionPane {
      *
      * @param  markup  renderer DOCUMENT ME!
      */
-
     @Override
     public void setPageFromContent(final String markup) {
+        setPageFromContent(markup, "");
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  markup   renderer DOCUMENT ME!
+     * @param  baseURL  DOCUMENT ME!
+     */
+    @Override
+    public void setPageFromContent(final String markup, final String baseURL) {
         try {
-            xHTMLPanel1.setDocumentFromString(markup, "", new XhtmlNamespaceHandler());
+            xHTMLPanel1.setDocumentFromString(markup, baseURL, new XhtmlNamespaceHandler());
         } catch (Exception e) {
             LOG.error(org.openide.util.NbBundle.getMessage(
                     DescriptionPaneFS.class,
-                    "DescriptionPaneFS.setPageFromContent(String).error",
-                    markup),
+                    "DescriptionPaneFS.setPageFromContent(String).error"),
                 e); // NOI18N
 
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
                     DescriptionPaneFS.class,
-                    "DescriptionPaneFS.setPageFromContent(String).error",
-                    markup), // NOI18N
+                    "DescriptionPaneFS.setPageFromContent(String).error"), // NOI18N
                 Status.MESSAGE_POSITION_3,
                 Status.ICON_DEACTIVATED,
                 Status.ICON_ACTIVATED);

@@ -33,8 +33,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringBufferInputStream;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,9 +56,12 @@ import de.cismet.security.exceptions.RequestFailedException;
  */
 public class WebAccessManagerUserAgent extends NaiveUserAgent {
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Static fields/initializers ---------------------------------------------
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            WebAccessManagerUserAgent.class);
+
+    //~ Instance fields --------------------------------------------------------
 
     private Pattern encodingPattern = Pattern.compile("(encoding|charset)=\"?(.*?)[;\" ]");
     private Pattern windowsEncodingPattern = Pattern.compile("windows-(\\d{4})");
@@ -67,20 +72,32 @@ public class WebAccessManagerUserAgent extends NaiveUserAgent {
     protected InputStream resolveAndOpenStream(final String uri) {
         InputStream result = null;
 
-        try {
-            result = WebAccessManager.getInstance().doRequest(new URI(uri).toURL());
-        } catch (URISyntaxException ex) {
-            log.error("Can't load from URI '" + uri + "' since its syntax is broken.", ex);
-        } catch (MissingArgumentException ex) {
-            log.error("Can't load from URI '" + uri + "' since it couldn't be converted to a URL.", ex);
-        } catch (AccessMethodIsNotSupportedException ex) {
-            log.error("Can't load from URI '" + uri + "' since the access method isn't supported.", ex);
-        } catch (RequestFailedException ex) {
-            log.error("The request to load URI '" + uri + "' failed.", ex);
-        } catch (NoHandlerForURLException ex) {
-            log.error("Can't load from URI '" + uri + "' since there is no matching handler.", ex);
-        } catch (Exception ex) {
-            log.error("Can't load from URI '" + uri + "' since an unexcpected exception occurred.", ex);
+        if ((uri != null) && (uri.trim().length() > 0)) {
+            if (uri.startsWith("jar") || uri.startsWith("file")) {
+                try {
+                    result = new URL(uri).openStream();
+                } catch (MalformedURLException ex) {
+                    LOG.error("Can't load from URI '" + uri + "' since the resulting URL is malformed.", ex); // NOI18N
+                } catch (IOException ex) {
+                    LOG.error("Can't load from URI '" + uri + "'.", ex);                                      // NOI18N
+                }
+            } else {
+                try {
+                    result = WebAccessManager.getInstance().doRequest(new URL(uri));
+                } catch (URISyntaxException ex) {
+                    LOG.error("Can't load from URI '" + uri + "' since its syntax is broken.", ex);           // NOI18N
+                } catch (MissingArgumentException ex) {
+                    LOG.error("Can't load from URI '" + uri + "' since it couldn't be converted to a URL.", ex); // NOI18N
+                } catch (AccessMethodIsNotSupportedException ex) {
+                    LOG.error("Can't load from URI '" + uri + "' since the access method isn't supported.", ex); // NOI18N
+                } catch (RequestFailedException ex) {
+                    LOG.error("The request to load URI '" + uri + "' failed.", ex);                           // NOI18N
+                } catch (NoHandlerForURLException ex) {
+                    LOG.error("Can't load from URI '" + uri + "' since there is no matching handler.", ex);   // NOI18N
+                } catch (Exception ex) {
+                    LOG.error("Can't load from URI '" + uri + "' since an unexcpected exception occurred.", ex); // NOI18N
+                }
+            }
         }
 
         return result;
@@ -127,15 +144,15 @@ public class WebAccessManagerUserAgent extends NaiveUserAgent {
                 }
             }
         } catch (IOException ex) {
-            log.warn("Couldn't determine encoding of resource: " + uri, ex);
+            LOG.warn("Couldn't determine encoding of resource: " + uri, ex); // NOI18N
         }
 
         matcher = windowsEncodingPattern.matcher(encoding);
         if (matcher.find()) {
-            encoding = "Cp" + matcher.group(1);
+            encoding = "Cp" + matcher.group(1);                                  // NOI18N
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Encoding resource '" + uri + "' in '" + encoding + "'.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Encoding resource '" + uri + "' in '" + encoding + "'."); // NOI18N
         }
 
         result = resolveAndOpenStream(uri);
@@ -153,7 +170,7 @@ public class WebAccessManagerUserAgent extends NaiveUserAgent {
             result = new StringBufferInputStream(new String(bout.toByteArray(), encoding));
             bout.close();
         } catch (IOException ex) {
-            log.error("Couldn't encode resource '" + uri + "' in '" + encoding + "'.", ex);
+            LOG.error("Couldn't encode resource '" + uri + "' in '" + encoding + "'.", ex); // NOI18N
         }
 
         return result;

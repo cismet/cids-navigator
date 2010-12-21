@@ -189,18 +189,28 @@ public class DescriptionPaneCalpa extends DescriptionPane {
         } catch (Exception e) {
             LOG.error(org.openide.util.NbBundle.getMessage(
                     DescriptionPaneCalpa.class,
-                    "DescriptionPaneCalpa.setPageFromContent(String).error",
-                    markup),
+                    "DescriptionPaneCalpa.setPageFromContent(String).error"),
                 e); // NOI18N
 
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
                     DescriptionPaneCalpa.class,
-                    "DescriptionPaneCalpa.setPageFromContent(String).error",
-                    markup), // NOI18N
+                    "DescriptionPaneCalpa.setPageFromContent(String).error"), // NOI18N
                 Status.MESSAGE_POSITION_3,
                 Status.ICON_DEACTIVATED,
                 Status.ICON_ACTIVATED);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  markup   renderer DOCUMENT ME!
+     * @param  baseURL  DOCUMENT ME!
+     */
+
+    @Override
+    public void setPageFromContent(final String markup, final String baseURL) {
+        setPageFromContent(markup);
     }
 }
