@@ -244,7 +244,11 @@ public class RootTreeNode extends DefaultMetaTreeNode {
                     explored &= children[i].isValid();
                     // if(logger.isDebugEnabled())logger.debug("[DefaultTreeNodeLoader] ClassNode Children added");
                 } else if (children[i] instanceof MetaObjectNode) {
-                    node.add(new ObjectTreeNode((MetaObjectNode)children[i]));
+                    final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode)children[i]);
+                    // toString aufrufen, damit das MetaObject nicht erst im CellRenderer des MetaCatalogueTree vom
+                    // Server geholt wird
+                    otn.toString();
+                    node.add(otn);
                     explored &= children[i].isValid();
                     // if(logger.isDebugEnabled())logger.debug("[DefaultTreeNodeLoader] ObjectNode Children added");
                 } else {

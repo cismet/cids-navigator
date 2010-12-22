@@ -503,12 +503,27 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 if (logger.isDebugEnabled()) {
                     logger.debug("treeExpanded() Expanding Node: " + selectedNode.toString() + " ok."); // NOI18N
                 }
-                if (useThread && (threadCount < (maxThreadCount - 1))) {
-                    selectedNode.add(waitNode);
-                    defaultTreeModel.nodeStructureChanged(selectedNode);
+                if (useThread) {
+                    new SwingWorker<Void, Void>() {
 
-                    treeExploreThread = new TreeExploreThread(selectedNode, defaultTreeModel);
-                    CismetThreadPool.execute(treeExploreThread);
+                            @Override
+                            protected Void doInBackground() throws Exception {
+                                selectedNode.add(waitNode);
+                                defaultTreeModel.nodeStructureChanged(selectedNode);
+
+                                // warten bis genug andere Threads durch sind
+                                while (threadCount >= maxThreadCount) {
+                                    Thread.sleep(100);
+                                }
+                                return null;
+                            }
+
+                            @Override
+                            protected void done() {
+                                treeExploreThread = new TreeExploreThread(selectedNode, defaultTreeModel);
+                                CismetThreadPool.execute(treeExploreThread);
+                            }
+                        }.execute();
                 } else {
                     try {
                         statusChangeSupport.fireStatusChange(
