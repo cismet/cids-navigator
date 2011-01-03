@@ -27,14 +27,13 @@ import org.xhtmlrenderer.resource.XMLResource;
 import org.xhtmlrenderer.swing.NaiveUserAgent;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringBufferInputStream;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -49,9 +48,8 @@ import de.cismet.security.exceptions.NoHandlerForURLException;
 import de.cismet.security.exceptions.RequestFailedException;
 
 /**
- * DOCUMENT ME!
+ * A subclass of Flying Saucer's NaiveUserAgent. It's intended to fetch all requested resources via WebAccessManager.
  *
- * @author   jweintraut
  * @version  $Revision$, $Date$
  */
 public class WebAccessManagerUserAgent extends NaiveUserAgent {
@@ -105,36 +103,37 @@ public class WebAccessManagerUserAgent extends NaiveUserAgent {
 
     @Override
     public XMLResource getXMLResource(final String uri) {
-        final InputStream inputStream = resolveAndOpenEncodedStream(uri);
-        final XMLResource xmlResource;
-        try {
-            xmlResource = XMLResource.load(inputStream);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    // swallow
-                }
+        final Reader reader = resolveAndOpenEncodedStream(uri);
+        final XMLResource xmlResource = XMLResource.load(reader);
+
+        if (reader != null) {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                LOG.warn("Couldn't close reader.", e);
             }
         }
+
         return xmlResource;
     }
 
     /**
-     * DOCUMENT ME!
+     * This method is intended to avoid broken umlauts when reading from text files. To do this it returns an
+     * InputStream for the given URI which uses the correct encoding. Since this method should be used to open streams
+     * on HTML/XHTML documents the correct encoding is determined by parsing the file referenced by the given URI. So
+     * one should be sure to call this method on text files.
      *
-     * @param   uri  DOCUMENT ME!
+     * @param   uri  The URI referencing the resource which is to be opened
      *
-     * @return  DOCUMENT ME!
+     * @return  A reader which allows reading from the resource using the correct encoding.
      */
-    private InputStream resolveAndOpenEncodedStream(final String uri) {
-        InputStream result = null;
+    private Reader resolveAndOpenEncodedStream(final String uri) {
+        Reader result = null;
         String encoding = null;
-
         final BufferedReader reader = new BufferedReader(new InputStreamReader(resolveAndOpenStream(uri)));
         Matcher matcher = null;
         String line = null;
+
         try {
             while ((line = reader.readLine()) != null) {
                 matcher = encodingPattern.matcher(line);
@@ -144,33 +143,22 @@ public class WebAccessManagerUserAgent extends NaiveUserAgent {
                 }
             }
         } catch (IOException ex) {
-            LOG.warn("Couldn't determine encoding of resource: " + uri, ex); // NOI18N
+            LOG.warn("Couldn't determine encoding of resource: '" + uri + "'.", ex); // NOI18N
         }
 
         matcher = windowsEncodingPattern.matcher(encoding);
         if (matcher.find()) {
-            encoding = "Cp" + matcher.group(1);                                  // NOI18N
+            encoding = "Cp" + matcher.group(1); // NOI18N
         }
+
         if (LOG.isDebugEnabled()) {
             LOG.debug("Encoding resource '" + uri + "' in '" + encoding + "'."); // NOI18N
         }
 
-        result = resolveAndOpenStream(uri);
-        final ByteArrayOutputStream bout = new ByteArrayOutputStream();
-        final byte[] buffer = new byte[1024];
-        int bufferUsed;
-
         try {
-            while ((bufferUsed = result.read(buffer)) > 0) {
-                bout.write(buffer, 0, bufferUsed);
-            }
-
-            result.close();
-
-            result = new StringBufferInputStream(new String(bout.toByteArray(), encoding));
-            bout.close();
-        } catch (IOException ex) {
-            LOG.error("Couldn't encode resource '" + uri + "' in '" + encoding + "'.", ex); // NOI18N
+            result = new InputStreamReader(resolveAndOpenStream(uri), encoding);
+        } catch (UnsupportedEncodingException ex) {
+            LOG.error("Error opening a reader on URI '" + uri + "' with unsupported encoding '" + encoding + "'.", ex);
         }
 
         return result;

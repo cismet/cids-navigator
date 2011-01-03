@@ -74,7 +74,7 @@ import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
 /**
  * DOCUMENT ME!
  *
- * @author   jweintraut
+ * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
 public abstract class DescriptionPane extends JPanel implements StatusChangeSupport {
@@ -92,6 +92,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected GridBagConstraints gridBagConstraints;
     protected String welcomePage;
     protected String blankPage;
+    protected String errorPage;
     protected boolean showsWaitScreen = false;
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     protected LinkStyleBreadCrumbGui breadCrumbGui;
@@ -140,6 +141,18 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             }
 
             this.blankPage = buffer.toString();
+
+            buffer = new StringBuffer();
+            string = null;
+            reader = new BufferedReader(new InputStreamReader(
+                        RESOURCE.getNavigatorResourceAsStream("doc/error.xhtml"), // NOI18N
+                        "UTF-8")); // NOI18N
+
+            while ((string = reader.readLine()) != null) {
+                buffer.append(string);
+            }
+
+            this.errorPage = buffer.toString();
         } catch (final IOException ioexp) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Couldn't read default pages.", ioexp); // NOI18N

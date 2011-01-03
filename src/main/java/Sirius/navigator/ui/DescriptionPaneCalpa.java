@@ -19,9 +19,8 @@ import java.awt.EventQueue;
 import java.net.URL;
 
 /**
- * DOCUMENT ME!
+ * An implementation of DescriptionPane which uses CalpaHTML to render HTML documents.
  *
- * @author   jweintraut
  * @version  $Revision$, $Date$
  */
 public class DescriptionPaneCalpa extends DescriptionPane {
@@ -103,7 +102,7 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Initialisation method of Matisse. Initializes visual components added by this subclass.
      */
     private void initComponents() {
         htmlPane = new CalHTMLPane(htmlPrefs, htmlObserver, "cismap");
@@ -114,7 +113,7 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Show a blank page.
      */
     @Override
     public void clear() {
@@ -136,9 +135,9 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Loads the given URI and renders the referenced document. Shows an error page if loading causes an error.
      *
-     * @param  page  DOCUMENT ME!
+     * @param  page  An URI to an HTML document.
      */
     @Override
     public void setPageFromURI(final String page) {
@@ -177,9 +176,9 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Renders the given markup.
      *
-     * @param  markup  renderer DOCUMENT ME!
+     * @param  markup  HTML markup to render.
      */
 
     @Override
@@ -203,10 +202,10 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Renders the given markup using baseURL as base for relative paths in the markup.
      *
-     * @param  markup   renderer DOCUMENT ME!
-     * @param  baseURL  DOCUMENT ME!
+     * @param  markup   HTML markup to render
+     * @param  baseURL  Base path for relative paths used in markup
      */
 
     @Override

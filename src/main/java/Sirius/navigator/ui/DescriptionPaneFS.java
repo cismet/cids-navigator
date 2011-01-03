@@ -10,13 +10,20 @@ package Sirius.navigator.ui;
 import Sirius.navigator.ui.status.Status;
 
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
+import org.xhtmlrenderer.swing.FSMouseListener;
+import org.xhtmlrenderer.swing.LinkListener;
 
 import java.awt.EventQueue;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
- * DOCUMENT ME!
+ * An implementation of DescriptionPane which uses Flying Saucer to render XHTML content. The retrieval of XHTML
+ * documents is done by WebAccessManager. Therefore FLying Saucer is configured to use WebAccessUserAgent which acts as
+ * an adapter for WebAccessManager. In order to read invalid XHTML documents or HTML documents, Tagsoup is used as
+ * XMLReader.
  *
- * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
 public class DescriptionPaneFS extends DescriptionPane {
@@ -39,8 +46,20 @@ public class DescriptionPaneFS extends DescriptionPane {
         super();
 
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
+        System.setProperty("xr.load.string-interning", "true");
 
         initComponents();
+
+        final List listeners = xHTMLPanel1.getMouseTrackingListeners();
+        final Iterator iter = listeners.iterator();
+        while (iter.hasNext()) {
+            final Object listener = iter.next();
+            if (listener instanceof LinkListener) {
+                xHTMLPanel1.removeMouseTrackingListener((FSMouseListener)listener);
+            }
+        }
+
+        xHTMLPanel1.addMouseTrackingListener(new NativeBrowserLinkListener());
 
         xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
 
@@ -50,7 +69,7 @@ public class DescriptionPaneFS extends DescriptionPane {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Initialisation method of Matisse. Initializes visual components added by this subclass.
      */
     private void initComponents() {
         fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
@@ -62,7 +81,7 @@ public class DescriptionPaneFS extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Show the blank page.
      */
     @Override
     public void clear() {
@@ -87,9 +106,9 @@ public class DescriptionPaneFS extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Loads the given URI and renders the referenced XHTML document. Shows an error page if loading causes an error.
      *
-     * @param  page  DOCUMENT ME!
+     * @param  page  An URI to an XHTML document.
      */
     @Override
     public void setPageFromURI(final String page) {
@@ -115,6 +134,10 @@ public class DescriptionPaneFS extends DescriptionPane {
                     page),
                 e); // NOI18N
 
+            setPageFromContent(
+                errorPage,
+                getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml").toString());
+
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
                     DescriptionPaneFS.class,
@@ -127,19 +150,20 @@ public class DescriptionPaneFS extends DescriptionPane {
     }
 
     /**
-     * DOCUMENT ME!
+     * Renders the given markup.
      *
-     * @param  markup  renderer DOCUMENT ME!
+     * @param  markup  XHTML markup to render.
      */
     @Override
     public void setPageFromContent(final String markup) {
         setPageFromContent(markup, "");
     }
+
     /**
-     * DOCUMENT ME!
+     * Renders the given markup using baseURL as base for relative paths in the markup.
      *
-     * @param  markup   renderer DOCUMENT ME!
-     * @param  baseURL  DOCUMENT ME!
+     * @param  markup   XHTML markup to render
+     * @param  baseURL  Base path for relative paths used in markup
      */
     @Override
     public void setPageFromContent(final String markup, final String baseURL) {
