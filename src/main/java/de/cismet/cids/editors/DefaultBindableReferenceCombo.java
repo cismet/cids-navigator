@@ -77,6 +77,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     private boolean fakeModel = false;
     private boolean nullable = false;
     private boolean onlyUsed = false;
+    private Comparator<CidsBean> comparator = beanToStringComparator;
     private String nullValueRepresentation = null;
 
     //~ Constructors -----------------------------------------------------------
@@ -114,6 +115,16 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * Creates a new DefaultBindableReferenceCombo object.
      *
+     * @param  comparator  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo(final Comparator<CidsBean> comparator) {
+        this();
+        this.comparator = comparator;
+    }
+
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     *
      * @param  mc  DOCUMENT ME!
      */
     public DefaultBindableReferenceCombo(final MetaClass mc) {
@@ -135,6 +146,25 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         init(mc);
     }
 
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     *
+     * @param  mc          DOCUMENT ME!
+     * @param  nullable    DOCUMENT ME!
+     * @param  onlyUsed    DOCUMENT ME!
+     * @param  comparator  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator) {
+        this();
+        this.nullable = nullable;
+        this.onlyUsed = onlyUsed;
+        this.comparator = comparator;
+        init(mc);
+    }
+
     //~ Methods ----------------------------------------------------------------
 
     /**
@@ -148,7 +178,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
                     @Override
                     protected DefaultComboBoxModel doInBackground() throws Exception {
-                        return getModelByMetaClass(mc, nullable, onlyUsed);
+                        return getModelByMetaClass(mc, nullable, onlyUsed, comparator);
                     }
 
                     @Override
@@ -286,9 +316,10 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
-     * @param   mc        DOCUMENT ME!
-     * @param   nullable  DOCUMENT ME!
-     * @param   onlyUsed  DOCUMENT ME!
+     * @param   mc          DOCUMENT ME!
+     * @param   nullable    DOCUMENT ME!
+     * @param   onlyUsed    DOCUMENT ME!
+     * @param   comparator  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
@@ -296,7 +327,8 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      */
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
             final boolean nullable,
-            final boolean onlyUsed) throws Exception {
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator) throws Exception {
         final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                 // NOI18N
         String orderBy = "";                                                                             // NOI18N
         if (ca != null) {
@@ -318,9 +350,26 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         }
         if (ca == null) {
             // Sorts the model using String comparison on the bean's toString()
-            Collections.sort(cbv, beanToStringComparator);
+            Collections.sort(cbv, comparator);
         }
         return new DefaultComboBoxModel(cbv.toArray());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc        DOCUMENT ME!
+     * @param   nullable  DOCUMENT ME!
+     * @param   onlyUsed  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed) throws Exception {
+        return getModelByMetaClass(mc, nullable, onlyUsed, beanToStringComparator);
     }
 
     /**
