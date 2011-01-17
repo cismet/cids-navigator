@@ -616,6 +616,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         @Override
         public MetaObject getMetaObject(final int objectID, final int classID, final String domain)
                 throws ConnectionException {
+            if (classAndMethodCache == null) {
+                initClassAndMethodCache();
+            }
             if (log.isDebugEnabled()) {
                 log.debug("getMetaObject(): objectID=" + objectID + ", classID=" + classID + ", domain=" + domain); // NOI18N
             }
