@@ -52,6 +52,9 @@ import javax.swing.JFileChooser;
 
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
+import de.cismet.cismap.commons.BoundingBox;
+import de.cismet.cismap.commons.interaction.CismapBroker;
+
 import de.cismet.security.Proxy;
 
 import de.cismet.tools.gui.TextAreaAppender;

@@ -427,7 +427,6 @@ public class CidsObjectEditorFactory {
 
                         final BindableJList lstArrayMaster = new BindableJList();
 
-                        // <editor-fold defaultstate="collapsed" desc="CellRenderer">
                         final DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
                         lstArrayMaster.setCellRenderer(new ListCellRenderer() {
 
@@ -464,7 +463,6 @@ public class CidsObjectEditorFactory {
                                     return l;
                                 }
                             });
-// </editor-fold>
 
                         final ArrayTitleAndControls arrayTitleAndControls = new ArrayTitleAndControls(
                                 lblDescription.getText(),
@@ -731,7 +729,6 @@ public class CidsObjectEditorFactory {
                                 elProperty,
                                 lstList);
 
-                // <editor-fold defaultstate="collapsed" desc="füge PC Listener hinzu um Änderungen an den variablen direkt in der Liste anzuzeigen">
                 try {
                     final ObservableList observableList = (ObservableList)ed.getCidsBean()
                                 .getProperty(keyWithoutBrackets);
@@ -763,8 +760,6 @@ public class CidsObjectEditorFactory {
                                 }
                             }
                         });
-
-                    // </editor-fold>
                 } catch (Exception e) {
                     if (log.isDebugEnabled()) {
                         log.debug("No observableList update for Array in Array in ...", e); // NOI18N
