@@ -6,7 +6,7 @@
     <parent>
         <groupId>de.cismet.cids</groupId>
         <artifactId>cids-parent</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.5</version>
     </parent>
 
     <groupId>de.cismet.cids.navigator</groupId>
@@ -47,11 +47,6 @@
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
             <version>6.1.16</version>
-        </dependency>
-        <dependency>
-            <groupId>com.explodingpixels</groupId>
-            <artifactId>mac_widgets</artifactId>
-            <version>0.9.5</version>
         </dependency>
         <dependency>
             <groupId>de.huxhorn.lilith</groupId>
