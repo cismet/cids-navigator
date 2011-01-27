@@ -14,7 +14,7 @@ import Sirius.server.newuser.UserException;
 
 import org.apache.log4j.Logger;
 
-import de.cismet.security.Proxy;
+import de.cismet.netutil.Proxy;
 
 /**
  * A singleton factory class that creates and manages connections.

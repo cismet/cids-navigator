@@ -52,11 +52,11 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
 
+import de.cismet.netutil.Proxy;
+
 import de.cismet.reconnector.Reconnector;
 
 import de.cismet.reconnector.rmi.RmiReconnector;
-
-import de.cismet.security.Proxy;
 
 /**
  * A singleton factory class that creates and manages connections.

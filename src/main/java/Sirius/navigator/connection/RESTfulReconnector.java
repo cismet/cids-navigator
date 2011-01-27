@@ -15,10 +15,10 @@ import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
+import de.cismet.netutil.Proxy;
+
 import de.cismet.reconnector.Reconnector;
 import de.cismet.reconnector.ReconnectorException;
-
-import de.cismet.security.Proxy;
 
 /**
  * DOCUMENT ME!

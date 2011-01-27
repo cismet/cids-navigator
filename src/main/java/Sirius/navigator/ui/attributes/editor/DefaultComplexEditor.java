@@ -14,14 +14,13 @@ package Sirius.navigator.ui.attributes.editor;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.GridBagConstraints;
 
-import java.beans.*;
+import java.util.Iterator;
+import java.util.Map;
 
-import java.util.*;
-
-import javax.swing.*;
+import javax.swing.JLabel;
 
 /**
  * Standardimplementierung eines komplexen Editors.
@@ -49,8 +48,6 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
         this.editorUIDelegate = new ComplexEditorUIDelegate();
         this.editorHandler = new ComplexEditorHandler();
         this.editorLocator = new DefaultEditorLocator();
-
-        // this.setProperty(PROPERTY_LOCALE, new Locale("de", "DE"));
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -193,9 +190,6 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
                 }
                 final DefaultSimpleEditor simpleEditor = new DefaultSimpleEditor();
 
-                // ((ComplexEditor)editor).setProperty(BasicEditor.PROPERTY_LOCALE,
-                // this.getProperty(BasicEditor.PROPERTY_LOCALE)); simpleEditor.setProperty(BasicEditor.PROPERTY_LOCALE,
-                // this.getProperty(BasicEditor.PROPERTY_LOCALE));
                 simpleEditor.setProperty(SimpleEditor.PROPERTY_COMLPEX_EDTIOR, editor.getClass());
                 simpleEditor.setProperty(SimpleEditor.PROPERTY_READ_ONLY, new Boolean(true));
 
@@ -219,8 +213,6 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
                 }
                 final Object complexEditorClass = ((SimpleEditor)editor).getProperty(
                         SimpleEditor.PROPERTY_COMLPEX_EDTIOR);
-                // ((SimpleEditor)editor).setProperty(BasicEditor.PROPERTY_LOCALE,
-                // this.getProperty(BasicEditor.PROPERTY_LOCALE));
 
                 if (complexEditorClass != null) {
                     if (logger.isDebugEnabled()) {
@@ -229,8 +221,6 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
 
                     try {
                         final ComplexEditor complexEditor = (ComplexEditor)((Class)complexEditorClass).newInstance();
-                        // complexEditor.setProperty(BasicEditor.PROPERTY_LOCALE,
-                        // this.getProperty(BasicEditor.PROPERTY_LOCALE));
 
                         editorComponent = ((SimpleEditor)editor).getEditorComponent(this, complexEditor, id, value);
                     } catch (Throwable t) {
@@ -350,6 +340,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
             logger.error("setValue(" + this + "): unexpected call to setValue(): this.value is null"); // NOI18N
         }
     }
+
     /**
      * XXX method not supported.
      *
@@ -360,6 +351,7 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
     public void addValue(final java.lang.Object key, final java.lang.Object value) {
         logger.error("addValue() method not supported"); // NOI18N
     }
+
     /**
      * XXX method not supported.
      *
@@ -377,84 +369,4 @@ public class DefaultComplexEditor extends AbstractComplexEditor {
     public boolean isEditable(final java.util.EventObject anEvent) {
         return !((Boolean)this.getProperty(PROPERTY_READ_ONLY)).booleanValue();
     }
-
-    /*public static void main(String args[])
-     * { try {     //org.apache.log4j.BasicConfigurator.configure();
-     * org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource("Sirius/navigator/resource/cfg/log4j.debug.properties"));
-     *
-     * final JFrame jf = new JFrame("DefaultComplexEditor");     jf.setSize(600,400);
-     * jf.setDefaultCloseOperation(jf.DO_NOTHING_ON_CLOSE);     jf.setLocationRelativeTo(null);
-     *
-     * final ArrayList value = new ArrayList();     value.add(new String("ein String"));     value.add(new Boolean(true));
-     *    value.add(new Integer(1));
-     *
-     * LinkedHashMap map = new LinkedHashMap();     map.put(String.class, new String("noch ein String"));
-     * map.put(Boolean.class, new Boolean(false));     map.put(Integer.class, new Integer(2));     map.put(Double.class,
-     * new Double(Double.MIN_VALUE));
-     *
-     * ArrayList value2 = new ArrayList();     value2.add(new String("ein String"));     value2.add(new Boolean(true));
-     * value2.add(new Integer(1));     value2.add(new Double(6.66));     value2.add(new String("ein zweiter String"));
-     *
-     * LinkedHashMap map2 = new LinkedHashMap();     map2.put(String.class, new String("und noch ein String"));
-     * map2.put(Boolean.class, new Boolean(false));     map2.put(Integer.class, new Integer(Integer.MAX_VALUE));
-     * map2.put(Float.class, new Float(4711));          LinkedHashMap map3 = new LinkedHashMap(); map3.put(Short.class,
-     * new Short(Short.MIN_VALUE));     map3.put(Character.class, new Character('X')); map3.put(Byte.class, new
-     * Byte(Byte.MAX_VALUE));     map3.put(String[].class, new String[]{"1", "2", "3"});
-     *
-     * value2.add(map2);     value2.add(map3);     map.put(java.util.List.class, value2);     value.add(map);
-     * value.add(new Double(6.66));
-     *
-     * final DefaultComplexEditor dce = new DefaultComplexEditor();
-     * jf.setContentPane((JComponent)dce.getEditorComponent(null, "DefaultComplexEditor", value));
-     * /*dce.addPropertyChangeListener(new PropertyChangeListener()     {         public void
-     * propertyChange(PropertyChangeEvent e)         {             dce.logger.info(e.getPropertyName());
-     * if(e.getPropertyName().equals(EditorActivationDelegate.ACTIVE_CHILD_EDITOR_TREE))             {       LinkedList
-     * oldlist = (LinkedList)e.getOldValue();                 LinkedList newlist = (LinkedList)e.getNewValue();
-     *     dce.logger.info("propertyChange: old list");         Iterator iterator = oldlist.iterator();
-     * while(iterator.hasNext())                 { dce.logger.info(iterator.next());                 }
-     * dce.logger.info("propertyChange: new list"); iterator = newlist.iterator(); while(iterator.hasNext())    {
-     * dce.logger.info(iterator.next());
-     * }             }         }     });*/
-
-    /* jf.addWindowListener(new WindowAdapter()
-     * {  public void windowClosing(WindowEvent e)   {      Iterator iterator =
-     * dce.getActiveChildEditorTree(null).iterator();      dce.logger.info("ActiveChildEditorTree");
-     * while(iterator.hasNext())      {          dce.logger.info(iterator.next());      }
-     *
-     * dce.stopEditing();      jf.dispose();
-     *
-     * dce.logger.info("...........................................");      if(dce.isValueChanged())      { iterator =
-     * ((Collection)dce.getValue()).iterator();          while(iterator.hasNext())          {
-     * dce.logger.info(iterator.next());          }      }      else      {          dce.logger.warn("value not
-     * changed");      }
-     *
-     * System.exit(0);  } });
-     *
-     * jf.setVisible(true);  Thread.currentThread().sleep(500);  LinkedList activeChildEditorTree = new LinkedList();
-     * activeChildEditorTree.add(dce.getId()); activeChildEditorTree.add(new Integer(3));
-     * activeChildEditorTree.add(java.util.List.class); activeChildEditorTree.add(new Integer(5));
-     * dce.logger.info("setActiveChildEditorTree: 5"); dce.setActiveChildEditorTree(activeChildEditorTree);
-     * Thread.currentThread().sleep(500);  activeChildEditorTree = new LinkedList();
-     * activeChildEditorTree.add(dce.getId()); activeChildEditorTree.add(new Integer(3));
-     * activeChildEditorTree.add(java.util.List.class); activeChildEditorTree.add(new Integer(6));
-     * dce.logger.info("setActiveChildEditorTree: 6"); dce.setActiveChildEditorTree(activeChildEditorTree);
-     * Thread.currentThread().sleep(500);  activeChildEditorTree = new LinkedList();
-     * activeChildEditorTree.add(dce.getId()); dce.logger.info("setActiveChildEditorTree: " + dce.getId());
-     * dce.setActiveChildEditorTree(activeChildEditorTree);  Thread.currentThread().sleep(500);  activeChildEditorTree =
-     * new LinkedList(); activeChildEditorTree.add(dce.getId()); activeChildEditorTree.add(new Integer(3));
-     * activeChildEditorTree.add(java.util.List.class); dce.logger.info("setActiveChildEditorTree:
-     * java.util.List.class"); dce.setActiveChildEditorTree(activeChildEditorTree);  Thread.currentThread().sleep(500);
-     * activeChildEditorTree = new LinkedList(); activeChildEditorTree.add(dce.getId());
-     * dce.logger.info("setActiveChildEditorTree: " + dce.getId()); dce.setActiveChildEditorTree(activeChildEditorTree);
-     * Thread.currentThread().sleep(500);  activeChildEditorTree = new LinkedList();
-     * activeChildEditorTree.add(dce.getId()); activeChildEditorTree.add(new Integer(3));
-     * activeChildEditorTree.add(java.util.List.class); activeChildEditorTree.add(new Integer(6));
-     * dce.logger.info("setActiveChildEditorTree: 6"); dce.setActiveChildEditorTree(activeChildEditorTree);
-     * /*dce.addEditorListener(new EditorAdapter() {  public void editingStopped(javax.swing.event.ChangeEvent e)  {
-     * if(dce.isValueChanged())      {          dce.logger.info(dce.getValue());      }  }    public void
-     * uiChanged(javax.swing.event.ChangeEvent e)  {      Iterator iterator =
-     * dce.getActiveChildEditorTree(null).iterator();      dce.logger.info("ActiveChildEditorTree:");
-     * while(iterator.hasNext())      {          dce.logger.info(iterator.next());      }  } });*/
-    /*}
-     * catch(Throwable t) { Logger.getLogger(DefaultComplexEditor.class).fatal(t.getMessage(), t); }}  */
 }

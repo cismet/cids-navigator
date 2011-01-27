@@ -47,9 +47,9 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
 
-import de.cismet.reconnector.Reconnector;
+import de.cismet.netutil.Proxy;
 
-import de.cismet.security.Proxy;
+import de.cismet.reconnector.Reconnector;
 
 /**
  * DOCUMENT ME!

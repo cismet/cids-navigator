@@ -32,9 +32,9 @@ import java.awt.BorderLayout;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
-import de.cismet.reconnector.DefaultReconnectorErrorPanel;
+import de.cismet.netutil.Proxy;
 
-import de.cismet.security.Proxy;
+import de.cismet.reconnector.DefaultReconnectorErrorPanel;
 
 /**
  * DOCUMENT ME!

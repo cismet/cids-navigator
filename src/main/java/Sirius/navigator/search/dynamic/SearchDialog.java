@@ -5,34 +5,43 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * SearchDialog.java
- *
- * Created on 18. November 2003, 10:18
- */
 package Sirius.navigator.search.dynamic;
 
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.*;
+import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
-import Sirius.navigator.resource.*;
+import Sirius.navigator.resource.PropertyManager;
+import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.dynamic.profile.QueryProfileManager;
-import Sirius.navigator.types.treenode.*;
-import Sirius.navigator.ui.status.*;
-import Sirius.navigator.ui.tree.*;
+import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
+import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
+import Sirius.navigator.ui.status.StatusChangeListener;
+import Sirius.navigator.ui.status.StatusChangeSupport;
+import Sirius.navigator.ui.tree.SearchSelectionTree;
 
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.*;
+import Sirius.server.search.SearchOption;
+import Sirius.server.search.SearchResult;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
 
-import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.tree.TreePath;
 
 /**
  * DOCUMENT ME!
@@ -40,7 +49,7 @@ import javax.swing.tree.*;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class SearchDialog extends javax.swing.JDialog implements StatusChangeSupport {
+public class SearchDialog extends JDialog implements StatusChangeSupport {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -75,15 +84,14 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
      * @param  classNodes        DOCUMENT ME!
      */
     public SearchDialog(final java.awt.Frame parent, final Map searchOptionsMap, final Node[] classNodes) {
-        // super(parent, ResourceManager.getManager().getString("search.dialog.title"), true);
-
         // nicht modal
         super(parent, org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.title"), false); // NOI18N
 
         this.logger = Logger.getLogger(this.getClass());
         if (logger.isInfoEnabled()) {
-            logger.info("creating SearchDialog with " + searchOptionsMap.size() + " queries & " + classNodes.length
-                        + " class nodes"); // NOI18N
+            logger.info("creating SearchDialog with " + searchOptionsMap.size() + " queries & "
+                        + classNodes.length // NOI18N
+                        + " class nodes");  // NOI18N
         }
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
         this.resources = ResourceManager.getManager();
@@ -95,15 +103,9 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         this.queryProfileManager.setSearchDialog(this);
         this.searchProgressDialog = new SearchProgressDialog(this, this.statusChangeSupport);
 
-        initComponents(); // ...................................................
-        // this.searchSelectionTree.setPreferredSize(new Dimension(195,320));
-        // this.searchFormManager.setPreferredSize(new Dimension(400,320));
-        // this.searchSelectionTree.setMaximumSize(new Dimension(195,320));
-        // this.splitPane.setLeftComponent(new JScrollPane(this.searchSelectionTree));
-        // this.splitPane.setRightComponent(this.searchFormManager);
+        initComponents();
         this.treeScrollPane.setViewportView(this.searchSelectionTree);
         this.managerPanel.add(this.searchFormManager, BorderLayout.CENTER);
-        // .....................................................................
 
         this.searchFormManager.addSearchFormSelectionListener(new SearchFormSelectionListener());
         this.searchSelectionTree.addMouseListener(new SearchSelectionListener());
@@ -113,18 +115,17 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         this.resetButton.addActionListener(actionListener);
         this.cancelButton.addActionListener(actionListener);
         this.manageProfilesItem.addActionListener(actionListener);
-        // this.loadProfileItem.addActionListener(actionListener);
 
         this.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // dynamic search form initialization
-        this.loadSearchForms(); // .............................................
+        this.loadSearchForms();
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * .........................................................................
+     * DOCUMENT ME!
      *
      * @param  formDataBean  DOCUMENT ME!
      */
@@ -311,18 +312,6 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         return null;
     }
 
-    /*public Node[] search(java.util.List classNodeKeys, java.util.List searchFormData, Component owner, boolean
-     * appendSearchResults) { try {     java.util.List searchOptions = this.fillSearchOptions(searchFormData);
-     * if(this.checkCompleteness(classNodeKeys, searchOptions))     {
-     * this.searchProgressDialog.setLocationRelativeTo(owner);         this.searchProgressDialog.show(classNodeKeys,
-     * searchOptions);
-     *
-     * if(!this.searchProgressDialog.isCanceld())         { if(logger.isDebugEnabled())logger.debug("returning search
-     * result nodes");             return this.searchProgressDialog.getResultNodes(); SearchDialog.this.dispose();  }
-     *  else if(logger.isDebugEnabled())         { logger.debug("search canceld, don't do anything"); } }     else  {
-     *      logger.warn("could not perform search: incomplete data");     } }
-     * catch(FormValidationException fvexp) {     this.handleFormValidationException(fvexp); }  return null;}*/
-
     /**
      * Copies data from form data beans into search options (query parameters).
      *
@@ -335,7 +324,6 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
      * @thows   FormValidationException by <code>getSelectedFormData()</code>
      */
     private java.util.List fillSearchOptions(final Collection searchFormData) throws FormValidationException {
-        // java.util.List searchFormData = this.getSelectedFormData();
         final LinkedList searchOptionsList = new LinkedList();
 
         if (logger.isDebugEnabled()) {
@@ -344,7 +332,6 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
         final Iterator iterator = searchFormData.iterator();
         while (iterator.hasNext()) {
             final FormDataBean dataBean = (FormDataBean)iterator.next();
-            // SearchOption searchOption = (SearchOption)this.searchOptionsMap.get();
 
             if (logger.isDebugEnabled()) {
                 logger.info("filling search option '" + dataBean.getQueryId() + "' with data"); // NOI18N
@@ -387,7 +374,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     }
 
     /**
-     * .........................................................................
+     * DOCUMENT ME!
      */
     private void loadSearchForms() {
         logger.info("loading dynamic search categories & forms ..."); // NOI18N
@@ -495,7 +482,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     }
 
     /**
-     * =========================================================================.
+     * DOCUMENT ME!
      *
      * @param  formValidationException  DOCUMENT ME!
      */
@@ -691,7 +678,7 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
     //~ Inner Classes ----------------------------------------------------------
 
     /**
-     * =========================================================================.
+     * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
@@ -712,8 +699,6 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                                 .getSelectedClassNodeKeys();
                     final java.util.List selectedSearchFormData = SearchDialog.this.searchFormManager
                                 .getSelectedFormData();
-                    // java.util.List selectedSearchOptions =
-                    // SearchDialog.this.searchFormManager.getSelectedSearchOptions();
 
                     SearchDialog.this.search(selectedClassNodeKeys, selectedSearchFormData);
                 } catch (FormValidationException fvexp) {
@@ -734,27 +719,12 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             {
                 // show profiles manager
                 SearchDialog.this.showQueryProfilesManager();
-
-                /*try
-                 * { SearchPropertiesBean searchPropertiesBean = SearchDialog.this.getSearchProperties();
-                 * if(SearchDialog.this.checkCompleteness(searchPropertiesBean.getClassNodeKeys(),
-                 * searchPropertiesBean.getFormDataBeans())) {     logger.info("saving search properties bean ...");
-                 * SearchDialog.this.queryProfileManager.setLocationRelativeTo(SearchDialog.this);
-                 * SearchDialog.this.queryProfileManager.show(); } } catch(FormValidationException fvexp) {
-                 * SearchDialog.this.handleFormValidationException(fvexp);}*/
-
             }
-            /*else if(e.getActionCommand().equals("loadProfile"))
-             * { SearchDialog.this.queryProfileManager.setLocationRelativeTo(SearchDialog.this);
-             * SearchDialog.this.queryProfileManager.show();  SearchPropertiesBean searchProperties =
-             * SearchDialog.this.queryProfileManager.getSearchPropertiesBean(); if(searchProperties != null) {
-             * SearchDialog.this.setSearchProperties(searchProperties); } else if(logger.isDebugEnabled()) {
-             * logger.debug("no search properties bean loaded"); }}*/
         }
     }
 
     /**
-     * .........................................................................
+     * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
@@ -772,11 +742,9 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                     if (logger.isDebugEnabled()) {
                         logger.debug("selecting theme (and all subthemes) '" + node + "'"); // NOI18N
                     }
-                    // logger.debug("node.isSelected(): " + node + "  " + node.isSelected());
                     node.selectSubtree(!node.isSelected());
-                    // logger.debug("node.isSelected(): " + node + "  " + node.isSelected());
                     if (logger.isDebugEnabled()) {
-                        logger.debug("setting search forms enabled"); // NOI18N
+                        logger.debug("setting search forms enabled");                       // NOI18N
                     }
                     final Collection userGroups = new LinkedList();
                     userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
@@ -784,9 +752,6 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
                     SearchDialog.this.searchFormManager.setSearchFormsEnabled(SearchDialog.this.searchSelectionTree
                                 .getSelectedClassNodeKeys(),
                         userGroups);
-
-                    // searchSelectionTree.revalidate();
-                    // searchSelectionTree.repaint();
 
                     SearchDialog.this.validate();
                     SearchDialog.this.repaint();
@@ -823,23 +788,4 @@ public class SearchDialog extends javax.swing.JDialog implements StatusChangeSup
             }
         }
     }
-
-    // #########################################################################
-
-    // =========================================================================
-
-    /**
-     * @param args the command line arguments
-     */
-    /*public static void main(String args[])
-     * {
-     * org.apache.log4j.PropertyConfigurator.configure(ClassLoader.getSystemResource("Sirius/Navigator/resource/cfg/log4j.debug.properties"));
-     * //PropertyManager.getManager().configure(System.getProperty("user.home") + "\\.navigator\\",
-     * "D:\\work\\web\\Sirius\\navigator\\plugins\\", "D:\\work\\web\\Sirius\\navigator\\search\\", null,
-     * System.getProperty("user.home") + "\\.navigator\\navigator.cfg");
-     * PropertyManager.getManager().configure(System.getProperty("user.home") + "\\.navigator\\navigator.cfg",
-     * System.getProperty("user.home") + "\\.navigator\\", "D:\\cids\\web\\navigator\\plugins\\",
-     * "D:\\cids\\web\\navigator\\search\\", null);  SearchDialog searchDialog = new SearchDialog(new
-     * javax.swing.JFrame(), new HashMap(), new Node[0]); searchDialog.pack(); searchDialog.setLocationRelativeTo(null);
-     * searchDialog .show(); System.exit(0);}*/
 }

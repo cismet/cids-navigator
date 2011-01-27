@@ -5,20 +5,17 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * ProgressDialog.java
- *
- * Created on 18. Juni 2003, 11:13
- */
 package Sirius.navigator.ui.progress;
 
-import Sirius.navigator.method.*;
+import Sirius.navigator.method.MultithreadedMethod;
 
-import java.awt.*;
+import java.awt.GridLayout;
 
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import javax.swing.*;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 /**
  * DOCUMENT ME!
@@ -81,8 +78,7 @@ public class ProgressDialog extends JDialog {
      *
      * @param  method  DOCUMENT ME!
      */
-    public void show(final MultithreadedMethod method) // throws Exception
-    {
+    public void show(final MultithreadedMethod method) {
         this.pack();
         this.progressPanel.invokeMethod(method);
         super.show();
@@ -94,8 +90,7 @@ public class ProgressDialog extends JDialog {
      * @param  method     DOCUMENT ME!
      * @param  arguments  DOCUMENT ME!
      */
-    public void show(final MultithreadedMethod method, final Object arguments) // throws Exception
-    {
+    public void show(final MultithreadedMethod method, final Object arguments) {
         this.pack();
         this.progressPanel.invokeMethod(method, arguments);
         super.show();
@@ -104,7 +99,7 @@ public class ProgressDialog extends JDialog {
     //~ Inner Classes ----------------------------------------------------------
 
     /**
-     * -------------------------------------------------------------------------.
+     * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
@@ -126,30 +121,4 @@ public class ProgressDialog extends JDialog {
             }
         }
     }
-
-    // TEST ====================================================================
-
-    /*private void test()
-     * { ProgressObserver po = new ProgressObserver(10000, 100); po.setInterruptible(false); po.setIndeterminate(true);
-     * final TimerTestMethod ttm = new TimerTestMethod(po);
-     *
-     * SwingUtilities.invokeLater(new Runnable()  {     public void run()     {         try         { show(ttm);         }
-     *       catch(Exception exp)         {             exp.printStackTrace();         }     } }); }
-     *
-     * public static void main(String args[]) { org.apache.log4j.BasicConfigurator.configure();  ProgressDialog pd = new
-     * ProgressDialog(); pd.test(); }
-     *
-     * private class TimerTestMethod extends MultithreadedMethod { private TimerTestMethod(ProgressObserver
-     * progressObserver) {     super(progressObserver);    }  int i = 0; String message = "Fortschritt ";  protected
-     * void doInvoke() {     progressObserver.setInterruptible(true);          while(i <
-     * progressObserver.getMaxProgress())     {         try         {             if(progressObserver.isInterrupted())
-     *  {                 throw new InterruptedException();             } //logger.info("warte 1000 ms");
-     * Thread.currentThread().sleep(100); progressObserver.setProgress((i += 50), (message += "."));         }
-     * catch(InterruptedException iexp)    {             this.interrupt();                          try             {
-     * progressObserver.setMessage("unterbrochen");                 progressObserver.setInterrupted(true);             }
-     *          catch(InterruptedException irexp) {}                          i = progressObserver.getMaxProgress();
-     * //logger.warn("interrupted");             //iexp.printStackTrace();         }     }          try     {
-     * progressObserver.setMessage("fertig"); progressObserver.setProgress(progressObserver.getMaxProgress());
-     * progressObserver.setFinished(true);
-     * }     catch(InterruptedException iexp) {}          }  }*/
 }

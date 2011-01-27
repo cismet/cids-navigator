@@ -12,7 +12,7 @@
  */
 package Sirius.navigator.types.iterator;
 
-import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 
 import org.apache.log4j.Logger;
 
@@ -24,9 +24,11 @@ import org.apache.log4j.Logger;
  */
 public class TreeNodeRestriction implements Restriction {
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Static fields/initializers ---------------------------------------------
 
-    private final Logger logger = Logger.getLogger(TreeNodeRestriction.class);
+    private static final transient Logger LOG = Logger.getLogger(TreeNodeRestriction.class);
+
+    //~ Instance fields --------------------------------------------------------
 
     private final long typeRestriction;
     private final String domainRestriction;
@@ -70,8 +72,8 @@ public class TreeNodeRestriction implements Restriction {
      * @return  DOCUMENT ME!
      */
     public DefaultMetaTreeNode applyRestriction(final Object object) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("apply restriction on '" + object.toString() + "' (" + object.getClass().getName() + ")"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("apply restriction on '" + object.toString() + "' (" + object.getClass().getName() + ")"); // NOI18N
         }
 
         final DefaultMetaTreeNode node;
@@ -98,9 +100,4 @@ public class TreeNodeRestriction implements Restriction {
     public long getTypeRestriction() {
         return this.typeRestriction;
     }
-
-    /*public final static void main(String args[])
-     * { TreeNodeRestriction treeNodeRestriction = new TreeNodeRestriction();
-     * System.out.println(treeNodeRestriction.typeRestriction); System.out.println(treeNodeRestriction.CLASS &
-     * treeNodeRestriction.typeRestriction);}*/
 }

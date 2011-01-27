@@ -35,7 +35,7 @@ import java.util.Vector;
 
 import javax.swing.Icon;
 
-import de.cismet.security.Proxy;
+import de.cismet.netutil.Proxy;
 
 /**
  * A singleton factory class that creates and manages connections.

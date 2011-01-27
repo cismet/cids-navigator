@@ -7,46 +7,38 @@
 ****************************************************/
 package Sirius.navigator.ui.dialog;
 
-/*******************************************************************************
- *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
- *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
- *
- * Programmers          :       Pascal
- *
- * Project                      :       WuNDA 2
- * Version                      :       1.0
- * Purpose                      :
- * Created                      :       01.03.2000
- * History                      :
- *
- *******************************************************************************/
-
-import Sirius.navigator.*;
 import Sirius.navigator.resource.ResourceManager;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
-import java.beans.*;
-
-import java.text.*;
+import java.text.SimpleDateFormat;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Vector;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.AbstractButton;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.JToggleButton;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 /**
  * Dies ist ein Dialog ueber den ein Datum ausgewaehlt werden kann.
@@ -54,8 +46,7 @@ import javax.swing.event.*;
  * @author   Pascal Dihe
  * @version  1.0 erstellt am 01.03.2000
  */
-public class DateChooser extends JDialog // implements ActionListener, ListSelectionListener, ItemListener
-{
+public class DateChooser extends JDialog {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -69,8 +60,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
     private int minYear = 1900;
     private Calendar calendar;
 
-    // private JList yearList;
-    // private SingleLineListBox yearList;
     private JSpinner yearList;
     private JComboBox monthComboBox;
     private JToggleButton dayButton;
@@ -82,8 +71,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
     private int selectedYear;
     private int selectedMonth;
     private int selectedDay;
-    private int lastScrollBarPosition = 0;
-    private int selectedIndex = 0;
     private GridBagConstraints constraints;
 
     private boolean accept = false;
@@ -156,36 +143,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
      * DOCUMENT ME!
      */
     protected void initDateChooser() {
-        /*days[0] = resources.getString("dialog.date.days.mo");
-         * days[1] = resources.getString("dialog.date.days.tu"); days[2] = resources.getString("dialog.date.days.we");
-         * days[3] = resources.getString("dialog.date.days.th"); days[4] = resources.getString("dialog.date.days.fr");
-         * days[5] = resources.getString("dialog.date.days.sa"); days[6] = resources.getString("dialog.date.days.su");
-         *
-         * months[0] = resources.getString("dialog.date.month.01"); months[1] =
-         * resources.getString("dialog.date.month.02"); months[2] = resources.getString("dialog.date.month.03");
-         * months[3] = resources.getString("dialog.date.month.04"); months[4] =
-         * resources.getString("dialog.date.month.05"); months[5] = resources.getString("dialog.date.month.06");
-         * months[6] = resources.getString("dialog.date.month.07"); months[7] =
-         * resources.getString("dialog.date.month.08"); months[8] = resources.getString("dialog.date.month.09");
-         * months[9] = resources.getString("dialog.date.month.10"); months[10] =
-         * resources.getString("dialog.date.month.11");months[11] = resources.getString("dialog.date.month.12");*/
-
-        // days[0] = this.getLocalizedDay(Calendar.MONDAY);
-        // days[1] = this.getLocalizedDay(Calendar.TUESDAY);
-        // days[2] = this.getLocalizedDay(Calendar.WEDNESDAY);
-        // days[3] = this.getLocalizedDay(Calendar.THURSDAY);
-        // days[4] = this.getLocalizedDay(Calendar.FRIDAY);
-        // days[5] = this.getLocalizedDay(Calendar.SATURDAY);
-        // days[6] = this.getLocalizedDay(Calendar.SUNDAY);
-
-        // days[0] = this.getLocalizedDay(Calendar.MONDAY);
-        // days[1] = this.getLocalizedDay(Calendar.TUESDAY);
-        // days[2] = this.getLocalizedDay(Calendar.WEDNESDAY);
-        // days[3] = this.getLocalizedDay(Calendar.THURSDAY);
-        // days[4] = this.getLocalizedDay(Calendar.FRIDAY);
-        // days[5] = this.getLocalizedDay(Calendar.SATURDAY);
-        // days[6] = this.getLocalizedDay(Calendar.SUNDAY);
-
         days[0] = this.getLocalizedDay(1);
         days[1] = this.getLocalizedDay(2);
         days[2] = this.getLocalizedDay(3);
@@ -224,17 +181,10 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
         controls.add(monthComboBox);
 
         // Jahre ==============================================================
-        /*Integer[] years = new Integer[(selectedYear - minYear + 1)];
-         * int j = 0; for (int i = years.length-1; i >= 0 ; i--) { years[i] = new Integer(minYear); minYear++;}*/
 
         yearList = new JSpinner(new SpinnerNumberModel(selectedYear, minYear, selectedYear, 1));
         ((JSpinner.NumberEditor)yearList.getEditor()).getFormat().setDecimalSeparatorAlwaysShown(false);
         yearList.addChangeListener(new YearSelectionListener());
-
-        // yearList = new SingleLineListBox(years);
-        // yearList = new SingleLineListBox(years, 10);
-        // yearList.addListSelectionListener(this);
-        // selectedIndex = yearList.getSelectedIndex();
 
         controls.add(Box.createHorizontalStrut(20));
         controls.add(yearList);
@@ -301,10 +251,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
 
         buttons.setBorder(new EmptyBorder(10, 20, 10, 20));
         this.getContentPane().add(buttons);
-        // Fuegt diese Komponente zum NavigatorLookAndFeelManager hinzu,
-        // damit das Look & Feel auch waehrend der Laufzeit geaendert
-        // werden kann.
-        // Sirius.navigator.NavigatorLookAndFeelManager.addComponent(this);
     }
 
     /**
@@ -333,12 +279,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
         constraints.weighty = 1.0;
         constraints.gridx = 0;
         constraints.gridy = 0;
-
-        /*      JLabel dayLabel;
-         *      for (int i = 0; i < days.length; i++)     {             dayLabel = new JLabel(days[i]);
-         * dayLabel.setPreferredSize(new Dimension(30,30));             dayLabel.setHorizontalAlignment(JLabel.CENTER);
-         *            dayPanel.add(dayLabel, constraints);             constraints.gridx++;     }*/
-
         constraints.weighty = 1.0;
         // die Woche beginnt hier mit Montag, gridx bei 0 deshalb -2.
         if ((cday.get(Calendar.DAY_OF_WEEK) - 2) == -1) {
@@ -396,24 +336,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
     }
 
     /**
-     * Liefert das ausgewaehlte Datum als String.
-     *
-     * @return  Das Datum als String (z.B. 8. April 1978)
-     */
-    /*public String getDateByName()
-     * { return this.toString();}*/
-
-    /**
-     * Liefert zu einem gegebenen Datum den entsprechenden String.
-     *
-     * @return  Das Datum als String (z.B. 8. April 1978)
-     */
-    /*public static String getDateByName(Date date)
-     * { Calendar tmpCalendar = Calendar.getInstance(); tmpCalendar.setTime(date); String ret =
-     * tmpCalendar.get(Calendar.DAY_OF_MONTH) + ". " + getMonthName(tmpCalendar) + " " + tmpCalendar.get(Calendar.YEAR);
-     * return ret;}*/
-
-    /**
      * Liefert das ausgewaehlte Datum als "Date".
      *
      * @return  Das ausgewaehlte Datum.
@@ -434,11 +356,8 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
         selectedMonth = calendar.get(Calendar.MONTH);
         selectedDay = calendar.get(Calendar.DAY_OF_MONTH);
         yearList.setValue(new Integer(selectedYear));
-        // yearList.setSelectedValue(selectedYear);
         monthComboBox.setSelectedIndex(selectedMonth);
         this.updateDays();
-
-        // NavigatorLogger.printMessage(calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     @Override
@@ -475,8 +394,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
         date = cal.getTime();
 
         final SimpleDateFormat dateF = new SimpleDateFormat("MMMM", resources.getLocale()); // NOI18N
-                                                                                            // dateF.applyLocalizedPattern("MMMM");
-                                                                                            //// complete monthname
 
         monthName = dateF.format(date);
         return monthName;
@@ -498,8 +415,6 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
         date = cal.getTime();
 
         final SimpleDateFormat dateF = new SimpleDateFormat("E", resources.getLocale()); // NOI18N
-                                                                                         // dateF.applyLocalizedPattern("DDDD");
-                                                                                         //// complete monthname
 
         dayName = dateF.format(date);
         return dayName;
@@ -525,37 +440,10 @@ public class DateChooser extends JDialog // implements ActionListener, ListSelec
     //~ Inner Classes ----------------------------------------------------------
 
     /**
-     * Liefert den aktuellen Monat als String.
-     *
-     * @return   Der Name des ausgewaehlten Monats.
+     * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
-    /*public static String getMonthName(Calendar calendar)
-     * { switch(calendar.get(Calendar.MONTH)) {                 /*_TA_case Calendar.JANUARY: return "Januar";     case
-     * Calendar.FEBRUARY: return "Februar";                 case Calendar.MARCH: return "Maerz";  case Calendar.APRIL:
-     * return "April";                 case Calendar.MAY: return "May";                 case Calendar.JUNE: return
-     * "Juni";                 case Calendar.JULY: return "Juli";                 case Calendar.AUGUST: return "August";
-     *               case Calendar.SEPTEMBER: return "September"; case Calendar.OCTOBER: return "Oktober";    case
-     * Calendar.NOVEMBER: return "November";  case Calendar.DECEMBER: return "Dezember";                 case
-     * Calendar.UNDECIMBER: return "Undecimber";
-     *           default: return "Unknown";*/
-    /*case Calendar.JANUARY: return                     (StringLoader.getStringArray("STL@monthsARRAY"))[0];
-     * case Calendar.FEBRUARY: return                      (StringLoader.getStringArray("STL@monthsARRAY"))[1]; case
-     * Calendar.MARCH: return                                 (StringLoader.getStringArray("STL@monthsARRAY"))[2]; case
-     * Calendar.APRIL: return                                 (StringLoader.getStringArray("STL@monthsARRAY"))[3]; case
-     * Calendar.MAY: return                                   (StringLoader.getStringArray("STL@monthsARRAY"))[4]; case
-     * Calendar.JUNE: return                                  (StringLoader.getStringArray("STL@monthsARRAY"))[5]; case
-     * Calendar.JULY: return                                  (StringLoader.getStringArray("STL@monthsARRAY"))[6]; case
-     * Calendar.AUGUST: return                                (StringLoader.getStringArray("STL@monthsARRAY"))[7]; case
-     * Calendar.SEPTEMBER: return             (StringLoader.getStringArray("STL@monthsARRAY"))[8]; case
-     * Calendar.OCTOBER: return                       (StringLoader.getStringArray("STL@monthsARRAY"))[9]; case
-     * Calendar.NOVEMBER: return                      (StringLoader.getStringArray("STL@monthsARRAY"))[10]; case
-     * Calendar.DECEMBER: return                      (StringLoader.getStringArray("STL@monthsARRAY"))[11]; case
-     * Calendar.UNDECIMBER: return            "Undecimber";   //Was ist das??? default: return "Unknown"; }}*/
-
-    // ACTION EVENTS ===========================================================
-
     private class YearSelectionListener implements ChangeListener {
 
         //~ Methods ------------------------------------------------------------

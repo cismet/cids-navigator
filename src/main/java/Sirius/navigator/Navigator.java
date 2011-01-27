@@ -77,7 +77,7 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
-import de.cismet.security.Proxy;
+import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;

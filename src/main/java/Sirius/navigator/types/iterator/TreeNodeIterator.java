@@ -7,11 +7,14 @@
 ****************************************************/
 package Sirius.navigator.types.iterator;
 
-import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 
 import org.apache.log4j.Logger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * DOCUMENT ME!
@@ -19,11 +22,13 @@ import java.util.*;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class TreeNodeIterator {
+public final class TreeNodeIterator {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger LOG = Logger.getLogger(TreeNodeIterator.class);
 
     //~ Instance fields --------------------------------------------------------
-
-    private final Logger logger = Logger.getLogger(TreeNodeIterator.class);
 
     private Iterator iterator;
     private final TreeNodeRestriction restriction;
@@ -94,13 +99,13 @@ public class TreeNodeIterator {
     public boolean init(final Collection collection) {
         this.nextElement = null;
         if ((collection != null) && (collection.size() > 0)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(" init collection size: " + collection.size()); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(" init collection size: " + collection.size()); // NOI18N
             }
             this.iterator = collection.iterator();
             return true;
         } else {
-            logger.warn("could not create iterator");                        // NOI18N
+            LOG.warn("could not create iterator");                        // NOI18N
             this.iterator = null;
             return false;
         }
@@ -114,15 +119,15 @@ public class TreeNodeIterator {
      * @return  DOCUMENT ME!
      */
     public boolean init(final Enumeration enumeration) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(" init enumeration hasMoreElements: " + enumeration.hasMoreElements()); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(" init enumeration hasMoreElements: " + enumeration.hasMoreElements()); // NOI18N
         }
         this.nextElement = null;
         if ((enumeration != null) && enumeration.hasMoreElements()) {
             this.iterator = new EnumerationIterator(enumeration);
             return true;
         } else {
-            logger.warn("could not create iterator");                                            // NOI18N
+            LOG.warn("could not create iterator");                                            // NOI18N
             this.iterator = null;
             return false;
         }
@@ -138,7 +143,7 @@ public class TreeNodeIterator {
             return true;
         } else if ((iterator != null) && iterator.hasNext()) {
             while (iterator.hasNext() && ((nextElement = restriction.applyRestriction(iterator.next())) == null)) {
-                ;
+                // noop
             }
 
             return (nextElement != null) ? true : false;
@@ -158,6 +163,7 @@ public class TreeNodeIterator {
         if (this.hasNext()) {
             final DefaultMetaTreeNode next = nextElement;
             nextElement = null;
+
             return next;
         } else {
             throw new NoSuchElementException();

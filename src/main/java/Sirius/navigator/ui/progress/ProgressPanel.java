@@ -5,23 +5,18 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * ProgressPanel.java
- *
- * Created on 11. Mai 2003, 19:00
- */
 package Sirius.navigator.ui.progress;
 
-import Sirius.navigator.method.*;
+import Sirius.navigator.method.MultithreadedMethod;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.event.SwingPropertyChangeSupport;
 
 /**
  * DOCUMENT ME!
@@ -40,7 +35,6 @@ public class ProgressPanel extends javax.swing.JPanel {
 
     private boolean locked = false;
 
-    /** Utility field used by bound properties. */
     private SwingPropertyChangeSupport propertyChangeSupport = new SwingPropertyChangeSupport(this);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -68,7 +62,7 @@ public class ProgressPanel extends javax.swing.JPanel {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * .........................................................................
+     * DOCUMENT ME!
      *
      * @param  method  DOCUMENT ME!
      */
@@ -85,16 +79,15 @@ public class ProgressPanel extends javax.swing.JPanel {
      *
      * @throws  RuntimeException  DOCUMENT ME!
      */
-    public void invokeMethod(final MultithreadedMethod method, final Object arguments) // throws Exception
+    public void invokeMethod(final MultithreadedMethod method, final Object arguments)              // throws Exception
     {
         if (logger.isDebugEnabled()) {
-            logger.debug("invoking new multithreaded method");                         // NOI18N
+            logger.debug("invoking new multithreaded method");                                      // NOI18N
         }
         if (!isLocked() && !progressTimer.isRunning() && (method.getProgressObserver() != null)) {
             method.invoke(arguments);
             this.start(method.getProgressObserver());
         } else {
-            // System.out.println("isLocked() '" + isLocked() + "'");
             logger.error("can not invoke method: progress panel is locked (" + isLocked()
                         + "), progress timer is running (" + progressTimer.isRunning()
                         + ") or progress observer is null (" + method.getProgressObserver() + ")"); // NOI18N
@@ -141,7 +134,6 @@ public class ProgressPanel extends javax.swing.JPanel {
             progressTimer.setDelay(progressObserver.getDelay());
             progressTimer.start();
         } else {
-            // System.out.println("isLocked() '" + isLocked() + "'");
             logger.error("can not start: progress panel is locked (" + isLocked() + ") or progress timer is running ("
                         + progressTimer.isRunning() + ")"); // NOI18N
         }
@@ -169,7 +161,7 @@ public class ProgressPanel extends javax.swing.JPanel {
     }
 
     /**
-     * .........................................................................
+     * DOCUMENT ME!
      */
     protected void interrupted() {
         logger.warn("progress observer interrupted"); // NOI18N
@@ -204,12 +196,11 @@ public class ProgressPanel extends javax.swing.JPanel {
 
         if (!progressObserver.isIndeterminate()) {
             progressBar.setValue(progressObserver.getProgress());
-            // progressBar.setString(progressObserver.getPercentage() + "%");
         }
     }
 
     /**
-     * .........................................................................
+     * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -330,18 +321,17 @@ public class ProgressPanel extends javax.swing.JPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cancelButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_cancelButtonActionPerformed
-    {                                                                              //GEN-HEADEREND:event_cancelButtonActionPerformed
+    private void cancelButtonActionPerformed(final java.awt.event.ActionEvent evt)                   //GEN-FIRST:event_cancelButtonActionPerformed
+    {                                                                                                //GEN-HEADEREND:event_cancelButtonActionPerformed
         if (logger.isDebugEnabled()) {
-            logger.debug("interrupting progess observer");                         // NOI18N
+            logger.debug("interrupting progess observer");                                           // NOI18N
         }
         if (isLocked()) {
             progressTimer.stop();
             progressLabel.setText(org.openide.util.NbBundle.getMessage(
                     ProgressPanel.class,
-                    "ProgressPanel.progressLabel.canceldText"));                   // NOI18N
+                    "ProgressPanel.progressLabel.canceldText"));                                     // NOI18N
             progressBar.setValue(progressObserver.getProgress());
-            // progressBar.setString(progressObserver.getPercentage() + "%");
             progressObserver.setInterrupted(true);
         } else {
             logger.warn("can not cancel: progress panel is not locked (" + isLocked()
@@ -437,33 +427,4 @@ public class ProgressPanel extends javax.swing.JPanel {
             }
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Testing Stuff
-    // -------------------------------------------------------------------------
-
-    /*private void test()
-     * { ProgressObserver po = new ProgressObserver(10000, 100); po.setInterruptible(false); po.setIndeterminate(true);
-     * final TimerTestMethod ttm = new TimerTestMethod(po);  this.setBorder(new EtchedBorder());  JFrame jf = new
-     * JFrame("ProgressPanel"); jf.getContentPane().setLayout(new GridLayout()); jf.getContentPane().add(this);
-     * jf.setLocationRelativeTo(null); jf.setUndecorated(true);  jf.pack(); jf.setVisible(true);
-     * SwingUtilities.invokeLater(new Runnable()  {     public void run()     {         try         { invokeMethod(ttm);
-     *       }         catch(Exception exp)         {             exp.printStackTrace();         }   } }); }
-     *
-     * public static void main(String args[]) { org.apache.log4j.BasicConfigurator.configure();  ProgressPanel pp = new
-     * ProgressPanel(); pp.test(); }
-     *
-     * private class TimerTestMethod extends MultithreadedMethod { private TimerTestMethod(ProgressObserver
-     * progressObserver) {     super(progressObserver);    }  int i = 0; String message = "Fortschritt ";  protected
-     * void doInvoke() {     progressObserver.setInterruptible(true);          while(i <
-     * progressObserver.getMaxProgress())     {         try         {             if(progressObserver.isInterrupted())
-     *  {                 throw new InterruptedException();             } logger.info("warte 1000 ms");
-     * Thread.currentThread().sleep(100); progressObserver.setProgress((i += 50), (message += "."));         }
-     * catch(InterruptedException iexp)    {             this.interrupt();                          try             {
-     * progressObserver.setMessage("unterbrochen");                 progressObserver.setInterrupted(true);             }
-     *          catch(InterruptedException irexp) {}                          i = progressObserver.getMaxProgress();
-     * logger.warn("interrupted");             //iexp.printStackTrace();         }     }          try     {
-     * progressObserver.setMessage("fertig"); progressObserver.setProgress(progressObserver.getMaxProgress());
-     * progressObserver.setFinished(true);
-     * }     catch(InterruptedException iexp) {}          }  }*/
 }

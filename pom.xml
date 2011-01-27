@@ -58,6 +58,12 @@
             <artifactId>calpahtml</artifactId>
             <version>2_04</version>
         </dependency>
+        <dependency>
+            <groupId>de.cismet.cids.navigator</groupId>
+            <artifactId>default-forms</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -72,20 +78,8 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>de.cismet.cids.navigator</groupId>
-                    <artifactId>default-forms</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                    <scope>runtime</scope>
-                </dependency>
-                <dependency>
                     <groupId>de.cismet.cismap</groupId>
                     <artifactId>cismap-plugin</artifactId>
-                    <version>1.0-SNAPSHOT</version>
-                    <scope>runtime</scope>
-                </dependency>
-                <dependency>
-                    <groupId>de.cismet.cids.custom.sudplan</groupId>
-                    <artifactId>cids-custom-sudplan</artifactId>
                     <version>1.0-SNAPSHOT</version>
                     <scope>runtime</scope>
                 </dependency>
