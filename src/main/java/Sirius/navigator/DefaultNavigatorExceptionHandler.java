@@ -25,6 +25,15 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
 
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {
+        if (error instanceof ThreadDeath) {
+            final StackTraceElement[] ste = error.getStackTrace();
+            if ((ste.length == 2) && ste[1].getClassName().startsWith("calpa.html.Cal") && LOG.isDebugEnabled()) {
+                // downgrade calpa html's thread death to debug
+                LOG.debug("uncaught exception in thread: " + thread, error);
+
+                return;
+            }
+        }
         LOG.error("uncaught exception in thread: " + thread, error);
     }
 }
