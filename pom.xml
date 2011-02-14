@@ -49,11 +49,6 @@
             <version>6.1.16</version>
         </dependency>
         <dependency>
-            <groupId>de.huxhorn.lilith</groupId>
-            <artifactId>de.huxhorn.lilith.3rdparty.flyingsaucer.core-renderer</artifactId>
-            <version>8RC1</version>
-        </dependency>
-        <dependency>
             <groupId>calpa.html</groupId>
             <artifactId>calpahtml</artifactId>
             <version>2_04</version>

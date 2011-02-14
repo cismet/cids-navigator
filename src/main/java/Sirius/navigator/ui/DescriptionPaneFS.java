@@ -11,20 +11,16 @@ import Sirius.navigator.ui.status.Status;
 
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 
-import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import java.io.IOException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+
+import de.cismet.tools.gui.xhtmlrenderer.WebAccessManagerUserAgent;
 
 /**
  * An implementation of DescriptionPane which uses Flying Saucer to render XHTML content. The retrieval of XHTML
@@ -44,8 +40,8 @@ public class DescriptionPaneFS extends DescriptionPane {
 
     private org.xhtmlrenderer.simple.FSScrollPane fSScrollPane1;
     private org.xhtmlrenderer.simple.XHTMLPanel xHTMLPanel1;
-    private Desktop desktop;
     private JPopupMenu popupMenu;
+    private JMenuItem mnuItem_openInExternalBrowser;
     private String pageURI;
 
     //~ Constructors -----------------------------------------------------------
@@ -59,17 +55,6 @@ public class DescriptionPaneFS extends DescriptionPane {
         System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
         System.setProperty("xr.load.string-interning", "true");
         System.setProperty("xr.use.listeners", "true");
-
-        if (Desktop.isDesktopSupported()) {
-            desktop = Desktop.getDesktop();
-        } else {
-            LOG.warn("Could not retrieve a desktop object to open links in user's browser.");
-        }
-
-        if ((desktop != null) && !desktop.isSupported(Desktop.Action.BROWSE)) {
-            desktop = null;
-            LOG.warn("Current desktop object doesn't allow browsing.");
-        }
 
         initComponents();
 
@@ -89,32 +74,28 @@ public class DescriptionPaneFS extends DescriptionPane {
         popupMenu = new JPopupMenu();
 
         fSScrollPane1.setViewportView(xHTMLPanel1);
-        final JMenuItem item = new JMenuItem(org.openide.util.NbBundle.getMessage(
+        mnuItem_openInExternalBrowser = new JMenuItem(org.openide.util.NbBundle.getMessage(
                     DescriptionPaneFS.class,
                     "DescriptionPaneFS.btn_openInSystemBrowser.text"),
                 new javax.swing.ImageIcon(
                     getClass().getResource("/Sirius/navigator/ui/world.png")));
-        item.addActionListener(new ActionListener() {
+        mnuItem_openInExternalBrowser.addActionListener(new ActionListener() {
 
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     if ((pageURI != null) && (pageURI.trim().length() > 0)) {
                         try {
-                            desktop.browse(new URI(pageURI));
-                        } catch (IOException ex) {
-                            LOG.error("Referenced URI '" + pageURI + "' couldn't be read.", ex);
-                        } catch (URISyntaxException ex) {
-                            LOG.error("Syntax of URI '" + pageURI + "' is broken.", ex);
+                            de.cismet.tools.BrowserLauncher.openURL(pageURI);
+                        } catch (Exception ex) {
+                            LOG.error("Couldn't open URI '" + pageURI + "' in external browser.", ex);
                         }
                     }
                 }
             });
-        popupMenu.add(item);
+        popupMenu.add(mnuItem_openInExternalBrowser);
 
-        if (desktop != null) {
-            xHTMLPanel1.add(popupMenu);
-            xHTMLPanel1.addMouseListener(new PopupListener(popupMenu));
-        }
+        xHTMLPanel1.add(popupMenu);
+        xHTMLPanel1.addMouseListener(new PopupListener(popupMenu));
 
         add(fSScrollPane1, "html");
     }
@@ -166,6 +147,7 @@ public class DescriptionPaneFS extends DescriptionPane {
             } else {
                 pageURI = page;
                 xHTMLPanel1.setDocument(page);
+                mnuItem_openInExternalBrowser.setEnabled(true);
             }
         } catch (Exception e) {
             LOG.error(org.openide.util.NbBundle.getMessage(
@@ -224,6 +206,7 @@ public class DescriptionPaneFS extends DescriptionPane {
                 Status.ICON_DEACTIVATED,
                 Status.ICON_ACTIVATED);
         }
+        mnuItem_openInExternalBrowser.setEnabled(false);
     }
 
     //~ Inner Classes ----------------------------------------------------------
