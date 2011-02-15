@@ -64,8 +64,12 @@ public class RmiReconnector<R extends Remote> extends Reconnector<R> {
         if (exception instanceof ConnectException) {
             return new ReconnectorException(CONNECTION_LOST);
         } else if (exception instanceof ServerException) {
-            if (exception.getCause().getClass().equals(RemoteException.class)) {
-                return new ReconnectorException(CONNECTION_LOST);
+            final Throwable serverCause = exception.getCause();
+            if (serverCause instanceof RemoteException) {
+                final Throwable remoteCause = (RemoteException)exception.getCause();
+                if (remoteCause.getCause() instanceof NullPointerException) {
+                    return new ReconnectorException(CONNECTION_LOST);
+                }
             }
         }
         if (LOG.isDebugEnabled()) {
