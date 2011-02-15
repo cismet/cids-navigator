@@ -87,16 +87,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
      */
     private void showError(final Component component) {
         panError.add(component, BorderLayout.CENTER);
-        if (component instanceof Container) {
-            final Container cont = (Container)component;
-            cont.addComponentListener(new ComponentAdapter() {
-
-                    @Override
-                    public void componentResized(final ComponentEvent ce) {
-                        reconnector.pack();
-                    }
-                });
-        }
+        reconnector.pack();
         setConnecting(false);
     }
 
@@ -164,15 +155,10 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panProgress.add(labTryingToConnect, gridBagConstraints);
 
         panRetry.setMinimumSize(new java.awt.Dimension(200, 53));
-        panRetry.setLayout(new java.awt.GridBagLayout());
+        panRetry.setLayout(new java.awt.BorderLayout());
 
         panError.setLayout(new java.awt.BorderLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
-        panRetry.add(panError, gridBagConstraints);
+        panRetry.add(panError, java.awt.BorderLayout.CENTER);
 
         btnExit.setText("Beenden");
         btnExit.setPreferredSize(new java.awt.Dimension(125, 29));
@@ -196,10 +182,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
             });
         jPanel1.add(btnRetry);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        panRetry.add(jPanel1, gridBagConstraints);
+        panRetry.add(jPanel1, java.awt.BorderLayout.SOUTH);
 
         setLayout(new java.awt.BorderLayout());
     } // </editor-fold>//GEN-END:initComponents

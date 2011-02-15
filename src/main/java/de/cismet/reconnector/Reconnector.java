@@ -8,6 +8,7 @@
 package de.cismet.reconnector;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -164,7 +165,8 @@ public abstract class Reconnector<S extends Object> {
             }
 
             reconnectorDialog = new JDialog(dialogOwner, "Verbindungsfehler", true);
-            reconnectorDialog.setResizable(false);
+            reconnectorDialog.setResizable(true);
+            reconnectorDialog.setMinimumSize(new Dimension(400, 150));
             reconnectorDialog.setContentPane(createReconnectorPanel());
             reconnectorDialog.addWindowListener(new WindowAdapter() {
 

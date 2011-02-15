@@ -28,6 +28,9 @@
  */
 package de.cismet.reconnector;
 
+import java.awt.Container;
+
+import javax.swing.JDialog;
 import javax.swing.UIManager;
 
 /**
@@ -45,7 +48,7 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToggleButton btnDetails;
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labIco;
     private javax.swing.JLabel labMessage;
     private javax.swing.JScrollPane panDetails;
@@ -90,6 +93,7 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
         labMessage = new javax.swing.JLabel();
         panDetails = new javax.swing.JScrollPane();
         txtDetails = new javax.swing.JTextArea();
+        jPanel1 = new javax.swing.JPanel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -101,6 +105,7 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 0);
         add(labIco, gridBagConstraints);
 
         btnDetails.setText(org.openide.util.NbBundle.getMessage(
@@ -115,9 +120,10 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 3;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 0, 6);
         add(btnDetails, gridBagConstraints);
 
         labMessage.setText(org.openide.util.NbBundle.getMessage(
@@ -127,7 +133,7 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 6);
         add(labMessage, gridBagConstraints);
 
         txtDetails.setColumns(20);
@@ -138,10 +144,17 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 3;
+        gridBagConstraints.gridwidth = 4;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         add(panDetails, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(6, 6, 0, 6);
+        add(jPanel1, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -152,5 +165,14 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
     private void btnDetailsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnDetailsActionPerformed
         panDetails.setVisible(btnDetails.isSelected());
         revalidate();
+        Container parent = this;
+        Container child = this;
+        while (parent.getParent() != null) {
+            child = parent;
+            parent = parent.getParent();
+        }
+        if (child instanceof JDialog) {
+            ((JDialog)child).pack();
+        }
     }                                                                              //GEN-LAST:event_btnDetailsActionPerformed
 }

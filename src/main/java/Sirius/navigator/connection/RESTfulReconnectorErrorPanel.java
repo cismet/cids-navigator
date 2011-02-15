@@ -154,6 +154,8 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
         add(errPanWrapper, gridBagConstraints);
 
         tbProxy.setText(org.openide.util.NbBundle.getMessage(
