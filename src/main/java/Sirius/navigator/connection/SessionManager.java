@@ -69,6 +69,17 @@ public final class SessionManager {
 
     /**
      * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static boolean isInitialized() {
+        synchronized (blocker) {
+            return manager != null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
      */
     public static void destroy() {
         if (logger.isInfoEnabled()) {
