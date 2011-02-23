@@ -15,6 +15,7 @@ import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 
+import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
@@ -551,29 +552,46 @@ public class SearchResultsTree extends MetaCatalogueTree {
             logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
-        final ArrayList tempList = new ArrayList(Arrays.asList(resultNodes));
-        // java.util.List tempList = Arrays.asList(resultNodes);
-        final TreeNodeIterator iterator = new TreeNodeIterator(selectedNodes);
 
-        while (iterator.hasNext()) {
-            /*for (int i = 0; i < tempList.size(); i++)
-             * { if (i < tempList.size() && iterator.next().equalsNode((Node)tempList.get(i))) { tempList.remove(i);
-             * deleted = true; }}*/
-
-            // logger.debug("iterator" + iterator);
-            final DefaultMetaTreeNode nextNode = iterator.next();
-            final Iterator nodeIterator = tempList.iterator();
-            while (nodeIterator.hasNext()) {
-                // logger.debug("nodeIterator" + nodeIterator);
-                if (nextNode.equalsNode(((Node)nodeIterator.next()))) {
-                    nodeIterator.remove();
-                    deleted = true;
+        if ((selectedNodes != null) && (selectedNodes.size() > 0)) {
+            final ArrayList all = new ArrayList(Arrays.asList(resultNodes));
+            final ArrayList selectionTreeNodes = new ArrayList(selectedNodes);
+            final ArrayList selection = new ArrayList();
+            for (final Object selO : selectionTreeNodes) {
+                if (selO instanceof DefaultMetaTreeNode) {
+                    final Node n = ((DefaultMetaTreeNode)selO).getNode();
+                    selection.add(n);
                 }
             }
-        }
 
-        if (deleted) {
-            this.setResultNodes((Node[])tempList.toArray(new Node[tempList.size()]), false);
+            
+            for (final Object allO : all) {
+                for (final Object selO : selection) {
+                    if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
+                        final MetaObjectNode allMON = (MetaObjectNode)allO;
+                        final MetaObjectNode selMON = (MetaObjectNode)selO;
+                        if ((allMON.getObjectId() == selMON.getObjectId())
+                                    && (allMON.getClassId() == selMON.getClassId())
+                                    && (allMON.getId() == selMON.getId())
+                                    && allMON.getDomain().equals(selMON.getDomain())
+                                    && allMON.toString().equals(selMON.toString())) {
+                            all.remove(allO);
+                            deleted = true;
+                        }
+                    } else if ((allO instanceof MetaNode) && (selO instanceof MetaNode)) {
+                        final MetaNode allMN = (MetaNode)allO;
+                        final MetaNode selMN = (MetaNode)selO;
+                        if ((allMN.getId() == selMN.getId())
+                                    && allMN.getDomain().equals(selMN.getDomain())
+                                    && allMN.toString().equals(selMN.toString())) {
+                            all.remove(allO);
+                            deleted = true;
+                        }
+                    }
+                }
+            }
+
+            this.setResultNodes((Node[])all.toArray(new Node[all.size()]), false);
         }
 
         return deleted;

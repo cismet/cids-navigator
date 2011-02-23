@@ -37,10 +37,8 @@ public class SearchResultsTreePanel extends JPanel {
     //~ Instance fields --------------------------------------------------------
 
     private final Logger logger;
-
     private final SearchResultsTree searchResultsTree;
     private final JToolBar toolBar;
-
     private JButton browseBackButton;
     private JButton browseForwardButton;
     private JButton removeButton;
