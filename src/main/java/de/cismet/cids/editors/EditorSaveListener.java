@@ -34,9 +34,9 @@ public interface EditorSaveListener {
     /**
      * DOCUMENT ME!
      *
-     * @param  status  DOCUMENT ME!
+     * @param  event  status DOCUMENT ME!
      */
-    void editorClosed(EditorSaveStatus status);
+    void editorClosed(EditorClosedEvent event);
     /**
      * DOCUMENT ME!
      *

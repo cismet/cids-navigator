@@ -281,7 +281,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             JXErrorPane.showDialog(this, ei);
         }
         if (currentBeanStore instanceof EditorSaveListener) {
-            ((EditorSaveListener)currentBeanStore).editorClosed(EditorSaveListener.EditorSaveStatus.CANCELED);
+            ((EditorSaveListener)currentBeanStore).editorClosed(new EditorClosedEvent(
+                    EditorSaveListener.EditorSaveStatus.CANCELED));
         }
     }
 
@@ -364,12 +365,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 }
             }
             if (editorSaveListener != null) {
-                editorSaveListener.editorClosed(EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS);
+                editorSaveListener.editorClosed(new EditorClosedEvent(
+                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
+                        savedInstance));
             }
             refreshTree();
         } catch (Exception ex) {
             if (editorSaveListener != null) {
-                editorSaveListener.editorClosed(EditorSaveListener.EditorSaveStatus.SAVE_ERROR);
+                editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
             }
             log.error("Error while saving", ex);                                   // NOI18N
             final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
