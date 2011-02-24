@@ -123,8 +123,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
-                                    && (!(backupObject.propertyEquals(editorObject))
-                                        || editorObject.getBean().hasArtificialChangeFlag()))
+                                    && (editorObject.getBean().hasArtificialChangeFlag()
+                                        || !(backupObject.propertyEquals(editorObject))))
                                 || (backupObject == null)) {
                         if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
                             final int answer = JOptionPane.showConfirmDialog(
@@ -159,8 +159,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 @Override
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
-                                    && (!(backupObject.propertyEquals(editorObject))
-                                        || editorObject.getBean().hasArtificialChangeFlag()))
+                                    && (editorObject.getBean().hasArtificialChangeFlag()
+                                        || !(backupObject.propertyEquals(editorObject))))
                                 || (backupObject == null)) {
                         final int answer = JOptionPane.showConfirmDialog(
                                 NavigatorAttributeEditorGui.this,
@@ -400,7 +400,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     @Override
     public void setTreeNode(final Object node) {
         if ((treeNode != null) && (editorObject != null) && (backupObject != null)) {
-            if (!editorObject.propertyEquals(backupObject) || editorObject.getBean().hasArtificialChangeFlag()) {
+            if (editorObject.getBean().hasArtificialChangeFlag() || !editorObject.propertyEquals(backupObject)) {
                 final int answer = JOptionPane.showConfirmDialog(
                         NavigatorAttributeEditorGui.this,
                         org.openide.util.NbBundle.getMessage(
