@@ -50,6 +50,21 @@ public class CataloguePopupMenuListener extends MouseAdapter {
      * { if(e.isPopupTrigger()) { popupMenu.show((Component)e.getSource(), e.getX(), e.getY()); }}*/
     @Override
     public void mousePressed(final MouseEvent e) {
+        processPopupTrigger(e);
+    }
+
+    @Override
+    public void mouseReleased(final MouseEvent e) {
+        processPopupTrigger(e);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
+    private void processPopupTrigger(final MouseEvent e) {
+        // windows uses the mouseReleased event for popup menus and Linux uses the mousePressed event.
         if (e.isPopupTrigger()) {
             try {
                 if (e.getSource() instanceof JTree) {
@@ -63,13 +78,6 @@ public class CataloguePopupMenuListener extends MouseAdapter {
                 log.error("Error during on-the-fly-selection", ex);
             }
 
-            popupMenu.show((Component)e.getSource(), e.getX(), e.getY());
-        }
-    }
-
-    @Override
-    public void mouseReleased(final MouseEvent e) {
-        if (e.isPopupTrigger()) {
             popupMenu.show((Component)e.getSource(), e.getX(), e.getY());
         }
     }
