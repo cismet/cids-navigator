@@ -55,6 +55,7 @@ import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.*;
 
 import java.io.BufferedInputStream;
@@ -85,6 +86,7 @@ import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.tools.gui.slideabletree.SlideableSubTree;
 
 /**
  * DOCUMENT ME!
@@ -272,7 +274,6 @@ public class Navigator extends JFrame {
                 SwingUtilities.invokeLater(new Runnable() {
 
                         // UGLY WINNING
-
                         @Override
                         public void run() {
                             ((LayoutedContainer)container).loadLayout(
@@ -337,6 +338,7 @@ public class Navigator extends JFrame {
             logger.error("Error while checking/creating Navigator home directory", ex); // NOI18N
         }
     }
+
     /**
      * #########################################################################
      *
@@ -466,20 +468,34 @@ public class Navigator extends JFrame {
                 rootTreeNode,
                 PropertyManager.getManager().isEditable(),
                 true,
-                propertyManager.getMaxConnections());
+                propertyManager.getMaxConnections(),
+                true);
         // dnd
+
         final MetaTreeNodeDnDHandler dndHandler = new MetaTreeNodeDnDHandler(metaCatalogueTree);
 
         final MutableConstraints catalogueTreeConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
-        catalogueTreeConstraints.addAsScrollPane(
-            ComponentRegistry.CATALOGUE_TREE,
-            metaCatalogueTree,
-            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.name"),    // NOI18N
-            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.tooltip"), // NOI18N
-            resourceManager.getIcon("catalogue_tree_icon.gif"),                                           // NOI18N
-            MutableConstraints.P1,
-            MutableConstraints.ANY_INDEX,
-            true);
+        if (metaCatalogueTree.isUseSlideableTreeView()) {
+            catalogueTreeConstraints.addAsComponent(
+                ComponentRegistry.CATALOGUE_TREE,
+                metaCatalogueTree,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.name"),    // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.tooltip"), // NOI18N
+                resourceManager.getIcon("catalogue_tree_icon.gif"),                                           // NOI18N
+                MutableConstraints.P1,
+                MutableConstraints.ANY_INDEX);
+        } else {
+            catalogueTreeConstraints.addAsScrollPane(
+                ComponentRegistry.CATALOGUE_TREE,
+                metaCatalogueTree,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.name"),    // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.tooltip"), // NOI18N
+                resourceManager.getIcon("catalogue_tree_icon.gif"),                                           // NOI18N
+                MutableConstraints.P1,
+                MutableConstraints.ANY_INDEX,
+                true);
+        }
+
         container.add(catalogueTreeConstraints);
 
         // SearchResultsTree ---------------------------------------------------
@@ -794,6 +810,11 @@ public class Navigator extends JFrame {
         return false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  visible  DOCUMENT ME!
+     */
     @Override
     public void setVisible(final boolean visible) {
         if (logger.isInfoEnabled()) {
@@ -855,6 +876,9 @@ public class Navigator extends JFrame {
     }
     // .........................................................................
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void dispose() {
         if (logger.isInfoEnabled()) {
@@ -935,6 +959,7 @@ public class Navigator extends JFrame {
             this.setExtendedState(MAXIMIZED_BOTH);
         }
     }
+
     /**
      * private class ShutdownListener extends Thread { public void run() { if(Navigator.this.isDisposed()) {
      * Navigator.this.logger.info("ShutdownListener: clean shutdown initiated"); } else {

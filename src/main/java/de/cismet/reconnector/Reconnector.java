@@ -238,6 +238,17 @@ public abstract class Reconnector<S extends Object> {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   proxy   DOCUMENT ME!
+         * @param   method  DOCUMENT ME!
+         * @param   args    DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         *
+         * @throws  Throwable  DOCUMENT ME!
+         */
         @Override
         public Object invoke(final Object proxy, final Method method, final Object[] args) throws Throwable {
             Throwable targetEx = null;
@@ -280,6 +291,14 @@ public abstract class Reconnector<S extends Object> {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         *
+         * @throws  Exception           DOCUMENT ME!
+         * @throws  ExecutionException  DOCUMENT ME!
+         */
         @Override
         protected S doInBackground() throws Exception {
             dispatcher.connecting();
@@ -294,6 +313,9 @@ public abstract class Reconnector<S extends Object> {
             }
         }
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         protected void done() {
             // abgebrochen ?
@@ -328,6 +350,9 @@ public abstract class Reconnector<S extends Object> {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void connecting() {
             for (final ReconnectorListener listener : listeners) {
@@ -343,6 +368,11 @@ public abstract class Reconnector<S extends Object> {
             }
         }
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  event  DOCUMENT ME!
+         */
         @Override
         public void connectionFailed(final ReconnectorEvent event) {
             for (final ReconnectorListener listener : listeners) {
@@ -358,6 +388,9 @@ public abstract class Reconnector<S extends Object> {
             }
         }
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void connectionCompleted() {
             for (final ReconnectorListener listener : listeners) {
@@ -371,6 +404,9 @@ public abstract class Reconnector<S extends Object> {
             }
         }
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void connectionCanceled() {
             for (final ReconnectorListener listener : listeners) {

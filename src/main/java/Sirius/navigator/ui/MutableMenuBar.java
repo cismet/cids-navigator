@@ -481,6 +481,11 @@ public class MutableMenuBar extends JMenuBar {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void actionPerformed(final ActionEvent e) {
             if (e.getActionCommand().equals("search.search")) {              // NOI18N
@@ -644,6 +649,11 @@ public class MutableMenuBar extends JMenuBar {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  component  DOCUMENT ME!
+         */
         @Override
         protected void doAdd(final EmbeddedComponent component) {
             if (component instanceof EmbeddedMenu) {
@@ -654,6 +664,11 @@ public class MutableMenuBar extends JMenuBar {
             }
         }
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  component  DOCUMENT ME!
+         */
         @Override
         protected void doRemove(final EmbeddedComponent component) {
             if (component instanceof EmbeddedMenu) {
@@ -687,6 +702,11 @@ public class MutableMenuBar extends JMenuBar {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  visible  DOCUMENT ME!
+         */
         @Override
         public void setVisible(final boolean visible) {
             if (this.isVisible() != visible) {
@@ -702,6 +722,9 @@ public class MutableMenuBar extends JMenuBar {
             }
         }
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         protected void addComponents() {
             Component component = MutableMenuBar.this.getComponent(MutableMenuBar.this.getComponentCount() - 1);
@@ -733,6 +756,9 @@ public class MutableMenuBar extends JMenuBar {
                 });
         }
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         protected void removeComponents() {
             Component component = null;

@@ -31,9 +31,6 @@ package Sirius.navigator.ui.tree;
  *
  *******************************************************************************/
 import Sirius.navigator.method.*;
-import Sirius.navigator.plugin.PluginRegistry;
-import Sirius.navigator.plugin.interfaces.PluginSupport;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.status.*;
 
@@ -42,6 +39,9 @@ import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
 
+import org.jdesktop.swingx.JXTaskPaneContainer;
+
+import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -59,12 +59,16 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.tools.CismetThreadPool;
 
+import de.cismet.tools.gui.slideabletree.SlideableSubTree;
+import de.cismet.tools.gui.slideabletree.SlideableTree;
+import de.cismet.tools.gui.slideabletree.SubTreePane;
+
 /**
  * DefaultMetaTree ist ein Navigationsbaum.
  *
  * @version  $Revision$, $Date$
  */
-public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll {
+public class MetaCatalogueTree extends SlideableTree implements StatusChangeSupport, Autoscroll {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -94,21 +98,24 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * @param  editable      DOCUMENT ME!
      */
     public MetaCatalogueTree(final RootTreeNode rootTreeNode, final boolean editable) {
-        this(rootTreeNode, editable, true, 3);
+        this(rootTreeNode, editable, true, 3, false);
     }
 
     /**
      * Creates a new MetaCatalogueTree object.
      *
-     * @param  rootTreeNode    DOCUMENT ME!
-     * @param  editable        DOCUMENT ME!
-     * @param  useThread       DOCUMENT ME!
-     * @param  maxThreadCount  DOCUMENT ME!
+     * @param  rootTreeNode          DOCUMENT ME!
+     * @param  editable              DOCUMENT ME!
+     * @param  useThread             DOCUMENT ME!
+     * @param  maxThreadCount        DOCUMENT ME!
+     * @param  useSlideableTreeView  DOCUMENT ME!
      */
     public MetaCatalogueTree(final RootTreeNode rootTreeNode,
             final boolean editable,
             final boolean useThread,
-            final int maxThreadCount) {
+            final int maxThreadCount,
+            final boolean useSlideableTreeView) {
+        super(useSlideableTreeView);
         this.setModel(new DefaultTreeModel(rootTreeNode, true));
         this.setEditable(editable);
         this.useThread = useThread;
@@ -363,6 +370,37 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   x  DOCUMENT ME!
+     * @param   y  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    @Override
+    public TreePath getPathForLocation(final int x, final int y) {
+        // x und y sind auf Koordinaten der SubTreePane bezogen
+        if (this.isUseSlideableTreeView()) {
+            final JXTaskPaneContainer container = this.getContainer();
+            // returns top most child container or null
+            final Component c = container.getComponentAt(x, y);
+            if (c instanceof SubTreePane) {
+                final SubTreePane pane = (SubTreePane)c;
+                final SlideableSubTree t = this.getTrees().get(this.getPanes().indexOf(pane));
+                final int newX = x - pane.getX();
+                final int newY = y - pane.getY() - pane.getTitleBarHeight();
+                return this.getPathforOriginalTree(t.getPathForLocation(newX, newY));
+            }
+        }
+        return super.getPathForLocation(x, y);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  p  DOCUMENT ME!
+     */
     @Override
     public void autoscroll(final Point p) {
         int realrow = getRowForLocation(p.x, p.y);
@@ -372,6 +410,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         scrollRowToVisible(realrow);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Insets getAutoscrollInsets() {
         final Rectangle outer = getBounds();
@@ -402,16 +445,33 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         return (DefaultMetaTreeNode[])selectedNodes.toArray(new DefaultMetaTreeNode[selectedNodes.size()]);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
     @Override
     public void addStatusChangeListener(final StatusChangeListener listener) {
         this.statusChangeSupport.addStatusChangeListener(listener);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
     @Override
     public void removeStatusChangeListener(final StatusChangeListener listener) {
         this.statusChangeSupport.removeStatusChangeListener(listener);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   treePath  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public boolean isPathEditable(final TreePath treePath) {
         return false;
@@ -446,6 +506,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void valueChanged(final TreeSelectionEvent e) {
             final DefaultMetaTreeNode selectedNode = (DefaultMetaTreeNode)(e.getPath().getLastPathComponent());
@@ -487,10 +552,20 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void treeCollapsed(final TreeExpansionEvent e) {
         }
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void treeExpanded(final TreeExpansionEvent e) {
             final DefaultMetaTreeNode selectedNode = (DefaultMetaTreeNode)(e.getPath().getLastPathComponent());
@@ -620,6 +695,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void run() {
             try {
@@ -735,6 +813,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void run() {
             try {
@@ -804,6 +885,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
             //~ Methods --------------------------------------------------------
 
+            /**
+             * DOCUMENT ME!
+             */
             @Override
             public void run() {
                 MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);

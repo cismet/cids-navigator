@@ -1160,18 +1160,45 @@ class ObservableListListenerAdapter implements ObservableListListener {
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  list   DOCUMENT ME!
+     * @param  index  DOCUMENT ME!
+     */
     @Override
     public void listElementPropertyChanged(final ObservableList list, final int index) {
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  list        DOCUMENT ME!
+     * @param  index       DOCUMENT ME!
+     * @param  oldElement  DOCUMENT ME!
+     */
     @Override
     public void listElementReplaced(final ObservableList list, final int index, final Object oldElement) {
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  list    DOCUMENT ME!
+     * @param  index   DOCUMENT ME!
+     * @param  length  DOCUMENT ME!
+     */
     @Override
     public void listElementsAdded(final ObservableList list, final int index, final int length) {
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  list         DOCUMENT ME!
+     * @param  index        DOCUMENT ME!
+     * @param  oldElements  DOCUMENT ME!
+     */
     @Override
     public void listElementsRemoved(final ObservableList list, final int index, final List oldElements) {
     }
@@ -1221,26 +1248,51 @@ class BindableJList extends JList implements Bindable {
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public String getBindingProperty() {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Converter getConverter() {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Validator getValidator() {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Object getNullSourceValue() {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Object getErrorSourceValue() {
         return null;

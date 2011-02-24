@@ -12,7 +12,6 @@ package Sirius.navigator.ui.tree;
 // contents - edit "EventHandlers/Java file/onCreate" to customize
 //
  */
-
 import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.types.treenode.*;
 
@@ -21,6 +20,8 @@ import Sirius.server.middleware.types.*;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.*;
 
@@ -28,6 +29,10 @@ import javax.swing.*;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.tree.*;
+
+import de.cismet.tools.gui.slideabletree.SlideableSubTree;
+import de.cismet.tools.gui.slideabletree.SubTreePane;
+
 //import Sirius.navigator.NavigatorLogger;
 
 /**
@@ -42,7 +47,6 @@ public class SearchSelectionTree extends MetaCatalogueTree {
     /*public SearchSelectionTree(Node rootNodes[])
      * {     super(new SelectableClassTreeNode(rootNodes), true, 1);     //super(new RootTreeNode(rootNodes), true, 1);
      *    this.initSearchSelectionTree();}*/
-
     protected Logger logger = Logger.getLogger(SearchSelectionTree.class);
 
     //~ Constructors -----------------------------------------------------------
@@ -67,7 +71,7 @@ public class SearchSelectionTree extends MetaCatalogueTree {
      * @param  rootNode  DOCUMENT ME!
      */
     public SearchSelectionTree(final RootTreeNode rootNode) {
-        super(rootNode, false, true, 1);
+        super(rootNode, false, true, 1, false);
 
         try {
             if (logger.isDebugEnabled()) {
@@ -93,7 +97,6 @@ public class SearchSelectionTree extends MetaCatalogueTree {
         // this.addMouseListener(new ClassNodeSelectionListener());
         this.addTreeExpansionListener(new MetaCatalogueExpansionListener());
         // this.addTreeExpansionListener(new MetaTreeExpansionListener());
-
         this.setRowHeight(0);
     }
 
@@ -315,20 +318,15 @@ public class SearchSelectionTree extends MetaCatalogueTree {
         protected boolean selected;
         /** True if has focus. */
         protected boolean hasFocus;
-
         // Colors
         /** Color to use for the foreground for selected nodes. */
         protected Color textSelectionColor;
-
         /** Color to use for the foreground for non-selected nodes. */
         protected Color textNonSelectionColor;
-
         /** Color to use for the background when a node is selected. */
         protected Color backgroundSelectionColor;
-
         /** Color to use for the background when the node isn't selected. */
         protected Color backgroundNonSelectionColor;
-
         /** Color to use for the background when the node isn't selected. */
         protected Color borderSelectionColor;
         /** True if draws focus border around icon as well. */

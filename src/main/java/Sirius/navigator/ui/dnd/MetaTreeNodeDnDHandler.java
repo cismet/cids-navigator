@@ -14,7 +14,6 @@ package Sirius.navigator.ui.dnd;
 
 import Sirius.navigator.connection.*;
 import Sirius.navigator.method.*;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.tree.*;
@@ -36,6 +35,9 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.tree.*;
 
+import de.cismet.tools.gui.slideabletree.SlideableSubTree;
+import de.cismet.tools.gui.slideabletree.SubTreePane;
+
 /**
  * DOCUMENT ME!
  *
@@ -47,15 +49,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     //~ Instance fields --------------------------------------------------------
 
     private final Logger logger;
-
     private final MetaCatalogueTree metaTree;
     private final DragSource dragSource;
-
     private MetaTransferable metaTransferable;
-
     private Point dragPoint = new Point();
     private BufferedImage dragImage;
-
     // Fields...
     private TreePath _pathLast = null;
     private Rectangle2D _raCueLine = new Rectangle2D.Float();
@@ -65,7 +63,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     private TreePath[] dragPaths = new TreePath[0];
     private Vector<MutableTreeNode> draggedNodes = new Vector<MutableTreeNode>();
 //    private TreePath[] cachedTreePaths; //DND Fehlverhalten Workaround
-
     private TreePath[] cachedTreePaths; // DND Fehlverhalten Workaround
     private int insertAreaHeight = 8;
     private Rectangle lastRowBounds;
@@ -90,7 +87,8 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
         this.metaTree = metaTree;
         this.dragSource = DragSource.getDefaultDragSource();
-        metaTree.addMouseListener(new MouseAdapter() {                                  // DND Fehlverhalten Workaround
+        metaTree.addMouseListener(new MouseAdapter() { // DND Fehlverhalten Workaround
+
                 @Override
                 public void mouseReleased(final MouseEvent e) {                         // DND Fehlverhalten Workaround
                     cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths(); // DND Fehlverhalten Workaround
@@ -114,10 +112,20 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                 SystemColor.controlShadow.getBlue(),
                 64);
 
+        if (metaTree.isUseSlideableTreeView()) {
+            for (final SlideableSubTree t : metaTree.getTrees()) {
+                final DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(
+                        t,
+                        sourceActions,
+                        this);
+            }
+        }
+
         final DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(
-                this.metaTree,
+                metaTree,
                 sourceActions,
                 this);
+
 //        if(!(this.metaTree instanceof SearchResultsTree)) {
 //            DropTarget dropTarget = new DropTarget(this.metaTree, this);
 //        }
@@ -125,6 +133,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dge  DOCUMENT ME!
+     */
     @Override
     public void dragGestureRecognized(final DragGestureEvent dge) {
 //        metaTree.setSelectionPaths(cachedTreePaths); //DND Fehlverhalten Workaround
@@ -143,8 +156,27 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
 
         metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths); // DND Fehlverhalten Workaround
-        final TreePath selPath = metaTree.getPathForLocation((int)dge.getDragOrigin().getX(),
-                (int)dge.getDragOrigin().getY());                        // DND Fehlverhalten Workaround
+        int newX = (int)dge.getDragOrigin().getX();
+        int newY = (int)dge.getDragOrigin().getY();
+        /*
+         * dge.getOrigin() liefert Koordinaten bezogen auf die Komponente die das Drag-Ereignis auslöst, das ist, sofern
+         * die SlideableTreeView genutzt wird ein SlideableSubTree. Da die Methode getPathForLocation für den gesamten
+         * Metatree aufgerufen wird, müssen die koordinaten auf die entsprechende SubTreepane (JXTaskPaneContainer)
+         * umgerechnet werden
+         */
+        if (metaTree.isUseSlideableTreeView()) {
+            SlideableSubTree subTree = null;
+            if (dge.getComponent() instanceof SlideableSubTree) {
+                subTree = (SlideableSubTree)dge.getComponent();
+            }
+
+            if (subTree != null) {
+                final SubTreePane pane = metaTree.getPanes().get(metaTree.getTrees().indexOf(subTree));
+                newX += pane.getX();
+                newY += pane.getY() + pane.getTitleBarHeight();
+            }
+        }
+        final TreePath selPath = metaTree.getPathForLocation(newX, newY); // DND Fehlverhalten Workaround
 
         if ((dge.getTriggerEvent().getModifiers()
                         & (dge.getTriggerEvent().CTRL_MASK | dge.getTriggerEvent().SHIFT_MASK)) != 0) { // DND Fehlverhalten Workaround
@@ -180,6 +212,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dtde  DOCUMENT ME!
+     */
     @Override
     public void drop(final DropTargetDropEvent dtde) {
         if (logger.isDebugEnabled()) {
@@ -316,6 +353,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dsde  DOCUMENT ME!
+     */
     @Override
     public void dragDropEnd(final DragSourceDropEvent dsde) {
         if (logger.isDebugEnabled()) {
@@ -326,6 +368,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         /*if(dsde.getDropAction() == DnDConstants.ACTION_MOVE)
          * { logger.warn("dragDropEnd() moving nodes");}*/
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -364,6 +407,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             }
         }
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -417,6 +461,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             }
         }
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -500,6 +545,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 //        } catch (RuntimeException re) {}
 //        return image;
     }
+
     /**
      * DOCUMENT ME!
      *
@@ -514,6 +560,12 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             tree.getGraphics().drawImage(image, (int)pt.getX() - 15, (int)pt.getY() - 15, tree);
         }
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
     @Override
     public void dragOver(final DropTargetDragEvent e) {
         final JTree tree = (JTree)e.getDropTargetContext().getComponent();
@@ -559,11 +611,21 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 //        _raGhost = _raGhost.createUnion(_raCueLine);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dsde  DOCUMENT ME!
+     */
     @Override
     public void dragOver(final DragSourceDragEvent dsde) {
         // if(logger.isDebugEnabled())logger.debug("dragOver(DragSourceDragEvent)");
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dtde  DOCUMENT ME!
+     */
     @Override
     public void dragEnter(final DropTargetDragEvent dtde) {
         if (logger.isDebugEnabled()) {
@@ -573,6 +635,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         // this.thisTarget = true;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dsde  DOCUMENT ME!
+     */
     @Override
     public void dragEnter(final DragSourceDragEvent dsde) {
         if (logger.isDebugEnabled()) {
@@ -583,6 +650,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         dragSourceContext.setCursor(this.getCursor(dsde.getDropAction()));
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dse  DOCUMENT ME!
+     */
     @Override
     public void dragExit(final DragSourceEvent dse) {
         // if(logger.isDebugEnabled())logger.debug("dragExit(DragSourceEvent)");
@@ -590,6 +662,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         metaTree.setSelectionPaths(dragPaths);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dte  DOCUMENT ME!
+     */
     @Override
     public void dragExit(final DropTargetEvent dte) {
         // if(logger.isDebugEnabled())logger.debug("dragExit(DropTargetEvent)");
@@ -600,6 +677,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dtde  DOCUMENT ME!
+     */
     @Override
     public void dropActionChanged(final DropTargetDragEvent dtde) {
         if (logger.isDebugEnabled()) {
@@ -607,6 +689,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  dsde  DOCUMENT ME!
+     */
     @Override
     public void dropActionChanged(final DragSourceDragEvent dsde) {
         if (logger.isDebugEnabled()) {

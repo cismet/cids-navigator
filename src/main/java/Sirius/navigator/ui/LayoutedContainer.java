@@ -418,6 +418,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
 //        this.leftSplitPane.setDividerLocation(leftSplitPaneDividerLocation);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  constraints  DOCUMENT ME!
+     */
     @Override
     public synchronized void add(final MutableConstraints constraints) {
         if (logger.isInfoEnabled()) {
@@ -579,6 +584,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  id  DOCUMENT ME!
+     */
     @Override
     public synchronized void remove(final String id) {
         if (logger.isInfoEnabled()) {
@@ -629,6 +639,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  id  DOCUMENT ME!
+     */
     @Override
     public synchronized void select(final String id) {
         if (logger.isDebugEnabled()) {
@@ -809,6 +824,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         // rootWindow.registerKeyboardAction(showLayoutAction,showLayoutKeyStroke,JComponent.WHEN_FOCUSED);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  parent  DOCUMENT ME!
+     */
     @Override
     public void loadLayout(final Component parent) {
         final JFileChooser fc = new JFileChooser(Navigator.NAVIGATOR_HOME);
@@ -937,11 +957,19 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void resetLayout() {
         doLayoutInfoNode();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  parent  DOCUMENT ME!
+     */
     @Override
     public void saveCurrentLayout(final Component parent) {
         final JFileChooser fc = new JFileChooser(Navigator.NAVIGATOR_HOME);
@@ -1062,6 +1090,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  e  DOCUMENT ME!
+         */
         @Override
         public void propertyChange(final PropertyChangeEvent e) {
             if (e.getSource() instanceof MutableConstraints) {

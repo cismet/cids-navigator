@@ -146,16 +146,31 @@ public class DefaultBindableColorChooser extends javax.swing.JPanel implements B
         }
     }                                                                                  //GEN-LAST:event_btnChooseColorActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public String getBindingProperty() {
         return PROP_TIMESTAMP; // NOI18N
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Converter getConverter() {
         return new ColorToStringConverter();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Validator getValidator() {
         return null;
@@ -170,11 +185,21 @@ public class DefaultBindableColorChooser extends javax.swing.JPanel implements B
         return color;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Object getNullSourceValue() {
         return null;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Override
     public Object getErrorSourceValue() {
         return null;

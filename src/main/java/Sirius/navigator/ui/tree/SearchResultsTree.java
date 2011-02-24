@@ -49,10 +49,14 @@ import java.awt.EventQueue;
 import java.util.*;
 
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.tools.CismetThreadPool;
+
+import de.cismet.tools.gui.slideabletree.SlideableSubTree;
+import de.cismet.tools.gui.slideabletree.SubTreePane;
 
 /**
  * Der SearchTree dient zum Anzeigen von Suchergebnissen. Neben der Funktionalit\u00E4t, die er von GenericMetaTree
@@ -102,7 +106,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public SearchResultsTree(final int visibleNodes, final boolean useThread, final int maxThreadCount)
             throws Exception {
-        super(new RootTreeNode(), false, useThread, maxThreadCount);
+        super(new RootTreeNode(), false, useThread, maxThreadCount, false);
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         this.visibleNodes = visibleNodes;
         defaultTreeModel.setAsksAllowsChildren(true);
@@ -110,6 +114,26 @@ public class SearchResultsTree extends MetaCatalogueTree {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+// @Override
+// public void setCellRenderer(final TreeCellRenderer x) {
+// super.setCellRenderer(x);
+// final ArrayList<SlideableSubTree> trees = this.getTrees();
+// final ArrayList<SubTreePane> panes = this.getPanes();
+// if ((trees != null) && (panes != null)) {
+// for (final SubTreePane p : panes) {
+// final SlideableSubTree t = trees.get(panes.indexOf(p));
+// final DefaultMetaTreeNode treeNode = (DefaultMetaTreeNode)t.getModel().getRoot();
+// if (!(p.isCollapsed())) {
+// p.setIcon(treeNode.getOpenIcon());
+// } else if (treeNode.isLeaf()) {
+// p.setIcon(treeNode.getLeafIcon());
+// } else {
+// p.setIcon(treeNode.getClosedIcon());
+// }
+// }
+// }
+// }
 
     /**
      * Blaettert in der Ergebnissmenge einen Schritt vor. Loest einen PropertyChange Event ("browse") aus.
@@ -299,8 +323,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
             this.browseForward();
             empty = false;
         }
-
-        firePropertyChange("browse", 0, 1); // NOI18N
+//        this.setCellRenderer(this.getCellRenderer());
+        firePropertyChange("browse", 0, 1);     // NOI18N
         syncWithMap();
         checkForDynamicNodes();
     }
@@ -389,6 +413,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         visibleResultNodes = new Node[visibleNodes];
         this.browseForward();
         empty = false;
+//        this.setCellRenderer(this.getCellRenderer());
         firePropertyChange("browse", 0, 1); // NOI18N
         syncWithMap();
         checkForDynamicNodes();
@@ -564,7 +589,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 }
             }
 
-            
             for (final Object allO : all) {
                 for (final Object selO : selection) {
                     if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
