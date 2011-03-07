@@ -29,12 +29,12 @@ package Sirius.navigator.ui.tree;
  * History                      :
  *
  *******************************************************************************/
-
 import Sirius.navigator.types.treenode.*;
 
 import Sirius.server.middleware.types.*;
 
 import java.awt.Component;
+import java.awt.EventQueue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,9 +62,45 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
     // private   LocalClassNode lcn;
     // private   LocalObjectNode lon;
     // private java.lang.Object userObject;
-
     private static String CLASS_PREFIX = "de.cismet.cids.custom.treeicons."; // NOI18N
     private static String CLASS_POSTFIX = "IconFactory";                     // NOI18N
+    private static final CidsTreeObjectIconFactory NO_ICON_FACTORY = new CidsTreeObjectIconFactory() {
+
+            @Override
+            public Icon getClosedPureNodeIcon(final PureTreeNode ptn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Icon getOpenPureNodeIcon(final PureTreeNode ptn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Icon getLeafPureNodeIcon(final PureTreeNode ptn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Icon getOpenObjectNodeIcon(final ObjectTreeNode otn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Icon getClosedObjectNodeIcon(final ObjectTreeNode otn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Icon getLeafObjectNodeIcon(final ObjectTreeNode otn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Icon getClassNodeIcon(final ClassTreeNode dmtn) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        };
 
     //~ Instance fields --------------------------------------------------------
 
@@ -108,9 +144,8 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
 
         final int cid = treeNode.getClassID();
         final String domain = treeNode.getDomain();
-
-        CidsTreeObjectIconFactory iconFactory = null;
-        iconFactory = iconFactories.get(cid + "@" + domain); // NOI18N
+        final String key = cid + "@" + domain;
+        CidsTreeObjectIconFactory iconFactory = iconFactories.get(key); // NOI18N
 
         // TODO Iconfactory from DB
 // if (metaNode!=null && metaNode.getIconFactory()!=-1) {
@@ -118,7 +153,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
 // }
 
         // Iconfactroy from classname
-        if ((iconFactory == null) && (cid != -1) && (cid != 0) && (domain != null)) {
+        if ((iconFactory == null) && (cid > 0) && (domain != null)) {
             try {
                 final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
                 final Class<?> iconFactoryClass = ClassloadingHelper.getDynamicClass(
@@ -126,10 +161,14 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                         ClassloadingHelper.CLASS_TYPE.ICON_FACTORY);
                 if (iconFactoryClass != null) {
                     iconFactory = (CidsTreeObjectIconFactory)iconFactoryClass.getConstructor().newInstance();
-                    iconFactories.put(cid + "@" + domain, iconFactory);               // NOI18N
                 }
             } catch (Exception e) {
-                log.error("Could not load IconFactory for " + cid + "@" + domain, e); // NOI18N
+                log.error("Could not load IconFactory for " + key, e); // NOI18N
+            }
+            if (iconFactory != null) {
+                iconFactories.put(key, iconFactory);                   // NOI18N
+            } else {
+                iconFactories.put(key, NO_ICON_FACTORY);               // NOI18N
             }
         }
 
@@ -171,7 +210,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
             }
         }
 
-        if (iconFactory != null) {
+        if ((iconFactory != null) && (iconFactory != NO_ICON_FACTORY)) {
             if (treeNode instanceof PureTreeNode) {
                 if ((expanded == true) && (iconFactory.getOpenPureNodeIcon((PureTreeNode)treeNode) != null)) {
                     expandedIco = iconFactory.getOpenPureNodeIcon((PureTreeNode)treeNode);

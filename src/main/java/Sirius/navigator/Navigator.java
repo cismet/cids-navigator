@@ -471,7 +471,6 @@ public class Navigator extends JFrame {
                 propertyManager.getMaxConnections(),
                 true);
 
-        
         // dnd
 
         final MetaTreeNodeDnDHandler dndHandler = new MetaTreeNodeDnDHandler(metaCatalogueTree);
