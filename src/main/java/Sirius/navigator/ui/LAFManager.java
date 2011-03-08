@@ -1,10 +1,10 @@
 /***************************************************
-*
-* cismet GmbH, Saarbruecken, Germany
-*
-*              ... and it just works.
-*
-****************************************************/
+ *
+ * cismet GmbH, Saarbruecken, Germany
+ *
+ *              ... and it just works.
+ *
+ ****************************************************/
 package Sirius.navigator.ui;
 
 import org.apache.log4j.Logger;
@@ -23,16 +23,12 @@ import javax.swing.*;
 public final class LAFManager {
 
     //~ Static fields/initializers ---------------------------------------------
-
     private static final Logger logger = Logger.getLogger(LAFManager.class);
     private static LAFManager manager = null;
-
     //~ Instance fields --------------------------------------------------------
-
     private final LinkedHashMap installedLookAndFeels;
 
     //~ Constructors -----------------------------------------------------------
-
     /**
      * Creates a new LAFManager object.
      */
@@ -46,7 +42,7 @@ public final class LAFManager {
         for (int i = 0; i < lnfinfo.length; i++) {
             if (logger.isDebugEnabled()) {
                 logger.debug("installed look and feel #" + i + ": '" + lnfinfo[i].getName() + "' ("
-                            + lnfinfo[i].getClassName() + ")"); // NOI18N
+                        + lnfinfo[i].getClassName() + ")"); // NOI18N
             }
             this.installedLookAndFeels.put(lnfinfo[i].getName(), lnfinfo[i]);
         }
@@ -54,14 +50,13 @@ public final class LAFManager {
         if (logger.isDebugEnabled()) {
             logger.debug("- SystemLookAndFeel class: '" + UIManager.getSystemLookAndFeelClassName() + "'"); // NOI18N
             logger.debug("- CrossPlatformLookAndFeel class: '" + UIManager.getCrossPlatformLookAndFeelClassName()
-                        + "'");                                                                             // NOI18N
+                    + "'");                                                                             // NOI18N
             logger.debug("- Default look and feel: '" + this.getDefaultLookAndFeel() + "'");                // NOI18N
             logger.debug("- Current look and feel: '" + UIManager.getLookAndFeel() + "'");                  // NOI18N
         }
     }
 
     //~ Methods ----------------------------------------------------------------
-
     /**
      * DOCUMENT ME!
      *
@@ -127,7 +122,7 @@ public final class LAFManager {
         UIManager.LookAndFeelInfo lnfinfo = null;
 
         if (this.isInstalledLookAndFeel(lnfName)) {
-            lnfinfo = (UIManager.LookAndFeelInfo)this.installedLookAndFeels.get(lnfName);
+            lnfinfo = (UIManager.LookAndFeelInfo) this.installedLookAndFeels.get(lnfName);
         } else {
             logger.warn("could not change look & feel: unknown look and feel '" + lnfName + "'"); // NOI18N
             lnfinfo = this.getDefaultLookAndFeel();
@@ -137,7 +132,7 @@ public final class LAFManager {
             if (logger.isInfoEnabled()) {
                 logger.info("changing look & feel to '" + lnfinfo + "' (" + lnfinfo.getClassName() + ")"); // NOI18N
             }
-            if (lnfinfo.getName().equalsIgnoreCase("Plastic 3D"))                                          // NOI18N
+            if (lnfinfo.getName().equalsIgnoreCase("Plastic 3D")) // NOI18N
             {
                 if (logger.isDebugEnabled()) {
                     logger.debug("setting Plastic 3D Theme");                                              // NOI18N
@@ -181,8 +176,13 @@ public final class LAFManager {
             if (logger.isDebugEnabled()) {
                 logger.debug("installing Plastic 3D Look & Feel");                                         // NOI18N
             }
-            UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
 
+
+            UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
+            String heavyComps = System.getProperty("contains.heavyweight.comps");
+            if (heavyComps.equals("true")) {
+                com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
+            }
             // com.jgoodies.looks.plastic.Plastic3DLookAndFeel.setMyCurrentTheme (new
             // com.jgoodies.looks.plastic.theme.SkyBluer());
         } catch (Throwable e) {
