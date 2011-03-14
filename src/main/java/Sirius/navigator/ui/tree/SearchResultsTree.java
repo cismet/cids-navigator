@@ -564,7 +564,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 }
             }
 
-            
             for (final Object allO : all) {
                 for (final Object selO : selection) {
                     if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
