@@ -33,6 +33,10 @@ import java.awt.image.*;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
 import de.cismet.tools.gui.slideabletree.SlideableSubTree;
@@ -44,7 +48,10 @@ import de.cismet.tools.gui.slideabletree.SubTreePane;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetListener, DragSourceListener {
+public class MetaTreeNodeDnDHandler implements DragGestureListener,
+    DropTargetListener,
+    DragSourceListener,
+    TreeModelListener {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -113,11 +120,15 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                 64);
 
         if (metaTree.isUseSlideableTreeView()) {
+            metaTree.getModel().addTreeModelListener(this);
             for (final SlideableSubTree t : metaTree.getTrees()) {
-                final DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(
-                        t,
-                        sourceActions,
-                        this);
+                if (!t.hasDragGestureRecognizer()) {
+                    final DragGestureRecognizer dragGestureRecognizer = dragSource.createDefaultDragGestureRecognizer(
+                            t,
+                            sourceActions,
+                            this);
+                    t.setHasDragGestureRecognizer(true);
+                }
             }
         }
 
@@ -196,7 +207,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             dragPaths = metaTree.getSelectionPaths();
             final Rectangle pathBounds = this.metaTree.getPathBounds(treePath);
             this.dragPoint.setLocation(newX - pathBounds.x, newY - pathBounds.y);
-            //this.dragPoint.setLocation(dragOrigin.x - pathBounds.x, dragOrigin.y - pathBounds.y);
+            // this.dragPoint.setLocation(dragOrigin.x - pathBounds.x, dragOrigin.y - pathBounds.y);
 
             metaTree.setDragImage(this.getDragImage(metaTree));
 
@@ -842,5 +853,59 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     public void setDragImage(final BufferedImage dragImage) {
         this.dragImage = dragImage;
         metaTree.setDragImage(dragImage);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
+    @Override
+    public void treeNodesChanged(final TreeModelEvent e) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
+    @Override
+    public void treeNodesInserted(final TreeModelEvent e) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
+    @Override
+    public void treeNodesRemoved(final TreeModelEvent e) {
+        // throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  e  DOCUMENT ME!
+     */
+    @Override
+    public void treeStructureChanged(final TreeModelEvent e) {
+        if (metaTree.isUseSlideableTreeView()) {
+            final int sourceActions = DnDConstants.ACTION_COPY_OR_MOVE;
+            if (metaTree.getModel().getRoot().equals(e.getTreePath().getLastPathComponent())) {
+                for (final SlideableSubTree t : metaTree.getTrees()) {
+                    if (!t.hasDragGestureRecognizer()) {
+                        final DragGestureRecognizer dragGestureRecognizer =
+                            dragSource.createDefaultDragGestureRecognizer(
+                                t,
+                                sourceActions,
+                                this);
+                        t.setHasDragGestureRecognizer(true);
+                    }
+                }
+            }
+        }
     }
 }

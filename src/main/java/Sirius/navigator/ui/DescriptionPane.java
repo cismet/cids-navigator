@@ -32,6 +32,9 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerListener;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -51,6 +54,8 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.event.AncestorEvent;
+import javax.swing.event.AncestorListener;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -97,7 +102,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     protected LinkStyleBreadCrumbGui breadCrumbGui;
     private final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPane.class);
-
+    private final DescriptionPaneVisibleAncestorListener ancestorListener;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -175,6 +180,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         } else {
             wrappedWaitingPanel = null;
         }
+        ancestorListener = new DescriptionPaneVisibleAncestorListener(this);
+        this.addAncestorListener(ancestorListener);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -242,11 +249,21 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      */
     public abstract void clear();
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
     @Override
     public void addStatusChangeListener(final StatusChangeListener listener) {
         this.statusChangeSupport.addStatusChangeListener(listener);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
     @Override
     public void removeStatusChangeListener(final StatusChangeListener listener) {
         this.statusChangeSupport.removeStatusChangeListener(listener);
@@ -258,12 +275,14 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param  page  DOCUMENT ME!
      */
     public abstract void setPageFromURI(final String page);
+
     /**
      * DOCUMENT ME!
      *
      * @param  page  DOCUMENT ME!
      */
     public abstract void setPageFromContent(final String page);
+
     /**
      * DOCUMENT ME!
      *
@@ -279,114 +298,121 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      */
     public void setNodesDescriptions(final List<?> objects) {
         if (objects.size() == 1) {
+            ancestorListener.setObjects(objects);
             setNodeDescription(objects.get(0));
         } else {
-            if (worker != null) {
-                worker.cancel(true);
-                worker = null;
-            }
-            showObjects();
-            clear();
-            worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
+            // überprüfen ob Description Pane angezeigt wird
+            if (!this.isShowing()) {
+                ancestorListener.setObjects(objects);
+            } else {
+                if (worker != null) {
+                    worker.cancel(true);
+                    worker = null;
+                }
+                showObjects();
+                clear();
+                worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
-                    final List<JComponent> all = new ArrayList<JComponent>();
+                        final List<JComponent> all = new ArrayList<JComponent>();
 
-                    @Override
-                    protected SelfDisposingPanel doInBackground() throws Exception {
-                        final MultiMap objectsByClass = new MultiMap();
-                        for (final Object object : objects) {
-                            if ((object != null) && !((DefaultMetaTreeNode)object).isWaitNode()
-                                        && !((DefaultMetaTreeNode)object).isRootNode()
-                                        && !((DefaultMetaTreeNode)object).isPureNode()
-                                        && ((DefaultMetaTreeNode)object).isObjectNode()) {
-                                final ObjectTreeNode n = (ObjectTreeNode)object;
-                                objectsByClass.put(n.getMetaClass(), n);
+                        @Override
+                        protected SelfDisposingPanel doInBackground() throws Exception {
+                            final MultiMap objectsByClass = new MultiMap();
+                            for (final Object object : objects) {
+                                if ((object != null) && !((DefaultMetaTreeNode)object).isWaitNode()
+                                            && !((DefaultMetaTreeNode)object).isRootNode()
+                                            && !((DefaultMetaTreeNode)object).isPureNode()
+                                            && ((DefaultMetaTreeNode)object).isObjectNode()) {
+                                    final ObjectTreeNode n = (ObjectTreeNode)object;
+                                    objectsByClass.put(n.getMetaClass(), n);
+                                }
                             }
-                        }
-                        final Iterator it = objectsByClass.keySet().iterator();
+                            final Iterator it = objectsByClass.keySet().iterator();
 
-                        while (it.hasNext() && !isCancelled()) {
-                            final Object key = it.next();
-                            final List l = (List)objectsByClass.get(key);
+                            while (it.hasNext() && !isCancelled()) {
+                                final Object key = it.next();
+                                final List l = (List)objectsByClass.get(key);
 
-                            final List<MetaObject> v = new ArrayList<MetaObject>();
-                            for (final Object o : l) {
-                                v.add(((ObjectTreeNode)o).getMetaObject());
-                            }
-                            final MetaClass mc = ((MetaObject)v.toArray()[0]).getMetaClass();
+                                final List<MetaObject> v = new ArrayList<MetaObject>();
+                                for (final Object o : l) {
+                                    v.add(((ObjectTreeNode)o).getMetaObject());
+                                }
+                                final MetaClass mc = ((MetaObject)v.toArray()[0]).getMetaClass();
 
-                            // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden
-                            // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
-                            JComponent aggrRendererTester = null;
+                                // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden
+                                // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
+                                JComponent aggrRendererTester = null;
 
-                            if (l.size() > 1) {
-                                aggrRendererTester = CidsObjectRendererFactory.getInstance()
-                                            .getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")"); // NOI18N
-                            }
-                            if (aggrRendererTester == null) {
-                                LOG.warn("AggregationRenderer was null. Will use SingleRenderer");            // NOI18N
-                                for (final Object object : l) {
-                                    final ObjectTreeNode otn = (ObjectTreeNode)object;
-                                    final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
-                                            CidsObjectRendererFactory.getInstance().getSingleRenderer(
-                                                otn.getMetaObject(),
-                                                otn.getMetaClass().getName()
-                                                        + ": "
-                                                        + otn));
-                                    final CidsBean bean = otn.getMetaObject().getBean();
-                                    final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+                                if (l.size() > 1) {
+                                    aggrRendererTester = CidsObjectRendererFactory.getInstance()
+                                                .getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")"); // NOI18N
+                                }
+                                if (aggrRendererTester == null) {
+                                    LOG.warn("AggregationRenderer was null. Will use SingleRenderer");            // NOI18N
+                                    for (final Object object : l) {
+                                        final ObjectTreeNode otn = (ObjectTreeNode)object;
+                                        final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
+                                                CidsObjectRendererFactory.getInstance().getSingleRenderer(
+                                                    otn.getMetaObject(),
+                                                    otn.getMetaClass().getName()
+                                                            + ": "
+                                                            + otn));
+                                        final CidsBean bean = otn.getMetaObject().getBean();
+                                        final PropertyChangeListener propertyChangeListener =
+                                            new PropertyChangeListener() {
 
-                                            @Override
-                                            public void propertyChange(final PropertyChangeEvent evt) {
-                                                comp.repaint();
-                                            }
-                                        };
-                                    bean.addPropertyChangeListener(WeakListeners.propertyChange(
-                                            propertyChangeListener,
-                                            bean));
-                                    comp.setStrongListenerReference(propertyChangeListener);
+                                                @Override
+                                                public void propertyChange(final PropertyChangeEvent evt) {
+                                                    comp.repaint();
+                                                }
+                                            };
+                                        bean.addPropertyChangeListener(WeakListeners.propertyChange(
+                                                propertyChangeListener,
+                                                bean));
+                                        comp.setStrongListenerReference(propertyChangeListener);
+                                        publish(comp);
+                                    }
+                                } else {
+                                    final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
                                     publish(comp);
                                 }
-                            } else {
-                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
-                                publish(comp);
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            all.clear();
+                            if (worker == this) {
+                                worker = null;
                             }
                         }
-                        return null;
-                    }
 
-                    @Override
-                    protected void done() {
-                        all.clear();
-                        if (worker == this) {
-                            worker = null;
+                        @Override
+                        protected void process(final List<SelfDisposingPanel> chunks) {
+                            int y = all.size();
+                            for (final SelfDisposingPanel comp : chunks) {
+                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                                gridBagConstraints.gridx = 0;
+                                gridBagConstraints.gridy = y;
+                                gridBagConstraints.weightx = 1;
+                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                panRenderer.add(comp, gridBagConstraints);
+
+                                comp.startChecking();
+
+                                panRenderer.revalidate();
+                                panRenderer.repaint();
+
+                                y++;
+                            }
+                            all.addAll(chunks);
                         }
-                    }
-
-                    @Override
-                    protected void process(final List<SelfDisposingPanel> chunks) {
-                        int y = all.size();
-                        for (final SelfDisposingPanel comp : chunks) {
-                            final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-                            gridBagConstraints.gridx = 0;
-                            gridBagConstraints.gridy = y;
-                            gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                            panRenderer.add(comp, gridBagConstraints);
-
-                            comp.startChecking();
-
-                            panRenderer.revalidate();
-                            panRenderer.repaint();
-
-                            y++;
-                        }
-                        all.addAll(chunks);
-                    }
-                };
-            if (worker != null) {
-                CismetThreadPool.execute(worker);
+                    };
+                if (worker != null) {
+                    CismetThreadPool.execute(worker);
+                }
             }
         }
     }
@@ -626,6 +652,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
         this.setPageFromURI(descriptionURL);
     }
+
     /**
      * Single Object.
      *
@@ -665,6 +692,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         panRenderer.removeAll();
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  g  DOCUMENT ME!
+     */
     @Override
     public void paintComponent(final Graphics g) {
         final Graphics2D g2d = (Graphics2D)g;
@@ -694,6 +726,17 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   graphics    DOCUMENT ME!
+         * @param   pageFormat  DOCUMENT ME!
+         * @param   pageIndex   DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         *
+         * @throws  PrinterException  DOCUMENT ME!
+         */
         @Override
         public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
                 throws PrinterException {
@@ -738,11 +781,91 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void run() {
             if (parent.getLayout() instanceof CardLayout) {
                 ((CardLayout)parent.getLayout()).show(parent, cardToShow);
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    class DescriptionPaneVisibleAncestorListener implements AncestorListener {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private List<?> objects;
+        private DescriptionPane descPane;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new DescriptionPaneVisibleAncestorListener object.
+         *
+         * @param  pane  DOCUMENT ME!
+         */
+        public DescriptionPaneVisibleAncestorListener(final DescriptionPane pane) {
+            descPane = pane;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  objects  DOCUMENT ME!
+         */
+        public void setObjects(final List<?> objects) {
+            this.objects = objects;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public List<?> getObjects() {
+            return objects;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  event  DOCUMENT ME!
+         */
+        @Override
+        public void ancestorAdded(final AncestorEvent event) {
+            if ((objects != null) && (objects.size() > 1) && descPane.isShowing()) {
+                setNodesDescriptions(objects);
+                objects = null;
+            }
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  event  DOCUMENT ME!
+         */
+        @Override
+        public void ancestorMoved(final AncestorEvent event) {
+            System.out.println("ancsestor moved");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  event  DOCUMENT ME!
+         */
+        @Override
+        public void ancestorRemoved(final AncestorEvent event) {
+            System.out.println("ancestor removed");
         }
     }
 }
