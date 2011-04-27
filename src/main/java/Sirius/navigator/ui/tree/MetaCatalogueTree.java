@@ -31,9 +31,6 @@ package Sirius.navigator.ui.tree;
  *
  *******************************************************************************/
 import Sirius.navigator.method.*;
-import Sirius.navigator.plugin.PluginRegistry;
-import Sirius.navigator.plugin.interfaces.PluginSupport;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.status.*;
 
