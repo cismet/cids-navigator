@@ -201,13 +201,20 @@ public class ComponentRegistry {
             registry = null;
         }
     }
+
     /**
      * -------------------------------------------------------------------------
      *
      * @return  DOCUMENT ME!
      */
     public MetaCatalogueTree getActiveCatalogue() {
-        if (catalogueTree.isShowing()) {
+        if (catalogueTree.isShowing() && searchResultsTree.isShowing()) {
+            if (catalogueTree.getSelectedNodeCount() >= searchResultsTree.getSelectedNodeCount()) {
+                return catalogueTree;
+            } else {
+                return searchResultsTree;
+            }
+        } else if (catalogueTree.isShowing()) {
             return catalogueTree;
         } else {
             return searchResultsTree;
