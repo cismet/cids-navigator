@@ -60,7 +60,6 @@ public final class PropertyManager {
 
     private static final Logger logger = Logger.getLogger(PropertyManager.class);
     private static final PropertyManager manager = new PropertyManager();
-
     private static final String HEADER = "Navigator Configuration File";
     public static final String TRUE = "true";
     public static final String FALSE = "false";
@@ -107,7 +106,7 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
-
+    private boolean useSlideableTreeView = false;
     private transient String proxyURL;
     private transient String proxyUsername;
     private transient String proxyPassword;
@@ -756,6 +755,45 @@ public final class PropertyManager {
     }
 
     /**
+     * Getter for Property useSlideableTreeView.
+     *
+     * @return  Value of property useSlideableTreeView
+     */
+    public boolean isUseSlideableTreeView() {
+        return useSlideableTreeView;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  useSlideableTreeView  loadable DOCUMENT ME!
+     */
+    public void setUseSlideableTreeView(final String useSlideableTreeView) {
+        if ((useSlideableTreeView != null)
+                    && (useSlideableTreeView.equalsIgnoreCase(TRUE) || useSlideableTreeView.equals("1"))) {
+            this.setUseSlideableTreeView(true);
+        } else if ((useSlideableTreeView != null)
+                    && (useSlideableTreeView.equalsIgnoreCase(FALSE) || useSlideableTreeView.equals("0"))) {
+            this.setUseSlideableTreeView(false);
+        } else {
+            this.setUseSlideableTreeView(false);
+            logger.warn("useSlideableTreeView(): invalid property 'useSlideableTreeView': '" + useSlideableTreeView
+                        + "', setting default value to '"
+                        + this.useSlideableTreeView + "'");
+        }
+    }
+
+    /**
+     * Setter for Property useSlideableTreeView.
+     *
+     * @param  useSlideableTreeView  loadable New value of property useSlideableTreeView.
+     */
+    public void setUseSlideableTreeView(final boolean useSlideableTreeView) {
+        this.useSlideableTreeView = useSlideableTreeView;
+        properties.setProperty("useSlideableTreeView", String.valueOf(this.useFlyingSaucer)); // NOI18N
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param  useFlyingSaucer  loadable DOCUMENT ME!
@@ -881,6 +919,8 @@ public final class PropertyManager {
             this.setProxyPassword(value);
         } else if (property.equals("navigator.proxy.domain")) {
             this.setProxyDomain(value);
+        } else if (property.equals("useSlideableTreeView")) {
+            this.setUseSlideableTreeView(value);
         }
     }
 

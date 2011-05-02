@@ -389,7 +389,7 @@ public class MetaCatalogueTree extends SlideableTree implements StatusChangeSupp
                 final SlideableSubTree t = this.getTrees().get(this.getPanes().indexOf(pane));
                 final int newX = x - pane.getX();
                 final int newY = y - pane.getY() - pane.getTitleBarHeight();
-                final TreePath selectedPath = t.getPathForLocation(newX, newY);
+                final TreePath selectedPath = t.getClosestPathForLocation(newX, newY);
                 return this.getPathforOriginalTree(selectedPath);
             }
         }

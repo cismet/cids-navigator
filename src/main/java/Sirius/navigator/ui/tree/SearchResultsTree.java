@@ -577,47 +577,50 @@ public class SearchResultsTree extends MetaCatalogueTree {
             logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
-
-        if ((selectedNodes != null) && (selectedNodes.size() > 0)) {
-            final ArrayList all = new ArrayList(Arrays.asList(resultNodes));
-            final ArrayList selectionTreeNodes = new ArrayList(selectedNodes);
-            final ArrayList selection = new ArrayList();
-            for (final Object selO : selectionTreeNodes) {
-                if (selO instanceof DefaultMetaTreeNode) {
-                    final Node n = ((DefaultMetaTreeNode)selO).getNode();
-                    selection.add(n);
+        try {
+            if ((selectedNodes != null) && (selectedNodes.size() > 0)) {
+                final ArrayList all = new ArrayList(Arrays.asList(resultNodes));
+                final ArrayList allWorkingCopy = new ArrayList(Arrays.asList(resultNodes));
+                final ArrayList selectionTreeNodes = new ArrayList(selectedNodes);
+                final ArrayList selection = new ArrayList();
+                for (final Object selO : selectionTreeNodes) {
+                    if (selO instanceof DefaultMetaTreeNode) {
+                        final Node n = ((DefaultMetaTreeNode)selO).getNode();
+                        selection.add(n);
+                    }
                 }
-            }
 
-            for (final Object allO : all) {
-                for (final Object selO : selection) {
-                    if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
-                        final MetaObjectNode allMON = (MetaObjectNode)allO;
-                        final MetaObjectNode selMON = (MetaObjectNode)selO;
-                        if ((allMON.getObjectId() == selMON.getObjectId())
-                                    && (allMON.getClassId() == selMON.getClassId())
-                                    && (allMON.getId() == selMON.getId())
-                                    && allMON.getDomain().equals(selMON.getDomain())
-                                    && allMON.toString().equals(selMON.toString())) {
-                            all.remove(allO);
-                            deleted = true;
-                        }
-                    } else if ((allO instanceof MetaNode) && (selO instanceof MetaNode)) {
-                        final MetaNode allMN = (MetaNode)allO;
-                        final MetaNode selMN = (MetaNode)selO;
-                        if ((allMN.getId() == selMN.getId())
-                                    && allMN.getDomain().equals(selMN.getDomain())
-                                    && allMN.toString().equals(selMN.toString())) {
-                            all.remove(allO);
-                            deleted = true;
+                for (final Object allO : all) {
+                    for (final Object selO : selection) {
+                        if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
+                            final MetaObjectNode allMON = (MetaObjectNode)allO;
+                            final MetaObjectNode selMON = (MetaObjectNode)selO;
+                            if ((allMON.getObjectId() == selMON.getObjectId())
+                                        && (allMON.getClassId() == selMON.getClassId())
+                                        && (allMON.getId() == selMON.getId())
+                                        && allMON.getDomain().equals(selMON.getDomain())
+                                        && allMON.toString().equals(selMON.toString())) {
+                                allWorkingCopy.remove(allO);
+                                deleted = true;
+                            }
+                        } else if ((allO instanceof MetaNode) && (selO instanceof MetaNode)) {
+                            final MetaNode allMN = (MetaNode)allO;
+                            final MetaNode selMN = (MetaNode)selO;
+                            if ((allMN.getId() == selMN.getId())
+                                        && allMN.getDomain().equals(selMN.getDomain())
+                                        && allMN.toString().equals(selMN.toString())) {
+                                allWorkingCopy.remove(allO);
+                                deleted = true;
+                            }
                         }
                     }
                 }
+
+                this.setResultNodes((Node[])allWorkingCopy.toArray(new Node[allWorkingCopy.size()]), false);
             }
-
-            this.setResultNodes((Node[])all.toArray(new Node[all.size()]), false);
+        } catch (Exception e) {
+            logger.error("Fehler beim Entfernen eines Objektes aus den Suchergebnissen", e);
         }
-
         return deleted;
     }
 

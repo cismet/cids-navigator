@@ -7,12 +7,12 @@
 ****************************************************/
 package Sirius.navigator.event;
 
+import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.attributes.AttributeViewer;
+import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import java.util.List;
 
@@ -78,6 +78,37 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
 //            @Override
 //            public void run() {
         final JTree t = (JTree)e.getSource();
+
+        final MetaCatalogueTree catalogue = ComponentRegistry.getRegistry().getCatalogueTree();
+        final MetaCatalogueTree searchResults = ComponentRegistry.getRegistry().getSearchResultsTree();
+
+        boolean clearSearchresultSelection = false;
+
+        if (catalogue.isUseSlideableTreeView()) {
+            for (final JTree subTree : catalogue.getTrees()) {
+                if (t == subTree) {
+                    clearSearchresultSelection = true;
+                    break;
+                }
+            }
+        } else {
+            if (t == catalogue) {
+                clearSearchresultSelection = true;
+            }
+        }
+
+        if (clearSearchresultSelection) {
+            log.fatal("Suchergebnisse");
+            searchResults.removeTreeSelectionListener(this);
+            searchResults.clearSelection();
+            searchResults.addTreeSelectionListener(this);
+        } else {
+            log.fatal("Katalog");
+            catalogue.removeTreeSelectionListener(this);
+            catalogue.clearSelection();
+            catalogue.addTreeSelectionListener(this);
+        }
+
         final TreePath[] treePaths = t.getSelectionPaths();
 
         final List<Object> objects = TypeSafeCollections.newArrayList();

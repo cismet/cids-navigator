@@ -195,6 +195,12 @@ public class Navigator extends JFrame {
         final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
         proxyOptions.setProxy(Proxy.fromPreferences());
 
+        final String heavyComps = System.getProperty("contains.heavyweight.comps");
+        if ((heavyComps != null) && heavyComps.equals("true")) {
+            JPopupMenu.setDefaultLightWeightPopupEnabled(false);
+            ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
+        }
+
         boolean inSplashScreen = false;
 
         // splashscreen gesetzt?
@@ -469,7 +475,7 @@ public class Navigator extends JFrame {
                 PropertyManager.getManager().isEditable(),
                 true,
                 propertyManager.getMaxConnections(),
-                true);
+                PropertyManager.getManager().isUseSlideableTreeView());
 
         // dnd
 

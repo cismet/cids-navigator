@@ -14,6 +14,8 @@ package Sirius.navigator.tools;
 
 import java.util.*;
 
+import de.cismet.cismap.commons.interaction.CismapBroker;
+
 /**
  * DOCUMENT ME!
  *
@@ -270,6 +272,8 @@ public class NavigatorToolkit {
      */
     public String pointCoordinatesToOGCPolygon(final double[][] pointCoordinates, final boolean closePolygon) {
         final StringBuffer buffer = new StringBuffer();
+
+        buffer.append("SRID=").append(CismapBroker.getInstance().getDefaultCrsAlias()).append(";");
 
         if (pointCoordinates.length > 2) {
             buffer.append("POLYGON").append('(').append('('); // NOI18N

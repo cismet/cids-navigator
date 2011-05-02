@@ -179,14 +179,18 @@ public final class LAFManager {
             // javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel());
             // javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
             if (logger.isDebugEnabled()) {
-                logger.debug("installing Plastic 3D Look & Feel");                                         // NOI18N
+                logger.debug("installing Plastic 3D Look & Feel"); // NOI18N
             }
-            UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
 
+            UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
+            final String heavyComps = System.getProperty("contains.heavyweight.comps");
+            if (heavyComps.equals("true")) {
+                com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
+            }
             // com.jgoodies.looks.plastic.Plastic3DLookAndFeel.setMyCurrentTheme (new
             // com.jgoodies.looks.plastic.theme.SkyBluer());
         } catch (Throwable e) {
-            logger.warn("could not install Plastic 3D Look & Feel", e); // NOI18N
+            logger.warn("could not install Plastic 3D Look & Feel", e);                                    // NOI18N
         }
     }
 }

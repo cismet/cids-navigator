@@ -371,7 +371,7 @@ public class MethodManager {
                         org.openide.util.NbBundle.getMessage(
                             MethodManager.class,
                             "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
-                            sourceNode),                                                                               // NOI18N
+                            new Object[] { String.valueOf(sourceNode) }),                                              // NOI18N
                         org.openide.util.NbBundle.getMessage(
                             MethodManager.class,
                             "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"), // NOI18N
