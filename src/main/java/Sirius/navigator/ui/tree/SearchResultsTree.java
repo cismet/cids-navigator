@@ -10,7 +10,6 @@ package Sirius.navigator.ui.tree;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
-import Sirius.navigator.types.iterator.TreeNodeIterator;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -50,6 +49,8 @@ import java.util.*;
 
 import javax.swing.tree.DefaultTreeModel;
 
+
+import de.cismet.cids.navigator.utils.MetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.tools.CismetThreadPool;
@@ -384,6 +385,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
             // logger.debug("resultNodes.length: " + resultNodes.length);
         }
 
+        if (resultNodes.length <= visibleNodes) {
+            Arrays.sort(resultNodes, new MetaObjectNodeComparator());
+        }
         max = resultNodes.length;
         pos = 0;
         visibleResultNodes = new Node[visibleNodes];
