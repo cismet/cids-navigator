@@ -12,8 +12,11 @@ import Sirius.navigator.ui.DescriptionPane;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
+import org.apache.log4j.Logger;
+
 import java.awt.event.ActionEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -21,9 +24,7 @@ import javax.swing.JTree;
 import javax.swing.Timer;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.*;
-
-import de.cismet.tools.collections.TypeSafeCollections;
+import javax.swing.tree.TreePath;
 
 /**
  * DOCUMENT ME!
@@ -35,11 +36,12 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    private static final transient Logger LOG = Logger.getLogger(CatalogueSelectionListener.class);
+
     private static final int SELECTION_CADENCE_TIME = 300;
 
     //~ Instance fields --------------------------------------------------------
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private final AttributeViewer attributeViewer;
     private final DescriptionPane descriptionPane;
     private final Timer timer;
@@ -59,10 +61,6 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
         timerListener = new SelectionActionListener();
         timer = new Timer(SELECTION_CADENCE_TIME, timerListener);
         timer.setRepeats(false);
-        // class attributes only this.classAttributeIterator = new SingleAttributeIterator(new
-        // SimpleAttributeRestriction(AttributeRestriction.CLASS, AttributeRestriction.TRUE,
-        // AttributeRestriction.IGNORE, null, null), false); object attributes only this.objectAttributeIterator = new
-        // SingleAttributeIterator();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -73,22 +71,22 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
      * @param  e  DOCUMENT ME!
      */
     private void performValueChanged(final TreeSelectionEvent e) {
-//        final Runnable r = new Runnable() {
-//
-//            @Override
-//            public void run() {
         final JTree t = (JTree)e.getSource();
 
         final MetaCatalogueTree catalogue = ComponentRegistry.getRegistry().getCatalogueTree();
         final MetaCatalogueTree searchResults = ComponentRegistry.getRegistry().getSearchResultsTree();
 
         if (t == catalogue) {
-            log.fatal("Suchergebnisse");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("searchresults tree changed");
+            }
             searchResults.removeTreeSelectionListener(this);
             searchResults.clearSelection();
             searchResults.addTreeSelectionListener(this);
         } else {
-            log.fatal("Katalog");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("catalogue tree changed");
+            }
             catalogue.removeTreeSelectionListener(this);
             catalogue.clearSelection();
             catalogue.addTreeSelectionListener(this);
@@ -96,7 +94,7 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
 
         final TreePath[] treePaths = t.getSelectionPaths();
 
-        final List<Object> objects = TypeSafeCollections.newArrayList();
+        final List<Object> objects = new ArrayList<Object>();
         if (treePaths != null) {
             for (int i = 0; i < treePaths.length; i++) {
                 objects.add(treePaths[i].getLastPathComponent());
@@ -104,10 +102,6 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
         }
         CatalogueSelectionListener.this.attributeViewer.setTreeNodes(objects);
         CatalogueSelectionListener.this.descriptionPane.setNodesDescriptions(objects);
-
-//            }
-//        };
-//        ApplicationThreadPool.execute(r);
     }
 
     /**
