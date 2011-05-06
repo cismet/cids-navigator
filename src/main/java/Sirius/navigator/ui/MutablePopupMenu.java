@@ -47,6 +47,7 @@ import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.permission.PermissionHolder;
 import Sirius.server.newuser.permission.Policy;
 
@@ -274,13 +275,15 @@ public class MutablePopupMenu extends JPopupMenu {
 //                treeEditorMenu = new TreeEditorMenu(ComponentRegistry.getRegistry().getMainWindow(), ComponentRegistry.getRegistry().getCatalogueTree());
 //                addPluginMenu(treeEditorMenu);
                 final Node node = currentTree.getSelectedNode().getNode();
-                if ((node.getId() != -1) && (node.getDynamicChildrenStatement() == null)) {
-                    // Kein dynamischer Knoten, keine dynamischen Kinder
-                    newNode.setVisible(true);
-                    editNode.setVisible(true);
-                    deleteNode.setVisible(true);
-                    editObject.setVisible(true);
-                } else if ((node instanceof MetaObjectNode) && (node.getId() == -1)) {
+//                if ((node.getId() != -1) && (node.getDynamicChildrenStatement() == null)) {
+//                    // Kein dynamischer Knoten, keine dynamischen Kinder
+//                    newNode.setVisible(true);
+//                    editNode.setVisible(true);
+//                    deleteNode.setVisible(true);
+//                    editObject.setVisible(true);
+//                } else
+//
+                if ((node instanceof MetaObjectNode) && (node.getId() == -1)) {
                     // DynamicObjectNode
 
                     // EditObject
@@ -288,6 +291,18 @@ public class MutablePopupMenu extends JPopupMenu {
 
                     // DeleteObject
                     deleteObject.setVisible(true);
+                    final User u = SessionManager.getSession().getUser();
+
+                    final boolean permission = ((MetaObjectNode)node).getObject()
+                                .getMetaClass()
+                                .getPermissions()
+                                .hasWritePermission(u.getUserGroup())
+                                && ((MetaObjectNode)node).getObject()
+                                .getBean()
+                                .hasObjectWritePermission(u);
+
+                    editObject.setEnabled(permission);
+                    deleteObject.setEnabled(permission);
                 } else if ((node instanceof MetaNode) && (node.getClassId() != -1)) {
                     final int classID = node.getClassId();
                     final String domain = node.getDomain();
@@ -618,12 +633,12 @@ public class MutablePopupMenu extends JPopupMenu {
         public void invoke() throws Exception {
             final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser().getUserGroup())) {
-                final MetaObject MetaObject = metaClass.getEmptyInstance();
-                MetaObject.setStatus(MetaObject.NEW);
+                final MetaObject metaObject = metaClass.getEmptyInstance();
+                metaObject.setStatus(metaObject.NEW);
                 final MetaObjectNode MetaObjectNode = new MetaObjectNode(
                         -1,
                         SessionManager.getSession().getUser().getDomain(),
-                        MetaObject,
+                        metaObject,
                         null,
                         null,
                         true,

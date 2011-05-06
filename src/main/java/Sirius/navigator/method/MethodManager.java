@@ -877,6 +877,8 @@ public class MethodManager {
             // wenn MON dann editieren wenn Rechte am Knoten und and der Klasse
             hasPermission = c.getPermissions().hasPermission(key, permission);
             hasPermission &= node.getPermissions().hasPermission(key, permission);
+            // und am Objekt
+            hasPermission &= node.getObject().getBean().hasObjectWritePermission(SessionManager.getSession().getUser());
 
             if (logger.isDebugEnabled()) {
                 logger.debug("Check ClassPermissions for node" + node + "   " + c.getPermissions() + "  with key"

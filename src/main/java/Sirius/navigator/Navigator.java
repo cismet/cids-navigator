@@ -268,6 +268,7 @@ public class Navigator extends JFrame {
             initWidgets();
             initDialogs();
             initPlugins();
+
             initEvents();
             initWindow();
 //            if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
@@ -456,6 +457,14 @@ public class Navigator extends JFrame {
         this.getContentPane().add(statusBar, BorderLayout.SOUTH);
     }
     // #########################################################################
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private void initToolbar() throws Exception {
+    }
 
     /**
      * DOCUMENT ME!

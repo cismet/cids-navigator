@@ -357,13 +357,18 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                             .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
 
                 return (!this.readOnly & !((Attribute)this.getValue()).isPrimaryKey())
-                            && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION);
+                            && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)
+                            && this.getMetaObject(this.getValue()).getBean()
+                            .hasObjectWritePermission(SessionManager.getSession().getUser());
                     // return !this.readOnly & !((Attribute)this.getValue()).isPrimaryKey() &
                     // ((Attribute)this.getValue()).getPermissions().hasPermission(key,Sirius.navigator.connection.SessionManager.getSession().getWritePermission());
             } else {
                 final MetaClass metaClass = SessionManager.getProxy()
                             .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
-                return !this.readOnly & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION);
+                return (!this.readOnly
+                                & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION))
+                            && this.getMetaObject(this.getValue()).getBean()
+                            .hasObjectWritePermission(SessionManager.getSession().getUser());
             }
         } catch (Exception exp) {
             logger.error("isEditable() could not check permissions of object " + this.getValue(), exp); // NOI18N

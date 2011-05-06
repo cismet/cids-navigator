@@ -12,6 +12,7 @@
  */
 package Sirius.navigator.ui.attributes;
 
+import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
 import Sirius.navigator.resource.*;
@@ -101,8 +102,8 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         this.attributeTree.setTreeNode(treeNode);
 
         if ((treeNode != null) && (treeNode instanceof ObjectTreeNode) && PropertyManager.getManager().isEditable()) {
-            this.editButton.setEnabled(true);
             final MetaObject mo = ((ObjectTreeNode)treeNode).getMetaObject();
+            this.editButton.setEnabled(mo.getBean().hasObjectWritePermission(SessionManager.getSession().getUser()));
         } else {
             this.editButton.setEnabled(false);
         }
