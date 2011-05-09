@@ -54,6 +54,8 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 
+import org.openide.util.Lookup;
+
 import java.awt.BorderLayout;
 import java.awt.event.*;
 
@@ -74,6 +76,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.swing.*;
 
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
+
+import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
@@ -268,7 +272,7 @@ public class Navigator extends JFrame {
             initWidgets();
             initDialogs();
             initPlugins();
-
+            initToolbarExtensions();
             initEvents();
             initWindow();
 //            if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
@@ -463,7 +467,34 @@ public class Navigator extends JFrame {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    private void initToolbar() throws Exception {
+    private void initToolbarExtensions() throws Exception {
+        final Collection<? extends CidsClientToolbarItem> customToolbarItems = Lookup.getDefault()
+                    .lookupAll(CidsClientToolbarItem.class);
+
+        final Comparator<CidsClientToolbarItem> comp = new Comparator<CidsClientToolbarItem>() {
+
+                @Override
+                public int compare(final CidsClientToolbarItem t, final CidsClientToolbarItem t1) {
+                    try {
+                        return t.getSorterString().compareTo(t1.getSorterString());
+                    } catch (Exception e) {
+                        logger.warn(
+                            "Error during comparing ToolbarExtensions. (You should not return null in getSorterString()) --> returned 0",
+                            e);
+                        return 0;
+                    }
+                }
+            };
+
+        final ArrayList<CidsClientToolbarItem> sorted = new ArrayList<CidsClientToolbarItem>(customToolbarItems);
+
+        Collections.sort(sorted, comp);
+
+        for (final CidsClientToolbarItem ccti : sorted) {
+            if (ccti.isVisible()) {
+                toolBar.getDefaultToolBar().add(ccti);
+            }
+        }
     }
 
     /**

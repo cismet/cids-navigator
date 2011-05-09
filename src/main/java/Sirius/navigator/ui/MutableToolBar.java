@@ -252,6 +252,15 @@ public class MutableToolBar extends JToolBar {
         return this.pluginToolBars.isAvailable(id);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public JToolBar getDefaultToolBar() {
+        return defaultToolBar;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
