@@ -37,6 +37,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -64,7 +65,9 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
     public AbstractNewObjectToolbarAction() {
         try {
             cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName());
-            final ImageIcon base = new ImageIcon(cb.getMetaObject().getMetaClass().getIconData());
+            final ImageIcon iconIcon = new ImageIcon(cb.getMetaObject().getMetaClass().getIconData());
+            final Icon base = (((iconIcon.getIconHeight() < 0) || (iconIcon.getIconWidth() < 0))
+                    ? UIManager.getIcon("FileView.fileIcon") : iconIcon);
 //            final ImageIcon overlay = Static2DTools.createOverlayIcon(add, 20, 20);
 //            setIcon(Static2DTools.mergeIcons(base, overlay));
             setIcon(base);
