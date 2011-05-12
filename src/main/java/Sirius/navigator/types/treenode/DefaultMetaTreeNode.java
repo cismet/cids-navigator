@@ -184,7 +184,12 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
 //            if(node.getChildren() == null)
 //            {
 
-        return SessionManager.getProxy().getChildren(node, SessionManager.getSession().getUser());
+        final Node[] c = SessionManager.getProxy().getChildren(node, SessionManager.getSession().getUser());
+        if (node.isDynamic() && node.isSqlSort()) {
+            return c;
+        }
+
+        return Sirius.navigator.tools.NodeSorter.sortNodes(c);
 //            }
 //            else
 //            {

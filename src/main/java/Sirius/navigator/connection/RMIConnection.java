@@ -309,13 +309,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     @Override
     public Node[] getChildren(final Node node, final User user) throws ConnectionException {
         try {
-            final Node[] n = ((CatalogueService)callserver).getChildren(node, user);
-
-            if (node.isDynamic() && node.isSqlSort()) {
-                return n;
-            }
-
-            return Sirius.navigator.tools.NodeSorter.sortNodes(n);
+            return ((CatalogueService)callserver).getChildren(node, user);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve children of node '" + node, re);
             throw new ConnectionException("[ServerError] could not retrieve children of node '" + node
