@@ -30,6 +30,9 @@ package de.cismet.reconnector;
 
 import java.awt.Container;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import javax.swing.JDialog;
 import javax.swing.UIManager;
 
@@ -66,14 +69,11 @@ public class DefaultReconnectorErrorPanel extends javax.swing.JPanel {
     public DefaultReconnectorErrorPanel(final String message, final Throwable exception) {
         initComponents();
 
-        final StackTraceElement[] elements = exception.getStackTrace();
-        final StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < elements.length; i++) {
-            buffer.append(elements[i].toString()).append('\n');
-        }
+        final StringWriter exWriter = new StringWriter();
+        exception.printStackTrace(new PrintWriter(exWriter));
 
         labMessage.setText(message);
-        txtDetails.setText(buffer.toString());
+        txtDetails.setText(exWriter.toString());
         panDetails.setVisible(false);
     }
 
