@@ -10,7 +10,11 @@ package Sirius.navigator.connection;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
+import org.openide.util.Lookup;
+
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.ws.SSLConfig;
+import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
@@ -99,14 +103,9 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     @Override
     protected R connectService() {
-//        //TODO ab hier entfernen !!! nur zum Testen !
-//        try {
-//
-//            Thread.sleep(500);
-//        } catch (InterruptedException ex) {
-//            log.debug("Sleep interrupted", ex);
-//        }
-//        //TODO bis hier entfernen !!! nur zum Testen !
-        return (R)new RESTfulSerialInterfaceConnector(callserverURL, proxy);
+        final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
+        final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
+
+        return (R)new RESTfulSerialInterfaceConnector(callserverURL, proxy, sslConfig);
     }
 }
