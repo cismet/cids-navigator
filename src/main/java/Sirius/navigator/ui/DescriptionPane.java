@@ -169,7 +169,16 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
         scpRenderer.setViewportView(panRenderer);
         panRenderer.setLayout(new GridBagLayout());
-        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
+
+        /*Following try-catch-block only exists to enable the user to user DescriptionPaneTest which runs outside the
+         * navigator. Therefore a RuntimeException will be thrown because no SessionManager is available.
+         */
+        ComponentWrapper cw = null;
+        try {
+            cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
+        } catch (Exception e) {
+        }
+
         if (cw != null) {
             wrappedWaitingPanel = (JComponent)cw.wrapComponent(lblRendererCreationWaitingLabel);
         } else {

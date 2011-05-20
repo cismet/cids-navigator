@@ -9,6 +9,7 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.ui.status.Status;
 
+import org.xhtmlrenderer.extend.NamespaceHandler;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 
 import java.awt.EventQueue;
@@ -44,6 +45,8 @@ public class DescriptionPaneFS extends DescriptionPane {
     private JMenuItem mnuItem_openInExternalBrowser;
     private String pageURI;
 
+    private NamespaceHandler namespaceHandler;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -58,6 +61,7 @@ public class DescriptionPaneFS extends DescriptionPane {
 
         initComponents();
 
+        namespaceHandler = new XhtmlNamespaceHandler();
         xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
 
         showHTML();
@@ -190,8 +194,10 @@ public class DescriptionPaneFS extends DescriptionPane {
     @Override
     public void setPageFromContent(final String markup, final String baseURL) {
         pageURI = null;
+        mnuItem_openInExternalBrowser.setEnabled(false);
+
         try {
-            xHTMLPanel1.setDocumentFromString(markup, baseURL, new XhtmlNamespaceHandler());
+            xHTMLPanel1.setDocumentFromString(markup, baseURL, namespaceHandler);
         } catch (Exception e) {
             LOG.error(org.openide.util.NbBundle.getMessage(
                     DescriptionPaneFS.class,
@@ -206,7 +212,6 @@ public class DescriptionPaneFS extends DescriptionPane {
                 Status.ICON_DEACTIVATED,
                 Status.ICON_ACTIVATED);
         }
-        mnuItem_openInExternalBrowser.setEnabled(false);
     }
 
     //~ Inner Classes ----------------------------------------------------------
