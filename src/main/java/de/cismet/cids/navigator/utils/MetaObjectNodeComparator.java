@@ -65,32 +65,48 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
         final MetaObjectNode mon1 = (MetaObjectNode)o1;
         final MetaObjectNode mon2 = (MetaObjectNode)o2;
 
-        MetaObject mo1 = mon1.getObject();
-        MetaObject mo2 = mon2.getObject();
+        String mos1 = mon1.toString();
+        String mos2 = mon2.toString();
 
-        try {
-            if (mo1 == null) {
-                mo1 = SessionManager.getProxy()
-                            .getMetaObject(
-                                    ((MetaObjectNode)o1).getObjectId(),
-                                    o1.getClassId(),
-                                    o1.getDomain());
-                mon1.setObject(mo1);
+        if ((mos1 == null) || (mos1.trim().length() == 0)) {
+            MetaObject mo1 = mon1.getObject();
+            try {
+                if (mo1 == null) {
+                    mo1 = SessionManager.getProxy()
+                                .getMetaObject(
+                                        ((MetaObjectNode)o1).getObjectId(),
+                                        o1.getClassId(),
+                                        o1.getDomain());
+                    mon1.setObject(mo1);
+                    mon1.setName(mo1.toString());
+                }
+            } catch (final ConnectionException e) {
+                LOG.error("Connection problem: ", e);
             }
-            if (mo2 == null) {
-                mo2 = SessionManager.getProxy()
-                            .getMetaObject(
-                                    ((MetaObjectNode)o2).getObjectId(),
-                                    o2.getClassId(),
-                                    o2.getDomain());
-                mon2.setObject(mo2);
-            }
-
-            return mo1.toString().compareTo(mo2.toString());
-        } catch (final ConnectionException e) {
-            LOG.error("Connection problem: ", e);
+            mos1 = mon1.toString();
         }
+        if ((mos2 == null) || (mos2.trim().length() == 0)) {
+            try {
+                MetaObject mo2 = mon2.getObject();
 
-        return 0;
+                if (mo2 == null) {
+                    mo2 = SessionManager.getProxy()
+                                .getMetaObject(
+                                        ((MetaObjectNode)o2).getObjectId(),
+                                        o2.getClassId(),
+                                        o2.getDomain());
+                    mon2.setObject(mo2);
+                    mon2.setName(mo2.toString());
+                }
+                mos2 = mon2.toString();
+            } catch (final ConnectionException e) {
+                LOG.error("Connection problem: ", e);
+            }
+        }
+        if ((mos1 != null) && (mos2 != null)) {
+            return mos1.compareTo(mos2);
+        } else {
+            return 0;
+        }
     }
 }
