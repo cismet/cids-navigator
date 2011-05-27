@@ -144,7 +144,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             try {
                 rootNode.addChildren(visibleResultNodes);
             } catch (Exception exp) {
-                logger.fatal("[SearchResultsTree] could not browse forward", exp); // NOI18N
+                logger.warn("[SearchResultsTree] could not browse forward", exp); // NOI18N
             }
 
             firePropertyChange("browse", 0, 1); // NOI18N
@@ -233,7 +233,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             try {
                 rootNode.addChildren(visibleResultNodes);
             } catch (Exception exp) {
-                logger.fatal("[SearchResultsTree] could not browse back", exp); // NOI18N
+                logger.warn("[SearchResultsTree] could not browse back", exp); // NOI18N
             }
 
             firePropertyChange("browse", 0, 1); // NOI18N
