@@ -141,6 +141,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
             rootNode.removeChildren();
 
+            Arrays.sort(visibleResultNodes, new MetaObjectNodeComparator());
+
             try {
                 rootNode.addChildren(visibleResultNodes);
             } catch (Exception exp) {
@@ -229,6 +231,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 logger.debug("pos: " + pos + " max: " + max); // NOI18N
             }
             rootNode.removeChildren();
+
+            Arrays.sort(visibleResultNodes, new MetaObjectNodeComparator());
 
             try {
                 rootNode.addChildren(visibleResultNodes);
@@ -346,9 +350,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
             resultNodes = nodes;
         }
 
-        if (resultNodes.length <= visibleNodes) {
-            Arrays.sort(resultNodes, new MetaObjectNodeComparator());
-        }
         max = resultNodes.length;
         pos = 0;
         visibleResultNodes = new Node[visibleNodes];
