@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.openide.util.lookup.ServiceProvider;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import de.cismet.cids.server.ws.SSLConfig;
@@ -47,11 +48,21 @@ public final class DefaultSSLConfigProvider implements SSLConfigProvider {
             LOG.warn("cannot load default server certificate");                       // NOI18N
             sslConfig = null;
         } else {
+            BufferedInputStream bis = null;
             try {
-                sslConfig = SSLConfigFactory.getDefault().createClientConfig(new BufferedInputStream(is));
+                bis = new BufferedInputStream(is);
+                sslConfig = SSLConfigFactory.getDefault().createClientConfig(bis);
             } catch (final SSLConfigFactoryException ex) {
                 LOG.warn("cannot create config from default server certificate", ex); // NOI18N
                 sslConfig = null;
+            } finally {
+                if (bis != null) {
+                    try {
+                        bis.close();
+                    } catch (final IOException e) {
+                        LOG.warn("cannot close certificate inputstream", e);          // NOI18N
+                    }
+                }
             }
         }
 
