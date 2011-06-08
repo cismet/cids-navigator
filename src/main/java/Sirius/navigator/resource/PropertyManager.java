@@ -107,6 +107,7 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
+    private File downloadDestination;
 
     private transient String proxyURL;
     private transient String proxyUsername;
@@ -146,6 +147,7 @@ public final class PropertyManager {
         setConnectionInfoSaveable(false);
 
         setUseFlyingSaucer(false);
+        setDownloadDestination(System.getProperty("user.home"));
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
         connectionInfo.setPassword("");                                   // NOI18N
@@ -756,9 +758,9 @@ public final class PropertyManager {
     }
 
     /**
-     * DOCUMENT ME!
+     * Setter for property useFlyingSaucer.
      *
-     * @param  useFlyingSaucer  loadable DOCUMENT ME!
+     * @param  useFlyingSaucer  String containing 'true'/'false' or '1'/'0'.
      */
     public void setUseFlyingSaucer(final String useFlyingSaucer) {
         if ((useFlyingSaucer != null) && (useFlyingSaucer.equalsIgnoreCase(TRUE) || useFlyingSaucer.equals("1"))) {
@@ -768,7 +770,7 @@ public final class PropertyManager {
             this.setUseFlyingSaucer(false);
         } else {
             this.setUseFlyingSaucer(false);
-            logger.warn("useFlyingSaucer(): invalid property 'useFlyingSaucer': '" + useFlyingSaucer
+            logger.warn("setUseFlyingSaucer(): invalid property 'useFlyingSaucer': '" + useFlyingSaucer
                         + "', setting default value to '"
                         + this.useFlyingSaucer + "'");
         }
@@ -777,11 +779,11 @@ public final class PropertyManager {
     /**
      * Setter for property useFlyingSaucer.
      *
-     * @param  useFlyingSaucer  loadable New value of property useFlyingSaucer.
+     * @param  useFlyingSaucer  DOCUMENT ME!
      */
     public void setUseFlyingSaucer(final boolean useFlyingSaucer) {
         this.useFlyingSaucer = useFlyingSaucer;
-        properties.setProperty("useFlyingSaucer", String.valueOf(this.useFlyingSaucer)); // NOI18N
+        properties.setProperty("setUseFlyingSaucer", String.valueOf(this.useFlyingSaucer)); // NOI18N
     }
 
     /**
@@ -791,6 +793,34 @@ public final class PropertyManager {
      */
     public boolean isUseFlyingSaucer() {
         return this.useFlyingSaucer;
+    }
+
+    /**
+     * Setter for property downloadDestination.
+     *
+     * @param  downloadDestination  String containing download destination.
+     */
+    public void setDownloadDestination(final String downloadDestination) {
+        String calculatedDownloadDestination = null;
+        if ((downloadDestination != null) && (downloadDestination.trim().length() > 0)) {
+            calculatedDownloadDestination = downloadDestination;
+        } else {
+            calculatedDownloadDestination = System.getProperty("user.home");
+            logger.warn("setDownloadDestination(): invalid property 'downloadDestination': '" + downloadDestination
+                        + "', setting default value to user's home.");
+        }
+
+        this.downloadDestination = new File(calculatedDownloadDestination);
+        properties.setProperty("downloadDestination", this.downloadDestination.getAbsolutePath());
+    }
+
+    /**
+     * Getter for property downloadDestination.
+     *
+     * @return  Value of property downloadDestination.
+     */
+    public File getDownloadDestination() {
+        return this.downloadDestination;
     }
 
     /**
@@ -873,6 +903,8 @@ public final class PropertyManager {
             this.connectionInfo.setUsername(value);
         } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
             this.setUseFlyingSaucer(value);
+        } else if (property.equalsIgnoreCase("downloadDestination")) {    // NOI18N
+            this.setDownloadDestination(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
         } else if (property.equals("navigator.proxy.username")) {
