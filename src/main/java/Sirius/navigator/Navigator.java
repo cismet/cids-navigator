@@ -101,7 +101,9 @@ public class Navigator extends JFrame {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final ResourceManager resourceManager = ResourceManager.getManager();
-    public static final String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator/";
+    public static final String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator"
+                + (((System.getProperty("directory.extension")) != null) ? (System.getProperty("directory.extension"))
+                                                                         : "") + "/";
 
     //~ Instance fields --------------------------------------------------------
 
