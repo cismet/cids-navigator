@@ -990,7 +990,7 @@ public final class PropertyManager {
 
         if (cfgFile != null) {
             if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
-                        || (cfgFile.indexOf("file://") == 0)) {
+                        || (cfgFile.indexOf("file:/") == 0)) {
                 final URL url = new URL(cfgFile);
                 this.load(url.openStream());
 
