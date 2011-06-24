@@ -15,8 +15,6 @@ import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -63,8 +61,6 @@ public class DescriptionPaneFS extends DescriptionPane {
 
         namespaceHandler = new XhtmlNamespaceHandler();
         xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
-
-        showHTML();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -211,55 +207,6 @@ public class DescriptionPaneFS extends DescriptionPane {
                 Status.MESSAGE_POSITION_3,
                 Status.ICON_DEACTIVATED,
                 Status.ICON_ACTIVATED);
-        }
-    }
-
-    //~ Inner Classes ----------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private class PopupListener extends MouseAdapter {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private JPopupMenu menu;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new PopupListener object.
-         *
-         * @param  menu  DOCUMENT ME!
-         */
-        public PopupListener(final JPopupMenu menu) {
-            this.menu = menu;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void mousePressed(final MouseEvent e) {
-            showPopup(e);
-        }
-
-        @Override
-        public void mouseReleased(final MouseEvent e) {
-            showPopup(e);
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param  e  DOCUMENT ME!
-         */
-        private void showPopup(final MouseEvent e) {
-            if (e.isPopupTrigger() && (menu != null)) {
-                menu.show(e.getComponent(),
-                    e.getX(), e.getY());
-            }
         }
     }
 }
