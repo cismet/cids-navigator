@@ -32,6 +32,8 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -50,6 +52,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -82,6 +85,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     //~ Static fields/initializers ---------------------------------------------
 
     protected static final ResourceManager RESOURCE = ResourceManager.getManager();
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPane.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -96,7 +100,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected boolean showsWaitScreen = false;
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     protected LinkStyleBreadCrumbGui breadCrumbGui;
-    private final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPane.class);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
@@ -171,7 +174,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         panRenderer.setLayout(new GridBagLayout());
 
         /*Following try-catch-block only exists to enable the user to user DescriptionPaneTest which runs outside the
-         * navigator. Therefore a RuntimeException will be thrown because no SessionManager is available.
+         * navigator. When running DescriptionPaneTest a RuntimeException will be thrown because no SessionManager is
+         * available.
          */
         ComponentWrapper cw = null;
         try {
@@ -751,6 +755,53 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         public void run() {
             if (parent.getLayout() instanceof CardLayout) {
                 ((CardLayout)parent.getLayout()).show(parent, cardToShow);
+            }
+        }
+    }
+
+    /**
+     * Opens a given menu if user asks for. The menu is specified in the constructor.
+     *
+     * @version  $Revision$, $Date$
+     */
+    protected class PopupListener extends MouseAdapter {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private JPopupMenu menu;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new PopupListener object.
+         *
+         * @param  menu  The menu to open.
+         */
+        public PopupListener(final JPopupMenu menu) {
+            this.menu = menu;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void mousePressed(final MouseEvent e) {
+            showPopup(e);
+        }
+
+        @Override
+        public void mouseReleased(final MouseEvent e) {
+            showPopup(e);
+        }
+
+        /**
+         * Shows the popup menu.
+         *
+         * @param  e  The mouse event.
+         */
+        private void showPopup(final MouseEvent e) {
+            if (e.isPopupTrigger() && (menu != null)) {
+                menu.show(e.getComponent(),
+                    e.getX(), e.getY());
             }
         }
     }

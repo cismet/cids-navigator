@@ -27,7 +27,7 @@ public class DescriptionPaneCalpa extends DescriptionPane {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPaneFS.class);
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPaneCalpa.class);
 
     //~ Instance fields --------------------------------------------------------
 
