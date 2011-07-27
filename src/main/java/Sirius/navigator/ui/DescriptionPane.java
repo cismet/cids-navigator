@@ -48,6 +48,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JComponent;
@@ -598,6 +599,10 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                         }
                     } catch (final ExecutionException e) {
                         LOG.error("Error during Renderer creation", e);          // NOI18N
+                    } catch (final CancellationException e) {
+                        LOG.warn(
+                            "get() throw a cancellation exception. This can happen if the construction of a renderer was aborted before it was displayed.",
+                            e);
                     }
                     if (worker == this) {
                         worker = null;

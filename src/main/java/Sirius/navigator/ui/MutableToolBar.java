@@ -124,11 +124,11 @@ public class MutableToolBar extends JToolBar {
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);
 
-        button = new JButton(resources.getIcon("downloadmanager.png"));            // NOI18N
+        button = new JButton(resources.getIcon("downloads.png"));            // NOI18N
         button.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableToolBar.class,
-                "MutableToolBar.createDefaultButtons().downloadmanager.tooltip")); // NOI18N
-        button.setActionCommand("downloadmanager");                                // NOI18N
+                "MutableToolBar.createDefaultButtons().downloads.tooltip")); // NOI18N
+        button.setActionCommand("downloads");                                // NOI18N
         button.setMargin(new Insets(4, 4, 4, 4));
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);
@@ -310,7 +310,7 @@ public class MutableToolBar extends JToolBar {
             } else if (e.getActionCommand().equals("info"))                 // NOI18N
             {
                 MethodManager.getManager().showAboutDialog();
-            } else if (e.getActionCommand().equals("downloadmanager"))      // NOI18N
+            } else if (e.getActionCommand().equals("downloads"))            // NOI18N
             {
                 DownloadManagerDialog.show(ComponentRegistry.getRegistry().getMainWindow());
             }
