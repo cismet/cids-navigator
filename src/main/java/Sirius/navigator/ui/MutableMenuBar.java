@@ -409,6 +409,23 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         menu.addSeparator();
 
+        // Extras menu ......................................................
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.extrasMenu.title")); // NOI18N
+        menu.setMnemonic(org.openide.util.NbBundle.getMessage(
+                MutableMenuBar.class,
+                "MutableMenuBar.extrasMenu.mnemonic").charAt(0));                                                        // NOI18N
+        this.add(menu);
+        menu.add(item = new JMenuItem(
+                    org.openide.util.NbBundle.getMessage(
+                        MutableMenuBar.class,
+                        "MutableMenuBar.extrasMenu.options.title")));                                                    // NOI18N
+        item.setMnemonic(org.openide.util.NbBundle.getMessage(
+                MutableMenuBar.class,
+                "MutableMenuBar.extrasMenu.options.mnemonic").charAt(0));                                                // NOI18N
+        item.setIcon(resources.getIcon("tooloptions.png"));                                                              // NOI18N
+        item.setActionCommand("extras.options");                                                                         // NOI18N
+        item.addActionListener(itemListener);
+
         menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.windowMenu.title")); // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
@@ -416,12 +433,12 @@ public class MutableMenuBar extends JMenuBar {
         this.add(menu);
         viewMenu = menu;
 
-        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.title")); // NOI18N
+        // Help menu ......................................................
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.title"));  // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.helpMenu.mnemonic").charAt(0));                                                        // NOI18N
+                "MutableMenuBar.helpMenu.mnemonic").charAt(0));                                                         // NOI18N
         this.add(menu);
-        // plugin manager ......................................................
         menu.add(item = new JMenuItem(
                     org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.info.title"))); // NOI18N
         item.setMnemonic(org.openide.util.NbBundle.getMessage(
@@ -518,6 +535,8 @@ public class MutableMenuBar extends JMenuBar {
                 MethodManager.getManager().showQueryProfilesManager();
             } else if (e.getActionCommand().equals("plugin.manager")) { // NOI18N
                 MethodManager.getManager().showPluginManager();
+            } else if (e.getActionCommand().equals("extras.options")) { // NOI18N
+                MethodManager.getManager().showOptionsDialog();
             } else if (e.getActionCommand().equals("help.info")) { // NOI18N
                 MethodManager.getManager().showAboutDialog();
             } else if (e.getActionCommand().equals("tree.refresh")) { // NOI18N

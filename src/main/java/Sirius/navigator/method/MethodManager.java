@@ -41,6 +41,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.cismet.lookupoptions.gui.OptionsDialog;
+
 /**
  * DOCUMENT ME!
  *
@@ -184,6 +186,16 @@ public class MethodManager {
         aboutDialog.pack();
         aboutDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
         aboutDialog.show();
+    }
+
+    /**
+     * Shows the options dialog.
+     */
+    public void showOptionsDialog() {
+        final OptionsDialog optionsDialog = ComponentRegistry.getRegistry().getOptionsDialog();
+        optionsDialog.pack();
+        optionsDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
+        optionsDialog.show();
     }
 
     /**

@@ -79,12 +79,16 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.lookupoptions.gui.OptionsClient;
+
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
+
+import de.cismet.tools.configuration.ConfigurationManager;
 
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
@@ -101,14 +105,17 @@ public class Navigator extends JFrame {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final ResourceManager resourceManager = ResourceManager.getManager();
-    public static final String NAVIGATOR_HOME = System.getProperty("user.home") + "/.navigator"
+    public static final String NAVIGATOR_HOME_DIR = ".navigator"
                 + (((System.getProperty("directory.extension")) != null) ? (System.getProperty("directory.extension"))
-                                                                         : "") + "/";
+                                                                         : "");
+    public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
+                + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
 
     //~ Instance fields --------------------------------------------------------
 
     private final Logger logger; // = Logger.getLogger(Navigator.class);
     private final PropertyManager propertyManager;
+    private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final ExceptionManager exceptionManager;
     private final ProgressObserver progressObserver;
     private LoginDialog loginDialog;
@@ -270,6 +277,7 @@ public class Navigator extends JFrame {
 
         try {
             checkNavigatorHome();
+            initConfigurationManager();
             initUI();
             initWidgets();
             initDialogs();
@@ -279,6 +287,10 @@ public class Navigator extends JFrame {
             initWindow();
 //            if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
             initSearch();
+
+            configurationManager.addConfigurable(OptionsClient.getInstance());
+            
+            configurationManager.configure();
 //            }
             // Not in EDT
             if (container instanceof LayoutedContainer) {
@@ -324,6 +336,28 @@ public class Navigator extends JFrame {
             };
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(configLoggerKeyStroke, "CONFIGLOGGING"); // NOI18N
         getRootPane().getActionMap().put("CONFIGLOGGING", configAction);                                          // NOI18N
+    }
+
+    private void initConfigurationManager() {
+        // TODO: Put in method which modifies progress
+        String cismapconfig = null;
+        String fallBackConfig = null;
+
+        // Default
+        if (cismapconfig == null) {
+            cismapconfig = "defaultNavigatorProperties.xml"; // NOI18N
+        }
+
+        if (fallBackConfig == null) {
+            fallBackConfig = "defaultNavigatorProperties.xml"; // NOI18N
+        }
+
+        configurationManager.setDefaultFileName(cismapconfig);
+        configurationManager.setFallBackFileName(fallBackConfig);
+
+        configurationManager.setFileName("configuration.xml");
+        configurationManager.setClassPathFolder("/");
+        configurationManager.setFolder(NAVIGATOR_HOME_DIR);
     }
 
     /**
@@ -915,6 +949,8 @@ public class Navigator extends JFrame {
             ((LayoutedContainer)container).saveLayout(LayoutedContainer.DEFAULT_LAYOUT, this);
         }
         Navigator.this.saveWindowState();
+
+        configurationManager.writeConfiguration();
 
         PluginRegistry.destroy();
 

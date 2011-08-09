@@ -80,6 +80,7 @@ public class ComponentRegistry {
     private DescriptionPane descriptionPane = null;
     /** Holds value of property attributeEditor. */
     private AttributeEditor attributeEditor;
+    private de.cismet.lookupoptions.gui.OptionsDialog optionsDialog = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -406,6 +407,19 @@ public class ComponentRegistry {
         }
 
         return this.pluginManager;
+    }
+
+    /**
+     * Getter for property optionsDialog.
+     *
+     * @return  Value of property optionsDialog.
+     */
+    public de.cismet.lookupoptions.gui.OptionsDialog getOptionsDialog() {
+        if (this.optionsDialog == null) {
+            this.optionsDialog = new de.cismet.lookupoptions.gui.OptionsDialog(this.getMainWindow(), true);
+        }
+
+        return this.optionsDialog;
     }
 
     /**
