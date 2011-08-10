@@ -289,7 +289,7 @@ public class Navigator extends JFrame {
             initSearch();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
-            
+
             configurationManager.configure();
 //            }
             // Not in EDT
@@ -338,6 +338,9 @@ public class Navigator extends JFrame {
         getRootPane().getActionMap().put("CONFIGLOGGING", configAction);                                          // NOI18N
     }
 
+    /**
+     * Initialises the configuration manager.
+     */
     private void initConfigurationManager() {
         // TODO: Put in method which modifies progress
         String cismapconfig = null;

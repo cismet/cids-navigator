@@ -195,7 +195,7 @@ public class MethodManager {
         final OptionsDialog optionsDialog = ComponentRegistry.getRegistry().getOptionsDialog();
         optionsDialog.pack();
         optionsDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        optionsDialog.show();
+        optionsDialog.setVisible(true);
     }
 
     /**

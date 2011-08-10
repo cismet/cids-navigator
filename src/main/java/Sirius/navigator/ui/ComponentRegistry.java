@@ -417,6 +417,7 @@ public class ComponentRegistry {
     public de.cismet.lookupoptions.gui.OptionsDialog getOptionsDialog() {
         if (this.optionsDialog == null) {
             this.optionsDialog = new de.cismet.lookupoptions.gui.OptionsDialog(this.getMainWindow(), true);
+            this.optionsDialog.addWindowListener(this.optionsDialog);
         }
 
         return this.optionsDialog;
