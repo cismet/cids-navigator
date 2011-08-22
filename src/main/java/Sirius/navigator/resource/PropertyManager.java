@@ -69,8 +69,6 @@ public final class PropertyManager {
     public static final String SORT_ID_TOKEN = "%id%";
     public static final int MIN_SERVER_THREADS = 3;
     public static final int MAX_SERVER_THREADS = 10;
-    public static final int MIN_SEARCH_RESULTS = 20;
-    public static final int MAX_SEARCH_RESULTS = 300;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -90,7 +88,6 @@ public final class PropertyManager {
     private String connectionProxyClass;
     private boolean autoLogin;
     private int maxConnections;
-    private int maxSearchResults;
     private boolean sortChildren;
     private boolean sortAscending;
     private int httpInterfacePort = -1;
@@ -107,7 +104,6 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
-    private File downloadDestination;
 
     private transient String proxyURL;
     private transient String proxyUsername;
@@ -135,7 +131,6 @@ public final class PropertyManager {
         setConnectionProxyClass("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler"); // NOI18N
         setAutoLogin(false);
         setMaxConnections(MIN_SERVER_THREADS);
-        setMaxSearchResults(MIN_SEARCH_RESULTS);
         setSortChildren(false);
         setSortAscending(false);
 
@@ -147,7 +142,6 @@ public final class PropertyManager {
         setConnectionInfoSaveable(false);
 
         setUseFlyingSaucer(false);
-        setDownloadDestination(System.getProperty("user.home"));
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
         connectionInfo.setPassword("");                                   // NOI18N
@@ -476,46 +470,6 @@ public final class PropertyManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  maxSearchResults  DOCUMENT ME!
-     */
-    public void setMaxSearchResults(final String maxSearchResults) {
-        try {
-            final int imaxSearchResults = Integer.parseInt(maxSearchResults);
-            this.setMaxSearchResults(imaxSearchResults);
-        } catch (NumberFormatException nfe) {
-            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + nfe.getMessage() + "'"); // NOI18N
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  maxSearchResults  DOCUMENT ME!
-     */
-    public void setMaxSearchResults(final int maxSearchResults) {
-        if ((maxSearchResults < MIN_SEARCH_RESULTS) || (maxSearchResults > MAX_SEARCH_RESULTS)) {
-            this.maxSearchResults = MIN_SEARCH_RESULTS;
-            properties.setProperty("maxSearchResults", String.valueOf(this.maxSearchResults));
-            logger.warn("setMaxSearchResults(): invalid property 'maxSearchResults': '" + maxSearchResults
-                        + "', setting default value to '" + MIN_SEARCH_RESULTS + "'");
-        } else {
-            this.maxSearchResults = maxSearchResults;
-            properties.setProperty("maxSearchResults", String.valueOf(maxSearchResults)); // NOI18N
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getMaxSearchResults() {
-        return this.maxSearchResults;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  advancedLayout  DOCUMENT ME!
      */
     public void setAdvancedLayout(final String advancedLayout) {
@@ -796,34 +750,6 @@ public final class PropertyManager {
     }
 
     /**
-     * Setter for property downloadDestination.
-     *
-     * @param  downloadDestination  String containing download destination.
-     */
-    public void setDownloadDestination(final String downloadDestination) {
-        String calculatedDownloadDestination = null;
-        if ((downloadDestination != null) && (downloadDestination.trim().length() > 0)) {
-            calculatedDownloadDestination = downloadDestination;
-        } else {
-            calculatedDownloadDestination = System.getProperty("user.home");
-            logger.warn("setDownloadDestination(): invalid property 'downloadDestination': '" + downloadDestination
-                        + "', setting default value to user's home.");
-        }
-
-        this.downloadDestination = new File(calculatedDownloadDestination);
-        properties.setProperty("downloadDestination", this.downloadDestination.getAbsolutePath());
-    }
-
-    /**
-     * Getter for property downloadDestination.
-     *
-     * @return  Value of property downloadDestination.
-     */
-    public File getDownloadDestination() {
-        return this.downloadDestination;
-    }
-
-    /**
      * .........................................................................
      *
      * @return  DOCUMENT ME!
@@ -873,8 +799,6 @@ public final class PropertyManager {
             this.setConnectionProxyClass(value);
         } else if (property.equalsIgnoreCase("maxConnections")) {         // NOI18N
             this.setMaxConnections(value);
-        } else if (property.equalsIgnoreCase("maxSearchResults")) {       // NOI18N
-            this.setMaxSearchResults(value);
         } else if (property.equalsIgnoreCase("sortChildren")) {           // NOI18N
             this.setSortChildren(value);
         } else if (property.equalsIgnoreCase("sortAscending")) {          // NOI18N
@@ -903,8 +827,6 @@ public final class PropertyManager {
             this.connectionInfo.setUsername(value);
         } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
             this.setUseFlyingSaucer(value);
-        } else if (property.equalsIgnoreCase("downloadDestination")) {    // NOI18N
-            this.setDownloadDestination(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
         } else if (property.equals("navigator.proxy.username")) {

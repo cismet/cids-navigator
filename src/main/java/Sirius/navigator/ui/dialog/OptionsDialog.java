@@ -33,7 +33,6 @@ package Sirius.navigator.ui.dialog;
 //import ISClient.ims.client.ISFloatingFrameModel;
 //import Sirius.navigator.deprecated.NavigatorModel;
 
-import Sirius.navigator.*;
 //import Sirius.navigator.ui.widget.SingleLineListBox;
 import Sirius.navigator.resource.*;
 
@@ -44,7 +43,6 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
-import javax.swing.event.*;
 
 // !!! MANU_NAV: !!!
 //[ISDS PD 12062002]import Sirius.Model.ISDSClient.*;
@@ -82,7 +80,6 @@ public class OptionsDialog extends JDialog implements ActionListener {
     private JTextField navCallServerIPTextField;
     // private SingleLineListBox navMaxConnectionsBox, navMaxSearchResultBox;
     private JSpinner maxConnectionsSpinner;
-    private JSpinner maxSearchResultsSpinner;
     private JRadioButton optimizeLayout;
     private JRadioButton optimizeSpeed;
     // private JCheckBox navProportionalResizeCheck, navContinuousLayoutCheck, navSortChildrenCheck;
@@ -308,12 +305,6 @@ public class OptionsDialog extends JDialog implements ActionListener {
         gbc2.gridy++;
         // navMaxSearchResultBox = new SingleLineListBox(NavigatorModel.MIN_SEARCH_RESULTS,
         // NavigatorModel.MAX_SEARCH_RESULTS, 1);
-        maxSearchResultsSpinner = new JSpinner(new SpinnerNumberModel(
-                    PropertyManager.MIN_SEARCH_RESULTS,
-                    PropertyManager.MIN_SEARCH_RESULTS,
-                    PropertyManager.MAX_SEARCH_RESULTS,
-                    10));
-        navigatorServerPanel.add(maxSearchResultsSpinner, gbc2);
 
         // ANSICHT =============================================================
         // top, left, bottom, right
@@ -441,8 +432,6 @@ public class OptionsDialog extends JDialog implements ActionListener {
         // navMaxConnectionsBox.setSelectedValue(properties.getMaxConnections());
         // navMaxSearchResultBox.setSelectedValue(navigatorModel.getMaxSearchResults());
         ((SpinnerNumberModel)maxConnectionsSpinner.getModel()).setValue(new Integer(properties.getMaxConnections()));
-        ((SpinnerNumberModel)maxSearchResultsSpinner.getModel()).setValue(new Integer(
-                properties.getMaxSearchResults()));
         optimizeLayout.setSelected(properties.isAdvancedLayout());
         optimizeSpeed.setSelected(!properties.isAdvancedLayout());
         // navProportionalResizeCheck.setSelected(properties.isAdvancedLayout());
@@ -471,7 +460,6 @@ public class OptionsDialog extends JDialog implements ActionListener {
 
         properties.getConnectionInfo().setCallserverURL(navCallServerIPTextField.getText());
         properties.setMaxConnections(((SpinnerNumberModel)maxConnectionsSpinner.getModel()).getNumber().intValue());
-        properties.setMaxSearchResults(((SpinnerNumberModel)maxSearchResultsSpinner.getModel()).getNumber().intValue());
         properties.setAdvancedLayout(optimizeLayout.isSelected());
         // properties.setAdvancedLayout(navContinuousLayoutCheck.isSelected());
         properties.setLookAndFeel((String)navLookAndFeelBox.getSelectedItem());
