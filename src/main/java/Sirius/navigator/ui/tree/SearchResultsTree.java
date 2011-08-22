@@ -13,11 +13,13 @@ import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
+import Sirius.navigator.types.treenode.WaitTreeNode;
 
 import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
+
 
 import java.awt.EventQueue;
 
@@ -25,10 +27,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.cismet.cids.navigator.utils.MetaObjectNodeComparator;
+import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.tools.CismetThreadPool;
@@ -46,18 +50,13 @@ public class SearchResultsTree extends MetaCatalogueTree {
     //~ Instance fields --------------------------------------------------------
 
     private boolean empty = true;
-    private boolean browseBack = false;
-    private boolean browseForward = false;
     private Node[] resultNodes = null;
-    private Node[] visibleResultNodes = null;
     private final RootTreeNode rootNode;
-    private final int visibleNodes;
-    // Position des LETZTEN Elements
-    private int pos = 0;
-    private int max = 0;
-    private int rest = 0;
     private Thread runningNameLoader = null;
+    private SwingWorker<Void, Void> refreshWorker;
     private boolean syncWithMap = false;
+    private DirectedMetaObjectNodeComparator comparator;
+    private final WaitTreeNode waitTreeNode = new WaitTreeNode();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -67,188 +66,26 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @throws  Exception  DOCUMENT ME!
      */
     public SearchResultsTree() throws Exception {
-        this(50, true, 2);
+        this(true, 2);
     }
 
     /**
      * Creates a new SearchResultsTree object.
      *
-     * @param   visibleNodes    DOCUMENT ME!
      * @param   useThread       DOCUMENT ME!
      * @param   maxThreadCount  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public SearchResultsTree(final int visibleNodes, final boolean useThread, final int maxThreadCount)
-            throws Exception {
+    public SearchResultsTree(final boolean useThread, final int maxThreadCount) throws Exception {
         super(new RootTreeNode(), false, useThread, maxThreadCount);
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
-        this.visibleNodes = visibleNodes;
         defaultTreeModel.setAsksAllowsChildren(true);
         this.defaultTreeModel.setAsksAllowsChildren(true);
+        this.comparator = new DirectedMetaObjectNodeComparator();
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * Blaettert in der Ergebnissmenge einen Schritt vor. Loest einen PropertyChange Event ("browse") aus.
-     *
-     * @return  true, bis das Ende der Ergebnissmenge erreicht wurde.
-     */
-    public boolean browseForward() {
-        logger.info("[SearchResultsTree] browsing forward"); // NOI18N
-        if (resultNodes != null) {
-            boolean full = true;
-
-            if ((pos + 1) > max) {
-                browseForward = false;
-                browseBack = true;
-            } else if (visibleNodes >= max) {
-                browseBack = false;
-                browseForward = false;
-
-                visibleResultNodes = new Node[max];
-                visibleResultNodes = resultNodes;
-            } else if ((pos + visibleNodes) < max) {
-                int j = 0;
-                for (int i = pos; i < (pos + visibleNodes); i++) {
-                    visibleResultNodes[j] = resultNodes[i];
-                    j++;
-                }
-                pos += visibleNodes;
-                full = false;
-
-                if (pos > visibleNodes) {
-                    browseBack = true;
-                } else {
-                    browseBack = false;
-                }
-                browseForward = true;
-            } else {
-                browseForward = false;
-                browseBack = true;
-
-                rest = max - pos;
-                visibleResultNodes = new Node[rest];
-                int j = 0;
-                for (int i = pos; i < max; i++) {
-                    visibleResultNodes[j] = resultNodes[i];
-                    j++;
-                }
-                pos = max;
-                full = true;
-            }
-
-            rootNode.removeChildren();
-
-            Arrays.sort(visibleResultNodes, new MetaObjectNodeComparator());
-
-            try {
-                rootNode.addChildren(visibleResultNodes);
-            } catch (Exception exp) {
-                logger.warn("[SearchResultsTree] could not browse forward", exp); // NOI18N
-            }
-
-            firePropertyChange("browse", 0, 1); // NOI18N
-            defaultTreeModel.nodeStructureChanged(rootNode);
-            checkForDynamicNodes();
-            return full;
-        }
-
-        System.gc();
-        return true;
-    }
-
-    /**
-     * Blaettert in der Ergebnissmenge einen Schritt zurueck. Loest einen PropertyChange Event ("browse") aus.
-     *
-     * @return  true, bis der Anfang der Ergebnissmenge erreicht wurde.
-     */
-    public boolean browseBack() {
-        logger.info("[SearchResultsTree] browsing back"); // NOI18N
-        if (resultNodes != null) {
-            boolean full = true;
-
-            if (visibleNodes >= max) {
-                browseForward = false;
-                browseBack = true;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack); // NOI18N
-                    logger.debug("visibleNodes: " + visibleNodes + " >= max: " + max);              // NOI18N
-                }
-                visibleResultNodes = new Node[max];
-                visibleResultNodes = resultNodes;
-            } else if ((pos < max) && ((pos - visibleNodes) >= visibleNodes)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("pos: " + pos + " - visibleNodes: " + visibleNodes + " >= 0");     // NOI18N
-                }
-                pos -= visibleNodes;
-                int j = 0;
-                visibleResultNodes = new Node[visibleNodes];
-
-                for (int i = (pos - visibleNodes); i < pos; i++) {
-                    // logger.debug("i: " + i + "j: " + j);
-                    visibleResultNodes[j] = resultNodes[i];
-                    j++;
-                }
-                full = false;
-
-                if (pos <= visibleNodes) {
-                    browseBack = false;
-                } else {
-                    browseBack = true;
-                }
-                browseForward = true;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack); // NOI18N
-                }
-            } else if (pos == max) {
-                browseForward = true;
-                browseBack = true;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("browseForward: " + browseForward + " browseBack: " + browseBack); // NOI18N
-                    logger.debug("pos: " + pos + " == max" + max);                                  // NOI18N
-                }
-                pos -= rest;
-                int j = 0;
-                visibleResultNodes = new Node[visibleNodes];
-
-                for (int i = (pos - visibleNodes); i < pos; i++) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("i: " + i + "j: " + j); // NOI18N
-                    }
-                    visibleResultNodes[j] = resultNodes[i];
-                    j++;
-                }
-                full = false;
-            }
-
-            if (pos == visibleNodes) {
-                browseBack = false;
-            }
-
-            if (logger.isDebugEnabled()) {
-                logger.debug("pos: " + pos + " max: " + max); // NOI18N
-            }
-            rootNode.removeChildren();
-
-            Arrays.sort(visibleResultNodes, new MetaObjectNodeComparator());
-
-            try {
-                rootNode.addChildren(visibleResultNodes);
-            } catch (Exception exp) {
-                logger.warn("[SearchResultsTree] could not browse back", exp); // NOI18N
-            }
-
-            firePropertyChange("browse", 0, 1); // NOI18N
-            defaultTreeModel.nodeStructureChanged(rootNode);
-            checkForDynamicNodes();
-            return full;
-        }
-        checkForDynamicNodes();
-        System.gc();
-        return true;
-    }
 
     /**
      * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.
@@ -259,22 +96,15 @@ public class SearchResultsTree extends MetaCatalogueTree {
         if (logger.isInfoEnabled()) {
             logger.info("[SearchResultsTree] filling tree with '" + nodes.length + "' nodes"); // NOI18N
         }
-        pos = 0;
 
         if ((nodes == null) || (nodes.length < 1)) {
             empty = true;
-            browseBack = false;
-            browseForward = false;
-            firePropertyChange("browse", 0, 1); // NOI18N
+            resultNodes = new Node[0];
         } else {
-            resultNodes = nodes;
-            max = resultNodes.length;
-            visibleResultNodes = new Node[visibleNodes];
-            this.browseForward();
             empty = false;
         }
 
-        firePropertyChange("browse", 0, 1); // NOI18N
+        refreshTree(resultNodes.length > 0);
         syncWithMap();
         checkForDynamicNodes();
     }
@@ -327,6 +157,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         if (logger.isInfoEnabled()) {
             logger.info("[SearchResultsTree] appending '" + nodes.length + "' nodes"); // NOI18N
         }
+
         if ((append == true) && ((nodes == null) || (nodes.length < 1))) {
             return;
         } else if ((append == false) && ((nodes == null) || (nodes.length < 1))) {
@@ -350,14 +181,29 @@ public class SearchResultsTree extends MetaCatalogueTree {
             resultNodes = nodes;
         }
 
-        max = resultNodes.length;
-        pos = 0;
-        visibleResultNodes = new Node[visibleNodes];
-        this.browseForward();
         empty = false;
-        firePropertyChange("browse", 0, 1); // NOI18N
+        refreshTree(true);
         syncWithMap();
         checkForDynamicNodes();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sort  DOCUMENT ME!
+     */
+    private void refreshTree(final boolean sort) {
+        if ((refreshWorker != null) && !refreshWorker.isDone()) {
+            logger.warn("Refreshing search result tree is triggered while another refresh process is still not done.");
+            refreshWorker.cancel(true);
+        }
+
+        rootNode.removeAllChildren();
+        rootNode.add(waitTreeNode);
+        defaultTreeModel.nodeStructureChanged(rootNode);
+
+        refreshWorker = new RefreshTreeWorker(sort, this);
+        CismetThreadPool.execute(refreshWorker);
     }
 
     /**
@@ -374,7 +220,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                 @Override
                 public void run() {
-                    final Thread parentThread = this;
                     runningNameLoader = this;
                     for (int i = 0; i < dtm.getChildCount(node); ++i) {
                         if (interrupted()) {
@@ -555,11 +400,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     public void clear() {
         logger.info("[SearchResultsTree] removing all nodes"); // NOI18N
         resultNodes = null;
-        pos = 0;
-        max = 0;
         empty = true;
-        browseBack = false;
-        browseForward = false;
         rootNode.removeAllChildren();
         firePropertyChange("browse", 0, 1);                    // NOI18N
         defaultTreeModel.nodeStructureChanged(rootNode);
@@ -567,36 +408,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
     }
 
     /**
-     * Liefert true, wenn im SearchTree zurueck geblaettert werden kann.
+     * Returns a flag indicating whether the SearchResultsTree is empty or not.
      *
-     * @return  true/false
-     */
-    public boolean isBrowseBack() {
-        return this.browseBack;
-    }
-
-    /**
-     * Liefert true, wenn im SearchTree vorwaerts geblaettert werden kann.
-     *
-     * @return  true/false
-     */
-    public boolean isBrowseForward() {
-        return this.browseForward;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public int getVisibleNodes() {
-        return this.visibleNodes;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @return  Flag indicating whether tree is empty or not.
      */
     public boolean isEmpty() {
         return this.empty;
@@ -618,5 +432,81 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void setSyncWithMap(final boolean syncWithMap) {
         this.syncWithMap = syncWithMap;
+    }
+
+    /**
+     * Changes the sort order to ascending or descending according to the given parameter.
+     *
+     * @param  ascending  Whether to sort ascending (<code>true</code>) or descending (<code>false</code>).
+     */
+    public void sort(final boolean ascending) {
+        comparator.setAscending(ascending);
+        refreshTree(true);
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * A SwingWorker which encapsulates sorting the results and refreshing the tree. This worker is needed since it
+     * could be necessary to load every object during the first sort process on a certain result set.
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class RefreshTreeWorker extends SwingWorker<Void, Void> {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private boolean sort = false;
+        private SearchResultsTree tree;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new RefreshTreeWorker object.
+         *
+         * @param  sort  A flag indicating whether to sort the result set or not.
+         * @param  tree  The tree displaying the results.
+         */
+        public RefreshTreeWorker(final boolean sort, final SearchResultsTree tree) {
+            this.sort = sort;
+            this.tree = tree;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        protected Void doInBackground() throws Exception {
+            if (sort && !isCancelled()) {
+                Arrays.sort(resultNodes, comparator);
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                if (!isCancelled()) {
+                    get();
+                }
+            } catch (InterruptedException ex) {
+                logger.error("Error occured while refreshing search results tree", ex);
+            } catch (ExecutionException ex) {
+                logger.error("Error occured while refreshing search results tree", ex);
+            }
+
+            rootNode.removeAllChildren();
+
+            if (!isCancelled()) {
+                try {
+                    rootNode.addChildren(resultNodes);
+                } catch (Exception exp) {
+                    logger.warn("[SearchResultsTree] could not add new nodes", exp); // NOI18N
+                }
+            }
+
+            tree.firePropertyChange("browse", 0, 1); // NOI18N
+            defaultTreeModel.nodeStructureChanged(rootNode);
+        }
     }
 }

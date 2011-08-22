@@ -34,18 +34,19 @@ import de.cismet.tools.gui.JPopupMenuButton;
  */
 public class SearchResultsTreePanel extends JPanel {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger LOG = Logger.getLogger(SearchResultsTreePanel.class);
+
     //~ Instance fields --------------------------------------------------------
 
-    private final Logger logger;
     private final SearchResultsTree searchResultsTree;
     private final JToolBar toolBar;
-    private JButton browseBackButton;
-    private JButton browseForwardButton;
     private JButton removeButton;
     private JButton clearButton;
-    private JButton saveButton;
     private JPopupMenuButton saveAllButton;
     private JCheckBox showDirectlyInMap;
+    private JToggleButton tbnSort;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -74,8 +75,6 @@ public class SearchResultsTreePanel extends JPanel {
         this.toolBar.setRollover(advancedLayout);
         this.toolBar.setFloatable(advancedLayout);
 
-        this.logger = Logger.getLogger(this.getClass());
-
         this.init();
     }
 
@@ -103,25 +102,14 @@ public class SearchResultsTreePanel extends JPanel {
         final ResourceManager resources = ResourceManager.getManager();
         final ActionListener toolBarListener = new ToolBarListener();
 
-        browseBackButton = new JButton(resources.getIcon("back24.gif")); // NOI18N
-        browseBackButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+        tbnSort = new JToggleButton(resources.getIcon("sort_ascending_16.png"));
+        tbnSort.setToolTipText(org.openide.util.NbBundle.getMessage(
                 SearchResultsTreePanel.class,
-                "SearchResultsTreePanel.backButton.tooltip"));           // NOI18N
-        browseBackButton.setActionCommand("back");                       // NOI18N
-        browseBackButton.setMargin(new Insets(4, 4, 4, 4));
-        browseBackButton.addActionListener(toolBarListener);
-        toolBar.add(browseBackButton);
-        // toolBar.addSeparator();
-
-        browseForwardButton = new JButton(resources.getIcon("forward24.gif")); // NOI18N
-        browseForwardButton.setToolTipText(org.openide.util.NbBundle.getMessage(
-                SearchResultsTreePanel.class,
-                "SearchResultsTreePanel.browseForwardButton.tooltip"));        // NOI18N
-        browseForwardButton.setActionCommand("forward");                       // NOI18N
-        browseForwardButton.setMargin(new Insets(4, 4, 4, 4));
-        browseForwardButton.addActionListener(toolBarListener);
-        toolBar.add(browseForwardButton);
-        toolBar.addSeparator();
+                "SearchResultsTreePanel.tbnSort.tooltip"));
+        tbnSort.setMargin(new Insets(4, 4, 4, 4));
+        tbnSort.setActionCommand("sort");
+        tbnSort.addActionListener(toolBarListener);
+        toolBar.add(tbnSort);
 
         removeButton = new JButton(resources.getIcon("remove24.gif")); // NOI18N
         removeButton.setToolTipText(org.openide.util.NbBundle.getMessage(
@@ -186,14 +174,9 @@ public class SearchResultsTreePanel extends JPanel {
      * DOCUMENT ME!
      */
     public void setButtonsEnabled() {
-        browseBackButton.setEnabled(searchResultsTree.isBrowseBack());
-        browseForwardButton.setEnabled(searchResultsTree.isBrowseForward());
+        tbnSort.setEnabled(!searchResultsTree.isEmpty());
         removeButton.setEnabled(!searchResultsTree.isEmpty() && (searchResultsTree.getSelectedNodeCount() > 0));
         clearButton.setEnabled(!searchResultsTree.isEmpty());
-
-        // not implemented:
-        // saveButton.setEnabled(!searchResultsTree.isEmpty() && searchResultsTree.getSelectedNodeCount() > 0);
-        // saveButton.setEnabled(false);
 
         // saveAllButton.setEnabled(!searchResultsTree.isEmpty());
         saveAllButton.setEnabled(true);
@@ -265,13 +248,7 @@ public class SearchResultsTreePanel extends JPanel {
          */
         @Override
         public void actionPerformed(final ActionEvent e) {
-            if (e.getActionCommand().equals("back"))           // NOI18N
-            {
-                searchResultsTree.browseBack();
-            } else if (e.getActionCommand().equals("forward")) // NOI18N
-            {
-                searchResultsTree.browseForward();
-            } else if (e.getActionCommand().equals("remove"))  // NOI18N
+            if (e.getActionCommand().equals("remove"))         // NOI18N
             {
                 searchResultsTree.removeSelectedResultNodes();
             } else if (e.getActionCommand().equals("clear"))   // NOI18N
@@ -283,6 +260,19 @@ public class SearchResultsTreePanel extends JPanel {
             } else if (e.getActionCommand().equals("saveall")) // NOI18N
             {
                 MethodManager.getManager().showQueryResultProfileManager();
+            } else if (e.getActionCommand().equals("sort")) {
+                if (tbnSort.isSelected()) {
+                    tbnSort.setIcon(ResourceManager.getManager().getIcon("sort_descending_16.png"));
+                    tbnSort.setToolTipText(org.openide.util.NbBundle.getMessage(
+                            SearchResultsTreePanel.class,
+                            "SearchResultsTreePanel.tbnSort.selected.tooltip"));
+                } else {
+                    tbnSort.setIcon(ResourceManager.getManager().getIcon("sort_ascending_16.png"));
+                    tbnSort.setToolTipText(org.openide.util.NbBundle.getMessage(
+                            SearchResultsTreePanel.class,
+                            "SearchResultsTreePanel.tbnSort.tooltip"));
+                }
+                searchResultsTree.sort(!tbnSort.isSelected());
             }
 
             SearchResultsTreePanel.this.setButtonsEnabled();
@@ -336,8 +326,8 @@ public class SearchResultsTreePanel extends JPanel {
          * Creates a new HistoryPopupMenu object.
          */
         public HistoryPopupMenu() {
-            if (logger.isDebugEnabled()) {
-                logger.debug("HistoryPopupMenu(): creating new instance"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("HistoryPopupMenu(): creating new instance"); // NOI18N
             }
             this.addPopupMenuListener(this);
 
@@ -349,8 +339,8 @@ public class SearchResultsTreePanel extends JPanel {
 
         @Override
         public void popupMenuCanceled(final PopupMenuEvent e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("popupMenuCanceled()"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("popupMenuCanceled()"); // NOI18N
             }
 
             // ugly workaround
@@ -359,8 +349,8 @@ public class SearchResultsTreePanel extends JPanel {
 
         @Override
         public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("popupMenuWillBecomeInvisible()"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("popupMenuWillBecomeInvisible()"); // NOI18N
             }
 
             // ugly workaround
@@ -369,8 +359,8 @@ public class SearchResultsTreePanel extends JPanel {
 
         @Override
         public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("popupMenuWillBecomeVisible(): showing popup meu"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("popupMenuWillBecomeVisible(): showing popup meu"); // NOI18N
             }
 
             if (this.queryResultProfileManager == null) {
@@ -393,15 +383,15 @@ public class SearchResultsTreePanel extends JPanel {
 
                     this.add(menuItem);
                 }
-            } else if (logger.isDebugEnabled()) {
-                logger.warn("HistoryPopupMenu: no query result profiles found"); // NOI18N
+            } else if (LOG.isDebugEnabled()) {
+                LOG.warn("HistoryPopupMenu: no query result profiles found"); // NOI18N
             }
         }
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            if (logger.isInfoEnabled()) {
-                logger.info("HistoryPopupMenu: loading query result profile '" + e.getActionCommand() + "'"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("HistoryPopupMenu: loading query result profile '" + e.getActionCommand() + "'"); // NOI18N
             }
             this.queryResultProfileManager.loadSearchResults(e.getActionCommand());
         }
