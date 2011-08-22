@@ -201,7 +201,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         rootNode.add(waitTreeNode);
         defaultTreeModel.nodeStructureChanged(rootNode);
 
-        refreshWorker = new RefreshTreeWorker(sort, this);
+        refreshWorker = new RefreshTreeWorker(sort);
         CismetThreadPool.execute(refreshWorker);
     }
 
@@ -456,7 +456,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
         //~ Instance fields ----------------------------------------------------
 
         private boolean sort = false;
-        private SearchResultsTree tree;
 
         //~ Constructors -------------------------------------------------------
 
@@ -464,11 +463,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
          * Creates a new RefreshTreeWorker object.
          *
          * @param  sort  A flag indicating whether to sort the result set or not.
-         * @param  tree  The tree displaying the results.
          */
-        public RefreshTreeWorker(final boolean sort, final SearchResultsTree tree) {
+        public RefreshTreeWorker(final boolean sort) {
             this.sort = sort;
-            this.tree = tree;
         }
 
         //~ Methods ------------------------------------------------------------
@@ -504,7 +501,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 }
             }
 
-            tree.firePropertyChange("browse", 0, 1); // NOI18N
+            SearchResultsTree.this.firePropertyChange("browse", 0, 1); // NOI18N
             defaultTreeModel.nodeStructureChanged(rootNode);
         }
     }

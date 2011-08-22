@@ -16,10 +16,8 @@ import Sirius.navigator.connection.*;
 import Sirius.navigator.exception.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.status.*;
-import Sirius.navigator.ui.tree.*;
 import Sirius.navigator.ui.widget.*;
 
-import Sirius.server.middleware.types.Node;
 import Sirius.server.search.SearchResult;
 
 import org.apache.log4j.Logger;
