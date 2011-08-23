@@ -89,6 +89,8 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.ConfigurationManager;
+import de.cismet.tools.configuration.ShutdownHook;
+import de.cismet.tools.configuration.StartupHook;
 
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
@@ -110,6 +112,8 @@ public class Navigator extends JFrame {
                                                                          : "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
+
+    private static volatile boolean startupFinished = false;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -135,7 +139,6 @@ public class Navigator extends JFrame {
     // Panels
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
-    private JPanel metaCatalogueTreePanel;
     private NavigatorSplashScreen splashScreen;
 
     //~ Constructors -----------------------------------------------------------
@@ -182,6 +185,8 @@ public class Navigator extends JFrame {
         this.exceptionManager = ExceptionManager.getManager();
 
         this.init();
+
+        startupFinished = true;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -192,7 +197,6 @@ public class Navigator extends JFrame {
      * @throws  Exception  DOCUMENT ME!
      */
     private void init() throws Exception {
-        // LAFManager.getManager().changeLookAndFeel(LAFManager.WINDOWS);
         if (StaticDebuggingTools.checkHomeForFile("cismetDebuggingInitEventDispatchThreadHangMonitor")) { // NOI18N
             EventDispatchThreadHangMonitor.initMonitoring();
         }
@@ -206,19 +210,15 @@ public class Navigator extends JFrame {
         final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
         proxyOptions.setProxy(Proxy.fromPreferences());
 
-        final String heavyComps = System.getProperty("contains.heavyweight.comps");
-        if ((heavyComps != null) && heavyComps.equals("true")) {
+        final String heavyComps = System.getProperty("contains.heavyweight.comps"); // NOI18N
+        if ((heavyComps != null) && heavyComps.equals("true")) {                    // NOI18N
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         }
 
-        boolean inSplashScreen = false;
-
         // splashscreen gesetzt?
         if (splashScreen != null) {
             // ProxyOptions panel soll im SplashScreen integriert werden
-            inSplashScreen = true;
-
             // panel übergeben
             splashScreen.setProxyOptionsPanel(proxyOptions);
             // panel noch nicht anzeigen
@@ -238,42 +238,7 @@ public class Navigator extends JFrame {
                 });
         }
 
-//        while (!SessionManager.isConnected()) {
-//            try {
         initConnection(Proxy.fromPreferences());
-//            } catch (final ConnectionException e) { // Verbinden fehlgeschlagen
-//
-//                if (inSplashScreen) { // das ProxyOptions panel soll im SplashScreen integriert werden
-//
-//                    proxyOptions.setProxy(Proxy.fromPreferences());
-//
-//                    // ProxyOptions panel anzeigen
-//                    splashScreen.setProxyOptionsVisible(true);
-//
-//                    // Solange nicht "Anwenden" gedrückt wurde
-//                    while (splashScreen.isProxyOptionsVisible()) {
-//                        // warten
-//                        Thread.sleep(100);
-//                    }
-//
-//                } else { // das ProxyOptions panel soll als Dialog angezeigt werden
-//                    final JOptionPane pane = new JOptionPane(
-//                            proxyOptions,
-//                            JOptionPane.QUESTION_MESSAGE,
-//                            JOptionPane.OK_CANCEL_OPTION);
-//                    final JDialog dialog = pane.createDialog(null, "Proxy");
-//                    dialog.setAlwaysOnTop(true);
-//                    dialog.setVisible(true);
-//                    dialog.toFront();
-//                    final Object answer = pane.getValue();
-//                    if (answer instanceof Integer && JOptionPane.OK_OPTION == ((Integer) answer).intValue()) {
-//                        proxyOptions.getProxy().toPreferences();
-//                    } else {
-//                        throw e;
-//                    }
-//                }
-//            }
-//        }
 
         try {
             checkNavigatorHome();
@@ -285,31 +250,28 @@ public class Navigator extends JFrame {
             initToolbarExtensions();
             initEvents();
             initWindow();
-//            if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
             initSearch();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
-
             configurationManager.configure();
-//            }
-            // Not in EDT
-            if (container instanceof LayoutedContainer) {
-                SwingUtilities.invokeLater(new Runnable() {
 
-                        // UGLY WINNING
-                        @Override
-                        public void run() {
-                            ((LayoutedContainer)container).loadLayout(
-                                LayoutedContainer.DEFAULT_LAYOUT,
-                                true,
-                                Navigator.this);
-                        }
-                    });
-            }
-            if (!StaticDebuggingTools.checkHomeForFile("cismetTurnOffInternalWebserver")) {                     // NOI18N
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    // UGLY WINNING
+                    @Override
+                    public void run() {
+                        container.loadLayout(
+                            LayoutedContainer.DEFAULT_LAYOUT,
+                            true,
+                            Navigator.this);
+                    }
+                });
+            if (!StaticDebuggingTools.checkHomeForFile("cismetTurnOffInternalWebserver")) { // NOI18N
                 initHttpServer();
             }
-        } catch (InterruptedException iexp) {
+
+            initStartupHooks();
+        } catch (final InterruptedException iexp) {
             logger.error("navigator start interrupted: " + iexp.getMessage() + "\n disconnecting from server"); // NOI18N
             SessionManager.getSession().logout();
             SessionManager.getConnection().disconnect();
@@ -467,18 +429,10 @@ public class Navigator extends JFrame {
             100,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_100")); // NOI18N
 
-        // vergiss es 2 GHz, keine sanduhr
-        // Toolkit.getDefaultToolkit().getSystemEventQueue().push(new WaitCursorEventQueue(200));
-
         menuBar = new MutableMenuBar();
         toolBar = new MutableToolBar(propertyManager.isAdvancedLayout());
-//        JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT,5,5));
-//        innerPanel.add(new CidsSearchComboBar());
-//        toolBar.add(innerPanel, -1);
         container = new LayoutedContainer(toolBar, menuBar, propertyManager.isAdvancedLayout());
-        if (container instanceof LayoutedContainer) {
-            menuBar.registerLayoutManager((LayoutedContainer)container);
-        }
+        menuBar.registerLayoutManager(container);
         statusBar = new MutableStatusBar();
         popupMenu = new MutablePopupMenu();
 
@@ -487,10 +441,6 @@ public class Navigator extends JFrame {
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_150")); // NOI18N
         this.setContentPane(new JPanel(new BorderLayout(), true));
         this.setJMenuBar(menuBar);
-
-        // this.getContentPane().add(toolBar, BorderLayout.NORTH);
-        // this.getContentPane().add(statusBar, BorderLayout.SOUTH);
-        // this.getContentPane().add(container.getContainer() , BorderLayout.CENTER);
 
         final JPanel panel = new JPanel(new BorderLayout());
         panel.add(toolBar, BorderLayout.NORTH);
@@ -724,9 +674,6 @@ public class Navigator extends JFrame {
             350,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_350")); // NOI18N
 
-        // searchDialog = new SearchDialog(this, this.searchResultsTree, "Suche",
-        // SessionManager.getProxy().getClassTreeNodes(SessionManager.getSession().getUser()),
-        // PropertyManager.getManager().getMaxSearchResults());
         searchDialog = new SearchDialog(
                 this,
                 SessionManager.getProxy().getSearchOptions(),
@@ -748,7 +695,6 @@ public class Navigator extends JFrame {
             searchDialog,
             descriptionPane);
     }
-    // #########################################################################
 
     /**
      * DOCUMENT ME!
@@ -771,7 +717,6 @@ public class Navigator extends JFrame {
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_850")); // NOI18N
         PluginRegistry.getRegistry().activatePlugins();
     }
-    // #########################################################################
 
     /**
      * DOCUMENT ME!
@@ -806,10 +751,7 @@ public class Navigator extends JFrame {
         final CataloguePopupMenuListener cataloguePopupMenuListener = new CataloguePopupMenuListener(popupMenu);
         metaCatalogueTree.addMouseListener(cataloguePopupMenuListener);
         searchResultsTree.addMouseListener(cataloguePopupMenuListener);
-
-        // Runtime.getRuntime().addShutdownHook(new ShutdownListener());
     }
-    // #########################################################################
 
     /**
      * DOCUMENT ME!
@@ -819,15 +761,12 @@ public class Navigator extends JFrame {
     private void initWindow() throws InterruptedException {
         progressObserver.setProgress(
             950,
-            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950"));  // NOI18N
-        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));               // NOI18N
-        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                           // NOI18N
+            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950")); // NOI18N
+        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));              // NOI18N
+        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new ClosingListener());
-        progressObserver.setProgress(
-            1000,
-            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_1000")); // NOI18N
     }
 
     /**
@@ -836,7 +775,27 @@ public class Navigator extends JFrame {
     private void initSearch() {
         new CidsSearchInitializer();
     }
-    // .........................................................................
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  InterruptedException  DOCUMENT ME!
+     */
+    private void initStartupHooks() throws InterruptedException {
+        progressObserver.setProgress(
+            980,
+            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_980")); // NOI18N
+
+        final Collection<? extends StartupHook> hooks = Lookup.getDefault().lookupAll(StartupHook.class);
+
+        for (final StartupHook hook : hooks) {
+            hook.applicationStarted();
+        }
+
+        progressObserver.setProgress(
+            1000,
+            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_1000")); // NOI18N
+    }
 
     /**
      * DOCUMENT ME!
@@ -849,8 +808,6 @@ public class Navigator extends JFrame {
     private boolean hasPermission(final MetaClass[] classes,
             final Sirius.server.newuser.permission.Permission permission) {
         final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
-
-        // propertyManager.getConnectionInfo().getUsergroup()+"@"+propertyManager.getConnectionInfo().getUsergroupDomain();
 
         for (int i = 0; i < classes.length; i++) {
             try {
@@ -866,12 +823,8 @@ public class Navigator extends JFrame {
                     }
                     return true;
                 }
-
-                // if(classes[i].getPermissions().hasPermission(permission)) //xxxxxxxxxxxxxxxxxxxxxx user???? {
-                // if(logger.isDebugEnabled())logger.debug("permission '" + permission + "' found in class '" +
-                // classes[i] + "'"); return true; }
-            } catch (Exception exp) {
-                logger.error("hasPermission(): could not check permissions", exp); // NOI18N
+            } catch (final Exception exp) {
+                logger.error("hasPermission(): could not check permissions", exp);                           // NOI18N
             }
         }
 
@@ -899,13 +852,6 @@ public class Navigator extends JFrame {
                     }
                 });
         }
-
-        /*if(SwingUtilities.isEventDispatchThread())
-         * { PluginRegistry.getRegistry().setPluginsVisible(visible); } else { logger.debug("setPluginsVisible():
-         * synchronizing method"); SwingUtilities.invokeLater(new Runnable() { public void run() { PluginRegistry
-         *        PluginRegistry.getRegistry().setPluginsVisible(visible); } });}*/
-
-        // PluginRegistry.getRegistry().setPluginsVisible(visible);
     }
 
     /**
@@ -916,16 +862,11 @@ public class Navigator extends JFrame {
     private void doSetVisible(final boolean visible) {
         super.setVisible(visible);
 
-        // PluginRegistry.getRegistry().setPluginsVisible(visible);
-
         if (visible) {
             this.searchResultsTreePanel.setButtonsEnabled();
             this.container.setDividerLocations(0.23, 0.60);
             this.menuBar.repaint();
             this.toolBar.repaint();
-
-            // container.select(ComponentRegistry.SEARCHRESULTS_TREE);
-            // descriptionPane.setPage("http://www.cismet.de");
 
             this.toFront();
         }
@@ -943,14 +884,10 @@ public class Navigator extends JFrame {
     @Override
     public void dispose() {
         if (logger.isInfoEnabled()) {
-            logger.info("dispose() called");  // NOI18N
+            logger.info("dispose() called"); // NOI18N
+            logger.info("saving Layout");    // NOI18N
         }
-        if (container instanceof LayoutedContainer) {
-            if (logger.isInfoEnabled()) {
-                logger.info("saving Layout"); // NOI18N
-            }
-            ((LayoutedContainer)container).saveLayout(LayoutedContainer.DEFAULT_LAYOUT, this);
-        }
+        container.saveLayout(LayoutedContainer.DEFAULT_LAYOUT, this);
         Navigator.this.saveWindowState();
 
         configurationManager.writeConfiguration();
@@ -965,8 +902,6 @@ public class Navigator extends JFrame {
         if (!Navigator.this.isDisposed()) {
             Navigator.super.dispose();
             Navigator.this.setDisposed(true);
-        } else {
-            logger.warn("..............................."); // NOI18N
         }
     }
 
@@ -990,8 +925,9 @@ public class Navigator extends JFrame {
         this.preferences.putInt("windowX", windowX);                     // NOI18N
         this.preferences.putInt("windowY", windowY);                     // NOI18N
         this.preferences.putBoolean("windowMaximised", windowMaximised); // NOI18N
+
         if (logger.isInfoEnabled()) {
-            logger.info("saved window state");                           // NOI18N
+            logger.info("saved window state"); // NOI18N
         }
     }
 
@@ -1000,8 +936,9 @@ public class Navigator extends JFrame {
      */
     private void restoreWindowState() {
         if (logger.isInfoEnabled()) {
-            logger.info("restoring window state ...");                                                              // NOI18N
+            logger.info("restoring window state ..."); // NOI18N
         }
+
         final int windowHeight = this.preferences.getInt("windowHeight", PropertyManager.getManager().getHeight()); // NOI18N
         final int windowWidth = this.preferences.getInt("windowWidth", PropertyManager.getManager().getWidth());    // NOI18N
         final int windowX = this.preferences.getInt("windowX", 0);                                                  // NOI18N
@@ -1024,15 +961,13 @@ public class Navigator extends JFrame {
     }
 
     /**
-     * private class ShutdownListener extends Thread { public void run() { if(Navigator.this.isDisposed()) {
-     * Navigator.this.logger.info("ShutdownListener: clean shutdown initiated"); } else {
-     * Navigator.this.logger.warn("ShutdownListener: unclean shutdown initiated, invokinbg dispose()");
-     * Navigator.this.dispose(); } } } -------------------------------------------------------------------------
+     * DOCUMENT ME!
      *
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        final boolean release = true;
+        Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
+        Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
 
         // For some unknown reason, the content of the user.language and the user.country properties
         // must explicitly set as default locale. This is requiered for the cids-navigator project, but
@@ -1046,90 +981,63 @@ public class Navigator extends JFrame {
             } else if (lang != null) {
                 Locale.setDefault(new Locale(lang));
             }
-        } catch (SecurityException e) {
+        } catch (final SecurityException e) {
             System.err.println("You have insufficient rights to set the default locale."); // NOI18N
         }
 
         try {
             // cmdline arguments ...............................................
 
-            // <RELEASE>
-            if (release) {
-                if (args.length < 5) {
-                    final String errorString = new String(
-                            "\nusage: navigator %1 %2 %3 %4 %5 %6(%5)\n%1 = navigator config file \n%2 = navigator working directory \n%3 = plugin base directory \n%4 = navigator search forms base directory \n%5 navigator search profile store (optional, default: %1/profiles \n\nexample: java Sirius.navigator.Navigator c:\\programme\\cids\\navigator\\navigator.cfg c:\\programme\\cids\\navigator\\ c:\\programme\\cids\\navigator\\plugins\\ c:\\programme\\cids\\navigator\\search\\ c:\\programme\\cids\\navigator\\search\\profiles\\"); // NOI18N
-                    System.out.println(errorString);
+            if (args.length < 5) {
+                // FIXME: use correct error string
+                final String errorString = new String(
+                        "\nusage: navigator %1 %2 %3 %4 %5 %6(%5)\n%1 = navigator config file \n%2 = navigator working directory \n%3 = plugin base directory \n%4 = navigator search forms base directory \n%5 navigator search profile store (optional, default: %1/profiles \n\nexample: java Sirius.navigator.Navigator c:\\programme\\cids\\navigator\\navigator.cfg c:\\programme\\cids\\navigator\\ c:\\programme\\cids\\navigator\\plugins\\ c:\\programme\\cids\\navigator\\search\\ c:\\programme\\cids\\navigator\\search\\profiles\\"); // NOI18N
+                System.out.println(errorString);
 
-                    // System.exit(1);
-                    throw new Exception(errorString);
-                } else {
-                    System.out.println("-------------------------------------------------------"); // NOI18N
-                    System.out.println("C I D S   N A V I G A T 0 R   C O N F I G U R A T I 0 N"); // NOI18N
-                    System.out.println("-------------------------------------------------------"); // NOI18N
-                    System.out.println("log4j.properties = " + args[0]);                           // NOI18N
-                    System.out.println("navigator.cfg    = " + args[1]);                           // NOI18N
-                    System.out.println("basedir          = " + args[2]);                           // NOI18N
-                    System.out.println("plugindir        = " + args[3]);                           // NOI18N
-                    System.out.println("searchdir        = " + args[4]);                           // NOI18N
-                    if (args.length > 5) {
-                        System.out.println("profilesdir      = " + args[5]);                       // NOI18N
-                    }
-                    System.out.println("-------------------------------------------------------"); // NOI18N
-
-                    // log4j configuration .....................................
-                    final Properties properties = new Properties();
-                    boolean l4jinited = false;
-                    try {
-                        final URL log4jPropertiesURL = new URL(args[0]);
-                        properties.load(log4jPropertiesURL.openStream());
-
-                        l4jinited = true;
-                    } catch (Throwable t) {
-                        System.err.println("could not lode log4jproperties will try to load it from file"
-                                    + t.getMessage()); // NOI18N
-                        t.printStackTrace();
-                    }
-
-                    try {
-                        if (!l4jinited) {
-                            properties.load(new BufferedInputStream(new FileInputStream(new File(args[0]))));
-                        }
-                    } catch (Throwable t) {
-                        System.err.println("could not lode log4jproperties " + t.getMessage()); // NOI18N
-                        t.printStackTrace();
-                    }
-
-                    PropertyConfigurator.configure(properties);
-
-                    // log4j configuration .....................................
-
-                    PropertyManager.getManager()
-                            .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
-                    resourceManager.setLocale(PropertyManager.getManager().getLocale());
+                throw new Exception(errorString);
+            } else {
+                System.out.println("-------------------------------------------------------"); // NOI18N
+                System.out.println("C I D S   N A V I G A T 0 R   C O N F I G U R A T I 0 N"); // NOI18N
+                System.out.println("-------------------------------------------------------"); // NOI18N
+                System.out.println("log4j.properties = " + args[0]);                           // NOI18N
+                System.out.println("navigator.cfg    = " + args[1]);                           // NOI18N
+                System.out.println("basedir          = " + args[2]);                           // NOI18N
+                System.out.println("plugindir        = " + args[3]);                           // NOI18N
+                System.out.println("searchdir        = " + args[4]);                           // NOI18N
+                if (args.length > 5) {
+                    System.out.println("profilesdir      = " + args[5]);                       // NOI18N
                 }
-            }                                                                     // </RELEASE>
-            else {
-                PropertyConfigurator.configure(ClassLoader.getSystemResource(
-                        "Sirius/navigator/resource/cfg/log4j.debug.properties")); // NOI18N
+                System.out.println("-------------------------------------------------------"); // NOI18N
 
-                // ohne plugins:
-                // PropertyManager.getManager().configure("D:\\cids\\res\\Sirius\\navigator\\resource\\cfg\\navigator.cfg",
-                // System.getProperty("user.home") + "\\.navigator\\", System.getProperty("user.home") +
-                // "\\.navigator\\plugins\\", "D:\\cids\\dist\\client\\search\\", null);
+                // log4j configuration .....................................
+                final Properties properties = new Properties();
+                boolean l4jinited = false;
+                try {
+                    final URL log4jPropertiesURL = new URL(args[0]);
+                    properties.load(log4jPropertiesURL.openStream());
 
-                // mit plugins:
+                    l4jinited = true;
+                } catch (final Exception e) {
+                    System.err.println("could not lode log4jproperties will try to load it from file" // NOI18N
+                                + e.getMessage());
+                    e.printStackTrace();
+                }
+
+                try {
+                    if (!l4jinited) {
+                        properties.load(new BufferedInputStream(new FileInputStream(new File(args[0]))));
+                    }
+                } catch (Exception e) {
+                    System.err.println("could not lode log4jproperties " + e.getMessage()); // NOI18N
+                    e.printStackTrace();
+                }
+
+                PropertyConfigurator.configure(properties);
+
+                // log4j configuration .....................................
+
                 PropertyManager.getManager()
-                        .configure(
-                            "D:\\cids\\res\\Sirius\\navigator\\resource\\cfg\\navigator.cfg",
-                            System.getProperty("user.home")
-                            + "\\.navigator\\",
-                            "D:\\cids\\dist\\client\\plugins\\",
-                            "D:\\cids\\dist\\client\\search\\",
-                            null); // NOI18N
-                resourceManager.setLocale(PropertyManager.getManager().getLocale());
-
-                // Properties ausgeben:
-                PropertyManager.getManager().print();
+                        .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
             }
 
             // configuration ...................................................
@@ -1137,29 +1045,17 @@ public class Navigator extends JFrame {
             // look and feel ...................................................
             LAFManager.getManager().changeLookAndFeel(PropertyManager.getManager().getLookAndFeel());
 
-// look and feel ...................................................
-
-            // configuration ...................................................
-
-            // run .............................................................
-            // Navigator navigator = new Navigator();
-            // navigator.logger.debug("new navigator instance created");
-            // navigator.setVisible(true);
-
-            // logger.debug("SPLASH");
             final NavigatorSplashScreen navigatorSplashScreen = new NavigatorSplashScreen(PropertyManager.getManager()
                             .getSharedProgressObserver(),
+                    // FIXME: illegal icon
                     resourceManager.getIcon("wundaLogo.png"));
 
             navigatorSplashScreen.pack();
             navigatorSplashScreen.setLocationRelativeTo(null);
             navigatorSplashScreen.toFront();
             navigatorSplashScreen.show();
-
-            Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
-
             // run .............................................................
-        } catch (Throwable t) {
+        } catch (final Throwable t) {
             // error .............................................................
             Logger.getLogger(Navigator.class).fatal("could not create navigator instance", t); // NOI18N
             ExceptionManager.getManager()
@@ -1266,7 +1162,7 @@ public class Navigator extends JFrame {
                                                         for (final String key : params.keySet()) {
                                                             parambean.setBeanParameter(key, params.get(key));
                                                         }
-                                                        final Vector v = new Vector();
+                                                        final List v = new ArrayList();
                                                         final String cid = classId + "@" + domain;                                      // NOI18N
                                                         v.add(cid);
                                                         final LinkedList searchFormData = new LinkedList();
@@ -1311,6 +1207,39 @@ public class Navigator extends JFrame {
     }
 
     //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static final class NavigatorShutdown extends Thread {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final transient Logger LOG = Logger.getLogger(NavigatorShutdown.class);
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void run() {
+            if (startupFinished) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Shutting down Navigator..."); // NOI18N
+                }
+
+                final Collection<? extends ShutdownHook> hooks = Lookup.getDefault().lookupAll(ShutdownHook.class);
+
+                for (final ShutdownHook hook : hooks) {
+                    hook.applicationFinished();
+                }
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Shutting down Navigator... FINISHED"); // NOI18N
+                }
+            }
+        }
+    }
 
     /**
      * DOCUMENT ME!
