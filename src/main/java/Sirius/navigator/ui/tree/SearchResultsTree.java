@@ -103,9 +103,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
             empty = false;
         }
 
-        refreshTree(resultNodes.length > 0);
-        syncWithMap();
-        checkForDynamicNodes();
+        if (resultNodes.length > 0) {
+            refreshTree(true);
+        }
     }
 
     /**
@@ -182,27 +182,29 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         empty = false;
         refreshTree(true);
-        syncWithMap();
-        checkForDynamicNodes();
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  sort  DOCUMENT ME!
+     * @param  initialFill  sort DOCUMENT ME!
      */
-    private void refreshTree(final boolean sort) {
+    private void refreshTree(final boolean initialFill) {
         if ((refreshWorker != null) && !refreshWorker.isDone()) {
             logger.warn("Refreshing search result tree is triggered while another refresh process is still not done.");
             refreshWorker.cancel(true);
         }
+        EventQueue.invokeLater(new Runnable() {
 
-        rootNode.removeAllChildren();
-        rootNode.add(waitTreeNode);
-        defaultTreeModel.nodeStructureChanged(rootNode);
-
-        refreshWorker = new RefreshTreeWorker(sort);
-        CismetThreadPool.execute(refreshWorker);
+                @Override
+                public void run() {
+                    rootNode.removeAllChildren();
+                    rootNode.add(waitTreeNode);
+                    defaultTreeModel.nodeStructureChanged(rootNode);
+                    refreshWorker = new RefreshTreeWorker(initialFill);
+                    CismetThreadPool.execute(refreshWorker);
+                }
+            });
     }
 
     /**
@@ -440,7 +442,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void sort(final boolean ascending) {
         comparator.setAscending(ascending);
-        refreshTree(true);
+        refreshTree(false);
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -455,24 +457,24 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         //~ Instance fields ----------------------------------------------------
 
-        private boolean sort = false;
+        private boolean initialFill = false;
 
         //~ Constructors -------------------------------------------------------
 
         /**
          * Creates a new RefreshTreeWorker object.
          *
-         * @param  sort  A flag indicating whether to sort the result set or not.
+         * @param  initialFill  A flag indicating whether to sort the result set or not.
          */
-        public RefreshTreeWorker(final boolean sort) {
-            this.sort = sort;
+        public RefreshTreeWorker(final boolean initialFill) {
+            this.initialFill = initialFill;
         }
 
         //~ Methods ------------------------------------------------------------
 
         @Override
         protected Void doInBackground() throws Exception {
-            if (sort && !isCancelled()) {
+            if (!isCancelled()) {
                 Arrays.sort(resultNodes, comparator);
             }
 
@@ -503,6 +505,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
             SearchResultsTree.this.firePropertyChange("browse", 0, 1); // NOI18N
             defaultTreeModel.nodeStructureChanged(rootNode);
+
+            if (initialFill) {
+                syncWithMap();
+                checkForDynamicNodes();
+            }
         }
     }
 }
