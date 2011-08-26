@@ -7,32 +7,14 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
-/*******************************************************************************
- *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
- *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
- *
- * Programmers          :       Pascal
- *
- * Project                      :       WuNDA 2
- * Filename             :
- * Version                      :       1.0
- * Purpose                      :
- * Created                      :       27.04.2000
- * History                      : 30.10.2001 changes by M. Derschang (vgl. MANU_NAV)
- *
- *******************************************************************************/
-import Sirius.navigator.method.*;
-import Sirius.navigator.types.treenode.*;
-import Sirius.navigator.ui.status.*;
+import Sirius.navigator.method.MethodManager;
+import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
+import Sirius.navigator.types.treenode.RootTreeNode;
+import Sirius.navigator.types.treenode.WaitTreeNode;
+import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
+import Sirius.navigator.ui.status.Status;
+import Sirius.navigator.ui.status.StatusChangeListener;
+import Sirius.navigator.ui.status.StatusChangeSupport;
 
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.permission.PermissionHolder;
@@ -43,14 +25,36 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.dnd.Autoscroll;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Future;
 
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JTree;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeExpansionListener;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
@@ -71,6 +75,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     protected final boolean useThread;
     protected final int maxThreadCount;
     protected TreeExploreThread treeExploreThread;
+    // TODO: use atomic integer
     protected volatile int threadCount = 0;
     private BufferedImage dragImage = null;
     /**
@@ -154,26 +159,22 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     super.mouseClicked(e);
                     if (e.getClickCount() > 1) {
                         try {
-//                        PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap");
-
-                            final Vector<DefaultMetaTreeNode> v = new Vector<DefaultMetaTreeNode>();
+                            final ArrayList<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
                             final DefaultMetaTreeNode[] resultNodes = getSelectedNodesArray();
                             for (int i = 0; i < resultNodes.length; ++i) {
                                 if (logger.isDebugEnabled()) {
                                     logger.debug("resultNodes:" + resultNodes[i]); // NOI18N
                                 }
                                 if (resultNodes[i].getNode() instanceof MetaObjectNode) {
-                                    // ObjectTreeNode otn=new ObjectTreeNode((MetaObjectNode)resultNodes[i].getNode());
                                     final DefaultMetaTreeNode otn = resultNodes[i];
                                     v.add(otn);
                                 }
                             }
                             if (v.size() > 0) {
                                 MetaTreeNodeVisualization.getInstance().addVisualization(v);
-                                // ((de.cismet.cismap.navigatorplugin.CismapPlugin) map).showInMap(v, false);
                             }
                         } catch (Throwable t) {
-                            logger.warn("Error of displaying map", t); // NOI18N
+                            logger.warn("Error of displaying map", t);             // NOI18N
                         }
                     }
                 }
@@ -182,9 +183,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
     //~ Methods ----------------------------------------------------------------
 
-    /*public void update(TreeNode node)
-     * { this.defaultTreeModel.nodeStructureChanged(node);}*/
-    // -------------------------------------------------------------------------
     /**
      * Expandiert alle geladenen Knoten.
      */
@@ -210,9 +208,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     /**
      * DOCUMENT ME!
      *
-     * @param  treePath  DOCUMENT ME!
+     * @param   treePath  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    public void exploreSubtree(final TreePath treePath) {
+    public Future exploreSubtree(final TreePath treePath) {
         final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
         if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
@@ -234,10 +234,13 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
             final SubTreeExploreThread subTreeExploreThread = new SubTreeExploreThread((DefaultMetaTreeNode)rootNode,
                     childrenIterator);
-            CismetThreadPool.execute(subTreeExploreThread);
+
+            return CismetThreadPool.submit(subTreeExploreThread);
         } else {
             logger.warn("could not explore subtree"); // NOI18N
         }
+
+        return null;
     }
 
     // -------------------------------------------------------------------------
@@ -253,11 +256,9 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         final TreePath[] selectedPaths = this.getSelectionPaths();
 
         if (selectedPaths == null) {
-            // if(logger.isDebugEnabled())logger.debug("<TREE> getSelectionCount(): none selected");
             return 0;
         }
 
-        // if(logger.isDebugEnabled())logger.debug("<TREE> getSelectionCount(): " + selectedPaths);
         return selectedPaths.length;
     }
 
@@ -271,7 +272,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             final TreePath[] selectedPaths = this.getSelectionPaths();
 
             if ((selectedPaths == null) || (selectedPaths.length == 0)) {
-                // if(logger.isDebugEnabled())logger.debug("<TREE> getSelectionCount(): none selected");
                 return 0;
             }
 
@@ -355,7 +355,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             logger.warn("setSelectedNodes(): collections of nodes is empty"); // NOI18N
         }
         // vor Messe
-        if (selectedNodes.size() == 0) {
+        if (selectedNodes.isEmpty()) {
             this.removeSelectionPaths(getSelectionPaths());
         }
     }
@@ -635,36 +635,10 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                             @Override
                             public void run() {
                                 for (int i = 0; i < defaultTreeModel.getChildCount(node); ++i) {
-//                                    try {
-//                                        Thread.sleep(100);
-//                                    } catch (InterruptedException ex) {
-//                                        ex.printStackTrace();
-//                                    }
                                     try {
                                         final DefaultMetaTreeNode n = (DefaultMetaTreeNode)defaultTreeModel.getChild(
                                                 node,
                                                 i);
-                                        // logger.fatal("HELL: "+n); if (n != null && n.getNode() != null &&
-                                        // n.getNode().getName() == null && n.isObjectNode()) { //logger.fatal("HELL: in
-                                        // if"); try { final ObjectTreeNode on = ((ObjectTreeNode) n);
-                                        // EventQueue.invokeLater(new Runnable() {
-                                        //
-                                        // public void run() { n.getNode().setName("Name wird geladen .....");
-                                        // defaultTreeModel.nodeChanged(on); } }); if (logger.isDebugEnabled()) {
-                                        // logger.debug("caching object node"); } final MetaObject metaObject =
-                                        // SessionManager.getProxy().getMetaObject(on.getMetaObjectNode().getObjectId(),
-                                        // on.getMetaObjectNode().getClassId(), on.getMetaObjectNode().getDomain());
-                                        // on.getMetaObjectNode().setObject(metaObject); EventQueue.invokeLater(new
-                                        // Runnable() {
-                                        //
-                                        // public void run() { logger.debug("setze den namen des "+n+" mit null als name
-                                        // auf:" + metaObject.toString());
-                                        // n.getNode().setName(metaObject.toString());
-                                        // defaultTreeModel.nodeChanged(on); } });
-                                        //
-                                        // } catch (Throwable t) { logger.error("could not retrieve meta object of node
-                                        // '" + this + "'", t); } } else { logger.debug("n.getNode().getName()!=null:
-                                        // " + n.getNode().getName() + ":"); }
                                     } catch (Exception e) {
                                         logger.error("Error while loading name", e); // NOI18N
                                     }
@@ -805,8 +779,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             public void run() {
                 MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
                 MetaCatalogueTree.this.setSelectionPath(this.selectionPath);
-//                Object o = selectionPath.getLastPathComponent();
-//                MetaCatalogueTree.this.expandPath(selectionPath);
                 MetaCatalogueTree.this.scrollPathToVisible(selectionPath);
 
                 if (logger.isDebugEnabled()) {
