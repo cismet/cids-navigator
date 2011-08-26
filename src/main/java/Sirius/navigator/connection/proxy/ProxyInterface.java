@@ -14,6 +14,7 @@ import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
+import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchResult;
 
@@ -407,4 +408,15 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     boolean addQueryParameter(int queryId, String paramkey, String description) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   serverSearch  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Collection customServerSearch(CidsServerSearch serverSearch) throws ConnectionException;
 }
