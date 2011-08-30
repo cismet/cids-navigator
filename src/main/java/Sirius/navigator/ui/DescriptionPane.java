@@ -200,6 +200,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
         panObjects = new javax.swing.JPanel();
         scpRenderer = new javax.swing.JScrollPane();
@@ -207,8 +208,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         panBreadCrump = new javax.swing.JPanel();
 
         lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
         setLayout(new java.awt.CardLayout());
 
@@ -223,7 +223,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         panObjects.add(panBreadCrump, java.awt.BorderLayout.PAGE_START);
 
         add(panObjects, "objects");
-    } // </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -301,6 +301,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             }
             showObjects();
             clear();
+
             worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
                     final List<JComponent> all = new ArrayList<JComponent>();
@@ -381,19 +382,33 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                     protected void process(final List<SelfDisposingPanel> chunks) {
                         int y = all.size();
                         for (final SelfDisposingPanel comp : chunks) {
-                            final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-                            gridBagConstraints.gridx = 0;
-                            gridBagConstraints.gridy = y;
-                            gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                            panRenderer.add(comp, gridBagConstraints);
+                            if ((chunks.size() == 1) && (comp instanceof RequestsFullSizeComponent)) {
+                                panObjects.remove(scpRenderer);
+                                panObjects.add(panRenderer);
 
+                                panRenderer.setLayout(new BorderLayout());
+                                panRenderer.add(comp, BorderLayout.CENTER);
+                            } else {
+                                panObjects.remove(panRenderer);
+                                panObjects.add(scpRenderer);
+                                scpRenderer.setViewportView(panRenderer);
+
+                                panRenderer.setLayout(new GridBagLayout());
+
+                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                                gridBagConstraints.gridx = 0;
+                                gridBagConstraints.gridy = y;
+                                gridBagConstraints.weightx = 1;
+                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                panRenderer.add(comp, gridBagConstraints);
+                            }
+                            
                             comp.startChecking();
 
                             panRenderer.revalidate();
                             panRenderer.repaint();
-
+                            
                             y++;
                         }
                         all.addAll(chunks);
@@ -417,7 +432,12 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         if (renderer instanceof WrappedComponent) {
             originalComponent = ((WrappedComponent)renderer).getOriginalComponent();
         }
-        final SelfDisposingPanel sdp = new SelfDisposingPanel(originalComponent);
+        final SelfDisposingPanel sdp;
+        if (originalComponent instanceof RequestsFullSizeComponent) {
+            sdp = new SelfDisposingFullscreenPanel(originalComponent);
+        } else {
+            sdp = new SelfDisposingPanel(originalComponent);
+        }
         sdp.setLayout(new BorderLayout());
         sdp.add(renderer, BorderLayout.CENTER);
         return sdp;
@@ -578,9 +598,17 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 if (LOG.isInfoEnabled()) {
                                     LOG.info("Renderer is FullSize Component!"); // NOI18N
                                 }
+
+                                panObjects.remove(scpRenderer);
+                                panObjects.add(panRenderer);
+
                                 panRenderer.setLayout(new BorderLayout());
                                 panRenderer.add(sdp, BorderLayout.CENTER);
                             } else {
+                                panObjects.remove(panRenderer);
+                                panObjects.add(scpRenderer);
+                                scpRenderer.setViewportView(panRenderer);
+
                                 panRenderer.setLayout(new GridBagLayout());
                                 panRenderer.add(sdp, gridBagConstraints);
                             }
@@ -590,15 +618,15 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             repaint();
                         } else {
                             if (LOG.isDebugEnabled()) {
-                                LOG.debug("Worker canceled!");                   // NOI18N
+                                LOG.debug("Worker canceled!"); // NOI18N
                             }
                         }
                     } catch (final InterruptedException iex) {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("Worker canceled!");                       // NOI18N
+                            LOG.debug("Worker canceled!");     // NOI18N
                         }
                     } catch (final ExecutionException e) {
-                        LOG.error("Error during Renderer creation", e);          // NOI18N
+                        LOG.error("Error during Renderer creation", e); // NOI18N
                     } catch (final CancellationException e) {
                         LOG.warn(
                             "get() throw a cancellation exception. This can happen if the construction of a renderer was aborted before it was displayed.",
@@ -702,6 +730,26 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     }
 
     //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static final class SelfDisposingFullscreenPanel extends SelfDisposingPanel
+            implements RequestsFullSizeComponent {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new SelfDisposingFullscreenPanel object.
+         *
+         * @param  disposableBeanStore  DOCUMENT ME!
+         */
+        public SelfDisposingFullscreenPanel(final JComponent disposableBeanStore) {
+            super(disposableBeanStore);
+        }
+    }
 
     /**
      * DOCUMENT ME!
