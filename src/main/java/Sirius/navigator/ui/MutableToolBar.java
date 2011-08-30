@@ -27,7 +27,7 @@ import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
-import de.cismet.tools.gui.downloadmanager.DownloadManagerDialog;
+import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
 
 /**
  * Eine Toolbar, zu der zur Laufzeit automatisch neue Buttons hinzugefuegt- und entfernt werden koennen.
@@ -124,13 +124,9 @@ public class MutableToolBar extends JToolBar {
         button.addActionListener(toolBarListener);
         defaultToolBar.add(button);
 
-        button = new JButton(resources.getIcon("downloads.png"));            // NOI18N
-        button.setToolTipText(org.openide.util.NbBundle.getMessage(
-                MutableToolBar.class,
-                "MutableToolBar.createDefaultButtons().downloads.tooltip")); // NOI18N
-        button.setActionCommand("downloads");                                // NOI18N
+        button = new JButton(new DownloadManagerAction(this)); // NOI18N
+        button.setText("");
         button.setMargin(new Insets(4, 4, 4, 4));
-        button.addActionListener(toolBarListener);
         defaultToolBar.add(button);
     }
 
@@ -310,9 +306,6 @@ public class MutableToolBar extends JToolBar {
             } else if (e.getActionCommand().equals("info"))                 // NOI18N
             {
                 MethodManager.getManager().showAboutDialog();
-            } else if (e.getActionCommand().equals("downloads"))            // NOI18N
-            {
-                DownloadManagerDialog.show(ComponentRegistry.getRegistry().getMainWindow());
             }
         }
     }
