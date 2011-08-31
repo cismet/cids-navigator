@@ -24,6 +24,7 @@ import org.openide.util.WeakListeners;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.GradientPaint;
@@ -62,6 +63,7 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 
+import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
 import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
@@ -71,7 +73,9 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.collections.MultiMap;
 
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.CoolEditor;
 import de.cismet.tools.gui.WrappedComponent;
+import de.cismet.tools.gui.breadcrumb.BreadCrumb;
 import de.cismet.tools.gui.breadcrumb.DefaultBreadCrumbModel;
 import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
 
@@ -200,7 +204,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
         panObjects = new javax.swing.JPanel();
         scpRenderer = new javax.swing.JScrollPane();
@@ -208,7 +211,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         panBreadCrump = new javax.swing.JPanel();
 
         lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
         setLayout(new java.awt.CardLayout());
 
@@ -223,7 +227,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         panObjects.add(panBreadCrump, java.awt.BorderLayout.PAGE_START);
 
         add(panObjects, "objects");
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -403,12 +407,12 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
                                 panRenderer.add(comp, gridBagConstraints);
                             }
-                            
+
                             comp.startChecking();
 
                             panRenderer.revalidate();
                             panRenderer.repaint();
-                            
+
                             y++;
                         }
                         all.addAll(chunks);
@@ -418,6 +422,38 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 CismetThreadPool.execute(worker);
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsBeanRenderer currentRenderer() {
+        final BreadCrumb bc = breadCrumbModel.getLastCrumb();
+
+        if (bc instanceof CidsMetaObjectBreadCrumb) {
+            final Component renderer = ((CidsMetaObjectBreadCrumb)bc).getRenderer();
+            if (renderer instanceof CidsBeanRenderer) {
+                return (CidsBeanRenderer)renderer;
+            } else if (renderer instanceof CoolEditor) {
+                final CoolEditor editor = (CoolEditor)renderer;
+                final JComponent original = editor.getOriginalComponent();
+                if (original instanceof CidsBeanRenderer) {
+                    return (CidsBeanRenderer)original;
+                } else {
+                    LOG.warn("original component of CoolEditor is no CidsbeanRenderer");                        // NOI18N
+                }
+            } else {
+                LOG.warn("renderer Component of CidsMetaOjectBreadCrumb is no CidsBeanRenderer or CoolEditor"); // NOI18N
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("last breadcrumb is no CidsMetaObjectbreadCrumb");                                    // NOI18N
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -574,6 +610,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 jComp.repaint();
                             }
                         };
+
+                    // set the renderer for the current breadcrumb
+                    final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
+                    if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
+                        ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                    }
+
                     bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     final SelfDisposingPanel sdp = encapsulateInSelfDisposingPanel(jComp);
                     sdp.setStrongListenerReference(localListener);
