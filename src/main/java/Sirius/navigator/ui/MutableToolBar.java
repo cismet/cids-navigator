@@ -125,7 +125,6 @@ public class MutableToolBar extends JToolBar {
         defaultToolBar.add(button);
 
         button = new JButton(new DownloadManagerAction(this)); // NOI18N
-        button.setText("");
         button.setMargin(new Insets(4, 4, 4, 4));
         defaultToolBar.add(button);
     }
