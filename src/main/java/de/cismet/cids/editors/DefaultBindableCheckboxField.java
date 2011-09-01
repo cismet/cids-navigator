@@ -54,6 +54,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
     private List selectedElements = null;
     private MetaClass mc = null;
     private Map<JCheckBox, MetaObject> boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
+    private volatile boolean initialised = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -156,7 +157,14 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
             LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
         }
         this.mc = metaClass;
-        initBoxes();
+        new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    initBoxes();
+                    initialised = true;
+                }
+            }).start();
     }
 
     /**
@@ -246,22 +254,35 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * @param  decider                 DOCUMENT ME!
      * @param  removeSelectedElements  DOCUMENT ME!
      */
-    public void refreshCheckboxState(final CheckboxStateDecider decider, final boolean removeSelectedElements) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("refresh CheckboxState", new Exception());
-        }
+    public void refreshCheckboxState(final FieldStateDecider decider, final boolean removeSelectedElements) {
+        new Thread(new Runnable() {
 
-        final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
-        if (removeSelectedElements) {
-            selectedElements.clear();
-        }
+                @Override
+                public void run() {
+                    while (!initialised) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (final InterruptedException e) {
+                            // nothing to do
+                        }
+                    }
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("refresh CheckboxState", new Exception());
+                    }
 
-        while (it.hasNext()) {
-            final JCheckBox box = it.next();
-            box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
-            box.setSelected(false);
-        }
-        activateSelectedObjects();
+                    final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
+                    if (removeSelectedElements) {
+                        selectedElements.clear();
+                    }
+
+                    while (it.hasNext()) {
+                        final JCheckBox box = it.next();
+                        box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
+                        box.setSelected(false);
+                    }
+                    activateSelectedObjects();
+                }
+            }).start();
     }
 
     /**

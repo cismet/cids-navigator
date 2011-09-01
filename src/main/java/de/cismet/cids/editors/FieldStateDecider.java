@@ -15,7 +15,7 @@ import Sirius.server.middleware.types.MetaObject;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public interface CheckboxStateDecider {
+public interface FieldStateDecider {
 
     //~ Methods ----------------------------------------------------------------
 

@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -60,6 +61,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     private MetaClass mc = null;
     private Map<JRadioButton, MetaObject> boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private volatile boolean initialised = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -96,17 +98,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
             this.selectedElements = (CidsBean)element;
         }
 
-        if (selectedElements != null) {
-            final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
-
-            while (it.hasNext()) {
-                final JRadioButton tmp = it.next();
-                final MetaObject mo = boxToObjectMapping.get(tmp);
-                if ((mo != null) && selectedElements.equals(mo.getBean())) {
-                    bg.setSelected(tmp.getModel(), true);
-                }
-            }
-        }
+        activateElement();
     }
 
     /**
@@ -154,7 +146,14 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
             LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
         }
         this.mc = metaClass;
-        initBoxes();
+        new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    initBoxes();
+                    initialised = true;
+                }
+            }).start();
     }
 
     /**
@@ -198,12 +197,70 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                     add(button);
                     boxToObjectMapping.put(button, tmpMc);
                 }
+
+                activateElement();
             } catch (ConnectionException e) {
                 LOG.error("Error while loading the measurement object with query: " + query, e); // NOI18N
             }
         } else {
             LOG.error("The initBoxes method was invoked before the meta class was set.", new Throwable());
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void activateElement() {
+        if (selectedElements != null) {
+            final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
+
+            while (it.hasNext()) {
+                final JRadioButton tmp = it.next();
+                final MetaObject mo = boxToObjectMapping.get(tmp);
+                if ((mo != null) && selectedElements.equals(mo.getBean())) {
+                    bg.setSelected(tmp.getModel(), true);
+                }
+            }
+        } else {
+            this.bg.clearSelection();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  decider                 DOCUMENT ME!
+     * @param  removeSelectedElements  DOCUMENT ME!
+     */
+    public void refreshCheckboxState(final FieldStateDecider decider, final boolean removeSelectedElements) {
+        new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    while (!initialised) {
+                        try {
+                            Thread.sleep(50);
+                        } catch (final InterruptedException e) {
+                            // nothing to do
+                        }
+                    }
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("refresh CheckboxState", new Exception());
+                    }
+
+                    final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
+                    if (removeSelectedElements) {
+                        selectedElements = null;
+                    }
+
+                    while (it.hasNext()) {
+                        final JRadioButton button = it.next();
+                        button.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(button)));
+                        button.setSelected(false);
+                    }
+                    activateElement();
+                }
+            }).start();
     }
 
     /**
