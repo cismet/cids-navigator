@@ -106,6 +106,9 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     protected LinkStyleBreadCrumbGui breadCrumbGui;
 
+    // will only be accessed in EDT !
+    private transient boolean fullScreenRenderer;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -125,6 +128,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         breadCrumbGui = new LinkStyleBreadCrumbGui(breadCrumbModel);
         panBreadCrump.add(breadCrumbGui, BorderLayout.CENTER);
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
+        this.fullScreenRenderer = false;
         BufferedReader reader = null;
         try {
             StringBuffer buffer = new StringBuffer();
@@ -385,28 +389,26 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                     @Override
                     protected void process(final List<SelfDisposingPanel> chunks) {
                         int y = all.size();
+
+                        if (fullScreenRenderer) {
+                            fullScreenRenderer = false;
+
+                            panObjects.remove(panRenderer);
+                            panObjects.add(scpRenderer, BorderLayout.CENTER);
+
+                            scpRenderer.setViewportView(panRenderer);
+
+                            panRenderer.setLayout(new GridBagLayout());
+                        }
+
                         for (final SelfDisposingPanel comp : chunks) {
-                            if ((chunks.size() == 1) && (comp instanceof RequestsFullSizeComponent)) {
-                                panObjects.remove(scpRenderer);
-                                panObjects.add(panRenderer);
-
-                                panRenderer.setLayout(new BorderLayout());
-                                panRenderer.add(comp, BorderLayout.CENTER);
-                            } else {
-                                panObjects.remove(panRenderer);
-                                panObjects.add(scpRenderer);
-                                scpRenderer.setViewportView(panRenderer);
-
-                                panRenderer.setLayout(new GridBagLayout());
-
-                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-                                gridBagConstraints.gridx = 0;
-                                gridBagConstraints.gridy = y;
-                                gridBagConstraints.weightx = 1;
-                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                                panRenderer.add(comp, gridBagConstraints);
-                            }
+                            final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                            gridBagConstraints.gridx = 0;
+                            gridBagConstraints.gridy = y;
+                            gridBagConstraints.weightx = 1;
+                            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                            panRenderer.add(comp, gridBagConstraints);
 
                             comp.startChecking();
 
@@ -642,14 +644,18 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                     LOG.info("Renderer is FullSize Component!"); // NOI18N
                                 }
 
+                                fullScreenRenderer = true;
+
                                 panObjects.remove(scpRenderer);
-                                panObjects.add(panRenderer);
+                                panObjects.add(panRenderer, BorderLayout.CENTER);
 
                                 panRenderer.setLayout(new BorderLayout());
                                 panRenderer.add(sdp, BorderLayout.CENTER);
                             } else {
+                                fullScreenRenderer = false;
+
                                 panObjects.remove(panRenderer);
-                                panObjects.add(scpRenderer);
+                                panObjects.add(scpRenderer, BorderLayout.CENTER);
                                 scpRenderer.setViewportView(panRenderer);
 
                                 panRenderer.setLayout(new GridBagLayout());
