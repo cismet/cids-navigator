@@ -587,17 +587,17 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
 
         @Override
         public void dragExit(final DropTargetEvent dte) {
-            // if(logger.isDebugEnabled())logger.debug("dragExit()");
+            // if(LOG.isDebugEnabled())LOG.debug("dragExit()");
         }
 
         @Override
         public void dragOver(final DropTargetDragEvent dtde) {
-            // if(logger.isDebugEnabled())logger.debug("dragOver()");
+            // if(LOG.isDebugEnabled())LOG.debug("dragOver()");
         }
 
         @Override
         public void dropActionChanged(final DropTargetDragEvent dtde) {
-            // if(logger.isDebugEnabled())logger.debug("dropActionChangedr()");
+            // if(LOG.isDebugEnabled())LOG.debug("dropActionChangedr()");
         }
     }
 }

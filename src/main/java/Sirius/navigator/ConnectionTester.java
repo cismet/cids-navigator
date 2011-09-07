@@ -33,6 +33,8 @@ import Sirius.navigator.resource.PropertyManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import org.openide.util.Lookup;
+
 import java.awt.EventQueue;
 
 import java.io.BufferedOutputStream;
@@ -50,10 +52,8 @@ import java.util.Properties;
 
 import javax.swing.JFileChooser;
 
+import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
-
-import de.cismet.cismap.commons.BoundingBox;
-import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.netutil.Proxy;
 
@@ -390,8 +390,9 @@ public class ConnectionTester extends javax.swing.JFrame {
         }
 
         final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
-                "http://callserver-lung.cismet.de/callserver/binary",
-                proxy);
+                "https://fis-wasser-mv.de/callserver/binary",
+                proxy,
+                Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig());
 
         final Thread establisher = new Thread(new Runnable() {
 

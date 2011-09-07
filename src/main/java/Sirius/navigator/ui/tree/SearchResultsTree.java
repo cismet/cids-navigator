@@ -20,6 +20,8 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
+import org.apache.log4j.Logger;
+
 import java.awt.EventQueue;
 
 import java.util.ArrayList;
@@ -45,6 +47,10 @@ import de.cismet.tools.CismetThreadPool;
  * @version  $Revision$, $Date$
  */
 public class SearchResultsTree extends MetaCatalogueTree {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient Logger LOG = Logger.getLogger(SearchResultsTree.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -92,8 +98,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @param  nodes  Ergebnisse, die im SearchTree angezeigt werden sollen.
      */
     public void setResultNodes(final Node[] nodes) {
-        if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] filling tree with '" + nodes.length + "' nodes"); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("[SearchResultsTree] filling tree with '" + nodes.length + "' nodes"); // NOI18N
         }
 
         if ((nodes == null) || (nodes.length < 1)) {
@@ -122,8 +128,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void syncWithMap(final boolean sync) {
         if (sync) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("syncWithMap");                                                // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("syncWithMap");                                                   // NOI18N
             }
             try {
                 final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
@@ -140,7 +146,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                 MetaTreeNodeVisualization.getInstance().addVisualization(v);
             } catch (Throwable t) {
-                logger.warn("Fehler beim synchronisieren der Suchergebnisse mit der Karte", t); // NOI18N
+                LOG.warn("Fehler beim synchronisieren der Suchergebnisse mit der Karte", t); // NOI18N
             }
         }
     }
@@ -153,8 +159,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @param  append  Ergebnisse anhaengen.
      */
     public void setResultNodes(final Node[] nodes, final boolean append) {
-        if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] appending '" + nodes.length + "' nodes"); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("[SearchResultsTree] appending '" + nodes.length + "' nodes"); // NOI18N
         }
 
         if ((append == true) && ((nodes == null) || (nodes.length < 1))) {
@@ -191,7 +197,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     private void refreshTree(final boolean initialFill) {
         if ((refreshWorker != null) && !refreshWorker.isDone()) {
-            logger.warn("Refreshing search result tree is triggered while another refresh process is still not done.");
+            LOG.warn("Refreshing search result tree is triggered while another refresh process is still not done.");
             refreshWorker.cancel(true);
         }
         EventQueue.invokeLater(new Runnable() {
@@ -244,8 +250,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
                                                 dtm.nodeChanged(on);
                                             }
                                         });
-                                    if (logger.isDebugEnabled()) {
-                                        logger.debug("caching object node");                                           // NOI18N
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("caching object node");                                              // NOI18N
                                     }
                                     final MetaObject MetaObject = SessionManager.getProxy()
                                                 .getMetaObject(on.getMetaObjectNode().getObjectId(),
@@ -261,15 +267,15 @@ public class SearchResultsTree extends MetaCatalogueTree {
                                             }
                                         });
                                 } catch (final Exception t) {
-                                    logger.error("could not retrieve meta object of node '" + this + "'", t); // NOI18N
+                                    LOG.error("could not retrieve meta object of node '" + this + "'", t); // NOI18N
                                 }
                             } else {
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":"); // NOI18N
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("n.getNode().getName()!=null: " + n.getNode().getName() + ":"); // NOI18N
                                 }
                             }
                         } catch (final Exception e) {
-                            logger.error("Error while loading the name", e);                                  // NOI18N
+                            LOG.error("Error while loading the name", e);                                  // NOI18N
                         }
                     }
                     runningNameLoader = null;
@@ -296,8 +302,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @return  true, wenn mindestens ein Knoten geloescht wurde.
      */
     public boolean removeResultNodes(final DefaultMetaTreeNode[] selectedNodes) {
-        if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
 
@@ -344,8 +350,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @return  DOCUMENT ME!
      */
     public boolean removeResultNodes(final Collection selectedNodes) {
-        if (logger.isInfoEnabled()) {
-            logger.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
         try {
@@ -390,7 +396,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 this.setResultNodes((Node[])allWorkingCopy.toArray(new Node[allWorkingCopy.size()]), false);
             }
         } catch (Exception e) {
-            logger.error("Fehler beim Entfernen eines Objektes aus den Suchergebnissen", e);
+            LOG.error("Fehler beim Entfernen eines Objektes aus den Suchergebnissen", e);
         }
         return deleted;
     }
@@ -399,11 +405,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * Setzt den SearchTree komplett zurueck und entfernt alle Knoten.
      */
     public void clear() {
-        logger.info("[SearchResultsTree] removing all nodes"); // NOI18N
+        LOG.info("[SearchResultsTree] removing all nodes"); // NOI18N
         resultNodes = null;
         empty = true;
         rootNode.removeAllChildren();
-        firePropertyChange("browse", 0, 1);                    // NOI18N
+        firePropertyChange("browse", 0, 1);                 // NOI18N
         defaultTreeModel.nodeStructureChanged(rootNode);
         System.gc();
     }
@@ -488,9 +494,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
                     get();
                 }
             } catch (InterruptedException ex) {
-                logger.error("Error occured while refreshing search results tree", ex);
+                LOG.error("Error occured while refreshing search results tree", ex);
             } catch (ExecutionException ex) {
-                logger.error("Error occured while refreshing search results tree", ex);
+                LOG.error("Error occured while refreshing search results tree", ex);
             }
 
             rootNode.removeAllChildren();
@@ -499,7 +505,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 try {
                     rootNode.addChildren(resultNodes);
                 } catch (Exception exp) {
-                    logger.warn("[SearchResultsTree] could not add new nodes", exp); // NOI18N
+                    LOG.warn("[SearchResultsTree] could not add new nodes", exp); // NOI18N
                 }
             }
 

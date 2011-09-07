@@ -23,6 +23,7 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
@@ -126,6 +127,24 @@ public class MutableToolBar extends JToolBar {
 
         button = new JButton(new DownloadManagerAction(this)); // NOI18N
         button.setMargin(new Insets(4, 4, 4, 4));
+        defaultToolBar.add(button);
+
+        button = new JButton(new AbstractAction("testrefresh") {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        ComponentRegistry.getRegistry().getCatalogueTree().requestRefreshNode("test"); // NOI18N
+                    }
+                });
+        defaultToolBar.add(button);
+
+        button = new JButton(new AbstractAction("ia_id1_scenarios") {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        ComponentRegistry.getRegistry().getCatalogueTree().requestRefreshNode("ia_id1_scenarios"); // NOI18N
+                    }
+                });
         defaultToolBar.add(button);
     }
 

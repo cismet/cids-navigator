@@ -7,13 +7,12 @@
 ****************************************************/
 package Sirius.navigator.types.treenode;
 
-import java.io.*;
+import Sirius.server.middleware.types.Node;
 
-import javax.swing.tree.*;
+import java.io.Serializable;
 
 /**
- * // header - edit "Data/yourJavaHeader" to customize // contents - edit "EventHandlers/Java file/onCreate" to
- * customize //.
+ * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
@@ -42,5 +41,5 @@ public interface TreeNodeLoader extends Serializable {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    boolean addChildren(DefaultMetaTreeNode node, Sirius.server.middleware.types.Node[] children) throws Exception;
+    boolean addChildren(DefaultMetaTreeNode node, Node[] children) throws Exception;
 }
