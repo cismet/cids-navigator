@@ -383,22 +383,25 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
             if ((firstCause != null) && (firstCause.getMessage() != null)
                         && firstCause.getMessage().equals("not allowed to insert meta object")) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    org.openide.util.NbBundle.getMessage(
-                        NavigatorAttributeEditorGui.class,
-                        "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"),
-                    org.openide.util.NbBundle.getMessage(
-                        NavigatorAttributeEditorGui.class,
-                        "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),
-                    JOptionPane.ERROR_MESSAGE);
+                final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
+                            NavigatorAttributeEditorGui.class,
+                            "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),   // NOI18N
+                        org.openide.util.NbBundle.getMessage(
+                            NavigatorAttributeEditorGui.class,
+                            "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"), // NOI18N
+                        null,
+                        null,
+                        ex,
+                        Level.SEVERE,
+                        null);
+                JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
             } else {
                 final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
                             NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),   // NOI18N
+                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),     // NOI18N
                         org.openide.util.NbBundle.getMessage(
                             NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"), // NOI18N
+                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),   // NOI18N
                         null,
                         null,
                         ex,
@@ -556,8 +559,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private Throwable getFirstCause(final Throwable th) {
         if (th == null) {
             return null;
-        }
-        if (th.getCause() == null) {
+        } else if (th.getCause() == null) {
             return th;
         } else {
             return getFirstCause(th.getCause());
