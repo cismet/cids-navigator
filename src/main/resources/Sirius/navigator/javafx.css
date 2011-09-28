@@ -1,0 +1,449 @@
+.scene {
+    -fx-fill: green;
+    -fx-stroke: yellow;
+    -fx-stroke-width: 5;
+    -fx-stroke-dash-array: 12 2 4 2;
+    -fx-stroke-dash-offset: 6;
+    -fx-stroke-line-cap: butt;
+    /***************************************************************************
+     *                                                                         *
+     * The default font for all text.                                          *
+     *                                                                         *
+     **************************************************************************/
+    -fx-font: 6px "Amble Cn";
+
+    /***************************************************************************
+     *                                                                         *
+     * The main color palette from which the rest of the colors are derived.   *
+     *                                                                         *
+     **************************************************************************/
+
+    /* A light grey that is the base color for objects.  Instead of using
+     * -fx-base directly, the sections in this file will typically use -fx-color.
+     */
+    -fx-base: #d00000;
+
+    /* A very light grey used for the background of windows.  See also
+     * -fx-text-background-color, which should be used as the -fx-text-fill
+     * value for text painted on top of backgrounds colored with -fx-background.
+     */
+    -fx-background: #0000f4;
+
+    /* Used for the inside of text boxes, password boxes, lists, trees, and
+     * tables.  See also -fx-text-inner-color, which should be used as the
+     * -fx-text-fill value for text painted on top of backgrounds colored
+     * with -fx-control-inner-background.
+     */
+    /*-fx-control-inner-background: white;*/
+    -fx-control-inner-background: red;
+
+    /* One of these colors will be chosen based upon a ladder calculation
+     * that uses the brightness of a background color.  Instead of using these
+     * colors directly as -fx-text-fill values, the sections in this file should
+     * use a derived color to match the background in use.  See also:
+     *
+     * -fx-text-base-color for text on top of -fx-base, -fx-color, and -fx-body-color
+     * -fx-text-background-color for text on top of -fx-background
+     * -fx-text-inner-color for text on top of -fx-control-inner-color
+     * -fx-selection-bar-text for text on top of -fx-selection-bar
+     */
+    /*-fx-dark-text-color: black;
+    -fx-mid-text-color: #292929;
+    -fx-light-text-color: white;*/
+    -fx-dark-text-color: green;
+    -fx-mid-text-color: red;
+    -fx-light-text-color: blue;
+
+    /* A bright blue for highlighting/accenting objects.  For example: selected
+     * text; selected items in menus, lists, trees, and tables; progress bars;
+     * default buttons.
+     */
+    -fx-accent: #0093ff;
+
+    /* A bright blue for the focus indicator of objects. Typically used as the
+     * first color in -fx-background-color for the "focused" pseudo-class. Also
+     * typically used with insets of -1.4 to provide a glowing effect.
+     *
+     * TODO: should this be derived from -fx-accent?
+     */
+    -fx-focus-color: #0093ff;
+
+    /* The color that is used in styling controls. The default value is based
+     * on -fx-base, but is changed by pseudoclasses to change the base color.
+     * For example, the "hover" pseudoclass will typically set -fx-color to
+     * -fx-hover-base (see below) and the "armed" pseudoclass will typically
+     * set -fx-color to -fx-pressed-base.
+     */
+    /*-fx-color: -fx-base;*/
+    -fx-color: blue;
+
+    /* The opacity level to use for the "disabled" pseudoclass.
+     */
+    -fx-disabled-opacity: 0.75;
+
+    /***************************************************************************
+     *                                                                         *
+     * Colors that are derived from the main color palette.                    *
+     *                                                                         *
+     **************************************************************************/
+
+    /* A little lighter than -fx-base and used as the -fx-color for the
+     * "hovered" pseudoclass state.
+     */
+    -fx-hover-base: ladder -fx-base
+        stops (20%,derive(-fx-base,20%))
+              (35%,derive(-fx-base,30%))
+              (50%,derive(-fx-base,40%));
+
+    /* A little darker than -fx-base and used as the -fx-color for the
+     * "armed" pseudoclass state.
+     *
+     * TODO: should this be renamed to -fx-armed-base?
+     */
+    -fx-pressed-base: derive(-fx-base,-20%);
+
+    /* Used to specify the body color for focused objects.  By default, it's
+     * the same as -fx-base (i.e., the body color doesn't change when a control
+     * gets focus).
+     */
+    -fx-focused-base: -fx-base;
+
+    /* The color to use for -fx-text-fill when text is to be painted on top of
+     * a background filled with the -fx-background color.
+     */
+    -fx-text-background-color: ladder -fx-background
+        stops (30%,-fx-light-text-color)
+              (31%,-fx-dark-text-color)
+              (59%,-fx-dark-text-color)
+              (60%,-fx-mid-text-color);
+
+    /* The default color for all text.  Sections should change the -fx-text-fill
+     * property if change the background color to something else.  See also:
+     *
+     * -fx-text-base-color for text on top of -fx-base, -fx-color, and -fx-body-color
+     * -fx-text-background-color for text on top of -fx-background
+     * -fx-text-inner-color for text on top of -fx-control-inner-color
+     * -fx-selection-bar-text for text on top of -fx-selection-bar
+     */
+    -fx-text-fill: -fx-text-background-color;
+
+    /* A little darker than -fx-color and used to draw boxes around objects such
+     * as progress bars, scroll bars, scroll panes, trees, tables, and lists.
+     */
+    -fx-box-border: ladder -fx-color
+        stops (20%,black)
+              (30%,derive(-fx-color,-30%));
+
+    /* Darker than -fx-background and used to draw boxes around text boxes and
+     * password boxes.
+     */
+    -fx-text-box-border: ladder -fx-background
+        stops (10%,black)
+              (30%,derive(-fx-background,-15%));
+
+    /* Typically lighter than -fx-background and used to provide a small
+     * highlight under controls and tick marks for checkboxes and radio buttons.
+     * Often used with an insets of 0 0 -1 0, and is also often the first
+     * color in a -fx-background-color list.  Also is typically replaced by
+     * -fx-focus-color with an insets of -1.4 in the "focused" pseudoclass.
+     */
+    -fx-shadow-highlight-color: ladder -fx-background
+        stops (0%,transparent)
+              (5%,derive(-fx-background,40%))
+              (70%,derive(-fx-background,60%))
+              (85%,derive(-fx-background,100%))
+              (97%,derive(-fx-background,100%))
+              (97.5%,derive(-fx-background,-10%));
+
+    /* A gradient that goes from a little darker than -fx-color on the top to
+     * even more darker than -fx-color on the bottom.  Typically is the second
+     * color in the -fx-background-color list as the small thin border around
+     * a control. It is typically the same size as the control (i.e., insets
+     * are 0).
+     */
+    -fx-outer-border: linear (0%,0%) to (0%,100%)
+        stops (0%,derive(-fx-color,-9%))
+              (100%,derive(-fx-color,-33%));
+
+    /* A gradient that goes from a bit lighter than -fx-color on the top to
+     * a little darker at the bottom.  Typically is the third color in the
+     * -fx-background-color list as a thin highlight inside the outer border.
+     * Insets are typically 1.
+     */
+    -fx-inner-border: linear (0%,0%) to (0%,100%)
+        stops (0%,ladder -fx-color
+                      stops (60%,derive(-fx-color,80%))
+                            (82%,white))
+              (100%,ladder -fx-color
+                      stops (10%,derive(-fx-color,20%))
+                            (80%,derive(-fx-color,-10%)));
+
+    -fx-inner-border-horizontal: linear (0%,0%) to (100%,0%)
+        stops (0%,ladder -fx-color
+                      stops (60%,derive(-fx-color,80%))
+                            (82%,white))
+              (100%,ladder -fx-color
+                      stops (10%,derive(-fx-color,20%))
+                            (80%,derive(-fx-color,-10%)));
+
+    -fx-inner-border-bottomup: linear (0%,100%) to (0%,0%)
+        stops (0%,ladder -fx-color
+                      stops (60%,derive(-fx-color,80%))
+                            (82%,white))
+              (100%,ladder -fx-color
+                      stops (10%,derive(-fx-color,20%))
+                            (80%,derive(-fx-color,-10%)));
+
+    /* A gradient that goes from a little lighter than -fx-color at the top to
+     * a little darker than -fx-color at the bottom and is used to fill the
+     * body of many controls such as buttons.  Typically is the fourth color
+     * in the -fx-background-color list and represents main body of the control.
+     * Insets are typically 2.
+     */
+    -fx-body-color: linear (0%,0%) to (0%,100%)
+        stops (0%,derive(-fx-color,34%))
+              (100%,derive(-fx-color,-18%));
+
+    -fx-body-color-bottomup: linear (0%,100%) to (0%,0%)
+        stops (0%,derive(-fx-color,34%))
+              (100%,derive(-fx-color,-18%));
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-base, -fx-color, and -fx-body-color.
+     */
+    -fx-text-base-color: ladder -fx-color
+        stops (30%,-fx-light-text-color)
+              (31%,-fx-dark-text-color)
+              (59%,-fx-dark-text-color)
+              (60%,-fx-mid-text-color);
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-control-inner-background.
+     */
+    -fx-text-inner-color: ladder -fx-control-inner-background
+        stops (30%,-fx-light-text-color)
+              (31%,-fx-dark-text-color)
+              (59%,-fx-dark-text-color)
+              (60%,-fx-mid-text-color);
+
+    /* The color to use for small mark-like objects such as checks on check
+     * boxes, filled in circles in radio buttons, arrows on scroll bars, etc.
+     */
+    -fx-mark-color: ladder -fx-color
+        stops (30%,white)
+              (31%,derive(-fx-color,-63%));
+
+    /* The small thin light "shadow" for mark-like objects. Typically used in
+     * conjunction with -fx-mark-color with an insets of 1 0 -1 0.
+     */
+    -fx-mark-highlight-color: ladder -fx-color
+        stops (60%,derive(-fx-color,80%))
+              (70%,white);
+
+    /* Background for items in list like things such as menus, lists, trees,
+     * and tables.
+     *
+     * TODO: it seems like this should be based upon -fx-accent and we should
+     * remove the setting -fx-background in all the sections that use
+     * -fx-selection-bar.
+     */
+    -fx-selection-bar: linear (0%,0%) to (0%,100%)
+        stops (0%,derive(-fx-background,-7%))
+              (100%,derive(-fx-background,-34%));
+
+    /* The color to use as -fx-text-fill when painting text on top of
+     * backgrounds filled with -fx-selection-bar.
+     *
+     * TODO: it seems like this should be derived from -fx-selection-bar.
+     */
+    -fx-selection-bar-text: ladder -fx-background
+        stops (50%,-fx-light-text-color)
+              (51%,-fx-mid-text-color);
+
+    /* The default border color for a tab.
+     *
+     * TODO: should this be -fx-box-border or derived from some other color?
+     */
+    -fx-tab-border-color: gray;
+
+    /* These are needed for Popup */
+    -fx-background-color: inherit;
+    -fx-background-radius: inherit;
+    -fx-background-insets: inherit;
+    -fx-padding: inherit;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * ScrollBar                                                                   *
+ *                                                                             *
+ ******************************************************************************/
+
+.scroll-bar {
+    /*-fx-skin: "com.sun.javafx.scene.control.skin.ScrollBarSkin";*/
+    -fx-color: red;
+}
+
+.scroll-bar:horizontal {
+    -fx-background-color: #D4D0C8;
+    -fx-background-insets: 0, 1;
+}
+
+.scroll-bar:horizontal:focused {
+    -fx-background-color:
+        -fx-focus-color,
+        -fx-box-border,
+        linear (0%,0%) to (0%,100%) stops (5%, derive(-fx-color,30%)) (100%, derive(-fx-color,-17%));
+    -fx-background-insets: -1.4, 0, 1;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: #D4D0C8;
+    -fx-background-insets: 0, 1;
+}
+
+.scroll-bar:vertical:focused {
+    -fx-background-color:
+        -fx-focus-color,
+        -fx-box-border,
+        linear (0%,0%) to (100%,0%) stops (5%, derive(-fx-color,30%)) (100%, derive(-fx-color,-17%));
+    -fx-background-insets: -1.4, 0, 1;
+}
+
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #5A77AD;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0.5em; /* makes sure this remains circular */
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #5A77AD;
+    -fx-background-insets: 0, 1, 2;
+    -fx-background-radius: 0.5em; /* makes sure this remains circular */
+}
+
+.scroll-bar:focused .thumb {
+    -fx-color: -fx-focused-base;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-color: -fx-hover-base;
+}
+
+/* Uncomment when RT-10521 is fixed.
+.scroll-bar .thumb:pressed {
+    -fx-color: -fx-pressed-base;
+}
+*/
+
+.scroll-bar:horizontal .track {
+     -fx-background-color:
+        -fx-box-border,
+        linear (0%,0%) to (0%,100%) stops (0%, derive(-fx-color,-15%)) (20%, derive(-fx-color,2.2%)) (100%, derive(-fx-color,60%));
+    -fx-background-insets:  0, 1;
+    -fx-background-radius: 0.5em; /* makes sure this remains circular */
+}
+
+.scroll-bar:vertical .track {
+     -fx-background-color:
+        -fx-box-border,
+        linear (0%,0%) to (100%,0%) stops (0%, derive(-fx-color,-15%)) (20%, derive(-fx-color,2.2%)) (100%, derive(-fx-color,60%));
+    -fx-background-insets:  0, 1;
+    -fx-background-radius: 0.5em; /* makes sure this remains circular */
+}
+
+.scroll-bar .increment-button {
+    -fx-background-color: null;
+    -fx-padding: 0.25em; /* 3 */
+}
+
+.scroll-bar .decrement-button {
+    -fx-background-color: null;
+    -fx-padding: 0.25em; /* 3 */
+}
+
+.scroll-bar:horizontal .increment-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+    -fx-shape: "M 4 0 L 0 -3 L 0 3 z";
+}
+
+.scroll-bar:vertical .increment-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+    -fx-shape: "M -3 0 L 0 4 L 3 0 z";
+}
+
+.scroll-bar:horizontal .decrement-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.5em 0.333333em 0.0em 0.0em; /* 6 4 0 0 */
+    -fx-shape: "M 0 0 L 4 -3 L 4 3 z";
+}
+
+.scroll-bar:vertical .decrement-arrow {
+    -fx-background-color: -fx-mark-highlight-color, -fx-mark-color;
+    -fx-background-insets: 1 0 -1 0, 0;
+    -fx-padding: 0.333333em 0.5em 0.0em 0.0em; /* 4 6 0 0 */
+    -fx-shape: "M -3 0 L 0 -4 L 3 0 z";
+}
+
+.scroll-bar:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+/* The opacity of the parent is applied to the children.  So we make the
+ * opacity 1.0 here to avoid double translucency.
+ */
+/*:disabled > * > .scroll-bar {
+    -fx-opacity: 1.0;
+}*/
+
+/*******************************************************************************
+ *                                                                             *
+ * ScrollPane                                                                  *
+ *                                                                             *
+ ******************************************************************************/
+
+.scroll-pane {
+    -fx-skin: "com.sun.javafx.scene.control.skin.ScrollPaneSkin";
+    -fx-background-color: -fx-box-border,-fx-background;
+    -fx-background-insets: 0, 1;
+    -fx-padding: 1.0;
+}
+
+.scroll-pane:focused {
+    -fx-background-color: -fx-focus-color, -fx-box-border, -fx-background;
+    -fx-background-insets: -1.4, 0, 1;
+}
+
+.scroll-pane > * > .scroll-bar:horizontal {
+    -fx-background-insets: 0, 1 0 0 0;
+    -fx-padding: 0.0 0.0 -1.0 -1.0;
+}
+
+.scroll-pane > * > .scroll-bar:vertical {
+    -fx-background-insets: 0, 0 0 0 1;
+    -fx-padding: -1.0 -1.0 -1.0 0.0;
+}
+
+.scroll-pane .corner {
+    -fx-background-color: -fx-box-border, -fx-base;
+    -fx-background-insets: 0, 1 0 0 1;
+}
+
+.scroll-pane:disabled {
+    -fx-opacity: -fx-disabled-opacity;
+}
+
+#id-of-browser {
+    -fx-padding: 10.0;
+    -fx-fill: yellow;
+    -fx-stroke: green;
+    -fx-stroke-width: 5;
+    -fx-stroke-dash-array: 12 2 4 2;
+    -fx-stroke-dash-offset: 6;
+    -fx-stroke-line-cap: butt;
+}
