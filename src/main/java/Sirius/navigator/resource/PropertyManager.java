@@ -104,6 +104,8 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
+    private boolean useWebView = false;
+    private boolean enableSearchDialog = false;
 
     private transient String proxyURL;
     private transient String proxyUsername;
@@ -142,6 +144,8 @@ public final class PropertyManager {
         setConnectionInfoSaveable(false);
 
         setUseFlyingSaucer(false);
+        setUseWebView(false);
+        setEnableSearchDialog(false);
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
         connectionInfo.setPassword("");                                   // NOI18N
@@ -750,6 +754,83 @@ public final class PropertyManager {
     }
 
     /**
+     * Setter for property useWebView.
+     *
+     * @param  useWebView  String containing 'true'/'false' or '1'/'0'.
+     */
+    public void setUseWebView(final String useWebView) {
+        if ((useWebView != null) && (useWebView.equalsIgnoreCase(TRUE) || useWebView.equals("1"))) {
+            this.setUseWebView(true);
+        } else if ((useWebView != null)
+                    && (useWebView.equalsIgnoreCase(FALSE) || useWebView.equals("0"))) {
+            this.setUseWebView(false);
+        } else {
+            this.setUseWebView(false);
+            logger.warn("setUseWebView(): invalid property 'useWebView': '" + useWebView
+                        + "', setting default value to '"
+                        + this.useWebView + "'");
+        }
+    }
+
+    /**
+     * Setter for property useWebView.
+     *
+     * @param  useWebView  New value of property useWebView.
+     */
+    public void setUseWebView(final boolean useWebView) {
+        this.useWebView = useWebView;
+        properties.setProperty("useWebView", String.valueOf(this.useWebView)); // NOI18N
+    }
+
+    /**
+     * Getter for property useWebView.
+     *
+     * @return  Value of property useWebView.
+     */
+    public boolean isUseWebView() {
+        return this.useWebView;
+    }
+
+    /**
+     * Setter for property enableSearchDialog.
+     *
+     * @param  enableSearchDialog  String containing 'true'/'false' or '1'/'0'.
+     */
+    public void setEnableSearchDialog(final String enableSearchDialog) {
+        if ((enableSearchDialog != null)
+                    && (enableSearchDialog.equalsIgnoreCase(TRUE) || enableSearchDialog.equals("1"))) {
+            this.setEnableSearchDialog(true);
+        } else if ((enableSearchDialog != null)
+                    && (enableSearchDialog.equalsIgnoreCase(FALSE) || enableSearchDialog.equals("0"))) {
+            this.setEnableSearchDialog(false);
+        } else {
+            this.setEnableSearchDialog(false);
+            logger.warn("setEnableSearchDialog(): invalid property 'enableSearchDialog': '" + enableSearchDialog
+                        + "', setting default value to '"
+                        + this.enableSearchDialog + "'");
+        }
+    }
+
+    /**
+     * Setter for property enableSearchDialog.
+     *
+     * @param  enableSearchDialog  New value of property enableSearchDialog.
+     */
+    public void setEnableSearchDialog(final boolean enableSearchDialog) {
+        this.enableSearchDialog = enableSearchDialog;
+        properties.setProperty("enableSearchDialog", String.valueOf(this.enableSearchDialog)); // NOI18N
+    }
+
+    /**
+     * Getter for property enableSearchDialog.
+     *
+     * @return  Value of property enableSearchDialog.
+     */
+    public boolean isEnableSearchDialog() {
+        return this.enableSearchDialog;
+    }
+
+    /**
      * .........................................................................
      *
      * @return  DOCUMENT ME!
@@ -827,6 +908,10 @@ public final class PropertyManager {
             this.connectionInfo.setUsername(value);
         } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
             this.setUseFlyingSaucer(value);
+        } else if (property.equalsIgnoreCase("useWebView")) {             // NOI18N
+            this.setUseWebView(value);
+        } else if (property.equalsIgnoreCase("enableSearchDialog")) {     // NOI18N
+            this.setEnableSearchDialog(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
         } else if (property.equals("navigator.proxy.username")) {

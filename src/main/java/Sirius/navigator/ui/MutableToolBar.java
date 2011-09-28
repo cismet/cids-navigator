@@ -9,6 +9,7 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
+import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.ui.embedded.AbstractEmbeddedComponentsMap;
 import Sirius.navigator.ui.embedded.EmbeddedComponent;
@@ -105,14 +106,16 @@ public class MutableToolBar extends JToolBar {
         final ActionListener toolBarListener = new ToolBarListener();
         JButton button = null;
 
-        button = new JButton(resources.getIcon("find24.gif"));            // NOI18N
-        button.setToolTipText(org.openide.util.NbBundle.getMessage(
-                MutableToolBar.class,
-                "MutableToolBar.createDefaultButtons().search.tooltip")); // NOI18N
-        button.setActionCommand("search");                                // NOI18N
-        button.setMargin(new Insets(4, 4, 4, 4));
-        button.addActionListener(toolBarListener);
-        defaultToolBar.add(button);
+        if (PropertyManager.getManager().isEnableSearchDialog()) {
+            button = new JButton(resources.getIcon("find24.gif"));            // NOI18N
+            button.setToolTipText(org.openide.util.NbBundle.getMessage(
+                    MutableToolBar.class,
+                    "MutableToolBar.createDefaultButtons().search.tooltip")); // NOI18N
+            button.setActionCommand("search");                                // NOI18N
+            button.setMargin(new Insets(4, 4, 4, 4));
+            button.addActionListener(toolBarListener);
+            defaultToolBar.add(button);
+        }
 
         button = new JButton(resources.getIcon("plugin24.gif"));          // NOI18N
         button.setToolTipText(org.openide.util.NbBundle.getMessage(
