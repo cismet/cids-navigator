@@ -12,6 +12,8 @@ import Sirius.navigator.plugin.interfaces.EmbededControlBar;
 import Sirius.navigator.tools.NavigatorToolkit;
 import Sirius.navigator.ui.widget.*;
 
+import net.infonode.docking.DockingWindowListener;
+
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -167,6 +169,10 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
     public CustomView getView() {
         if (constraintView == null) {
             constraintView = new CustomView(getId(), getName(), getIcon(), getContainer());
+            if (component instanceof DescriptionPaneFX) {
+                final DescriptionPaneFX fx = (DescriptionPaneFX)component;
+                constraintView.addListener(fx);
+            }
             if (component instanceof EmbededControlBar) {
                 ((EmbededControlBar)component).setControlBarVisible(false);
                 final Vector<AbstractButton> customButtons = ((EmbededControlBar)component).getControlBarButtons();

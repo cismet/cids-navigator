@@ -104,6 +104,7 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
+    private boolean useWebView = false;
 
     private transient String proxyURL;
     private transient String proxyUsername;
@@ -142,6 +143,7 @@ public final class PropertyManager {
         setConnectionInfoSaveable(false);
 
         setUseFlyingSaucer(false);
+        setUseWebView(false);
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
         connectionInfo.setPassword("");                                   // NOI18N
@@ -750,6 +752,44 @@ public final class PropertyManager {
     }
 
     /**
+     * Setter for property useWebView.
+     *
+     * @param  useWebView  String containing 'true'/'false' or '1'/'0'.
+     */
+    public void setUseWebView(final String useWebView) {
+        if ((useWebView != null) && (useWebView.equalsIgnoreCase(TRUE) || useWebView.equals("1"))) {
+            this.setUseWebView(true);
+        } else if ((useWebView != null)
+                    && (useWebView.equalsIgnoreCase(FALSE) || useWebView.equals("0"))) {
+            this.setUseWebView(false);
+        } else {
+            this.setUseWebView(false);
+            logger.warn("setUseWebView(): invalid property 'useWebView': '" + useWebView
+                        + "', setting default value to '"
+                        + this.useWebView + "'");
+        }
+    }
+
+    /**
+     * Setter for property useWebView.
+     *
+     * @param  useWebView  New value of property useWebView.
+     */
+    public void setUseWebView(final boolean useWebView) {
+        this.useWebView = useWebView;
+        properties.setProperty("useWebView", String.valueOf(this.useWebView)); // NOI18N
+    }
+
+    /**
+     * Getter for property useWebView.
+     *
+     * @return  Value of property useWebView.
+     */
+    public boolean isUseWebView() {
+        return this.useWebView;
+    }
+
+    /**
      * .........................................................................
      *
      * @return  DOCUMENT ME!
@@ -827,6 +867,8 @@ public final class PropertyManager {
             this.connectionInfo.setUsername(value);
         } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
             this.setUseFlyingSaucer(value);
+        } else if (property.equalsIgnoreCase("useWebView")) {             // NOI18N
+            this.setUseWebView(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
         } else if (property.equals("navigator.proxy.username")) {

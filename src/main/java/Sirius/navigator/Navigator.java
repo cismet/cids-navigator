@@ -635,10 +635,14 @@ public class Navigator extends JFrame {
             325,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_325")); // NOI18N
 
-        if (PropertyManager.getManager().isUseFlyingSaucer()) {
-            descriptionPane = new DescriptionPaneFS();
+        if (PropertyManager.getManager().isUseWebView()) {
+            descriptionPane = new DescriptionPaneFX();
         } else {
-            descriptionPane = new DescriptionPaneCalpa();
+            if (PropertyManager.getManager().isUseFlyingSaucer()) {
+                descriptionPane = new DescriptionPaneFS();
+            } else {
+                descriptionPane = new DescriptionPaneCalpa();
+            }
         }
 
         configurator = new FloatingFrameConfigurator(

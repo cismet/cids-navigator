@@ -81,7 +81,7 @@ body {
 .header-center h1 {
     margin: 0px;
     padding: 0.7em 0em 0em 0em;
-    font-family: Tahoma, Verdana, Helvetica, Arial;
+    font-family: Helvetica, Arial;
     font-size: 1.5em;
     color: white;
 }
@@ -89,6 +89,11 @@ body {
 .body p {
     margin: 0px;
     padding: 0px;
-    font-family: Tahoma, Verdana, Helvetica, Arial;
+    font-family: Helvetica, Arial;
+    font-size: 0.8em;
+}
+
+.body ul {
+    font-family: Helvetica, Arial;
     font-size: 0.8em;
 }
