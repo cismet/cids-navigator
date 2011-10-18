@@ -17,6 +17,8 @@ import Sirius.server.middleware.types.MetaObject;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
+import org.openide.util.Exceptions;
+
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -56,12 +58,14 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     private boolean enableLabels = true;
     private HashMap<Object, Icon> icons = null;
     private String iconProperty = null;
-    private ButtonGroup bg;
+    private ButtonGroup bg = new ButtonGroup();
     private CidsBean selectedElements = null;
     private MetaClass mc = null;
     private Map<JRadioButton, MetaObject> boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
     private volatile boolean initialised = false;
+    private Thread initThread = null;
+    private Thread refreshThread = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -69,7 +73,6 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
      * Creates a new CustomReferencedCheckboxField object.
      */
     public DefaultBindableRadioButtonField() {
-        bg = new ButtonGroup();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -142,16 +145,35 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
 
     @Override
     public void setMetaClass(final MetaClass metaClass) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
-        }
-        this.mc = metaClass;
         new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    initBoxes();
-                    initialised = true;
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
+                    }
+                    if ((initThread != null) && initThread.isAlive()) {
+                        initThread.interrupt();
+                    }
+                    while ((initThread != null) && initThread.isAlive()) {
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
+                    mc = metaClass;
+                    initialised = false;
+                    initThread = new Thread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    initBoxes();
+                                    initialised = true;
+                                    initThread = null;
+                                }
+                            });
+
+                    initThread.start();
                 }
             }).start();
     }
@@ -196,6 +218,10 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                     }
                     add(button);
                     boxToObjectMapping.put(button, tmpMc);
+
+                    if (Thread.currentThread().isInterrupted()) {
+                        return;
+                    }
                 }
 
                 activateElement();
@@ -237,28 +263,46 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
 
                 @Override
                 public void run() {
-                    while (!initialised) {
+                    while ((refreshThread != null) && refreshThread.isAlive()) {
                         try {
-                            Thread.sleep(50);
-                        } catch (final InterruptedException e) {
-                            // nothing to do
+                            Thread.sleep(20);
+                        } catch (InterruptedException ex) {
                         }
                     }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("refresh CheckboxState", new Exception());
-                    }
+                    refreshThread = new Thread(new Runnable() {
 
-                    final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
-                    if (removeSelectedElements) {
-                        selectedElements = null;
-                    }
+                                @Override
+                                public void run() {
+                                    while (!initialised) {
+                                        try {
+                                            Thread.sleep(50);
+                                        } catch (final InterruptedException e) {
+                                            // nothing to do
+                                        }
+                                    }
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("refresh CheckboxState", new Exception());
+                                    }
 
-                    while (it.hasNext()) {
-                        final JRadioButton button = it.next();
-                        button.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(button)));
-                        button.setSelected(false);
-                    }
-                    activateElement();
+                                    final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
+                                    if (removeSelectedElements) {
+                                        selectedElements = null;
+                                    }
+
+                                    while (it.hasNext()) {
+                                        final JRadioButton button = it.next();
+                                        button.setEnabled(
+                                            decider.isCheckboxForClassActive(boxToObjectMapping.get(button)));
+                                        button.setSelected(false);
+                                        if (Thread.currentThread().isInterrupted()) {
+                                            return;
+                                        }
+                                    }
+                                    activateElement();
+                                }
+                            });
+
+                    refreshThread.start();
                 }
             }).start();
     }
@@ -267,8 +311,18 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
      * DOCUMENT ME!
      */
     public void dispose() {
+        if ((initThread != null) && initThread.isAlive()) {
+            initThread.interrupt();
+        }
+        if ((refreshThread != null) && refreshThread.isAlive()) {
+            refreshThread.interrupt();
+        }
+        bg = new ButtonGroup();
+        selectedElements = null;
+        mc = null;
+        boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
+        initialised = false;
         this.removeAll();
-        boxToObjectMapping.clear();
     }
 
     @Override
