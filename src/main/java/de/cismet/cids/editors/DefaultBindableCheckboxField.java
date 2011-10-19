@@ -50,6 +50,9 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
     //~ Instance fields --------------------------------------------------------
 
+    Thread initThread = null;
+    Thread refreshThread = null;
+
     private PropertyChangeSupport propertyChangeSupport;
     private List selectedElements = null;
     private MetaClass mc = null;
@@ -153,16 +156,34 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
     @Override
     public void setMetaClass(final MetaClass metaClass) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
-        }
-        this.mc = metaClass;
         new Thread(new Runnable() {
 
                 @Override
                 public void run() {
-                    initBoxes();
-                    initialised = true;
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
+                    }
+                    if ((initThread != null) && initThread.isAlive()) {
+                        initThread.interrupt();
+                    }
+                    while ((initThread != null) && initThread.isAlive()) {
+                        try {
+                            Thread.sleep(20);
+                        } catch (InterruptedException ex) {
+                        }
+                    }
+
+                    mc = metaClass;
+                    initThread = new Thread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    initBoxes();
+                                    initialised = true;
+                                    initThread = null;
+                                }
+                            });
+                    initThread.start();
                 }
             }).start();
     }
@@ -259,28 +280,45 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
                 @Override
                 public void run() {
-                    while (!initialised) {
+                    while ((refreshThread != null) && refreshThread.isAlive()) {
                         try {
-                            Thread.sleep(50);
-                        } catch (final InterruptedException e) {
-                            // nothing to do
+                            Thread.sleep(20);
+                        } catch (InterruptedException ex) {
                         }
                     }
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("refresh CheckboxState", new Exception());
-                    }
+                    refreshThread = new Thread(new Runnable() {
 
-                    final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
-                    if (removeSelectedElements) {
-                        selectedElements.clear();
-                    }
+                                @Override
+                                public void run() {
+                                    while (!initialised) {
+                                        try {
+                                            Thread.sleep(50);
+                                        } catch (final InterruptedException e) {
+                                            // nothing to do
+                                        }
+                                    }
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("refresh CheckboxState", new Exception());
+                                    }
 
-                    while (it.hasNext()) {
-                        final JCheckBox box = it.next();
-                        box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
-                        box.setSelected(false);
-                    }
-                    activateSelectedObjects();
+                                    final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
+                                    if (removeSelectedElements) {
+                                        selectedElements.clear();
+                                    }
+
+                                    while (it.hasNext()) {
+                                        final JCheckBox box = it.next();
+                                        box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
+                                        box.setSelected(false);
+                                        if (Thread.currentThread().isInterrupted()) {
+                                            return;
+                                        }
+                                    }
+                                    activateSelectedObjects();
+                                }
+                            });
+
+                    refreshThread.start();
                 }
             }).start();
     }
@@ -289,8 +327,17 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * DOCUMENT ME!
      */
     public void dispose() {
+        if ((initThread != null) && initThread.isAlive()) {
+            initThread.interrupt();
+        }
+        if ((refreshThread != null) && refreshThread.isAlive()) {
+            refreshThread.interrupt();
+        }
+        selectedElements = null;
+        mc = null;
+        boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
+        initialised = false;
         this.removeAll();
-        boxToObjectMapping.clear();
     }
 
     @Override

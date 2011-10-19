@@ -105,10 +105,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected boolean showsWaitScreen = false;
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     protected LinkStyleBreadCrumbGui breadCrumbGui;
-
     // will only be accessed in EDT !
     private transient boolean fullScreenRenderer;
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -280,12 +278,14 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param  page  DOCUMENT ME!
      */
     public abstract void setPageFromURI(final String page);
+
     /**
      * DOCUMENT ME!
      *
      * @param  page  DOCUMENT ME!
      */
     public abstract void setPageFromContent(final String page);
+
     /**
      * DOCUMENT ME!
      *
@@ -314,6 +314,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                     final List<JComponent> all = new ArrayList<JComponent>();
 
+                    boolean multipleClasses = false;
+
                     @Override
                     protected SelfDisposingPanel doInBackground() throws Exception {
                         final MultiMap objectsByClass = new MultiMap();
@@ -327,7 +329,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             }
                         }
                         final Iterator it = objectsByClass.keySet().iterator();
-
+                        multipleClasses = objectsByClass.keySet().size() > 1;
                         while (it.hasNext() && !isCancelled()) {
                             final Object key = it.next();
                             final List l = (List)objectsByClass.get(key);
@@ -390,32 +392,71 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                     protected void process(final List<SelfDisposingPanel> chunks) {
                         int y = all.size();
 
-                        if (fullScreenRenderer) {
-                            fullScreenRenderer = false;
-
-                            panObjects.remove(panRenderer);
-                            panObjects.add(scpRenderer, BorderLayout.CENTER);
-
-                            scpRenderer.setViewportView(panRenderer);
-
-                            panRenderer.setLayout(new GridBagLayout());
-                        }
-
-                        for (final SelfDisposingPanel comp : chunks) {
-                            final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                        if (!multipleClasses && (chunks.size() == 1)) {
+                            final SelfDisposingPanel sdp = chunks.get(0);
+                            showsWaitScreen = false;
+                            removeAndDisposeAllRendererFromPanel();
+                            gridBagConstraints = new java.awt.GridBagConstraints();
                             gridBagConstraints.gridx = 0;
-                            gridBagConstraints.gridy = y;
+                            gridBagConstraints.gridy = 0;
                             gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                            panRenderer.add(comp, gridBagConstraints);
 
-                            comp.startChecking();
+                            if (sdp instanceof RequestsFullSizeComponent) {
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info("Renderer is FullSize Component!"); // NOI18N
+                                }
 
+                                fullScreenRenderer = true;
+
+                                panObjects.remove(scpRenderer);
+                                panObjects.add(panRenderer, BorderLayout.CENTER);
+
+                                panRenderer.setLayout(new BorderLayout());
+                                panRenderer.add(sdp, BorderLayout.CENTER);
+                            } else {
+                                fullScreenRenderer = false;
+
+                                panObjects.remove(panRenderer);
+                                panObjects.add(scpRenderer, BorderLayout.CENTER);
+                                scpRenderer.setViewportView(panRenderer);
+
+                                panRenderer.setLayout(new GridBagLayout());
+                                panRenderer.add(sdp, gridBagConstraints);
+                            }
+                            sdp.startChecking();
                             panRenderer.revalidate();
-                            panRenderer.repaint();
+                            revalidate();
+                            repaint();
+                        } else {
+                            if (fullScreenRenderer) {
+                                fullScreenRenderer = false;
 
-                            y++;
+                                panObjects.remove(panRenderer);
+                                panObjects.add(scpRenderer, BorderLayout.CENTER);
+
+                                scpRenderer.setViewportView(panRenderer);
+
+                                panRenderer.setLayout(new GridBagLayout());
+                            }
+
+                            for (final SelfDisposingPanel comp : chunks) {
+                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                                gridBagConstraints.gridx = 0;
+                                gridBagConstraints.gridy = y;
+                                gridBagConstraints.weightx = 1;
+                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                panRenderer.add(comp, gridBagConstraints);
+
+                                comp.startChecking();
+
+                                panRenderer.revalidate();
+                                panRenderer.repaint();
+
+                                y++;
+                            }
                         }
                         all.addAll(chunks);
                     }
@@ -721,6 +762,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
         this.setPageFromURI(descriptionURL);
     }
+
     /**
      * Single Object.
      *

@@ -378,19 +378,38 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
             }
-            log.error("Error while saving", ex);                                   // NOI18N
-            final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
-                        NavigatorAttributeEditorGui.class,
-                        "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),   // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        NavigatorAttributeEditorGui.class,
-                        "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"), // NOI18N
-                    null,
-                    null,
-                    ex,
-                    Level.SEVERE,
-                    null);
-            JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+            final Throwable firstCause = getFirstCause(ex);
+            log.error("Error while saving", ex); // NOI18N
+
+            if ((firstCause != null) && (firstCause.getMessage() != null)
+                        && firstCause.getMessage().equals("not allowed to insert meta object")) {
+                final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
+                            NavigatorAttributeEditorGui.class,
+                            "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),   // NOI18N
+                        org.openide.util.NbBundle.getMessage(
+                            NavigatorAttributeEditorGui.class,
+                            "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"), // NOI18N
+                        null,
+                        null,
+                        ex,
+                        Level.SEVERE,
+                        null);
+                JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+            } else {
+                final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
+                            NavigatorAttributeEditorGui.class,
+                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),     // NOI18N
+                        org.openide.util.NbBundle.getMessage(
+                            NavigatorAttributeEditorGui.class,
+                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),   // NOI18N
+                        null,
+                        null,
+                        ex,
+                        Level.SEVERE,
+                        null);
+                JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+            }
+            refreshTree();
         }
         if (closeEditor) {
             clear();
@@ -527,6 +546,23 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 });
         } else {
             log.warn("Given Treenode is not instance of ObjectTreeMode, but: " + node.getClass()); // NOI18N
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   th  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Throwable getFirstCause(final Throwable th) {
+        if (th == null) {
+            return null;
+        } else if (th.getCause() == null) {
+            return th;
+        } else {
+            return getFirstCause(th.getCause());
         }
     }
 
