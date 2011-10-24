@@ -17,6 +17,7 @@ import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.RequestsFullSizeComponent;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
@@ -29,6 +30,7 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.openide.util.WeakListeners;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -487,7 +489,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 log.debug("editor:" + ed); // NOI18N
                             }
                             removeAndDisposeEditor();
-                            scpEditor.getViewport().setView(ed);
+                            switchPanel.remove(scpEditor);
+                            if (ed instanceof RequestsFullSizeComponent) {
+                                switchPanel.add(ed, BorderLayout.CENTER);
+                            } else {
+                                switchPanel.add(scpEditor, BorderLayout.CENTER);
+                                scpEditor.getViewport().setView(ed);
+                            }
+
                             if (ed instanceof WrappedComponent) {
                                 ed = ((WrappedComponent)ed).getOriginalComponent();
                             }
