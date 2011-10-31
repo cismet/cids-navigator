@@ -17,8 +17,6 @@ import Sirius.server.middleware.types.MetaObject;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
-import org.openide.util.Exceptions;
-
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,13 +29,15 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.ButtonGroup;
-import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.tools.CismetThreadPool;
 
 /**
  * DOCUMENT ME!
@@ -63,9 +63,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     private MetaClass mc = null;
     private Map<JRadioButton, MetaObject> boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
-    private volatile boolean initialised = false;
-    private Thread initThread = null;
-    private Thread refreshThread = null;
+    private volatile boolean threadRunning = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -145,92 +143,94 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
 
     @Override
     public void setMetaClass(final MetaClass metaClass) {
-        new Thread(new Runnable() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
+        }
+
+        CismetThreadPool.execute(new SwingWorker<MetaObject[], Void>() {
 
                 @Override
-                public void run() {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
-                    }
-                    if ((initThread != null) && initThread.isAlive()) {
-                        initThread.interrupt();
-                    }
-                    while ((initThread != null) && initThread.isAlive()) {
+                protected MetaObject[] doInBackground() throws Exception {
+                    while (!setThreadRunning()) {
                         try {
-                            Thread.sleep(20);
-                        } catch (InterruptedException ex) {
+                            Thread.sleep(50);
+                        } catch (final InterruptedException e) {
+                            // nothing to do
                         }
                     }
+
+                    selectedElements = null;
+                    boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
+
                     mc = metaClass;
-                    initialised = false;
-                    initThread = new Thread(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    initBoxes();
-                                    initialised = true;
-                                    initThread = null;
-                                }
-                            });
-
-                    initThread.start();
-                }
-            }).start();
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void initBoxes() {
-        if (mc != null) {
-            final String query = "select " + mc.getID() + ", " + mc.getPrimaryKey() + " from "
-                        + mc.getTableName();
-
-            try {
-                final MetaObject[] metaObjects = SessionManager.getProxy().getMetaObjectByQuery(query, 0);
-                JRadioButton button = null;
-                if (icons == null) {
-                    setLayout(new GridLayout(metaObjects.length, 1));
-                } else {
-                    setLayout(new GridLayout(metaObjects.length, 2));
-                }
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(metaObjects.length + "objects found.");
-                }
-
-                for (final MetaObject tmpMc : metaObjects) {
-                    button = new JRadioButton();
-                    button.addActionListener(this);
-                    button.setOpaque(false);
-                    button.setContentAreaFilled(false);
-                    if (enableLabels) {
-                        button.setText(tmpMc.getBean().toString());
-                    }
-                    bg.add(button);
-                    if (icons != null) {
-                        final Icon i = icons.get(tmpMc.getBean().getProperty(iconProperty));
-                        final JLabel l = new JLabel();
-                        if (i != null) {
-                            l.setIcon(i);
+                    if (mc != null) {
+                        final String query = "select " + mc.getID() + ", " + mc.getPrimaryKey() + " from "
+                                    + mc.getTableName();
+                        try {
+                            return SessionManager.getProxy().getMetaObjectByQuery(query, 0);
+                        } catch (ConnectionException e) {
+                            LOG.error("Error while loading the objects with query: " + query, e); // NOI18N
                         }
-                        l.setSize(i.getIconWidth(), i.getIconHeight());
-                        add(l);
+                    } else {
+                        LOG.error("Meta class is null.", new Throwable());
                     }
-                    add(button);
-                    boxToObjectMapping.put(button, tmpMc);
 
-                    if (Thread.currentThread().isInterrupted()) {
-                        return;
-                    }
+                    return null;
                 }
 
-                activateElement();
-            } catch (ConnectionException e) {
-                LOG.error("Error while loading the measurement object with query: " + query, e); // NOI18N
-            }
-        } else {
-            LOG.error("The initBoxes method was invoked before the meta class was set.", new Throwable());
-        }
+                @Override
+                protected void done() {
+                    try {
+                        bg = new ButtonGroup();
+                        DefaultBindableRadioButtonField.this.removeAll();
+
+                        JRadioButton button = null;
+                        final MetaObject[] metaObjects = get();
+
+                        if (icons == null) {
+                            DefaultBindableRadioButtonField.this.setLayout(new GridLayout(metaObjects.length, 1));
+                        } else {
+                            DefaultBindableRadioButtonField.this.setLayout(new GridLayout(metaObjects.length, 2));
+                        }
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(metaObjects.length + " objects found.");
+                        }
+
+                        for (final MetaObject tmpMc : metaObjects) {
+                            button = new JRadioButton();
+                            button.addActionListener(DefaultBindableRadioButtonField.this);
+                            button.setOpaque(false);
+                            button.setContentAreaFilled(false);
+                            if (enableLabels) {
+                                button.setText(tmpMc.getBean().toString());
+                            }
+                            bg.add(button);
+                            if (icons != null) {
+                                final Icon i = icons.get(tmpMc.getBean().getProperty(iconProperty));
+                                final JLabel l = new JLabel();
+                                if (i != null) {
+                                    l.setIcon(i);
+                                }
+                                l.setSize(i.getIconWidth(), i.getIconHeight());
+                                add(l);
+                            }
+                            add(button);
+                            boxToObjectMapping.put(button, tmpMc);
+
+                            if (Thread.currentThread().isInterrupted()) {
+                                return;
+                            }
+                        }
+
+                        activateElement();
+                    } catch (final Exception e) {
+                        LOG.error("Exception while filling a radio button field.", e);
+                    } finally {
+                        threadRunning = false;
+                    }
+                }
+            });
     }
 
     /**
@@ -259,70 +259,54 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
      * @param  removeSelectedElements  DOCUMENT ME!
      */
     public void refreshCheckboxState(final FieldStateDecider decider, final boolean removeSelectedElements) {
-        new Thread(new Runnable() {
+        CismetThreadPool.execute(new SwingWorker<Void, Void>() {
 
                 @Override
-                public void run() {
-                    while ((refreshThread != null) && refreshThread.isAlive()) {
+                protected Void doInBackground() throws Exception {
+                    while (!setThreadRunning()) {
                         try {
-                            Thread.sleep(20);
-                        } catch (InterruptedException ex) {
+                            Thread.sleep(50);
+                        } catch (final InterruptedException e) {
+                            // nothing to do
                         }
                     }
-                    refreshThread = new Thread(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    while (!initialised) {
-                                        try {
-                                            Thread.sleep(50);
-                                        } catch (final InterruptedException e) {
-                                            // nothing to do
-                                        }
-                                    }
-                                    if (LOG.isDebugEnabled()) {
-                                        LOG.debug("refresh CheckboxState", new Exception());
-                                    }
-
-                                    final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
-                                    if (removeSelectedElements) {
-                                        selectedElements = null;
-                                    }
-
-                                    while (it.hasNext()) {
-                                        final JRadioButton button = it.next();
-                                        button.setEnabled(
-                                            decider.isCheckboxForClassActive(boxToObjectMapping.get(button)));
-                                        button.setSelected(false);
-                                        if (Thread.currentThread().isInterrupted()) {
-                                            return;
-                                        }
-                                    }
-                                    activateElement();
-                                }
-                            });
-
-                    refreshThread.start();
+                    return null;
                 }
-            }).start();
+
+                @Override
+                protected void done() {
+                    try {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("refresh CheckboxState", new Exception());
+                        }
+
+                        final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
+                        if (removeSelectedElements) {
+                            selectedElements = null;
+                        }
+
+                        while (it.hasNext()) {
+                            final JRadioButton button = it.next();
+                            button.setEnabled(
+                                decider.isCheckboxForClassActive(boxToObjectMapping.get(button)));
+                            button.setSelected(false);
+                            if (Thread.currentThread().isInterrupted()) {
+                                return;
+                            }
+                        }
+                        activateElement();
+                    } finally {
+                        threadRunning = false;
+                    }
+                }
+            });
     }
 
     /**
      * DOCUMENT ME!
      */
     public void dispose() {
-        if ((initThread != null) && initThread.isAlive()) {
-            initThread.interrupt();
-        }
-        if ((refreshThread != null) && refreshThread.isAlive()) {
-            refreshThread.interrupt();
-        }
-        bg = new ButtonGroup();
-        selectedElements = null;
-        mc = null;
-        boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
-        initialised = false;
-        this.removeAll();
     }
 
     @Override
@@ -370,5 +354,19 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
      */
     public void setEnableLabels(final boolean enableLabels) {
         this.enableLabels = enableLabels;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private synchronized boolean setThreadRunning() {
+        if (threadRunning) {
+            return false;
+        } else {
+            threadRunning = true;
+            return true;
+        }
     }
 }

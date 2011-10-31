@@ -32,8 +32,11 @@ import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
+import javax.swing.SwingWorker;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
+import de.cismet.tools.CismetThreadPool;
 
 /**
  * DOCUMENT ME!
@@ -50,14 +53,11 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
     //~ Instance fields --------------------------------------------------------
 
-    Thread initThread = null;
-    Thread refreshThread = null;
-
     private PropertyChangeSupport propertyChangeSupport;
     private List selectedElements = null;
     private MetaClass mc = null;
     private Map<JCheckBox, MetaObject> boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
-    private volatile boolean initialised = false;
+    private volatile boolean threadRunning = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -156,70 +156,72 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
     @Override
     public void setMetaClass(final MetaClass metaClass) {
-        new Thread(new Runnable() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
+        }
+        CismetThreadPool.execute(new SwingWorker<MetaObject[], Void>() {
 
                 @Override
-                public void run() {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("set meta class " + ((metaClass != null) ? metaClass.getName() : "null"));
-                    }
-                    if ((initThread != null) && initThread.isAlive()) {
-                        initThread.interrupt();
-                    }
-                    while ((initThread != null) && initThread.isAlive()) {
+                protected MetaObject[] doInBackground() throws Exception {
+                    while (!setThreadRunning()) {
                         try {
                             Thread.sleep(20);
                         } catch (InterruptedException ex) {
                         }
                     }
 
+                    selectedElements = null;
                     mc = metaClass;
-                    initThread = new Thread(new Runnable() {
+                    boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
 
-                                @Override
-                                public void run() {
-                                    initBoxes();
-                                    initialised = true;
-                                    initThread = null;
-                                }
-                            });
-                    initThread.start();
-                }
-            }).start();
-    }
+                    if (mc != null) {
+                        final MetaClass foreignClass = getReferencedClass(mc);
+                        final String query = "select " + foreignClass.getID() + ", " + foreignClass.getPrimaryKey()
+                                    + " from "
+                                    + foreignClass.getTableName();
 
-    /**
-     * DOCUMENT ME!
-     */
-    private void initBoxes() {
-        if (mc != null) {
-            final MetaClass foreignClass = getReferencedClass(mc);
-            final String query = "select " + foreignClass.getID() + ", " + foreignClass.getPrimaryKey() + " from "
-                        + foreignClass.getTableName();
+                        try {
+                            return SessionManager.getProxy().getMetaObjectByQuery(query, 0);
+                        } catch (ConnectionException e) {
+                            LOG.error("Error while loading the objects with query: " + query, e); // NOI18N
+                        }
+                    } else {
+                        LOG.error("The meta class was not set.", new Throwable());
+                    }
 
-            try {
-                final MetaObject[] metaObjects = SessionManager.getProxy().getMetaObjectByQuery(query, 0);
-                JCheckBox box = null;
-                setLayout(new GridLayout(metaObjects.length, 1));
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug(metaObjects.length + "objects found.");
+                    return null;
                 }
 
-                for (final MetaObject tmpMc : metaObjects) {
-                    box = new JCheckBox(tmpMc.getBean().toString());
-                    box.addActionListener(this);
-                    box.setOpaque(false);
-                    box.setContentAreaFilled(false);
-                    add(box);
-                    boxToObjectMapping.put(box, tmpMc);
+                @Override
+                protected void done() {
+                    try {
+                        final MetaObject[] metaObjects = get();
+                        DefaultBindableCheckboxField.this.removeAll();
+
+                        if (metaObjects != null) {
+                            JCheckBox box = null;
+                            DefaultBindableCheckboxField.this.setLayout(new GridLayout(metaObjects.length, 1));
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug(metaObjects.length + "objects found.");
+                            }
+
+                            for (final MetaObject tmpMc : metaObjects) {
+                                box = new JCheckBox(tmpMc.getBean().toString());
+                                box.addActionListener(DefaultBindableCheckboxField.this);
+                                box.setOpaque(false);
+                                box.setContentAreaFilled(false);
+                                add(box);
+                                boxToObjectMapping.put(box, tmpMc);
+                            }
+                            activateSelectedObjects();
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Error while filling a checkbox field.", e); // NOI18N
+                    } finally {
+                        threadRunning = false;
+                    }
                 }
-                activateSelectedObjects();
-            } catch (ConnectionException e) {
-                LOG.error("Error while loading the measurement object with query: " + query, e); // NOI18N
-            }
-        } else {
-            LOG.error("The initBoxes method was invoked before the meta class was set.", new Throwable());
-        }
+            });
     }
 
     /**
@@ -276,68 +278,48 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * @param  removeSelectedElements  DOCUMENT ME!
      */
     public void refreshCheckboxState(final FieldStateDecider decider, final boolean removeSelectedElements) {
-        new Thread(new Runnable() {
+        CismetThreadPool.execute(new SwingWorker<Void, Void>() {
 
                 @Override
-                public void run() {
-                    while ((refreshThread != null) && refreshThread.isAlive()) {
+                protected Void doInBackground() throws Exception {
+                    while (!setThreadRunning()) {
                         try {
                             Thread.sleep(20);
                         } catch (InterruptedException ex) {
                         }
                     }
-                    refreshThread = new Thread(new Runnable() {
 
-                                @Override
-                                public void run() {
-                                    while (!initialised) {
-                                        try {
-                                            Thread.sleep(50);
-                                        } catch (final InterruptedException e) {
-                                            // nothing to do
-                                        }
-                                    }
-                                    if (LOG.isDebugEnabled()) {
-                                        LOG.debug("refresh CheckboxState", new Exception());
-                                    }
-
-                                    final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
-                                    if (removeSelectedElements) {
-                                        selectedElements.clear();
-                                    }
-
-                                    while (it.hasNext()) {
-                                        final JCheckBox box = it.next();
-                                        box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
-                                        box.setSelected(false);
-                                        if (Thread.currentThread().isInterrupted()) {
-                                            return;
-                                        }
-                                    }
-                                    activateSelectedObjects();
-                                }
-                            });
-
-                    refreshThread.start();
+                    return null;
                 }
-            }).start();
+
+                @Override
+                protected void done() {
+                    try {
+                        final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
+                        if (removeSelectedElements) {
+                            selectedElements.clear();
+                        }
+
+                        while (it.hasNext()) {
+                            final JCheckBox box = it.next();
+                            box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
+                            box.setSelected(false);
+                            if (Thread.currentThread().isInterrupted()) {
+                                return;
+                            }
+                        }
+                        activateSelectedObjects();
+                    } finally {
+                        threadRunning = false;
+                    }
+                }
+            });
     }
 
     /**
      * DOCUMENT ME!
      */
     public void dispose() {
-        if ((initThread != null) && initThread.isAlive()) {
-            initThread.interrupt();
-        }
-        if ((refreshThread != null) && refreshThread.isAlive()) {
-            refreshThread.interrupt();
-        }
-        selectedElements = null;
-        mc = null;
-        boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
-        initialised = false;
-        this.removeAll();
     }
 
     @Override
@@ -347,6 +329,20 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
             selectedElements.remove(mo.getBean());
         } else {
             selectedElements.add(mo.getBean());
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private synchronized boolean setThreadRunning() {
+        if (threadRunning) {
+            return false;
+        } else {
+            threadRunning = true;
+            return true;
         }
     }
 }
