@@ -9,6 +9,7 @@ package de.cismet.cids.editors;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.tools.MetaObjectCache;
 
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
@@ -180,11 +181,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                                     + " from "
                                     + foreignClass.getTableName();
 
-                        try {
-                            return SessionManager.getProxy().getMetaObjectByQuery(query, 0);
-                        } catch (ConnectionException e) {
-                            LOG.error("Error while loading the objects with query: " + query, e); // NOI18N
-                        }
+                        return MetaObjectCache.getInstance().getMetaObjectByQuery(query);
                     } else {
                         LOG.error("The meta class was not set.", new Throwable());
                     }

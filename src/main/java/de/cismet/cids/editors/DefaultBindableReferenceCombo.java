@@ -12,6 +12,7 @@
 package de.cismet.cids.editors;
 
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.tools.MetaObjectCache;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.middleware.types.MetaClass;
@@ -340,7 +341,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             query += " where used is true";                                                              // NOI18N
         }
         query += orderBy;
-        final MetaObject[] MetaObjects = SessionManager.getProxy().getMetaObjectByQuery(query, 0);
+        final MetaObject[] MetaObjects = MetaObjectCache.getInstance().getMetaObjectByQuery(query);
         final List<CidsBean> cbv = new ArrayList<CidsBean>(MetaObjects.length);
         if (nullable) {
             cbv.add(null);

@@ -9,6 +9,7 @@ package de.cismet.cids.editors;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.tools.MetaObjectCache;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
@@ -167,11 +168,8 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                     if (mc != null) {
                         final String query = "select " + mc.getID() + ", " + mc.getPrimaryKey() + " from "
                                     + mc.getTableName();
-                        try {
-                            return SessionManager.getProxy().getMetaObjectByQuery(query, 0);
-                        } catch (ConnectionException e) {
-                            LOG.error("Error while loading the objects with query: " + query, e); // NOI18N
-                        }
+
+                        return MetaObjectCache.getInstance().getMetaObjectByQuery(query);
                     } else {
                         LOG.error("Meta class is null.", new Throwable());
                     }
