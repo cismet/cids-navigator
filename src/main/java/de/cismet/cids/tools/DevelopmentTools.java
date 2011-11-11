@@ -30,10 +30,22 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
 
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRRewindableDataSource;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.swing.JRViewer;
+
 import java.awt.BorderLayout;
+
+import java.io.FileInputStream;
 
 import java.rmi.Naming;
 import java.rmi.Remote;
+
+import java.util.HashMap;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -45,6 +57,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
+import de.cismet.jasperreports.CidsBeanDataSource;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -130,6 +144,193 @@ public class DevelopmentTools {
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   table   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean[] createCidsBeansFromRMIConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table) throws Exception {
+        // lookup des callservers
+        final Remote r;
+        final SearchService ss;
+        final CatalogueService cat;
+        final MetaService meta;
+        final UserService us;
+        final User u;
+
+        Log4JQuickConfig.configure4LumbermillOnLocalhost();
+        r = (Remote)Naming.lookup("rmi://localhost/callServer");
+        System.out.println("Server gefunden.");
+        ss = (SearchService)r;
+        cat = (CatalogueService)r;
+        meta = (MetaService)r;
+        us = (UserService)r;
+        u = us.getUser(domain, group, domain, user, pass);
+        System.out.println(user + " angemeldet.");
+        ConnectionSession session = null;
+        ConnectionProxy proxy = null;
+        final ConnectionInfo info = new ConnectionInfo();
+        info.setCallserverURL("rmi://localhost/callServer");
+        info.setUsername(user);
+        info.setUsergroup(group);
+        info.setPassword(pass);
+        info.setUserDomain(domain);
+        info.setUsergroupDomain(domain);
+
+        final Connection connection = ConnectionFactory.getFactory()
+                    .createConnection(
+                        "Sirius.navigator.connection.RMIConnection",
+                        info.getCallserverURL());
+
+        session = ConnectionFactory.getFactory().createSession(connection,
+                info, true);
+        proxy = ConnectionFactory.getFactory()
+                    .createProxy(
+
+                            "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                            session);
+        System.out.println("Initialisiere SessionManager.");
+        SessionManager.init(proxy);
+
+        ClassCacheMultiple.setInstance(domain);
+        System.out.println("Rufe MetaObject ab.");
+
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+
+        final MetaObject[] metaObjects = SessionManager.getConnection()
+                    .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                        "SELECT "
+                        + mc.getID()
+                        + ", "
+                        + mc.getPrimaryKey()
+                        + " FROM "
+                        + mc.getTableName());
+        final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
+        for (int i = 0; i < metaObjects.length; i++) {
+            final MetaObject metaObject = metaObjects[i];
+            cidsBeans[i] = metaObject.getBean();
+        }
+        System.out.println("CidsBeans erzeugt.");
+        return cidsBeans;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   path    DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   table   DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void showReportForCidsBeans(final String path,
+            final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table) throws Exception {
+        System.out.print("Lade JasperReport ...");
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(new FileInputStream(path));
+        System.out.println(" geladen.\nErstelle Datenquelle ...");
+        final JRRewindableDataSource dataSource = new CidsBeanDataSource(createCidsBeansFromRMIConnectionOnLocalhost(
+                    domain,
+                    group,
+                    user,
+                    pass,
+                    table));
+        boolean hasEntries = false;
+        try {
+            hasEntries = dataSource.next();
+        } catch (JRException e) {
+        } finally {
+            dataSource.moveFirst();
+        }
+        System.out.println("Datenquelle erstellt. Daten verfügbar? " + hasEntries + ".");
+        if (!hasEntries) {
+            return;
+        }
+        System.out.print("Fülle Report ...");
+        // print aus report und daten erzeugen
+        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+        System.out.print(" gefüllt.\nZeige Report an ...");
+        final JRViewer aViewer = new JRViewer(jasperPrint);
+        final JFrame aFrame = new JFrame(path); // NOI18N
+        aFrame.getContentPane().add(aViewer);
+        final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        aFrame.setSize(screenSize.width / 2, screenSize.height / 2);
+        final java.awt.Insets insets = aFrame.getInsets();
+        aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
+            aFrame.getHeight()
+                    + insets.top
+                    + insets.bottom
+                    + 20);
+        aFrame.setLocation((screenSize.width - aFrame.getWidth()) / 2,
+            (screenSize.height - aFrame.getHeight())
+                    / 2);
+        aFrame.setVisible(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   path       DOCUMENT ME!
+     * @param   cidsBeans  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void showReportForCidsBeans(final String path,
+            final CidsBean[] cidsBeans) throws Exception {
+        System.out.print("Lade JasperReport ...");
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(new FileInputStream(path));
+        System.out.println(" geladen.\nErstelle Datenquelle ...");
+        final JRRewindableDataSource dataSource = new CidsBeanDataSource(cidsBeans);
+        boolean hasEntries = false;
+        try {
+            hasEntries = dataSource.next();
+        } catch (JRException e) {
+        } finally {
+            dataSource.moveFirst();
+        }
+        System.out.println("Datenquelle erstellt. Daten verfügbar? " + hasEntries + ".");
+        if (!hasEntries) {
+            return;
+        }
+        System.out.print("Fülle Report ...");
+        // print aus report und daten erzeugen
+        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+        System.out.print(" gefüllt.\nZeige Report an ...");
+        final JRViewer aViewer = new JRViewer(jasperPrint);
+        final JFrame aFrame = new JFrame(path); // NOI18N
+        aFrame.getContentPane().add(aViewer);
+        final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        aFrame.setSize(screenSize.width / 2, screenSize.height / 2);
+        final java.awt.Insets insets = aFrame.getInsets();
+        aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
+            aFrame.getHeight()
+                    + insets.top
+                    + insets.bottom
+                    + 20);
+        aFrame.setLocation((screenSize.width - aFrame.getWidth()) / 2,
+            (screenSize.height - aFrame.getHeight())
+                    / 2);
+        aFrame.setVisible(true);
     }
 
     /**

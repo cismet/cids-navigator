@@ -732,6 +732,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
     /**
      * DOCUMENT ME!
+     */
+    public void clearBreadCrumb() {
+        breadCrumbModel.clear();
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  n  DOCUMENT ME!
      */
@@ -747,7 +754,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                         startSingleRendererWorker(o, n.toString());
                     }
                 });
-
             startSingleRendererWorker(n);
         } else {
             if (n.isPureNode()) {

@@ -23,6 +23,8 @@ import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 
 import org.jdesktop.swingx.JXErrorPane;
@@ -51,6 +53,8 @@ import javax.swing.tree.DefaultTreeModel;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
+
+import de.cismet.cismap.navigatorplugin.MetaSearch;
 
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
@@ -208,6 +212,42 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
         final Object node = ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNode();
         viewer.setTreeNode(node);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void refreshSearchTree() {
+        final Node[] oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
+        
+        if (oldNodes == null) {
+            // The search result tree has no elements. So it should not be refreshed
+            return;
+        }
+        final Node[] newNodes = new Node[oldNodes.length];
+        
+        for (int index = 0; index < oldNodes.length; index++) {
+            final Node node = oldNodes[index];
+            if (node instanceof MetaObjectNode) {
+                // Bei MetaObjectNodes wird der Node neu erzeugt, damit der Name gleich dem ToString Wert des
+                // veränderten Objektes ist
+                try {
+                    final MetaObjectNode metaObjectNode = (MetaObjectNode)node;
+                    final MetaObject metaObject = metaObjectNode.getObject();
+                    final CidsBean cidsBean = metaObject.getBean();
+                    newNodes[index] = new MetaObjectNode(cidsBean);
+                } catch (final Exception ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("error while creating new MetaObjectNode", ex);
+                    }
+                    // wenn was schief läuft, dann wenigstens den alten node übernehmen
+                    newNodes[index] = node;
+                }
+            } else {
+                newNodes[index] = node;
+            }
+        }
+        ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(newNodes, false);
     }
 
     /**
@@ -376,6 +416,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         savedInstance));
             }
             refreshTree();
+            refreshSearchTree();
         } catch (Exception ex) {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
@@ -412,6 +453,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
             }
             refreshTree();
+            refreshSearchTree();
         }
         if (closeEditor) {
             clear();
@@ -672,8 +714,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
-        setLayout(new java.awt.BorderLayout());
-
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         commitButton.setIcon(resources.getIcon("save_objekt.gif"));
@@ -781,21 +821,21 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if ((getTreeNode() != null) && (getTreeNode() instanceof ObjectTreeNode)) {
             final MetaObject mo = ((ObjectTreeNode)getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());              // NOI18N
             EditorBeanInitializerStore.getInstance()
                     .registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
         }
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {      //GEN-FIRST:event_copyButtonActionPerformed
+    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
             final boolean isNewBean = bean.getMetaObject().getStatus() == MetaObject.NEW;
@@ -816,14 +856,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             // enable editor attribute paste only for new MOs
             pasteButton.setEnabled((currentInitializer != null) && isNewBean);
         }
-    } //GEN-LAST:event_copyButtonActionPerformed
+    }//GEN-LAST:event_copyButtonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pasteButtonActionPerformed
+    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
             try {
@@ -832,5 +872,5 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 log.error(ex, ex);
             }
         }
-    }                                                                               //GEN-LAST:event_pasteButtonActionPerformed
+    }//GEN-LAST:event_pasteButtonActionPerformed
 }
