@@ -27,13 +27,18 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
     public void uncaughtException(final Thread thread, final Throwable error) {
         if (error instanceof ThreadDeath) {
             final StackTraceElement[] ste = error.getStackTrace();
-            if ((ste.length == 2) && ste[1].getClassName().startsWith("calpa.html.Cal") && LOG.isDebugEnabled()) {
+            if (LOG.isDebugEnabled() && (ste.length == 2) && ste[1].getClassName().startsWith("calpa.html.Cal")) { // NOI18N
                 // downgrade calpa html's thread death to debug
-                LOG.debug("uncaught exception in thread: " + thread, error);
+                LOG.debug("uncaught exception in thread: " + thread, error); // NOI18N
 
                 return;
             }
         }
-        LOG.error("uncaught exception in thread: " + thread, error);
+
+        if (error instanceof Error) {
+            LOG.fatal("uncaught error in thread: " + thread, error);     // NOI18N
+        } else {
+            LOG.error("uncaught exception in thread: " + thread, error); // NOI18N
+        }
     }
 }

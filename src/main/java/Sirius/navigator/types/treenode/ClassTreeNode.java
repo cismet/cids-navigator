@@ -7,18 +7,16 @@
 ****************************************************/
 package Sirius.navigator.types.treenode;
 
-/*
-// header - edit "Data/yourJavaHeader" to customize
-// contents - edit "EventHandlers/Java file/onCreate" to customize
-//
- */
-import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
-import Sirius.navigator.resource.*;
+import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.resource.ResourceManager;
 
-import Sirius.server.middleware.types.*;
+import Sirius.server.middleware.types.MetaClass;
+import Sirius.server.middleware.types.MetaClassNode;
+import Sirius.server.middleware.types.Node;
 
-import javax.swing.*;
+import org.apache.log4j.Logger;
+
+import javax.swing.ImageIcon;
 
 /**
  * DOCUMENT ME!
@@ -28,6 +26,8 @@ import javax.swing.*;
 public class ClassTreeNode extends DefaultMetaTreeNode {
 
     //~ Static fields/initializers ---------------------------------------------
+
+    private static final transient Logger LOG = Logger.getLogger(ClassTreeNode.class);
 
     private static final ResourceManager resource = ResourceManager.getManager();
 
@@ -76,16 +76,16 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
     // --------------------------------------------------------------------------
     @Override
     public final synchronized void explore() throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("[ClassNode] Begin explore()"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[ClassNode] Begin explore()"); // NOI18N
         }
 
         if (!isExplored() && !getMetaClassNode().isLeaf()) {
             this.explored = this.getTreeNodeLoader().addChildren(this);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("[ClassNode] End explore()"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[ClassNode] End explore()"); // NOI18N
         }
     }
 

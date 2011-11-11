@@ -219,13 +219,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      */
     private void refreshSearchTree() {
         final Node[] oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
-        
+
         if (oldNodes == null) {
             // The search result tree has no elements. So it should not be refreshed
             return;
         }
         final Node[] newNodes = new Node[oldNodes.length];
-        
+
         for (int index = 0; index < oldNodes.length; index++) {
             final Node node = oldNodes[index];
             if (node instanceof MetaObjectNode) {
@@ -821,21 +821,21 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         if ((getTreeNode() != null) && (getTreeNode() instanceof ObjectTreeNode)) {
             final MetaObject mo = ((ObjectTreeNode)getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());              // NOI18N
             EditorBeanInitializerStore.getInstance()
                     .registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
+    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {      //GEN-FIRST:event_copyButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
             final boolean isNewBean = bean.getMetaObject().getStatus() == MetaObject.NEW;
@@ -856,14 +856,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             // enable editor attribute paste only for new MOs
             pasteButton.setEnabled((currentInitializer != null) && isNewBean);
         }
-    }//GEN-LAST:event_copyButtonActionPerformed
+    } //GEN-LAST:event_copyButtonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
+    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pasteButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
             try {
@@ -872,5 +872,5 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 log.error(ex, ex);
             }
         }
-    }//GEN-LAST:event_pasteButtonActionPerformed
+    }                                                                               //GEN-LAST:event_pasteButtonActionPerformed
 }

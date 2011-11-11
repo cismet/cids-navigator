@@ -7,44 +7,23 @@
 ****************************************************/
 package Sirius.navigator.types.treenode;
 
-/*******************************************************************************
- *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
- *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
- *
- * Programmers          :       Pascal
- *
- * Project                      :       WuNDA 2
- * Version                      :       1.0
- * Purpose                      :
- * Created                      :       01.11.1999
- * History                      :
- *
- *******************************************************************************/
-import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
-import Sirius.navigator.exception.*;
+import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
-import Sirius.server.middleware.types.*;
-import Sirius.server.newuser.permission.*;
+import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.permission.Permission;
+
+import Sirius.util.NodeComparator;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.util.Enumeration;
+import java.util.Iterator;
 
-import java.util.*;
-
-import javax.swing.*;
-import javax.swing.tree.*;
+import javax.swing.ImageIcon;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 /**
  * DOCUMENT ME!
@@ -56,40 +35,19 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
 
     //~ Static fields/initializers ---------------------------------------------
 
-    // deprecated
-    // #########################################################################
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @deprecated  DOCUMENT ME!
-     */
-    // public final static short ANY_NODES = 1;
-    /**
-     * DOCUMENT ME!
-     *
-     * @deprecated  DOCUMENT ME!
-     */
-    // public final static short CLASS_NODES = 2;
-    /**
-     * DOCUMENT ME!
-     *
-     * @deprecated  DOCUMENT ME!
-     */
-    // public final static short OBJECT_NODES = 4;
-    // #########################################################################
-    protected static final Logger logger = Logger.getLogger(DefaultMetaTreeNode.class);
+    private static final transient Logger LOG = Logger.getLogger(DefaultMetaTreeNode.class);
 
     //~ Instance fields --------------------------------------------------------
 
     protected boolean explored = false;
     protected boolean selected = false;
     protected boolean enabled = true;
-    // protected Node[] children = null;
     /** Holds value of property changed. */
     private boolean changed;
     /** Holds value of property new_node. */
     private boolean new_node;
+
+    private final transient NodeComparator nodeComparator;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -102,6 +60,8 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      */
     public DefaultMetaTreeNode(final Node node) {
         super(node);
+
+        nodeComparator = new NodeComparator();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -113,7 +73,6 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      */
     public void setSelected(final boolean selected) {
         this.selected = enabled & selected;
-        // this.selected = selected;
     }
 
     /**
@@ -168,7 +127,6 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
     public void setLeaf(final boolean leaf) {
         this.getNode().setLeaf(leaf);
     }
-//yxc
 
     /**
      * DOCUMENT ME!
@@ -179,10 +137,6 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      */
     public Node[] getChildren() throws Exception {
         final Node node = this.getNode();
-//        if(node != null &&  !node.isLeaf())
-//        {
-//            if(node.getChildren() == null)
-//            {
 
         final Node[] c = SessionManager.getProxy().getChildren(node, SessionManager.getSession().getUser());
         if (node.isDynamic() && node.isSqlSort()) {
@@ -190,16 +144,81 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
         }
 
         return Sirius.navigator.tools.NodeSorter.sortNodes(c);
-//            }
-//            else
-//            {
-//                return node.getChildren();
-//            }
-//        }
-//        else
-//        {
-//            return new Node[0];
-//        }
+    }
+
+    /**
+     * Performs a hard refresh by removing all children, fetching them again from the database and then adding them.
+     * Make sure to notify the tree model about the node change.<br/>
+     * <br/>
+     * <b>NOTE:</b>This operation is preferably used if the node's children are created dynamically and the SQL sort
+     * property is true. If these conditions are not met consider to do a soft refresh.
+     */
+    public void refreshChildren() {
+        try {
+            final Node[] dbChildren = getChildren();
+            removeAllChildren();
+
+            for (final Node node : dbChildren) {
+                add(MetaCatalogueTree.createTreeNode(node));
+            }
+        } catch (final Exception e) {
+            LOG.warn("cannot refresh node: " + this, e); // NOI18N
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   toRemove  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int removeNode(final DefaultMetaTreeNode toRemove) {
+        final int index = getIndex(toRemove);
+
+        if (index >= 0) {
+            remove(index);
+        }
+
+        return index;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   toAdd  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IllegalStateException  DOCUMENT ME!
+     */
+    public int insertNode(final DefaultMetaTreeNode toAdd) {
+        final Node newNode = toAdd.getNode();
+
+        assert newNode != null : "received DefaultMetaTreeNode without backing Node: " + toAdd; // NOI18N
+
+        for (int i = 0; i < children.size(); ++i) {
+            final TreeNode tn = getChildAt(i);
+            if (tn instanceof DefaultMetaTreeNode) {
+                final DefaultMetaTreeNode dmtn = (DefaultMetaTreeNode)tn;
+                final Node child = dmtn.getNode();
+
+                assert child != null : "found DefaultMetaTreeNode without backing Node: " + dmtn; // NOI18N
+
+                if (nodeComparator.compare(child, newNode) > 0) {
+                    insert(toAdd, i);
+
+                    return i;
+                }
+            } else {
+                throw new IllegalStateException("Illegal child: " + tn); // NOI18N
+            }
+        }
+
+        // the node was not inserted, so we insert it at the end
+        add(toAdd);
+
+        return getChildCount() - 1;
     }
 
     /**
@@ -219,13 +238,14 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
     public boolean isEnabled() {
         return this.enabled;
     }
+
     /**
-     * public void setChildren(Node[] children) { this.children = children; } public abstract Node[] getChildren()
-     * throws Exception; public abstract void setTreeNodeLoader(TreeNodeLoader loader);
+     * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public abstract TreeNodeLoader getTreeNodeLoader();
+
     /**
      * Gibt an, ober dieser Knoten bereits expandiert wurde, bzw. ob seine Children schon vom Server geladen wurden.
      *
@@ -236,19 +256,10 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
     }
 
     /**
-     * Ueberschreibt die Funktion getAllowsChildren() in MutableTreeNode.<br>
-     * Wird ueberschrieben um die Expansion 'Anfasser' ('+', 'o-') anzuzeigen, auch wenn diese Node noch gar keine
-     * Children hat.
-     *
-     * @return  true/false
-     */
-    // public abstract boolean getAllowsChildren();
-    /**
      * Ueberschreibt die Funktion isLeaf() in MutableTreeNode.
      *
      * @return  true/false
      */
-    // public abstract boolean isLeaf();
     @Override
     public boolean isLeaf() {
         return (this.getUserObject() != null) ? this.getNode().isLeaf() : true;
@@ -324,16 +335,16 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      */
     public void exploreAll() throws Exception {
         if (!this.isLeaf()) {
-            if (logger.isDebugEnabled()) {
-                logger.warn("exploring all children of node '" + this + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("exploring all children of node '" + this + "'"); // NOI18N
             }
             if (!this.isExplored()) {
                 this.explore();
             }
 
-            final Enumeration children = this.children();
-            while (children.hasMoreElements()) {
-                ((DefaultMetaTreeNode)children.nextElement()).exploreAll();
+            final Enumeration e = this.children();
+            while (e.hasMoreElements()) {
+                ((DefaultMetaTreeNode)e.nextElement()).exploreAll();
             }
         }
     }
@@ -368,13 +379,13 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
                                 return thisChildNode.explore(childrenIterator);
                             }
                         } else {
-                            logger.warn("Fixme: thisChildNodeString is null!");
+                            LOG.warn("Fixme: thisChildNodeString is null!");
                         }
                     }
                 }
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("explore(): child node '" + childNode + "' not found"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("explore(): child node '" + childNode + "' not found"); // NOI18N
                 }
                 final TreePath fallback = handleNotMatchingNodeFound();
                 if (fallback != null) {
@@ -382,6 +393,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
                 }
             }
         }
+
         return new TreePath(getPath());
     }
 
@@ -394,8 +406,10 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
         final Enumeration<DefaultMetaTreeNode> childrenEnum = children();
         if (childrenEnum.hasMoreElements()) {
             final DefaultMetaTreeNode fallbackCandidate = childrenEnum.nextElement();
+
             return new TreePath(fallbackCandidate.getPath());
         }
+
         return null;
     }
 
@@ -403,46 +417,13 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      * Entfernt alle Children dieser Node und setzt ihren status zurueck;
      */
     public void removeChildren() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("removing children"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("removing children"); // NOI18N
         }
         this.removeAllChildren();
         this.explored = false;
     }
 
-    /**
-     * Fuegt neue Children zu einem Knoten hinzu.
-     *
-     * @return    DOCUMENT ME!
-     *
-     * @children  Ein Array mit den Children.
-     */
-    /*public boolean addChildren(Node[] children) throws Exception
-     * { boolean explored = true;
-     *
-     * if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("[DefaultMetaTreeNode] Begin addChildren()"); //
-     * WaitNode entfernen! this.removeChildren();
-     *
-     * if(children == null) return false;
-     *
-     * for (int i = 0; i < children.length; i++) { if (children[i] instanceof PureNode) { this.add(new PureTreeNode(new
-     * LocalPureNode(children[i]))); explored &= children[i].isValid();
-     *
-     * if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("[DefaultMetaTreeNode] PureNode Children added"); }
-     * else if (children[i] instanceof ClassNode) { this.add(new ClassTreeNode(new LocalClassNode(children[i])));
-     * explored &= children[i].isValid();
-     *
-     * if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("[DefaultMetaTreeNode] ClassNode Children added"); }
-     * else if (children[i] instanceof ObjectNode) { this.add(new ObjectTreeNode(new LocalObjectNode(children[i])));
-     * explored &= children[i].isValid();
-     *
-     * if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("[DefaultMetaTreeNode] ObjectNode Children added"); }
-     * else { if(NavigatorLogger.DEV)NavigatorLogger.printMessage("[DefaultMetaTreeNode] Wrong Node Type: " +
-     * children[i]); //_TA_throw new Exception("<TREENODE> Fehler: falscher Node-Typ: " + children[i]); throw new
-     * Exception(StringLoader.getString("STL@wrongNodeType") + children[i]); }
-     *
-     * if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("[DefaultMetaTreeNode] Children #" + i+1 + " added.");
-     * } return explored;}*/
     /**
      * Liefert die Beschreibung (bzw. den URL zur Beschreibung) der selektierten TreeNode.
      *
@@ -465,12 +446,8 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
     /**
      * DOCUMENT ME!
      *
-     * @return      DOCUMENT ME!
-     *
-     * @deprecated  , use <code>AttributeIterator</code>
+     * @return  DOCUMENT ME!
      */
-    // public abstract String[][] getAttributes() throws Exception;
-    // icons ...................................................................
     public abstract ImageIcon getOpenIcon();
 
     /**
@@ -486,7 +463,6 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      * @return  DOCUMENT ME!
      */
     public abstract ImageIcon getLeafIcon();
-    // .........................................................................
 
     /**
      * DOCUMENT ME!
@@ -496,6 +472,36 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      * @return  DOCUMENT ME!
      */
     public abstract boolean equals(DefaultMetaTreeNode node);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean deepEquals(final DefaultMetaTreeNode node) {
+        if (node == null) {
+            return false;
+        }
+
+        if (this == node) {
+            return true;
+        }
+
+        if (!node.getClass().equals(this.getClass())) {
+            return false;
+        }
+
+        if (!((userObject instanceof Node) && (node.userObject instanceof Node))) {
+            return false;
+        }
+
+        final Node n1 = (Node)userObject;
+        final Node n2 = (Node)node.userObject;
+
+        return n1.deepEquals(n2);
+    }
 
     /**
      * Returns the class ob object id.
@@ -518,71 +524,6 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      */
     public abstract String getDomain();
 
-    // deprecated
-    // #########################################################################
-    /**
-     * Falls das UserObject dieser TreeNode eine ClassNode ist, liefert diese Funktion die zugehoerige Class.
-     *
-     * @return      Eine Sirius.Middleware.Types.Class oder null;
-     *
-     * @throws      Exception  DOCUMENT ME!
-     *
-     * @deprecated  use Iterator
-     */
-    /*public MetaClass getClass(int ofWhichNodes) throws Exception
-     * { // Auf WaitNode muss immer ueberprueft werden, da diese kein // nodeObject hat. if(this.isWaitNode() ||
-     * this.isRootNode()) return null; else if (this.isObjectNode() && (ofWhichNodes == ANY_NODES || ofWhichNodes ==
-     * OBJECT_NODES)) return ((ObjectTreeNode)this).getMetaClass(); else if (this.isClassNode() && (ofWhichNodes ==
-     * ANY_NODES || ofWhichNodes ==  CLASS_NODES)) return ((ClassTreeNode)this).getMetaClass(); else return null;}*/
-    /**
-     * Falls das UserObject dieser TreeNode eine ClassNode oder eine ObjectNode ist, liefert diese Funktion die ClassID
-     * der Class der ClassNode oder die ClassID der Class des Objects der ObjectNode.
-     *
-     * @return      Die ClassID oder -1.
-     *
-     * @throws      Exception  DOCUMENT ME!
-     *
-     * @deprecated  use Iterator
-     */
-    /*public int getClassID(int ofWhichNodes)  throws Exception
-     * { MetaClass tmpClass = this.getClass(ofWhichNodes);
-     *
-     * if(tmpClass != null) return tmpClass.getID(); else return -1;}*/
-    /**
-     * Falls das UserObject dieser TreeNode eine ObjectNode ist, liefert diese Funktion das zugehoerige Objekt.
-     *
-     * @return      Ein Sirius.Middleware.Types.Object oder null;
-     *
-     * @throws      Exception  DOCUMENT ME!
-     *
-     * @deprecated  use Iterator
-     */
-    /*public MetaObject getObject()
-     * { if(this.isObjectNode()) { return ((ObjectTreeNode)this).getObject(); }
-     *
-     * return null;}*/
-    /**
-     * Falls das UserObject dieser TreeNode eine eine ObjectNode ist, liefert diese Funktion alle Attribute alle
-     * Attribute der Class des Objects der ObjectNode.
-     *
-     * @return      Ein Array mit allen Attributen oder null.
-     *
-     * @throws      Exception  DOCUMENT ME!
-     *
-     * @deprecated  use AttributeIterator
-     */
-    /*public Sirius.server.localserver.attribute.Attribute[] getAttributes(int ofWhichNodes)  throws Exception
-     * { if(this.isWaitNode() || this.isRootNode()) { return null; } else if ((ofWhichNodes == ANY_NODES || ofWhichNodes
-     * ==  OBJECT_NODES) && this.isObjectNode()) { Sirius.server.localserver.attribute.Attribute[] attr =
-     * this.getObject().getAttribs(); //if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("<TREENODE> Object
-     * getNodeAttributes(): " + attr.length); return attr; } else if (ofWhichNodes == ANY_NODES || ofWhichNodes ==
-     * CLASS_NODES) { if (this.isClassNode()) { Sirius.server.localserver.attribute.Attribute[] attr =
-     * ((ClassTreeNode)this).getMetaClass().getAttribs();
-     * //if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("<TREENODE> Class getNodeAttributes(): " +
-     * attr.length); return attr; } else if (this.isObjectNode()) { Sirius.server.localserver.attribute.Attribute[] attr
-     * = ((ObjectTreeNode)this).getObject().getAttribs();
-     * //if(NavigatorLogger.TREE_VERBOSE)NavigatorLogger.printMessage("<TREENODE> Object:Class getNodeAttributes(): " +
-     * attr.length); return attr; } else return null; } else return null;}*/
     /**
      * Returns the unique key of the node's user object (class or object).
      *
@@ -628,14 +569,8 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
         this.new_node = new_node;
     }
 
-    /*public boolean equals(Object object)
-     * { if(object instanceof DefaultMetaTreeNode) { return this.equals((DefaultMetaTreeNode)object); }
-     *
-     * return false;}*/
-    /*{
-     * return "xxx";}*/
     /**
-     * returns true if the key is equal to this nodes key.
+     * DOCUMENT ME!
      *
      * @param   key  DOCUMENT ME!
      * @param   p    DOCUMENT ME!
@@ -644,15 +579,6 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    /*public boolean equals(String key)
-     * { return this.getKey() != null ? key.equals(this.getKey()) : false;}*/
-    /*public boolean equals(Object object)
-     * { if(object instanceof DefaultMetaTreeNode) { logger.debug("equals DefaultMetaTreeNode :"  + object); return
-     * this.equals((DefaultMetaTreeNode)object); } else if (object instanceof Node) { return this.equals((Node)object);
-     * } else if (object instanceof String) { return this.equals(object.toString()); }
-     *
-     * return false;}*/
-    // #########################################################################
     public boolean isEditable(final Object key, final Permission p) throws Exception {
         return getNode().getPermissions().hasPermission(key, p);
     }
