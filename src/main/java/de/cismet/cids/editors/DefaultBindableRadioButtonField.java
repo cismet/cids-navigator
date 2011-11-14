@@ -97,7 +97,9 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
         if (element instanceof CidsBean) {
             this.selectedElements = (CidsBean)element;
         } else {
-            LOG.error("Selected element is not a CidsBean.");
+            if (element != null) {
+                LOG.error("Selected element is not a CidsBean.");
+            }
         }
 
         activateElement();
