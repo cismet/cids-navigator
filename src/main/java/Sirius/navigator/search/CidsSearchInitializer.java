@@ -69,22 +69,22 @@ public class CidsSearchInitializer {
         final MutableMenuBar menuBar = ComponentRegistry.getRegistry().getMutableMenuBar();
         final MutableToolBar toolBar = ComponentRegistry.getRegistry().getMutableToolBar();
         final GUIContainer guiContainer = ComponentRegistry.getRegistry().getGUIContainer();
-
         // Toolbar Searches
-        if (!toolbarSearches.isEmpty()) {
-            final CidsSearchComboBar searchBar = new CidsSearchComboBar();
-            final Iterator<? extends CidsToolbarSearch> itTS = toolbarSearches.iterator();
-            while (itTS.hasNext()) {
-                if (!checkActionTag(itTS.next())) {
-                    itTS.remove();
+        if (StaticDebuggingTools.checkHomeForFile("cidsNewServerSearchEnabled")) {
+            if (!toolbarSearches.isEmpty()) {
+                final CidsSearchComboBar searchBar = new CidsSearchComboBar();
+                final Iterator<? extends CidsToolbarSearch> itTS = toolbarSearches.iterator();
+                while (itTS.hasNext()) {
+                    if (!checkActionTag(itTS.next())) {
+                        itTS.remove();
+                    }
                 }
+                searchBar.setSearches(toolbarSearches);
+                final JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
+                innerPanel.add(searchBar);
+                toolBar.add(innerPanel, -1);
             }
-            searchBar.setSearches(toolbarSearches);
-            final JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
-            innerPanel.add(searchBar);
-            toolBar.add(innerPanel, -1);
         }
-
         // Dialog Searches
         if (!dialogeSearches.isEmpty()) {
             final JMenu menu = menuBar.getSearchMenu();
