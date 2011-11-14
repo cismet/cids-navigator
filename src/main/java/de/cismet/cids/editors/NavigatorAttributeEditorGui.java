@@ -54,8 +54,6 @@ import javax.swing.tree.DefaultTreeModel;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 
-import de.cismet.cismap.navigatorplugin.MetaSearch;
-
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 

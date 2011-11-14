@@ -52,7 +52,6 @@ import Sirius.navigator.ui.embedded.*;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.Frame;
 import java.awt.event.*;
 
 import java.util.*;
@@ -324,18 +323,20 @@ public class MutableMenuBar extends JMenuBar {
                 "MutableMenuBar.searchMenu.mnemonic").charAt(0));                                                        // NOI18N
         this.add(menu);
         // Suche ...............................................................
-        menu.add(item = new JMenuItem(
-                    org.openide.util.NbBundle.getMessage(
-                        MutableMenuBar.class,
-                        "MutableMenuBar.searchMenu.search.title")));     // NOI18N
-        item.setMnemonic(org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.searchMenu.search.mnemonic").charAt(0)); // NOI18N
-        item.setIcon(resources.getIcon("find16.gif"));                   // NOI18N
-        item.setAccelerator(KeyStroke.getKeyStroke("alt S"));            // NOI18N
-        item.setActionCommand("search.search");                          // NOI18N
-        item.addActionListener(itemListener);
-        menu.addSeparator();
+        if (PropertyManager.getManager().isEnableSearchDialog()) {
+            menu.add(item = new JMenuItem(
+                        org.openide.util.NbBundle.getMessage(
+                            MutableMenuBar.class,
+                            "MutableMenuBar.searchMenu.search.title")));     // NOI18N
+            item.setMnemonic(org.openide.util.NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.searchMenu.search.mnemonic").charAt(0)); // NOI18N
+            item.setIcon(resources.getIcon("find16.gif"));                   // NOI18N
+            item.setAccelerator(KeyStroke.getKeyStroke("alt S"));            // NOI18N
+            item.setActionCommand("search.search");                          // NOI18N
+            item.addActionListener(itemListener);
+            menu.addSeparator();
+        }
         // show search results .................................................
         menu.add(item = new JMenuItem(
                     org.openide.util.NbBundle.getMessage(
@@ -359,17 +360,20 @@ public class MutableMenuBar extends JMenuBar {
         item.setActionCommand("search.profiles.result");                               // NOI18N
         item.addActionListener(itemListener);
         // search profiles .....................................................
-        menu.addSeparator();
-        menu.add(item = new JMenuItem(
-                    org.openide.util.NbBundle.getMessage(
-                        MutableMenuBar.class,
-                        "MutableMenuBar.searchMenu.searchProfiles.title")));                                            // NOI18N
-        item.setMnemonic(org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.searchMenu.searchProfiles.mnemonic").charAt(0));                                        // NOI18N
-        item.setIcon(resources.getIcon("searchresultprofiles16.gif"));                                                  // NOI18N
-        item.setActionCommand("search.profiles");                                                                       // NOI18N
-        item.addActionListener(itemListener);
+        if (PropertyManager.getManager().isEnableSearchDialog()) {
+            menu.addSeparator();
+            menu.add(item = new JMenuItem(
+                        org.openide.util.NbBundle.getMessage(
+                            MutableMenuBar.class,
+                            "MutableMenuBar.searchMenu.searchProfiles.title")));     // NOI18N
+            item.setMnemonic(org.openide.util.NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.searchMenu.searchProfiles.mnemonic").charAt(0)); // NOI18N
+            item.setIcon(resources.getIcon("searchresultprofiles16.gif"));           // NOI18N
+            item.setActionCommand("search.profiles");                                // NOI18N
+            item.addActionListener(itemListener);
+        }
+
         searchMenu = menu;
         menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.title")); // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
