@@ -7,18 +7,14 @@
 ****************************************************/
 package Sirius.navigator.types.treenode;
 
-/*
-// header - edit "Data/yourJavaHeader" to customize
-// contents - edit "EventHandlers/Java file/onCreate" to customize
-//
- */
-import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
-import Sirius.navigator.resource.*;
+import Sirius.navigator.resource.ResourceManager;
 
-import Sirius.server.middleware.types.*;
+import Sirius.server.middleware.types.MetaNode;
+import Sirius.server.middleware.types.Node;
 
-import javax.swing.*;
+import org.apache.log4j.Logger;
+
+import javax.swing.ImageIcon;
 
 /**
  * DOCUMENT ME!
@@ -29,11 +25,15 @@ public class PureTreeNode extends DefaultMetaTreeNode {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static ImageIcon openIcon = null;
-    private static ImageIcon closedIcon = null;
-    private static ImageIcon leafIcon = null;
+    private static final transient Logger LOG = Logger.getLogger(PureTreeNode.class);
 
     private static final ResourceManager resource = ResourceManager.getManager();
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final transient ImageIcon openIcon;
+    private final transient ImageIcon closedIcon;
+    private final transient ImageIcon leafIcon;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -45,11 +45,9 @@ public class PureTreeNode extends DefaultMetaTreeNode {
     public PureTreeNode(final MetaNode metaNode) {
         super(metaNode);
 
-        if (openIcon == null) {
-            openIcon = resource.getIcon("NodeIconOpen.gif");     // NOI18N
-            closedIcon = resource.getIcon("NodeIconClosed.gif"); // NOI18N
-            leafIcon = resource.getIcon("NodeIconClosed.gif");   // NOI18N
-        }
+        openIcon = resource.getIcon("NodeIconOpen.gif");     // NOI18N
+        closedIcon = resource.getIcon("NodeIconClosed.gif"); // NOI18N
+        leafIcon = resource.getIcon("NodeIconClosed.gif");   // NOI18N
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -72,16 +70,16 @@ public class PureTreeNode extends DefaultMetaTreeNode {
     // --------------------------------------------------------------------------
     @Override
     public final synchronized void explore() throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug("[PureNode] Begin explore()"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[PureNode] Begin explore()"); // NOI18N
         }
 
         if (!isExplored() && !getMetaNode().isLeaf()) {
             this.explored = this.getTreeNodeLoader().addChildren(this);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("[PureNode] End explore()"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[PureNode] End explore()"); // NOI18N
         }
     }
 
@@ -138,12 +136,12 @@ public class PureTreeNode extends DefaultMetaTreeNode {
 
     @Override
     public final boolean equals(final DefaultMetaTreeNode node) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("equals pure node :" + node);     // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("equals pure node :" + node);     // NOI18N
         }
         if (node.isPureNode() && (this.getID() == node.getID()) && this.getDomain().equals(node.getDomain())) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("equals pure node :" + node); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("equals pure node :" + node); // NOI18N
             }
             return true;
         } else {

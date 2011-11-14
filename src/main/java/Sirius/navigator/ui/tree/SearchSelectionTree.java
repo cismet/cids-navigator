@@ -7,43 +7,50 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
-/*
-// header - edit "Data/yourJavaHeader" to customize
-// contents - edit "EventHandlers/Java file/onCreate" to customize
-//
- */
+import Sirius.navigator.types.iterator.TreeNodeIterator;
+import Sirius.navigator.types.iterator.TreeNodeRestriction;
+import Sirius.navigator.types.treenode.ClassTreeNode;
+import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
+import Sirius.navigator.types.treenode.PureTreeNode;
+import Sirius.navigator.types.treenode.RootTreeNode;
+import Sirius.navigator.types.treenode.TreeNodeLoader;
+import Sirius.navigator.ui.widget.IconCheckBox;
 
-import Sirius.navigator.types.iterator.*;
-import Sirius.navigator.types.treenode.*;
-
-import Sirius.server.middleware.types.*;
+import Sirius.server.middleware.types.MetaClassNode;
+import Sirius.server.middleware.types.MetaNode;
+import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.middleware.types.Node;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 
-import javax.swing.*;
+import javax.swing.JTree;
+import javax.swing.UIManager;
 import javax.swing.plaf.ColorUIResource;
 import javax.swing.plaf.FontUIResource;
-import javax.swing.tree.*;
-//import Sirius.navigator.NavigatorLogger;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellRenderer;
+import javax.swing.tree.TreeNode;
 
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class SearchSelectionTree extends MetaCatalogueTree {
+public final class SearchSelectionTree extends MetaCatalogueTree {
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Static fields/initializers ---------------------------------------------
 
-    /*public SearchSelectionTree(Node rootNodes[])
-     * {     super(new SelectableClassTreeNode(rootNodes), true, 1);     //super(new RootTreeNode(rootNodes), true, 1);
-     *    this.initSearchSelectionTree();}*/
-
-    protected Logger logger = Logger.getLogger(SearchSelectionTree.class);
+    private static final transient Logger LOG = Logger.getLogger(SearchSelectionTree.class);
 
     //~ Constructors -----------------------------------------------------------
 
@@ -52,12 +59,7 @@ public class SearchSelectionTree extends MetaCatalogueTree {
      *
      * @param  rootNodes  DOCUMENT ME!
      */
-    public SearchSelectionTree(final Node[] rootNodes) // throws Exception
-    {
-        // super(new RootTreeNode(rootNodes, new SelectionTreeNodeLoader()), true, 1);
-        // super(new RootTreeNode(rootNodes), true, 1);
-        // this.initSearchSelectionTree();
-
+    public SearchSelectionTree(final Node[] rootNodes) {
         this(new RootTreeNode(rootNodes, new SelectionTreeNodeLoader()));
     }
 
@@ -70,32 +72,20 @@ public class SearchSelectionTree extends MetaCatalogueTree {
         super(rootNode, false, true, 1);
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.warn("Exploring all nodes of search selection tree root node");           // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.warn("Exploring all nodes of search selection tree root node");           // NOI18N
             }
             rootNode.exploreAll();
         } catch (Exception exp) {
-            logger.error("cound not explore all nodes of search selection tree root node", exp); // NOI18N
+            LOG.error("cound not explore all nodes of search selection tree root node", exp); // NOI18N
         }
 
-        this.initSearchSelectionTree();
+        this.setSelectionModel(null);
+        this.setCellRenderer(new CheckBoxTreeCellRenderer());
+        this.setRowHeight(0);
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     */
-    protected void initSearchSelectionTree() {
-        this.setSelectionModel(null);
-        // this.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        this.setCellRenderer(new CheckBoxTreeCellRenderer());
-        // this.addMouseListener(new ClassNodeSelectionListener());
-        this.addTreeExpansionListener(new MetaCatalogueExpansionListener());
-        // this.addTreeExpansionListener(new MetaTreeExpansionListener());
-
-        this.setRowHeight(0);
-    }
 
     /**
      * DOCUMENT ME!
@@ -104,7 +94,7 @@ public class SearchSelectionTree extends MetaCatalogueTree {
      */
     public ClassTreeNode[] getClassNodes() {
         final Enumeration enu = ((DefaultMutableTreeNode)this.getModel().getRoot()).breadthFirstEnumeration();
-        final Vector nodeVector = new Vector(10, 10);
+        final List<ClassTreeNode> nodes = new ArrayList<ClassTreeNode>();
 
         if (enu == null) {
             return null;
@@ -114,102 +104,19 @@ public class SearchSelectionTree extends MetaCatalogueTree {
             final DefaultMetaTreeNode tempNode = (DefaultMetaTreeNode)enu.nextElement();
 
             if ((tempNode != null) && tempNode.isClassNode()) {
-                nodeVector.add(tempNode);
+                nodes.add((ClassTreeNode)tempNode);
             }
         }
 
-        nodeVector.trimToSize();
-        if (logger.isDebugEnabled()) {
-            logger.debug("[SearchSelectionTree] ClassNodes: " + nodeVector.size()); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("[SearchSelectionTree] ClassNodes: " + nodes.size()); // NOI18N
         }
-        return (ClassTreeNode[])nodeVector.toArray(new ClassTreeNode[nodeVector.size()]);
+
+        return nodes.toArray(new ClassTreeNode[nodes.size()]);
     }
 
     /**
      * DOCUMENT ME!
-     *
-     * @return      DOCUMENT ME!
-     *
-     * @deprecated  DOCUMENT ME!
-     */
-    public ClassTreeNode[] getSelectedClassNodes() {
-        final ClassTreeNode[] classNodes = this.getClassNodes();
-        ArrayList classNodesList = null;
-
-        if ((classNodes != null) && (classNodes.length > 0)) {
-            classNodesList = new ArrayList(classNodes.length);
-
-            for (int i = 0; i < classNodes.length; i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[SearchSelectionTree] classNode.isSelected(): " + classNodes[i] + " : "
-                                + classNodes[i].isSelected());                                      // NOI18N
-                }
-                if (classNodes[i].isSelected()) {
-                    classNodesList.add(classNodes[i]);
-                }
-            }
-            if (logger.isDebugEnabled()) {
-                logger.debug("[SearchSelectionTree] SelectedClassNodes: " + classNodesList.size()); // NOI18N
-            }
-
-            if (classNodesList.size() > 0) {
-                return (ClassTreeNode[])classNodesList.toArray(new ClassTreeNode[classNodesList.size()]);
-            }
-        }
-
-        return null;
-
-        /*TreePath[] selectedPaths =  this.getSelectionPaths();
-         *  if (selectedPaths != null && selectedPaths.length > 0) {     DefaultMetaTreeNode[] nodeArray = new
-         * DefaultMetaTreeNode[selectedPaths.length];     int j = 0;      for (int i = 0; i < selectedPaths.length; i++)
-         * { DefaultMetaTreeNode tempNode = (DefaultMetaTreeNode)selectedPaths[i].getLastPathComponent();
-         * NavigatorLogger.printMessage("tempNode: " + tempNode + "isClassNode(): " + tempNode.isClassNode());
-         * if(tempNode.isClassNode())             { nodeArray[j] = tempNode;                     j++;             } }
-         * if(j > 0)     {             ClassTreeNode[] returnArray = new ClassTreeNode[j]; System.arraycopy(nodeArray,
-         * 0, returnArray, 0, j);             return returnArray;     }     else     {
-         *       return null;     } } else {      return null;}*/
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param       classNodes  DOCUMENT ME!
-     *
-     * @deprecated  use <code>selectClassNodes(java.util.List)</code>
-     */
-    public void selectClassNodes(final ClassTreeNode[] classNodes) {
-        this.clearSelection();
-
-        if ((classNodes != null) && (classNodes.length > 0)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("selecting '" + classNodes.length + "'class nodes"); // NOI18N
-            }
-            final DefaultTreeModel model = (DefaultTreeModel)this.getModel();
-            final DefaultMetaTreeNode rootNode = (DefaultMetaTreeNode)model.getRoot();
-
-            final Enumeration enu = rootNode.breadthFirstEnumeration();
-            while (enu.hasMoreElements()) {
-                final DefaultMetaTreeNode tempNode = (DefaultMetaTreeNode)enu.nextElement();
-                tempNode.setSelected(false);
-
-                for (int i = 0; i < classNodes.length; i++) {
-                    if (classNodes[i].equals(tempNode)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("selecting class node '" + tempNode + "'"); // NOI18N
-                        }
-                        tempNode.setSelected(true);
-                        // this.addSelectionPath(new TreePath(model.getPathToRoot(tempNode))); break;
-                    }
-                }
-            }
-        }
-
-        this.revalidate();
-        this.repaint();
-    }
-
-    /**
-     * new =====================================================================.
      */
     public void deselectAllNodes() {
         this.clearSelection();
@@ -230,29 +137,28 @@ public class SearchSelectionTree extends MetaCatalogueTree {
      *
      * @return  DOCUMENT ME!
      */
-    public java.util.List getSelectedClassNodeKeys() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("getSelectedClassNodeKeys() called"); // NOI18N
+    public List<String> getSelectedClassNodeKeys() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("getSelectedClassNodeKeys() called"); // NOI18N
         }
 
-        final LinkedList selectedClassNodeKeys = new LinkedList();
+        final List<String> selectedClassNodeKeys = new ArrayList<String>();
         final Enumeration enu = ((DefaultMutableTreeNode)this.getModel().getRoot()).breadthFirstEnumeration();
-        // TreeNodeIterator iterator = new TreeNodeIterator(enum, new TreeNodeRestriction(TreeNodeRestriction.CLASS));
         final TreeNodeIterator iterator = new TreeNodeIterator(enu, new TreeNodeRestriction());
 
         while (iterator.hasNext()) {
             final DefaultMetaTreeNode node = iterator.next();
             if (node.isSelected()) {
                 try {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("selected class node '" + node.toString() + "' key: " + node.getKey()); // NOI18N
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("selected class node '" + node.toString() + "' key: " + node.getKey()); // NOI18N
                     }
                     selectedClassNodeKeys.add(node.getKey());
-                } catch (Exception exp) {
-                    logger.error("could not add class node key", exp);                                       // NOI18N
+                } catch (final Exception exp) {
+                    LOG.warn("could not add class node key", exp);                                        // NOI18N
                 }
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("ignoring class node '" + node.toString() + "' (not selected)");                // NOI18N
+            } else if (LOG.isDebugEnabled()) {
+                LOG.debug("ignoring class node '" + node.toString() + "' (not selected)");                // NOI18N
             }
         }
 
@@ -264,9 +170,9 @@ public class SearchSelectionTree extends MetaCatalogueTree {
      *
      * @param  classNodeKeys  DOCUMENT ME!
      */
-    public void setSelectedClassNodeKeys(final java.util.List classNodeKeys) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("selecting '" + classNodeKeys.size() + "'class nodes"); // NOI18N
+    public void setSelectedClassNodeKeys(final List classNodeKeys) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("selecting '" + classNodeKeys.size() + "'class nodes"); // NOI18N
         }
         this.clearSelection();
 
@@ -284,14 +190,13 @@ public class SearchSelectionTree extends MetaCatalogueTree {
                     final Object key = iterator.next();
 
                     if ((key != null) && (tempNode.getKey() != null) && tempNode.getKey().equals(key)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("selecting class node '" + tempNode + "' (" + key + ")"); // NOI18N
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("selecting class node '" + tempNode + "' (" + key + ")"); // NOI18N
                         }
                         tempNode.setSelected(true);
-                        // break;
                     }
-                } catch (Exception exp) {
-                    logger.error("could not compare class node key", exp);                         // NOI18N
+                } catch (final Exception exp) {
+                    LOG.warn("could not compare class node key", exp);                          // NOI18N
                 }
             }
         }
@@ -307,7 +212,7 @@ public class SearchSelectionTree extends MetaCatalogueTree {
      *
      * @version  $Revision$, $Date$
      */
-    class CheckBoxTreeCellRenderer extends Sirius.navigator.ui.widget.IconCheckBox implements TreeCellRenderer {
+    final class CheckBoxTreeCellRenderer extends IconCheckBox implements TreeCellRenderer {
 
         //~ Instance fields ----------------------------------------------------
 
@@ -341,17 +246,13 @@ public class SearchSelectionTree extends MetaCatalogueTree {
          * determined from the UIManager.
          */
         public CheckBoxTreeCellRenderer() {
-            setTextSelectionColor(UIManager.getColor("Tree.selectionForeground"));           // NOI18N
-            setTextNonSelectionColor(UIManager.getColor("Tree.textForeground"));             // NOI18N
-            setBackgroundSelectionColor(UIManager.getColor("Tree.selectionBackground"));     // NOI18N
-            setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));       // NOI18N
-            setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));        // NOI18N
-            final java.lang.Object value = UIManager.get("Tree.drawsFocusBorderAroundIcon"); // NOI18N
+            setTextSelectionColor(UIManager.getColor("Tree.selectionForeground"));       // NOI18N
+            setTextNonSelectionColor(UIManager.getColor("Tree.textForeground"));         // NOI18N
+            setBackgroundSelectionColor(UIManager.getColor("Tree.selectionBackground")); // NOI18N
+            setBackgroundNonSelectionColor(UIManager.getColor("Tree.textBackground"));   // NOI18N
+            setBorderSelectionColor(UIManager.getColor("Tree.selectionBorderColor"));    // NOI18N
+            final Object value = UIManager.get("Tree.drawsFocusBorderAroundIcon");       // NOI18N
             drawsFocusBorderAroundIcon = ((value != null) && ((Boolean)value).booleanValue());
-
-            // setPreferredSize(new Dimension(250, 22));
-            // setMaximumSize(new Dimension(100, 22));
-            // setMinimumSize(new Dimension(100, 22));
         }
 
         //~ Methods ------------------------------------------------------------
@@ -530,68 +431,21 @@ public class SearchSelectionTree extends MetaCatalogueTree {
                 this.setIcon(treeNode.getClosedIcon());
             }
 
-            /*CompoundIcon compoundIcon;
-             * if(expanded == true) { compoundIcon = new CompoundIcon(treeNode.getOpenIcon(), this.getIcon()); } else
-             * if(leaf == true) { compoundIcon = new CompoundIcon(treeNode.getLeafIcon(), this.getIcon()); } else {
-             * compoundIcon = new CompoundIcon(treeNode.getClosedIcon(), this.getIcon()); }
-             * this.setIcon(compoundIcon);*/
-
             return this;
         }
-
-        /*public Dimension getPreferredSize()
-         * { Dimension        retDimension = super.getPreferredSize();  if(retDimension != null)     retDimension = new
-         * Dimension(retDimension.width + 3,     retDimension.height); return retDimension; }
-         *
-         * public void validate() {}
-         *
-         * public void revalidate() {}
-         *
-         * public void repaint(long tm, int x, int y, int width, int height) {}
-         *
-         * public void repaint(Rectangle r) {}
-         *
-         * protected void firePropertyChange(String propertyName, java.lang.Object oldValue, java.lang.Object newValue) {
-         * // Strings get interned... if (propertyName=="text")     super.firePropertyChange(propertyName, oldValue,
-         * newValue); }
-         *
-         * public void firePropertyChange(String propertyName, byte oldValue, byte newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, char oldValue, char newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, short oldValue, short newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, int oldValue, int newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, long oldValue, long newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, float oldValue, float newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, double oldValue, double newValue) {}
-         *
-         * public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
-         *
-         * /*private class CompoundIcon implements Icon { private Icon icon1; private Icon icon2;  public CompoundIcon(
-         * Icon icon1, Icon icon2 ) {     this.icon1 = icon1;     this.icon2 = icon2;      if(icon1 == null)     {
-         * this.icon1 = Sirius.navigator.resource.ResourceManager.getManager().getIcon("x.gif");     }      if(icon2 ==
-         * null)     {         this.icon2 = Sirius.navigator.resource.ResourceManager.getManager().getIcon("x.gif");   }
-         * }  public int getIconHeight() {     return Math.max( icon1.getIconHeight(), icon2.getIconHeight() ); } public
-         * int getIconWidth() {     return ( icon1.getIconWidth() + icon2.getIconWidth() ); }  public void paintIcon(
-         * Component c, Graphics g, int x, int y ) {     icon1.paintIcon( c, g, x, y );     icon2.paintIcon(
-         * c, g, x + icon1.getIconWidth(), y ); }}*/
     }
 }
 
 /**
- * -----------------------------------------------------------------------------.
+ * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-class SelectionTreeNodeLoader implements TreeNodeLoader {
+final class SelectionTreeNodeLoader implements TreeNodeLoader {
 
-    //~ Instance fields --------------------------------------------------------
+    //~ Static fields/initializers ---------------------------------------------
 
-    protected Logger logger = Logger.getLogger(SelectionTreeNodeLoader.class);
+    private static final transient Logger LOG = Logger.getLogger(SelectionTreeNodeLoader.class);
 
     //~ Methods ----------------------------------------------------------------
 
@@ -604,7 +458,6 @@ class SelectionTreeNodeLoader implements TreeNodeLoader {
     public boolean addChildren(final DefaultMetaTreeNode node, final Node[] children) throws Exception {
         boolean explored = true;
 
-        // logger.debug("[SelectionTreeNodeLoader] Begin addChildren()");
         // WaitNode entfernen!
         node.removeChildren();
 
@@ -622,14 +475,10 @@ class SelectionTreeNodeLoader implements TreeNodeLoader {
                 childNode.setEnabled(!childNode.isLeaf());
                 node.add(childNode);
 
-                // NavigatorLogger.printMessage("[!!!] Node: " + node); NavigatorLogger.printMessage("[!!!]
-                // ChildPureNode: " + childNode); NavigatorLogger.printMessage("[!!!] ChildPureNode AllowsChildren Leaf
-                // Enabled: " + childNode.getAllowsChildren() + " " + childNode.isLeaf() + " " + childNode.isEnabled());
-
                 explored &= children[i].isValid();
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[SelectionTreeNodeLoader] PureNode Children added"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[SelectionTreeNodeLoader] PureNode Children added"); // NOI18N
                 }
             } else if (children[i] instanceof MetaClassNode) {
                 childNode = new ClassTreeNode((MetaClassNode)children[i]);
@@ -638,26 +487,22 @@ class SelectionTreeNodeLoader implements TreeNodeLoader {
                 node.add(childNode);
                 explored &= children[i].isValid();
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[SelectionTreeNodeLoader] ClassNode Children added"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[SelectionTreeNodeLoader] ClassNode Children added");                     // NOI18N
                 }
             } else if (children[i] instanceof MetaObjectNode) {
-                // node.add(new ObjectTreeNode(new LocalObjectNode(children[i]))); explored &= children[i].isValid();
-                // if(logger.isDebugEnabled())logger.debug("[SelectionTreeNodeLoader] ObjectNode Children added");
-
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[SelectionTreeNodeLoader] ObjectNodes not allowed here: " + children[i]); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[SelectionTreeNodeLoader] ObjectNodes not allowed here: " + children[i]); // NOI18N
                 }
             } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("[SelectionTreeNodeLoader] Wrong Node Type: " + children[i]);              // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("[SelectionTreeNodeLoader] Wrong Node Type: " + children[i]);              // NOI18N
                 }
-                // _TA_throw new Exception("<TREENODE> Fehler: falscher Node-Typ: " + children[i]);
-                throw new Exception("Wrong Node Type: " + children[i]); // NOI18N
+                throw new Exception("Wrong Node Type: " + children[i]);                                  // NOI18N
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("[SelectionTreeNodeLoader] Children #" + i + 1 + " added."); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("[SelectionTreeNodeLoader] Children #" + i + 1 + " added."); // NOI18N
             }
         }
 
@@ -672,9 +517,10 @@ class SelectionTreeNodeLoader implements TreeNodeLoader {
      * @return  DOCUMENT ME!
      */
     protected boolean checkForChildren(final DefaultMetaTreeNode node) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("cycle check: '" + node + "'"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("cycle check: '" + node + "'"); // NOI18N
         }
+
         if (!node.isLeaf() && !node.isWaitNode()) {
             try {
                 final Node[] children = node.getChildren();
@@ -692,33 +538,30 @@ class SelectionTreeNodeLoader implements TreeNodeLoader {
                                             && ((DefaultMetaTreeNode)anchestors[j]).getDomain().equals(
                                                 children[i].getDomain())) {
                                     recursive = true;
-                                    if (logger.isDebugEnabled()) {
-                                        logger.debug("[SelectionTreeNodeLoader] cycle detected: " + children[i]
-                                                    + " id: " + children[i].getId() + " LocalServerName: "
-                                                    + children[i].getDomain()); // NOI18N
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("[SelectionTreeNodeLoader] cycle detected: " + children[i] // NOI18N
+                                                    + " id: " + children[i].getId() + " LocalServerName: " // NOI18N
+                                                    + children[i].getDomain());
                                     }
                                     break;
                                 }
                             }
 
                             if (!recursive) {
-                                // NavigatorLogger.printMessage("childrenList.add(children[i]): " + children[i]);
                                 childrenList.add(children[i]);
                             }
                         } else {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Node Type not allowed here" + children[i]); // NOI18N
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Node Type not allowed here" + children[i]); // NOI18N
                             }
                         }
                     }
-
-                    /*if(childrenList.size() > 0)
-                     * { node.setChildren((Node[])childrenList.toArray(new Node[childrenList.size()])); return true;}*/
                 }
-            } catch (Exception exp) {
-                logger.error("[SelectionTreeNodeLoader] Exception at checkForChildren(DefaultMetaTreeNode node): "
+            } catch (final Exception exp) {
+                LOG.error(
+                    "[SelectionTreeNodeLoader] Exception at checkForChildren(DefaultMetaTreeNode node): " // NOI18N
                             + node,
-                    exp); // NOI18N
+                    exp);
             }
         }
         return false;

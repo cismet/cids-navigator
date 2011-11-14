@@ -17,11 +17,14 @@ import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.RequestsFullSizeComponent;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 
 import org.jdesktop.swingx.JXErrorPane;
@@ -29,6 +32,7 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.openide.util.WeakListeners;
 
+import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -211,6 +215,42 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     /**
      * DOCUMENT ME!
      */
+    private void refreshSearchTree() {
+        final Node[] oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
+
+        if (oldNodes == null) {
+            // The search result tree has no elements. So it should not be refreshed
+            return;
+        }
+        final Node[] newNodes = new Node[oldNodes.length];
+
+        for (int index = 0; index < oldNodes.length; index++) {
+            final Node node = oldNodes[index];
+            if (node instanceof MetaObjectNode) {
+                // Bei MetaObjectNodes wird der Node neu erzeugt, damit der Name gleich dem ToString Wert des
+                // veränderten Objektes ist
+                try {
+                    final MetaObjectNode metaObjectNode = (MetaObjectNode)node;
+                    final MetaObject metaObject = metaObjectNode.getObject();
+                    final CidsBean cidsBean = metaObject.getBean();
+                    newNodes[index] = new MetaObjectNode(cidsBean);
+                } catch (final Exception ex) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("error while creating new MetaObjectNode", ex);
+                    }
+                    // wenn was schief läuft, dann wenigstens den alten node übernehmen
+                    newNodes[index] = node;
+                }
+            } else {
+                newNodes[index] = node;
+            }
+        }
+        ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(newNodes, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
     private void refreshTree() {
         if (treePath != null) {
             try {
@@ -374,6 +414,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         savedInstance));
             }
             refreshTree();
+            refreshSearchTree();
         } catch (Exception ex) {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
@@ -410,6 +451,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
             }
             refreshTree();
+            refreshSearchTree();
         }
         if (closeEditor) {
             clear();
@@ -487,7 +529,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 log.debug("editor:" + ed); // NOI18N
                             }
                             removeAndDisposeEditor();
-                            scpEditor.getViewport().setView(ed);
+                            switchPanel.remove(scpEditor);
+                            if (ed instanceof RequestsFullSizeComponent) {
+                                switchPanel.add(ed, BorderLayout.CENTER);
+                            } else {
+                                switchPanel.add(scpEditor, BorderLayout.CENTER);
+                                scpEditor.getViewport().setView(ed);
+                            }
+
                             if (ed instanceof WrappedComponent) {
                                 ed = ((WrappedComponent)ed).getOriginalComponent();
                             }
@@ -662,8 +711,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
-
-        setLayout(new java.awt.BorderLayout());
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
