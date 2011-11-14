@@ -7,8 +7,6 @@
 ****************************************************/
 package de.cismet.cids.editors;
 
-import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.tools.MetaObjectCache;
 
 import Sirius.server.middleware.types.MetaClass;
@@ -98,6 +96,8 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     public void setSelectedElements(final Object element) {
         if (element instanceof CidsBean) {
             this.selectedElements = (CidsBean)element;
+        } else {
+            LOG.error("Selected element is not a CidsBean.");
         }
 
         activateElement();
@@ -161,6 +161,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                     }
 
                     selectedElements = null;
+                    bg = new ButtonGroup();
                     boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
 
                     mc = metaClass;
@@ -180,7 +181,6 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                 @Override
                 protected void done() {
                     try {
-                        bg = new ButtonGroup();
                         DefaultBindableRadioButtonField.this.removeAll();
 
                         JRadioButton button = null;
@@ -234,7 +234,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     /**
      * DOCUMENT ME!
      */
-    private void activateElement() {
+    private synchronized void activateElement() {
         if (selectedElements != null) {
             final Iterator<JRadioButton> it = boxToObjectMapping.keySet().iterator();
 
