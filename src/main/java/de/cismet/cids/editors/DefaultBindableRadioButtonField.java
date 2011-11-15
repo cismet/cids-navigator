@@ -162,7 +162,6 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                         }
                     }
 
-                    selectedElements = null;
                     bg = new ButtonGroup();
                     boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
 
