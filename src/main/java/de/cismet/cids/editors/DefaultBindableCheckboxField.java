@@ -14,6 +14,8 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
 
+import org.apache.log4j.Logger;
+
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
@@ -37,7 +39,6 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.tools.CismetThreadPool;
-import org.apache.log4j.Logger;
 
 /**
  * DOCUMENT ME!

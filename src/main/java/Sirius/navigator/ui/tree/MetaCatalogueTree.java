@@ -67,6 +67,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
@@ -880,9 +881,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                     final TreePath selectionPath = this.node.explore(this.childrenNodes);
 
-                    final TreeUpdateThread treeUpdateThread = new TreeUpdateThread(selectionPath);
-
-                    SwingUtilities.invokeLater(treeUpdateThread);
+                    SwingUtilities.invokeLater(new TreeUpdateThread(selectionPath));
 
                     statusChangeSupport.fireStatusChange(
                         org.openide.util.NbBundle.getMessage(
@@ -946,12 +945,17 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
             @Override
             public void run() {
-                MetaCatalogueTree.this.setSelectionPath(this.selectionPath);
-                MetaCatalogueTree.this.scrollPathToVisible(selectionPath);
-                MetaCatalogueTree.this.defaultTreeModel.nodeStructureChanged(node);
+                if (!EventQueue.isDispatchThread()) {
+                    throw new IllegalStateException("Tree Update Thread can only be scheduled in EDT"); // NOI18N
+                }
+
+                expandPath(selectionPath);
+                setSelectionPath(this.selectionPath);
+                scrollPathToVisible(selectionPath);
+                defaultTreeModel.nodeStructureChanged((TreeNode)selectionPath.getLastPathComponent());
 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("SubTreeExploreThread: GUI Update done"); // NOI18N
+                    LOG.debug("GUI Update done"); // NOI18N
                 }
             }
         }

@@ -45,6 +45,8 @@ import java.io.FileInputStream;
 import java.rmi.Naming;
 import java.rmi.Remote;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import javax.swing.JComponent;
@@ -59,11 +61,10 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
+
 import de.cismet.jasperreports.CidsBeanDataSource;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * DOCUMENT ME!
@@ -397,7 +398,21 @@ public class DevelopmentTools {
         showTestFrame(c, w, h);
     }
 
-    
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     * @param   title     DOCUMENT ME!
+     * @param   w         DOCUMENT ME!
+     * @param   h         DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
     public static void createRendererInFrameFromRMIConnectionOnLocalhost(final String domain,
             final String group,
             final String user,
@@ -414,10 +429,20 @@ public class DevelopmentTools {
         }
         UIManager.setLookAndFeel("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
         final CidsBean cb = createCidsBeanFromRMIConnectionOnLocalhost(domain, group, user, pass, table, objectId);
-        final JComponent c = CidsObjectRendererFactory.getInstance().getSingleRenderer(cb.getMetaObject(),title);
+        final JComponent c = CidsObjectRendererFactory.getInstance().getSingleRenderer(cb.getMetaObject(), title);
         showTestFrame(c, w, h);
     }
-    public static void createAggregationRendererInFrameFromRMIConnectionOnLocalhost(Collection<CidsBean> beans,
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   beans  DOCUMENT ME!
+     * @param   title  DOCUMENT ME!
+     * @param   w      DOCUMENT ME!
+     * @param   h      DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void createAggregationRendererInFrameFromRMIConnectionOnLocalhost(final Collection<CidsBean> beans,
             final String title,
             final int w,
             final int h) throws Exception {
@@ -427,17 +452,14 @@ public class DevelopmentTools {
             com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
         }
         UIManager.setLookAndFeel("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
-        ArrayList<MetaObject> mos=new ArrayList<MetaObject>(beans.size());
-        
-        for (CidsBean b:beans){
+        final ArrayList<MetaObject> mos = new ArrayList<MetaObject>(beans.size());
+
+        for (final CidsBean b : beans) {
             mos.add(b.getMetaObject());
         }
-        final JComponent c = CidsObjectRendererFactory.getInstance().getAggregationRenderer(mos,title);
+        final JComponent c = CidsObjectRendererFactory.getInstance().getAggregationRenderer(mos, title);
         showTestFrame(c, w, h);
     }
-    
-    
-    
 
     /**
      * DOCUMENT ME!
