@@ -58,9 +58,12 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.jasperreports.CidsBeanDataSource;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  * DOCUMENT ME!
@@ -393,6 +396,48 @@ public class DevelopmentTools {
         final JComponent c = CidsObjectEditorFactory.getInstance().getEditor(cb.getMetaObject());
         showTestFrame(c, w, h);
     }
+
+    
+    public static void createRendererInFrameFromRMIConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId,
+            final String title,
+            final int w,
+            final int h) throws Exception {
+        UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
+        final String heavyComps = System.getProperty("contains.heavyweight.comps");
+        if ((heavyComps != null) && heavyComps.equals("true")) {
+            com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
+        }
+        UIManager.setLookAndFeel("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
+        final CidsBean cb = createCidsBeanFromRMIConnectionOnLocalhost(domain, group, user, pass, table, objectId);
+        final JComponent c = CidsObjectRendererFactory.getInstance().getSingleRenderer(cb.getMetaObject(),title);
+        showTestFrame(c, w, h);
+    }
+    public static void createAggregationRendererInFrameFromRMIConnectionOnLocalhost(Collection<CidsBean> beans,
+            final String title,
+            final int w,
+            final int h) throws Exception {
+        UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
+        final String heavyComps = System.getProperty("contains.heavyweight.comps");
+        if ((heavyComps != null) && heavyComps.equals("true")) {
+            com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
+        }
+        UIManager.setLookAndFeel("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
+        ArrayList<MetaObject> mos=new ArrayList<MetaObject>(beans.size());
+        
+        for (CidsBean b:beans){
+            mos.add(b.getMetaObject());
+        }
+        final JComponent c = CidsObjectRendererFactory.getInstance().getAggregationRenderer(mos,title);
+        showTestFrame(c, w, h);
+    }
+    
+    
+    
 
     /**
      * DOCUMENT ME!

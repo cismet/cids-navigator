@@ -105,6 +105,10 @@ public class CidsObjectRendererFactory {
         // nicht mehr bebraucht wird) wieder dem cache zur verfuegung zu stellen. problem ist, das es noch keine
         // gemeinsame oberklasse für die renderer gibt
 
+        
+        //insert Ooops here
+        
+        
         JComponent componentReferenceHolder = null;
         try {
             final Class<?> rendererClass = ClassloadingHelper.getDynamicClass(mo.getMetaClass(),
