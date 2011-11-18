@@ -14,7 +14,6 @@ package de.cismet.cids.client.tools;
  *              ... and it just works.
  *
  ****************************************************/
-
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
@@ -79,23 +78,17 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param   domain    DOCUMENT ME!
-     * @param   group     DOCUMENT ME!
-     * @param   user      DOCUMENT ME!
-     * @param   pass      DOCUMENT ME!
-     * @param   table     DOCUMENT ME!
-     * @param   objectId  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public static CidsBean createCidsBeanFromRMIConnectionOnLocalhost(final String domain,
+    public static void initSessionManagerFromRMIConnectionOnLocalhost(final String domain,
             final String group,
             final String user,
-            final String pass,
-            final String table,
-            final int objectId) throws Exception {
+            final String pass) throws Exception {
         System.out.println("start");
         // lookup des callservers
         final Remote r;
@@ -139,6 +132,31 @@ public class DevelopmentTools {
         SessionManager.init(proxy);
 
         ClassCacheMultiple.setInstance(domain);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createCidsBeanFromRMIConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId) throws Exception {
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
+        }
         System.out.println("MO abfragen");
 
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
@@ -168,51 +186,9 @@ public class DevelopmentTools {
             final String user,
             final String pass,
             final String table) throws Exception {
-        // lookup des callservers
-        final Remote r;
-        final SearchService ss;
-        final CatalogueService cat;
-        final MetaService meta;
-        final UserService us;
-        final User u;
-
-        Log4JQuickConfig.configure4LumbermillOnLocalhost();
-        r = (Remote)Naming.lookup("rmi://localhost/callServer");
-        System.out.println("Server gefunden.");
-        ss = (SearchService)r;
-        cat = (CatalogueService)r;
-        meta = (MetaService)r;
-        us = (UserService)r;
-        u = us.getUser(domain, group, domain, user, pass);
-        System.out.println(user + " angemeldet.");
-        ConnectionSession session = null;
-        ConnectionProxy proxy = null;
-        final ConnectionInfo info = new ConnectionInfo();
-        info.setCallserverURL("rmi://localhost/callServer");
-        info.setUsername(user);
-        info.setUsergroup(group);
-        info.setPassword(pass);
-        info.setUserDomain(domain);
-        info.setUsergroupDomain(domain);
-
-        final Connection connection = ConnectionFactory.getFactory()
-                    .createConnection(
-                        "Sirius.navigator.connection.RMIConnection",
-                        info.getCallserverURL());
-
-        session = ConnectionFactory.getFactory().createSession(connection,
-                info, true);
-        proxy = ConnectionFactory.getFactory()
-                    .createProxy(
-
-                            "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
-                            session);
-        System.out.println("Initialisiere SessionManager.");
-        SessionManager.init(proxy);
-
-        ClassCacheMultiple.setInstance(domain);
-        System.out.println("Rufe MetaObject ab.");
-
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
+        }
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject[] metaObjects = SessionManager.getConnection()
@@ -432,6 +408,7 @@ public class DevelopmentTools {
         final JComponent c = CidsObjectRendererFactory.getInstance().getSingleRenderer(cb.getMetaObject(), title);
         showTestFrame(c, w, h);
     }
+
     /**
      * DOCUMENT ME!
      *
