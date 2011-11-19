@@ -252,6 +252,7 @@ public class DevelopmentTools {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static void showReportForCidsBeans(final String path,
             final String domain,
             final String group,
@@ -356,6 +357,7 @@ public class DevelopmentTools {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static void showReportForCidsBeans(final String path,
             final CidsBean[] cidsBeans) throws Exception {
         System.out.print("Lade JasperReport ...");
