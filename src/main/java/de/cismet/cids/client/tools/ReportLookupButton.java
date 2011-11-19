@@ -9,9 +9,14 @@ package de.cismet.cids.client.tools;
 
 import org.openide.util.Lookup;
 
+import java.awt.event.ActionEvent;
+
+import java.beans.PropertyChangeListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.AbstractAction;
 import javax.swing.JButton;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -32,6 +37,8 @@ public class ReportLookupButton extends JButton {
 
     //~ Instance fields --------------------------------------------------------
 
+    private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+
     private ReportAction reportAction = null;
 
     //~ Constructors -----------------------------------------------------------
@@ -39,9 +46,7 @@ public class ReportLookupButton extends JButton {
     /**
      * Creates a new ReportLookupButton object.
      *
-     * @param   reportKey  DOCUMENT ME!
-     *
-     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @param  reportKey  DOCUMENT ME!
      */
     public ReportLookupButton(final String reportKey) {
         assert (reportKey != null);
@@ -53,7 +58,8 @@ public class ReportLookupButton extends JButton {
             }
         }
         if (reportAction == null) {
-            throw new IllegalArgumentException("Could not find report with this reportKey:" + reportKey
+            reportAction = new DummyAction();
+            log.warn("Could not find report with this reportKey:" + reportKey
                         + " Check your Classpath and the assigned reportKeys.");
         }
     }
@@ -79,5 +85,38 @@ public class ReportLookupButton extends JButton {
         final ArrayList<CidsBean> al = new ArrayList<CidsBean>(1);
         al.add(bean);
         reportAction.setCidsBeans(al);
+    }
+}
+
+/**
+ * DOCUMENT ME!
+ *
+ * @version  $Revision$, $Date$
+ */
+class DummyAction extends AbstractAction implements ReportAction {
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
+
+    @Override
+    public void actionPerformed(final ActionEvent e) {
+    }
+
+    @Override
+    public String getReportKey() {
+        return "";
+    }
+
+    @Override
+    public Collection<CidsBean> getCidsBeans() {
+        return null;
+    }
+
+    @Override
+    public void setCidsBeans(final Collection<CidsBean> beans) {
     }
 }
