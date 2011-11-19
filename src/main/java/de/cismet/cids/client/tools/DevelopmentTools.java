@@ -34,12 +34,11 @@ import net.sf.jasperreports.engine.JRRewindableDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.swing.JRViewer;
 
 import java.awt.BorderLayout;
-
-import java.io.FileInputStream;
 
 import java.rmi.Naming;
 import java.rmi.Remote;
@@ -186,11 +185,40 @@ public class DevelopmentTools {
             final String user,
             final String pass,
             final String table) throws Exception {
+        return createCidsBeansFromRMIConnectionOnLocalhost(domain, group, user, pass, table, 0);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   table   DOCUMENT ME!
+     * @param   limit   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean[] createCidsBeansFromRMIConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int limit) throws Exception {
+        String limitS = "";
+
+        if (limit > 0) {
+            limitS = "LIMIT " + limit;
+        }
         if (!SessionManager.isInitialized()) {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
         }
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
+        System.out.println("bauen ...");
         final MetaObject[] metaObjects = SessionManager.getConnection()
                     .getMetaObjectByQuery(SessionManager.getSession().getUser(),
                         "SELECT "
@@ -198,7 +226,11 @@ public class DevelopmentTools {
                         + ", "
                         + mc.getPrimaryKey()
                         + " FROM "
-                        + mc.getTableName());
+                        + mc.getTableName()
+                        + " order by "
+                        + mc.getPrimaryKey()
+                        + " "
+                        + limitS);
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
         for (int i = 0; i < metaObjects.length; i++) {
             final MetaObject metaObject = metaObjects[i];
@@ -227,7 +259,8 @@ public class DevelopmentTools {
             final String pass,
             final String table) throws Exception {
         System.out.print("Lade JasperReport ...");
-        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(new FileInputStream(path));
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
+                    path));
         System.out.println(" geladen.\nErstelle Datenquelle ...");
         final JRRewindableDataSource dataSource = new CidsBeanDataSource(createCidsBeansFromRMIConnectionOnLocalhost(
                     domain,
@@ -270,6 +303,54 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
+     * @param   path  DOCUMENT ME!
+     * @param   c     DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void showReportForBeans(final String path, final Collection c) throws Exception {
+        System.out.print("Lade JasperReport ...");
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
+                    path));
+        System.out.println(" geladen.\nErstelle Datenquelle ...");
+        final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(c);
+
+        boolean hasEntries = false;
+        try {
+            hasEntries = dataSource.next();
+        } finally {
+            dataSource.moveFirst();
+        }
+        System.out.println("Datenquelle erstellt. Daten verfügbar? " + hasEntries + ".");
+        if (!hasEntries) {
+            return;
+        }
+        System.out.print("Fülle Report ...");
+        // print aus report und daten erzeugen
+        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+//        JasperExportManager.exportReportToPdfFile(jasperPrint, "/Users/thorsten/xxx.pdf");
+
+        System.out.print(" gefüllt.\nZeige Report an ...");
+        final JRViewer aViewer = new JRViewer(jasperPrint);
+        final JFrame aFrame = new JFrame(path); // NOI18N
+        aFrame.getContentPane().add(aViewer);
+        final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        aFrame.setSize(700, 970);
+        final java.awt.Insets insets = aFrame.getInsets();
+        aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
+            aFrame.getHeight()
+                    + insets.top
+                    + insets.bottom
+                    + 20);
+        aFrame.setLocation((screenSize.width - aFrame.getWidth()) / 2,
+            (screenSize.height - aFrame.getHeight())
+                    / 2);
+        aFrame.setVisible(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   path       DOCUMENT ME!
      * @param   cidsBeans  DOCUMENT ME!
      *
@@ -278,7 +359,8 @@ public class DevelopmentTools {
     public static void showReportForCidsBeans(final String path,
             final CidsBean[] cidsBeans) throws Exception {
         System.out.print("Lade JasperReport ...");
-        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(new FileInputStream(path));
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
+                    path));
         System.out.println(" geladen.\nErstelle Datenquelle ...");
         final JRRewindableDataSource dataSource = new CidsBeanDataSource(cidsBeans);
         boolean hasEntries = false;
@@ -295,12 +377,14 @@ public class DevelopmentTools {
         System.out.print("Fülle Report ...");
         // print aus report und daten erzeugen
         final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+//        JasperExportManager.exportReportToPdfFile(jasperPrint, "/Users/thorsten/xxx.pdf");
+
         System.out.print(" gefüllt.\nZeige Report an ...");
         final JRViewer aViewer = new JRViewer(jasperPrint);
         final JFrame aFrame = new JFrame(path); // NOI18N
         aFrame.getContentPane().add(aViewer);
         final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
-        aFrame.setSize(screenSize.width / 2, screenSize.height / 2);
+        aFrame.setSize(700, 970);
         final java.awt.Insets insets = aFrame.getInsets();
         aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
             aFrame.getHeight()
