@@ -7,14 +7,14 @@
 ****************************************************/
 package de.cismet.cids.editors;
 
-import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.tools.MetaObjectCache;
 
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
+
+import org.apache.log4j.Logger;
 
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
@@ -26,6 +26,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -49,8 +50,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
-            DefaultBindableCheckboxField.class);
+    private static final Logger LOG = Logger.getLogger(DefaultBindableCheckboxField.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -171,7 +171,6 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                         }
                     }
 
-                    selectedElements = null;
                     mc = metaClass;
                     boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
 
@@ -322,11 +321,14 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
     @Override
     public void actionPerformed(final ActionEvent ae) {
         final MetaObject mo = boxToObjectMapping.get((JCheckBox)ae.getSource());
+        final List old = new ArrayList(selectedElements);
         if (selectedElements.contains(mo.getBean())) {
             selectedElements.remove(mo.getBean());
         } else {
             selectedElements.add(mo.getBean());
         }
+        propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
+        propertyChangeSupport.firePropertyChange("selectedElements", null, mo.getBean());
     }
 
     /**
