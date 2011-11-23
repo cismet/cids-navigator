@@ -141,6 +141,67 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
+     * @param   search    DOCUMENT ME!
+     * @param   listener  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static SwingWorker<Node[], Void> searchAndDisplayResults(final CidsServerSearch search,
+            final PropertyChangeListener listener) {
+        final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
+
+                @Override
+                protected Node[] doInBackground() throws Exception {
+                    Node[] result = null;
+                    final Collection searchResult = SessionManager.getProxy()
+                                .customServerSearch(SessionManager.getSession().getUser(), search);
+
+                    if (isCancelled()) {
+                        return result;
+                    }
+
+                    final ArrayList<Node> nodes = new ArrayList<Node>(searchResult.size());
+
+                    for (final Object singleSearchResult : searchResult) {
+                        nodes.add((Node)singleSearchResult);
+
+                        if (isCancelled()) {
+                            return result;
+                        }
+                    }
+
+                    result = nodes.toArray(new Node[0]);
+                    if (!isCancelled()) {
+                        MethodManager.getManager().showSearchResults(result, false);
+                    }
+
+                    return result;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        if (!isCancelled()) {
+                            final Node[] result = get();
+                        }
+                    } catch (Exception ex) {
+                        log.error("Error occurred while searching.", ex);
+                    }
+                }
+            };
+
+        if (listener != null) {
+            worker.addPropertyChangeListener(listener);
+        }
+
+        CismetThreadPool.execute(worker);
+
+        return worker;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     private static SearchProgressDialog getSearchProgressDialog() {

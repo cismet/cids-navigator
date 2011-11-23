@@ -33,7 +33,7 @@ import de.cismet.cids.tools.search.clientstuff.CidsDialogSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 
-import de.cismet.tools.StaticDebuggingTools;
+import de.cismet.tools.configuration.ConfigurationManager;
 
 /**
  * This class is responsibility is to lookup all relevant search components, to initialize and to plug them into the
@@ -48,17 +48,21 @@ public class CidsSearchInitializer {
 
     /**
      * Creates a new CidsSearchInitializer object.
+     *
+     * @param  configurationManager  DOCUMENT ME!
      */
-    public CidsSearchInitializer() {
-        initializeSearch();
+    public CidsSearchInitializer(final ConfigurationManager configurationManager) {
+        initializeSearch(configurationManager);
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  configurationManager  DOCUMENT ME!
      */
-    private void initializeSearch() {
+    private void initializeSearch(final ConfigurationManager configurationManager) {
         final Collection<? extends CidsToolbarSearch> toolbarSearches = Lookup.getDefault()
                     .lookupAll(CidsToolbarSearch.class);
         final Collection<? extends CidsDialogSearch> dialogeSearches = Lookup.getDefault()
@@ -83,6 +87,8 @@ public class CidsSearchInitializer {
             final JPanel innerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 5));
             innerPanel.add(searchBar);
             toolBar.add(innerPanel, -1);
+
+            configurationManager.addConfigurable(searchBar);
         }
 
         // Dialog Searches

@@ -773,7 +773,7 @@ public class Navigator extends JFrame {
      * DOCUMENT ME!
      */
     private void initSearch() {
-        new CidsSearchInitializer();
+        new CidsSearchInitializer(configurationManager);
     }
 
     /**
