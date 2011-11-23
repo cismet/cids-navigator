@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
@@ -188,6 +189,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         empty = false;
         refreshTree(true);
+
+        if (!getModel().getRoot().equals(rootNode)) {
+            ((DefaultTreeModel)getModel()).setRoot(rootNode);
+            ((DefaultTreeModel)getModel()).reload();
+        }
     }
 
     /**
