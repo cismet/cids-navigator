@@ -21,6 +21,7 @@ import org.jdom.Element;
 
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 
 import java.awt.BorderLayout;
@@ -69,6 +70,9 @@ import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxUI;
 
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
+import de.cismet.cids.tools.search.clientstuff.Modifier;
+
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.NoWriteError;
@@ -89,6 +93,9 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     private static final String CONF_HISTORY_ITEM = "historyItem";
 
     private static final String POPUPMENUITEM_SEARCH = "search";
+    private static final String SEPARATOR_MODIFIER = "#";
+    private static final String SEPARATOR_MODIFIER_OPTION = ":";
+
     private static final ImageIcon ICON_BTNSEARCH = new ImageIcon(CidsSearchComboBar.class.getResource(
                 "/Sirius/navigator/search/btnSearch.png"));
     private static final ImageIcon ICON_BTNSEARCH_CANCEL = new ImageIcon(CidsSearchComboBar.class.getResource(
@@ -101,15 +108,16 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     //~ Instance fields --------------------------------------------------------
 
     private int width;
-    private Color origForeground;
     private CidsToolbarSearch selectedSearch;
     private final Collection<CidsToolbarSearch> searches;
     private final EventList<String> history;
-    private AutoCompleteSupport supportInput;
     private Map<CidsToolbarSearch, ImageIcon> icons;
     private Collection<String> searchHints;
-    private SwingWorker search;
+    private Collection<? extends Modifier> modifiers;
+    private SwingWorker searchThread;
+    private AutoCompleteSupport supportInput;
     private final Timer animationTimer = new Timer(100, new AnimationTimerListener());
+    private Color origForeground;
     private JLabel lblSearchTopic;
     private JPanel pnlSearch;
     private JComboBox cbbInput;
@@ -136,6 +144,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
         this.history = new BasicEventList<String>();
         this.icons = new HashMap<CidsToolbarSearch, ImageIcon>();
         this.searchHints = new LinkedList<String>();
+        this.modifiers = Lookup.getDefault().lookupAll(Modifier.class);
 
         initComponents();
     }
@@ -184,6 +193,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @param  searches  DOCUMENT ME!
      */
     public void setSearches(final Collection<? extends CidsToolbarSearch> searches) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting new searches: " + searches);
+        }
+
         this.searches.clear();
         this.searches.addAll(searches);
 
@@ -196,6 +209,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
             selectedSearch = this.searches.iterator().next();
             lblSearchTopic.setIcon(icons.get(selectedSearch));
             showSearchHint(true);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Search '" + selectedSearch.getName() + "' selected.");
+            }
         }
     }
 
@@ -205,6 +222,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @param  search  DOCUMENT ME!
      */
     public void addSearch(final CidsToolbarSearch search) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Adding new search: " + search);
+        }
+
         searches.add(search);
 
         addOverlayIcon(search);
@@ -214,6 +235,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
             selectedSearch = search;
             lblSearchTopic.setIcon(icons.get(selectedSearch));
             showSearchHint(true);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Search '" + selectedSearch.getName() + "' selected.");
+            }
         }
     }
 
@@ -225,6 +250,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @return  DOCUMENT ME!
      */
     public boolean removeSearch(final CidsToolbarSearch search) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Removing search: " + search);
+        }
+
         final boolean result = searches.remove(search);
 
         if (selectedSearch.equals(search)) {
@@ -233,6 +262,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
         if (!searches.isEmpty()) {
             selectedSearch = searches.iterator().next();
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Search '" + selectedSearch.getName() + "' selected.");
+            }
         }
 
         removeOverlayIcon(search);
@@ -248,6 +281,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @param  history  DOCUMENT ME!
      */
     public void setHistoryItems(final Collection<? extends String> history) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Setting new history: " + history);
+        }
+
         this.history.clear();
         this.history.addAll(history);
     }
@@ -260,6 +297,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     public void addHistoryItem(final String historyItem) {
         if (!history.contains(historyItem)) {
             history.add(historyItem);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("History item '" + historyItem + "' added.");
+            }
         }
     }
 
@@ -271,6 +312,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @return  DOCUMENT ME!
      */
     public boolean removeHistoryItem(final String historyItem) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Remove history item '" + historyItem + "'.");
+        }
+
         return history.remove(historyItem);
     }
 
@@ -296,7 +341,9 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * DOCUMENT ME!
      */
     private void initComponents() {
-        cbbInput = createInputComponent();
+        final ActionListener performSearchListener = new PerformSearchListener();
+
+        cbbInput = createInputComponent(performSearchListener);
         cbbInput.setName("cbbInput");
 
         java.awt.GridBagConstraints gridBagConstraints;
@@ -345,17 +392,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
         btnSearch.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         btnSearch.setFocusPainted(false);
         btnSearch.setName("btnSearch"); // NOI18N
-        btnSearch.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (isSearchRunning()) {
-                        cancelRunningSearch();
-                    } else {
-                        performSelectedSearch();
-                    }
-                }
-            });
+        btnSearch.addActionListener(performSearchListener);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 2;
@@ -380,20 +417,18 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                 @Override
                 public void run() {
-                    if (cbbInputEditorComponent == null) {
-                        // TODO: May happen if there was not enough time between the constructor call (initilizing
-                        // cbbInputEditorComponent in a thread) and calls to setSearches().
-
-                        return;
-                    }
+//                    if (cbbInputEditorComponent == null) {
+//                        // TODO: May happen if there was not enough time between the constructor call (initilizing
+//                        // cbbInputEditorComponent in a thread) and calls to setSearches().
+//
+//                        return;
+//                    }
 
                     final String currentInput = cbbInputEditorComponent.getText();
                     final boolean isCurrentInputAHint = (currentInput != null)
                                 && ((currentInput.trim().length() == 0) || searchHints.contains(currentInput));
 
-                    if (showSearchHint && (selectedSearch != null)
-                                && isCurrentInputAHint
-                                /*&& !cbbInputEditorComponent.isFocusOwner()*/) {
+                    if (showSearchHint && (selectedSearch != null) && isCurrentInputAHint) {
                         cbbInputEditorComponent.setForeground(cbbInputEditorComponent.getDisabledTextColor());
                         cbbInputEditorComponent.setFont(cbbInputEditorComponent.getFont().deriveFont(Font.ITALIC));
                         cbbInputEditorComponent.setText(selectedSearch.getHint());
@@ -421,7 +456,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @param  evt  DOCUMENT ME!
      */
     private void lblSearchTopicMousePressed(final MouseEvent evt) {
-        showSearches(evt);
+        showSearchesPopup(evt);
     }
 
     /**
@@ -429,8 +464,8 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void showSearches(final MouseEvent evt) {
-        if ((evt != null) && !SwingUtilities.isLeftMouseButton(evt)) {
+    private void showSearchesPopup(final MouseEvent evt) {
+        if (((evt != null) && !SwingUtilities.isLeftMouseButton(evt)) || isSearchRunning()) {
             return;
         }
 
@@ -566,13 +601,16 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     /**
      * DOCUMENT ME!
      *
+     * @param   actionListener  DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
-    private JComboBox createInputComponent() {
+    private JComboBox createInputComponent(final ActionListener actionListener) {
         final JComboBox result = new DynamicWidthCB();
+
         result.setEditable(true);
         result.setBorder(BorderFactory.createEmptyBorder());
-        result.addActionListener(this);
+        result.addActionListener(actionListener);
 
         SwingUtilities.invokeLater(new Runnable() {
 
@@ -585,7 +623,6 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                     cbbInputEditorComponent = (JTextField)result.getEditor().getEditorComponent();
                     cbbInputEditorComponent.addFocusListener(new SearchHintListener());
-                    cbbInputEditorComponent.addKeyListener(new PerformSearchListener());
                     cbbInputEditorComponent.getDocument().addDocumentListener(new SyntaxHintListener());
 
                     origForeground = cbbInputEditorComponent.getForeground();
@@ -604,6 +641,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 @Override
                 public void run() {
                     cbbInput.setEnabled(false);
+
                     cbbInputEditorComponent.setEnabled(false);
                     lblSearchTopic.setEnabled(false);
                     btnSearch.setIcon(ICON_BTNSEARCH_CANCEL);
@@ -631,6 +669,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 public void run() {
                     cbbInput.setEnabled(true);
                     cbbInputEditorComponent.setEnabled(true);
+
                     lblSearchTopic.setEnabled(true);
                     btnSearch.setIcon(ICON_BTNSEARCH);
 
@@ -654,25 +693,66 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      * @return  DOCUMENT ME!
      */
     private boolean isSearchRunning() {
-        return (search != null) && !search.isDone() && !search.isCancelled();
+        return (searchThread != null) && !searchThread.isDone() && !searchThread.isCancelled();
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void performSelectedSearch() {
-        if (cbbInput.getSelectedItem() == null) {
+    private void parseInputAndPerformSearch() {
+        final String input = cbbInputEditorComponent.getText();
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Performing search with input '" + input + "'.");
+        }
+        if ((input == null) || (input.trim().length() == 0)) {
             return;
         }
 
-        final String searchString = cbbInput.getSelectedItem().toString();
-        addHistoryItem(searchString);
+        final Collection<Modifier> appliedModifiers = new LinkedList<Modifier>();
+        final StringBuilder searchParameter = new StringBuilder();
 
-        if ((selectedSearch != null) && (searchString.length() > 0) && !isSearchRunning()) {
+        for (final String wordFromInput : input.split("\\s")) {
+            if (wordFromInput.startsWith(SEPARATOR_MODIFIER)) {
+                for (final Modifier potentialModifier : modifiers) {
+                    if (SEPARATOR_MODIFIER.concat(potentialModifier.getCommand()).equalsIgnoreCase(wordFromInput)) {
+                        appliedModifiers.add(potentialModifier);
+
+                        if (potentialModifier instanceof HereModifier) {
+                            ((HereModifier)potentialModifier).setValue(CismapBroker.getInstance().getMappingComponent()
+                                        .getCurrentBoundingBox().getGeometryFromTextLineString());
+                        }
+
+                        break;
+                    }
+                }
+            } else if (wordFromInput.trim().length() > 0) {
+                searchParameter.append(wordFromInput);
+                searchParameter.append(" ");
+            }
+        }
+
+        if ((searchParameter.toString().trim().length() == 0)) {
+            return;
+        }
+
+        if (searchParameter.charAt(searchParameter.length() - 1) == ' ') {
+            searchParameter.setLength(searchParameter.length() - 1);
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Parsed '" + searchParameter.toString() + "' with modifiers '" + appliedModifiers
+                        + "' from input '" + input + "'.");
+        }
+
+        addHistoryItem(searchParameter.toString());
+
+        if ((selectedSearch != null) && (searchParameter.length() > 0) && !isSearchRunning()) {
             displaySearchMode();
-            selectedSearch.setSearchParameter(searchString);
+            selectedSearch.setSearchParameter(searchParameter.toString());
+            selectedSearch.applyModifiers(appliedModifiers);
 
-            search = CidsSearchExecutor.searchAndDisplayResults(selectedSearch.getServerSearch(),
+            searchThread = CidsSearchExecutor.searchAndDisplayResults(selectedSearch.getServerSearch(),
                     // TODO: new instance on every call?
                     new SearchDoneListener());
         }
@@ -683,7 +763,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      */
     private void cancelRunningSearch() {
         if (isSearchRunning()) {
-            search.cancel(true);
+            searchThread.cancel(true);
             displayNormalMode();
         }
     }
@@ -691,7 +771,9 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     /**
      * DOCUMENT ME!
      *
-     * @param  args  DOCUMENT ME!
+     * @param   args  DOCUMENT ME!
+     *
+     * @throws  UnsupportedOperationException  DOCUMENT ME!
      */
     public static void main(final String[] args) {
         final String[] LAFS = new String[] {
@@ -745,6 +827,11 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 public String getHint() {
                     return "Hinweis fürs null-Icon";
                 }
+
+                @Override
+                public void applyModifiers(final Collection<? extends Modifier> modifiers) {
+                    throw new UnsupportedOperationException("Not supported yet.");
+                }
             });
 
         searchBar.addSearch(new CidsToolbarSearch() {
@@ -774,6 +861,11 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 @Override
                 public String getHint() {
                     return "Hinweis fürs leere Icon";
+                }
+
+                @Override
+                public void applyModifiers(final Collection<? extends Modifier> modifiers) {
+                    throw new UnsupportedOperationException("Not supported yet.");
                 }
             });
 
@@ -806,6 +898,11 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 @Override
                 public String getHint() {
                     return "Nachname Vorname";
+                }
+
+                @Override
+                public void applyModifiers(final Collection<? extends Modifier> modifiers) {
+                    throw new UnsupportedOperationException("Not supported yet.");
                 }
             });
 
@@ -926,23 +1023,6 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      *
      * @version  $Revision$, $Date$
      */
-    private class SearchDoneListener implements PropertyChangeListener {
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void propertyChange(final PropertyChangeEvent evt) {
-            if (SwingWorker.StateValue.DONE == evt.getNewValue()) {
-                displayNormalMode();
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
     public class OverlayIcon extends ImageIcon {
 
         //~ Instance fields ----------------------------------------------------
@@ -985,26 +1065,6 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      *
      * @version  $Revision$, $Date$
      */
-    private class SearchHintListener implements FocusListener {
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void focusGained(final FocusEvent e) {
-            showSearchHint(false);
-        }
-
-        @Override
-        public void focusLost(final FocusEvent e) {
-            showSearchHint(true);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
     private class SyntaxHintListener implements DocumentListener {
 
         //~ Instance fields ----------------------------------------------------
@@ -1022,22 +1082,21 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
             syntaxHints = new LinkedList<String>();
             originalHistory = new LinkedList<String>();
 
-            syntaxHints.add("#abc - Blubb");
-            syntaxHints.add("#hier - Sucht Objekte in aktuellem Ausschnitt");
-            syntaxHints.add("#huhu - Blubb");
-            syntaxHints.add("#test - Blubb");
+            for (final Modifier modifier : modifiers) {
+                syntaxHints.add(SEPARATOR_MODIFIER + modifier.getCommand() + " - " + modifier.getHint());
+            }
         }
 
         //~ Methods ------------------------------------------------------------
 
         @Override
         public void insertUpdate(final DocumentEvent e) {
-            showSyntaxHintsIfPossible();
+            switchAutocompleteList();
         }
 
         @Override
         public void removeUpdate(final DocumentEvent e) {
-            showSyntaxHintsIfPossible();
+            switchAutocompleteList();
         }
 
         @Override
@@ -1047,17 +1106,29 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
         /**
          * DOCUMENT ME!
          */
-        private void showSyntaxHintsIfPossible() {
-            final String modifier = getCurrentModifier(cbbInputEditorComponent);
-
+        private void switchAutocompleteList() {
             SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
+                        final String modifier = getCurrentModifier(cbbInputEditorComponent);
+
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug(
+                                "Current modifier: "
+                                        + modifier
+                                        + ", areSyntaxHintsShown? "
+                                        + areSyntaxHintsShown);
+                        }
+
                         if ((modifier == null) && areSyntaxHintsShown) {
                             history.clear();
                             history.addAll(originalHistory);
                             areSyntaxHintsShown = false;
+
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Switched to history");
+                            }
                         } else if ((modifier != null) && !areSyntaxHintsShown) {
                             originalHistory.clear();
                             originalHistory.addAll(history);
@@ -1065,6 +1136,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                             history.addAll(syntaxHints);
                             supportInput.getComboBox().showPopup();
                             areSyntaxHintsShown = true;
+
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Switched to syntax hints");
+                            }
                         }
                     }
                 });
@@ -1102,7 +1177,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
             }
 
             String result = input.substring(preceedingSpacePosition, succeedingSpacePosition);
-            if (!result.startsWith("#")) {
+            if (!result.startsWith(SEPARATOR_MODIFIER)) {
                 result = null;
             }
 
@@ -1115,14 +1190,61 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      *
      * @version  $Revision$, $Date$
      */
-    private class PerformSearchListener extends KeyAdapter {
+    private class SearchHintListener implements FocusListener {
 
         //~ Methods ------------------------------------------------------------
 
         @Override
-        public void keyPressed(final java.awt.event.KeyEvent evt) {
-            if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-                performSelectedSearch();
+        public void focusGained(final FocusEvent e) {
+            showSearchHint(false);
+        }
+
+        @Override
+        public void focusLost(final FocusEvent e) {
+            showSearchHint(true);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class PerformSearchListener implements ActionListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            final Object source = e.getSource();
+
+            if ((source instanceof JComboBox) && source.equals(cbbInput)) {
+                if ("comboBoxEdited".equals(e.getActionCommand()) && !isSearchRunning()) {
+                    parseInputAndPerformSearch();
+                }
+            } else if ((source instanceof JButton) && source.equals(btnSearch)) {
+                if (isSearchRunning()) {
+                    cancelRunningSearch();
+                } else {
+                    parseInputAndPerformSearch();
+                }
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class SearchDoneListener implements PropertyChangeListener {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
+            if (SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                displayNormalMode();
             }
         }
     }
