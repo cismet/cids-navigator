@@ -155,11 +155,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                             JOptionPane.showMessageDialog(
                                 NavigatorAttributeEditorGui.this,
                                 org.openide.util.NbBundle.getMessage(
-                                    AttributeEditor.class,
+                                    NavigatorAttributeEditorGui.class,
                                     "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.message"),
                                 org.openide.util.NbBundle.getMessage(
-                                    AttributeEditor.class,
-                                    "ANavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.title"),
+                                    NavigatorAttributeEditorGui.class,
+                                    "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.title"),
                                 JOptionPane.WARNING_MESSAGE);
                             return;
                         }
@@ -200,6 +200,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        System.out.println(
+            org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.message"));
+    }
 
     @Override
     public void setControlBarVisible(final boolean isVisible) {
