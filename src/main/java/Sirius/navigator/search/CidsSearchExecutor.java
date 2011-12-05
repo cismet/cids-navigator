@@ -12,7 +12,6 @@ import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.search.dynamic.SearchProgressDialog;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
-import Sirius.navigator.ui.status.StatusChangeListener;
 
 import Sirius.server.middleware.types.Node;
 import Sirius.server.search.CidsServerSearch;
@@ -26,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.SwingWorker;
-import javax.swing.UIManager;
 
 import de.cismet.tools.CismetThreadPool;
 
