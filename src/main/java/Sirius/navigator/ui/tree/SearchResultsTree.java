@@ -61,7 +61,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private Thread runningNameLoader = null;
     private SwingWorker<Void, Void> refreshWorker;
     private boolean syncWithMap = false;
-    private DirectedMetaObjectNodeComparator comparator;
+    private boolean ascending = true;
     private final WaitTreeNode waitTreeNode = new WaitTreeNode();
 
     //~ Constructors -----------------------------------------------------------
@@ -88,7 +88,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         defaultTreeModel.setAsksAllowsChildren(true);
         this.defaultTreeModel.setAsksAllowsChildren(true);
-        this.comparator = new DirectedMetaObjectNodeComparator();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -161,7 +160,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void setResultNodes(final Node[] nodes, final boolean append) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("[SearchResultsTree] appending '" + nodes.length + "' nodes"); // NOI18N
+            LOG.info("[SearchResultsTree] " + (append ? "appending" : "setting") + " '" + nodes.length + "' nodes"); // NOI18N
         }
 
         if ((append == true) && ((nodes == null) || (nodes.length < 1))) {
@@ -453,7 +452,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @param  ascending  Whether to sort ascending (<code>true</code>) or descending (<code>false</code>).
      */
     public void sort(final boolean ascending) {
-        comparator.setAscending(ascending);
+        this.ascending = ascending;
         refreshTree(false);
     }
 
@@ -470,6 +469,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         //~ Instance fields ----------------------------------------------------
 
         private boolean initialFill = false;
+        private DirectedMetaObjectNodeComparator comparator;
 
         //~ Constructors -------------------------------------------------------
 
@@ -480,6 +480,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
          */
         public RefreshTreeWorker(final boolean initialFill) {
             this.initialFill = initialFill;
+            comparator = new DirectedMetaObjectNodeComparator(ascending);
         }
 
         //~ Methods ------------------------------------------------------------
@@ -495,6 +496,10 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         @Override
         protected void done() {
+            if (isCancelled()) {
+                comparator.cancel();
+            }
+
             try {
                 if (!isCancelled()) {
                     get();
@@ -505,14 +510,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 LOG.error("Error occured while refreshing search results tree", ex);
             }
 
-            rootNode.removeAllChildren();
-
             if (!isCancelled()) {
-                try {
-                    rootNode.addChildren(resultNodes);
-                } catch (Exception exp) {
-                    LOG.warn("[SearchResultsTree] could not add new nodes", exp); // NOI18N
-                }
+                rootNode.removeAllChildren();
+                rootNode.addChildren(resultNodes);
             }
 
             SearchResultsTree.this.firePropertyChange("browse", 0, 1); // NOI18N
