@@ -810,7 +810,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                 @Override
                 public CidsServerSearch getServerSearch() {
-                    return new FullTextSearch(parameter);
+                    return new FullTextSearch(parameter, false);
                 }
 
                 @Override
@@ -845,7 +845,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                 @Override
                 public CidsServerSearch getServerSearch() {
-                    return new FullTextSearch(parameter);
+                    return new FullTextSearch(parameter, false);
                 }
 
                 @Override
@@ -880,7 +880,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                 @Override
                 public CidsServerSearch getServerSearch() {
-                    return new FullTextSearch(parameter);
+                    return new FullTextSearch(parameter, false);
                 }
 
                 @Override

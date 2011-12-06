@@ -24,12 +24,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
-
-import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
 
 /**
  * Eine Toolbar, zu der zur Laufzeit automatisch neue Buttons hinzugefuegt- und entfernt werden koennen.
@@ -117,20 +114,6 @@ public class MutableToolBar extends JToolBar {
             button.addActionListener(toolBarListener);
             defaultToolBar.add(button);
         }
-
-        button = new JButton(resources.getIcon("plugin24.gif"));          // NOI18N
-        button.setToolTipText(org.openide.util.NbBundle.getMessage(
-                MutableToolBar.class,
-                "MutableToolBar.createDefaultButtons().plugin.tooltip")); // NOI18N
-        button.setActionCommand("plugin");                                // NOI18N
-        button.setEnabled(false);                                         // HELL
-        button.setMargin(new Insets(4, 4, 4, 4));
-        button.addActionListener(toolBarListener);
-        defaultToolBar.add(button);
-
-        button = new JButton(new DownloadManagerAction(this)); // NOI18N
-        button.setMargin(new Insets(4, 4, 4, 4));
-        defaultToolBar.add(button);
     }
 
     /**
@@ -289,24 +272,17 @@ public class MutableToolBar extends JToolBar {
          */
         @Override
         public void actionPerformed(final ActionEvent e) {
-            if (e.getActionCommand().equals("exit"))                        // NOI18N
+            if (e.getActionCommand().equals("exit"))          // NOI18N
             {
                 if (ExceptionManager.getManager().showExitDialog(ComponentRegistry.getRegistry().getMainWindow())) {
-                    logger.info("closing program");                         // NOI18N
+                    logger.info("closing program");           // NOI18N
                     ComponentRegistry.getRegistry().getNavigator().dispose();
                     System.exit(0);
                 }
-            } else if (e.getActionCommand().equals("search"))               // NOI18N
-            {
-                try {
-                    MethodManager.getManager().showSearchDialog();
-                } catch (Throwable t) {
-                    logger.fatal("Error while processing searchmethod", t); // NOI18N
-                }
-            } else if (e.getActionCommand().equals("plugin"))               // NOI18N
+            } else if (e.getActionCommand().equals("plugin")) // NOI18N
             {
                 MethodManager.getManager().showPluginManager();
-            } else if (e.getActionCommand().equals("info"))                 // NOI18N
+            } else if (e.getActionCommand().equals("info"))   // NOI18N
             {
                 MethodManager.getManager().showAboutDialog();
             }

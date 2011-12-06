@@ -460,6 +460,10 @@ public class Navigator extends JFrame {
         final Collection<? extends CidsClientToolbarItem> customToolbarItems = Lookup.getDefault()
                     .lookupAll(CidsClientToolbarItem.class);
 
+        if (logger.isDebugEnabled()) {
+            logger.debug("Initializing " + customToolbarItems.size() + " toolbar extensions.");
+        }
+
         final Comparator<CidsClientToolbarItem> comp = new Comparator<CidsClientToolbarItem>() {
 
                 @Override
@@ -480,6 +484,10 @@ public class Navigator extends JFrame {
         Collections.sort(sorted, comp);
 
         for (final CidsClientToolbarItem ccti : sorted) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Adding CidsClientToolbarItem: " + ccti.getValue(Action.NAME) + " - class: '"
+                            + ccti.getClass().toString() + "'? " + ccti.isVisible());
+            }
             if (ccti.isVisible()) {
                 toolBar.getDefaultToolBar().add(ccti);
             }
