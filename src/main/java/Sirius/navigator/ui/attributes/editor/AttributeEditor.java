@@ -62,14 +62,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
 
     protected TreePath treePath;
     private final Logger logger = Logger.getLogger(this.getClass());
-
     private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
-
     private ComplexEditor editor = null;
-
     private Object commitBlocker = new Object();
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private Sirius.navigator.ui.attributes.AttributeTree attributeTree;
     private javax.swing.JButton cancelButton;
@@ -242,6 +238,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
             this.clear();
         }
     }
+
     /**
      * DOCUMENT ME!
      */
@@ -659,26 +656,41 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                 // Alle \u00C4nderungen im Objekt speichern:
                 editor.stopEditing();
 
-                if (isChanged()
-                            && (JOptionPane.YES_NO_OPTION
-                                == JOptionPane.showOptionDialog(
-                                    AttributeEditor.this,
-                                    org.openide.util.NbBundle.getMessage(
-                                        AttributeEditor.class,
-                                        "AttributeEditor.ButtonListener.JOptionPane.commit.message"), // NOI18N
-                                    org.openide.util.NbBundle.getMessage(
-                                        AttributeEditor.class,
-                                        "AttributeEditor.ButtonListener.JOptionPane.commit.title"), // NOI18N
-                                    JOptionPane.YES_NO_OPTION,
-                                    JOptionPane.QUESTION_MESSAGE,
-                                    null,
-                                    null,
-                                    null))) {
-                    commit();
+                if (isChanged()) {
+                    final MetaObject editedMetaObject = (MetaObject)AttributeEditor.this.editor.getValue();
+                    if (editedMetaObject.getBean().hasObjectWritePermission(SessionManager.getSession().getUser())) {
+                        if (JOptionPane.YES_NO_OPTION
+                                    == JOptionPane.showOptionDialog(
+                                        AttributeEditor.this,
+                                        org.openide.util.NbBundle.getMessage(
+                                            AttributeEditor.class,
+                                            "AttributeEditor.ButtonListener.JOptionPane.commit.message"), // NOI18N
+                                        org.openide.util.NbBundle.getMessage(
+                                            AttributeEditor.class,
+                                            "AttributeEditor.ButtonListener.JOptionPane.commit.title"), // NOI18N
+                                        JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE,
+                                        null,
+                                        null,
+                                        null)) {
+                            commit();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            AttributeEditor.this,
+                            org.openide.util.NbBundle.getMessage(
+                                AttributeEditor.class,
+                                "AttributeEditor.ButtonListener.JOptionPane.noobjectpermission.message"),
+                            org.openide.util.NbBundle.getMessage(
+                                AttributeEditor.class,
+                                "AttributeEditor.ButtonListener.JOptionPane.noobjectpermission.title"),
+                            JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
                 } else {
                     AttributeEditor.this.clear();
                 }
-            } else if (e.getActionCommand().equals("cancel")                        // NOI18N
+            } else if (e.getActionCommand().equals("cancel")                                // NOI18N
                         && (JOptionPane.YES_NO_OPTION
                             == JOptionPane.showOptionDialog(
                                 AttributeEditor.this,
@@ -693,10 +705,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                 null,
                                 null,
                                 null))) {
-                logger.error("unknown action command '" + e.getActionCommand() + "'"); // NOI18N
+                logger.error("unknown action command '" + e.getActionCommand() + "'");      // NOI18N
                 cancel();
             } else {
-                logger.error("unknown action command '" + e.getActionCommand() + "'"); // NOI18N
+                logger.error("unknown action command '" + e.getActionCommand() + "'");      // NOI18N
             }
             /*else if(e.getActionCommand().equals("edit"))
              * { confirmEdit(); DefaultMetaTreeNode node =

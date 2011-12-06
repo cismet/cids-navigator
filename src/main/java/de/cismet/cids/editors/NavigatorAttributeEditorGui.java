@@ -130,25 +130,38 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                     && (editorObject.getBean().hasArtificialChangeFlag()
                                         || !(backupObject.propertyEquals(editorObject))))
                                 || (backupObject == null)) {
-                        if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
-                            final int answer = JOptionPane.showConfirmDialog(
-                                    NavigatorAttributeEditorGui.this,
-                                    org.openide.util.NbBundle.getMessage(
-                                        NavigatorAttributeEditorGui.class,
-                                        "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), // NOI18N
-                                    org.openide.util.NbBundle.getMessage(
-                                        NavigatorAttributeEditorGui.class,
-                                        "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"), // NOI18N
-                                    JOptionPane.YES_NO_CANCEL_OPTION);
-                            if (answer == JOptionPane.YES_OPTION) {
-                                saveIt();
-                            } else if (answer == JOptionPane.CANCEL_OPTION) {
+                        if (editorObject.getBean().hasObjectWritePermission(SessionManager.getSession().getUser())) {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                                final int answer = JOptionPane.showConfirmDialog(
+                                        NavigatorAttributeEditorGui.this,
+                                        org.openide.util.NbBundle.getMessage(
+                                            NavigatorAttributeEditorGui.class,
+                                            "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), // NOI18N
+                                        org.openide.util.NbBundle.getMessage(
+                                            NavigatorAttributeEditorGui.class,
+                                            "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"), // NOI18N
+                                        JOptionPane.YES_NO_CANCEL_OPTION);
+                                if (answer == JOptionPane.YES_OPTION) {
+                                    saveIt();
+                                } else if (answer == JOptionPane.CANCEL_OPTION) {
+                                } else {
+                                    reloadFromDB();
+                                    clear();
+                                }
                             } else {
-                                reloadFromDB();
-                                clear();
+                                saveIt(false);
                             }
                         } else {
-                            saveIt(false);
+                            JOptionPane.showMessageDialog(
+                                NavigatorAttributeEditorGui.this,
+                                org.openide.util.NbBundle.getMessage(
+                                    NavigatorAttributeEditorGui.class,
+                                    "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.message"),
+                                org.openide.util.NbBundle.getMessage(
+                                    NavigatorAttributeEditorGui.class,
+                                    "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.title"),
+                                JOptionPane.WARNING_MESSAGE);
+                            return;
                         }
                     } else {
                         if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
@@ -187,6 +200,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        System.out.println(
+            org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.noobjectpermission.message"));
+    }
 
     @Override
     public void setControlBarVisible(final boolean isVisible) {
