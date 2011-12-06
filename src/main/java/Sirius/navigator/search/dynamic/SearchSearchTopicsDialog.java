@@ -15,13 +15,13 @@ package Sirius.navigator.search.dynamic;
 import Sirius.navigator.search.CidsSearchExecutor;
 
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.builtin.FullTextSearch;
-import Sirius.server.search.builtin.GeoSearch;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.log4j.Logger;
+
+import org.openide.util.NbBundle;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -34,6 +34,8 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -293,46 +295,25 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
                     + "'. Case sensitive? "
                     + chkCaseSensitive.isSelected() + ", Only in cismap? " + chkHere.isSelected());
 
-        CidsServerSearch serverSearch = null;
+        FullTextSearch fullTextSearch = null;
+        Geometry searchGeometry = null;
+
         if (chkHere.isSelected()) {
             final BoundingBox boundingBox = CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox();
             final int srid = CrsTransformer.extractSridFromCrs(CismapBroker.getInstance().getMappingComponent()
                             .getMappingModel().getSrs().getCode());
-            final Geometry transformed = CrsTransformer.transformToDefaultCrs(boundingBox.getGeometry(srid));
+
+            searchGeometry = CrsTransformer.transformToDefaultCrs(boundingBox.getGeometry(srid));
             // Damits auch mit -1 funzt:
-            transformed.setSRID(CismapBroker.getInstance().getDefaultCrsAlias());
-
-            serverSearch = new GeoSearch(transformed);
-        } else {
-            serverSearch = new FullTextSearch(txtSearchParameter.getText());
+            searchGeometry.setSRID(CismapBroker.getInstance().getDefaultCrsAlias());
         }
 
-        if (serverSearch != null) {
-            serverSearch.setCaseSensitive(chkCaseSensitive.isSelected());
-            serverSearch.setValidClassesFromStrings(selectedSearchClasses);
-            CidsSearchExecutor.executeCidsSearchAndDisplayResults(serverSearch, new PropertyChangeListener() {
+        fullTextSearch = new FullTextSearch(txtSearchParameter.getText(),
+                chkCaseSensitive.isSelected(),
+                searchGeometry);
+        fullTextSearch.setValidClassesFromStrings(selectedSearchClasses);
 
-                    @Override
-                    public void propertyChange(final PropertyChangeEvent evt) {
-                        if (SwingWorker.StateValue.DONE == evt.getNewValue()) {
-                            try {
-                                if (((SwingWorker<Node[], Void>)evt.getSource()).get().length > 0) {
-                                    setVisible(false);
-                                    dispose();
-                                }
-                            } catch (InterruptedException ex) {
-                                LOG.warn(
-                                    "Something went wrong while trying to retrieve search results in order to close search dialog.",
-                                    ex);
-                            } catch (ExecutionException ex) {
-                                LOG.warn(
-                                    "Something went wrong while trying to retrieve search results in order to close search dialog.",
-                                    ex);
-                            }
-                        }
-                    }
-                });
-        }
+        CidsSearchExecutor.executeCidsSearchAndDisplayResults(fullTextSearch, new CloseDialogListener(this));
     } //GEN-LAST:event_btnSearchActionPerformed
 
     /**
@@ -417,6 +398,64 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
                         btnSearch.setEnabled(enableSearchButton);
                     }
                 });
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class CloseDialogListener implements PropertyChangeListener {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private JDialog searchDialog;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new CloseDialogListener object.
+         *
+         * @param  searchDialog  DOCUMENT ME!
+         */
+        public CloseDialogListener(final JDialog searchDialog) {
+            this.searchDialog = searchDialog;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void propertyChange(final PropertyChangeEvent evt) {
+            if ((evt.getSource() instanceof SwingWorker) && (SwingWorker.StateValue.DONE == evt.getNewValue())) {
+                Object result = null;
+
+                try {
+                    result = ((SwingWorker)evt.getSource()).get();
+                } catch (InterruptedException ex) {
+                    LOG.warn(
+                        "Something went wrong while trying to retrieve search results in order to close search dialog. It seems that the progress dialog was closed by the user.",
+                        ex);
+                } catch (ExecutionException ex) {
+                    LOG.error(
+                        "Something went wrong while trying to retrieve search results in order to close search dialog. The search couldn't be executed correctly.",
+                        ex);
+                    JOptionPane.showMessageDialog(
+                        SearchSearchTopicsDialog.this,
+                        NbBundle.getMessage(
+                            SearchSearchTopicsDialog.class,
+                            "SearchSearchTopicsDialog.CloseDialogListener.propertyChanged(PropertyChangeEvent).JOptionPane_anon.message"),
+                        NbBundle.getMessage(
+                            SearchSearchTopicsDialog.class,
+                            "SearchSearchTopicsDialog.CloseDialogListener.propertyChanged(PropertyChangeEvent).JOptionPane_anon.title"),
+                        JOptionPane.ERROR_MESSAGE);
+                }
+
+                if ((result instanceof Node[]) && (((Node[])result).length > 0)) {
+                    searchDialog.setVisible(false);
+                    searchDialog.dispose();
+                }
+            }
         }
     }
 }
