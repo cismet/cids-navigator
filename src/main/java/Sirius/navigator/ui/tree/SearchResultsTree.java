@@ -23,6 +23,8 @@ import Sirius.server.middleware.types.Node;
 import org.apache.log4j.Logger;
 
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +34,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
@@ -63,6 +64,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private boolean syncWithMap = false;
     private boolean ascending = true;
     private final WaitTreeNode waitTreeNode = new WaitTreeNode();
+    private MouseAdapter cancelRefreshingListener;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -88,6 +90,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         defaultTreeModel.setAsksAllowsChildren(true);
         this.defaultTreeModel.setAsksAllowsChildren(true);
+        cancelRefreshingListener = new CancelRefreshingListener();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -211,6 +214,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 public void run() {
                     rootNode.removeAllChildren();
                     rootNode.add(waitTreeNode);
+                    addMouseListener(cancelRefreshingListener);
                     defaultTreeModel.nodeStructureChanged(rootNode);
                     refreshWorker = new RefreshTreeWorker(initialFill);
                     CismetThreadPool.execute(refreshWorker);
@@ -496,6 +500,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         @Override
         protected void done() {
+            SearchResultsTree.this.removeMouseListener(cancelRefreshingListener);
+
             if (isCancelled()) {
                 comparator.cancel();
             }
@@ -522,6 +528,27 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 syncWithMap();
                 checkForDynamicNodes();
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class CancelRefreshingListener extends MouseAdapter {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void mousePressed(final MouseEvent e) {
+            if ((e.getButton() != MouseEvent.BUTTON1) || (e.getClickCount() != 2)) {
+                return;
+            }
+
+            refreshWorker.cancel(true);
+            rootNode.removeAllChildren();
+            defaultTreeModel.nodeStructureChanged(rootNode);
         }
     }
 }
