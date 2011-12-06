@@ -32,30 +32,38 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
 
     //~ Instance fields --------------------------------------------------------
 
-    private boolean ascending = true;
+    private boolean ascending;
+    private boolean cancelled = false;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DirectedMetaObjectNodeComparator object.
+     *
+     * @param  ascending  Sort ascending?
+     */
+    public DirectedMetaObjectNodeComparator(final boolean ascending) {
+        this.ascending = ascending;
+    }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * Returns a flag indicating whether sort order is ascending.
-     *
-     * @return  Sort order flag.
+     * Since compare() connects to the server, the comparison is time consuming. Once called, Arrays.sort() invokes
+     * compare() for every array entry, even if the user cancelled the SwingWorker which called Arrays.sort(). To reduce
+     * resource consumption this method sets a flag which tells the comparator to abort the comparison. This is done by
+     * returning a default value for every unsorted entry.
      */
-    public boolean isAscending() {
-        return ascending;
-    }
-
-    /**
-     * Sets whether to sort ascending (<code>true</code>) or descending (<code>false</code>).
-     *
-     * @param  ascending  A flag indicating sort order.
-     */
-    public void setAscending(final boolean ascending) {
-        this.ascending = ascending;
+    public void cancel() {
+        cancelled = true;
     }
 
     @Override
     public int compare(final Node o1, final Node o2) {
+        if (cancelled) {
+            return 0;
+        }
+
         if (!(o1 instanceof MetaObjectNode) || !(o2 instanceof MetaObjectNode)) {
             return 0;
         }

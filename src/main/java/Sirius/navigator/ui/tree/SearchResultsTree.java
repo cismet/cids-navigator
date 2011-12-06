@@ -23,6 +23,8 @@ import Sirius.server.middleware.types.Node;
 import org.apache.log4j.Logger;
 
 import java.awt.EventQueue;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,7 +34,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
@@ -61,8 +62,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private Thread runningNameLoader = null;
     private SwingWorker<Void, Void> refreshWorker;
     private boolean syncWithMap = false;
-    private DirectedMetaObjectNodeComparator comparator;
+    private boolean ascending = true;
     private final WaitTreeNode waitTreeNode = new WaitTreeNode();
+    private MouseAdapter cancelRefreshingListener;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -88,7 +90,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         defaultTreeModel.setAsksAllowsChildren(true);
         this.defaultTreeModel.setAsksAllowsChildren(true);
-        this.comparator = new DirectedMetaObjectNodeComparator();
+        cancelRefreshingListener = new CancelRefreshingListener();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -161,7 +163,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void setResultNodes(final Node[] nodes, final boolean append) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Appending " + nodes.length + " nodes"); // NOI18N
+            LOG.info("[SearchResultsTree] " + (append ? "appending" : "setting") + " '" + nodes.length + "' nodes"); // NOI18N
         }
 
         if ((append == true) && ((nodes == null) || (nodes.length < 1))) {
@@ -214,6 +216,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 public void run() {
                     rootNode.removeAllChildren();
                     rootNode.add(waitTreeNode);
+                    addMouseListener(cancelRefreshingListener);
                     defaultTreeModel.nodeStructureChanged(rootNode);
                     refreshWorker = new RefreshTreeWorker(initialFill);
                     CismetThreadPool.execute(refreshWorker);
@@ -455,7 +458,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @param  ascending  Whether to sort ascending (<code>true</code>) or descending (<code>false</code>).
      */
     public void sort(final boolean ascending) {
-        comparator.setAscending(ascending);
+        this.ascending = ascending;
         refreshTree(false);
     }
 
@@ -472,6 +475,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         //~ Instance fields ----------------------------------------------------
 
         private boolean initialFill = false;
+        private DirectedMetaObjectNodeComparator comparator;
 
         //~ Constructors -------------------------------------------------------
 
@@ -482,6 +486,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
          */
         public RefreshTreeWorker(final boolean initialFill) {
             this.initialFill = initialFill;
+            comparator = new DirectedMetaObjectNodeComparator(ascending);
         }
 
         //~ Methods ------------------------------------------------------------
@@ -512,6 +517,12 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         @Override
         protected void done() {
+            SearchResultsTree.this.removeMouseListener(cancelRefreshingListener);
+
+            if (isCancelled()) {
+                comparator.cancel();
+            }
+
             try {
                 if (!isCancelled()) {
                     get();
@@ -522,6 +533,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 LOG.error("Error occured while refreshing search results tree", ex);
             }
 
+            if (!isCancelled()) {
+                rootNode.removeAllChildren();
+                rootNode.addChildren(resultNodes);
+            }
+
             SearchResultsTree.this.firePropertyChange("browse", 0, 1); // NOI18N
             defaultTreeModel.nodeStructureChanged(rootNode);
 
@@ -529,6 +545,27 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 syncWithMap();
                 checkForDynamicNodes();
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class CancelRefreshingListener extends MouseAdapter {
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void mousePressed(final MouseEvent e) {
+            if ((e.getButton() != MouseEvent.BUTTON1) || (e.getClickCount() != 2)) {
+                return;
+            }
+
+            refreshWorker.cancel(true);
+            rootNode.removeAllChildren();
+            defaultTreeModel.nodeStructureChanged(rootNode);
         }
     }
 }
