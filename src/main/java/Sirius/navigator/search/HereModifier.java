@@ -7,6 +7,10 @@
 ****************************************************/
 package Sirius.navigator.search;
 
+import org.openide.util.NbBundle;
+
+import java.util.MissingResourceException;
+
 import de.cismet.cids.tools.search.clientstuff.Modifier;
 
 /**
@@ -22,11 +26,25 @@ public class HereModifier extends Modifier {
 
     @Override
     public String getCommand() {
-        return "here";
+        String command = "hier";
+
+        try {
+            command = NbBundle.getMessage(HereModifier.class, "HereModifier.command");
+        } catch (MissingResourceException e) {
+        }
+
+        return command;
     }
 
     @Override
     public String getHint() {
-        return "Sucht im aktuellen cismap-Ausschnitt";
+        String hint = "Sucht im aktuellen cismap-Ausschnitt";
+
+        try {
+            hint = NbBundle.getMessage(HereModifier.class, "HereModifier.hint");
+        } catch (MissingResourceException e) {
+        }
+
+        return hint;
     }
 }

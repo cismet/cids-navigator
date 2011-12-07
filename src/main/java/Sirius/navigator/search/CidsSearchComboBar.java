@@ -28,6 +28,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -37,8 +38,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
 import java.beans.PropertyChangeEvent;
@@ -47,6 +46,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +56,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -68,6 +69,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.text.BadLocationException;
 
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.Modifier;
@@ -90,11 +92,11 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
     private static final String CONF_ROOT = "metaSearch";
     private static final String CONF_HISTORY = "history";
+    private static final String CONF_HISTORY_ATTR_MAXSIZE = "size";
     private static final String CONF_HISTORY_ITEM = "historyItem";
 
     private static final String POPUPMENUITEM_SEARCH = "search";
     private static final String SEPARATOR_MODIFIER = "#";
-    private static final String SEPARATOR_MODIFIER_OPTION = ":";
 
     private static final ImageIcon ICON_BTNSEARCH = new ImageIcon(CidsSearchComboBar.class.getResource(
                 "/Sirius/navigator/search/btnSearch.png"));
@@ -104,6 +106,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 "/Sirius/navigator/search/lblSearchTopic.png"));
     private static final ImageIcon ICON_LBLSEARCHTOPIC_OVERLAY = new ImageIcon(CidsSearchComboBar.class.getResource(
                 "/Sirius/navigator/search/lblSearchTopic_overlay.png"));
+    private static int maxHistorySize = 10;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -286,7 +289,13 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
         }
 
         this.history.clear();
-        this.history.addAll(history);
+
+        final Iterator<? extends String> historyIter = history.iterator();
+        int i = 0;
+        while (historyIter.hasNext() && (i < maxHistorySize)) {
+            this.history.add(historyIter.next());
+            i++;
+        }
     }
 
     /**
@@ -296,6 +305,9 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      */
     public void addHistoryItem(final String historyItem) {
         if (!history.contains(historyItem)) {
+            if (history.size() == maxHistorySize) {
+                history.remove(0);
+            }
             history.add(historyItem);
 
             if (LOG.isDebugEnabled()) {
@@ -417,13 +429,6 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                 @Override
                 public void run() {
-//                    if (cbbInputEditorComponent == null) {
-//                        // TODO: May happen if there was not enough time between the constructor call (initilizing
-//                        // cbbInputEditorComponent in a thread) and calls to setSearches().
-//
-//                        return;
-//                    }
-
                     final String currentInput = cbbInputEditorComponent.getText();
                     final boolean isCurrentInputAHint = (currentInput != null)
                                 && ((currentInput.trim().length() == 0) || searchHints.contains(currentInput));
@@ -443,10 +448,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 }
             };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             setShowHint.run();
         } else {
-            SwingUtilities.invokeLater(setShowHint);
+            EventQueue.invokeLater(setShowHint);
         }
     }
 
@@ -497,7 +502,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 selectedSearch = (CidsToolbarSearch)search;
             }
 
-            SwingUtilities.invokeLater(new Runnable() {
+            EventQueue.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
@@ -545,6 +550,40 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
     @Override
     public void masterConfigure(final Element parent) {
+        if (parent == null) {
+            LOG.info(
+                "There is no server configuration for CidsSearchComboBar. The maximum size of the history is set to '"
+                        + CidsSearchComboBar.maxHistorySize
+                        + "'.");
+            return;
+        }
+
+        final Element metaSearch = parent.getChild(CONF_ROOT);
+        if (metaSearch == null) {
+            LOG.info(
+                "There is no server configuration for CidsSearchComboBar. The maximum size of the history is set to '"
+                        + CidsSearchComboBar.maxHistorySize
+                        + "'.");
+            return;
+        }
+
+        final Element history = metaSearch.getChild(CONF_HISTORY);
+        if (history == null) {
+            LOG.info(
+                "There is no history configuration given in the server configuration of CidsSearchComboBar. The maximum size of the history is set to '"
+                        + CidsSearchComboBar.maxHistorySize
+                        + "'.");
+            return;
+        }
+
+        final String maxHistorySize = history.getAttributeValue(CONF_HISTORY_ATTR_MAXSIZE);
+        try {
+            CidsSearchComboBar.maxHistorySize = Integer.parseInt(maxHistorySize);
+        } catch (NumberFormatException e) {
+            LOG.error("Could not parse given maximum size of history ('" + maxHistorySize
+                        + "'). This value has to be an integer. The maximum size of the history is set to '"
+                        + CidsSearchComboBar.maxHistorySize + "'.");
+        }
     }
 
     @Override
@@ -612,7 +651,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
         result.setBorder(BorderFactory.createEmptyBorder());
         result.addActionListener(actionListener);
 
-        SwingUtilities.invokeLater(new Runnable() {
+        EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
@@ -624,6 +663,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                     cbbInputEditorComponent = (JTextField)result.getEditor().getEditorComponent();
                     cbbInputEditorComponent.addFocusListener(new SearchHintListener());
                     cbbInputEditorComponent.getDocument().addDocumentListener(new SyntaxHintListener());
+
+                    // For an explanation why we catch this low-level event additionally to the higher-level event
+                    // please see the notice in the JavaDoc of PerformSearchListener.
+                    cbbInputEditorComponent.addActionListener(actionListener);
 
                     origForeground = cbbInputEditorComponent.getForeground();
                 }
@@ -652,10 +695,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 }
             };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             displaySearchMode.run();
         } else {
-            SwingUtilities.invokeLater(displaySearchMode);
+            EventQueue.invokeLater(displaySearchMode);
         }
     }
 
@@ -680,10 +723,10 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                 }
             };
 
-        if (SwingUtilities.isEventDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             displaySearchMode.run();
         } else {
-            SwingUtilities.invokeLater(displaySearchMode);
+            EventQueue.invokeLater(displaySearchMode);
         }
     }
 
@@ -1065,38 +1108,32 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
      *
      * @version  $Revision$, $Date$
      */
-    private class SyntaxHintListener implements DocumentListener {
+    private class SyntaxHintListener implements DocumentListener, ActionListener {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final String POPUPMENUITEM_SYNTAXHINT = "syntaxHint";
 
         //~ Instance fields ----------------------------------------------------
 
-        private boolean areSyntaxHintsShown = false;
-        private Collection<String> syntaxHints;
-        private Collection<String> originalHistory;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new SyntaxHintListener object.
-         */
-        public SyntaxHintListener() {
-            syntaxHints = new LinkedList<String>();
-            originalHistory = new LinkedList<String>();
-
-            for (final Modifier modifier : modifiers) {
-                syntaxHints.add(SEPARATOR_MODIFIER + modifier.getCommand() + " - " + modifier.getHint());
-            }
-        }
+        private int offset;
 
         //~ Methods ------------------------------------------------------------
 
         @Override
         public void insertUpdate(final DocumentEvent e) {
-            switchAutocompleteList();
+            offset = e.getOffset();
+            try {
+                if ((e.getLength() == 1) && e.getDocument().getText(offset, 1).equals(SEPARATOR_MODIFIER)) {
+                    showSyntaxHintsPopup();
+                }
+            } catch (BadLocationException ex) {
+                LOG.error("Could not determine which text was inserted.", ex);
+            }
         }
 
         @Override
         public void removeUpdate(final DocumentEvent e) {
-            switchAutocompleteList();
         }
 
         @Override
@@ -1106,82 +1143,54 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
         /**
          * DOCUMENT ME!
          */
-        private void switchAutocompleteList() {
-            SwingUtilities.invokeLater(new Runnable() {
+        private void showSyntaxHintsPopup() {
+            final JPopupMenu popupMenu = new JPopupMenu();
+
+            for (final Modifier modifier : modifiers) {
+                final JMenuItem item = new JMenuItem(modifier.getCommand());
+                item.setToolTipText(modifier.getHint());
+                item.putClientProperty(POPUPMENUITEM_SYNTAXHINT, modifier);
+                item.addActionListener(this);
+                popupMenu.add(item);
+            }
+
+            final Runnable showPopup = new Runnable() {
 
                     @Override
                     public void run() {
-                        final String modifier = getCurrentModifier(cbbInputEditorComponent);
-
-                        if (LOG.isDebugEnabled()) {
-                            LOG.debug(
-                                "Current modifier: "
-                                        + modifier
-                                        + ", areSyntaxHintsShown? "
-                                        + areSyntaxHintsShown);
-                        }
-
-                        if ((modifier == null) && areSyntaxHintsShown) {
-                            history.clear();
-                            history.addAll(originalHistory);
-                            areSyntaxHintsShown = false;
-
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("Switched to history");
-                            }
-                        } else if ((modifier != null) && !areSyntaxHintsShown) {
-                            originalHistory.clear();
-                            originalHistory.addAll(history);
-                            history.clear();
-                            history.addAll(syntaxHints);
-                            supportInput.getComboBox().showPopup();
-                            areSyntaxHintsShown = true;
-
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("Switched to syntax hints");
-                            }
-                        }
+                        popupMenu.show(cbbInput, 0, cbbInput.getHeight() - 1);
                     }
-                });
+                };
+
+            EventQueue.invokeLater(showPopup);
         }
 
-        /**
-         * DOCUMENT ME!
-         *
-         * @param   textfield  DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        private String getCurrentModifier(final JTextField textfield) {
-            final String input = textfield.getText();
-
-            int caretPosition = textfield.getCaretPosition();
-            // By using CTRL-A and DEL the user can provoke situations in which the creatPosition
-            // is not in input's range becuse it is not yet updated.
-            if (caretPosition > input.length()) {
-                caretPosition = input.length();
+        @Override
+        public void actionPerformed(final ActionEvent e) {
+            if (!(e.getSource() instanceof JMenuItem)) {
+                return;
             }
 
-            int preceedingSpacePosition = input.substring(0, caretPosition).lastIndexOf(" ");
-            int succeedingSpacePosition = input.indexOf(" ", caretPosition);
-
-            // In case of -1, compute the result by substringing from position 0 on.
-            // In every other case, don't include the found space in computing the result.
-            preceedingSpacePosition++;
-
-            if (succeedingSpacePosition == -1) {
-                succeedingSpacePosition = input.length();
-            } else if (succeedingSpacePosition == caretPosition) {
-                // User just entered a space
-                return null;
+            final JMenuItem item = (JMenuItem)e.getSource();
+            if (!(item.getClientProperty(POPUPMENUITEM_SYNTAXHINT) instanceof Modifier)) {
+                return;
             }
 
-            String result = input.substring(preceedingSpacePosition, succeedingSpacePosition);
-            if (!result.startsWith(SEPARATOR_MODIFIER)) {
-                result = null;
+            final Modifier modifier = (Modifier)item.getClientProperty(POPUPMENUITEM_SYNTAXHINT);
+            try {
+                cbbInputEditorComponent.getDocument().insertString(offset + 1, modifier.getCommand(), null);
+            } catch (BadLocationException ex) {
+                LOG.error("Could not insert the selected modifier.", ex);
             }
 
-            return result;
+            EventQueue.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        cbbInputEditorComponent.requestFocus();
+                        cbbInputEditorComponent.setCaretPosition(offset + modifier.getCommand().length());
+                    }
+                });
         }
     }
 
@@ -1206,22 +1215,41 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     }
 
     /**
-     * DOCUMENT ME!
+     * This listener listens to all events that could start a search. At the moment it listens to ActionEvents fired by
+     * the search button or by the JTextField that is contained in the input UI element.
+     *
+     * <p>Notice: Listening only for ActionEvents fired by the input UI element (a JComboBox) would not work, since
+     * JComboBox fires ActionEvents if it loses focus and contains a value that is not in the ComboBoxModel (aka the
+     * history). Listening only to ActionEvents fired by the JTextField would not work, too. Under certain circumstances
+     * (especially if there is a modifier in the input) this blocks the JTextField in a way that the user can't enter
+     * something until he opened and closed the history. It's not clear why exactly this happens, but it maybe caused by
+     * the fact that one should not use the low-level events of a JComboBox or it is caused by some glitch in
+     * GlazedLists. The workaround for those limitations is to listen for both ActionEvents. The low-level event
+     * (JTextField) will be fired before the higher-level event (JComboBox). So we save the time of the last low-level
+     * event and only start a search if the higher-level event is fired within a certain time frame. We think 500ms
+     * should be enough for both events to be fired and not mix up with an ActionEvent fired by loosing the focus.</p>
      *
      * @version  $Revision$, $Date$
      */
     private class PerformSearchListener implements ActionListener {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private long lastTextfieldEvent = 0L;
 
         //~ Methods ------------------------------------------------------------
 
         @Override
         public void actionPerformed(final ActionEvent e) {
             final Object source = e.getSource();
-
             if ((source instanceof JComboBox) && source.equals(cbbInput)) {
-                if ("comboBoxEdited".equals(e.getActionCommand()) && !isSearchRunning()) {
+                if ("comboBoxEdited".equals(e.getActionCommand()) && !isSearchRunning()
+                            && ((e.getWhen() - lastTextfieldEvent) < 500)) {
                     parseInputAndPerformSearch();
                 }
+            }
+            if ((source instanceof JTextField) && source.equals(cbbInputEditorComponent)) {
+                lastTextfieldEvent = e.getWhen();
             } else if ((source instanceof JButton) && source.equals(btnSearch)) {
                 if (isSearchRunning()) {
                     cancelRunningSearch();
