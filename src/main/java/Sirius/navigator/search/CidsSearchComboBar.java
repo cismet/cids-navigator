@@ -659,6 +659,8 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
                             result,
                             history);
                     supportInput.setFilterMode(TextMatcherEditor.CONTAINS);
+                    supportInput.setCorrectsCase(false);
+                    supportInput.setSelectsTextOnFocusGain(false);
 
                     cbbInputEditorComponent = (JTextField)result.getEditor().getEditorComponent();
                     cbbInputEditorComponent.addFocusListener(new SearchHintListener());
@@ -1158,7 +1160,7 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
 
                     @Override
                     public void run() {
-                        popupMenu.show(cbbInput, 0, cbbInput.getHeight() - 1);
+                        popupMenu.show(cbbInput, 0, cbbInput.getHeight());
                     }
                 };
 
