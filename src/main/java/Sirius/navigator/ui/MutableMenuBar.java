@@ -45,6 +45,7 @@ import Sirius.navigator.exception.*;
 //import Sirius.navigator.types.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.resource.*;
+import Sirius.navigator.search.dynamic.SearchSearchTopicsDialogAction;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.dialog.*;
 import Sirius.navigator.ui.embedded.*;
@@ -327,14 +328,24 @@ public class MutableMenuBar extends JMenuBar {
             menu.add(item = new JMenuItem(
                         org.openide.util.NbBundle.getMessage(
                             MutableMenuBar.class,
-                            "MutableMenuBar.searchMenu.search.title")));     // NOI18N
+                            "MutableMenuBar.searchMenu.search.title")));          // NOI18N
             item.setMnemonic(org.openide.util.NbBundle.getMessage(
                     MutableMenuBar.class,
-                    "MutableMenuBar.searchMenu.search.mnemonic").charAt(0)); // NOI18N
-            item.setIcon(resources.getIcon("find16.gif"));                   // NOI18N
-            item.setAccelerator(KeyStroke.getKeyStroke("alt S"));            // NOI18N
-            item.setActionCommand("search.search");                          // NOI18N
+                    "MutableMenuBar.searchMenu.search.mnemonic").charAt(0));      // NOI18N
+            item.setIcon(resources.getIcon("find16.gif"));                        // NOI18N
+            item.setAccelerator(KeyStroke.getKeyStroke("alt S"));                 // NOI18N
+            item.setActionCommand("search.search");                               // NOI18N
             item.addActionListener(itemListener);
+            menu.addSeparator();
+        } else {
+            menu.add(item = new JMenuItem(new SearchSearchTopicsDialogAction())); // NOI18N
+            item.setText(org.openide.util.NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.searchMenu.search.title"));
+            item.setMnemonic(org.openide.util.NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.searchMenu.search.mnemonic").charAt(0));      // NOI18N
+            item.setAccelerator(KeyStroke.getKeyStroke("alt S"));                 // NOI18N
             menu.addSeparator();
         }
         // show search results .................................................
