@@ -471,6 +471,15 @@ public class SearchResultsTree extends MetaCatalogueTree {
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public SwingWorker getNodeLoadingWorker() {
+        return refreshWorker;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
