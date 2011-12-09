@@ -460,6 +460,17 @@ public class SearchResultsTree extends MetaCatalogueTree {
         refreshTree(false);
     }
 
+    /**
+     * DOCUMENT ME!
+     */
+    public void cancelNodeLoading() {
+        if ((refreshWorker != null) && !refreshWorker.isDone()) {
+            refreshWorker.cancel(true);
+            rootNode.removeAllChildren();
+            defaultTreeModel.nodeStructureChanged(rootNode);
+        }
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -545,10 +556,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             if ((e.getButton() != MouseEvent.BUTTON1) || (e.getClickCount() != 2)) {
                 return;
             }
-
-            refreshWorker.cancel(true);
-            rootNode.removeAllChildren();
-            defaultTreeModel.nodeStructureChanged(rootNode);
+            cancelNodeLoading();
         }
     }
 }
