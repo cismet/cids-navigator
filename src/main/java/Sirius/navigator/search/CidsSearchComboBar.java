@@ -7,6 +7,7 @@
 ****************************************************/
 package Sirius.navigator.search;
 
+import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.builtin.FullTextSearch;
 
@@ -809,7 +810,8 @@ public class CidsSearchComboBar extends JPanel implements ActionListener, Config
     private void cancelRunningSearch() {
         if (isSearchRunning()) {
             searchThread.cancel(true);
-            displayNormalMode();
+            ComponentRegistry.getRegistry().getSearchResultsTree().cancelNodeLoading();
+//            displayNormalMode();
         }
     }
 

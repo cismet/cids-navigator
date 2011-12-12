@@ -39,6 +39,7 @@ import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.tools.CismetThreadPool;
+import java.beans.PropertyChangeListener;
 
 /**
  * Der SearchTree dient zum Anzeigen von Suchergebnissen. Neben der Funktionalit\u00E4t, die er von GenericMetaTree
@@ -102,7 +103,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void setResultNodes(final Node[] nodes) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Displaying " + nodes.length + " nodes"); // NOI18N
+            LOG.info("Displaying " + nodes.length + " nodes");
         }
 
         if ((nodes == null) || (nodes.length < 1)) {
@@ -149,21 +150,21 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                 MetaTreeNodeVisualization.getInstance().addVisualization(v);
             } catch (Throwable t) {
-                LOG.warn("Error occurred while synchronising the search results with cismap", t); // NOI18N
+                LOG.warn("Error occurred while synchronising the search results with cismap", t);
             }
         }
     }
 
     /**
      * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.<br>
-     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt werden
+     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt werden.
      *
      * @param  nodes   Ergebnisse, die im SearchTree angezeigt werden sollen.
      * @param  append  Ergebnisse anhaengen.
      */
     public void setResultNodes(final Node[] nodes, final boolean append) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("[SearchResultsTree] " + (append ? "appending" : "setting") + " '" + nodes.length + "' nodes"); // NOI18N
+            LOG.info((append ? "Appending" : "Setting") + " '" + nodes.length + "' nodes"); // NOI18N
         }
 
         if ((append == true) && ((nodes == null) || (nodes.length < 1))) {
@@ -205,19 +206,19 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     private void refreshTree(final boolean initialFill) {
         if ((refreshWorker != null) && !refreshWorker.isDone()) {
-            LOG.warn(
-                "Refreshing search result tree is triggered while another refresh process is still not done. Trying to cancel the first one.");
+            LOG.warn("Refreshing search result tree is triggered while another refresh process is still not done.");
             refreshWorker.cancel(true);
         }
-
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
                     rootNode.removeAllChildren();
                     rootNode.add(waitTreeNode);
+                    
                     addMouseListener(cancelRefreshingListener);
                     defaultTreeModel.nodeStructureChanged(rootNode);
+                    
                     refreshWorker = new RefreshTreeWorker(initialFill);
                     CismetThreadPool.execute(refreshWorker);
                 }
@@ -314,7 +315,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public boolean removeResultNodes(final DefaultMetaTreeNode[] selectedNodes) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Removing " + selectedNodes.length + " nodes"); // NOI18N
+            LOG.info("Removing " + selectedNodes.length + " nodes");
         }
         boolean deleted = false;
 
@@ -362,7 +363,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public boolean removeResultNodes(final Collection selectedNodes) {
         if (LOG.isInfoEnabled()) {
-            LOG.info("Removing " + selectedNodes.size() + " nodes"); // NOI18N
+            LOG.info("Removing " + selectedNodes.size() + " nodes");
         }
         boolean deleted = false;
         try {
@@ -416,11 +417,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * Setzt den SearchTree komplett zurueck und entfernt alle Knoten.
      */
     public void clear() {
-        LOG.info("Removing all nodes");     // NOI18N
+        LOG.info("Removing all nodes");
         resultNodes = null;
         empty = true;
         rootNode.removeAllChildren();
-        firePropertyChange("browse", 0, 1); // NOI18N
+        firePropertyChange("browse", 0, 1);
         defaultTreeModel.nodeStructureChanged(rootNode);
         System.gc();
     }
@@ -462,6 +463,26 @@ public class SearchResultsTree extends MetaCatalogueTree {
         refreshTree(false);
     }
 
+    /**
+     * DOCUMENT ME!
+     */
+    public void cancelNodeLoading() {
+        if ((refreshWorker != null) && !refreshWorker.isDone()) {
+            refreshWorker.cancel(true);
+            rootNode.removeAllChildren();
+            defaultTreeModel.nodeStructureChanged(rootNode);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public SwingWorker getNodeLoadingWorker() {
+        return refreshWorker;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -493,23 +514,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         @Override
         protected Void doInBackground() throws Exception {
-            if (isCancelled()) {
-                return null;
-            }
-
-            Arrays.sort(resultNodes, comparator);
-
-            if (isCancelled()) {
-                return null;
-            }
-            rootNode.removeAllChildren();
-
             if (!isCancelled()) {
-                try {
-                    rootNode.addChildren(resultNodes);
-                } catch (Exception exp) {
-                    LOG.warn("Error occurred while adding new nodes", exp); // NOI18N
-                }
+                Arrays.sort(resultNodes, comparator);
             }
 
             return null;
@@ -562,10 +568,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             if ((e.getButton() != MouseEvent.BUTTON1) || (e.getClickCount() != 2)) {
                 return;
             }
-
-            refreshWorker.cancel(true);
-            rootNode.removeAllChildren();
-            defaultTreeModel.nodeStructureChanged(rootNode);
+            cancelNodeLoading();
         }
     }
 }
