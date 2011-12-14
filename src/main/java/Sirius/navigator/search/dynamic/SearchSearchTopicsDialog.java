@@ -12,31 +12,21 @@
  */
 package Sirius.navigator.search.dynamic;
 
-import Sirius.navigator.search.CidsSearchExecutor;
-
 import Sirius.server.middleware.types.Node;
+import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.builtin.FullTextSearch;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.NbBundle;
-
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import java.util.Collection;
-import java.util.concurrent.ExecutionException;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.SwingWorker;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -51,14 +41,19 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
  * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class SearchSearchTopicsDialog extends javax.swing.JDialog {
+public class SearchSearchTopicsDialog extends javax.swing.JDialog implements SearchControlListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(SearchSearchTopicsDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private SearchControlPanel pnlSearchCancel;
+    private boolean searchRunning = false;
+//    private SwingWorker searchThread;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
-    private javax.swing.JButton btnSearch;
     private javax.swing.JCheckBox chkCaseSensitive;
     private javax.swing.JCheckBox chkHere;
     private javax.swing.Box.Filler gluBottom;
@@ -85,6 +80,12 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
         super(parent, modal);
 
         initComponents();
+
+        pnlSearchCancel = new SearchControlPanel(this);
+        pnlSearchCancel.setEnabled(false);
+        pnlButtons.remove(btnClose);
+        pnlButtons.add(pnlSearchCancel);
+        pnlButtons.add(btnClose);
 
         final EnableSearchListener listener = new EnableSearchListener();
         pnlSearchTopics.setSearchTopics(MetaSearch.instance().getSearchTopics());
@@ -113,7 +114,6 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
 
         lblSearchParameter = new javax.swing.JLabel();
         pnlButtons = new javax.swing.JPanel();
-        btnSearch = new javax.swing.JButton();
         btnClose = new javax.swing.JButton();
         chkCaseSensitive = new javax.swing.JCheckBox();
         sepButtons = new javax.swing.JSeparator();
@@ -132,12 +132,19 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 32767));
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(
                 SearchSearchTopicsDialog.class,
                 "SearchSearchTopicsDialog.title")); // NOI18N
         setMinimumSize(new java.awt.Dimension(500, 300));
         setModal(true);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+
+                @Override
+                public void windowClosing(final java.awt.event.WindowEvent evt) {
+                    formWindowClosing(evt);
+                }
+            });
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
         lblSearchParameter.setText(org.openide.util.NbBundle.getMessage(
@@ -153,22 +160,12 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
 
         pnlButtons.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT, 5, 0));
 
-        btnSearch.setText(org.openide.util.NbBundle.getMessage(
-                SearchSearchTopicsDialog.class,
-                "SearchSearchTopicsDialog.btnSearch.text")); // NOI18N
-        btnSearch.setEnabled(false);
-        btnSearch.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnSearchActionPerformed(evt);
-                }
-            });
-        pnlButtons.add(btnSearch);
-
         btnClose.setText(org.openide.util.NbBundle.getMessage(
                 SearchSearchTopicsDialog.class,
                 "SearchSearchTopicsDialog.btnClose.text")); // NOI18N
+        btnClose.setMaximumSize(new java.awt.Dimension(100, 25));
+        btnClose.setMinimumSize(new java.awt.Dimension(59, 25));
+        btnClose.setPreferredSize(new java.awt.Dimension(100, 25));
         btnClose.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -288,7 +285,63 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchActionPerformed
+    private void chkHereItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_chkHereItemStateChanged
+        txtSearchParameter.setEnabled(evt.getStateChange() != ItemEvent.SELECTED);
+    }                                                                          //GEN-LAST:event_chkHereItemStateChanged
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void txtSearchParameterActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSearchParameterActionPerformed
+        // Avoid invalid input.
+        if (pnlSearchCancel.isEnabled()) {
+            pnlSearchCancel.startSearch();
+        }
+    } //GEN-LAST:event_txtSearchParameterActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+        setVisible(false);
+        dispose();
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
+        if (!searchRunning) {
+            setVisible(false);
+            dispose();
+        }
+    }                                                                      //GEN-LAST:event_formWindowClosing
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void switchControls() {
+        if (searchRunning) {
+            btnClose.setEnabled(false);
+            txtSearchParameter.setEnabled(false);
+            chkCaseSensitive.setEnabled(false);
+            chkHere.setEnabled(false);
+        } else {
+            btnClose.setEnabled(true);
+            txtSearchParameter.setEnabled(true);
+            chkCaseSensitive.setEnabled(true);
+            chkHere.setEnabled(true);
+        }
+    }
+
+    @Override
+    public CidsServerSearch assembleSearch() {
         final Collection<String> selectedSearchClasses = MetaSearch.instance().getSelectedSearchClassesForQuery();
 
         LOG.info("Starting search for '" + txtSearchParameter.getText() + "' in '" + selectedSearchClasses
@@ -313,39 +366,36 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
                 searchGeometry);
         fullTextSearch.setValidClassesFromStrings(selectedSearchClasses);
 
-        CidsSearchExecutor.executeCidsSearchAndDisplayResults(fullTextSearch, new CloseDialogListener(this));
-    } //GEN-LAST:event_btnSearchActionPerformed
+        return fullTextSearch;
+    }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
-        setVisible(false);
-        dispose();
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    @Override
+    public void searchStarted() {
+        searchRunning = true;
+        switchControls();
+    }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void chkHereItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_chkHereItemStateChanged
-        txtSearchParameter.setEnabled(evt.getStateChange() != ItemEvent.SELECTED);
-    }                                                                          //GEN-LAST:event_chkHereItemStateChanged
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void txtSearchParameterActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSearchParameterActionPerformed
-        // Avoid invalid input.
-        if (btnSearch.isEnabled()) {
-            btnSearchActionPerformed(evt);
+    @Override
+    public void searchDone(final Node[] result) {
+        if (result.length > 0) {
+            setVisible(false);
+            dispose();
+        } else {
+            searchRunning = false;
+            switchControls();
         }
-    } //GEN-LAST:event_txtSearchParameterActionPerformed
+    }
+
+    @Override
+    public void searchCancelled() {
+        searchRunning = false;
+        switchControls();
+    }
+
+    @Override
+    public boolean displaysEmptyResultMessage() {
+        return true;
+    }
 
     //~ Inner Classes ----------------------------------------------------------
 
@@ -395,67 +445,9 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog {
                                         && (txtSearchParameter.getText().trim().length() > 0);
                         }
                         enableSearchButton &= MetaSearch.instance().getSelectedSearchTopics().size() > 0;
-                        btnSearch.setEnabled(enableSearchButton);
+                        pnlSearchCancel.setEnabled(enableSearchButton);
                     }
                 });
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private class CloseDialogListener implements PropertyChangeListener {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private JDialog searchDialog;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new CloseDialogListener object.
-         *
-         * @param  searchDialog  DOCUMENT ME!
-         */
-        public CloseDialogListener(final JDialog searchDialog) {
-            this.searchDialog = searchDialog;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void propertyChange(final PropertyChangeEvent evt) {
-            if ((evt.getSource() instanceof SwingWorker) && (SwingWorker.StateValue.DONE == evt.getNewValue())) {
-                Object result = null;
-
-                try {
-                    result = ((SwingWorker)evt.getSource()).get();
-                } catch (InterruptedException ex) {
-                    LOG.warn(
-                        "Something went wrong while trying to retrieve search results in order to close search dialog. It seems that the progress dialog was closed by the user.",
-                        ex);
-                } catch (ExecutionException ex) {
-                    LOG.error(
-                        "Something went wrong while trying to retrieve search results in order to close search dialog. The search couldn't be executed correctly.",
-                        ex);
-                    JOptionPane.showMessageDialog(
-                        SearchSearchTopicsDialog.this,
-                        NbBundle.getMessage(
-                            SearchSearchTopicsDialog.class,
-                            "SearchSearchTopicsDialog.CloseDialogListener.propertyChanged(PropertyChangeEvent).JOptionPane_anon.message"),
-                        NbBundle.getMessage(
-                            SearchSearchTopicsDialog.class,
-                            "SearchSearchTopicsDialog.CloseDialogListener.propertyChanged(PropertyChangeEvent).JOptionPane_anon.title"),
-                        JOptionPane.ERROR_MESSAGE);
-                }
-
-                if ((result instanceof Node[]) && (((Node[])result).length > 0)) {
-                    searchDialog.setVisible(false);
-                    searchDialog.dispose();
-                }
-            }
         }
     }
 }

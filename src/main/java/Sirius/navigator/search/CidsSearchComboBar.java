@@ -436,12 +436,21 @@ public class CidsSearchComboBar extends javax.swing.JPanel implements ActionList
             startProgressAnimation();
             // TODO threading!
             currentSearch.setSearchParameter(searchString);
-            CidsSearchExecutor.executeCidsSearchAndDisplayResults(currentSearch.getServerSearch(),
+            CidsSearchExecutor.searchAndDisplayResultsWithDialog(currentSearch.getServerSearch(),
+                null,
                 new PropertyChangeListener() {
 
                     @Override
                     public void propertyChange(final PropertyChangeEvent evt) {
-                        if (SwingWorker.StateValue.DONE == evt.getNewValue()) {
+                        SwingWorker source = null;
+                        if (evt.getSource() instanceof SwingWorker) {
+                            source = (SwingWorker)evt.getSource();
+                        } else {
+                            return;
+                        }
+
+                        if ("state".equalsIgnoreCase(evt.getPropertyName())
+                                    && evt.getNewValue().equals(SwingWorker.StateValue.DONE)) {
                             stopProgressAnimation();
                         }
                     }

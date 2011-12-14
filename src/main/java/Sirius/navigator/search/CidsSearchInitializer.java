@@ -14,6 +14,8 @@ import Sirius.navigator.ui.MutableConstraints;
 import Sirius.navigator.ui.MutableMenuBar;
 import Sirius.navigator.ui.MutableToolBar;
 
+import org.apache.log4j.Logger;
+
 import org.openide.util.Lookup;
 
 import java.awt.FlowLayout;
@@ -43,6 +45,10 @@ import de.cismet.tools.StaticDebuggingTools;
  * @version  $Revision$, $Date$
  */
 public class CidsSearchInitializer {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger LOG = Logger.getLogger(CidsSearchInitializer.class);
 
     //~ Constructors -----------------------------------------------------------
 
@@ -100,7 +106,13 @@ public class CidsSearchInitializer {
         }
         // Window Searches
         if (!windowSearches.isEmpty()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Initializing " + windowSearches.size() + " window searches.");
+            }
             for (final CidsWindowSearch windowSearch : windowSearches) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Initializing window search '" + windowSearch.getName() + "'.");
+                }
                 if (checkActionTag(windowSearch)) {
                     final MutableConstraints mutableConstraints = new MutableConstraints();
                     final String name = windowSearch.getName();
@@ -112,6 +124,11 @@ public class CidsSearchInitializer {
                         MutableConstraints.P1,
                         MutableConstraints.ANY_INDEX);
                     guiContainer.add(mutableConstraints);
+                } else {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Could not initialize window search '" + windowSearch.getName()
+                                    + "' due to restricted permissions.");
+                    }
                 }
             }
         }

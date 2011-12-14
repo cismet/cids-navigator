@@ -31,6 +31,8 @@ import Sirius.server.newuser.permission.Permission;
 
 import org.apache.log4j.Logger;
 
+import java.beans.PropertyChangeListener;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -157,7 +159,7 @@ public class MethodManager {
                     selectedNodes[i] = selectedTreeNodes[i].getNode();
                 }
 
-                ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(selectedNodes, true);
+                ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(selectedNodes, true, null);
             } else {
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                     org.openide.util.NbBundle.getMessage(
@@ -307,8 +309,11 @@ public class MethodManager {
      *
      * @param  resultNodes  DOCUMENT ME!
      * @param  append       DOCUMENT ME!
+     * @param  listener     DOCUMENT ME!
      */
-    public void showSearchResults(final Node[] resultNodes, final boolean append) {
+    public void showSearchResults(final Node[] resultNodes,
+            final boolean append,
+            final PropertyChangeListener listener) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
             JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
                 org.openide.util.NbBundle.getMessage(
@@ -319,7 +324,7 @@ public class MethodManager {
                     "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
                 JOptionPane.WARNING_MESSAGE);
         } else {
-            ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(resultNodes, append);
+            ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(resultNodes, append, listener);
             this.showSearchResults();
         }
     }
