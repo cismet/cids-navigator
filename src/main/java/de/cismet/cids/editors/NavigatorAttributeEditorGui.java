@@ -270,7 +270,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 newNodes[index] = node;
             }
         }
-        ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(newNodes, false);
+        ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(newNodes, false, null);
     }
 
     /**

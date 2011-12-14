@@ -9,6 +9,7 @@ package Sirius.navigator.search;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.method.MethodManager;
+import Sirius.navigator.search.dynamic.SearchControlDialog;
 import Sirius.navigator.search.dynamic.SearchProgressDialog;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
@@ -50,24 +51,36 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
-     * @param   search  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
+     * @param  search  DOCUMENT ME!
      */
-    public static SwingWorker<Node[], Void> executeCidsSearchAndDisplayResults(final CidsServerSearch search) {
-        return executeCidsSearchAndDisplayResults(search, null);
+    public static void searchAndDisplayResultsWithDialog(final CidsServerSearch search) {
+        final SearchControlDialog dialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(),
+                true,
+                search);
+        dialog.pack();
+        dialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getNavigator());
+        EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    dialog.startSearch();
+                }
+            });
+        dialog.setVisible(true);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   search    DOCUMENT ME!
-     * @param   listener  DOCUMENT ME!
+     * @param   search                 DOCUMENT ME!
+     * @param   listener               DOCUMENT ME!
+     * @param   searchResultsListener  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public static SwingWorker<Node[], Void> executeCidsSearchAndDisplayResults(final CidsServerSearch search,
-            final PropertyChangeListener listener) {
+    public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final CidsServerSearch search,
+            final PropertyChangeListener listener,
+            final PropertyChangeListener searchResultsListener) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 PropertyChangeListener cancelListener = null;
@@ -105,7 +118,7 @@ public final class CidsSearchExecutor {
 
                         final Node[] ret = aln.toArray(new Node[0]);
                         if (!isCancelled()) {
-                            MethodManager.getManager().showSearchResults(ret, false);
+                            MethodManager.getManager().showSearchResults(ret, false, searchResultsListener);
                         }
                         return ret;
                     }
@@ -127,9 +140,8 @@ public final class CidsSearchExecutor {
                     dscs.removePropertyChangeListener(cancelListener);
                 }
             };
-        if (listener != null) {
-            worker.addPropertyChangeListener(listener);
-        }
+
+        worker.addPropertyChangeListener(listener);
 
         CismetThreadPool.execute(worker);
 
@@ -139,13 +151,17 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
-     * @param   search    DOCUMENT ME!
-     * @param   listener  DOCUMENT ME!
+     * @param   search                      DOCUMENT ME!
+     * @param   listener                    DOCUMENT ME!
+     * @param   searchResultsListener       DOCUMENT ME!
+     * @param   suppressEmptyResultMessage  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResults(final CidsServerSearch search,
-            final PropertyChangeListener listener) {
+            final PropertyChangeListener listener,
+            final PropertyChangeListener searchResultsListener,
+            final boolean suppressEmptyResultMessage) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 @Override
@@ -170,27 +186,16 @@ public final class CidsSearchExecutor {
 
                     result = nodes.toArray(new Node[0]);
                     if (!isCancelled()) {
-                        MethodManager.getManager().showSearchResults(result, false);
+                        if (!suppressEmptyResultMessage || (result.length > 0)) {
+                            MethodManager.getManager().showSearchResults(result, false, searchResultsListener);
+                        }
                     }
 
                     return result;
                 }
-
-                @Override
-                protected void done() {
-                    try {
-                        if (!isCancelled()) {
-                            final Node[] result = get();
-                        }
-                    } catch (Exception ex) {
-                        log.error("Error occurred while searching.", ex);
-                    }
-                }
             };
 
-        if (listener != null) {
-            worker.addPropertyChangeListener(listener);
-        }
+        worker.addPropertyChangeListener(listener);
 
         CismetThreadPool.execute(worker);
 
