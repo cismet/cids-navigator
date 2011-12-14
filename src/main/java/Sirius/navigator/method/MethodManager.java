@@ -309,20 +309,35 @@ public class MethodManager {
      *
      * @param  resultNodes  DOCUMENT ME!
      * @param  append       DOCUMENT ME!
-     * @param  listener     DOCUMENT ME!
+     */
+    public void showSearchResults(final Node[] resultNodes,
+            final boolean append) {
+        showSearchResults(resultNodes, append, null, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  resultNodes                 DOCUMENT ME!
+     * @param  append                      DOCUMENT ME!
+     * @param  listener                    DOCUMENT ME!
+     * @param  suppressEmptyResultWarning  DOCUMENT ME!
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append,
-            final PropertyChangeListener listener) {
+            final PropertyChangeListener listener,
+            final boolean suppressEmptyResultWarning) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"), // NOI18N
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
-                JOptionPane.WARNING_MESSAGE);
+            if (!suppressEmptyResultWarning) {
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"), // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
+                    JOptionPane.WARNING_MESSAGE);
+            }
         } else {
             ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(resultNodes, append, listener);
             this.showSearchResults();

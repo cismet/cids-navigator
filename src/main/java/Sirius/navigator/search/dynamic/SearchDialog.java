@@ -149,7 +149,7 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                     logger.debug("showing search results in search results tree"); // NOI18N
                 }
                 // XXX event w\u00E4re besser ...
-                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults, null);
+                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults);
                 SearchDialog.this.dispose();
             } else {
                 if (logger.isDebugEnabled()) {
@@ -210,7 +210,7 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                     logger.debug("showing search results in search results tree"); // NOI18N
                 }
                 // XXX event w\u00E4re besser ...
-                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults, null);
+                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults);
                 SearchDialog.this.dispose();
             } else {
                 if (logger.isDebugEnabled()) {
