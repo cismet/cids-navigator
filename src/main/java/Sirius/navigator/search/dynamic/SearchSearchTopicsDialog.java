@@ -224,13 +224,6 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
         chkHere.setText(org.openide.util.NbBundle.getMessage(
                 SearchSearchTopicsDialog.class,
                 "SearchSearchTopicsDialog.chkHere.text")); // NOI18N
-        chkHere.addItemListener(new java.awt.event.ItemListener() {
-
-                @Override
-                public void itemStateChanged(final java.awt.event.ItemEvent evt) {
-                    chkHereItemStateChanged(evt);
-                }
-            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 4;
@@ -285,15 +278,6 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void chkHereItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_chkHereItemStateChanged
-        txtSearchParameter.setEnabled(evt.getStateChange() != ItemEvent.SELECTED);
-    }                                                                          //GEN-LAST:event_chkHereItemStateChanged
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
     private void txtSearchParameterActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtSearchParameterActionPerformed
         // Avoid invalid input.
         if (pnlSearchCancel.isEnabled()) {
@@ -308,7 +292,6 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
      */
     private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         setVisible(false);
-        dispose();
     }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
@@ -319,7 +302,6 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
     private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
         if (!searchRunning) {
             setVisible(false);
-            dispose();
         }
     }                                                                      //GEN-LAST:event_formWindowClosing
 
@@ -377,12 +359,11 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
 
     @Override
     public void searchDone(final Node[] result) {
+        searchRunning = false;
+        switchControls();
+
         if (result.length > 0) {
             setVisible(false);
-            dispose();
-        } else {
-            searchRunning = false;
-            switchControls();
         }
     }
 
@@ -440,10 +421,8 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
                     @Override
                     public void run() {
                         boolean enableSearchButton = true;
-                        if (!chkHere.isSelected()) {
-                            enableSearchButton &= (txtSearchParameter.getText() != null)
-                                        && (txtSearchParameter.getText().trim().length() > 0);
-                        }
+                        enableSearchButton &= (txtSearchParameter.getText() != null)
+                                    && (txtSearchParameter.getText().trim().length() > 0);
                         enableSearchButton &= MetaSearch.instance().getSelectedSearchTopics().size() > 0;
                         pnlSearchCancel.setEnabled(enableSearchButton);
                     }

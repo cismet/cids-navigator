@@ -18,7 +18,6 @@ import Sirius.server.search.CidsServerSearch;
 import org.apache.log4j.Logger;
 
 import java.awt.Color;
-import java.awt.GridBagConstraints;
 
 /**
  * DOCUMENT ME!

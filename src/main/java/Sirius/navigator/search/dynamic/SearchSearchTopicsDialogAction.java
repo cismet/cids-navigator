@@ -38,6 +38,10 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
 
     private static final Logger LOG = Logger.getLogger(SearchSearchTopicsDialogAction.class);
 
+    //~ Instance fields --------------------------------------------------------
+
+    private SearchSearchTopicsDialog dialog;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -84,8 +88,11 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
 
     @Override
     public void actionPerformed(final ActionEvent e) {
-        final JDialog dialog = new SearchSearchTopicsDialog(ComponentRegistry.getRegistry().getMainWindow(), true);
-        dialog.setLocationRelativeTo(null);
+        if (dialog == null) {
+            dialog = new SearchSearchTopicsDialog(ComponentRegistry.getRegistry().getMainWindow(), true);
+            dialog.setLocationRelativeTo(null);
+        }
+
         dialog.setVisible(true);
         dialog.pack();
     }
