@@ -32,8 +32,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 /**
@@ -59,6 +57,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
     private org.jdesktop.swingx.JXBusyLabel lblBusyIcon;
+    private javax.swing.Box.Filler strGap;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -105,10 +104,18 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         lblBusyIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
+        strGap = new javax.swing.Box.Filler(new java.awt.Dimension(5, 0),
+                new java.awt.Dimension(5, 25),
+                new java.awt.Dimension(5, 32767));
         btnSearchCancel = new javax.swing.JButton();
+
+        setMinimumSize(new java.awt.Dimension(125, 25));
+        setPreferredSize(new java.awt.Dimension(125, 25));
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 0, 0));
 
         lblBusyIcon.setEnabled(false);
         add(lblBusyIcon);
+        add(strGap);
 
         btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
                 SearchControlPanel.class,
@@ -118,7 +125,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
         btnSearchCancel.setFocusPainted(false);
         btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, 25));
-        btnSearchCancel.setMinimumSize(new java.awt.Dimension(65, 25));
+        btnSearchCancel.setMinimumSize(new java.awt.Dimension(100, 25));
         btnSearchCancel.setPreferredSize(new java.awt.Dimension(100, 25));
         btnSearchCancel.addActionListener(new java.awt.event.ActionListener() {
 

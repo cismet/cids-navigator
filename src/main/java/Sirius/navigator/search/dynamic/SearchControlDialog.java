@@ -17,7 +17,11 @@ import Sirius.server.search.CidsServerSearch;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.EventQueue;
 
 /**
  * DOCUMENT ME!
@@ -40,6 +44,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     private boolean allowUserToCloseDialog;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
+    private javax.swing.JLabel lblIcon;
     private javax.swing.JLabel lblMessage;
     private javax.swing.JPanel pnlControls;
     private javax.swing.JSeparator sepMessage;
@@ -78,6 +83,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
         java.awt.GridBagConstraints gridBagConstraints;
 
         btnClose = new javax.swing.JButton();
+        lblIcon = new javax.swing.JLabel();
         lblMessage = new javax.swing.JLabel();
         sepMessage = new javax.swing.JSeparator();
         pnlControls = new javax.swing.JPanel();
@@ -86,6 +92,9 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
                 SearchControlDialog.class,
                 "SearchControlDialog.btnClose.text")); // NOI18N
         btnClose.setFocusPainted(false);
+        btnClose.setMaximumSize(new java.awt.Dimension(100, 25));
+        btnClose.setMinimumSize(new java.awt.Dimension(58, 25));
+        btnClose.setPreferredSize(new java.awt.Dimension(100, 25));
         btnClose.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -106,26 +115,37 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
             });
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
-        lblMessage.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/Sirius/navigator/search/dynamic/SearchControlDialog_lblMessage.png"))); // NOI18N
+        lblIcon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/Sirius/navigator/search/dynamic/SearchControlDialog_lblIcon.png"))); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(lblIcon, gridBagConstraints);
+
         lblMessage.setText(org.openide.util.NbBundle.getMessage(
                 SearchControlDialog.class,
-                "SearchControlDialog.lblMessage.text"));                                                         // NOI18N
+                "SearchControlDialog.lblMessage.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         getContentPane().add(lblMessage, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(sepMessage, gridBagConstraints);
+
+        pnlControls.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         getContentPane().add(pnlControls, gridBagConstraints);
@@ -199,5 +219,77 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     @Override
     public boolean displaysEmptyResultMessage() {
         return false;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+         */
+        final String[] LAFS = new String[] {
+                "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel",
+                "com.sun.java.swing.plaf.motif.MotifLookAndFeel",
+                "com.sun.java.swing.plaf.windows.WindowsLookAndFeel",
+                "com.jgoodies.looks.windows.WindowsLookAndFeel",
+                "com.jgoodies.looks.plastic.PlasticLookAndFeel",
+                "com.jgoodies.looks.plastic.Plastic3DLookAndFeel",
+                "com.jgoodies.looks.plastic.PlasticXPLookAndFeel"
+            };
+
+        try {
+            javax.swing.UIManager.setLookAndFeel(LAFS[4]);
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(SearchControlDialog.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(SearchControlDialog.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(SearchControlDialog.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(SearchControlDialog.class.getName())
+                    .log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        final SearchControlDialog dialog = new SearchControlDialog(new javax.swing.JFrame(), true, null);
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+
+                            @Override
+                            public void windowClosing(final java.awt.event.WindowEvent e) {
+                                System.exit(0);
+                            }
+                        });
+                    dialog.searchStarted();
+                    dialog.setVisible(true);
+                }
+            });
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+
+        final Runnable run = new Runnable() {
+
+                @Override
+                public void run() {
+                    dialog.searchDone(null);
+                }
+            };
+
+        EventQueue.invokeLater(run);
     }
 }
