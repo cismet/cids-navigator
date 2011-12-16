@@ -194,12 +194,15 @@ public class AttributeTable extends JXTable // implements ComplexContainer
         final int colIndex = columnAtPoint(p);
         final int realColumnIndex = convertColumnIndexToModel(colIndex);
 
-        final Object value = getValueAt(rowIndex, colIndex);
-        if (value != null) {
-            tip = value.toString();
+        if (rowIndex != -1) {
+            final Object value = getValueAt(rowIndex, colIndex);
+            if (value != null) {
+                tip = value.toString();
+            }
+            return tip;
+        } else {
+            return "";
         }
-
-        return tip;
     }
 
     // #########################################################################
