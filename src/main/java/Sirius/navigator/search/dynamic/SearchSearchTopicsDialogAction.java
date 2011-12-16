@@ -7,8 +7,6 @@
 ****************************************************/
 package Sirius.navigator.search.dynamic;
 
-import Sirius.navigator.ui.ComponentRegistry;
-
 import org.apache.log4j.Logger;
 
 import org.openide.util.NbBundle;
@@ -21,7 +19,6 @@ import java.util.MissingResourceException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JDialog;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
@@ -89,8 +86,7 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
     @Override
     public void actionPerformed(final ActionEvent e) {
         if (dialog == null) {
-            dialog = new SearchSearchTopicsDialog(ComponentRegistry.getRegistry().getMainWindow(), true);
-            dialog.setLocationRelativeTo(null);
+            dialog = SearchSearchTopicsDialog.instance();
         }
 
         dialog.setVisible(true);

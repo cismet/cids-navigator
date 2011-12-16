@@ -12,6 +12,8 @@
  */
 package Sirius.navigator.search.dynamic;
 
+import Sirius.navigator.ui.ComponentRegistry;
+
 import Sirius.server.middleware.types.Node;
 import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.builtin.FullTextSearch;
@@ -46,6 +48,7 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(SearchSearchTopicsDialog.class);
+    private static SearchSearchTopicsDialog instance;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -76,7 +79,7 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
      * @param  parent  DOCUMENT ME!
      * @param  modal   DOCUMENT ME!
      */
-    public SearchSearchTopicsDialog(final java.awt.Frame parent, final boolean modal) {
+    private SearchSearchTopicsDialog(final java.awt.Frame parent, final boolean modal) {
         super(parent, modal);
 
         initComponents();
@@ -102,6 +105,20 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static SearchSearchTopicsDialog instance() {
+        if (instance == null) {
+            instance = new SearchSearchTopicsDialog(ComponentRegistry.getRegistry().getMainWindow(), true);
+            instance.setLocationRelativeTo(null);
+        }
+
+        return instance;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -163,6 +180,7 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
         btnClose.setText(org.openide.util.NbBundle.getMessage(
                 SearchSearchTopicsDialog.class,
                 "SearchSearchTopicsDialog.btnClose.text")); // NOI18N
+        btnClose.setFocusPainted(false);
         btnClose.setMaximumSize(new java.awt.Dimension(100, 25));
         btnClose.setMinimumSize(new java.awt.Dimension(59, 25));
         btnClose.setPreferredSize(new java.awt.Dimension(100, 25));
@@ -247,6 +265,7 @@ public class SearchSearchTopicsDialog extends javax.swing.JDialog implements Sea
         gridBagConstraints.weighty = 1.0;
         getContentPane().add(sepSearchTopics, gridBagConstraints);
 
+        scpSearchTopics.setBorder(null);
         scpSearchTopics.setViewportView(pnlSearchTopics);
 
         gridBagConstraints = new java.awt.GridBagConstraints();

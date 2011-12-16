@@ -36,6 +36,7 @@ import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.interfaces.PluginMethod;
 import Sirius.navigator.plugin.ui.*;
 import Sirius.navigator.resource.*;
+import Sirius.navigator.search.dynamic.SearchSearchTopicsDialogAction;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.dialog.*;
 import Sirius.navigator.ui.embedded.*;
@@ -115,12 +116,16 @@ public class MutablePopupMenu extends JPopupMenu {
     protected void createDefaultMenues() {
         itemActionListener = new PopupMenuItemsActionListener();
 
-        searchItem = new JMenuItem(org.openide.util.NbBundle.getMessage(
-                    MutablePopupMenu.class,
-                    "MutablePopupMenu.searchItem.text")); // NOI18N
-        searchItem.setActionCommand("search");            // NOI18N
-        searchItem.addActionListener(itemActionListener);
-        this.add(searchItem);
+        if (PropertyManager.getManager().isEnableSearchDialog()) {
+            searchItem = new JMenuItem(org.openide.util.NbBundle.getMessage(
+                        MutablePopupMenu.class,
+                        "MutablePopupMenu.searchItem.text"));              // NOI18N
+            searchItem.setActionCommand("search");                         // NOI18N
+            searchItem.addActionListener(itemActionListener);
+            this.add(searchItem);
+        } else {
+            this.add(new JMenuItem(new SearchSearchTopicsDialogAction())); // NOI18N
+        }
 
         specialTreeItem = new JMenuItem(org.openide.util.NbBundle.getMessage(
                     MutablePopupMenu.class,
