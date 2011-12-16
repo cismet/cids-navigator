@@ -303,6 +303,17 @@ public class MethodManager {
 
         return new MethodAvailability(classKeys, availability);
     }
+    
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  resultNodes  DOCUMENT ME!
+     * @param  append       DOCUMENT ME!
+     */
+    public void showSearchResults(final Node[] resultNodes,
+            final boolean append) {
+        showSearchResults(resultNodes, append, null);
+    }
 
     /**
      * DOCUMENT ME!
