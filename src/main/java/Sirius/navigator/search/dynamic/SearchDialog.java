@@ -149,7 +149,7 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                     logger.debug("showing search results in search results tree"); // NOI18N
                 }
                 // XXX event w\u00E4re besser ...
-                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults, null);
+                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults);
                 SearchDialog.this.dispose();
             } else {
                 if (logger.isDebugEnabled()) {
@@ -210,7 +210,7 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                     logger.debug("showing search results in search results tree"); // NOI18N
                 }
                 // XXX event w\u00E4re besser ...
-                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults, null);
+                MethodManager.getManager().showSearchResults(searchResult.getNodes(), appendSearchResults);
                 SearchDialog.this.dispose();
             } else {
                 if (logger.isDebugEnabled()) {
@@ -669,11 +669,11 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void closeDialog(final java.awt.event.WindowEvent evt) //GEN-FIRST:event_closeDialog
+    private void closeDialog(final java.awt.event.WindowEvent evt)//GEN-FIRST:event_closeDialog
     {
         setVisible(false);
         dispose();
-    }                                                              //GEN-LAST:event_closeDialog
+    }//GEN-LAST:event_closeDialog
 
     //~ Inner Classes ----------------------------------------------------------
 
