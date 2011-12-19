@@ -20,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.openide.util.Exceptions;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 
 /**
@@ -42,6 +41,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     private SearchControlPanel pnlSearchCancel;
     private Color foregroundColor;
     private boolean allowUserToCloseDialog;
+    private boolean isCloseButtonShown;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
     private javax.swing.JLabel lblIcon;
@@ -51,6 +51,16 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates new form SearchControlDialog.
+     *
+     * @param  parent  DOCUMENT ME!
+     * @param  modal   DOCUMENT ME!
+     */
+    public SearchControlDialog(final java.awt.Frame parent, final boolean modal) {
+        this(parent, modal, null);
+    }
 
     /**
      * Creates new form SearchControlDialog.
@@ -103,7 +113,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
                 }
             });
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getMessage(SearchControlDialog.class, "SearchControlDialog.title")); // NOI18N
         setMinimumSize(new java.awt.Dimension(300, 200));
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -161,7 +171,6 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
         if (allowUserToCloseDialog) {
             setVisible(false);
-            dispose();
         }
     }                                                                      //GEN-LAST:event_formWindowClosing
 
@@ -172,12 +181,38 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
      */
     private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         setVisible(false);
-        dispose();
     }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  search  DOCUMENT ME!
      */
+    public void setSearch(final CidsServerSearch search) {
+        this.search = search;
+
+        if (isCloseButtonShown) {
+            EventQueue.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        pnlControls.remove(btnClose);
+                        pnlControls.add(pnlSearchCancel);
+                        validate();
+                        isCloseButtonShown = false;
+                    }
+                });
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public CidsServerSearch getSearch() {
+        return search;
+    }
     /**
      * DOCUMENT ME!
      */
@@ -192,7 +227,11 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
 
     @Override
     public void searchStarted() {
+        lblMessage.setText(org.openide.util.NbBundle.getMessage(
+                SearchControlDialog.class,
+                "SearchControlDialog.lblMessage.text"));
         lblMessage.setForeground(foregroundColor);
+        allowUserToCloseDialog = false;
     }
 
     @Override
@@ -201,19 +240,20 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
             lblMessage.setText(org.openide.util.NbBundle.getMessage(
                     SearchControlDialog.class,
                     "SearchControlDialog.lblMessage_emptyResult.text"));
-            allowUserToCloseDialog = true;
             pnlControls.remove(pnlSearchCancel);
             pnlControls.add(btnClose);
+            allowUserToCloseDialog = true;
+            isCloseButtonShown = true;
+            validate();
+            repaint();
         } else {
             setVisible(false);
-            dispose();
         }
     }
 
     @Override
     public void searchCancelled() {
         setVisible(false);
-        dispose();
     }
 
     @Override

@@ -45,6 +45,7 @@ public final class CidsSearchExecutor {
     private static final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
             CidsSearchExecutor.class);
     private static SearchProgressDialog searchProgressDialog;
+    private static SearchControlDialog searchControlDialog;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -54,19 +55,22 @@ public final class CidsSearchExecutor {
      * @param  search  DOCUMENT ME!
      */
     public static void searchAndDisplayResultsWithDialog(final CidsServerSearch search) {
-        final SearchControlDialog dialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(),
-                true,
-                search);
-        dialog.pack();
-        dialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getNavigator());
+        if (searchControlDialog == null) {
+            searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
+            searchControlDialog.pack();
+            searchControlDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getNavigator());
+        }
+
+        searchControlDialog.setSearch(search);
+
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    dialog.startSearch();
+                    searchControlDialog.startSearch();
                 }
             });
-        dialog.setVisible(true);
+        searchControlDialog.setVisible(true);
     }
 
     /**

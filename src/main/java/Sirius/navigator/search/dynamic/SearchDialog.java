@@ -669,11 +669,11 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void closeDialog(final java.awt.event.WindowEvent evt)//GEN-FIRST:event_closeDialog
+    private void closeDialog(final java.awt.event.WindowEvent evt) //GEN-FIRST:event_closeDialog
     {
         setVisible(false);
         dispose();
-    }//GEN-LAST:event_closeDialog
+    }                                                              //GEN-LAST:event_closeDialog
 
     //~ Inner Classes ----------------------------------------------------------
 
