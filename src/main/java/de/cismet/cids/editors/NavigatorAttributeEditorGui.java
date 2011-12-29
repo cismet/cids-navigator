@@ -83,6 +83,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private JComponent wrappedWaitingPanel;
     private BeanInitializer currentInitializer = null;
     private DisposableCidsBeanStore currentBeanStore = null;
+    private JComponent editorComponent = null;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;
@@ -554,6 +556,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 log.debug("editor:" + ed); // NOI18N
                             }
                             removeAndDisposeEditor();
+                            editorComponent = ed;
                             switchPanel.remove(scpEditor);
                             if (ed instanceof RequestsFullSizeComponent) {
                                 switchPanel.add(ed, BorderLayout.CENTER);
@@ -646,11 +649,17 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private void removeAndDisposeEditor() {
         if (currentBeanStore != null) {
             currentBeanStore.dispose();
-            currentBeanStore = null;
         }
-        scpEditor.getViewport().removeAll();
+        if (editorComponent instanceof RequestsFullSizeComponent) {
+            switchPanel.remove(editorComponent);
+//            switchPanel.removeAll();
+        } else {
+            scpEditor.getViewport().removeAll();
+        }
         // release the strong reference on the listener, so that the weak listener can be GCed.
         strongReferenceOnWeakListener = null;
+        currentBeanStore = null;
+        editorComponent = null;
     }
 
     @Override
