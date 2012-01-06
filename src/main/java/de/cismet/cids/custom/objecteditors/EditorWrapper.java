@@ -11,6 +11,7 @@
  */
 package de.cismet.cids.custom.objecteditors;
 
+import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 
 import org.apache.log4j.Logger;
@@ -21,8 +22,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 
+import de.cismet.cids.tools.metaobjectrenderer.BlurredMapObjectRenderer;
 import de.cismet.cids.tools.metaobjectrenderer.Titled;
 
+import de.cismet.tools.gui.BlurredMapWrapper;
 import de.cismet.tools.gui.BorderProvider;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.CoolEditor;
@@ -48,9 +51,34 @@ public class EditorWrapper implements ComponentWrapper {
     public WrappedComponent wrapComponent(final JComponent component) {
         component.setBorder(new EmptyBorder(10, 10, 10, 10));
         final CoolEditor ced;
+        final boolean usePainterCoolPanel = PropertyManager.getManager().isUsePainterCoolPanel();
         if (component instanceof RequestsFullSizeComponent) {
             // tagging interface fue full size an umschliessende komponente "weitervererben"
             ced = new FullSizeCoolEditor();
+        } else if ((component instanceof BlurredMapObjectRenderer)) {
+            if (!usePainterCoolPanel) {
+                component.setBorder(new EmptyBorder(0, 0, 0, 0));
+                return (BlurredMapObjectRenderer)component;
+            }
+            final BlurredMapObjectRenderer cp = (BlurredMapObjectRenderer)component;
+            final BlurredMapWrapper wrappingComp = new BlurredMapWrapper();
+            wrappingComp.setGeometry(cp.getGeometry());
+            final JComponent p = cp.getPanInter();
+            if (p != null) {
+                wrappingComp.getPanFooter().add(p);
+            }
+            if (cp.getSpinner() != null) {
+                wrappingComp.setPanSpinner(cp.getSpinner());
+            }
+
+            if (cp.getPanMap() != null) {
+                wrappingComp.getPanMap().add(cp.getPanMap(), BorderLayout.CENTER);
+                wrappingComp.getPanMap().setPreferredSize(cp.getPanMap().getMinimumSize());
+            }
+            wrappingComp.getPanTitleAndIcon().add(cp.getPanTitle());
+            wrappingComp.getPanContent().add(cp.getPanContent(), BorderLayout.CENTER);
+            wrappingComp.setOriginalComponent(component);
+            return (WrappedComponent)wrappingComp;
         } else {
             ced = new CoolEditor();
         }
