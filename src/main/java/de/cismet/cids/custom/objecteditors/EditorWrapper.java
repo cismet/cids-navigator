@@ -23,9 +23,9 @@ import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 
 import de.cismet.cids.tools.metaobjectrenderer.BlurredMapObjectRenderer;
+import de.cismet.cids.tools.metaobjectrenderer.BlurredMapWrapper;
 import de.cismet.cids.tools.metaobjectrenderer.Titled;
 
-import de.cismet.tools.gui.BlurredMapWrapper;
 import de.cismet.tools.gui.BorderProvider;
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.CoolEditor;
