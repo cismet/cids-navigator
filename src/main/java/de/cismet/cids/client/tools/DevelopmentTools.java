@@ -60,7 +60,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
-import de.cismet.jasperreports.CidsBeanDataSource;
+import de.cismet.cids.utils.jasperreports.CidsBeanDataSource;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
