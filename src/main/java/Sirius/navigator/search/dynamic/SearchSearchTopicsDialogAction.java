@@ -19,8 +19,11 @@ import java.util.MissingResourceException;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.JDialog;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
+
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 /**
  * DOCUMENT ME!
@@ -37,7 +40,7 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
 
     //~ Instance fields --------------------------------------------------------
 
-    private SearchSearchTopicsDialog dialog;
+    private JDialog dialog;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -86,7 +89,10 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
     @Override
     public void actionPerformed(final ActionEvent e) {
         if (dialog == null) {
-            dialog = SearchSearchTopicsDialog.instance();
+            if (CismapBroker.getInstance().getMetaSearch() == null) {
+                return;
+            }
+            dialog = CismapBroker.getInstance().getMetaSearch().getSearchDialog();
         }
 
         dialog.setVisible(true);

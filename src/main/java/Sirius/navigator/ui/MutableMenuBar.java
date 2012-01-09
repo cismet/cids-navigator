@@ -61,6 +61,8 @@ import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.cismet.cismap.commons.interaction.CismapBroker;
+
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**

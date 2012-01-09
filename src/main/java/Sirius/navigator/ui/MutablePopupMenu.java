@@ -66,6 +66,8 @@ import javax.swing.tree.TreePath;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
+import de.cismet.cismap.commons.interaction.CismapBroker;
+
 /**
  * DOCUMENT ME!
  *
