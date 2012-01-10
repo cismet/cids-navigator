@@ -51,12 +51,11 @@ public class EditorWrapper implements ComponentWrapper {
     public WrappedComponent wrapComponent(final JComponent component) {
         component.setBorder(new EmptyBorder(10, 10, 10, 10));
         final CoolEditor ced;
-        final boolean usePainterCoolPanel = PropertyManager.getManager().isUsePainterCoolPanel();
         if (component instanceof RequestsFullSizeComponent) {
             // tagging interface fue full size an umschliessende komponente "weitervererben"
             ced = new FullSizeCoolEditor();
         } else if ((component instanceof BlurredMapObjectRenderer)) {
-            if (!usePainterCoolPanel) {
+            if (!((BlurredMapObjectRenderer)component).usePainterCoolPanel) {
                 component.setBorder(new EmptyBorder(0, 0, 0, 0));
                 return (BlurredMapObjectRenderer)component;
             }

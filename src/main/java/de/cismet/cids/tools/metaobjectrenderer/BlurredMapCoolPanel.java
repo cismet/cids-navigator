@@ -88,7 +88,6 @@ public class BlurredMapCoolPanel extends PainterCoolPanel implements ComponentLi
     private Rectangle mapBounds;
     private ImageIcon icons;
     private boolean noTitlePanel;
-    private boolean usePainterCoolPanel;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -98,11 +97,8 @@ public class BlurredMapCoolPanel extends PainterCoolPanel implements ComponentLi
     public BlurredMapCoolPanel() {
         super();
         // FUSE initialisieren
-        FuseLoader.load();
 //        Ressourcen hierarchisch rekursiv nach oben einfuegen
-        ResourceInjector.get("blurredmapcoolpanel.style").inject(true, this); //
         // NOI18N
-        usePainterCoolPanel = PropertyManager.getManager().isUsePainterCoolPanel();
         gradientColorTop = javax.swing.UIManager.getDefaults().getColor("Button.shadow");                        // NOI18N
         gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");                 // NOI18N
         mapBounds = null;
@@ -454,19 +450,12 @@ public class BlurredMapCoolPanel extends PainterCoolPanel implements ComponentLi
                     final double offRight = (panWith - (b.getX() + b.width - (3 * offset))) * widthValuePerPixel;
 
                     // BoundingBox mit neuer Groesse erstellen
-                    if (usePainterCoolPanel) {
-                        bb = new BoundingBox((midX - ((worldWidth / 2) + offLeft)),
-                                (midY - ((worldHeight / 2) + offTop) - 95),
-                                (midX + (worldWidth / 2) + offRight),
-                                (midY + (worldHeight / 2) + offBottom)
-                                        - 95);
-                    } else {
-                        bb = new BoundingBox((midX - ((worldWidth / 2) + offLeft)),
-                                (midY - ((worldHeight / 2) + offTop) - 95),
-                                (midX + (worldWidth / 2) + offRight),
-                                (midY + (worldHeight / 2) + offBottom)
-                                        - 95);
-                    }
+
+                    bb = new BoundingBox((midX - ((worldWidth / 2) + offLeft)),
+                            (midY - ((worldHeight / 2) + offTop) - 95),
+                            (midX + (worldWidth / 2) + offRight),
+                            (midY + (worldHeight / 2) + offBottom)
+                                    - 95);
                 } else {
                     final double midX = bb.getX1() + ((bb.getX2() - bb.getX1()) / 2);
                     final double midY = bb.getY1() + ((bb.getY2() - bb.getY1()) / 2);

@@ -123,6 +123,8 @@ public class BlurredMapObjectRenderer extends CustomMetaObjectRenderer implement
     public Color gradientColorTop;
     @InjectedResource
     public Color gradientColorBottom;
+    @InjectedResource
+    public boolean usePainterCoolPanel;
 
     // Lumbermill Logger initialisieren
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());

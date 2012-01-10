@@ -106,7 +106,7 @@ public final class PropertyManager {
     private boolean useFlyingSaucer = false;
     private boolean useWebView = false;
     private boolean enableSearchDialog = false;
-    private boolean usePainterCoolPanel = false;
+    private boolean usePainterCoolPanel = true;
 
     private transient String proxyURL;
     private transient String proxyUsername;
@@ -921,8 +921,6 @@ public final class PropertyManager {
             this.setProxyPassword(value);
         } else if (property.equals("navigator.proxy.domain")) {
             this.setProxyDomain(value);
-        } else if (property.equals("usePainterCoolPanel")) {              // NOI18N
-            this.setUsePainterCoolPanel(value);
         }
     }
 
@@ -1457,45 +1455,6 @@ public final class PropertyManager {
      */
     public void setAutoClose(final boolean autoClose) {
         this.autoClose = autoClose;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isUsePainterCoolPanel() {
-        return usePainterCoolPanel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  usePainterCoolPanel  DOCUMENT ME!
-     */
-    public void setUsePainterCoolPanel(final boolean usePainterCoolPanel) {
-        this.usePainterCoolPanel = usePainterCoolPanel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  usePainterCoolPanel  DOCUMENT ME!
-     */
-    public void setUsePainterCoolPanel(final String usePainterCoolPanel) {
-        if ((usePainterCoolPanel != null)
-                    && (usePainterCoolPanel.equalsIgnoreCase(TRUE) || usePainterCoolPanel.equals("1"))) {  // NOI18N
-            this.setUsePainterCoolPanel(true);
-        } else if ((usePainterCoolPanel != null)
-                    && (usePainterCoolPanel.equalsIgnoreCase(FALSE) || usePainterCoolPanel.equals("0"))) { // NOI18N
-            this.setUsePainterCoolPanel(false);
-        } else {
-            this.setUseFlyingSaucer(false);
-            logger.warn("setUsePainterCoolPanel(): invalid property 'usePainterCoolPanel': '"
-                        + usePainterCoolPanel                                                              // NOI18N
-                        + "', setting default value to '"                                                  // NOI18N
-                        + this.usePainterCoolPanel + "'");                                                 // NOI18N
-        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
