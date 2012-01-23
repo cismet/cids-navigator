@@ -303,7 +303,7 @@ public class MethodManager {
 
         return new MethodAvailability(classKeys, availability);
     }
-    
+
     /**
      * DOCUMENT ME!
      *
