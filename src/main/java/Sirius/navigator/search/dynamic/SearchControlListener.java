@@ -33,9 +33,9 @@ public interface SearchControlListener {
     /**
      * DOCUMENT ME!
      *
-     * @param  result  DOCUMENT ME!
+     * @param  numberOfResults  result DOCUMENT ME!
      */
-    void searchDone(final Node[] result);
+    void searchDone(int numberOfResults);
     /**
      * DOCUMENT ME!
      */

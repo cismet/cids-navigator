@@ -14,6 +14,8 @@ import Sirius.server.middleware.types.Node;
 
 import org.apache.log4j.Logger;
 
+import java.awt.EventQueue;
+
 import javax.swing.ImageIcon;
 
 /**
@@ -25,7 +27,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final transient Logger LOG = Logger.getLogger(RootTreeNode.class);
+    private static final transient Logger log = Logger.getLogger(RootTreeNode.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -78,10 +80,28 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      */
     public void addChildren(final Node[] topNodes) {
         this.removeAllChildren();
+
+        de.cismet.tools.CismetThreadPool.execute(new javax.swing.SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    treeNodeLoader.addChildren(RootTreeNode.this, topNodes);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        get();
+                    } catch (Exception e) {
+                        log.error("could not add children", e);
+                    }
+                }
+            });
+
         try {
-            this.treeNodeLoader.addChildren(this, topNodes);
         } catch (Exception exp) {
-            LOG.error("could not add children", exp); // NOI18N
+            log.error("could not add children", exp); // NOI18N
         }
     }
 
@@ -91,14 +111,12 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
     }
 
     // ----------------------------------------------------------------------------
-
     @Override
     public TreeNodeLoader getTreeNodeLoader() {
         return this.treeNodeLoader;
     }
 
     // ----------------------------------------------------------------------------
-
     @Override
     public synchronized void explore() throws Exception {
     }
@@ -129,14 +147,12 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
     }
 
     // ----------------------------------------------------------------------------
-
     @Override
     public boolean isExplored() {
         return true;
     }
 
     // ----------------------------------------------------------------------------
-
     @Override
     public String toString() {
         return org.openide.util.NbBundle.getMessage(RootTreeNode.class, "RootTreeNode.toString().returnValue"); // NOI18N
@@ -188,13 +204,13 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
     @Override
     public int getID() {
-        LOG.warn("method 'getID()' should not be called on RootNode"); // NOI18N
+        log.warn("method 'getID()' should not be called on RootNode"); // NOI18N
         return -1;
     }
 
     @Override
     public String getDomain() {
-        LOG.warn("method 'getDomain()' should not be called on RootNode"); // NOI18N
+        log.warn("method 'getDomain()' should not be called on RootNode"); // NOI18N
         return null;
     }
 
@@ -230,19 +246,60 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
             // if(LOG.isDebugEnabled())LOG.debug("[DefaultTreeNodeLoader] Begin
             // addChildren("+children.length+")"); WaitNode entfernen!
-            node.removeChildren();
+            final boolean inEDT = EventQueue.isDispatchThread();
 
+            {
+                final Runnable r = new Runnable() {
+
+                        @Override
+                        public void run() {
+                            node.removeChildren();
+                        }
+                    };
+                if (inEDT) {
+                    r.run();
+                } else {
+                    EventQueue.invokeLater(r);
+                }
+            }
             if (children == null) {
                 return false;
             }
 
             for (int i = 0; i < children.length; i++) {
                 if (children[i] instanceof MetaNode) {
-                    node.add(new PureTreeNode((MetaNode)children[i]));
+                    final PureTreeNode iPTN = new PureTreeNode((MetaNode)children[i]);
+
+                    final Runnable r = new Runnable() {
+
+                            @Override
+                            public void run() {
+                                node.add(iPTN);
+                            }
+                        };
+                    if (inEDT) {
+                        r.run();
+                    } else {
+                        EventQueue.invokeLater(r);
+                    }
+
                     explored &= children[i].isValid();
                     // if(LOG.isDebugEnabled())LOG.debug("[DefaultTreeNodeLoader] PureNode Children added");
                 } else if (children[i] instanceof MetaClassNode) {
-                    node.add(new ClassTreeNode((MetaClassNode)children[i]));
+                    final ClassTreeNode iCTN = new ClassTreeNode((MetaClassNode)children[i]);
+
+                    final Runnable r = new Runnable() {
+
+                            @Override
+                            public void run() {
+                                node.add(iCTN);
+                            }
+                        };
+                    if (inEDT) {
+                        r.run();
+                    } else {
+                        EventQueue.invokeLater(r);
+                    }
                     explored &= children[i].isValid();
                     // if(LOG.isDebugEnabled())LOG.debug("[DefaultTreeNodeLoader] ClassNode Children added");
                 } else if (children[i] instanceof MetaObjectNode) {
@@ -250,11 +307,22 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     // toString aufrufen, damit das MetaObject nicht erst im CellRenderer des MetaCatalogueTree vom
                     // Server geholt wird
                     otn.toString();
-                    node.add(otn);
+                    final Runnable r = new Runnable() {
+
+                            @Override
+                            public void run() {
+                                node.add(otn);
+                            }
+                        };
+                    if (inEDT) {
+                        r.run();
+                    } else {
+                        EventQueue.invokeLater(r);
+                    }
                     explored &= children[i].isValid();
                     // if(LOG.isDebugEnabled())LOG.debug("[DefaultTreeNodeLoader] ObjectNode Children added");
                 } else {
-                    LOG.fatal("[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");            // NOI18N
+                    log.fatal("[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'");            // NOI18N
                     throw new Exception("[DDefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'"); // NOI18N
                 }
             }

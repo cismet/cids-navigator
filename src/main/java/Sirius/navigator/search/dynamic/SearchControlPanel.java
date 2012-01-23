@@ -28,6 +28,7 @@ import java.beans.PropertyChangeListener;
 
 import java.net.URL;
 
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -229,12 +230,15 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 listener.searchCancelled();
                 setControlsAccordingToState();
             } else {
-                Node[] result = null;
+                int results = 0;
 
                 try {
                     final Object obj = source.get();
                     if (obj instanceof Node[]) {
-                        result = (Node[])obj;
+                        results = ((Node[])obj).length;
+                    }
+                    if (obj instanceof Collection) {
+                        results = ((Collection)obj).size();
                     }
                 } catch (InterruptedException ex) {
                     LOG.error("Search result can't be get().", ex);
@@ -255,14 +259,10 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                     JXErrorPane.showDialog(getRootPane(), errorInfo);
                 }
 
-                if (result == null) {
-                    result = new Node[0];
-                }
-
-                if ((source.equals(searchThread) && (result.length == 0))
+                if ((source.equals(searchThread) && (results == 0))
                             || !source.equals(searchThread)) {
                     searching = false;
-                    listener.searchDone(result);
+                    listener.searchDone(results);
                     setControlsAccordingToState();
                 }
             }

@@ -12,6 +12,8 @@
  */
 package Sirius.navigator.search.dynamic;
 
+import Sirius.navigator.ui.ComponentRegistry;
+
 import Sirius.server.middleware.types.Node;
 import Sirius.server.search.CidsServerSearch;
 
@@ -235,8 +237,8 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     }
 
     @Override
-    public void searchDone(final Node[] result) {
-        if ((result == null) || (result.length == 0)) {
+    public void searchDone(final int numberOfResults) {
+        if (numberOfResults == 0) {
             lblMessage.setText(org.openide.util.NbBundle.getMessage(
                     SearchControlDialog.class,
                     "SearchControlDialog.lblMessage_emptyResult.text"));
@@ -326,7 +328,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
 
                 @Override
                 public void run() {
-                    dialog.searchDone(null);
+                    dialog.searchDone(1);
                 }
             };
 

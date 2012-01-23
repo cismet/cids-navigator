@@ -7,28 +7,22 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
+ * Copyright (c) : EIG (Environmental Informatics Group)
+ * http://www.htw-saarland.de/eig Prof. Dr. Reiner Guettler Prof. Dr. Ralf
+ * Denzer
  *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
+ * HTWdS Hochschule fuer Technik und Wirtschaft des Saarlandes Goebenstr. 40
+ * 66117 Saarbruecken Germany
  *
- * Programmers          :       Pascal
+ * Programmers : Pascal
  *
- * Project                      :       WuNDA 2
- * Version                      :       1.0
- * Purpose                      :
- * Created                      :       01.11.1999
- * History                      :
+ * Project : WuNDA 2 Version : 1.0 Purpose : Created : 01.11.1999 History :
  *
- *******************************************************************************/
+ ******************************************************************************
+ */
 import Sirius.navigator.types.treenode.*;
 
 import Sirius.server.middleware.types.*;
@@ -41,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -102,9 +97,11 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
             }
         };
 
+    static HashMap<String, Icon> iconCache = new HashMap<String, Icon>();
+    static HashMap<String, CidsTreeObjectIconFactory> iconFactories = new HashMap<String, CidsTreeObjectIconFactory>();
+
     //~ Instance fields --------------------------------------------------------
 
-    HashMap<String, CidsTreeObjectIconFactory> iconFactories = new HashMap<String, CidsTreeObjectIconFactory>();
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(getClass());
 
     //~ Constructors -----------------------------------------------------------
@@ -150,21 +147,43 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                         final String leafIconString = baseIcon.substring(0, baseIcon.lastIndexOf(".")) + "Leaf"
                                     + baseIcon.substring(baseIcon.lastIndexOf(".")); // NOI18N
 
-                        final javax.swing.ImageIcon base = new javax.swing.ImageIcon(getClass().getResource(baseIcon));
-                        try {
-                            expandedIco = new javax.swing.ImageIcon(getClass().getResource(openIconString));
-                        } catch (Exception e) {
-                            expandedIco = base;
+                        Icon base = null;
+                        base = iconCache.get(baseIcon);
+                        expandedIco = iconCache.get(openIconString);
+                        leafIco = iconCache.get(leafIconString);
+                        closedIco = iconCache.get(closedIconString);
+
+                        if (base == null) {
+                            base = new javax.swing.ImageIcon(getClass().getResource(baseIcon));
+                            iconCache.put(baseIcon, base);
                         }
-                        try {
-                            leafIco = new javax.swing.ImageIcon(getClass().getResource(leafIconString));
-                        } catch (Exception e) {
-                            leafIco = base;
+
+                        if (expandedIco == null) {
+                            try {
+                                expandedIco = new javax.swing.ImageIcon(getClass().getResource(openIconString));
+                            } catch (Exception e) {
+                                expandedIco = base;
+                            } finally {
+                                iconCache.put(openIconString, expandedIco);
+                            }
                         }
-                        try {
-                            closedIco = new javax.swing.ImageIcon(getClass().getResource(closedIconString));
-                        } catch (Exception e) {
-                            closedIco = base;
+                        if (leafIco == null) {
+                            try {
+                                leafIco = new javax.swing.ImageIcon(getClass().getResource(leafIconString));
+                            } catch (Exception e) {
+                                leafIco = base;
+                            } finally {
+                                iconCache.put(leafIconString, leafIco);
+                            }
+                        }
+                        if (closedIco == null) {
+                            try {
+                                closedIco = new javax.swing.ImageIcon(getClass().getResource(closedIconString));
+                            } catch (Exception e) {
+                                closedIco = base;
+                            } finally {
+                                iconCache.put(closedIconString, closedIco);
+                            }
                         }
                     } catch (Exception e) {
                         log.error("Error during Iconstuff" + metaNode.getIconString(), e); // NOI18N
@@ -172,54 +191,58 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                 }
             }
 
-            // Iconfactroy from classname
-            if ((iconFactory == null) && (cid > 0) && (domain != null)) {
-                try {
-                    final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
-                    final Class<?> iconFactoryClass = ClassloadingHelper.getDynamicClass(
-                            mc,
-                            ClassloadingHelper.CLASS_TYPE.ICON_FACTORY);
-                    if (iconFactoryClass != null) {
-                        iconFactory = (CidsTreeObjectIconFactory)iconFactoryClass.getConstructor().newInstance();
+            if (leafIco == null) {
+                // Iconfactroy from classname
+                if ((iconFactory == null) && (cid > 0) && (domain != null)) {
+                    try {
+                        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
+                        final Class<?> iconFactoryClass = ClassloadingHelper.getDynamicClass(
+                                mc,
+                                ClassloadingHelper.CLASS_TYPE.ICON_FACTORY);
+                        if (iconFactoryClass != null) {
+                            iconFactory = (CidsTreeObjectIconFactory)iconFactoryClass.getConstructor().newInstance();
+                        }
+                    } catch (Exception e) {
+                        log.error("Could not load IconFactory for " + key, e); // NOI18N
                     }
-                } catch (Exception e) {
-                    log.error("Could not load IconFactory for " + key, e); // NOI18N
+                    if (iconFactory != null) {
+                        iconFactories.put(key, iconFactory);                   // NOI18N
+                    } else {
+                        iconFactories.put(key, NO_ICON_FACTORY);               // NOI18N
+                    }
                 }
-                if (iconFactory != null) {
-                    iconFactories.put(key, iconFactory);                   // NOI18N
-                } else {
-                    iconFactories.put(key, NO_ICON_FACTORY);               // NOI18N
+
+                if ((iconFactory != null) && (iconFactory != NO_ICON_FACTORY)) {
+                    if (treeNode instanceof PureTreeNode) {
+                        if ((expanded == true) && (iconFactory.getOpenPureNodeIcon((PureTreeNode)treeNode) != null)) {
+                            expandedIco = iconFactory.getOpenPureNodeIcon((PureTreeNode)treeNode);
+                        } else if ((leaf == true)
+                                    && (iconFactory.getLeafPureNodeIcon((PureTreeNode)treeNode) != null)) {
+                            leafIco = iconFactory.getLeafPureNodeIcon((PureTreeNode)treeNode);
+                        } else if (iconFactory.getClosedPureNodeIcon((PureTreeNode)treeNode) != null) {
+                            closedIco = iconFactory.getClosedPureNodeIcon((PureTreeNode)treeNode);
+                        }
+                    } else if (treeNode instanceof ObjectTreeNode) {
+                        if ((expanded == true)
+                                    && (iconFactory.getOpenObjectNodeIcon((ObjectTreeNode)treeNode) != null)) {
+                            expandedIco = iconFactory.getOpenObjectNodeIcon((ObjectTreeNode)treeNode);
+                        } else if ((leaf == true)
+                                    && (iconFactory.getLeafObjectNodeIcon((ObjectTreeNode)treeNode) != null)) {
+                            leafIco = iconFactory.getLeafObjectNodeIcon((ObjectTreeNode)treeNode);
+                        } else if (iconFactory.getClosedObjectNodeIcon((ObjectTreeNode)treeNode) != null) {
+                            closedIco = iconFactory.getClosedObjectNodeIcon((ObjectTreeNode)treeNode);
+                        }
+                    } else if ((treeNode instanceof ClassTreeNode)
+                                && (iconFactory.getClassNodeIcon((ClassTreeNode)treeNode) != null)) {
+                        expandedIco = iconFactory.getClassNodeIcon((ClassTreeNode)treeNode);
+                        leafIco = expandedIco;
+                        closedIco = expandedIco;
+                    }
                 }
             }
 
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             this.setText(treeNode.toString());
-
-            if ((iconFactory != null) && (iconFactory != NO_ICON_FACTORY)) {
-                if (treeNode instanceof PureTreeNode) {
-                    if ((expanded == true) && (iconFactory.getOpenPureNodeIcon((PureTreeNode)treeNode) != null)) {
-                        expandedIco = iconFactory.getOpenPureNodeIcon((PureTreeNode)treeNode);
-                    } else if ((leaf == true) && (iconFactory.getLeafPureNodeIcon((PureTreeNode)treeNode) != null)) {
-                        leafIco = iconFactory.getLeafPureNodeIcon((PureTreeNode)treeNode);
-                    } else if (iconFactory.getClosedPureNodeIcon((PureTreeNode)treeNode) != null) {
-                        closedIco = iconFactory.getClosedPureNodeIcon((PureTreeNode)treeNode);
-                    }
-                } else if (treeNode instanceof ObjectTreeNode) {
-                    if ((expanded == true) && (iconFactory.getOpenObjectNodeIcon((ObjectTreeNode)treeNode) != null)) {
-                        expandedIco = iconFactory.getOpenObjectNodeIcon((ObjectTreeNode)treeNode);
-                    } else if ((leaf == true)
-                                && (iconFactory.getLeafObjectNodeIcon((ObjectTreeNode)treeNode) != null)) {
-                        leafIco = iconFactory.getLeafObjectNodeIcon((ObjectTreeNode)treeNode);
-                    } else if (iconFactory.getClosedObjectNodeIcon((ObjectTreeNode)treeNode) != null) {
-                        closedIco = iconFactory.getClosedObjectNodeIcon((ObjectTreeNode)treeNode);
-                    }
-                } else if ((treeNode instanceof ClassTreeNode)
-                            && (iconFactory.getClassNodeIcon((ClassTreeNode)treeNode) != null)) {
-                    expandedIco = iconFactory.getClassNodeIcon((ClassTreeNode)treeNode);
-                    leafIco = expandedIco;
-                    closedIco = expandedIco;
-                }
-            }
 
             if (expanded == true) {
                 if (expandedIco != null) {

@@ -40,6 +40,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -243,16 +244,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      * DOCUMENT ME!
      */
     private void refreshSearchTree() {
-        final Node[] oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
+        final List<Node> oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
 
         if (oldNodes == null) {
             // The search result tree has no elements. So it should not be refreshed
             return;
         }
-        final Node[] newNodes = new Node[oldNodes.length];
+        final Node[] newNodes = new Node[oldNodes.size()];
 
-        for (int index = 0; index < oldNodes.length; index++) {
-            final Node node = oldNodes[index];
+        for (int index = 0; index < oldNodes.size(); index++) {
+            final Node node = oldNodes.get(index);
             if (node instanceof MetaObjectNode) {
                 // Bei MetaObjectNodes wird der Node neu erzeugt, damit der Name gleich dem ToString Wert des
                 // veränderten Objektes ist
