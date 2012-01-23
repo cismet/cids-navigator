@@ -97,7 +97,7 @@ public class BlurredMapCoolPanel extends PainterCoolPanel implements ComponentLi
     public BlurredMapCoolPanel() {
         super();
         // FUSE initialisieren
-//        Ressourcen hierarchisch rekursiv nach oben einfuegen
+// Ressourcen hierarchisch rekursiv nach oben einfuegen
         // NOI18N
         gradientColorTop = javax.swing.UIManager.getDefaults().getColor("Button.shadow");                        // NOI18N
         gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");                 // NOI18N
