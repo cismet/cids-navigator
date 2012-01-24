@@ -940,9 +940,15 @@ public class MutablePopupMenu extends JPopupMenu {
             if ((selectionPath != null) && (selectionPath.getPath().length > 0)) {
                 final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
 
-                ((DefaultTreeModel)currentTree.getModel()).setRoot(rootTreeNode);
-                ((DefaultTreeModel)currentTree.getModel()).reload();
-                currentTree.exploreSubtree(selectionPath);
+                EventQueue.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            ((DefaultTreeModel)currentTree.getModel()).setRoot(rootTreeNode);
+                            ((DefaultTreeModel)currentTree.getModel()).reload();
+                            currentTree.exploreSubtree(selectionPath);
+                        }
+                    });
             }
         }
     }
