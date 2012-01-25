@@ -155,16 +155,22 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
-     * @param   search                      DOCUMENT ME!
-     * @param   listener                    DOCUMENT ME!
-     * @param   searchResultsListener       DOCUMENT ME!
-     * @param   suppressEmptyResultMessage  DOCUMENT ME!
+     * @param   search                      The search to perform.
+     * @param   searchListener              A listener which will be informed about status changes of search thread.
+     *                                      Usually a SearchControlPanel.
+     * @param   searchResultsTreeListener   A listener which will be informed about status changes of the thread which
+     *                                      refreshes the SearchResultsTree. Usually the same SearchControlPanel as
+     *                                      listener.
+     * @param   suppressEmptyResultMessage  A flag indicating that the user shouldn't be informed about an empty result.
+     *                                      Since this message is generated in the called method to display the search
+     *                                      results in the SearchResultsTree this flag decides about calling thismethod
+     *                                      or not.
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResults(final CidsServerSearch search,
-            final PropertyChangeListener listener,
-            final PropertyChangeListener searchResultsListener,
+            final PropertyChangeListener searchListener,
+            final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
@@ -191,7 +197,7 @@ public final class CidsSearchExecutor {
                     result = nodes.toArray(new Node[0]);
                     if (!isCancelled()) {
                         if (!suppressEmptyResultMessage || (result.length > 0)) {
-                            MethodManager.getManager().showSearchResults(result, false, searchResultsListener);
+                            MethodManager.getManager().showSearchResults(result, false, searchResultsTreeListener);
                         }
                     }
 
@@ -199,7 +205,7 @@ public final class CidsSearchExecutor {
                 }
             };
 
-        worker.addPropertyChangeListener(listener);
+        worker.addPropertyChangeListener(searchListener);
 
         CismetThreadPool.execute(worker);
 

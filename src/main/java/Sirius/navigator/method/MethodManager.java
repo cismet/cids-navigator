@@ -307,8 +307,8 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  resultNodes  DOCUMENT ME!
-     * @param  append       DOCUMENT ME!
+     * @param  resultNodes  The results to display in the SearchResultsTree.
+     * @param  append       Whether to append the search results or not.
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append) {
@@ -318,13 +318,14 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  resultNodes  DOCUMENT ME!
-     * @param  append       DOCUMENT ME!
-     * @param  listener     DOCUMENT ME!
+     * @param  resultNodes                The results to display in the SearchResultsTree.
+     * @param  append                     Whether to append the search results or not.
+     * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
+     *                                    Usually a SearchControlPanel.
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append,
-            final PropertyChangeListener listener) {
+            final PropertyChangeListener searchResultsTreeListener) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
             JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
                 org.openide.util.NbBundle.getMessage(
@@ -335,7 +336,9 @@ public class MethodManager {
                     "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
                 JOptionPane.WARNING_MESSAGE);
         } else {
-            ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(resultNodes, append, listener);
+            ComponentRegistry.getRegistry()
+                    .getSearchResultsTree()
+                    .setResultNodes(resultNodes, append, searchResultsTreeListener);
             this.showSearchResults();
         }
     }

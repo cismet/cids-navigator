@@ -254,13 +254,13 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     }
 
     @Override
-    public void searchCancelled() {
+    public void searchCanceled() {
         setVisible(false);
     }
 
     @Override
-    public boolean displaysEmptyResultMessage() {
-        return false;
+    public boolean suppressEmptyResultMessage() {
+        return true;
     }
 
     /**

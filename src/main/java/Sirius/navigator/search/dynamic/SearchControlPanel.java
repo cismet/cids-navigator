@@ -174,7 +174,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                     search,
                     this,
                     this,
-                    !listener.displaysEmptyResultMessage());
+                    listener.suppressEmptyResultMessage());
             searching = true;
             setControlsAccordingToState();
             listener.searchStarted();
@@ -227,7 +227,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
         if (SwingWorker.StateValue.DONE.equals(evt.getNewValue())) {
             if (source.isCancelled()) {
                 searching = false;
-                listener.searchCancelled();
+                listener.searchCanceled();
                 setControlsAccordingToState();
             } else {
                 int results = 0;
@@ -259,6 +259,13 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                     JXErrorPane.showDialog(getRootPane(), errorInfo);
                 }
 
+                // SearchControlPanel is used as listener of the search thread and as a listener for the thread which
+                // refreshes the SearchResultsTree. So this point is reached by on of two conditions:
+                // - The search thread is done.
+                // - Refreshing the SearchResultsTree is done.
+                // SearchControlPanel can display normal mode only if:
+                // - Search is done and has no results (refreshing the SearchResultsTree is not started).
+                // - Or refreshing SearchResultsTree is done.
                 if ((source.equals(searchThread) && (results == 0))
                             || !source.equals(searchThread)) {
                     searching = false;
