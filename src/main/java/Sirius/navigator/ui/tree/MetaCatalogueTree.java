@@ -45,9 +45,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -232,23 +234,32 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      *
      * @return  DOCUMENT ME!
      */
-    public Future requestRefreshNode(final String artificialId) {
+    public Set<Future> requestRefreshNode(final String artificialId) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("refresh for artificial id requested: " + artificialId); // NOI18N
         }
 
-        final DefaultMetaTreeNode node = refreshCache.get(artificialId);
+        final Set<Future> futures = new HashSet<Future>();
 
-        final Future future;
-        if ((node == null) || !node.isExplored()) {
-            // we won't do anything, the node is not in cache or has not been explored yet, so an update would be
-            // pointless
-            future = null;
+        if (refreshCache.isValid()) {
+            final Set<DefaultMetaTreeNode> nodes = refreshCache.get(artificialId);
+
+            final Iterator<DefaultMetaTreeNode> it = nodes.iterator();
+
+            while (it.hasNext()) {
+                final DefaultMetaTreeNode node = it.next();
+                if ((node == null) || !node.isExplored()) {
+                    // we won't do anything, the node is not in cache or has not been explored yet, so an update would
+                    // be pointless
+                } else {
+                    futures.add(treePool.submit(new RefreshWorker(node)));
+                }
+            }
         } else {
-            future = treePool.submit(new RefreshWorker(node));
+            LOG.warn("cannot refresh nodes, because the cache is invalid"); // NOI18N
         }
 
-        return future;
+        return futures;
     }
 
     /**
@@ -561,7 +572,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     }
                 }
             }
-        }
+            }
 
         /**
          * DOCUMENT ME!

@@ -21,10 +21,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -42,6 +46,7 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(MetaTreeRefreshCache.class);
+    private static final transient Pattern WC_PATTERN = Pattern.compile("(?<!\\\\)\\*{1}|(?<!\\\\)\\?{1}"); // NOI18N
 
     //~ Instance fields --------------------------------------------------------
 
@@ -67,20 +72,105 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * The cache allows wildcards in the artificalId string. There are two wildcard characters:
      *
      * @param   artificialId  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public DefaultMetaTreeNode get(final String artificialId) {
+    public Set<DefaultMetaTreeNode> get(final String artificialId) {
         if (valid) {
-            return nodeCache.get(artificialId);
+            final Set<DefaultMetaTreeNode> nodes = new HashSet<DefaultMetaTreeNode>();
+
+            final Matcher m = WC_PATTERN.matcher(artificialId);
+            if (m.find()) {
+                m.reset();
+                final StringBuilder regexbuilder = new StringBuilder();
+
+                int beginIndex = 0;
+                while (m.find()) {
+                    regexbuilder.append(Pattern.quote(artificialId.substring(beginIndex, m.start())));
+                    regexbuilder.append((artificialId.charAt(m.start()) == '*') ? ".*" : ".?"); // NOI18N
+
+                    beginIndex = m.end();
+                }
+
+                if (beginIndex < artificialId.length()) {
+                    regexbuilder.append(artificialId.substring(beginIndex));
+                }
+
+                final Pattern regex = Pattern.compile(regexbuilder.toString());
+
+                for (final String key : nodeCache.keySet()) {
+                    if (regex.matcher(key).matches()) {
+                        nodes.add(nodeCache.get(key));
+                    }
+                }
+            } else {
+                final DefaultMetaTreeNode node = nodeCache.get(artificialId);
+                if (node != null) {
+                    nodes.add(node);
+                }
+            }
+
+            return nodes;
         } else {
             LOG.warn("cache is invalid, tree ui probably not accurate anymore, perform manual tree refresh"); // NOI18N
         }
 
         return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        final String s = "rainfall.*";
+        final Matcher m = WC_PATTERN.matcher(s);
+        final StringBuilder sb = new StringBuilder();
+
+        int beginIndex = 0;
+        while (m.find()) {
+            sb.append(Pattern.quote(s.substring(beginIndex, m.start())));
+            beginIndex = m.end();
+            if (s.charAt(m.start()) == '*') {
+                sb.append(".*");
+            } else {
+                sb.append(".?");
+            }
+        }
+
+        if (beginIndex < s.length()) {
+            sb.append(s.substring(beginIndex));
+        }
+
+        System.out.println(sb.toString());
+        System.out.println(beginIndex);
+        System.out.println(s.length());
+
+        final Pattern p = Pattern.compile(sb.toString());
+        System.out.println("***="
+                    + p.matcher("***").matches());
+
+//        final String[] anySplit = "abc*ds\\*gh?beda\\* dalskd*".split(WC_ANY_SPLIT_PATTERN);
+//        final StringBuilder regex = new StringBuilder();
+//        for(final String anyPart : anySplit){
+//            final StringBuilder sb = new StringBuilder();
+//            final String[] oneSplit = anyPart.split(WC_ONE_SPLIT_PATTERN);
+//            for(final String onePart : oneSplit){
+//                sb.append(Pattern.quote(onePart));
+//                sb.append(".?");
+//            }
+//
+//            regex.append(sb);
+//            regex.append(".*");
+//        }
+//
+//
+//
+//        System.out.println(regex.toString());
     }
 
     /**
