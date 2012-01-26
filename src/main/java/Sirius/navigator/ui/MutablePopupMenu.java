@@ -66,7 +66,6 @@ import javax.swing.tree.TreePath;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
-import de.cismet.cismap.commons.interaction.CismapBroker;
 
 /**
  * DOCUMENT ME!
@@ -940,7 +939,7 @@ public class MutablePopupMenu extends JPopupMenu {
             if ((selectionPath != null) && (selectionPath.getPath().length > 0)) {
                 final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
 
-                EventQueue.invokeLater(new Runnable() {
+                final Runnable r = new Runnable() {
 
                         @Override
                         public void run() {
@@ -948,7 +947,13 @@ public class MutablePopupMenu extends JPopupMenu {
                             ((DefaultTreeModel)currentTree.getModel()).reload();
                             currentTree.exploreSubtree(selectionPath);
                         }
-                    });
+                    };
+                
+                if(EventQueue.isDispatchThread()){
+                    r.run();
+                } else {
+                    EventQueue.invokeLater(r);
+                }
             }
         }
     }
