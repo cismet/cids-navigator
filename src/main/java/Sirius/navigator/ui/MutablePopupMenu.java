@@ -66,7 +66,6 @@ import javax.swing.tree.TreePath;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
-
 /**
  * DOCUMENT ME!
  *
@@ -948,8 +947,8 @@ public class MutablePopupMenu extends JPopupMenu {
                             currentTree.exploreSubtree(selectionPath);
                         }
                     };
-                
-                if(EventQueue.isDispatchThread()){
+
+                if (EventQueue.isDispatchThread()) {
                     r.run();
                 } else {
                     EventQueue.invokeLater(r);

@@ -16,11 +16,12 @@ import Sirius.server.middleware.types.Node;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.NbBundle;
+
 import java.awt.EventQueue;
 
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeModel;
-import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -55,8 +56,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      *
      * @param  topNodes  ein Array von Nodes
      */
-    public RootTreeNode(final Node[] topNodes)
-    {
+    public RootTreeNode(final Node[] topNodes) {
         this(topNodes, new DefaultTreeNodeLoader());
     }
 
@@ -66,8 +66,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      * @param  topNodes        DOCUMENT ME!
      * @param  treeNodeLoader  DOCUMENT ME!
      */
-    public RootTreeNode(final Node[] topNodes, final TreeNodeLoader treeNodeLoader)
-    {
+    public RootTreeNode(final Node[] topNodes, final TreeNodeLoader treeNodeLoader) {
         super(null);
         this.treeNodeLoader = treeNodeLoader;
         this.setAllowsChildren(true);
@@ -240,7 +239,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     EventQueue.invokeLater(r);
                 }
             }
-            
+
             if (children == null) {
                 return false;
             }
@@ -278,7 +277,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     } else {
                         EventQueue.invokeLater(r);
                     }
-                    
+
                     explored &= children[i].isValid();
                 } else if (children[i] instanceof MetaObjectNode) {
                     final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode)children[i]);
@@ -291,7 +290,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                                 @Override
                                 protected Void doInBackground() throws Exception {
                                     otn.getMetaObject(true);
-                                    
+
                                     return null;
                                 }
 
@@ -322,11 +321,11 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     } else {
                         EventQueue.invokeLater(r);
                     }
-                    
+
                     explored &= children[i].isValid();
                 } else {
                     final String message = "[DefaultTreeNodeLoader] Wrong Node Type: '" + children[i] + "'"; // NOI18N
-                    LOG.error(message);          
+                    LOG.error(message);
                     throw new IllegalStateException(message);
                 }
             }
