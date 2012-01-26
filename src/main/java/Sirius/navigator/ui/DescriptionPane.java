@@ -563,13 +563,26 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param  optionalTitle  DOCUMENT ME!
      */
     public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
-        breadCrumbModel.appendCrumb(new CidsMetaObjectBreadCrumb(to) {
+        final CidsMetaObjectBreadCrumb crumb = new CidsMetaObjectBreadCrumb(to) {
 
                 @Override
                 public void crumbActionPerformed(final ActionEvent e) {
                     startSingleRendererWorker(to, optionalTitle);
                 }
-            });
+            };
+
+        if (currentRenderer() == null) {
+            // there is no renderer displayed
+            if ((worker != null) && !worker.isDone()) {
+                worker.cancel(true);
+                worker = null;
+            } else {
+                showObjects();
+                showWaitScreen();
+            }
+        }
+
+        breadCrumbModel.appendCrumb(crumb);
         startSingleRendererWorker(to, optionalTitle);
     }
 
