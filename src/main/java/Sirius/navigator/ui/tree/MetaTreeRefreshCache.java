@@ -122,58 +122,6 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
     }
 
     /**
-     * DOCUMENT ME!
-     *
-     * @param  args  DOCUMENT ME!
-     */
-    public static void main(final String[] args) {
-        final String s = "rainfall.*";
-        final Matcher m = WC_PATTERN.matcher(s);
-        final StringBuilder sb = new StringBuilder();
-
-        int beginIndex = 0;
-        while (m.find()) {
-            sb.append(Pattern.quote(s.substring(beginIndex, m.start())));
-            beginIndex = m.end();
-            if (s.charAt(m.start()) == '*') {
-                sb.append(".*");
-            } else {
-                sb.append(".?");
-            }
-        }
-
-        if (beginIndex < s.length()) {
-            sb.append(s.substring(beginIndex));
-        }
-
-        System.out.println(sb.toString());
-        System.out.println(beginIndex);
-        System.out.println(s.length());
-
-        final Pattern p = Pattern.compile(sb.toString());
-        System.out.println("***="
-                    + p.matcher("***").matches());
-
-//        final String[] anySplit = "abc*ds\\*gh?beda\\* dalskd*".split(WC_ANY_SPLIT_PATTERN);
-//        final StringBuilder regex = new StringBuilder();
-//        for(final String anyPart : anySplit){
-//            final StringBuilder sb = new StringBuilder();
-//            final String[] oneSplit = anyPart.split(WC_ONE_SPLIT_PATTERN);
-//            for(final String onePart : oneSplit){
-//                sb.append(Pattern.quote(onePart));
-//                sb.append(".?");
-//            }
-//
-//            regex.append(sb);
-//            regex.append(".*");
-//        }
-//
-//
-//
-//        System.out.println(regex.toString());
-    }
-
-    /**
      * The cache will be cleared and initialised with the currently expanded paths.
      */
     private void init() {
