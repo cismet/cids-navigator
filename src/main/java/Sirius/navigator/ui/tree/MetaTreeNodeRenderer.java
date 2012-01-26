@@ -240,7 +240,6 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                     }
                 }
             }
-
             super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
             this.setText(treeNode.toString());
 

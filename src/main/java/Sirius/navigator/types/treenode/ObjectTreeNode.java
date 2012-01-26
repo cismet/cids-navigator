@@ -17,6 +17,8 @@ import Sirius.server.middleware.types.Node;
 
 import org.apache.log4j.Logger;
 
+import java.util.HashMap;
+
 import javax.swing.ImageIcon;
 
 import de.cismet.tools.CurrentStackTrace;
@@ -32,6 +34,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     private static final transient Logger LOG = Logger.getLogger(ObjectTreeNode.class);
     private static final ResourceManager resource = ResourceManager.getManager();
+    private static final HashMap<String, ImageIcon> iconCache = new HashMap<String, ImageIcon>();
 
     //~ Instance fields --------------------------------------------------------
 
@@ -71,14 +74,20 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         super(MetaObjectNode);
 
         try {
-            final MetaClass metaClass = this.getMetaClass();
-            if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
-                this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
-            } else {
-                this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif"); // NOI18N
+            final MetaClass myMetaClass = this.getMetaClass();
+            final String classKey = myMetaClass.getID() + "@" + myMetaClass.getDomain();
+
+            nodeIcon = iconCache.get(classKey);
+            if (nodeIcon == null) {
+                if ((myMetaClass != null) && (myMetaClass.getObjectIconData().length > 0)) {
+                    this.nodeIcon = new ImageIcon(myMetaClass.getObjectIconData());
+                } else {
+                    this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif"); // NOI18N
+                }
+                iconCache.put(classKey, nodeIcon);
             }
         } catch (Exception exp) {
-            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");     // NOI18N
+            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");         // NOI18N
         }
     }
 

@@ -7,6 +7,8 @@
 ****************************************************/
 package Sirius.navigator.types.treenode;
 
+import Sirius.navigator.ui.ComponentRegistry;
+
 import Sirius.server.middleware.types.MetaClassNode;
 import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObjectNode;
@@ -17,6 +19,7 @@ import org.apache.log4j.Logger;
 import java.awt.EventQueue;
 
 import javax.swing.ImageIcon;
+import javax.swing.tree.DefaultTreeModel;
 
 /**
  * DOCUMENT ME!
@@ -81,27 +84,10 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
     public void addChildren(final Node[] topNodes) {
         this.removeAllChildren();
 
-        de.cismet.tools.CismetThreadPool.execute(new javax.swing.SwingWorker<Void, Void>() {
-
-                @Override
-                protected Void doInBackground() throws Exception {
-                    treeNodeLoader.addChildren(RootTreeNode.this, topNodes);
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    try {
-                        get();
-                    } catch (Exception e) {
-                        log.error("could not add children", e);
-                    }
-                }
-            });
-
         try {
-        } catch (Exception exp) {
-            log.error("could not add children", exp); // NOI18N
+            treeNodeLoader.addChildren(RootTreeNode.this, topNodes);
+        } catch (Exception e) {
+            log.error("could not add children", e);
         }
     }
 
@@ -306,7 +292,31 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode)children[i]);
                     // toString aufrufen, damit das MetaObject nicht erst im CellRenderer des MetaCatalogueTree vom
                     // Server geholt wird
-                    otn.toString();
+
+                    if ((otn.getMetaObject(false) == null) && (otn.getMetaObjectNode().getName() == null)) {
+                        de.cismet.tools.CismetThreadPool.execute(new javax.swing.SwingWorker<Void, Void>() {
+
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    otn.getMetaObject(true);
+                                    return null;
+                                }
+
+                                @Override
+                                protected void done() {
+                                    try {
+                                        final Void result = get();
+                                        ((DefaultTreeModel)ComponentRegistry.getRegistry().getSearchResultsTree()
+                                                    .getModel()).nodeChanged(otn);
+                                        ((DefaultTreeModel)ComponentRegistry.getRegistry().getCatalogueTree()
+                                                    .getModel()).nodeChanged(otn);
+                                    } catch (Exception e) {
+                                        log.error("Exception in Background Thread", e);
+                                    }
+                                }
+                            });
+                    }
+
                     final Runnable r = new Runnable() {
 
                             @Override
