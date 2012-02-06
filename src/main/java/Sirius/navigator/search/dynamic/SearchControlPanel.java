@@ -23,6 +23,8 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import java.awt.Dimension;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -125,9 +127,15 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 SearchControlPanel.class,
                 "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
         btnSearchCancel.setFocusPainted(false);
-        btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, 25));
-        btnSearchCancel.setMinimumSize(new java.awt.Dimension(100, 25));
-        btnSearchCancel.setPreferredSize(new java.awt.Dimension(100, 25));
+        btnSearchCancel.setMaximumSize(new java.awt.Dimension(
+                100,
+                (new Double(getMaximumSize().getHeight()).intValue())));
+        btnSearchCancel.setMinimumSize(new java.awt.Dimension(
+                100,
+                (new Double(getMinimumSize().getHeight()).intValue())));
+        btnSearchCancel.setPreferredSize(new java.awt.Dimension(
+                100,
+                (new Double(getPreferredSize().getHeight()).intValue())));
         btnSearchCancel.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -292,5 +300,25 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
             LOG.info("Start search programmatically.");
         }
         btnSearchCancel.doClick();
+    }
+
+    @Override
+    public void setMaximumSize(final Dimension maximumSize) {
+        btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, (new Double(maximumSize.getHeight()).intValue())));
+        super.setMaximumSize(maximumSize);
+    }
+
+    @Override
+    public void setMinimumSize(final Dimension minimumSize) {
+        btnSearchCancel.setMinimumSize(new java.awt.Dimension(100, (new Double(minimumSize.getHeight()).intValue())));
+        super.setMinimumSize(minimumSize);
+    }
+
+    @Override
+    public void setPreferredSize(final Dimension preferredSize) {
+        btnSearchCancel.setPreferredSize(new java.awt.Dimension(
+                100,
+                (new Double(preferredSize.getHeight()).intValue())));
+        super.setPreferredSize(preferredSize);
     }
 }
