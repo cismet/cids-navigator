@@ -135,18 +135,7 @@ public class MethodManager {
      */
     public void callSpecialTreeCommand() {
         if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof SearchResultsTree) {
-            if (
-                !((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeResultNodes(
-                            ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNodes())) {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.message"), // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.title"), // NOI18N
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
+            ((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeSelectedResultNodes();
         } else if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof MetaCatalogueTree) {
             final DefaultMetaTreeNode[] selectedTreeNodes = ComponentRegistry.getRegistry()
                         .getActiveCatalogue()

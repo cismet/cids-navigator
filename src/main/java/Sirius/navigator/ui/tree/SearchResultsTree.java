@@ -209,7 +209,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 @Override
                 public void run() {
                     rootNode.removeAllChildren();
-                    rootNode.add(waitTreeNode);
+                    if (resultNodes.size() > 0) {
+                        rootNode.add(waitTreeNode);
+                    }
 
                     defaultTreeModel.nodeStructureChanged(rootNode);
 
@@ -357,6 +359,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         final Collection selectedNodes = this.getSelectedNodes();
         if (selectedNodes != null) {
             this.removeResultNodes(selectedNodes);
+            refreshTree(false);
         }
     }
 
@@ -372,6 +375,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             log.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
         boolean deleted = false;
+
         try {
             if ((selectedNodes != null) && (selectedNodes.size() > 0)) {
                 final ArrayList all = new ArrayList(Arrays.asList(resultNodes));
@@ -382,37 +386,47 @@ public class SearchResultsTree extends MetaCatalogueTree {
                     if (selO instanceof DefaultMetaTreeNode) {
                         final Node n = ((DefaultMetaTreeNode)selO).getNode();
                         selection.add(n);
+                        deleted = true;
                     }
                 }
+                resultNodes.removeAll(selection);
 
-                for (final Object allO : all) {
-                    for (final Object selO : selection) {
-                        if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
-                            final MetaObjectNode allMON = (MetaObjectNode)allO;
-                            final MetaObjectNode selMON = (MetaObjectNode)selO;
-                            if ((allMON.getObjectId() == selMON.getObjectId())
-                                        && (allMON.getClassId() == selMON.getClassId())
-                                        && (allMON.getId() == selMON.getId())
-                                        && allMON.getDomain().equals(selMON.getDomain())
-                                        && allMON.toString().equals(selMON.toString())) {
-                                allWorkingCopy.remove(allO);
-                                deleted = true;
-                            }
-                        } else if ((allO instanceof MetaNode) && (selO instanceof MetaNode)) {
-                            final MetaNode allMN = (MetaNode)allO;
-                            final MetaNode selMN = (MetaNode)selO;
-                            if ((allMN.getId() == selMN.getId())
-                                        && allMN.getDomain().equals(selMN.getDomain())
-                                        && allMN.toString().equals(selMN.toString())) {
-                                allWorkingCopy.remove(allO);
-                                deleted = true;
-                            }
-                        }
-                    }
-                }
-
-                this.setResultNodes((Node[])allWorkingCopy.toArray(new Node[allWorkingCopy.size()]), false, null);
+//                if (resultNodes.size() == 0) {
+//                    clear();
+//                } else {
+//                    defaultTreeModel.nodeStructureChanged(rootNode);
+//                }
             }
+
+//
+//                for (final Object allO : all) {
+//                    for (final Object selO : selection) {
+//                        if ((allO instanceof MetaObjectNode) && (selO instanceof MetaObjectNode)) {
+//                            final MetaObjectNode allMON = (MetaObjectNode)allO;
+//                            final MetaObjectNode selMON = (MetaObjectNode)selO;
+//                            if ((allMON.getObjectId() == selMON.getObjectId())
+//                                        && (allMON.getClassId() == selMON.getClassId())
+//                                        && (allMON.getId() == selMON.getId())
+//                                        && allMON.getDomain().equals(selMON.getDomain())
+//                                        && allMON.toString().equals(selMON.toString())) {
+//                                allWorkingCopy.remove(allO);
+//                                deleted = true;
+//                            }
+//                        } else if ((allO instanceof MetaNode) && (selO instanceof MetaNode)) {
+//                            final MetaNode allMN = (MetaNode)allO;
+//                            final MetaNode selMN = (MetaNode)selO;
+//                            if ((allMN.getId() == selMN.getId())
+//                                        && allMN.getDomain().equals(selMN.getDomain())
+//                                        && allMN.toString().equals(selMN.toString())) {
+//                                allWorkingCopy.remove(allO);
+//                                deleted = true;
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                this.setResultNodes((Node[])allWorkingCopy.toArray(new Node[allWorkingCopy.size()]), false, null);
+//            }
         } catch (Exception e) {
             log.error("Fehler beim Entfernen eines Objektes aus den Suchergebnissen", e);
         }
