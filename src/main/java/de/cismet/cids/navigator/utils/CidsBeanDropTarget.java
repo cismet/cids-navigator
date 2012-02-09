@@ -16,6 +16,7 @@ import java.awt.Component;
 import java.awt.HeadlessException;
 import java.awt.dnd.DropTargetDragEvent;
 import java.awt.dnd.DropTargetEvent;
+import java.awt.dnd.DropTargetListener;
 
 import java.util.ArrayList;
 
@@ -79,38 +80,29 @@ public class CidsBeanDropTarget extends AbstractCidsBeanDropTarget {
     @Override
     public void beansDropped(final ArrayList<CidsBean> beans) {
         dropListener.beansDropped(beans);
-        if (getComponent() instanceof JComponent) {
-            ((JComponent)getComponent()).setBorder(old);
-        }
     }
 
     @Override
     public void dragOver(final DropTargetDragEvent dtde) {
         super.dragOver(dtde);
-        if ((getComponent() instanceof JComponent)
-                    && (((JComponent)getComponent()).getBorder() instanceof EtchedBorder)) {
-            if ((getComponent() instanceof JComponent)
-                        && (((JComponent)getComponent()).getBorder() instanceof EtchedBorder)) {
-                ((JComponent)getComponent()).setBorder(active);
-            } else {
-                ((JComponent)getComponent()).setBorder(etched);
-            }
+        if (getComponent() instanceof DropTargetListener) {
+            ((DropTargetListener)getComponent()).dragOver(dtde);
         }
     }
 
     @Override
     public void dragExit(final DropTargetEvent dte) {
         super.dragExit(dte);
-        if (getComponent() instanceof JComponent) {
-            ((JComponent)getComponent()).setBorder(old);
+        if (getComponent() instanceof DropTargetListener) {
+            ((DropTargetListener)getComponent()).dragExit(dte);
         }
     }
 
     @Override
     public void dragEnter(final DropTargetDragEvent dtde) {
         super.dragEnter(dtde);
-        if (getComponent() instanceof JComponent) {
-            old = ((JComponent)getComponent()).getBorder();
+        if (getComponent() instanceof DropTargetListener) {
+            ((DropTargetListener)getComponent()).dragEnter(dtde);
         }
     }
 }

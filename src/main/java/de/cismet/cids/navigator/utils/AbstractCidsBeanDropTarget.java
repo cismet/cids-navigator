@@ -65,7 +65,7 @@ public abstract class AbstractCidsBeanDropTarget extends DropTarget {
 
     @Override
     public synchronized void drop(final DropTargetDropEvent dtde) {
-        log.fatal("drop");                                      // NOI18N
+        log.info("dropped Cidsbeans");                          // NOI18N
         try {
             final ArrayList<CidsBean> beans = new ArrayList<CidsBean>();
             if (dtde.getTransferable().isDataFlavorSupported(fromNavigatorNode)

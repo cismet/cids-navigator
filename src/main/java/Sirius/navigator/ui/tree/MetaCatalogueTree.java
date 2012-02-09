@@ -572,7 +572,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     }
                 }
             }
-            }
+        }
 
         /**
          * DOCUMENT ME!
