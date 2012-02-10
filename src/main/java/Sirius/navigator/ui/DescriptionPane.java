@@ -180,7 +180,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         scpRenderer.setViewportView(panRenderer);
         panRenderer.setLayout(new GridBagLayout());
 
-        /*Following try-catch-block only exists to enable the user to user DescriptionPaneTest which runs outside the
+        /*
+         * Following try-catch-block only exists to enable the user to user DescriptionPaneTest which runs outside the
          * navigator. When running DescriptionPaneTest a RuntimeException will be thrown because no SessionManager is
          * available.
          */
@@ -313,8 +314,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
                     final List<JComponent> all = new ArrayList<JComponent>();
-
                     boolean multipleClasses = false;
+                    boolean initialized = false;
 
                     @Override
                     protected SelfDisposingPanel doInBackground() throws Exception {
@@ -392,8 +393,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                     protected void process(final List<SelfDisposingPanel> chunks) {
                         int y = all.size();
 
-                        if (!multipleClasses && (chunks.size() == 1)) {
-                            final SelfDisposingPanel sdp = chunks.get(0);
+                        if (!initialized) {
                             showsWaitScreen = false;
                             removeAndDisposeAllRendererFromPanel();
                             gridBagConstraints = new java.awt.GridBagConstraints();
@@ -402,7 +402,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             gridBagConstraints.weightx = 1;
                             gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                             gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                            initialized = true;
+                        }
 
+                        if ((chunks.size() == 1) && (y == 0)) {
+                            final SelfDisposingPanel sdp = chunks.get(0);
                             if (sdp instanceof RequestsFullSizeComponent) {
                                 if (LOG.isInfoEnabled()) {
                                     LOG.info("Renderer is FullSize Component!"); // NOI18N
