@@ -11,7 +11,6 @@
  */
 package de.cismet.cids.editors;
 
-import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.tools.MetaObjectCache;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -79,19 +78,12 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     private boolean nullable = false;
     private boolean onlyUsed = false;
     private Comparator<CidsBean> comparator = beanToStringComparator;
-    private String nullValueRepresentation = null;
+    private String nullValueRepresentation = " ";
 
-    //~ Constructors -----------------------------------------------------------
+    //~ Instance initializers --------------------------------------------------
 
-    /**
-     * Creates a new DefaultBindableReferenceCombo object.
-     */
-    public DefaultBindableReferenceCombo() {
-        final String[] s = new String[] { null };
-
-        setModel(new DefaultComboBoxModel(s));
-        final DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
-        setRenderer(new ListCellRenderer() {
+    {
+        setRenderer(new DefaultListCellRenderer() {
 
                 @Override
                 public Component getListCellRendererComponent(final JList list,
@@ -99,7 +91,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                         final int index,
                         final boolean isSelected,
                         final boolean cellHasFocus) {
-                    final Component ret = dlcr.getListCellRendererComponent(
+                    final Component ret = super.getListCellRendererComponent(
                             list,
                             value,
                             index,
@@ -111,6 +103,27 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                     return ret;
                 }
             });
+    }
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     */
+    public DefaultBindableReferenceCombo() {
+        final String[] s = new String[] { null };
+
+        setModel(new DefaultComboBoxModel(s));
+    }
+
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     *
+     * @param  nullable  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo(final boolean nullable) {
+        this();
+        this.nullable = nullable;
     }
 
     /**
