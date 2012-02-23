@@ -29,6 +29,7 @@ import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
 import Sirius.server.search.CidsServerSearch;
+import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
 import Sirius.server.search.store.Info;
@@ -442,10 +443,35 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public MetaObject[] getMetaObject(final User user, final Sirius.server.search.Query query)
+    public MetaObject[] getMetaObjectByQuery(final User user, final String query, final String domain)
             throws ConnectionException {
         try {
+            return ((MetaService)callserver).getMetaObject(user, query, domain);
+        } catch (RemoteException re) {
+            LOG.error("[ServerError] could not retrieve MetaObject", re);
+            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),
+                ConnectionException.ERROR,
+                re.getCause());
+        }
+    }
+
+    @Override
+    public MetaObject[] getMetaObject(final User user, final Query query) throws ConnectionException {
+        try {
             return ((MetaService)callserver).getMetaObject(user, query);
+        } catch (RemoteException re) {
+            LOG.error("[ServerError] could not retrieve MetaObject", re);
+            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),
+                ConnectionException.ERROR,
+                re.getCause());
+        }
+    }
+
+    @Override
+    public MetaObject[] getMetaObject(final User usr, final Query query, final String domain)
+            throws ConnectionException {
+        try {
+            return ((MetaService)callserver).getMetaObject(usr, query, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve MetaObject", re);
             throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),

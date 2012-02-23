@@ -321,6 +321,19 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
+     * @param   usr     DOCUMENT ME!
+     * @param   query   DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject[] getMetaObject(User usr, Query query, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   user      DOCUMENT ME!
      * @param   objectID  DOCUMENT ME!
      * @param   classID   DOCUMENT ME!
@@ -343,6 +356,19 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject[] getMetaObjectByQuery(User user, String query) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user    DOCUMENT ME!
+     * @param   query   DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject[] getMetaObjectByQuery(User user, String query, String domain) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
