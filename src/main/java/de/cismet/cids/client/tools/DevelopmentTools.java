@@ -208,10 +208,39 @@ public class DevelopmentTools {
             final String pass,
             final String table,
             final int limit) throws Exception {
+        return createCidsBeansFromRMIConnectionOnLocalhost(domain, group, user, pass, table, null, limit);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain     DOCUMENT ME!
+     * @param   group      DOCUMENT ME!
+     * @param   user       DOCUMENT ME!
+     * @param   pass       DOCUMENT ME!
+     * @param   table      DOCUMENT ME!
+     * @param   condition  DOCUMENT ME!
+     * @param   limit      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean[] createCidsBeansFromRMIConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final String condition,
+            final int limit) throws Exception {
         String limitS = "";
+        String whereS = "";
 
         if (limit > 0) {
             limitS = "LIMIT " + limit;
+        }
+        if ((condition != null) && (condition.trim().length() > 0)) {
+            whereS = "WHERE " + condition;
         }
         if (!SessionManager.isInitialized()) {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
@@ -219,18 +248,21 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         System.out.println("bauen ...");
+        final String query = "SELECT "
+                    + mc.getID()
+                    + ", "
+                    + mc.getPrimaryKey()
+                    + " FROM "
+                    + mc.getTableName()
+                    + " "
+                    + whereS
+                    + " order by "
+                    + mc.getPrimaryKey()
+                    + " "
+                    + limitS;
+        System.out.println("Query: " + query);
         final MetaObject[] metaObjects = SessionManager.getConnection()
-                    .getMetaObjectByQuery(SessionManager.getSession().getUser(),
-                        "SELECT "
-                        + mc.getID()
-                        + ", "
-                        + mc.getPrimaryKey()
-                        + " FROM "
-                        + mc.getTableName()
-                        + " order by "
-                        + mc.getPrimaryKey()
-                        + " "
-                        + limitS);
+                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
         for (int i = 0; i < metaObjects.length; i++) {
             final MetaObject metaObject = metaObjects[i];
