@@ -270,8 +270,51 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * @return  DOCUMENT ME!
      */
     public Future exploreSubtree(final TreePath treePath) {
+        final Set<Future> futures = new HashSet<Future>();
         final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
+        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
+
+        if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("exploring subtree: " + nodes.length);                                                        // NOI18N
+            }
+            final List<?> nodeList = Arrays.asList(nodes);
+            for (final Object o : nodeList) {
+                if (!(o instanceof DefaultMetaTreeNode)) {
+                    nodeList.remove(o);
+                    LOG.warn("Node " + o                                                                                // NOI18N
+                                + " is not instance of DefaultMetaTreeNode and has been removed from the Collection."); // NOI18N
+                }
+            }
+            final Iterator<DefaultMetaTreeNode> childrenIterator = (Iterator<DefaultMetaTreeNode>)nodeList.iterator();
+
+            // Root Node entfernen
+            childrenIterator.next();
+            final SubTreeExploreThread subTreeExploreThread = new SubTreeExploreThread((DefaultMetaTreeNode)rootNode,
+                    childrenIterator);
+
+            return CismetThreadPool.submit(subTreeExploreThread);
+        } else {
+            LOG.warn("could not explore subtree"); // NOI18N
+        }
+
+        return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   treePath  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Future refreshTreePath(final TreePath treePath) {
+        final Set<Future> futures = new HashSet<Future>();
+        final Object[] nodes = treePath.getPath();
+        final Object rootNode = this.getModel().getRoot();
+        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
+
         if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("exploring subtree: " + nodes.length);                                                        // NOI18N
@@ -289,10 +332,19 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             // Root Node entfernen
             childrenIterator.next();
 
-            final SubTreeExploreThread subTreeExploreThread = new SubTreeExploreThread((DefaultMetaTreeNode)rootNode,
-                    childrenIterator);
-
-            return CismetThreadPool.submit(subTreeExploreThread);
+            while (childrenIterator.hasNext()) {
+                final DefaultMetaTreeNode node = childrenIterator.next();
+//                if ((node == null) || !node.isExplored()) {
+//                    // we won't do anything, the node is not in cache or has not been explored yet, so an update would
+//                    // be pointless
+//                } else {
+//                    if (LOG.isDebugEnabled()) {
+//                        LOG.debug("refresh node: " + node);
+//                    }
+                futures.add(treePool.submit(new RefreshWorker(node)));
+//                }
+            }
+            return null;
         } else {
             LOG.warn("could not explore subtree"); // NOI18N
         }
@@ -597,6 +649,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                                         + "]");                                       // NOI18N
                         }
                         defaultTreeModel.nodesWereRemoved(node, new int[] { index }, new Object[] { toRemove });
+                        defaultTreeModel.nodeStructureChanged(node);
                     }
                 });
         }
@@ -624,6 +677,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                                         + "]");                       // NOI18N
                         }
                         defaultTreeModel.nodesWereInserted(node, new int[] { index });
+                        defaultTreeModel.nodeStructureChanged(node);
                     }
                 });
         }

@@ -14,6 +14,7 @@ package de.cismet.cids.editors;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.resource.ResourceManager;
+import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -22,6 +23,7 @@ import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
+import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
@@ -283,13 +285,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         if (treePath != null) {
             try {
                 final MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
-
-                final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
-
-                ((DefaultTreeModel)metaCatalogueTree.getModel()).setRoot(rootTreeNode);
-                ((DefaultTreeModel)metaCatalogueTree.getModel()).reload();
-
-                metaCatalogueTree.exploreSubtree(treePath);
+                metaCatalogueTree.refreshTreePath(treePath);
             } catch (Exception e) {
                 log.error("Error when refreshing Tree", e); // NOI18N
             }
@@ -386,6 +382,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         }
         try {
             final CidsBean savedInstance = oldBean.persist();
+            ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
             if (closeEditor) {
                 final JOptionPane jop = new JOptionPane(
                         org.openide.util.NbBundle.getMessage(
@@ -414,7 +411,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             } else {
 //                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
 //                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
-                ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
                 editorObject = savedInstance.getMetaObject();
                 createBackup(editorObject);
                 // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener propertyChangeListener = new
