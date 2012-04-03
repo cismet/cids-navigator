@@ -102,7 +102,10 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
             }
         }
 
-        activateElement();
+        if (setThreadRunning()) {
+            activateElement();
+            threadRunning = false;
+        }
     }
 
     /**

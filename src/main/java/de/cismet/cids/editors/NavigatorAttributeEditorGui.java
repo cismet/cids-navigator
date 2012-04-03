@@ -303,9 +303,19 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final int cid = orig.getMetaClass().getID();
             final String domain = orig.getDomain();
             final User user = SessionManager.getSession().getUser();
+            backupObject = null;
             backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
         } catch (Exception e) {
-            log.error("Error during Backupcreation. Cannot detect whether the objects is changed.", e); // NOI18N
+            log.error("Error during Backupcreation. Cannot detect whether the object is changed.", e); // NOI18N
+            JOptionPane.showMessageDialog(
+                NavigatorAttributeEditorGui.this,
+                org.openide.util.NbBundle.getMessage(
+                    NavigatorAttributeEditorGui.class,
+                    "NavigatorAttributeEditorGui.createBackup().exception.JOptionPane.message"),       // NOI18N
+                org.openide.util.NbBundle.getMessage(
+                    NavigatorAttributeEditorGui.class,
+                    "NavigatorAttributeEditorGui.createBackup().exception.JOptionPane.title"),         // NOI18N
+                JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -518,13 +528,33 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         treeNode = node;
         if (treeNode instanceof ObjectTreeNode) {
 //            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
+            cancelButton.setEnabled(false);
+            commitButton.setEnabled(false);
             CismetThreadPool.execute(new SwingWorker<JComponent, Void>() {
 
                     @Override
                     protected JComponent doInBackground() throws Exception {
                         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
                         editorObject = otn.getMetaObject();
-                        createBackup(editorObject);
+                        backupObject = null;
+                        new Thread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    try {
+                                        createBackup(editorObject);
+                                    } finally {
+                                        EventQueue.invokeLater(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    cancelButton.setEnabled(true);
+                                                    commitButton.setEnabled(true);
+                                                }
+                                            });
+                                    }
+                                }
+                            }).start();
 
 //                    editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 //
@@ -569,8 +599,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 currentBeanStore = (DisposableCidsBeanStore)ed;
                                 currentInitializer = EditorBeanInitializerStore.getInstance()
                                             .getInitializer(editorObject.getMetaClass());
-                                cancelButton.setEnabled(true);
-                                commitButton.setEnabled(true);
                                 copyButton.setEnabled(true);
                                 if (currentInitializer != null) {
                                     // enable editor attribute paste only for NEW MOs
