@@ -573,10 +573,10 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                                 + " MetaObject.getEditor(): " + metaObject.getEditor()
                                 + " MetaObject.getComplexEditor(): " + metaObject.getComplexEditor());
                 }
-            }
 
-            // set Classes in SubObjects as well
-            metaObject.setAllClasses(classAndMethodCache.getClassHash());
+                // set Classes in SubObjects as well
+                metaObject.setAllClasses(classAndMethodCache.getClassHash());
+            }
 
             return metaObject;
         }
