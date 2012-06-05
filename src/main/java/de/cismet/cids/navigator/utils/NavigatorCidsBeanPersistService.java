@@ -5,10 +5,6 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.navigator.utils;
 
 import Sirius.navigator.connection.SessionManager;
@@ -36,20 +32,27 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
         final MetaObject metaObject = cidsBean.getMetaObject();
         final String domain = metaObject.getDomain();
         final User user = SessionManager.getSession().getUser();
-        if (metaObject.getStatus() == metaObject.MODIFIED) {
+
+        if (metaObject.getStatus() == MetaObject.MODIFIED) {
             SessionManager.getConnection().updateMetaObject(user, metaObject, domain);
+
             return SessionManager.getConnection()
                         .getMetaObject(user, metaObject.getID(), metaObject.getClassID(), domain)
                         .getBean();
-        } else if (metaObject.getStatus() == metaObject.TO_DELETE) {
+        } else if (metaObject.getStatus() == MetaObject.TO_DELETE) {
             SessionManager.getConnection().deleteMetaObject(user, metaObject, domain);
+
             return null;
-        } else if (metaObject.getStatus() == metaObject.NEW) {
+        } else if (metaObject.getStatus() == MetaObject.NEW) {
             final MetaObject mo = SessionManager.getConnection().insertMetaObject(user, metaObject, domain);
-            if (mo != null) {
-                return mo.getBean();
-            }
+
+            // mo == null shall never occur
+            assert mo != null : "illegal state: insert metaobject returned null"; // NOI18N
+
+            return mo.getBean();
+        } else {
+            // [issue:2585] nothing to do, persist was called on a bean that has not been modified
+            return cidsBean;
         }
-        return null;
     }
 }
