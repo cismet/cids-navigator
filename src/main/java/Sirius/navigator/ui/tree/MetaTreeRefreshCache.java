@@ -304,17 +304,32 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
                                             + artificialId + "]"); // NOI18N
                             }
 
-                            if (nodeCache.containsKey(artificialId) == insert) {
-                                valid = false;
-                                nodeCache.clear();
+                            // as tree structure changed is also an insert, we should additionally inspect, if the node
+                            // to insert is deep equal to the already present node
+                            final DefaultMetaTreeNode cacheNode = nodeCache.get(artificialId);
 
-                                final String keyword = insert ? "already" : "not";                       // NOI18N
-                                final String message = "the artificial id is " + keyword + " in cache, " // NOI18N
-                                            + "cache corrupt or illegal tree, invalidating cache: "      // NOI18N
-                                            + artificialId;
+                            if ((cacheNode != null) == insert) {
+                                if ((cacheNode != null) && cacheNode.deepEquals(dmtn)) {
+                                    // there was a structural change, but the node itself was not changed at all, we can
+                                    // ignore the change and go on
 
-                                LOG.error(message);
-                                throw new IllegalStateException(message);
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("ignoring already present node: " + dmtn); // NOI18N
+                                    }
+
+                                    continue;
+                                } else {
+                                    valid = false;
+                                    nodeCache.clear();
+
+                                    final String keyword = insert ? "already" : "not";                       // NOI18N
+                                    final String message = "the artificial id is " + keyword + " in cache, " // NOI18N
+                                                + "cache corrupt or illegal tree, invalidating cache: "      // NOI18N
+                                                + artificialId;
+
+                                    LOG.error(message);
+                                    throw new IllegalStateException(message);
+                                }
                             }
 
                             if (insert) {
