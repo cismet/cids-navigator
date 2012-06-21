@@ -301,7 +301,7 @@ public class MutablePopupMenu extends JPopupMenu {
                     final boolean permission = ((MetaObjectNode)node).getObject()
                                 .getMetaClass()
                                 .getPermissions()
-                                .hasWritePermission(u.getUserGroup())
+                                .hasWritePermission(u)
                                 && ((MetaObjectNode)node).getObject()
                                 .getBean()
                                 .hasObjectWritePermission(u);
@@ -637,7 +637,7 @@ public class MutablePopupMenu extends JPopupMenu {
         @Override
         public void invoke() throws Exception {
             final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
-            if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser().getUserGroup())) {
+            if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser())) {
                 final MetaObject metaObject = metaClass.getEmptyInstance();
                 metaObject.setStatus(metaObject.NEW);
                 final MetaObjectNode MetaObjectNode = new MetaObjectNode(
