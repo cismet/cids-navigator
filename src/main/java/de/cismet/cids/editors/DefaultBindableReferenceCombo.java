@@ -55,7 +55,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
     private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
             DefaultBindableReferenceCombo.class);
-    private static final Comparator<CidsBean> beanToStringComparator;
+    protected static final Comparator<CidsBean> beanToStringComparator;
 
     static {
         beanToStringComparator = new Comparator<CidsBean>() {
@@ -71,7 +71,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
     //~ Instance fields --------------------------------------------------------
 
-    private CidsBean cidsBean = null;
+    protected CidsBean cidsBean = null;
     private MetaClass metaClass = null;
 //    private String fieldname = null;
     private boolean fakeModel = false;
