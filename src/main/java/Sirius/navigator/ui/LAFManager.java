@@ -10,10 +10,10 @@ package Sirius.navigator.ui;
 import org.apache.log4j.Logger;
 
 import java.awt.Component;
-
-import java.util.*;
-
-import javax.swing.*;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * DOCUMENT ME!
@@ -124,7 +124,7 @@ public final class LAFManager {
      * @return  DOCUMENT ME!
      */
     public boolean changeLookAndFeel(final String lnfName, final Component component) {
-        UIManager.LookAndFeelInfo lnfinfo = null;
+        final UIManager.LookAndFeelInfo lnfinfo;
 
         if (this.isInstalledLookAndFeel(lnfName)) {
             lnfinfo = (UIManager.LookAndFeelInfo)this.installedLookAndFeels.get(lnfName);
@@ -142,19 +142,16 @@ public final class LAFManager {
                 if (logger.isDebugEnabled()) {
                     logger.debug("setting Plastic 3D Theme");                                              // NOI18N
                 }
-                // com.jgoodies.looks.plastic.Plastic3DLookAndFeel.setMyCurrentTheme (new
-                // com.jgoodies.looks.plastic.theme.SkyBluer());
             }
 
             UIManager.setLookAndFeel(lnfinfo.getClassName());
-            // UIManager.setLookAndFeel(new SubstanceNebulaLookAndFeel());
 
             if (component != null) {
                 SwingUtilities.updateComponentTreeUI(component);
                 component.validate();
             }
-        } catch (Throwable t) {
-            logger.error("could not change look to '" + lnfName + "'", t); // NOI18N
+        } catch (final Exception ex) {
+            logger.error("could not change look to '" + lnfName + "'", ex); // NOI18N
             return false;
         }
 
@@ -170,26 +167,21 @@ public final class LAFManager {
                 logger.debug("installing GTK+ Look & Feel");                                    // NOI18N
             }
             UIManager.installLookAndFeel("GTK+", "com.sun.java.swing.plaf.gtk.GTKLookAndFeel"); // NOI18N
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             logger.warn("could not install GTK+ & Feel", e);                                    // NOI18N
         }
 
         try {
-            // com.jgoodies.clearlook.ClearLookManager.setMode(com.jgoodies.clearlook.ClearLookMode.ON);
-            // javax.swing.UIManager.setLookAndFeel(new com.jgoodies.plaf.plastic.Plastic3DLookAndFeel());
-            // javax.swing.UIManager.setLookAndFeel(new PlasticLookAndFeel());
             if (logger.isDebugEnabled()) {
                 logger.debug("installing Plastic 3D Look & Feel"); // NOI18N
             }
 
             UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
             final String heavyComps = System.getProperty("contains.heavyweight.comps");
-            if (heavyComps.equals("true")) {
+            if ("true".equals(heavyComps)) {
                 com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
             }
-            // com.jgoodies.looks.plastic.Plastic3DLookAndFeel.setMyCurrentTheme (new
-            // com.jgoodies.looks.plastic.theme.SkyBluer());
-        } catch (Throwable e) {
+        } catch (final Exception e) {
             logger.warn("could not install Plastic 3D Look & Feel", e);                                    // NOI18N
         }
     }
