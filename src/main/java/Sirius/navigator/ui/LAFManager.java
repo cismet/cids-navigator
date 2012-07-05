@@ -10,8 +10,10 @@ package Sirius.navigator.ui;
 import org.apache.log4j.Logger;
 
 import java.awt.Component;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
+
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
