@@ -160,7 +160,7 @@ public class BlurredMapObjectRenderer extends CustomMetaObjectRenderer implement
         // FUSE initialisieren
         FuseLoader.load();
         // Ressourcen hierarchisch rekursiv nach oben einfuegen
-        ResourceInjector.get("blurredmapobjectrenderer.style").inject(true, new Object[] {getInstance()});       // NOI18N
+        ResourceInjector.get("blurredmapobjectrenderer.style").inject(true, new Object[] { getInstance() });     // NOI18N
         gradientColorTop = javax.swing.UIManager.getDefaults().getColor("Button.shadow");                        // NOI18N
         gradientColorBottom = javax.swing.UIManager.getDefaults().getColor("Button.background");                 // NOI18N
         mapBounds = null;
