@@ -661,6 +661,9 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
      * @param  constraints  DOCUMENT ME!
      */
     private void doSelect(final MutableConstraints constraints) {
+        if (!constraints.getView().isClosable()) {
+            constraints.getView().restore();
+        }
         final Vector<View> tabbedPane = this.getViewsAtPosition(constraints.getPosition());
 
 //        if (constraints.getContainerType().equals(MutableConstraints.FLOATINGFRAME)) {
