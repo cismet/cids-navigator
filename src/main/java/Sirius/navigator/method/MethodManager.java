@@ -10,6 +10,7 @@ package Sirius.navigator.method;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
+import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.tools.CloneHelper;
 import Sirius.navigator.types.iterator.TreeNodeIterator;
 import Sirius.navigator.types.iterator.TreeNodeRestriction;
@@ -44,6 +45,8 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -175,8 +178,7 @@ public class MethodManager {
     public void showAboutDialog() {
         final AboutDialog aboutDialog = ComponentRegistry.getRegistry().getAboutDialog();
         aboutDialog.pack();
-        aboutDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        aboutDialog.show();
+        StaticSwingTools.showDialog(aboutDialog);
     }
 
     /**
@@ -185,38 +187,28 @@ public class MethodManager {
     public void showOptionsDialog() {
         final OptionsDialog optionsDialog = ComponentRegistry.getRegistry().getOptionsDialog();
         optionsDialog.pack();
-        optionsDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        optionsDialog.setVisible(true);
+        StaticSwingTools.showDialog(optionsDialog);
     }
 
     /**
      * DOCUMENT ME!
      */
     public void showQueryResultProfileManager() {
-        ComponentRegistry.getRegistry()
-                .getQueryResultProfileManager()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getQueryResultProfileManager().show();
+        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getQueryResultProfileManager());
     }
 
     /**
      * DOCUMENT ME!
      */
     public void showPasswordDialog() {
-        ComponentRegistry.getRegistry()
-                .getPasswordDialog()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getPasswordDialog().show();
+        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getPasswordDialog());
     }
 
     /**
      * DOCUMENT ME!
      */
     public void showPluginManager() {
-        ComponentRegistry.getRegistry()
-                .getPluginManager()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getPluginManager().show();
+        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getPluginManager());
     }
 
     /**
@@ -224,13 +216,10 @@ public class MethodManager {
      */
     public void showSearchDialog() // throws Exception
     {
-        // this.showSearchDialog(false);
-
-        ComponentRegistry.getRegistry().getSearchDialog().pack();
-        ComponentRegistry.getRegistry()
-                .getSearchDialog()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getSearchDialog().show();
+        final ComponentRegistry cr = ComponentRegistry.getRegistry();
+        final SearchDialog dialog = cr.getSearchDialog();
+        dialog.pack();
+        StaticSwingTools.showDialog(dialog);
     }
 
     /**
@@ -238,12 +227,7 @@ public class MethodManager {
      */
     public void showQueryProfilesManager() // throws Exception
     {
-        // this.showSearchDialog(false);
-
         ComponentRegistry.getRegistry().getSearchDialog().pack();
-        ComponentRegistry.getRegistry()
-                .getSearchDialog()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
         ComponentRegistry.getRegistry().getSearchDialog().showQueryProfilesManager();
     }
 
@@ -316,7 +300,7 @@ public class MethodManager {
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                 org.openide.util.NbBundle.getMessage(
                     MethodManager.class,
                     "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"), // NOI18N

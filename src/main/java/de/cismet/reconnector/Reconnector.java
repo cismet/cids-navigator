@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.reconnector;
 
+import Sirius.navigator.ui.ComponentRegistry;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -25,6 +27,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -36,6 +40,20 @@ public abstract class Reconnector<S extends Object> {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Reconnector.class);
+
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static enum ReconnectorState {
+
+        //~ Enum constants -----------------------------------------------------
+
+        CONNECTING, CANCELED, COMPLETED, FAILED
+    }
 
     //~ Instance fields --------------------------------------------------------
 
@@ -175,7 +193,6 @@ public abstract class Reconnector<S extends Object> {
                         doAbbort();
                     }
                 });
-            reconnectorDialog.setLocationRelativeTo(null);
             reconnectorDialog.setAlwaysOnTop(true);
         } else {
             // TODO reconnectorPanel des Dialogs aus der Liste entfernen
@@ -225,6 +242,18 @@ public abstract class Reconnector<S extends Object> {
         reconnectorPanels.add(reconnectorPanel);
         addListener(reconnectorPanel);
         return reconnectorPanel;
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void updateReconnectorDialogOwner() {
+        if (dialogOwner == null) {
+            if (ComponentRegistry.isRegistred()) {
+                useDialog(false, null);
+                useDialog(true, ComponentRegistry.getRegistry().getMainWindow());
+            }
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -328,62 +357,74 @@ public abstract class Reconnector<S extends Object> {
 
         //~ Methods ------------------------------------------------------------
 
-        @Override
-        public void connecting() {
-            for (final ReconnectorListener listener : listeners) {
-                listener.connecting();
-            }
-
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  state  DOCUMENT ME!
+         * @param  evt    DOCUMENT ME!
+         */
+        private void updateAndNotifyAboutState(final ReconnectorState state, final ReconnectorEvent evt) {
             if (reconnectorDialog != null) {
+                final boolean isVisible = reconnectorDialog.isVisible();
+
+                if (!isVisible) {
+                    updateReconnectorDialogOwner();
+                }
+
+                switch (state) {
+                    case CONNECTING: {
+                        for (final ReconnectorListener listener : listeners) {
+                            listener.connecting();
+                        }
+                        break;
+                    }
+
+                    case FAILED: {
+                        for (final ReconnectorListener listener : listeners) {
+                            listener.connectionFailed(evt);
+                        }
+                        break;
+                    }
+                    case COMPLETED: {
+                        for (final ReconnectorListener listener : listeners) {
+                            listener.connectionCompleted();
+                        }
+                        break;
+                    }
+                    case CANCELED: {
+                        for (final ReconnectorListener listener : listeners) {
+                            listener.connectionCanceled();
+                        }
+                        break;
+                    }
+                }
+
                 reconnectorDialog.pack();
-                if (!reconnectorDialog.isVisible()) {
-                    reconnectorDialog.setLocationRelativeTo(dialogOwner);
-                    reconnectorDialog.setVisible(true);
+
+                if (!isVisible) {
+                    StaticSwingTools.showDialog(reconnectorDialog);
                 }
             }
+        }
+
+        @Override
+        public void connecting() {
+            this.updateAndNotifyAboutState(ReconnectorState.CONNECTING, null);
         }
 
         @Override
         public void connectionFailed(final ReconnectorEvent event) {
-            for (final ReconnectorListener listener : listeners) {
-                listener.connectionFailed(event);
-            }
-
-            if (reconnectorDialog != null) {
-                reconnectorDialog.pack();
-                if (!reconnectorDialog.isVisible()) {
-                    reconnectorDialog.setLocationRelativeTo(dialogOwner);
-                    reconnectorDialog.setVisible(true);
-                }
-            }
+            this.updateAndNotifyAboutState(ReconnectorState.FAILED, event);
         }
 
         @Override
         public void connectionCompleted() {
-            for (final ReconnectorListener listener : listeners) {
-                listener.connectionCompleted();
-            }
-
-            if (reconnectorDialog != null) {
-                if (reconnectorDialog.isVisible()) {
-                    reconnectorDialog.setVisible(false);
-                }
-            }
+            this.updateAndNotifyAboutState(ReconnectorState.COMPLETED, null);
         }
 
         @Override
         public void connectionCanceled() {
-            for (final ReconnectorListener listener : listeners) {
-                listener.connectionCanceled();
-            }
-
-            if (reconnectorDialog != null) {
-                reconnectorDialog.pack();
-                if (!reconnectorDialog.isVisible()) {
-                    reconnectorDialog.setLocationRelativeTo(dialogOwner);
-                    reconnectorDialog.setVisible(true);
-                }
-            }
+            this.updateAndNotifyAboutState(ReconnectorState.CANCELED, null);
         }
     }
 }

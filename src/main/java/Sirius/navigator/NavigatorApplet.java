@@ -60,6 +60,8 @@ import javax.swing.plaf.basic.*;
 
 import de.cismet.tools.CismetThreadPool;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -571,7 +573,7 @@ public class NavigatorApplet extends javax.swing.JApplet {
                 startAction();
             } else if (e.getActionCommand().equals("options")) // NOI18N
             {
-                optionsDialog.show();
+                StaticSwingTools.showDialog(optionsDialog);
                 startAction();
             } else if (e.getActionCommand().equals("restart")) // NOI18N
             {

@@ -58,7 +58,6 @@ public final class CidsSearchExecutor {
         if (searchControlDialog == null) {
             searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
             searchControlDialog.pack();
-            searchControlDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getNavigator());
         }
 
         searchControlDialog.setSearch(search);
@@ -70,7 +69,7 @@ public final class CidsSearchExecutor {
                     searchControlDialog.startSearch();
                 }
             });
-        searchControlDialog.setVisible(true);
+        StaticSwingTools.showDialog(searchControlDialog);
     }
 
     /**
@@ -105,10 +104,8 @@ public final class CidsSearchExecutor {
                                     };
                                 dscs.addPropertyChangeListener(cancelListener);
                                 getSearchProgressDialog().pack();
-                                getSearchProgressDialog().setLocationRelativeTo(
-                                    ComponentRegistry.getRegistry().getNavigator());
                                 getSearchProgressDialog().setLabelAnimation(true);
-                                getSearchProgressDialog().setVisible(true);
+                                StaticSwingTools.showDialog(getSearchProgressDialog());
                             }
                         });
 

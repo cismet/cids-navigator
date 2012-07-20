@@ -534,8 +534,7 @@ public class MutableMenuBar extends JMenuBar {
                                 "MutableMenuBar.MenuItemActionListener.actionPerformed(ActionEvent).ErrorDialog.message"), // NOI18N
                             t.toString(),
                             ErrorDialog.WARNING);
-                    errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-                    errorDialog.show();
+                    StaticSwingTools.showDialog(errorDialog);
                 }
             } else if (e.getActionCommand().equals("tools.password")) { // NOI18N
                 MethodManager.getManager().showPasswordDialog();

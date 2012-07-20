@@ -94,6 +94,7 @@ import de.cismet.tools.configuration.StartupHook;
 
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
@@ -404,8 +405,7 @@ public class Navigator extends JFrame {
             SessionManager.init(proxy);
 
             loginDialog = new LoginDialog(this);
-            loginDialog.setLocationRelativeTo(null);
-            loginDialog.show();
+            StaticSwingTools.showDialog(loginDialog);
         }
 
         PropertyManager.getManager()
@@ -868,6 +868,7 @@ public class Navigator extends JFrame {
      * @param  visible  DOCUMENT ME!
      */
     private void doSetVisible(final boolean visible) {
+        super.setLocationRelativeTo(this.loginDialog);
         super.setVisible(visible);
 
         if (visible) {

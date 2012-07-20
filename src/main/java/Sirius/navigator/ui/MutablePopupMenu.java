@@ -66,6 +66,8 @@ import javax.swing.tree.TreePath;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -395,8 +397,7 @@ public class MutablePopupMenu extends JPopupMenu {
                                 "MutablePopupMenu.PopupMenuItemsActionListener.actionPerformed(ActionEvent).errorDialog.errorMessage"), // NOI18N
                             t.toString(),
                             ErrorDialog.WARNING);
-                    errorDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-                    errorDialog.show();
+                    StaticSwingTools.showDialog(errorDialog);
                 }
             } else if (e.getActionCommand().equals("Passwort aendern")) { // NOI18N
                 MethodManager.getManager().showPasswordDialog();

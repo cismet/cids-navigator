@@ -12,9 +12,6 @@
  */
 package Sirius.navigator.search.dynamic;
 
-import Sirius.navigator.ui.ComponentRegistry;
-
-import Sirius.server.middleware.types.Node;
 import Sirius.server.search.CidsServerSearch;
 
 import org.apache.log4j.Logger;
@@ -23,6 +20,8 @@ import org.openide.util.Exceptions;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -315,7 +314,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
                             }
                         });
                     dialog.searchStarted();
-                    dialog.setVisible(true);
+                    StaticSwingTools.showDialog(dialog);
                 }
             });
         try {

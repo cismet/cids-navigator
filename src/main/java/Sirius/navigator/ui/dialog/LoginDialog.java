@@ -46,6 +46,8 @@ import java.util.prefs.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 //import Sirius.server.user.UserException;
 //import Sirius.navigator.*;
 //import Sirius.navigator.connection.*;
@@ -357,6 +359,11 @@ public class LoginDialog extends JDialog {
         }
 
         this.pack();
+
+        // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+        // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+        // setVisible(true) which internally calls JDialog show() -> endless recursion if
+        // StaticSwingTools.showDialog() is called here
         super.show();
         this.toFront();
     }
@@ -697,7 +704,7 @@ public class LoginDialog extends JDialog {
 
                 super.show(tmpStrArray);
             } else {
-                super.show(); // null);
+                StaticSwingTools.showDialog(this);
             }
         }
 

@@ -25,6 +25,8 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
 import de.cismet.cismap.commons.interaction.CismapBroker;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -95,7 +97,7 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
             dialog = CismapBroker.getInstance().getMetaSearch().getSearchDialog();
         }
 
-        dialog.setVisible(true);
         dialog.pack();
+        StaticSwingTools.showDialog(dialog);
     }
 }

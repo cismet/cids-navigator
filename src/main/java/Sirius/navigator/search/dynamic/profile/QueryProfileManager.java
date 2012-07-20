@@ -33,32 +33,23 @@ package Sirius.navigator.search.dynamic.profile;
 
 //import Sirius.navigator.NavigatorLogger;
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
 //import Sirius.navigator.Views.Tree.SearchTree;
 //import Sirius.navigator.tools.*;
 //import Sirius.navigator.ui.dialog.*;
 import Sirius.navigator.exception.*;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.search.dynamic.*;
 
 
 //import Sirius.server.search.query.*;
-import Sirius.server.newuser.UserGroup;
 import Sirius.server.search.store.*;
 
-import java.awt.*;
 import java.awt.event.*;
 
 import java.beans.*;
 
 import java.io.*;
 
-import java.util.zip.*;
-
 import javax.swing.*;
-import javax.swing.border.*;
-import javax.swing.event.*;
-import javax.swing.tree.*;
 
 /**
  * DOCUMENT ME!
@@ -174,9 +165,12 @@ public class QueryProfileManager extends ProfileManager {
 
     @Override
     public void show() {
-        // this.show(null);
         try {
             updateQueryProfileManager();
+            // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+            // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+            // setVisible(true) which internally calls JDialog show() -> endless recursion if
+            // StaticSwingTools.showDialog() is called here
             super.show();
         } catch (Exception exp) {
             logger.error(exp.getMessage(), exp);

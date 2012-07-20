@@ -43,6 +43,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.tree.TreePath;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -294,7 +296,6 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
 
             if (this.checkCompleteness(searchOptions)) {
                 this.searchProgressDialog.pack();
-                this.searchProgressDialog.setLocationRelativeTo(owner);
                 this.searchProgressDialog.show(classNodeKeys, searchOptions);
 
                 if (!this.searchProgressDialog.isCanceld()) {
@@ -407,11 +408,10 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
      */
     public void showQueryProfilesManager() {
         if (!this.isShowing()) {
-            this.show();
+            StaticSwingTools.showDialog(this);
         }
 
-        this.queryProfileManager.setLocationRelativeTo(SearchDialog.this);
-        this.queryProfileManager.show();
+        StaticSwingTools.showDialog(this.queryProfileManager);
         this.queryProfileManager.toFront();
     }
 

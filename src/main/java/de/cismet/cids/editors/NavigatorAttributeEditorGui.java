@@ -14,16 +14,13 @@ package de.cismet.cids.editors;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.resource.ResourceManager;
-import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
-import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
-import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
@@ -52,7 +49,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
-import javax.swing.tree.DefaultTreeModel;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
@@ -61,6 +57,7 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.WrappedComponent;
 
 /**
@@ -416,7 +413,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         });
                 t.setRepeats(false);
                 t.start();
-                dialog.setVisible(true);
+                StaticSwingTools.showDialog(dialog);
                 clear();
             } else {
 //                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();

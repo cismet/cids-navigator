@@ -30,6 +30,8 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * Dialog zum Ausw\u00E4hlen einer Klasse.
  *
@@ -285,6 +287,10 @@ public class TreeNodeEditor extends javax.swing.JDialog {
             this.pack();
         }
 
+        // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+        // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+        // setVisible(true) which internally calls JDialog show() -> endless recursion if
+        // StaticSwingTools.showDialog() is called here
         super.show();
     }
 
@@ -300,7 +306,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         this.objectNodeRadioButton.setEnabled(true);
         this.classBox.setEnabled(true);
 
-        this.show();
+        StaticSwingTools.showDialog(this);
         getRootPane().setDefaultButton(okButton);
         return this.metaTreeNode;
     }
@@ -321,7 +327,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         this.objectNodeRadioButton.setEnabled(false);
         this.classBox.setEnabled(false);
 
-        this.show();
+        StaticSwingTools.showDialog(this);
         getRootPane().setDefaultButton(okButton);
         return this.metaTreeNode;
     }
