@@ -13,7 +13,6 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.event.CatalogueActivationListener;
-import Sirius.navigator.event.CataloguePopupMenuListener;
 import Sirius.navigator.event.CatalogueSelectionListener;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
@@ -93,6 +92,7 @@ import de.cismet.tools.configuration.ShutdownHook;
 import de.cismet.tools.configuration.StartupHook;
 
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
+import de.cismet.tools.gui.DefaultPopupMenuListener;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -756,7 +756,7 @@ public class Navigator extends JFrame {
                 attributeViewer,
                 descriptionPane));
 
-        final CataloguePopupMenuListener cataloguePopupMenuListener = new CataloguePopupMenuListener(popupMenu);
+        final DefaultPopupMenuListener cataloguePopupMenuListener = new DefaultPopupMenuListener(popupMenu);
         metaCatalogueTree.addMouseListener(cataloguePopupMenuListener);
         searchResultsTree.addMouseListener(cataloguePopupMenuListener);
     }
