@@ -43,6 +43,8 @@ import Sirius.navigator.ui.embedded.*;
 import Sirius.navigator.ui.tree.*;
 import Sirius.navigator.ui.tree.editor.*;
 
+import Sirius.server.localserver.attribute.ClassAttribute;
+import Sirius.server.localserver.attribute.ObjectAttribute;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
@@ -51,6 +53,10 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.permission.PermissionHolder;
 import Sirius.server.newuser.permission.Policy;
+
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 import org.apache.log4j.Logger;
 
@@ -64,7 +70,14 @@ import javax.swing.event.*;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
+import de.cismet.cismap.commons.features.PureNewFeature;
+import de.cismet.cismap.commons.features.SearchFeature;
+import de.cismet.cismap.commons.gui.MappingComponent;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.CreateSearchGeometryListener;
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
@@ -87,10 +100,12 @@ public class MutablePopupMenu extends JPopupMenu {
     protected JMenuItem searchItem;
     protected JMenuItem passwordItem;
     protected JMenuItem specialTreeItem;
-    protected JMenuItem newNode;
-    protected JMenuItem editNode;
+//    protected JMenuItem newNode;
+//    protected JMenuItem editNode;
+    protected JMenuItem toMapNode;
+    protected JMenuItem geoSearchNode;
     protected JMenuItem editObject;
-    protected JMenuItem deleteNode;
+//    protected JMenuItem deleteNode;
     protected JMenuItem deleteObject;
     // statische Men\u00FCeintr\u00E4ge
     protected JMenuItem newObject;
@@ -147,18 +162,16 @@ public class MutablePopupMenu extends JPopupMenu {
 //        edit.setIcon(ResourceManager.getManager().getIcon(ResourceManager.getManager().getString("tree.editor.menu.icon")));
 //        this.add(edit);
 
-        newNode = new NewNodeMethod();
-        editNode = new EditNodeMethod();
-        editObject = new EditObjectMethod();
-        deleteNode = new DeleteNodeMethod();
+//        newNode = new NewNodeMethod();
+//        editNode = new EditNodeMethod();
+//        deleteNode = new DeleteNodeMethod();
         editObject = new EditObjectMethod();
         deleteObject = new DeleteObjectMethod();
         newObject = new NewObjectMethod();
 
-        this.add(newNode);
-        this.add(editNode);
-        this.add(editObject);
-        this.add(deleteNode);
+//        this.add(newNode);
+//        this.add(editNode);
+//        this.add(deleteNode);
         this.add(editObject);
         this.add(deleteObject);
         this.add(newObject);
@@ -171,13 +184,12 @@ public class MutablePopupMenu extends JPopupMenu {
      * DOCUMENT ME!
      */
     private void hideEditMenues() {
-        newNode.setVisible(false);
-        editNode.setVisible(false);
-        editObject.setVisible(false);
-        deleteNode.setVisible(false);
-        editObject.setVisible(false);
-        deleteObject.setVisible(false);
-        newObject.setVisible(false);
+//        newNode.setVisible(false);
+//        editNode.setVisible(false);
+//        deleteNode.setVisible(false);
+//        editObject.setVisible(false);
+//        deleteObject.setVisible(false);
+//        newObject.setVisible(false);
     }
 
     /**
@@ -257,15 +269,7 @@ public class MutablePopupMenu extends JPopupMenu {
 
         @Override
         public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-//            if (metaCatalogueTree == null) {
-            // metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
             currentTree = ComponentRegistry.getRegistry().getActiveCatalogue();
-//            }
-
-            // edit mbrill: now private static final variable
-// if (resources == null) {
-// resources = ResourceManager.getManager();
-// }
 
             if (treeNodeEditor == null) {
                 treeNodeEditor = new TreeNodeEditor(ComponentRegistry.getRegistry().getMainWindow(), true);
@@ -275,52 +279,144 @@ public class MutablePopupMenu extends JPopupMenu {
             // lazily construct tree editor menues treeEditorMenu wird immer neu angelegt, damit auf unterschiedliche
             // Anforderungen des selected Nodes reagiert werden kann
 
+            boolean permission = false;
             if ((treeEditorMenu == null) && PropertyManager.getManager().isEditable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("creating new tree editor menu"); // NOI18N
-                }
-//                treeEditorMenu = new TreeEditorMenu(ComponentRegistry.getRegistry().getMainWindow(), ComponentRegistry.getRegistry().getCatalogueTree());
-//                addPluginMenu(treeEditorMenu);
-                final Node node = currentTree.getSelectedNode().getNode();
-//                if ((node.getId() != -1) && (node.getDynamicChildrenStatement() == null)) {
-//                    // Kein dynamischer Knoten, keine dynamischen Kinder
-//                    newNode.setVisible(true);
-//                    editNode.setVisible(true);
-//                    deleteNode.setVisible(true);
-//                    editObject.setVisible(true);
-//                } else
-//
+                permission = true;
+            }
+            if (logger.isDebugEnabled()) {
+                logger.debug("creating new tree editor menu"); // NOI18N
+            }
+
+            final DefaultMetaTreeNode[] selectedNodes = currentTree.getSelectedNodesArray();
+            long availability = MethodManager.NONE;
+            Boolean dynamicObjectNode = null;
+            Boolean classNode = null;
+
+            for (final DefaultMetaTreeNode tmp : selectedNodes) {
+                final Node node = tmp.getNode();
+                availability = availability | MethodManager.PURE_NODE;
+
                 if ((node instanceof MetaObjectNode) && (node.getId() == -1)) {
                     // DynamicObjectNode
-
-                    // EditObject
-                    editObject.setVisible(true);
-
-                    // DeleteObject
-                    deleteObject.setVisible(true);
+                    if (dynamicObjectNode == null) {
+                        dynamicObjectNode = true;
+                    }
+                    classNode = false;
                     final User u = SessionManager.getSession().getUser();
 
-                    final boolean permission = ((MetaObjectNode)node).getObject()
-                                .getMetaClass()
-                                .getPermissions()
+                    permission = permission
+                                && ((MetaObjectNode)node).getObject().getMetaClass().getPermissions()
                                 .hasWritePermission(u.getUserGroup())
                                 && ((MetaObjectNode)node).getObject()
                                 .getBean()
                                 .hasObjectWritePermission(u);
-
-                    editObject.setEnabled(permission);
-                    deleteObject.setEnabled(permission);
                 } else if ((node instanceof MetaNode) && (node.getClassId() != -1)) {
-                    final int classID = node.getClassId();
-                    final String domain = node.getDomain();
+                    if (classNode == null) {
+                        classNode = true;
+                    }
+                    dynamicObjectNode = false;
+
                     try {
+                        final int classID = node.getClassId();
+                        final String domain = node.getDomain();
                         ((NewObjectMethod)newObject).init(classID, domain);
-                        newObject.setVisible(true);
                     } catch (Exception ex) {
                         logger.error("Error when adding the NewObjectMethodMenuItem", ex); // NOI18N
                     }
                 }
             }
+
+            if ((classNode != null) && dynamicObjectNode) {
+                availability += MethodManager.OBJECT_NODE;
+            }
+
+            if ((classNode != null) && classNode) {
+                availability += MethodManager.CLASS_NODE;
+            }
+
+            if (permission) {
+                availability += MethodManager.WRITE;
+            }
+
+            if ((selectedNodes != null) && (selectedNodes.length > 1)) {
+                availability += MethodManager.MULTIPLE;
+            } else if ((selectedNodes != null) && (selectedNodes.length == 1)) {
+                availability += MethodManager.SINGLE;
+            }
+
+            if ((availability & (MethodManager.CLASS_NODE + MethodManager.MULTIPLE)) != 0) {
+                availability += MethodManager.CLASS_MULTIPLE;
+            }
+
+//            if (CismapBroker.getInstance().getMappingComponent() != null) {
+//                if (toMapNode == null) {
+//                    toMapNode = new ToMapMethod();
+//                    geoSearchNode = new GeoSearchMethod();
+//                    MutablePopupMenu.this.add(toMapNode);
+//                    MutablePopupMenu.this.add(geoSearchNode);
+//                }
+//            }
+
+            final MenuElement[] mes = MutablePopupMenu.this.getSubElements();
+
+            if (mes != null) {
+                for (final MenuElement me : mes) {
+                    if (me instanceof PluginMenuItem) {
+                        final long avail = ((PluginMenuItem)me).getAvailability();
+
+                        ((PluginMenuItem)me).setVisible((avail & availability) == avail);
+                    }
+                }
+            }
+//
+//                final Node node = currentTree.getSelectedNode().getNode();
+//
+//                if ((node instanceof MetaObjectNode) && (node.getId() == -1)) {
+//                    // DynamicObjectNode
+//
+//                    // EditObject
+//                    editObject.setVisible(true);
+//
+//                    // DeleteObject
+//                    deleteObject.setVisible(true);
+//                    if (CismapBroker.getInstance().getMappingComponent() != null) {
+//                        if (toMapNode == null) {
+//                            toMapNode = new ToMapMethod();
+//                            geoSearchNode = new GeoSearchMethod();
+//                            MutablePopupMenu.this.add(toMapNode);
+//                            MutablePopupMenu.this.add(geoSearchNode);
+//                        }
+//                        toMapNode.setVisible(true);
+//                        geoSearchNode.setVisible(true);
+//                    }
+//
+//                    final User u = SessionManager.getSession().getUser();
+//
+//                    final boolean permission = ((MetaObjectNode)node).getObject()
+//                                .getMetaClass()
+//                                .getPermissions()
+//                                .hasWritePermission(u.getUserGroup())
+//                                && ((MetaObjectNode)node).getObject()
+//                                .getBean()
+//                                .hasObjectWritePermission(u);
+//
+//                    editObject.setEnabled(permission);
+//                    deleteObject.setEnabled(permission);
+//                } else if ((node instanceof MetaNode) && (node.getClassId() != -1)) {
+//                    final int classID = node.getClassId();
+//                    final String domain = node.getDomain();
+//                    if ((CismapBroker.getInstance().getMappingComponent() != null) && (toMapNode != null)) {
+//                        toMapNode.setVisible(false);
+//                        geoSearchNode.setVisible(false);
+//                    }
+//                    try {
+//                        ((NewObjectMethod)newObject).init(classID, domain);
+//                        newObject.setVisible(true);
+//                    } catch (Exception ex) {
+//                        logger.error("Error when adding the NewObjectMethodMenuItem", ex); // NOI18N
+//                    }
+//                }
+//            }
 
             // Text mit Unicode....
             // viel SPass beim /u0000DCbersetzen ;o)
@@ -350,6 +446,7 @@ public class MutablePopupMenu extends JPopupMenu {
             if (logger.isDebugEnabled()) {
                 logger.debug("setting menues availability"); // NOI18N
             }
+            // Die Plugin Menues werden nicht mehr verwendet
             MutablePopupMenu.this.pluginMenues.setAvailability(MethodManager.getManager().getMethodAvailability());
         }
 
@@ -363,6 +460,11 @@ public class MutablePopupMenu extends JPopupMenu {
             // (treeEditorMenu != null) { removePluginMenu(treeEditorMenu.getId()); treeEditorMenu = null; }
 
             hideEditMenues();
+
+            if ((toMapNode != null) && (geoSearchNode != null)) {
+                toMapNode.setVisible(false);
+                geoSearchNode.setVisible(false);
+            }
         }
     }
 
@@ -599,7 +701,7 @@ public class MutablePopupMenu extends JPopupMenu {
          * Creates a new NewObjectMethod object.
          */
         public NewObjectMethod() {
-            super(MethodManager.PURE_NODE);
+            super(MethodManager.CLASS_NODE + MethodManager.SINGLE);
             this.pluginMethod = this;
 
             this.setText(org.openide.util.NbBundle.getMessage(
@@ -729,7 +831,7 @@ public class MutablePopupMenu extends JPopupMenu {
          * Creates a new EditObjectMethod object.
          */
         public EditObjectMethod() {
-            super(MethodManager.OBJECT_NODE);
+            super(MethodManager.OBJECT_NODE + MethodManager.SINGLE);
 
             this.pluginMethod = this;
 
@@ -770,6 +872,190 @@ public class MutablePopupMenu extends JPopupMenu {
      *
      * @version  $Revision$, $Date$
      */
+    protected class GeoSearchMethod extends PluginMenuItem implements PluginMethod {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new EditObjectMethod object.
+         */
+        public GeoSearchMethod() {
+            super(MethodManager.OBJECT_NODE);
+
+            this.pluginMethod = this;
+
+            this.setText(org.openide.util.NbBundle.getMessage(
+                    MutablePopupMenu.class,
+                    "MutablePopupMenu.GeoSearchMethod.text"));   // NOI18N
+            this.setIcon(resources.getIcon("pluginSearch.gif")); // NOI18N
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String getId() {
+            return this.getClass().getName();
+        }
+
+        @Override
+        public void invoke() throws Exception {
+            final DefaultMetaTreeNode[] selectedNodes = currentTree.getSelectedNodesArray();
+            final MappingComponent mapC = CismapBroker.getInstance().getMappingComponent();
+            mapC.setInteractionMode(MappingComponent.CREATE_SEARCH_POLYGON);
+            final CreateSearchGeometryListener searchListener = ((CreateSearchGeometryListener)mapC.getInputListener(
+                        MappingComponent.CREATE_SEARCH_POLYGON));
+
+            de.cismet.tools.CismetThreadPool.execute(new javax.swing.SwingWorker<SearchFeature, Void>() {
+
+                    @Override
+                    protected SearchFeature doInBackground() throws Exception {
+                        SearchFeature search = null;
+                        final Collection<Geometry> searchGeoms = new ArrayList<Geometry>();
+                        for (final DefaultMetaTreeNode node : selectedNodes) {
+                            final MetaObjectNode mon = ((ObjectTreeNode)node).getMetaObjectNode();
+                            final CidsBean cb = mon.getObject().getBean();
+                            final MetaObject mo = cb.getMetaObject();
+                            final Geometry g = extractGeom(mo);
+
+                            if (g != null) {
+                                searchGeoms.add(g);
+                            }
+                        }
+                        final Geometry[] searchGeomsArr = searchGeoms.toArray(
+                                new Geometry[0]);
+                        final GeometryCollection coll = new GeometryFactory().createGeometryCollection(searchGeomsArr);
+
+                        final Geometry newG = coll.buffer(0.1d);
+                        search = new SearchFeature(newG);
+                        search.setGeometryType(PureNewFeature.geomTypes.POLYGON);
+                        return search;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            final SearchFeature search = get();
+                            if (search != null) {
+                                searchListener.search(search);
+                            }
+                        } catch (Exception e) {
+                            logger.error("Exception in Background Thread", e);
+                        }
+                    }
+                });
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   mo  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        private Geometry extractGeom(final MetaObject mo) {
+            final ClassAttribute attr = mo.getMetaClass().getClassAttribute("render_feature");
+            Geometry res = null;
+
+            if (attr != null) {
+                final Object val = attr.getValue();
+
+                if (val != null) {
+                    final String[] fields = val.toString().split(",");
+                    final java.util.List<Geometry> geoms = new ArrayList<Geometry>();
+
+                    for (final String tmp : fields) {
+                        final Geometry tmpGeom = (Geometry)mo.getBean().getProperty(tmp + ".geo_field");
+
+                        if (tmpGeom != null) {
+                            geoms.add(tmpGeom);
+                        }
+                    }
+
+                    if (geoms.size() > 0) {
+                        res = new GeometryFactory().createGeometryCollection(geoms.toArray(
+                                    new Geometry[geoms.size()]));
+                    }
+                }
+            }
+
+            if (res == null) {
+                final Collection c = mo.getAttributesByType(Geometry.class, 1);
+                for (final Object elem : c) {
+                    final ObjectAttribute oa = (ObjectAttribute)elem;
+
+                    res = (Geometry)oa.getValue();
+                }
+            }
+
+            return res;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    protected class ToMapMethod extends PluginMenuItem implements PluginMethod {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new EditObjectMethod object.
+         */
+        public ToMapMethod() {
+            super(MethodManager.OBJECT_NODE);
+
+            this.pluginMethod = this;
+
+            this.setText(org.openide.util.NbBundle.getMessage(
+                    MutablePopupMenu.class,
+                    "MutablePopupMenu.ToMapMethod.text")); // NOI18N
+            this.setIcon(resources.getIcon("map.png"));    // NOI18N
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String getId() {
+            return this.getClass().getName();
+        }
+
+        @Override
+        public void invoke() throws Exception {
+            final DefaultMetaTreeNode[] selectedNodes = currentTree.getSelectedNodesArray();
+
+            try {
+                final ArrayList<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
+
+                for (int i = 0; i < selectedNodes.length; ++i) {
+                    if (MethodManager.getManager().checkPermission(
+                                    selectedNodes[i].getNode(),
+                                    PermissionHolder.READPERMISSION)) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("resultNodes:" + selectedNodes[i]);                             // NOI18N
+                        }
+                        if (selectedNodes[i].getNode() instanceof MetaObjectNode) {
+                            v.add(selectedNodes[i]);
+                        }
+                    } else {
+                        logger.warn("insufficient permission to show node in map: " + selectedNodes[i]); // NOI18N
+                    }
+                }
+                if (v.size() > 0) {
+                    MetaTreeNodeVisualization.getInstance().addVisualization(v);
+                }
+            } catch (Throwable t) {
+                logger.warn("Error of displaying map", t);                                               // NOI18N
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     protected class DeleteNodeMethod extends PluginMenuItem implements PluginMethod {
 
         //~ Constructors -------------------------------------------------------
@@ -778,7 +1064,7 @@ public class MutablePopupMenu extends JPopupMenu {
          * Creates a new DeleteNodeMethod object.
          */
         public DeleteNodeMethod() {
-            super(MethodManager.PURE_NODE + MethodManager.CLASS_NODE + MethodManager.OBJECT_NODE);
+            super(MethodManager.OBJECT_NODE + MethodManager.CLASS_NODE + MethodManager.WRITE);
 
             this.pluginMethod = this;
 
@@ -797,29 +1083,40 @@ public class MutablePopupMenu extends JPopupMenu {
 
         @Override
         public void invoke() throws Exception {
-            final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
-            if (selectedNode != null) {
-                if (MethodManager.getManager().checkPermission(
-                                selectedNode.getNode(),
-                                PermissionHolder.WRITEPERMISSION)) {
-                    final boolean deleted = MethodManager.getManager().deleteNode(currentTree, selectedNode);
-                    if (deleted) {
+            final DefaultMetaTreeNode[] selectedNodes = currentTree.getSelectedNodesArray();
+
+            if ((selectedNodes != null) && (selectedNodes.length > 0)) {
+                for (final DefaultMetaTreeNode tmp : selectedNodes) {
+                    if (!MethodManager.getManager().checkPermission(
+                                    tmp.getNode(),
+                                    PermissionHolder.WRITEPERMISSION)) {
+                    } else {
+                        logger.warn("insufficient permission to delete node: " + tmp); // NOI18N
+                        return;
+                    }
+                }
+
+                boolean deleted = false;
+                for (final DefaultMetaTreeNode tmp : selectedNodes) {
+                    final boolean deletedSingleNode = MethodManager.getManager().deleteNode(currentTree, tmp);
+                    deleted = deleted | deletedSingleNode;
+                    if (deletedSingleNode) {
                         try {
-                            MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
-//                            CidsFeature cf = new CidsFeature((MetaObjectNode) selectedNode.getNode());
-//                            CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
+                            MetaTreeNodeVisualization.getInstance().removeVisualization(tmp);
+                            // CidsFeature cf = new CidsFeature((MetaObjectNode) selectedNode.getNode());
+                            // CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
                         } catch (Exception e) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Could not remove Node from map.", e); // NOI18N
                             }
                         }
-                        ComponentRegistry.getRegistry().getDescriptionPane().clear();
                     }
-                } else {
-                    logger.warn("insufficient permission to delete node: " + selectedNode); // NOI18N
+                }
+                if (deleted) {
+                    ComponentRegistry.getRegistry().getDescriptionPane().clear();
                 }
             } else {
-                logger.warn("can not delete node, node is no leaf: " + selectedNode); // NOI18N
+                logger.warn("cannot delete node, because there is no node selected."); // NOI18N
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                     org.openide.util.NbBundle.getMessage(
                         MutablePopupMenu.class,
@@ -847,7 +1144,7 @@ public class MutablePopupMenu extends JPopupMenu {
          * Creates a new DeleteObjectMethod object.
          */
         public DeleteObjectMethod() {
-            super(MethodManager.OBJECT_NODE);
+            super(MethodManager.OBJECT_NODE + MethodManager.WRITE);
 
             this.pluginMethod = this;
 
@@ -866,30 +1163,39 @@ public class MutablePopupMenu extends JPopupMenu {
 
         @Override
         public void invoke() throws Exception {
-            final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
-            if (selectedNode != null) {
-                if (MethodManager.getManager().checkPermission(
-                                selectedNode.getNode(),
-                                PermissionHolder.WRITEPERMISSION)) {
-                    final boolean deleted = MethodManager.getManager().deleteNode(currentTree, selectedNode);
+            final DefaultMetaTreeNode[] selectedNodes = currentTree.getSelectedNodesArray();
 
-                    if (deleted) {
+            if ((selectedNodes != null) && (selectedNodes.length > 0)) {
+                for (final DefaultMetaTreeNode tmp : selectedNodes) {
+                    if (!MethodManager.getManager().checkPermission(
+                                    tmp.getNode(),
+                                    PermissionHolder.WRITEPERMISSION)) {
+                        logger.warn("insufficient permission to delete node: " + tmp); // NOI18N
+                        return;
+                    }
+                }
+
+                boolean deleted = false;
+                for (final DefaultMetaTreeNode tmp : selectedNodes) {
+                    final boolean deletedSingleNode = MethodManager.getManager().deleteNode(currentTree, tmp);
+                    deleted = deleted | deletedSingleNode;
+                    if (deletedSingleNode) {
                         try {
-//                            CidsFeature cf = new CidsFeature((MetaObjectNode) selectedNode.getNode());
-//                            CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
-                            MetaTreeNodeVisualization.getInstance().removeVisualization(selectedNode);
+                            MetaTreeNodeVisualization.getInstance().removeVisualization(tmp);
+                            // CidsFeature cf = new CidsFeature((MetaObjectNode) selectedNode.getNode());
+                            // CismapBroker.getInstance().getMappingComponent().getFeatureCollection().removeFeature(cf);
                         } catch (Exception e) {
                             if (logger.isDebugEnabled()) {
                                 logger.debug("Could not remove Node from map.", e); // NOI18N
                             }
                         }
-                        ComponentRegistry.getRegistry().getDescriptionPane().clear();
                     }
-                } else {
-                    logger.warn("insufficient permission to delete node: " + selectedNode); // NOI18N
+                }
+                if (deleted) {
+                    ComponentRegistry.getRegistry().getDescriptionPane().clear();
                 }
             } else {
-                logger.warn("can not delete node, node is no leaf: " + selectedNode); // NOI18N
+                logger.warn("cannot delete node, because there is no node selected."); // NOI18N
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                     org.openide.util.NbBundle.getMessage(
                         MutablePopupMenu.class,
@@ -915,7 +1221,7 @@ public class MutablePopupMenu extends JPopupMenu {
          * Creates a new ExploreSubTreeMethod object.
          */
         public ExploreSubTreeMethod() {
-            super(Long.MAX_VALUE);
+            super(MethodManager.NONE);
 
             this.pluginMethod = this;
 

@@ -64,6 +64,8 @@ public class MethodManager {
     public static final long OBJECT_NODE = 4;
     public static final long MULTIPLE = 8;
     public static final long CLASS_MULTIPLE = 16;
+    public static final long WRITE = 32;
+    public static final long SINGLE = 64;
 
     private static final Logger logger = Logger.getLogger(MethodManager.class);
 
