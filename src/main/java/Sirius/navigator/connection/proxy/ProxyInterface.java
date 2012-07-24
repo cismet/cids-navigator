@@ -426,11 +426,12 @@ public interface ProxyInterface {
      * DOCUMENT ME!
      *
      * @param   taskname  DOCUMENT ME!
+     * @param   json      DOCUMENT ME!
      * @param   domain    DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Object executeTask(String taskname, String domain) throws ConnectionException;
+    Object executeTask(String taskname, String json, String domain) throws ConnectionException;
 }
