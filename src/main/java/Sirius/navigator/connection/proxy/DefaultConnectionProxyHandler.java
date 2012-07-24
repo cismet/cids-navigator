@@ -36,6 +36,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import de.cismet.cids.server.actions.ServerActionParameter;
+
 /**
  * Default implementation of the connection proxy interface.
  *
@@ -680,9 +682,11 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
-        public Object executeTask(final String taskname, final String json, final String domain)
-                throws ConnectionException {
-            return connection.executeTask(session.getUser(), taskname, json, domain);
+        public Object executeTask(final String domain,
+                final String taskname,
+                final Object body,
+                final ServerActionParameter... params) throws ConnectionException {
+            return connection.executeTask(session.getUser(), domain, taskname, body, params);
         }
     }
 }

@@ -23,6 +23,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
+import de.cismet.cids.server.actions.ServerActionParameter;
+
 /**
  * Default implementation of the connection proxy interface.
  *
@@ -425,13 +427,15 @@ public interface ProxyInterface {
     /**
      * DOCUMENT ME!
      *
-     * @param   taskname  DOCUMENT ME!
-     * @param   json      DOCUMENT ME!
      * @param   domain    DOCUMENT ME!
+     * @param   taskname  DOCUMENT ME!
+     * @param   body      DOCUMENT ME!
+     * @param   params    DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Object executeTask(String taskname, String json, String domain) throws ConnectionException;
+    Object executeTask(String domain, String taskname, Object body, ServerActionParameter... params)
+            throws ConnectionException;
 }
