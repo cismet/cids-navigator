@@ -23,6 +23,8 @@ import Sirius.server.search.SearchResult;
 
 import Sirius.util.image.ImageHashMap;
 
+import java.io.File;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -675,6 +677,11 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         @Override
         public Collection customServerSearch(final CidsServerSearch serverSearch) throws ConnectionException {
             return connection.customServerSearch(session.getUser(), serverSearch);
+        }
+
+        @Override
+        public Object executeTask(final String taskname, final String domain) throws ConnectionException {
+            return connection.executeTask(session.getUser(), taskname, domain);
         }
     }
 }
