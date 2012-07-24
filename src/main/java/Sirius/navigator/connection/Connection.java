@@ -29,6 +29,8 @@ import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
 
+import java.io.File;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
@@ -729,4 +731,17 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user      DOCUMENT ME!
+     * @param   taskname  DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(User user, String taskname, String domain) throws ConnectionException;
 }

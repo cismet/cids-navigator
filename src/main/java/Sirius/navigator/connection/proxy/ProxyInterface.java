@@ -18,6 +18,8 @@ import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchResult;
 
+import java.io.File;
+
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -419,4 +421,16 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     Collection customServerSearch(CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   taskname  DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(String taskname, String domain) throws ConnectionException;
 }
