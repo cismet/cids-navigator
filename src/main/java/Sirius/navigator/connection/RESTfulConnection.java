@@ -46,6 +46,7 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.netutil.Proxy;
 
@@ -1010,12 +1011,12 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
     }
 
     @Override
-    public Object executeTask(final User user, final String taskname, final String json, final String domain)
+    public Object executeTask(final User user, final String domain, final String taskname, final Object body, final ServerActionParameter... params)
             throws ConnectionException {
         try {
-            return connector.executeTask(user, taskname, json, domain);
+            return connector.executeTask(user, domain, taskname, body, params);
         } catch (final RemoteException e) {
-            throw new ConnectionException("could not executeTask: taskname: " + taskname + " || json: " + json
+            throw new ConnectionException("could not executeTask: taskname: " + taskname + " || body: " + body
                         + " || domain: " + domain
                         + " || user: " + user,
                 e);

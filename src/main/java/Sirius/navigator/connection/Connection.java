@@ -28,6 +28,7 @@ import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 import java.io.File;
 
@@ -744,5 +745,5 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Object executeTask(User user, String taskname, String json, String domain) throws ConnectionException;
+    Object executeTask(User user, String domain, String taskname, Object body, ServerActionParameter... params) throws ConnectionException;
 }
