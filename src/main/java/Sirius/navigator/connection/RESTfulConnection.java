@@ -1010,11 +1010,13 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
     }
 
     @Override
-    public Object executeTask(final User user, final String taskname, final String domain) throws ConnectionException {
+    public Object executeTask(final User user, final String taskname, final String json, final String domain)
+            throws ConnectionException {
         try {
-            return connector.executeTask(user, taskname, domain);
+            return connector.executeTask(user, taskname, json, domain);
         } catch (final RemoteException e) {
-            throw new ConnectionException("could not executeTask: taskname: " + taskname + " || domain: " + domain
+            throw new ConnectionException("could not executeTask: taskname: " + taskname + " || json: " + json
+                        + " || domain: " + domain
                         + " || user: " + user,
                 e);
         }

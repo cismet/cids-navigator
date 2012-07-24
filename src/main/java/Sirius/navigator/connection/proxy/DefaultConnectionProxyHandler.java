@@ -680,8 +680,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
-        public Object executeTask(final String taskname, final String domain) throws ConnectionException {
-            return connection.executeTask(session.getUser(), taskname, domain);
+        public Object executeTask(final String taskname, final String json, final String domain)
+                throws ConnectionException {
+            return connection.executeTask(session.getUser(), taskname, json, domain);
         }
     }
 }

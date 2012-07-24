@@ -737,11 +737,12 @@ public interface Connection {
      *
      * @param   user      DOCUMENT ME!
      * @param   taskname  DOCUMENT ME!
+     * @param   json      DOCUMENT ME!
      * @param   domain    DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Object executeTask(User user, String taskname, String domain) throws ConnectionException;
+    Object executeTask(User user, String taskname, String json, String domain) throws ConnectionException;
 }
