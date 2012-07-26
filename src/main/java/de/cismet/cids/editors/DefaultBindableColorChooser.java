@@ -36,6 +36,7 @@ public class DefaultBindableColorChooser extends javax.swing.JPanel implements B
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
     private Color color;
+    private boolean readOnly = false;
     private PropertyChangeSupport propertyChangeSupport;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChooseColor;
@@ -140,9 +141,11 @@ public class DefaultBindableColorChooser extends javax.swing.JPanel implements B
      * @param  evt  DOCUMENT ME!
      */
     private void btnChooseColorActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnChooseColorActionPerformed
-        final Color newColor = JColorChooser.showDialog(this, "Farbe auswählen", color);
-        if (newColor != null) {
-            setColor(newColor);
+        if (!readOnly) {
+            final Color newColor = JColorChooser.showDialog(this, "Farbe auswählen", color);
+            if (newColor != null) {
+                setColor(newColor);
+            }
         }
     }                                                                                  //GEN-LAST:event_btnChooseColorActionPerformed
 
@@ -191,5 +194,16 @@ public class DefaultBindableColorChooser extends javax.swing.JPanel implements B
         }
         this.color = color;
         getPropertyChangeSupport().firePropertyChange(PROP_TIMESTAMP, null, getColor());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  readOnly  DOCUMENT ME!
+     */
+    public void setReadOnly(final boolean readOnly) {
+        this.readOnly = readOnly;
+
+        btnChooseColor.setEnabled(readOnly);
     }
 }
