@@ -403,7 +403,8 @@ public abstract class Reconnector<S extends Object> {
 
                 if (!isVisible) {
                     StaticSwingTools.showDialog(reconnectorDialog);
-                } else if (isVisible && (state == ReconnectorState.COMPLETED || state == ReconnectorState.CANCELED)) {
+                } else if (isVisible
+                            && ((state == ReconnectorState.COMPLETED) || (state == ReconnectorState.CANCELED))) {
                     reconnectorDialog.setVisible(false);
                 }
             }
