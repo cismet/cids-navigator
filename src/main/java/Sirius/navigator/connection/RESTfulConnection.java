@@ -1012,15 +1012,15 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
 
     @Override
     public Object executeTask(final User user,
-            final String domain,
             final String taskname,
+            final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
         try {
-            return connector.executeTask(user, domain, taskname, body, params);
+            return connector.executeTask(user, taskname, taskdomain, body, params);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not executeTask: taskname: " + taskname + " || body: " + body
-                        + " || domain: " + domain
+                        + " || taskdomain: " + taskdomain
                         + " || user: " + user,
                 e);
         }

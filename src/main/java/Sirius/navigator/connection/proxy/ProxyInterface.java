@@ -14,11 +14,10 @@ import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.User;
 import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchResult;
-
-import java.io.File;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -427,15 +426,15 @@ public interface ProxyInterface {
     /**
      * DOCUMENT ME!
      *
-     * @param   domain    DOCUMENT ME!
-     * @param   taskname  DOCUMENT ME!
-     * @param   body      DOCUMENT ME!
-     * @param   params    DOCUMENT ME!
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   body        DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Object executeTask(String domain, String taskname, Object body, ServerActionParameter... params)
+    Object executeTask(String taskname, String taskdomain, Object body, ServerActionParameter... params)
             throws ConnectionException;
 }
