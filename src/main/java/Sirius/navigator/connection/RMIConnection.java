@@ -983,14 +983,14 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
 
     @Override
     public Object executeTask(final User user,
-            final String domain,
             final String taskname,
+            final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
         try {
-            return ((ActionService)callserver).executeTask(user, domain, taskname, body, params);
+            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, body, params);
         } catch (final RemoteException e) {
-            throw new ConnectionException("could executeTask: taskname: " + taskname + " || domain: " + domain
+            throw new ConnectionException("could executeTask: taskname: " + taskname + " || taskdomain: " + taskdomain
                         + " || user: " + user,
                 e);
         }

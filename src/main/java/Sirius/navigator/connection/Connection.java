@@ -737,16 +737,16 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param   user      DOCUMENT ME!
-     * @param   domain    DOCUMENT ME!
-     * @param   taskname  DOCUMENT ME!
-     * @param   body      json DOCUMENT ME!
-     * @param   params    DOCUMENT ME!
+     * @param   user        DOCUMENT ME!
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   body        json DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Object executeTask(User user, String domain, String taskname, Object body, ServerActionParameter... params)
+    Object executeTask(User user, String taskname, String taskdomain, Object body, ServerActionParameter... params)
             throws ConnectionException;
 }
