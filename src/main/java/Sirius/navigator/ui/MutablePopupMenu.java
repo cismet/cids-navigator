@@ -349,14 +349,14 @@ public class MutablePopupMenu extends JPopupMenu {
                 availability += MethodManager.CLASS_MULTIPLE;
             }
 
-//            if (CismapBroker.getInstance().getMappingComponent() != null) {
-//                if (toMapNode == null) {
-//                    toMapNode = new ToMapMethod();
-//                    geoSearchNode = new GeoSearchMethod();
-//                    MutablePopupMenu.this.add(toMapNode);
-//                    MutablePopupMenu.this.add(geoSearchNode);
-//                }
-//            }
+            if (CismapBroker.getInstance().getMappingComponent() != null) {
+                if (toMapNode == null) {
+                    toMapNode = new ToMapMethod();
+                    geoSearchNode = new GeoSearchMethod();
+                    MutablePopupMenu.this.add(toMapNode);
+                    MutablePopupMenu.this.add(geoSearchNode);
+                }
+            }
 
             final MenuElement[] mes = MutablePopupMenu.this.getSubElements();
 
