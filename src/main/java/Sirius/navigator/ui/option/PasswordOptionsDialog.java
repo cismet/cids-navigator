@@ -207,7 +207,10 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
 
         btnChangePassword.setText(org.openide.util.NbBundle.getMessage(
                 PasswordOptionsDialog.class,
-                "PasswordOptionsDialog.btnChangePassword.text")); // NOI18N
+                "PasswordOptionsDialog.btnChangePassword.text"));    // NOI18N
+        btnChangePassword.setToolTipText(org.openide.util.NbBundle.getMessage(
+                PasswordOptionsDialog.class,
+                "PasswordOptionsDialog.btnChangePassword.tooltip")); // NOI18N
         btnChangePassword.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -323,5 +326,17 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
     @Override
     public void update() {
         this.clearPwdFields();
+    }
+
+    /**
+     * Returns tooltip text.
+     *
+     * @return  tooltip text
+     */
+    @Override
+    public String getTooltip() {
+        return org.openide.util.NbBundle.getMessage(
+                PasswordOptionsDialog.class,
+                "PasswordOptionsDialog.tooltip"); // NOI18N
     }
 }
