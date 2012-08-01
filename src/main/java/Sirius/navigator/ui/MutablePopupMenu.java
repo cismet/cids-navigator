@@ -502,8 +502,6 @@ public class MutablePopupMenu extends JPopupMenu {
                             ErrorDialog.WARNING);
                     StaticSwingTools.showDialog(errorDialog);
                 }
-            } else if (e.getActionCommand().equals("Passwort aendern")) { // NOI18N
-                MethodManager.getManager().showPasswordDialog();
             } else if (e.getActionCommand().equals("treecommand")) { // NOI18N
                 MethodManager.getManager().callSpecialTreeCommand();
             }

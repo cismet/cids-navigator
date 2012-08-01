@@ -388,23 +388,6 @@ public class MutableMenuBar extends JMenuBar {
         }
 
         searchMenu = menu;
-        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.toolsMenu.title")); // NOI18N
-        menu.setMnemonic(org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.toolsMenu.mnemonic").charAt(0));                                                        // NOI18N
-        this.add(menu);
-        // password  ...............................................................
-        menu.add(item = new JMenuItem(
-                    org.openide.util.NbBundle.getMessage(
-                        MutableMenuBar.class,
-                        "MutableMenuBar.toolsMenu.password.title")));     // NOI18N
-        item.setMnemonic(org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.toolsMenu.password.mnemonic").charAt(0)); // NOI18N
-        item.setActionCommand("tools.password");                          // NOI18N
-        item.addActionListener(itemListener);
-
-        // this.add(new JSeparator(SwingConstants.HORIZONTAL));
 
         menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.pluginMenu.title")); // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
@@ -536,13 +519,7 @@ public class MutableMenuBar extends JMenuBar {
                             ErrorDialog.WARNING);
                     StaticSwingTools.showDialog(errorDialog);
                 }
-            } else if (e.getActionCommand().equals("tools.password")) { // NOI18N
-                MethodManager.getManager().showPasswordDialog();
-            }                 /*else if (e.getActionCommand().equals("navigator_logout"))
-                               * {
-                               * if(ExceptionManager.getManager().showExitDialog(ComponentRegistry.getRegistry().getMainWindow()))
-                               * { logger.info("closing program"); System.exit(0); }}*/
-            else if (e.getActionCommand().equals("navigator.exit")) { // NOI18N
+            } else if (e.getActionCommand().equals("navigator.exit")) { // NOI18N
                 if (ExceptionManager.getManager().showExitDialog(ComponentRegistry.getRegistry().getMainWindow())) {
                     logger.info("closing program"); // NOI18N
                     ComponentRegistry.getRegistry().getNavigator().dispose();

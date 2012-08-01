@@ -7,25 +7,24 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
-import Sirius.navigator.*;
-import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
-import Sirius.navigator.plugin.ui.manager.*;
-import Sirius.navigator.resource.*;
-//import Sirius.navigator.search.*;
-import Sirius.navigator.search.dynamic.*;
-import Sirius.navigator.search.dynamic.profile.*;
-import Sirius.navigator.ui.attributes.*;
-import Sirius.navigator.ui.attributes.editor.*;
-import Sirius.navigator.ui.dialog.*;
-import Sirius.navigator.ui.tree.*;
-import Sirius.navigator.ui.widget.*;
+import Sirius.navigator.Navigator;
+import Sirius.navigator.plugin.ui.manager.PluginManager;
+import Sirius.navigator.search.dynamic.SearchDialog;
+import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
+import Sirius.navigator.ui.attributes.AttributeViewer;
+import Sirius.navigator.ui.attributes.editor.AttributeEditor;
+import Sirius.navigator.ui.dialog.AboutDialog;
+import Sirius.navigator.ui.dialog.CoordinateChooser;
+import Sirius.navigator.ui.tree.MetaCatalogueTree;
+import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Window;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
 /**
  * DOCUMENT ME!
@@ -54,8 +53,6 @@ public class ComponentRegistry {
     private CoordinateChooser coordinateChooser = null;
     /** Holds value of property navigator. */
     private Navigator navigator = null;
-    /** Holds value of property passwordDialog. */
-    private PasswordDialog passwordDialog = null;
     /** Holds value of property searchDialog. */
     private SearchDialog searchDialog = null;
     /** Holds value of property searchResultsTree. */
@@ -286,19 +283,6 @@ public class ComponentRegistry {
      */
     public Navigator getNavigator() {
         return this.navigator;
-    }
-
-    /**
-     * Getter for property passwordDialog.
-     *
-     * @return  Value of property passwordDialog.
-     */
-    public PasswordDialog getPasswordDialog() {
-        if (this.passwordDialog == null) {
-            this.passwordDialog = new PasswordDialog(this.getMainWindow());
-        }
-
-        return this.passwordDialog;
     }
 
     /**

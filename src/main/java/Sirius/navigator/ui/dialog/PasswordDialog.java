@@ -30,22 +30,28 @@ package Sirius.navigator.ui.dialog;
  * History                      :
  *
  *******************************************************************************/
-import Sirius.navigator.*;
-import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
-import Sirius.navigator.resource.*;
+import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.resource.ResourceManager;
+import Sirius.navigator.ui.option.PasswordOptionsDialog;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.SoftBevelBorder;
 
 /**
  * DOCUMENT ME!
  *
- * @version  $Revision$, $Date$
+ * @version     $Revision$, $Date$
+ * @deprecated  Password is now changed via Extras -> Optionen (See {@link PasswordOptionsDialog})
  */
+@Deprecated
 public class PasswordDialog extends JDialog {
 
     //~ Static fields/initializers ---------------------------------------------

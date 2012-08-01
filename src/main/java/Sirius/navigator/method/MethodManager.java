@@ -202,13 +202,6 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      */
-    public void showPasswordDialog() {
-        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getPasswordDialog());
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
     public void showPluginManager() {
         StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getPluginManager());
     }
