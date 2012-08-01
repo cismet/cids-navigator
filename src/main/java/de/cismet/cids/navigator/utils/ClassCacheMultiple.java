@@ -15,9 +15,10 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.MetaClass;
-import de.cismet.cids.utils.MetaClassUtils;
 
 import java.util.HashMap;
+
+import de.cismet.cids.utils.MetaClassUtils;
 
 /**
  * DOCUMENT ME!
@@ -149,5 +150,5 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    
+
 }
