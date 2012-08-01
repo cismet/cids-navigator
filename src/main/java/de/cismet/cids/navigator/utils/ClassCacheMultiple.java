@@ -15,8 +15,8 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.MetaClass;
+import de.cismet.cids.utils.MetaClassUtils;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -118,8 +118,8 @@ public class ClassCacheMultiple {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
                         .getClasses(SessionManager.getSession().getUser(), domain);
-            allClassCaches.put(domain, getClassHashtable(mcArr, domain));
-            allTableNameClassCaches.put(domain, getClassByTableNameHashtable(mcArr));
+            allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
+            allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
             log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
         }
@@ -134,8 +134,8 @@ public class ClassCacheMultiple {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
                         .getClasses(SessionManager.getSession().getUser(), domain);
-            allClassCaches.put(domain, getClassHashtable(mcArr, domain));
-            allTableNameClassCaches.put(domain, getClassByTableNameHashtable(mcArr));
+            allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
+            allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
             log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
         }
@@ -149,32 +149,5 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    private static HashMap getClassHashtable(final MetaClass[] classes, final String localServerName) {
-        final HashMap classHash = new HashMap();
-        for (int i = 0; i < classes.length; i++) {
-            final String key = localServerName + classes[i].getID();
-            if (!classHash.containsKey(key)) {
-                classHash.put(key, classes[i]);
-            }
-        }
-        return classHash;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   classes  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private static HashMap getClassByTableNameHashtable(final MetaClass[] classes) {
-        final HashMap classHash = new HashMap();
-        for (final MetaClass mc : classes) {
-            final String key = mc.getTableName().toLowerCase();
-            if (!classHash.containsKey(key)) {
-                classHash.put(key, mc);
-            }
-        }
-        return classHash;
-    }
+    
 }
