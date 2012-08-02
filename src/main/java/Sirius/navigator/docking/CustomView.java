@@ -128,4 +128,13 @@ public class CustomView extends View {
     public JMenuItem getMenuItem() {
         return item;
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  tooltipText  DOCUMENT ME!
+     */
+    public void setMenuItemTooltip(final String tooltipText) {
+        this.item.setToolTipText(tooltipText);
+    }
 }
