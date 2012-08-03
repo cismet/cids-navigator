@@ -23,7 +23,10 @@ import de.cismet.cids.utils.MetaClassCacheService;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = MetaClassCacheService.class)
+@org.openide.util.lookup.ServiceProvider(
+    service = MetaClassCacheService.class,
+    position = 100
+)
 public class NavigatorMetaClassService implements MetaClassCacheService {
 
     //~ Instance fields --------------------------------------------------------
