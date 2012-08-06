@@ -820,7 +820,8 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
 
                 @Override
                 public boolean accept(final File f) {
-                    return f.getName().toLowerCase().endsWith(".layout"); // NOI18N
+                    return f.isDirectory()
+                                || f.getName().toLowerCase().endsWith(".layout"); // NOI18N
                 }
 
                 @Override
@@ -832,8 +833,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         final int state = fc.showOpenDialog(parent);
         if (state == JFileChooser.APPROVE_OPTION) {
             final File file = fc.getSelectedFile();
-            String name = file.getAbsolutePath();
-            name = name.toLowerCase();
+            final String name = file.getAbsolutePath();
             if (name.endsWith(".layout")) { // NOI18N
                 loadLayout(name, false, parent);
             } else {
@@ -952,7 +952,8 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
 
                 @Override
                 public boolean accept(final File f) {
-                    return f.getName().toLowerCase().endsWith(".layout"); // NOI18N
+                    return f.isDirectory()
+                                || f.getName().toLowerCase().endsWith(".layout"); // NOI18N
                 }
 
                 @Override
@@ -970,8 +971,7 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
             if (logger.isDebugEnabled()) {
                 logger.debug("file:" + file); // NOI18N
             }
-            String name = file.getAbsolutePath();
-            name = name.toLowerCase();
+            final String name = file.getAbsolutePath();
             if (name.endsWith(".layout")) { // NOI18N
                 saveLayout(name, parent);
             } else {
