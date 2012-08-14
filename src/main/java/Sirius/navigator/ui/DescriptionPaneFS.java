@@ -61,6 +61,8 @@ public class DescriptionPaneFS extends DescriptionPane {
 
         namespaceHandler = new XhtmlNamespaceHandler();
         xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
+
+        this.startNoDescriptionRenderer();
     }
 
     //~ Methods ----------------------------------------------------------------

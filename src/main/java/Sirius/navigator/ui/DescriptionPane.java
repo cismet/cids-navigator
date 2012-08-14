@@ -57,6 +57,8 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingWorker;
 
+import de.cismet.cids.custom.objectrenderer.sirius.NoDescriptionRenderer;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
@@ -643,6 +645,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
     /**
      * DOCUMENT ME!
+     */
+    protected void startNoDescriptionRenderer() {
+        startSingleRendererWorker(null, null, null);
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  o      DOCUMENT ME!
      * @param  node   DOCUMENT ME!
@@ -653,16 +662,26 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected SelfDisposingPanel doInBackground() throws Exception {
-                    final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
-                    if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
-                        ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
-                    } else if ((jComp instanceof WrappedComponent)
-                                && (((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore)
-                                && (node != null)) {
-                        final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
-                        ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
+                    final JComponent jComp;
+
+                    final boolean isNoDescriptionRenderer = (o == null) && (node == null);
+
+                    if (isNoDescriptionRenderer) {
+                        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
+                        jComp = (JComponent)cw.wrapComponent(NoDescriptionRenderer.getInstance());
+                    } else {
+                        jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
+
+                        if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
+                            ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
+                        } else if ((jComp instanceof WrappedComponent)
+                                    && (((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore)
+                                    && (node != null)) {
+                            final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
+                            ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
+                        }
                     }
-                    final CidsBean bean = o.getBean();
+
                     final PropertyChangeListener localListener = new PropertyChangeListener() {
 
                             @Override
@@ -671,13 +690,17 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             }
                         };
 
-                    // set the renderer for the current breadcrumb
-                    final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
-                    if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
-                        ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                    if (!isNoDescriptionRenderer) {
+                        // set the renderer for the current breadcrumb
+                        final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
+                        if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
+                            ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                        }
+
+                        final CidsBean bean = o.getBean();
+                        bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     }
 
-                    bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     final SelfDisposingPanel sdp = encapsulateInSelfDisposingPanel(jComp);
                     sdp.setStrongListenerReference(localListener);
                     return sdp;
@@ -773,17 +796,21 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 });
             startSingleRendererWorker(n);
         } else {
-            if (n.isPureNode()) {
-                showHTML();
+            if (descriptionURL == null) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading NoDescriptionRenderer"); // NOI18N
+                }
+                startNoDescriptionRenderer();
+            } else {
+                if (n.isPureNode()) {
+                    showHTML();
+                }
+
+                this.setPageFromURI(descriptionURL);
             }
+
             showsWaitScreen = false;
         }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
-        }
-
-        this.setPageFromURI(descriptionURL);
     }
 
     /**

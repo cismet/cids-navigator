@@ -97,6 +97,7 @@ public class DescriptionPaneCalpa extends DescriptionPane {
         initComponents();
 
         showHTML();
+//        this.startNoDescriptionRenderer();
     }
 
     //~ Methods ----------------------------------------------------------------
