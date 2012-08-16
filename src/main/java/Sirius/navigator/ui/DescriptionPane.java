@@ -198,6 +198,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         } else {
             wrappedWaitingPanel = null;
         }
+
+        this.startNoDescriptionRenderer();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -646,7 +648,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      */
-    protected void startNoDescriptionRenderer() {
+    protected final void startNoDescriptionRenderer() {
         startSingleRendererWorker(null, null, null);
     }
 

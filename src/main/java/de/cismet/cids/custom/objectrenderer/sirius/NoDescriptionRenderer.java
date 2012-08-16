@@ -11,9 +11,14 @@ import Sirius.navigator.ui.RequestsFullSizeComponent;
 
 import org.openide.util.Lookup;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,10 +32,15 @@ import javax.swing.JPanel;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
+import de.cismet.cids.editors.CidsObjectEditorFactory;
 
+import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
+import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
+
+import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.FooterComponentProvider;
 import de.cismet.tools.gui.TitleComponentProvider;
+import de.cismet.tools.gui.WrappedComponent;
 
 /**
  * DOCUMENT ME!
@@ -80,6 +90,33 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements CidsBea
 
         this.widgets = new ArrayList<NoDescriptionWidget>();
         this.lookup();
+
+        JPanel p;
+        for (int i = this.numWidgets; i < 9; i++) {
+            p = new JPanel();
+//            p.setOpaque(false);
+            p.setMinimumSize(new Dimension(100, 100));
+            this.addWidget(p, i % 3, (i - 1) % 3); // TODO: implement relative positioning
+        }
+
+        super.addHierarchyListener(new HierarchyListener() {
+
+                @Override
+                public void hierarchyChanged(final HierarchyEvent e) {
+                    if (((HierarchyEvent.SHOWING_CHANGED & e.getChangeFlags()) != 0)
+                                && NoDescriptionRenderer.super.isShowing()) {
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    for (final NoDescriptionWidget w : widgets) {
+                                        w.refresh();
+                                    }
+                                }
+                            });
+                    }
+                }
+            });
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -124,15 +161,6 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements CidsBea
         return INSTANCE;
     }
 
-    @Override
-    public void update(final Graphics g) {
-        super.update(g);
-
-        for (final NoDescriptionWidget w : this.widgets) {
-            w.refresh();
-        }
-    }
-
     /**
      * DOCUMENT ME!
      *
@@ -171,10 +199,17 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements CidsBea
             }
         }
 
+//        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
+
         if (targetPanel != null) {
-            targetPanel.add(widget, y);
+//            targetPanel.add((JComponent)cw.wrapComponent((JComponent)widget));
+            targetPanel.add(widget);
             targetPanel.add(Box.createVerticalStrut(8));
+
             this.numWidgets++;
+
+            targetPanel.revalidate();
+            this.revalidate();
         }
     }
 
