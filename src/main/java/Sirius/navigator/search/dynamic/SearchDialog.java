@@ -382,25 +382,6 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
 
         final SearchContext searchContext = new SearchContext(this);
         final SearchFormFactory formFactory = new SearchFormFactory();
-
-        try {
-            final java.util.List searchCategories = formFactory.createSearchForms(PropertyManager.getManager()
-                            .getSearchFormPath(),
-                    "search.xml",
-                    searchContext);                                                                                      // NOI18N
-            logger.info(searchCategories.size() + " search categories loaded");                                          // NOI18N
-            this.searchFormManager.setSearchFormContainers(searchCategories);
-        } catch (Exception exp) {
-            logger.fatal("could create dynmaic search categories & forms", exp);                                         // NOI18N
-            ExceptionManager.getManager()
-                    .showExceptionDialog(
-                        ExceptionManager.FATAL,
-                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.loadSearchForms().name"), // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            SearchDialog.class,
-                            "SearchDialog.loadSearchForms().message"),                                                   // NOI18N
-                        exp);
-        }
     }
 
     /**
