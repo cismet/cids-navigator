@@ -1012,10 +1012,6 @@ public class Navigator extends JFrame {
                 System.out.println("navigator.cfg    = " + args[1]);                           // NOI18N
                 System.out.println("basedir          = " + args[2]);                           // NOI18N
                 System.out.println("plugindir        = " + args[3]);                           // NOI18N
-                System.out.println("searchdir        = " + args[4]);                           // NOI18N
-                if (args.length > 5) {
-                    System.out.println("profilesdir      = " + args[5]);                       // NOI18N
-                }
                 System.out.println("-------------------------------------------------------"); // NOI18N
 
                 // log4j configuration .....................................
@@ -1046,7 +1042,7 @@ public class Navigator extends JFrame {
                 // log4j configuration .....................................
 
                 PropertyManager.getManager()
-                        .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
+                        .configure(args[1], args[2], args[3], null, ((args.length > 5) ? args[5] : null));
             }
 
             // configuration ...................................................
