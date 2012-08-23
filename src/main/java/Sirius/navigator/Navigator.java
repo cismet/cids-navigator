@@ -41,6 +41,8 @@ import Sirius.server.middleware.types.*;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.permission.*;
 
+import com.sun.org.apache.bcel.internal.generic.LoadClass;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -85,6 +87,7 @@ import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.CismetThreadPool;
+import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.ConfigurationManager;
@@ -978,18 +981,11 @@ public class Navigator extends JFrame {
         Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
         Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
 
-        // For some unknown reason, the content of the user.language and the user.country properties
-        // must explicitly set as default locale. This is requiered for the cids-navigator project, but
-        // not for the other internationalized projects
+        // There is no way to adjust the Locale using the Jnlp file.
         try {
-            final String lang = System.getProperty("user.language");   // NOI18N
-            final String country = System.getProperty("user.country"); // NOI18N
+            JnlpTools.adjustDefaultLocale();
 
-            if ((lang != null) && (country != null)) {
-                Locale.setDefault(new Locale(lang, country));
-            } else if (lang != null) {
-                Locale.setDefault(new Locale(lang));
-            }
+            System.out.println("Using default Locale: " + Locale.getDefault());
         } catch (final SecurityException e) {
             System.err.println("You have insufficient rights to set the default locale."); // NOI18N
         }
@@ -1012,10 +1008,6 @@ public class Navigator extends JFrame {
                 System.out.println("navigator.cfg    = " + args[1]);                           // NOI18N
                 System.out.println("basedir          = " + args[2]);                           // NOI18N
                 System.out.println("plugindir        = " + args[3]);                           // NOI18N
-                System.out.println("searchdir        = " + args[4]);                           // NOI18N
-                if (args.length > 5) {
-                    System.out.println("profilesdir      = " + args[5]);                       // NOI18N
-                }
                 System.out.println("-------------------------------------------------------"); // NOI18N
 
                 // log4j configuration .....................................
@@ -1046,7 +1038,7 @@ public class Navigator extends JFrame {
                 // log4j configuration .....................................
 
                 PropertyManager.getManager()
-                        .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
+                        .configure(args[1], args[2], args[3], null, ((args.length > 5) ? args[5] : null));
             }
 
             // configuration ...................................................
