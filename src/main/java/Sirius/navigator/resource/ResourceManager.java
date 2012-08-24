@@ -61,11 +61,6 @@ public class ResourceManager {
         logger.info("creating new singleton resource manager instance"); // NOI18N
         localIconCache = new Hashtable();
         ERROR_ICON = getIcon("x.gif");                                   // NOI18N
-
-        if (!setLocale(new Locale("de", "DE")))                      // NOI18N
-        {
-            logger.fatal("could not load default resource bundles"); // NOI18N
-        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -81,55 +76,6 @@ public class ResourceManager {
         }
 
         return manager;
-    }
-
-    // i182 ====================================================================
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param       locale  DOCUMENT ME!
-     *
-     * @return      DOCUMENT ME!
-     *
-     * @deprecated  DOCUMENT ME!
-     */
-    public /*synchronized*/ boolean setLocale(final Locale locale) {
-//        logger.info("setting new locale '" + locale.getDisplayName() + "'");//NOI18N
-//        try
-//        {
-//            if(this.resourcesBundle == null || !this.getLocale().equals(locale))
-//            {
-//                if(logger.isDebugEnabled())logger.debug("loading resource bundle '" + this.getClass().getPackage().getName() + ".i18n.resources' for language '" + locale.getDisplayLanguage() + "'");//NOI18N
-//                resourcesBundle = ResourceBundle.getBundle(this.getClass().getPackage().getName() + ".i18n.resources", locale);//NOI18N
-//
-//                if(logger.isDebugEnabled())logger.debug("loading resource bundle '" + this.getClass().getPackage().getName() + ".i18n.errorcodes' for language '" + locale.getDisplayLanguage() + "'");//NOI18N
-//                errorcodesBundle = ResourceBundle.getBundle(this.getClass().getPackage().getName() + ".i18n.errorcodes", locale);//NOI18N
-//
-//                return true;
-//            }
-//        }
-//        catch(MissingResourceException mrex)
-//        {
-//            logger.error("could not load resource bundles for locale '" + locale.getDisplayName() + "'", mrex);//NOI18N
-//
-//        }
-//
-//        return false;
-
-        return true;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return      DOCUMENT ME!
-     *
-     * @deprecated  use Locale.getDefault() instead
-     */
-    public Locale getLocale() {
-//        return resourcesBundle.getLocale();
-        return Locale.getDefault();
     }
 
     /**
@@ -426,22 +372,6 @@ public class ResourceManager {
             return null;
         }
     }
-
-    /*public InputStream getI18nNavigatorResourceAsStream(String resourceName)  throws IOException
-     * { String localeString = this.getLocale().getLanguage() + "_" + this.getLocale().getCountry(); String
-     * i18nResouceName
-     *
-     * if(logger.isDebugEnabled()
-     *
-     *
-     *
-     *
-     * try {     if(logger.isDebugEnabled())logger.debug("loading navigator resource '" +
-     * PropertyManager.getManager().getBasePath() + "res/" + resourceName + "'");     return
-     * this.getResourceAsStream(PropertyManager.getManager().getBasePath() + "res/" + resourceName); } catch(IOException
-     * ioexp) {     if(logger.isDebugEnabled())logger.debug("loading navigator resource 'Sirius/Navigator/resource/" +
-     * resourceName + "'");     return ClassLoader.getSystemResourceAsStream("Sirius/Navigator/resource/" +
-     * resourceName); }}*/
 
     /**
      * resources in or in a subdirectory of the navigator's 'resource' directory. The returned resources will be

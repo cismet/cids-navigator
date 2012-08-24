@@ -8,7 +8,6 @@
 package Sirius.navigator.plugin.context;
 
 import Sirius.navigator.exception.*;
-import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.*;
 import Sirius.navigator.plugin.interfaces.*;
 import Sirius.navigator.plugin.listener.*;
@@ -20,8 +19,6 @@ import Sirius.navigator.search.dynamic.*;
 import Sirius.navigator.tools.*;
 import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.ui.*;
-
-import Sirius.server.middleware.types.*;
 
 import org.apache.log4j.Logger;
 
@@ -455,33 +452,6 @@ public class PluginContext {
          */
         public boolean isDebug() {
             return PluginContext.logger.isDebugEnabled();
-        }
-
-        /**
-         * Returns the locale of the operating system or the locale of the web browser.
-         *
-         * @return  the system locale object
-         */
-        public Locale getDefaultLocale() {
-            if (this.isApplet()) {
-                final Enumeration enu = this.getAppletContext().getApplets();
-                if (enu.hasMoreElements()) {
-                    return ((Applet)enu.nextElement()).getLocale();
-                }
-            }
-
-            return Locale.getDefault();
-        }
-
-        /**
-         * Returns the current locale of the navigator.
-         *
-         * <p>This method can return a different locae than <code>getSystemLocale()</code></p>
-         *
-         * @return  the navigator locale object
-         */
-        public Locale getNavigatorLocale() {
-            return resources.getLocale();
         }
 
         /**

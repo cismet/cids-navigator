@@ -399,7 +399,7 @@ public class DateChooser extends JDialog {
         cal.set(2004, calendarMonth, 1);
         date = cal.getTime();
 
-        final SimpleDateFormat dateF = new SimpleDateFormat("MMMM", resources.getLocale()); // NOI18N
+        final SimpleDateFormat dateF = new SimpleDateFormat("MMMM"); // NOI18N
 
         monthName = dateF.format(date);
         return monthName;
@@ -420,7 +420,7 @@ public class DateChooser extends JDialog {
         cal.set(2001, 0, calendarDay);
         date = cal.getTime();
 
-        final SimpleDateFormat dateF = new SimpleDateFormat("E", resources.getLocale()); // NOI18N
+        final SimpleDateFormat dateF = new SimpleDateFormat("E"); // NOI18N
 
         dayName = dateF.format(date);
         return dayName;
