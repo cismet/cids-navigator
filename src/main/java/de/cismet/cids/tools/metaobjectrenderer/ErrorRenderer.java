@@ -37,10 +37,11 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDefaultRenderer;
-    private javax.swing.JButton btnSaveProblemHtml;
     private javax.swing.JButton btnShowProblem;
     private javax.swing.JPanel defaultrendererComponent;
     private javax.swing.JPanel footerComponent;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblOopsIcon;
     private javax.swing.JLabel lblOopsText;
@@ -89,8 +90,9 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         tpErrorMessage = new javax.swing.JTextPane();
         footerComponent = new javax.swing.JPanel();
         btnShowProblem = new javax.swing.JButton();
-        btnSaveProblemHtml = new javax.swing.JButton();
         btnDefaultRenderer = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         defaultrendererComponent = new javax.swing.JPanel();
         spDefaultRenderer = new javax.swing.JScrollPane();
         panOpps = new javax.swing.JPanel();
@@ -113,6 +115,9 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         btnShowProblem.setText(org.openide.util.NbBundle.getMessage(
                 ErrorRenderer.class,
                 "ErrorRenderer.btnShowProblem.text")); // NOI18N
+        btnShowProblem.setMaximumSize(new java.awt.Dimension(230, 25));
+        btnShowProblem.setMinimumSize(new java.awt.Dimension(230, 25));
+        btnShowProblem.setPreferredSize(new java.awt.Dimension(230, 25));
         btnShowProblem.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -121,35 +126,20 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         footerComponent.add(btnShowProblem, gridBagConstraints);
 
-        btnSaveProblemHtml.setText(org.openide.util.NbBundle.getMessage(
-                ErrorRenderer.class,
-                "ErrorRenderer.btnSaveProblemHtml.text")); // NOI18N
-        btnSaveProblemHtml.setEnabled(false);
-        btnSaveProblemHtml.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnSaveProblemHtmlActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
-        footerComponent.add(btnSaveProblemHtml, gridBagConstraints);
-
         btnDefaultRenderer.setText(org.openide.util.NbBundle.getMessage(
                 ErrorRenderer.class,
                 "ErrorRenderer.btnDefaultRenderer.text")); // NOI18N
+        btnDefaultRenderer.setMaximumSize(new java.awt.Dimension(230, 25));
+        btnDefaultRenderer.setMinimumSize(new java.awt.Dimension(230, 25));
+        btnDefaultRenderer.setPreferredSize(new java.awt.Dimension(230, 25));
         btnDefaultRenderer.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -161,9 +151,24 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         footerComponent.add(btnDefaultRenderer, gridBagConstraints);
+
+        jLabel1.setText(org.openide.util.NbBundle.getMessage(ErrorRenderer.class, "ErrorRenderer.jLabel1.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        footerComponent.add(jLabel1, gridBagConstraints);
+
+        jLabel2.setText(org.openide.util.NbBundle.getMessage(ErrorRenderer.class, "ErrorRenderer.jLabel2.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1.0;
+        footerComponent.add(jLabel2, gridBagConstraints);
 
         defaultrendererComponent.setOpaque(false);
         defaultrendererComponent.setLayout(new java.awt.BorderLayout());
@@ -226,15 +231,6 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         validate();
         repaint();
     }                                                                                  //GEN-LAST:event_btnShowProblemActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void btnSaveProblemHtmlActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSaveProblemHtmlActionPerformed
-        // TODO add your handling code here:
-    } //GEN-LAST:event_btnSaveProblemHtmlActionPerformed
 
     @Override
     public JComponent getTitleComponent() {
