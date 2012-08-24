@@ -58,6 +58,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.event.*;
 
 import java.io.BufferedInputStream;
@@ -871,7 +872,12 @@ public class Navigator extends JFrame {
      * @param  visible  DOCUMENT ME!
      */
     private void doSetVisible(final boolean visible) {
-        super.setLocationRelativeTo(this.loginDialog);
+        final Point location = this.getLocation();
+        // issue #8 we assume a position of 0,0 to be the default position. thus we center the navigator window then.
+        if ((location.x == 0) && (location.y == 0)) {
+            this.setLocationRelativeTo(this.loginDialog);
+        }
+
         super.setVisible(visible);
 
         if (visible) {
@@ -955,9 +961,17 @@ public class Navigator extends JFrame {
         final int windowWidth = this.preferences.getInt("windowWidth", PropertyManager.getManager().getWidth());    // NOI18N
         final int windowX = this.preferences.getInt("windowX", 0);                                                  // NOI18N
         final int windowY = this.preferences.getInt("windowY", 0);                                                  // NOI18N
-        final boolean windowMaximised = this.preferences.getBoolean(
-                "windowMaximised",
-                propertyManager.isMaximizeWindow());                                                                // NOI18N
+
+        final boolean windowMaximised;
+        // issue #8: osx does to correctly determine the maximised state of a window, thus we ignore that on osx
+        final String osName = System.getProperty("os.name"); // NOI18N
+        if (osName.startsWith("Mac")) {
+            windowMaximised = false;
+        } else {
+            windowMaximised = this.preferences.getBoolean(
+                    "windowMaximised",                       // NOI18N
+                    propertyManager.isMaximizeWindow());
+        }
 
         if (logger.isInfoEnabled()) {
             logger.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
