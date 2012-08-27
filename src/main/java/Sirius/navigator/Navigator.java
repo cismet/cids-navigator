@@ -41,8 +41,6 @@ import Sirius.server.middleware.types.*;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.permission.*;
 
-import com.sun.org.apache.bcel.internal.generic.LoadClass;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -258,7 +256,6 @@ public class Navigator extends JFrame {
             initSearch();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
-            configurationManager.addConfigurable(menuBar);
             configurationManager.configure();
 
             SwingUtilities.invokeLater(new Runnable() {

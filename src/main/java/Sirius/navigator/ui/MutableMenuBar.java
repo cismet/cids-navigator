@@ -24,23 +24,12 @@ import Sirius.navigator.ui.embedded.EmbeddedMenu;
 
 import org.apache.log4j.Logger;
 
-import org.jdesktop.swingx.JXErrorPane;
-import org.jdesktop.swingx.error.ErrorInfo;
-
-import org.jdom.CDATA;
-import org.jdom.Content;
-import org.jdom.Element;
-
-import org.openide.util.NbBundle;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 
 import java.util.Collection;
-import java.util.logging.Level;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -52,11 +41,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import de.cismet.tools.BrowserLauncher;
-
-import de.cismet.tools.configuration.Configurable;
-import de.cismet.tools.configuration.NoWriteError;
-
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
@@ -64,7 +48,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public class MutableMenuBar extends JMenuBar implements Configurable {
+public class MutableMenuBar extends JMenuBar {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -449,44 +433,6 @@ public class MutableMenuBar extends JMenuBar implements Configurable {
                 "MutableMenuBar.windowMenu.mnemonic").charAt(0));                                                        // NOI18N
         this.add(menu);
         viewMenu = menu;
-
-        // Help menu ......................................................
-        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.title")); // NOI18N
-        menu.setMnemonic(org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.helpMenu.mnemonic").charAt(0));                                                        // NOI18N
-        this.add(menu);
-
-        // online help
-        item = new JMenuItem(NbBundle.getMessage(
-                    MutableMenuBar.class,
-                    "MutableMenuBar.makeDefaultMenues.menuItem.help.text"));           // NOI18N
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
-        item.setMnemonic(NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.makeDefaultMenues.menuItem.help.mnemonic").charAt(0)); // NOI18N
-        item.setIcon(resources.getIcon("help.png"));                                   // NOI18N
-        item.setActionCommand("help.onlineHelp");                                      // NOI18N
-        item.addActionListener(itemListener);
-        item.setToolTipText(NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.makeDefaultMenues.menuItem.help.tooltip"));            // NOI18N
-        menu.add(item);
-
-        // news
-        item = new JMenuItem(NbBundle.getMessage(
-                    MutableMenuBar.class,
-                    "MutableMenuBar.makeDefaultMenues.menuItem.news.text"));           // NOI18N
-        item.setMnemonic(NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.makeDefaultMenues.menuItem.news.mnemonic").charAt(0)); // NOI18N
-        item.setIcon(resources.getIcon("news.png"));                                   // NOI18N
-        item.setActionCommand("help.news");                                            // NOI18N
-        item.addActionListener(itemListener);
-        item.setToolTipText(NbBundle.getMessage(
-                MutableMenuBar.class,
-                "MutableMenuBar.makeDefaultMenues.menuItem.news.tooltip"));            // NOI18N
-        menu.add(item);
     }
 
     /**
@@ -525,63 +471,6 @@ public class MutableMenuBar extends JMenuBar implements Configurable {
      */
     public void registerLayoutManager(final Sirius.navigator.plugin.interfaces.LayoutManager layoutManager) {
         this.layoutManager = layoutManager;
-    }
-
-    @Override
-    public void configure(final Element parent) {
-        // noop
-    }
-
-    @Override
-    public void masterConfigure(final Element root) {
-        final Element uiPrefs = root.getChild("navigatorUIPreferences"); // NOI18N
-
-        final Element helpUrlElement = uiPrefs.getChild("helpUrl");                    // NOI18N
-        if (helpUrlElement == null) {
-            LOG.warn("help url not present in navigatorUIPreferences, using default"); // NOI18N
-            helpUrl = "http://www.cismet.de";                                          // NOI18N
-        } else {
-            // we expect only cdata
-            final Content cdata = helpUrlElement.getContent(0);
-            if (cdata instanceof CDATA) {
-                helpUrl = ((CDATA)cdata).getValue();
-            } else {
-                LOG.warn("help url cdata not present in navigatorUIPreferences/helpUrl, using default"); // NOI18N
-                helpUrl = "http://www.cismet.de";                                                        // NOI18N
-            }
-        }
-
-        final Element newsUrlElement = uiPrefs.getChild("newsUrl");                    // NOI18N
-        if (newsUrlElement == null) {
-            LOG.warn("news url not present in navigatorUIPreferences, using default"); // NOI18N
-            newsUrl = "http://www.cismet.de";                                          // NOI18N
-        } else {
-            // we expect only cdata
-            final Content cdata = newsUrlElement.getContent(0);
-            if (cdata instanceof CDATA) {
-                newsUrl = ((CDATA)cdata).getValue();
-            } else {
-                LOG.warn("news url cdata not present in navigatorUIPreferences/helpUrl, using default"); // NOI18N
-                newsUrl = "http://www.cismet.de";                                                        // NOI18N
-            }
-        }
-    }
-
-    @Override
-    public Element getConfiguration() throws NoWriteError {
-        final Element ret = new Element("navigatorUIPreferences"); // NOI18N
-
-        final Element helpUrlElement = new Element("helpUrl"); // NOI18N
-        final CDATA helpUrlCdata = new CDATA(helpUrl);
-        helpUrlElement.addContent(helpUrlCdata);
-        ret.addContent(helpUrlElement);
-
-        final Element newsUrlElement = new Element("newsUrl"); // NOI18N
-        final CDATA newsUrlCdata = new CDATA(newsUrl);
-        newsUrlElement.addContent(newsUrlCdata);
-        ret.addContent(newsUrlElement);
-
-        return ret;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -632,40 +521,6 @@ public class MutableMenuBar extends JMenuBar implements Configurable {
                 MethodManager.getManager().showPluginManager();
             } else if (e.getActionCommand().equals("extras.options")) { // NOI18N
                 MethodManager.getManager().showOptionsDialog();
-            } else if (e.getActionCommand().equals("help.onlineHelp")) { // NOI18N
-                try {
-                    BrowserLauncher.openURL(helpUrl); // NOI18N
-                } catch (final Exception ex) {
-                    final String message = "cannot open url: " + helpUrl; // NOI18N
-                    LOG.error(message, ex);
-                    final ErrorInfo ei = new ErrorInfo(
-                            "Error opening url", // NOI18N
-                            "Cannot open the url: " // NOI18N
-                                    + helpUrl,
-                            null,
-                            null,
-                            ex,
-                            Level.WARNING,
-                            null);
-                    JXErrorPane.showDialog(ComponentRegistry.getRegistry().getMainWindow(), ei);
-                }
-            } else if (e.getActionCommand().equals("help.news")) { // NOI18N
-                try {
-                    BrowserLauncher.openURL(newsUrl); // NOI18N
-                } catch (final Exception ex) {
-                    final String message = "cannot open url: " + newsUrl; // NOI18N
-                    LOG.error(message, ex);
-                    final ErrorInfo ei = new ErrorInfo(
-                            "Error opening url", // NOI18N
-                            "Cannot open the url: " // NOI18N
-                                    + newsUrl,
-                            null,
-                            null,
-                            ex,
-                            Level.WARNING,
-                            null);
-                    JXErrorPane.showDialog(ComponentRegistry.getRegistry().getMainWindow(), ei);
-                }
             } else if (e.getActionCommand().equals("tree.refresh")) { // NOI18N
                 try {
                     final TreePath selectionPath = ComponentRegistry.getRegistry()
