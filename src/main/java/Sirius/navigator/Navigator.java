@@ -258,6 +258,7 @@ public class Navigator extends JFrame {
             initSearch();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
+            configurationManager.addConfigurable(menuBar);
             configurationManager.configure();
 
             SwingUtilities.invokeLater(new Runnable() {

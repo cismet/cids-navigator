@@ -7,61 +7,55 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
-/*******************************************************************************
- *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
- *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
- *
- * Programmers          :       Pascal
- *
- * Project                      :       WuNDA 2
- * Filename             :
- * Version                      :       2.0
- * Purpose                      :
- * Created                      :       27.04.2000
- * History                      :       02.08.2000 added support for dynamic Menus
- *
- *******************************************************************************/
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.*;
-//import Sirius.navigator.ui.embedded.*;
-//import Sirius.navigator.*;
-//import Sirius.navigator.Controls.*;
-//import Sirius.navigator.Views.*;
-//import Sirius.navigator.Views.Tree.*;
-//import Sirius.navigator.Dialog.*;
-//import Sirius.navigator.Dialog.Search.*;
-//import Sirius.navigator.connection.ConnectionHandler;
-//import Sirius.navigator.tools.ObjectManager;
-//import Sirius.navigator.PlugIn.*;
-//import Sirius.navigator.types.*;
-import Sirius.navigator.method.*;
-import Sirius.navigator.resource.*;
+import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.exception.ExceptionManager;
+import Sirius.navigator.method.MethodManager;
+import Sirius.navigator.resource.PropertyManager;
+import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.dynamic.SearchSearchTopicsDialogAction;
 import Sirius.navigator.types.treenode.RootTreeNode;
-import Sirius.navigator.ui.dialog.*;
-import Sirius.navigator.ui.embedded.*;
+import Sirius.navigator.ui.dialog.ErrorDialog;
+import Sirius.navigator.ui.embedded.AbstractEmbeddedComponentsMap;
+import Sirius.navigator.ui.embedded.EmbeddedComponent;
+import Sirius.navigator.ui.embedded.EmbeddedContainer;
+import Sirius.navigator.ui.embedded.EmbeddedContainersMap;
+import Sirius.navigator.ui.embedded.EmbeddedMenu;
 
 import org.apache.log4j.Logger;
 
-import java.awt.*;
-import java.awt.event.*;
+import org.jdesktop.swingx.JXErrorPane;
+import org.jdesktop.swingx.error.ErrorInfo;
 
-import java.util.*;
+import org.jdom.CDATA;
+import org.jdom.Content;
+import org.jdom.Element;
 
-import javax.swing.*;
+import org.openide.util.NbBundle;
+
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+
+import java.util.Collection;
+import java.util.logging.Level;
+
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.tools.BrowserLauncher;
+
+import de.cismet.tools.configuration.Configurable;
+import de.cismet.tools.configuration.NoWriteError;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
@@ -70,11 +64,11 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public class MutableMenuBar extends JMenuBar {
+public class MutableMenuBar extends JMenuBar implements Configurable {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(MutableMenuBar.class);
+    private static final Logger LOG = Logger.getLogger(MutableMenuBar.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -83,23 +77,16 @@ public class MutableMenuBar extends JMenuBar {
     private final EmbeddedContainersMap moveableMenues;
     private Sirius.navigator.plugin.interfaces.LayoutManager layoutManager;
     private JMenu viewMenu;
-    // Control Stuff
-    // private ControlModel model;
-    // private MethodManager methodManager;
-    // private GenericMetaTree activeTree;
-    // Default Menues
-    // private JMenu navigatorMenu;
-    // private JMenu functionsMenu;
     private JMenu pluginMenu;
     private JMenu searchMenu;
-//    private JMenu windowMenu;
-    // private JMenu helpMenu;
+
+    private String helpUrl;
+    private String newsUrl;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * public MutableMenuBar(ControlModel model) { super(); this.model = model; methodManager = new
-     * MethodManager(model); this.makeDefaultMenues(); }.
+     * Creates a new MutableMenuBar object.
      */
     public MutableMenuBar() {
         super();
@@ -112,7 +99,6 @@ public class MutableMenuBar extends JMenuBar {
 
     //~ Methods ----------------------------------------------------------------
 
-    // MOVEABLE MENUES ---------------------------------------------------------
     /**
      * Adds new moveable menues to this menu bar.
      *
@@ -185,15 +171,15 @@ public class MutableMenuBar extends JMenuBar {
         return this.moveableMenues.isAvailable(id);
     }
     /**
-     * PLUGIN MENUES -----------------------------------------------------------
+     * DOCUMENT ME!
      *
      * @param  menu  DOCUMENT ME!
      */
     public void addPluginMenu(final EmbeddedMenu menu) {
         if (menu.getItemCount() > 0) {
             this.pluginMenues.add(menu);
-        } else if (logger.isDebugEnabled()) {
-            logger.warn("menu '" + menu.getId() + "' does not contain any items, ignoring menu"); // NOI18N
+        } else if (LOG.isDebugEnabled()) {
+            LOG.warn("menu '" + menu.getId() + "' does not contain any items, ignoring menu"); // NOI18N
         }
     }
 
@@ -239,25 +225,16 @@ public class MutableMenuBar extends JMenuBar {
     }
 
     /**
-     * Um festzustellen, welcher Tree gerade aktiv ist.
-     */
-    /*public GenericMetaTree getActiveTree()
-     * { if(model.metaTree != null && (model.metaTree.hasFocus() || model.metaTree.isShowing())) return model.metaTree;
-     * else if(model.searchTree != null && (model.searchTree.hasFocus() || model.searchTree.isShowing())) return
-     * model.searchTree; else return null;}*/
-    /**
      * Creates the default menues & menu entries.
      */
     private void makeDefaultMenues() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("creating default menues"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("creating default menues"); // NOI18N
         }
 
-        JMenu menu = null;
-        JMenuItem item = null;
         final MenuItemActionListener itemListener = new MenuItemActionListener();
 
-        menu = new JMenu(org.openide.util.NbBundle.getMessage(
+        JMenu menu = new JMenu(org.openide.util.NbBundle.getMessage(
                     MutableMenuBar.class,
                     "MutableMenuBar.navigatorMenu.title"));          // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
@@ -267,17 +244,18 @@ public class MutableMenuBar extends JMenuBar {
 
         // LayoutControls
         // Gegenwärtiges Layout Speichern
-        menu.add(item = new JMenuItem(
-                    org.openide.util.NbBundle.getMessage(
-                        MutableMenuBar.class,
-                        "MutableMenuBar.navigatorMenu.saveCurrentLayout.title"))); // NOI18N
-        item.setIcon(resources.getIcon("layout.png"));                             // NOI18N
-        item.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));                     // NOI18N
-        item.setActionCommand("navigator.save.current.layout");                    // NOI18N
+        JMenuItem item = new JMenuItem(
+                org.openide.util.NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.navigatorMenu.saveCurrentLayout.title")); // NOI18N
+        menu.add(item);
+        item.setIcon(resources.getIcon("layout.png"));                        // NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));                // NOI18N
+        item.setActionCommand("navigator.save.current.layout");               // NOI18N
         item.addActionListener(itemListener);
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.navigatorMenu.saveCurrentLayout.tooltip"));
+                "MutableMenuBar.navigatorMenu.saveCurrentLayout.tooltip"));   // NOI18N
 
         // Layout öffnen
         menu.add(item = new JMenuItem(
@@ -290,7 +268,7 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.navigatorMenu.openLayout.tooltip"));
+                "MutableMenuBar.navigatorMenu.openLayout.tooltip"));        // NOI18N
 
         // Layout reseten
         menu.add(item = new JMenuItem(
@@ -303,7 +281,7 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.navigatorMenu.resetLayout.tooltip"));
+                "MutableMenuBar.navigatorMenu.resetLayout.tooltip"));        // NOI18N
 
         menu.add(new JSeparator());
 
@@ -320,7 +298,7 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.navigatorMenu.reloadCatalogue.tooltip"));
+                "MutableMenuBar.navigatorMenu.reloadCatalogue.tooltip"));            // NOI18N
 
         menu.add(new JSeparator());
 
@@ -338,7 +316,7 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.navigatorMenu.exit.tooltip"));
+                "MutableMenuBar.navigatorMenu.exit.tooltip"));            // NOI18N
 
         menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.searchMenu.title")); // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
@@ -368,7 +346,7 @@ public class MutableMenuBar extends JMenuBar {
             menu.add(item = new JMenuItem(new SearchSearchTopicsDialogAction())); // NOI18N
             item.setText(org.openide.util.NbBundle.getMessage(
                     MutableMenuBar.class,
-                    "MutableMenuBar.searchMenu.search.title"));
+                    "MutableMenuBar.searchMenu.search.title"));                   // NOI18N
             item.setMnemonic(org.openide.util.NbBundle.getMessage(
                     MutableMenuBar.class,
                     "MutableMenuBar.searchMenu.search.mnemonic").charAt(0));      // NOI18N
@@ -463,7 +441,7 @@ public class MutableMenuBar extends JMenuBar {
         item.addActionListener(itemListener);
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.extrasMenu.options.tooltip"));
+                "MutableMenuBar.extrasMenu.options.tooltip"));                                                           // NOI18N
 
         menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.windowMenu.title")); // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
@@ -473,22 +451,42 @@ public class MutableMenuBar extends JMenuBar {
         viewMenu = menu;
 
         // Help menu ......................................................
-        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.title"));  // NOI18N
+        menu = new JMenu(org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.title")); // NOI18N
         menu.setMnemonic(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.helpMenu.mnemonic").charAt(0));                                                         // NOI18N
+                "MutableMenuBar.helpMenu.mnemonic").charAt(0));                                                        // NOI18N
         this.add(menu);
-        menu.add(item = new JMenuItem(
-                    org.openide.util.NbBundle.getMessage(MutableMenuBar.class, "MutableMenuBar.helpMenu.info.title"))); // NOI18N
-        item.setMnemonic(org.openide.util.NbBundle.getMessage(
+
+        // online help
+        item = new JMenuItem(NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.makeDefaultMenues.menuItem.help.text"));           // NOI18N
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        item.setMnemonic(NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.helpMenu.info.mnemonic").charAt(0));                                                    // NOI18N
-        item.setIcon(resources.getIcon("information16.gif"));                                                           // NOI18N
-        item.setActionCommand("help.info");                                                                             // NOI18N
+                "MutableMenuBar.makeDefaultMenues.menuItem.help.mnemonic").charAt(0)); // NOI18N
+        item.setIcon(resources.getIcon("help.png"));                                   // NOI18N
+        item.setActionCommand("help.onlineHelp");                                      // NOI18N
         item.addActionListener(itemListener);
-        item.setToolTipText(org.openide.util.NbBundle.getMessage(
+        item.setToolTipText(NbBundle.getMessage(
                 MutableMenuBar.class,
-                "MutableMenuBar.helpMenu.info.tooltip"));                                                               // NOI18N
+                "MutableMenuBar.makeDefaultMenues.menuItem.help.tooltip"));            // NOI18N
+        menu.add(item);
+
+        // news
+        item = new JMenuItem(NbBundle.getMessage(
+                    MutableMenuBar.class,
+                    "MutableMenuBar.makeDefaultMenues.menuItem.news.text"));           // NOI18N
+        item.setMnemonic(NbBundle.getMessage(
+                MutableMenuBar.class,
+                "MutableMenuBar.makeDefaultMenues.menuItem.news.mnemonic").charAt(0)); // NOI18N
+        item.setIcon(resources.getIcon("news.png"));                                   // NOI18N
+        item.setActionCommand("help.news");                                            // NOI18N
+        item.addActionListener(itemListener);
+        item.setToolTipText(NbBundle.getMessage(
+                MutableMenuBar.class,
+                "MutableMenuBar.makeDefaultMenues.menuItem.news.tooltip"));            // NOI18N
+        menu.add(item);
     }
 
     /**
@@ -529,6 +527,63 @@ public class MutableMenuBar extends JMenuBar {
         this.layoutManager = layoutManager;
     }
 
+    @Override
+    public void configure(final Element parent) {
+        // noop
+    }
+
+    @Override
+    public void masterConfigure(final Element root) {
+        final Element uiPrefs = root.getChild("navigatorUIPreferences"); // NOI18N
+
+        final Element helpUrlElement = uiPrefs.getChild("helpUrl");                    // NOI18N
+        if (helpUrlElement == null) {
+            LOG.warn("help url not present in navigatorUIPreferences, using default"); // NOI18N
+            helpUrl = "http://www.cismet.de";                                          // NOI18N
+        } else {
+            // we expect only cdata
+            final Content cdata = helpUrlElement.getContent(0);
+            if (cdata instanceof CDATA) {
+                helpUrl = ((CDATA)cdata).getValue();
+            } else {
+                LOG.warn("help url cdata not present in navigatorUIPreferences/helpUrl, using default"); // NOI18N
+                helpUrl = "http://www.cismet.de";                                                        // NOI18N
+            }
+        }
+
+        final Element newsUrlElement = uiPrefs.getChild("newsUrl");                    // NOI18N
+        if (newsUrlElement == null) {
+            LOG.warn("news url not present in navigatorUIPreferences, using default"); // NOI18N
+            newsUrl = "http://www.cismet.de";                                          // NOI18N
+        } else {
+            // we expect only cdata
+            final Content cdata = newsUrlElement.getContent(0);
+            if (cdata instanceof CDATA) {
+                newsUrl = ((CDATA)cdata).getValue();
+            } else {
+                LOG.warn("news url cdata not present in navigatorUIPreferences/helpUrl, using default"); // NOI18N
+                newsUrl = "http://www.cismet.de";                                                        // NOI18N
+            }
+        }
+    }
+
+    @Override
+    public Element getConfiguration() throws NoWriteError {
+        final Element ret = new Element("navigatorUIPreferences"); // NOI18N
+
+        final Element helpUrlElement = new Element("helpUrl"); // NOI18N
+        final CDATA helpUrlCdata = new CDATA(helpUrl);
+        helpUrlElement.addContent(helpUrlCdata);
+        ret.addContent(helpUrlElement);
+
+        final Element newsUrlElement = new Element("newsUrl"); // NOI18N
+        final CDATA newsUrlCdata = new CDATA(newsUrl);
+        newsUrlElement.addContent(newsUrlCdata);
+        ret.addContent(newsUrlElement);
+
+        return ret;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -547,23 +602,23 @@ public class MutableMenuBar extends JMenuBar {
          */
         @Override
         public void actionPerformed(final ActionEvent e) {
-            if (e.getActionCommand().equals("search.search")) {              // NOI18N
+            if (e.getActionCommand().equals("search.search")) {            // NOI18N
                 try {
                     MethodManager.getManager().showSearchDialog();
-                } catch (Throwable t) {
-                    logger.fatal("Error while processing search method", t); // NOI18N
+                } catch (Exception ex) {
+                    LOG.fatal("Error while processing search method", ex); // NOI18N
 
                     final ErrorDialog errorDialog = new ErrorDialog(
                             org.openide.util.NbBundle.getMessage(
                                 MutableMenuBar.class,
                                 "MutableMenuBar.MenuItemActionListener.actionPerformed(ActionEvent).ErrorDialog.message"), // NOI18N
-                            t.toString(),
+                            ex.toString(),
                             ErrorDialog.WARNING);
                     StaticSwingTools.showDialog(errorDialog);
                 }
             } else if (e.getActionCommand().equals("navigator.exit")) { // NOI18N
                 if (ExceptionManager.getManager().showExitDialog(ComponentRegistry.getRegistry().getMainWindow())) {
-                    logger.info("closing program"); // NOI18N
+                    LOG.info("closing program"); // NOI18N
                     ComponentRegistry.getRegistry().getNavigator().dispose();
                     System.exit(0);
                 }
@@ -577,8 +632,40 @@ public class MutableMenuBar extends JMenuBar {
                 MethodManager.getManager().showPluginManager();
             } else if (e.getActionCommand().equals("extras.options")) { // NOI18N
                 MethodManager.getManager().showOptionsDialog();
-            } else if (e.getActionCommand().equals("help.info")) { // NOI18N
-                MethodManager.getManager().showAboutDialog();
+            } else if (e.getActionCommand().equals("help.onlineHelp")) { // NOI18N
+                try {
+                    BrowserLauncher.openURL(helpUrl); // NOI18N
+                } catch (final Exception ex) {
+                    final String message = "cannot open url: " + helpUrl; // NOI18N
+                    LOG.error(message, ex);
+                    final ErrorInfo ei = new ErrorInfo(
+                            "Error opening url", // NOI18N
+                            "Cannot open the url: " // NOI18N
+                                    + helpUrl,
+                            null,
+                            null,
+                            ex,
+                            Level.WARNING,
+                            null);
+                    JXErrorPane.showDialog(ComponentRegistry.getRegistry().getMainWindow(), ei);
+                }
+            } else if (e.getActionCommand().equals("help.news")) { // NOI18N
+                try {
+                    BrowserLauncher.openURL(newsUrl); // NOI18N
+                } catch (final Exception ex) {
+                    final String message = "cannot open url: " + newsUrl; // NOI18N
+                    LOG.error(message, ex);
+                    final ErrorInfo ei = new ErrorInfo(
+                            "Error opening url", // NOI18N
+                            "Cannot open the url: " // NOI18N
+                                    + newsUrl,
+                            null,
+                            null,
+                            ex,
+                            Level.WARNING,
+                            null);
+                    JXErrorPane.showDialog(ComponentRegistry.getRegistry().getMainWindow(), ei);
+                }
             } else if (e.getActionCommand().equals("tree.refresh")) { // NOI18N
                 try {
                     final TreePath selectionPath = ComponentRegistry.getRegistry()
@@ -592,13 +679,13 @@ public class MutableMenuBar extends JMenuBar {
                         ComponentRegistry.getRegistry().getCatalogueTree().exploreSubtree(selectionPath);
                     }
                 } catch (ConnectionException ex) {
-                    logger.error("Error while refreshing the tree", ex); // NOI18N
+                    LOG.error("Error while refreshing the tree", ex); // NOI18N
                 } catch (RuntimeException ex) {
-                    logger.error("Error while refreshing the tree", ex); // NOI18N
+                    LOG.error("Error while refreshing the tree", ex); // NOI18N
                 }
             } else if (e.getActionCommand().equals("navigator.reset.layout")) { // NOI18N
-                if (logger.isDebugEnabled()) {
-                    logger.debug("reset layout"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("reset layout"); // NOI18N
                 }
                 if (layoutManager != null) {
                     layoutManager.resetLayout();
@@ -606,8 +693,8 @@ public class MutableMenuBar extends JMenuBar {
                     // TODO Meldung Benutzer
                 }
             } else if (e.getActionCommand().equals("navigator.open.layout")) { // NOI18N
-                if (logger.isDebugEnabled()) {
-                    logger.debug("open layout"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("open layout"); // NOI18N
                 }
                 if (layoutManager != null) {
                     layoutManager.loadLayout((java.awt.Component)StaticSwingTools.getParentFrame(MutableMenuBar.this));
@@ -615,8 +702,8 @@ public class MutableMenuBar extends JMenuBar {
                     // TODO Meldung Benutzer
                 }
             } else if (e.getActionCommand().equals("navigator.save.current.layout")) { // NOI18N
-                if (logger.isDebugEnabled()) {
-                    logger.debug("save layout"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("save layout"); // NOI18N
                 }
                 if (layoutManager != null) {
                     layoutManager.saveCurrentLayout((java.awt.Component)StaticSwingTools.getParentFrame(
@@ -627,69 +714,12 @@ public class MutableMenuBar extends JMenuBar {
             }
         }
     }
-    /*if (e.getActionCommand().equals("functions_search"))
-     * { try { activeTree = getActiveTree();
-     *
-     * //NavigatorLogger.printMessage(activeTree); //methodManager.callSearch(activeTree, false);
-     * methodManager.callSearch(activeTree, true); } catch (Throwable t) { if(NavigatorLogger.DEV) {
-     * NavigatorLogger.printMessage("Fehler bei der Verarbeitung der Suchmethode"); t.printStackTrace(); }
-     *
-     * ErrorDialog errorDialog = new ErrorDialog(StringLoader.getString("STL@searchError"), t.toString(),
-     * ErrorDialog.WARNING); errorDialog.setLocationRelativeTo(model.navigator); errorDialog.show(); } } else if
-     * (e.getActionCommand().equals("functions_change_password")) { model.passwordDialog.show(); } else if
-     * (e.getActionCommand().equals("navigator_logout")) { try { model.navigator.setVisible(false);
-     *
-     * // Das komplette Model musss geloescht werden, da der MetaTree // neue RootNodes erhaelt.
-     * model.metaTree.setModel(null); model.searchTree.clear();
-     *
-     * ConnectionHandler.reset(); model.loginDialog.reset(); System.gc(); model.loginDialog.show();
-     * ConnectionHandler.refillCache();
-     *
-     * model.metaTree.setModel(new DefaultTreeModel(new MetaTreeNode(ConnectionHandler.getTopNodes(), true), true));
-     * System.gc(); model.navigator.setVisible(true); } catch(Exception ex) { if(NavigatorLogger.DEV) {
-     * NavigatorLogger.printMessage("Fehler waehrend des Anmeldevorgangs: "); ex.printStackTrace(); }
-     *
-     * ErrorDialog errorDialog = new ErrorDialog(StringLoader.getString("STL@loginError"), e.toString(),
-     * ErrorDialog.ERROR); errorDialog.setLocationRelativeTo(model.navigator); errorDialog.show(); } } else if
-     * (e.getActionCommand().equals("navigator_exit")) { String message = StringLoader.getString("STL@shouldClose");
-     * JOptionPane optionPane = new JOptionPane(message, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null,
-     * StringLoader.getStringArray("STL@yesNoOptionARRAY"), null); JDialog dialog =
-     * optionPane.createDialog(model.navigator, StringLoader.getString("STL@exitProgram")); dialog.show();
-     *
-     * if(optionPane.getValue().equals(StringLoader.getString("STL@yes"))) {
-     * if(NavigatorLogger.VERBOSE)NavigatorLogger.printMessage("<NAV> Navigator closed()"); model.navigator.dispose();
-     * System.exit(0); } } else if(e.getActionCommand().equals("functions_search_profiles")) {
-     * model.queryResultProfileManager.show();
-     *
-     * if(model.queryResultProfileManager.newNodesLoaded()) {
-     * model.statusBar.setStatusString(model.searchTree.getResultNodes().length +
-     * StringLoader.getString("STL@objectsLoaded"), StatusBar.STATUS_2); model.searchTree.bringToFront(); } }}*/
 
     /**
-     * Local MoveableComponents implementation.
+     * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
-    /*
-     * private class MoveableMenues extends MoveableComponents { private MoveableMenues(String id, Collection menues) {
-     * super(id, menues); }
-     *
-     * protected void doSetComponentsVisible(boolean componentsVisible) { MoveableMenues.ComponentIterator iterator =
-     * this.getComponentIterator();
-     *
-     * if(this.componentsVisible !=  componentsVisible) { if(componentsVisible) { MutableMenuBar.this.add(new
-     * JSeparator(SwingConstants.VERTICAL));
-     *
-     * while(iterator.hasNext()) { MutableMenuBar.this.add(iterator.next()); } } else { while(iterator.hasNext()) {
-     * MutableMenuBar.this.remove(iterator.next()); }
-     *
-     * Component component = MutableMenuBar.this.getComponent(MutableMenuBar.this.getMenuCount()-1); if(component
-     * instanceof JSeparator) { MutableMenuBar.this.remove(component); } else { logger.warn("synchronization error: no
-     * separator found but component '" + component + "'"); }
-     *
-     * } } else { logger.warn("synchronization error: componentsVisible = '" + componentsVisible + "' but '" +
-     * !componentsVisible + "' expected"); }}*/
-    // }
     private class PluginMenuesMap extends AbstractEmbeddedComponentsMap {
 
         //~ Constructors -------------------------------------------------------
@@ -713,7 +743,7 @@ public class MutableMenuBar extends JMenuBar {
             if (component instanceof EmbeddedMenu) {
                 MutableMenuBar.this.pluginMenu.add((EmbeddedMenu)component);
             } else {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName()
+                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName() // NOI18N
                             + "', 'Sirius.navigator.EmbeddedMenu' expected"); // NOI18N
             }
         }
@@ -728,7 +758,7 @@ public class MutableMenuBar extends JMenuBar {
             if (component instanceof EmbeddedMenu) {
                 MutableMenuBar.this.pluginMenu.remove((EmbeddedMenu)component);
             } else {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName()
+                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName() // NOI18N
                             + "', 'Sirius.navigator.EmbeddedMenu' expected"); // NOI18N
             }
         }
@@ -740,6 +770,11 @@ public class MutableMenuBar extends JMenuBar {
      * @version  $Revision$, $Date$
      */
     private class MoveableMenues extends EmbeddedContainer {
+
+        //~ Instance fields ----------------------------------------------------
+
+        /** LOGGER. */
+        private final transient Logger logger = Logger.getLogger(MoveableMenues.class);
 
         //~ Constructors -------------------------------------------------------
 
@@ -815,7 +850,7 @@ public class MutableMenuBar extends JMenuBar {
          */
         @Override
         protected void removeComponents() {
-            Component component = null;
+            Component component;
             final ComponentIterator iterator = this.iterator();
 
             while (iterator.hasNext()) {
