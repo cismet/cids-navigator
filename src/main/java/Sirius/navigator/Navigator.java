@@ -41,8 +41,6 @@ import Sirius.server.middleware.types.*;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.permission.*;
 
-import com.sun.org.apache.bcel.internal.generic.LoadClass;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 

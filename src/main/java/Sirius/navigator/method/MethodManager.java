@@ -18,7 +18,6 @@ import Sirius.navigator.types.treenode.ClassTreeNode;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.dialog.AboutDialog;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
@@ -172,15 +171,6 @@ public class MethodManager {
      */
     public void showSearchResults() {
         ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.SEARCHRESULTS_TREE);
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void showAboutDialog() {
-        final AboutDialog aboutDialog = ComponentRegistry.getRegistry().getAboutDialog();
-        aboutDialog.pack();
-        StaticSwingTools.showDialog(aboutDialog);
     }
 
     /**
