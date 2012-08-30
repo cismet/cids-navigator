@@ -23,7 +23,7 @@ public abstract class EmbeddedContainer implements EmbeddedComponent {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final Logger logger = Logger.getLogger(EmbeddedContainer.class);
+    private static final Logger logger = Logger.getLogger(EmbeddedContainer.class);
 
     //~ Instance fields --------------------------------------------------------
 

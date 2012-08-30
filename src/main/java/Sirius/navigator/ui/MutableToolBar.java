@@ -102,7 +102,7 @@ public class MutableToolBar extends JToolBar {
         }
 
         final ActionListener toolBarListener = new ToolBarListener();
-        JButton button = null;
+        final JButton button;
 
         if (PropertyManager.getManager().isEnableSearchDialog()) {
             button = new JButton(resources.getIcon("find24.gif"));            // NOI18N
@@ -282,9 +282,6 @@ public class MutableToolBar extends JToolBar {
             } else if (e.getActionCommand().equals("plugin")) // NOI18N
             {
                 MethodManager.getManager().showPluginManager();
-            } else if (e.getActionCommand().equals("info"))   // NOI18N
-            {
-                MethodManager.getManager().showAboutDialog();
             }
         }
     }

@@ -13,7 +13,6 @@ import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
-import Sirius.navigator.ui.dialog.AboutDialog;
 import Sirius.navigator.ui.dialog.CoordinateChooser;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
@@ -72,8 +71,6 @@ public class ComponentRegistry {
     private MutablePopupMenu mutablePopupMenu = null;
     /** Holds value of property pluginManager. */
     private PluginManager pluginManager = null;
-    /** Holds value of property aboutDialog. */
-    private AboutDialog aboutDialog;
     private DescriptionPane descriptionPane = null;
     /** Holds value of property attributeEditor. */
     private AttributeEditor attributeEditor;
@@ -405,19 +402,6 @@ public class ComponentRegistry {
         }
 
         return this.optionsDialog;
-    }
-
-    /**
-     * Getter for property aboutDialog.
-     *
-     * @return  Value of property aboutDialog.
-     */
-    public AboutDialog getAboutDialog() {
-        if (this.aboutDialog == null) {
-            this.aboutDialog = new AboutDialog(this.getMainWindow());
-        }
-
-        return this.aboutDialog;
     }
 
     /**
