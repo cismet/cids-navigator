@@ -8,6 +8,7 @@
 package Sirius.navigator.tools;
 
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.MetaObject;
@@ -124,8 +125,10 @@ public class MetaObjectCache {
     public MetaObject[] clearCache(final String query) {
         try {
             rwLock.writeLock().lock();
+            
+            final SoftReference<MetaObject[]> objs = cache.put(query.intern().hashCode(), null);
 
-            return cache.put(query.intern().hashCode(), null).get();
+            return objs == null ? null : objs.get();
         } finally {
             rwLock.writeLock().unlock();
         }
