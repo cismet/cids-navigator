@@ -8,7 +8,6 @@
 package Sirius.navigator.tools;
 
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.middleware.types.MetaObject;
@@ -76,7 +75,9 @@ public class MetaObjectCache {
         try {
             rwLock.readLock().lock();
 
-            return cache.get(query.intern().hashCode()).get();
+            final SoftReference<MetaObject[]> objs = cache.get(query.intern().hashCode());
+
+            return (objs == null) ? null : objs.get();
         } finally {
             rwLock.readLock().unlock();
         }
@@ -200,7 +201,9 @@ public class MetaObjectCache {
         try {
             lock = rwLock.readLock();
             lock.lock();
-            cachedObjects = cache.get(qHash).get();
+
+            SoftReference<MetaObject[]> objs = cache.get(qHash);
+            cachedObjects = (objs == null) ? null : objs.get();
 
             if ((cachedObjects == null) || forceReload) {
                 lock.unlock();
@@ -210,7 +213,8 @@ public class MetaObjectCache {
                 final boolean wasEmpty = cachedObjects == null;
 
                 // somebody may have aquired the write lock in the meantime and we're late
-                cachedObjects = cache.get(qHash).get();
+                objs = cache.get(qHash);
+                cachedObjects = (objs == null) ? null : objs.get();
 
                 // if this is the case we truly have to load it because there are no objects or there have already been
                 // objects in the cache but a reload is forced. in case of the write lock was aquired in the mean time
