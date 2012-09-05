@@ -125,10 +125,10 @@ public class MetaObjectCache {
     public MetaObject[] clearCache(final String query) {
         try {
             rwLock.writeLock().lock();
-            
+
             final SoftReference<MetaObject[]> objs = cache.put(query.intern().hashCode(), null);
 
-            return objs == null ? null : objs.get();
+            return (objs == null) ? null : objs.get();
         } finally {
             rwLock.writeLock().unlock();
         }

@@ -7,6 +7,8 @@
 ****************************************************/
 package Sirius.navigator.tools;
 
+import Sirius.server.middleware.types.MetaObject;
+
 import java.util.EventListener;
 
 /**
@@ -24,23 +26,29 @@ public interface MetaObjectChangeListener extends EventListener {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Shall be invoked if a {@link MetaObject} is added. It is not guaranteed that the call is made on the EDT. Callers
+     * should obey the semantics of an added-call: This means that the given event object should contain the source
+     * object and the new object.
      *
-     * @param  moce  DOCUMENT ME!
+     * @param  moce  the event object related to the add
      */
     void metaObjectAdded(MetaObjectChangeEvent moce);
 
     /**
-     * DOCUMENT ME!
+     * Shall be invoked if a {@link MetaObject} is changed. It is not guaranteed that the call is made on the EDT.
+     * Callers should obey the semantics of a changed-call: This means that the given event object should contain the
+     * source object and the old and the new object.
      *
-     * @param  moce  DOCUMENT ME!
+     * @param  moce  the event object related to the change
      */
     void metaObjectChanged(MetaObjectChangeEvent moce);
 
     /**
-     * DOCUMENT ME!
+     * Shall be invoked if a {@link MetaObject} is removed. It is not guaranteed that the call is made on the EDT.
+     * Callers should obey the semantics of a removed-call: This means that the given event object should contain the
+     * source object and the old object.
      *
-     * @param  moce  DOCUMENT ME!
+     * @param  moce  the event object related to the change
      */
     void metaObjectRemoved(MetaObjectChangeEvent moce);
 }

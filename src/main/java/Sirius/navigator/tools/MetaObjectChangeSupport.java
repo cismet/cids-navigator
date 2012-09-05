@@ -7,6 +7,8 @@
 ****************************************************/
 package Sirius.navigator.tools;
 
+import Sirius.server.middleware.types.MetaObject;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -49,9 +51,9 @@ public final class MetaObjectChangeSupport {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Adds the given {@link MetaObjectChangeListener} to the set of listeners.
      *
-     * @param  mocL  DOCUMENT ME!
+     * @param  mocL  the listener to add
      */
     public void addMetaObjectChangeListener(final MetaObjectChangeListener mocL) {
         synchronized (listeners) {
@@ -60,9 +62,9 @@ public final class MetaObjectChangeSupport {
     }
 
     /**
-     * DOCUMENT ME!
+     * Removes the given {@link MetaObjectChangeListener} from the set of listeners.
      *
-     * @param  mocL  DOCUMENT ME!
+     * @param  mocL  the listener to remove
      */
     public void removeMetaObjectChangeListener(final MetaObjectChangeListener mocL) {
         synchronized (listeners) {
@@ -71,11 +73,14 @@ public final class MetaObjectChangeSupport {
     }
 
     /**
-     * DOCUMENT ME!
+     * Fires the given {@link MetaObjectChangeEvent} to all registered listeners. This operation assures that the <code>
+     * MetaObjectChangeEvent</code> is properly initialised. In case of removed there has to be the source object and
+     * the old and the new {@link MetaObject}.
      *
-     * @param   moce  DOCUMENT ME!
+     * @param   moce  the <code>MetaObjectChangeEvent</code> to be fired
      *
-     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @throws  IllegalArgumentException  if the given event does not have a source object or an old or a new <code>
+     *                                    MetaObject</code>
      */
     public void fireMetaObjectChanged(final MetaObjectChangeEvent moce) {
         if (moce.getOldMetaObject() == null) {
@@ -92,11 +97,14 @@ public final class MetaObjectChangeSupport {
     }
 
     /**
-     * DOCUMENT ME!
+     * Fires the given {@link MetaObjectChangeEvent} to all registered listeners. This operation assures that the <code>
+     * MetaObjectChangeEvent</code> is properly initialised. In case of added there has to be the source object and the
+     * new {@link MetaObject}.
      *
-     * @param   moce  DOCUMENT ME!
+     * @param   moce  the <code>MetaObjectChangeEvent</code> to be fired
      *
-     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @throws  IllegalArgumentException  if the given event does not have a source object or a new <code>
+     *                                    MetaObject</code>
      */
     public void fireMetaObjectAdded(final MetaObjectChangeEvent moce) {
         if (moce.getNewMetaObject() == null) {
@@ -109,11 +117,14 @@ public final class MetaObjectChangeSupport {
     }
 
     /**
-     * DOCUMENT ME!
+     * Fires the given {@link MetaObjectChangeEvent} to all registered listeners. This operation assures that the <code>
+     * MetaObjectChangeEvent</code> is properly initialised. In case of removed there has to be the source object and
+     * the old {@link MetaObject}.
      *
-     * @param   moce  DOCUMENT ME!
+     * @param   moce  the <code>MetaObjectChangeEvent</code> to be fired
      *
-     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @throws  IllegalArgumentException  if the given event does not have a source object or an old <code>
+     *                                    MetaObject</code>
      */
     public void fireMetaObjectRemoved(final MetaObjectChangeEvent moce) {
         if (moce.getOldMetaObject() == null) {
@@ -126,12 +137,15 @@ public final class MetaObjectChangeSupport {
     }
 
     /**
-     * DOCUMENT ME!
+     * Assures that the source of the {@link MetaObjectChangeEvent} has been set and fires an appropriate change to all
+     * listeners.
      *
      * @param   moce    DOCUMENT ME!
      * @param   change  DOCUMENT ME!
      *
-     * @throws  IllegalArgumentException  DOCUMENT ME!
+     * @throws  IllegalArgumentException  if the <code>MetaObjectChangeEvent</code> does not have a source object or the
+     *                                    give change object is unknown (which only happens if somebody alters the enum
+     *                                    and does not add another case here).
      */
     private void doFireMetaObjectChanged(final MetaObjectChangeEvent moce, final Change change) {
         if (moce.getSource() == null) {
@@ -145,6 +159,7 @@ public final class MetaObjectChangeSupport {
         }
 
         while (it.hasNext()) {
+            // no switch, if is faster
             if (Change.ADDED == change) {
                 it.next().metaObjectAdded(moce);
             } else if (Change.CHANGED == change) {
@@ -158,9 +173,10 @@ public final class MetaObjectChangeSupport {
     }
 
     /**
-     * DOCUMENT ME!
+     * Returns the default instance of the <code>MetaObjectChangeSupport</code> which should be used by default
+     * components to register their interest in meta object changes.
      *
-     * @return  DOCUMENT ME!
+     * @return  the default instance of <code>MetaObjectChangeSupport</code>
      */
     public static MetaObjectChangeSupport getDefault() {
         return LazyInitialiser.INSTANCE;

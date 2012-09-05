@@ -15,7 +15,7 @@ import Sirius.server.middleware.types.MetaObject;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-// no {@link Event} since it is not (necessarily} propagated in the EDT
+// no {@link Event} since it is not (necessarily) propagated in the EDT
 public final class MetaObjectChangeEvent {
 
     //~ Instance fields --------------------------------------------------------
@@ -29,7 +29,7 @@ public final class MetaObjectChangeEvent {
     /**
      * Creates a new MetaObjectChangeEvent object.
      *
-     * @param  source  DOCUMENT ME!
+     * @param  source  the source object where the change happened, should not be <code>null</code>
      */
     public MetaObjectChangeEvent(final Object source) {
         this.source = source;
@@ -40,9 +40,9 @@ public final class MetaObjectChangeEvent {
     /**
      * Creates a new MetaObjectChangeEvent object.
      *
-     * @param  source         DOCUMENT ME!
-     * @param  oldMetaObject  DOCUMENT ME!
-     * @param  newMetaObject  DOCUMENT ME!
+     * @param  source         the source object where the change happened, should not be <code>null</code>
+     * @param  oldMetaObject  the old state of the object that changed, if applicable
+     * @param  newMetaObject  the new state of the object, if applicable
      */
     public MetaObjectChangeEvent(final Object source, final MetaObject oldMetaObject, final MetaObject newMetaObject) {
         this.source = source;
@@ -53,27 +53,27 @@ public final class MetaObjectChangeEvent {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * The source where the change happened.
      *
-     * @return  DOCUMENT ME!
+     * @return  the source
      */
     public Object getSource() {
         return source;
     }
 
     /**
-     * DOCUMENT ME!
+     * The new state of the changed object.
      *
-     * @return  DOCUMENT ME!
+     * @return  the new state of the changed object
      */
     public MetaObject getNewMetaObject() {
         return newMetaObject;
     }
 
     /**
-     * DOCUMENT ME!
+     * The old state of the changed object.
      *
-     * @return  DOCUMENT ME!
+     * @return  the old state of the changed object
      */
     public MetaObject getOldMetaObject() {
         return oldMetaObject;
