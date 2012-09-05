@@ -15,6 +15,8 @@ import Sirius.server.middleware.types.MetaObject;
 
 import org.apache.log4j.Logger;
 
+import java.lang.ref.SoftReference;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -35,7 +37,10 @@ public class MetaObjectCache {
     //~ Instance fields --------------------------------------------------------
 
     private final transient ReentrantReadWriteLock rwLock;
-    private final transient Map<Integer, MetaObject[]> cache;
+    // we're soft-referencing the whole array so that we can be sure that the whole array will be collected and not only
+    // single items of the array. if there is a need for additional cache access methods we'll have to change the data
+    // store anyway
+    private final transient Map<Integer, SoftReference<MetaObject[]>> cache;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -44,7 +49,7 @@ public class MetaObjectCache {
      */
     private MetaObjectCache() {
         rwLock = new ReentrantReadWriteLock();
-        cache = new HashMap<Integer, MetaObject[]>();
+        cache = new HashMap<Integer, SoftReference<MetaObject[]>>();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -71,7 +76,7 @@ public class MetaObjectCache {
         try {
             rwLock.readLock().lock();
 
-            return cache.get(query.intern().hashCode());
+            return cache.get(query.intern().hashCode()).get();
         } finally {
             rwLock.readLock().unlock();
         }
@@ -89,7 +94,7 @@ public class MetaObjectCache {
         try {
             rwLock.writeLock().lock();
 
-            cache.put(query.intern().hashCode(), value);
+            cache.put(query.intern().hashCode(), new SoftReference<MetaObject[]>(value));
         } finally {
             rwLock.writeLock().unlock();
         }
@@ -119,7 +124,7 @@ public class MetaObjectCache {
         try {
             rwLock.writeLock().lock();
 
-            return cache.put(query.intern().hashCode(), null);
+            return cache.put(query.intern().hashCode(), null).get();
         } finally {
             rwLock.writeLock().unlock();
         }
@@ -195,7 +200,7 @@ public class MetaObjectCache {
         try {
             lock = rwLock.readLock();
             lock.lock();
-            cachedObjects = cache.get(qHash);
+            cachedObjects = cache.get(qHash).get();
 
             if ((cachedObjects == null) || forceReload) {
                 lock.unlock();
@@ -205,7 +210,7 @@ public class MetaObjectCache {
                 final boolean wasEmpty = cachedObjects == null;
 
                 // somebody may have aquired the write lock in the meantime and we're late
-                cachedObjects = cache.get(qHash);
+                cachedObjects = cache.get(qHash).get();
 
                 // if this is the case we truly have to load it because there are no objects or there have already been
                 // objects in the cache but a reload is forced. in case of the write lock was aquired in the mean time
@@ -224,7 +229,7 @@ public class MetaObjectCache {
                         }
 
                         cachedObjects = SessionManager.getProxy().getMetaObjectByQuery(iQuery, 0);
-                        cache.put(qHash, cachedObjects);
+                        cache.put(qHash, new SoftReference<MetaObject[]>(cachedObjects));
                     } catch (final ConnectionException ex) {
                         final String message = "cannot fetch meta objects for query: " + iQuery; // NOI18N
                         LOG.error(message, ex);
