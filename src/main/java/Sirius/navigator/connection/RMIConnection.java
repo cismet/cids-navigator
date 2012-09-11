@@ -995,4 +995,9 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                 e);
         }
     }
+
+    @Override
+    public CallServerService getCallServerService() {
+        return (CallServerService)callserver;
+    }
 }

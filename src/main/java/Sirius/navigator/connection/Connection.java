@@ -37,6 +37,7 @@ import java.util.Vector;
 
 import javax.swing.Icon;
 
+import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.netutil.Proxy;
@@ -749,4 +750,11 @@ public interface Connection {
      */
     Object executeTask(User user, String taskname, String taskdomain, Object body, ServerActionParameter... params)
             throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    CallServerService getCallServerService();
 }
