@@ -130,7 +130,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
-                                        || !(backupObject.propertyEquals(editorObject))))
+                                        || editorObject.isChanged()))
                                 || (backupObject == null)) {
                         if (editorObject.getBean().hasObjectWritePermission(SessionManager.getSession().getUser())) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
@@ -179,7 +179,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
-                                        || !(backupObject.propertyEquals(editorObject))))
+                                        || editorObject.isChanged()))
                                 || (backupObject == null)) {
                         final int answer = JOptionPane.showConfirmDialog(
                                 NavigatorAttributeEditorGui.this,
@@ -492,7 +492,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     @Override
     public void setTreeNode(final Object node) {
         if ((treeNode != null) && (editorObject != null) && (backupObject != null)) {
-            if (editorObject.getBean().hasArtificialChangeFlag() || !editorObject.propertyEquals(backupObject)) {
+            if (editorObject.getBean().hasArtificialChangeFlag() || editorObject.isChanged()) {
                 final int answer = JOptionPane.showConfirmDialog(
                         NavigatorAttributeEditorGui.this,
                         org.openide.util.NbBundle.getMessage(
