@@ -168,8 +168,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                     @Override
                     protected void done() {
                         try {
-                            setModel(get());
-                            setSelectedItem(cidsBean);
+                            final DefaultComboBoxModel tmp = get();
+                            tmp.setSelectedItem(cidsBean);
+                            setModel(tmp);
                         } catch (InterruptedException interruptedException) {
                         } catch (ExecutionException executionException) {
                             LOG.error("Error while initializing the model of a referenceCombo", executionException); // NOI18N
@@ -327,39 +328,43 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload) {
-        final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                 // NOI18N
-        String orderBy = "";                                                                             // NOI18N
-        if (ca != null) {
-            final String value = ca.getValue().toString();
-            orderBy = " order by " + value;                                                              // NOI18N
-        }
-        String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName(); // NOI18N
-        if (onlyUsed) {
-            query += " where used is true";                                                              // NOI18N
-        }
-        query += orderBy;
+        if (mc != null) {
+            final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                 // NOI18N
+            String orderBy = "";                                                                             // NOI18N
+            if (ca != null) {
+                final String value = ca.getValue().toString();
+                orderBy = " order by " + value;                                                              // NOI18N
+            }
+            String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName(); // NOI18N
+            if (onlyUsed) {
+                query += " where used is true";                                                              // NOI18N
+            }
+            query += orderBy;
 
-        MetaObject[] metaObjects;
-        try {
-            metaObjects = MetaObjectCache.getInstance().getMetaObjectsByQuery(query, forceReload);
-        } catch (final CacheException ex) {
-            LOG.warn("cache could not come up with appropriate objects", ex); // NOI18N
-            metaObjects = new MetaObject[0];
-        }
+            MetaObject[] metaObjects;
+            try {
+                metaObjects = MetaObjectCache.getInstance().getMetaObjectsByQuery(query, forceReload);
+            } catch (final CacheException ex) {
+                LOG.warn("cache could not come up with appropriate objects", ex); // NOI18N
+                metaObjects = new MetaObject[0];
+            }
 
-        final List<CidsBean> cbv = new ArrayList<CidsBean>(metaObjects.length);
-        if (nullable) {
-            cbv.add(null);
-        }
-        for (final MetaObject mo : metaObjects) {
-            cbv.add(mo.getBean());
-        }
-        if (ca == null) {
-            // Sorts the model using String comparison on the bean's toString()
-            Collections.sort(cbv, comparator);
-        }
+            final List<CidsBean> cbv = new ArrayList<CidsBean>(metaObjects.length);
+            if (nullable) {
+                cbv.add(null);
+            }
+            for (final MetaObject mo : metaObjects) {
+                cbv.add(mo.getBean());
+            }
+            if (ca == null) {
+                // Sorts the model using String comparison on the bean's toString()
+                Collections.sort(cbv, comparator);
+            }
 
-        return new DefaultComboBoxModel(cbv.toArray());
+            return new DefaultComboBoxModel(cbv.toArray());
+        } else {
+            return new DefaultComboBoxModel();
+        }
     }
 
     /**
