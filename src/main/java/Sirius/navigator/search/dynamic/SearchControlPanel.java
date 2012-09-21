@@ -151,7 +151,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
         if (LOG.isInfoEnabled()) {
             LOG.info((searching ? "Cancel" : "Search") + " button was clicked.");
         }
@@ -187,7 +187,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
             setControlsAccordingToState();
             listener.searchStarted();
         }
-    } //GEN-LAST:event_btnSearchCancelActionPerformed
+    }//GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
