@@ -354,34 +354,55 @@ public class MethodManager {
      * @return  DOCUMENT ME!
      */
     public boolean deleteNode(final MetaCatalogueTree metaTree, final DefaultMetaTreeNode sourceNode) {
-        if (JOptionPane.YES_NO_OPTION
-                    == JOptionPane.showOptionDialog(
-                        ComponentRegistry.getRegistry().getMainWindow(),
+        return deleteNode(metaTree, sourceNode, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaTree      DOCUMENT ME!
+     * @param   sourceNode    DOCUMENT ME!
+     * @param   withQuestion  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean deleteNode(final MetaCatalogueTree metaTree,
+            final DefaultMetaTreeNode sourceNode,
+            final boolean withQuestion) {
+        boolean ans = false;
+
+        if (withQuestion) {
+            final int option = JOptionPane.showOptionDialog(
+                    ComponentRegistry.getRegistry().getMainWindow(),
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
+                        new Object[] { String.valueOf(sourceNode) }),                                                          // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"),             // NOI18N
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new String[] {
                         org.openide.util.NbBundle.getMessage(
                             MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
-                            new Object[] { String.valueOf(sourceNode) }),                                              // NOI18N
+                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
                         org.openide.util.NbBundle.getMessage(
                             MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"), // NOI18N
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[] {
-                            org.openide.util.NbBundle.getMessage(
-                                MethodManager.class,
-                                "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
-                            org.openide.util.NbBundle.getMessage(
-                                MethodManager.class,
-                                "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
-                        },                                                                                             // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"))) // NOI18N
+                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
+                    },                                                                                                         // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"));
+            ans = (option == JOptionPane.YES_OPTION);
+        }
+
+        if (!withQuestion || ans)                                            // NOI18N
         {
             try {
                 if (logger.isInfoEnabled()) {
-                    logger.info("deleteNode() deleting node " + sourceNode);                                           // NOI18N
+                    logger.info("deleteNode() deleting node " + sourceNode); // NOI18N
                 }
 
                 ComponentRegistry.getRegistry()
