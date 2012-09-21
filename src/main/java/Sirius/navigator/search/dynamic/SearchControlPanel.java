@@ -259,12 +259,11 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                             org.openide.util.NbBundle.getMessage(
                                 SearchControlPanel.class,
                                 "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.message"),
-                            null,
+                            ex.getLocalizedMessage(),
                             "ERROR",
-                            ex.getCause(),
+                            ex,
                             Level.WARNING,
                             null);
-
                     JXErrorPane.showDialog(getRootPane(), errorInfo);
                 }
 
