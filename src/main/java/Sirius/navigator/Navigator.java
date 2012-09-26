@@ -142,6 +142,7 @@ public class Navigator extends JFrame {
     // Panels
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
+    private DashBoard dashBoard;
     private NavigatorSplashScreen splashScreen;
 
     //~ Constructors -----------------------------------------------------------
@@ -672,6 +673,22 @@ public class Navigator extends JFrame {
             configurator,
             false);
         container.add(descriptionPaneConstraints);
+
+        dashBoard = DashBoard.getInstance();
+        final MutableConstraints dashBoardConstraints = new MutableConstraints(propertyManager
+                        .isAdvancedLayout());
+        descriptionPaneConstraints.addAsFloatingFrame(
+            ComponentRegistry.DESCRIPTION_PANE,
+            dashBoard,
+            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.dashboard.name"),    // NOI18N
+            org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.dashboard.tooltip"), // NOI18N
+            resourceManager.getIcon("descriptionpane_icon.gif"),
+            MutableConstraints.P3,
+            0,
+            false,
+            configurator,
+            false);
+        container.add(dashBoardConstraints);
     }
 
     /**
@@ -703,7 +720,8 @@ public class Navigator extends JFrame {
             attributeViewer,
             attributeEditor,
             searchDialog,
-            descriptionPane);
+            descriptionPane,
+            dashBoard);
     }
 
     /**
@@ -741,6 +759,7 @@ public class Navigator extends JFrame {
 
         metaCatalogueTree.addStatusChangeListener(statusChangeListener);
         descriptionPane.addStatusChangeListener(statusChangeListener);
+        dashBoard.addStatusChangeListener(statusChangeListener);
         searchDialog.addStatusChangeListener(statusChangeListener);
 
         final CatalogueSelectionListener catalogueSelectionListener = new CatalogueSelectionListener(
@@ -776,7 +795,7 @@ public class Navigator extends JFrame {
         this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new ClosingListener());
+        this.addWindowListener(new Navigator.ClosingListener());
     }
 
     /**
@@ -990,7 +1009,7 @@ public class Navigator extends JFrame {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
+        Runtime.getRuntime().addShutdownHook(new Navigator.NavigatorShutdown());
         Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
 
         // There is no way to adjust the Locale using the Jnlp file.
@@ -1230,7 +1249,7 @@ public class Navigator extends JFrame {
 
         //~ Static fields/initializers -----------------------------------------
 
-        private static final transient Logger LOG = Logger.getLogger(NavigatorShutdown.class);
+        private static final transient Logger LOG = Logger.getLogger(Navigator.NavigatorShutdown.class);
 
         //~ Methods ------------------------------------------------------------
 

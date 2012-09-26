@@ -74,6 +74,7 @@ public class ComponentRegistry {
     private DescriptionPane descriptionPane = null;
     /** Holds value of property attributeEditor. */
     private AttributeEditor attributeEditor;
+    private DashBoard dashBoard;
     private de.cismet.lookupoptions.gui.OptionsDialog optionsDialog = null;
 
     //~ Constructors -----------------------------------------------------------
@@ -92,6 +93,7 @@ public class ComponentRegistry {
      * @param   attributeEditor    DOCUMENT ME!
      * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
+     * @param   dashBoard          DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
@@ -105,7 +107,8 @@ public class ComponentRegistry {
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
-            final DescriptionPane descriptionPane) throws Exception {
+            final DescriptionPane descriptionPane,
+            final DashBoard dashBoard) throws Exception {
         this.navigator = navigator;
         this.guiContainer = guiContainer;
         this.mutableMenuBar = mutableMenuBar;
@@ -117,6 +120,7 @@ public class ComponentRegistry {
         this.attributeEditor = attributeEditor;
         this.searchDialog = searchDialog;
         this.descriptionPane = descriptionPane;
+        this.dashBoard = dashBoard;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -152,6 +156,7 @@ public class ComponentRegistry {
      * @param   attributeEditor    DOCUMENT ME!
      * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
+     * @param   dashBoard          DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
@@ -165,7 +170,8 @@ public class ComponentRegistry {
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
-            final DescriptionPane descriptionPane) throws Exception {
+            final DescriptionPane descriptionPane,
+            final DashBoard dashBoard) throws Exception {
         synchronized (blocker) {
             if (!isRegistred()) {
                 // Logger.getLogger(ComponentRegistry.class).debug("creating singelton ComponentRegistry instance");
@@ -180,7 +186,8 @@ public class ComponentRegistry {
                         attributeViewer,
                         attributeEditor,
                         searchDialog,
-                        descriptionPane);
+                        descriptionPane,
+                        dashBoard);
                 registry.registred = true;
             }
         }
