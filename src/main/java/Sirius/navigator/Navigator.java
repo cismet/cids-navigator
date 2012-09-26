@@ -675,10 +675,9 @@ public class Navigator extends JFrame {
         container.add(descriptionPaneConstraints);
 
         dashBoard = DashBoard.getInstance();
-        final MutableConstraints dashBoardConstraints = new MutableConstraints(propertyManager
-                        .isAdvancedLayout());
-        descriptionPaneConstraints.addAsFloatingFrame(
-            ComponentRegistry.DESCRIPTION_PANE,
+        final MutableConstraints dashBoardConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
+        dashBoardConstraints.addAsFloatingFrame(
+            ComponentRegistry.DASH_BOARD,
             dashBoard,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.dashboard.name"),    // NOI18N
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.dashboard.tooltip"), // NOI18N

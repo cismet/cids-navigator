@@ -196,8 +196,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         } else {
             wrappedWaitingPanel = null;
         }
-
-        this.startNoDescriptionRenderer();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -645,13 +643,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
     /**
      * DOCUMENT ME!
-     */
-    protected final void startNoDescriptionRenderer() {
-        startSingleRendererWorker(null, null, null);
-    }
-
-    /**
-     * DOCUMENT ME!
      *
      * @param  o      DOCUMENT ME!
      * @param  node   DOCUMENT ME!
@@ -662,10 +653,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected SelfDisposingPanel doInBackground() throws Exception {
-                    final JComponent jComp;
-
-                    jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
-
+                    final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
                     if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
                         ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
                     } else if ((jComp instanceof WrappedComponent)
@@ -674,7 +662,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                         final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
                         ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
                     }
-
+                    final CidsBean bean = o.getBean();
                     final PropertyChangeListener localListener = new PropertyChangeListener() {
 
                             @Override
@@ -689,9 +677,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                         ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
                     }
 
-                    final CidsBean bean = o.getBean();
                     bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
-
                     final SelfDisposingPanel sdp = encapsulateInSelfDisposingPanel(jComp);
                     sdp.setStrongListenerReference(localListener);
                     return sdp;
@@ -787,21 +773,17 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 });
             startSingleRendererWorker(n);
         } else {
-            if (descriptionURL == null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("loading NoDescriptionRenderer"); // NOI18N
-                }
-                startNoDescriptionRenderer();
-            } else {
-                if (n.isPureNode()) {
-                    showHTML();
-                }
-
-                this.setPageFromURI(descriptionURL);
+            if (n.isPureNode()) {
+                showHTML();
             }
-
             showsWaitScreen = false;
         }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
+        }
+
+        this.setPageFromURI(descriptionURL);
     }
 
     /**
