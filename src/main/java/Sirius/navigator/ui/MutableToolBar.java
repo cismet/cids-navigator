@@ -321,8 +321,10 @@ public class MutableToolBar extends JToolBar {
 
                     @Override
                     public void run() {
-                        MutableToolBar.this.validateTree();
-                        MutableToolBar.this.repaint();
+                        synchronized (getTreeLock()) {
+                            validateTree();
+                            repaint();
+                        }
                     }
                 });
         }
@@ -341,8 +343,10 @@ public class MutableToolBar extends JToolBar {
 
                     @Override
                     public void run() {
-                        MutableToolBar.this.validateTree();
-                        MutableToolBar.this.repaint();
+                        synchronized (getTreeLock()) {
+                            validateTree();
+                            repaint();
+                        }
                     }
                 });
         }
