@@ -1025,4 +1025,9 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                 e);
         }
     }
+
+    @Override
+    public CallServerService getCallServerService() {
+        return (CallServerService)connector;
+    }
 }
