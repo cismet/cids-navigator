@@ -506,7 +506,7 @@ public class SearchFormFactory {
          * @return  DOCUMENT ME!
          */
         private ResourceBundle getResourceBundle(final String resourceBundleName) {
-            final Locale locale = resource.getLocale();
+            final Locale locale = Locale.getDefault();
             if (logger.isDebugEnabled()) {
                 logger.debug("loading resource bundle '" + resourceBundleName + "' for locale '" + locale + "'"); // NOI18N
             }
@@ -519,8 +519,5 @@ public class SearchFormFactory {
                 return null;
             }
         }
-
-        /*public void initSearchFormManager()
-         * { this.searchFormManager.setSearchFormContainers(this.searchFormContainerList);}*/
     }
 }

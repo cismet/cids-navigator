@@ -14,12 +14,15 @@ import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.User;
 import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchResult;
 
 import java.util.Collection;
 import java.util.HashMap;
+
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -419,4 +422,19 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     Collection customServerSearch(CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   body        DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(String taskname, String taskdomain, Object body, ServerActionParameter... params)
+            throws ConnectionException;
 }

@@ -56,6 +56,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
+import java.awt.Point;
 import java.awt.event.*;
 
 import java.io.BufferedInputStream;
@@ -85,6 +86,7 @@ import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.CismetThreadPool;
+import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.ConfigurationManager;
@@ -868,7 +870,12 @@ public class Navigator extends JFrame {
      * @param  visible  DOCUMENT ME!
      */
     private void doSetVisible(final boolean visible) {
-        super.setLocationRelativeTo(this.loginDialog);
+        final Point location = this.getLocation();
+        // issue #8 we assume a position of 0,0 to be the default position. thus we center the navigator window then.
+        if ((location.x == 0) && (location.y == 0)) {
+            this.setLocationRelativeTo(this.loginDialog);
+        }
+
         super.setVisible(visible);
 
         if (visible) {
@@ -952,9 +959,17 @@ public class Navigator extends JFrame {
         final int windowWidth = this.preferences.getInt("windowWidth", PropertyManager.getManager().getWidth());    // NOI18N
         final int windowX = this.preferences.getInt("windowX", 0);                                                  // NOI18N
         final int windowY = this.preferences.getInt("windowY", 0);                                                  // NOI18N
-        final boolean windowMaximised = this.preferences.getBoolean(
-                "windowMaximised",
-                propertyManager.isMaximizeWindow());                                                                // NOI18N
+
+        final boolean windowMaximised;
+        // issue #8: osx does to correctly determine the maximised state of a window, thus we ignore that on osx
+        final String osName = System.getProperty("os.name"); // NOI18N
+        if (osName.startsWith("Mac")) {
+            windowMaximised = false;
+        } else {
+            windowMaximised = this.preferences.getBoolean(
+                    "windowMaximised",                       // NOI18N
+                    propertyManager.isMaximizeWindow());
+        }
 
         if (logger.isInfoEnabled()) {
             logger.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
@@ -978,18 +993,11 @@ public class Navigator extends JFrame {
         Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
         Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
 
-        // For some unknown reason, the content of the user.language and the user.country properties
-        // must explicitly set as default locale. This is requiered for the cids-navigator project, but
-        // not for the other internationalized projects
+        // There is no way to adjust the Locale using the Jnlp file.
         try {
-            final String lang = System.getProperty("user.language");   // NOI18N
-            final String country = System.getProperty("user.country"); // NOI18N
+            JnlpTools.adjustDefaultLocale();
 
-            if ((lang != null) && (country != null)) {
-                Locale.setDefault(new Locale(lang, country));
-            } else if (lang != null) {
-                Locale.setDefault(new Locale(lang));
-            }
+            System.out.println("Using default Locale: " + Locale.getDefault());
         } catch (final SecurityException e) {
             System.err.println("You have insufficient rights to set the default locale."); // NOI18N
         }
@@ -1012,10 +1020,6 @@ public class Navigator extends JFrame {
                 System.out.println("navigator.cfg    = " + args[1]);                           // NOI18N
                 System.out.println("basedir          = " + args[2]);                           // NOI18N
                 System.out.println("plugindir        = " + args[3]);                           // NOI18N
-                System.out.println("searchdir        = " + args[4]);                           // NOI18N
-                if (args.length > 5) {
-                    System.out.println("profilesdir      = " + args[5]);                       // NOI18N
-                }
                 System.out.println("-------------------------------------------------------"); // NOI18N
 
                 // log4j configuration .....................................
@@ -1046,7 +1050,7 @@ public class Navigator extends JFrame {
                 // log4j configuration .....................................
 
                 PropertyManager.getManager()
-                        .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
+                        .configure(args[1], args[2], args[3], null, ((args.length > 5) ? args[5] : null));
             }
 
             // configuration ...................................................

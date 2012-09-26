@@ -98,9 +98,6 @@ public final class PropertyManager {
     private boolean application = true;
     private AppletContext appletContext = null;
     private final ProgressObserver sharedProgressObserver;
-    private String language;
-    private String country;
-    private java.util.Locale locale;
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
@@ -136,9 +133,6 @@ public final class PropertyManager {
         setMaxConnections(MIN_SERVER_THREADS);
         setSortChildren(false);
         setSortAscending(false);
-
-        setCountry("DE");  // NOI18N
-        setLanguage("de"); // NOI18N
 
         setLoadable(true);
         setSaveable(false);
@@ -889,10 +883,6 @@ public final class PropertyManager {
             this.setSaveable(value);
         } else if (property.equalsIgnoreCase("loadable")) {               // NOI18N
             this.setLoadable(value);
-        } else if (property.equalsIgnoreCase("language")) {               // NOI18N
-            this.setLanguage(value);
-        } else if (property.equalsIgnoreCase("country")) {                // NOI18N
-            this.setCountry(value);
         } else if (property.equalsIgnoreCase("connectionInfoSaveable")) { // NOI18N
             this.setConnectionInfoSaveable(value);
         } else if (property.equalsIgnoreCase("callserverURL")) {          // NOI18N
@@ -1015,7 +1005,7 @@ public final class PropertyManager {
         try {
             final String parameter = this.properties.getProperty("plugins");
             setHttpInterfacePort(new Integer(properties.getProperty("httpInterfacePort", "9099")));
-            setAutoClose(new Boolean(properties.getProperty("closeWithoutAsking", "false")));
+            setAutoClose(Boolean.valueOf(properties.getProperty("closeWithoutAsking", "false")));
 
             if ((parameter != null) && (parameter.length() > 0)) {
                 pluginList = new ArrayList();
@@ -1087,11 +1077,6 @@ public final class PropertyManager {
                     this.configure();
                 }
             }
-        }
-
-        parameter = applet.getParameter("language"); // NOI18N
-        if ((parameter != null) && (parameter.length() > 0)) {
-            ResourceManager.getManager().setLocale(new Locale(parameter));
         }
 
         parameter = applet.getParameter("plugins"); // NOI18N
@@ -1327,71 +1312,6 @@ public final class PropertyManager {
      */
     public synchronized ProgressObserver getSharedProgressObserver() {
         return this.sharedProgressObserver;
-    }
-
-    /**
-     * Getter for property language.
-     *
-     * @return  Value of property language.
-     */
-    public String getLanguage() {
-        return this.language;
-    }
-
-    /**
-     * Setter for property language.
-     *
-     * @param  language  New value of property language.
-     */
-    public void setLanguage(final String language) {
-        if (language.trim().length() == 2) {
-            this.language = language.toLowerCase();
-        } else {
-            logger.warn("malformed language code '" + language + "', setting to default (de)"); // NOI18N
-            this.language = "de";                                                               // NOI18N
-        }
-    }
-
-    /**
-     * Getter for property country.
-     *
-     * @return  Value of property country.
-     */
-    public String getCountry() {
-        return this.country;
-    }
-
-    /**
-     * Setter for property country.
-     *
-     * @param  country  New value of property country.
-     */
-    public void setCountry(final String country) {
-        if (country.length() == 2) {
-            this.country = country.toUpperCase();
-        } else {
-            logger.warn("malformed country code '" + country + "', setting to default (de)"); // NOI18N
-            this.country = "DE";                                                              // NOI18N
-        }
-    }
-
-    /**
-     * Getter for property locale.
-     *
-     * @return  Value of property locale.
-     */
-    public java.util.Locale getLocale() {
-        return new Locale(this.getLanguage(), this.getCountry());
-    }
-
-    /**
-     * Setter for property locale.
-     *
-     * @param  locale  New value of property locale.
-     */
-    public void setLocale(final java.util.Locale locale) {
-        this.setLanguage(locale.getLanguage());
-        this.setCountry(locale.getCountry());
     }
 
     /**

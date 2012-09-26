@@ -29,11 +29,16 @@ import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
 
+import java.io.File;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
+
+import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.netutil.Proxy;
 
@@ -729,4 +734,27 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user        DOCUMENT ME!
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   body        json DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(User user, String taskname, String taskdomain, Object body, ServerActionParameter... params)
+            throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    CallServerService getCallServerService();
 }

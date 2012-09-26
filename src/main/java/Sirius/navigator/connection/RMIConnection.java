@@ -12,12 +12,7 @@ import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
-import Sirius.server.middleware.interfaces.proxy.CatalogueService;
-import Sirius.server.middleware.interfaces.proxy.MetaService;
-import Sirius.server.middleware.interfaces.proxy.QueryStore;
-import Sirius.server.middleware.interfaces.proxy.SearchService;
-import Sirius.server.middleware.interfaces.proxy.SystemService;
-import Sirius.server.middleware.interfaces.proxy.UserService;
+import Sirius.server.middleware.interfaces.proxy.*;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.LightweightMetaObject;
@@ -52,6 +47,7 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.netutil.Proxy;
 
@@ -983,5 +979,25 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                         + " || domain: " + domain + " || user: " + user + " || elements: " + elements, // NOI18N
                 e);
         }
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final Object body,
+            final ServerActionParameter... params) throws ConnectionException {
+        try {
+            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, body, params);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could executeTask: taskname: " + taskname + " || taskdomain: " + taskdomain
+                        + " || user: " + user,
+                e);
+        }
+    }
+
+    @Override
+    public CallServerService getCallServerService() {
+        return (CallServerService)callserver;
     }
 }
