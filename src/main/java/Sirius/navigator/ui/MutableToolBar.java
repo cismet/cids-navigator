@@ -323,8 +323,8 @@ public class MutableToolBar extends JToolBar {
                     public void run() {
                         synchronized (getTreeLock()) {
                             validateTree();
-                            repaint();
                         }
+                        repaint();
                     }
                 });
         }
@@ -345,8 +345,8 @@ public class MutableToolBar extends JToolBar {
                     public void run() {
                         synchronized (getTreeLock()) {
                             validateTree();
-                            repaint();
                         }
+                        repaint();
                     }
                 });
         }
