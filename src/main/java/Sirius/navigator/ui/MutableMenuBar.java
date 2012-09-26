@@ -696,8 +696,8 @@ public class MutableMenuBar extends JMenuBar {
                     public void run() {
                         synchronized (getTreeLock()) {
                             validateTree();
-                            repaint();
                         }
+                        repaint();
                     }
                 });
         }
@@ -734,8 +734,8 @@ public class MutableMenuBar extends JMenuBar {
                     public void run() {
                         synchronized (getTreeLock()) {
                             validateTree();
-                            repaint();
                         }
+                        repaint();
                     }
                 });
         }
