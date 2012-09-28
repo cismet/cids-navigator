@@ -694,8 +694,10 @@ public class MutableMenuBar extends JMenuBar {
 
                     @Override
                     public void run() {
-                        MutableMenuBar.this.validateTree();
-                        MutableMenuBar.this.repaint();
+                        synchronized (getTreeLock()) {
+                            validateTree();
+                        }
+                        repaint();
                     }
                 });
         }
@@ -730,8 +732,10 @@ public class MutableMenuBar extends JMenuBar {
 
                     @Override
                     public void run() {
-                        MutableMenuBar.this.validateTree();
-                        MutableMenuBar.this.repaint();
+                        synchronized (getTreeLock()) {
+                            validateTree();
+                        }
+                        repaint();
                     }
                 });
         }

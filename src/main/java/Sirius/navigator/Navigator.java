@@ -92,6 +92,7 @@ import de.cismet.tools.StaticDebuggingTools;
 import de.cismet.tools.configuration.ConfigurationManager;
 import de.cismet.tools.configuration.ShutdownHook;
 import de.cismet.tools.configuration.StartupHook;
+import de.cismet.tools.configuration.TakeoffHook;
 
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.DefaultPopupMenuListener;
@@ -209,6 +210,8 @@ public class Navigator extends JFrame {
         if (StaticDebuggingTools.checkHomeForFile("cismetCheckForEDThreadVialoation")) {                  // NOI18N
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
+
+        initTakeoffHooks();
 
         final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
         proxyOptions.setProxy(Proxy.fromPreferences());
@@ -805,6 +808,19 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             1000,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_1000")); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @throws  InterruptedException  DOCUMENT ME!
+     */
+    private void initTakeoffHooks() throws InterruptedException {
+        final Collection<? extends TakeoffHook> hooks = Lookup.getDefault().lookupAll(TakeoffHook.class);
+
+        for (final TakeoffHook hook : hooks) {
+            hook.applicationTakeoff();
+        }
     }
 
     /**
