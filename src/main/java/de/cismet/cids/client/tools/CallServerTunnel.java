@@ -190,10 +190,14 @@ public class CallServerTunnel implements Tunnel {
                     if (userKeyList == null) {
                         user = SessionManager.getSession().getUser();
                         final String configAttr = SessionManager.getProxy().getConfigAttr(user, "tunnel.targetgroups");
-                        final String[] keys = configAttr.split(",");
-                        userKeyList = new ArrayList<String>(keys.length);
-                        for (final String s : keys) {
-                            userKeyList.add(s.trim());
+                        if (configAttr != null) {
+                            final String[] keys = configAttr.split(",");
+                            userKeyList = new ArrayList<String>(keys.length);
+                            for (final String s : keys) {
+                                userKeyList.add(s.trim());
+                            }
+                        } else {
+                            userKeyList = new ArrayList<String>(1);
                         }
                     }
                 }
