@@ -66,7 +66,7 @@
             <activatedProfile>deploy-public</activatedProfile>
         </activatedProfiles>
     </action>
-    <action>
+<!--    <action>
             <actionName>run.single.main</actionName>
             <goals>
                 <goal>process-classes</goal>
@@ -78,5 +78,19 @@
                 <jalopy.skip>true</jalopy.skip>
                 <exec.executable>java</exec.executable>
             </properties>
-        </action>
+        </action>-->
+        
+    <action>
+        <actionName>run.single.main</actionName>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
+        </goals>
+        <properties>
+            <exec.classpathScope>${classPathScope}</exec.classpathScope>
+            <exec.args>-classpath %classpath ${packageClassName}</exec.args>
+            <jalopy.skip>true</jalopy.skip>
+            <exec.executable>java</exec.executable>
+        </properties>
+    </action>
 </actions>
