@@ -265,7 +265,7 @@ public final class MutablePopupMenu extends JPopupMenu {
                     assert mo != null : "the metaobject has not been loaded yet"; // NOI18N
 
                     permission = permission
-                                && mo.getMetaClass().getPermissions().hasWritePermission(u.getUserGroup())
+                                && mo.getMetaClass().getPermissions().hasWritePermission(u)
                                 && mo.getBean().hasObjectWritePermission(u);
                 } else if ((node instanceof MetaNode) && (node.getClassId() != -1)) {
                     if (classNode == null) {
@@ -543,7 +543,7 @@ public final class MutablePopupMenu extends JPopupMenu {
         @Override
         public void invoke() throws Exception {
             final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
-            if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser().getUserGroup())) {
+            if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser())) {
                 final MetaObject metaObject = metaClass.getEmptyInstance();
                 metaObject.setStatus(MetaObject.NEW);
                 final MetaObjectNode MetaObjectNode = new MetaObjectNode(
