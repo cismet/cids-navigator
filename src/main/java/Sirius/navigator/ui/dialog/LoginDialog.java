@@ -64,7 +64,7 @@ public class LoginDialog extends JDialog {
 
     private static final String PREF_NAME = "username"; // NOI18N
     private static final String PREF_DOMAIN = "domain"; // NOI18N
-//    private static final String PREF_USERGROUP = "usergroup"; // NOI18N
+//    private static final String PREF_USERGROUP = "usergroup"; // NOI18N 
     private static final Logger logger = Logger.getLogger(LoginDialog.class);
 
     //~ Instance fields --------------------------------------------------------
