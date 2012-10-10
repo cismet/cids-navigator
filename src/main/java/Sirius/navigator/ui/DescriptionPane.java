@@ -11,6 +11,7 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
+import Sirius.navigator.ui.attributes.renderer.NoDescriptionRenderer;
 import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
 import Sirius.navigator.ui.status.Status;
 import Sirius.navigator.ui.status.StatusChangeListener;
@@ -45,6 +46,9 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -100,7 +104,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected SwingWorker worker = null;
     protected GridBagConstraints gridBagConstraints;
     protected String welcomePage;
-    protected String blankPage;
     protected String errorPage;
     protected boolean showsWaitScreen = false;
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
@@ -129,40 +132,25 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         this.fullScreenRenderer = false;
         BufferedReader reader = null;
         try {
-            StringBuffer buffer = new StringBuffer();
-            String string = null;
+            final StringBuffer welcomeBuffer = new StringBuffer();
+            String welcomeString = null;
             reader = new BufferedReader(new InputStreamReader(
                         RESOURCE.getNavigatorResourceAsStream("doc/welcome.html"))); // NOI18N
 
-            while ((string = reader.readLine()) != null) {
-                buffer.append(string);
+            while ((welcomeString = reader.readLine()) != null) {
+                welcomeBuffer.append(welcomeString);
             }
+            this.welcomePage = welcomeBuffer.toString();
 
-            this.welcomePage = buffer.toString();
-
-            buffer = new StringBuffer();
-            string = null;
-            reader = new BufferedReader(new InputStreamReader(
-                        RESOURCE.getNavigatorResourceAsStream("doc/blank.xhtml"), // NOI18N
-                        "UTF-8")); // NOI18N
-
-            while ((string = reader.readLine()) != null) {
-                buffer.append(string);
-            }
-
-            this.blankPage = buffer.toString();
-
-            buffer = new StringBuffer();
-            string = null;
+            final StringBuffer errorBuffer = new StringBuffer();
+            String errorString = null;
             reader = new BufferedReader(new InputStreamReader(
                         RESOURCE.getNavigatorResourceAsStream("doc/error.xhtml"), // NOI18N
                         "UTF-8")); // NOI18N
-
-            while ((string = reader.readLine()) != null) {
-                buffer.append(string);
+            while ((errorString = reader.readLine()) != null) {
+                errorBuffer.append(errorString);
             }
-
-            this.errorPage = buffer.toString();
+            this.errorPage = errorBuffer.toString();
         } catch (final IOException ioexp) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Couldn't read default pages.", ioexp); // NOI18N
@@ -172,7 +160,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 try {
                     reader.close();
                 } catch (IOException ex) {
-                    LOG.warn("Can't close reader.", ex);          // NOI18N
+                    LOG.warn("Can't close reader.", ex); // NOI18N
                 }
             }
         }
@@ -261,7 +249,23 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      */
-    public abstract void clear();
+    public void clear() {
+        final Runnable clearRunnable = new Runnable() {
+
+                @Override
+                public void run() {
+                    removeAndDisposeAllRendererFromPanel();
+                    startNoDescriptionRenderer();
+//                    repaint();
+                }
+            };
+
+        if (!EventQueue.isDispatchThread()) {
+            EventQueue.invokeLater(clearRunnable);
+        } else {
+            clearRunnable.run();
+        }
+    }
 
     @Override
     public void addStatusChangeListener(final StatusChangeListener listener) {
@@ -643,6 +647,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
     /**
      * DOCUMENT ME!
+     */
+    protected void startNoDescriptionRenderer() {
+        startSingleRendererWorker(null, null, null);
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  o      DOCUMENT ME!
      * @param  node   DOCUMENT ME!
@@ -653,16 +664,22 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected SelfDisposingPanel doInBackground() throws Exception {
-                    final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
-                    if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
-                        ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
-                    } else if ((jComp instanceof WrappedComponent)
-                                && (((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore)
-                                && (node != null)) {
-                        final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
-                        ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
+                    final JComponent jComp;
+                    final boolean isNoDescriptionRenderer = (o == null) && (node == null);
+                    if (isNoDescriptionRenderer) {
+                        jComp = NoDescriptionRenderer.getInstance();
+                    } else {
+                        jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
+
+                        if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
+                            ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
+                        } else if ((jComp instanceof WrappedComponent)
+                                    && (((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore)
+                                    && (node != null)) {
+                            final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
+                            ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
+                        }
                     }
-                    final CidsBean bean = o.getBean();
                     final PropertyChangeListener localListener = new PropertyChangeListener() {
 
                             @Override
@@ -671,13 +688,17 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             }
                         };
 
-                    // set the renderer for the current breadcrumb
-                    final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
-                    if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
-                        ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                    if (!isNoDescriptionRenderer) {
+                        // set the renderer for the current breadcrumb
+                        final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
+                        if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
+                            ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                        }
+
+                        final CidsBean bean = o.getBean();
+                        bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     }
 
-                    bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     final SelfDisposingPanel sdp = encapsulateInSelfDisposingPanel(jComp);
                     sdp.setStrongListenerReference(localListener);
                     return sdp;
@@ -772,18 +793,16 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                     }
                 });
             startSingleRendererWorker(n);
-        } else {
-            if (n.isPureNode()) {
-                showHTML();
+        } else if (n.isPureNode() && (n.getDescription() != null)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
             }
-            showsWaitScreen = false;
+            setPageFromURI(descriptionURL);
+            showHTML();
+        } else {
+            startNoDescriptionRenderer();
         }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
-        }
-
-        this.setPageFromURI(descriptionURL);
+        showsWaitScreen = false;
     }
 
     /**
