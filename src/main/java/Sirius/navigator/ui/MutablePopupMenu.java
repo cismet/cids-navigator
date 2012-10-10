@@ -506,7 +506,7 @@ public final class MutablePopupMenu extends JPopupMenu {
          * Creates a new NewObjectMethod object.
          */
         public NewObjectMethod() {
-            super(MethodManager.CLASS_NODE + MethodManager.SINGLE);
+            super(MethodManager.CLASS_NODE + MethodManager.SINGLE + MethodManager.WRITE);
             this.pluginMethod = this;
 
             this.setText(org.openide.util.NbBundle.getMessage(
