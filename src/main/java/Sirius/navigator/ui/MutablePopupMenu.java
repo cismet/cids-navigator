@@ -273,6 +273,9 @@ public final class MutablePopupMenu extends JPopupMenu {
                     }
                     dynamicObjectNode = false;
 
+                    final User u = SessionManager.getSession().getUser();
+                    permission = permission && ((MetaNode)node).getPermissions().hasWritePermission(u.getUserGroup());
+
                     try {
                         final int classID = node.getClassId();
                         final String domain = node.getDomain();
