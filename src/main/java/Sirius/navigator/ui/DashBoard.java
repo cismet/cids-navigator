@@ -13,8 +13,7 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 
 import org.openide.util.Lookup;
 
-import java.awt.Component;
-import java.awt.Dimension;
+import java.awt.GridBagConstraints;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 
@@ -22,6 +21,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.*;
+
+import de.cismet.cids.custom.widgets.AbstractDashBoardWidget;
+import de.cismet.cids.custom.widgets.DashBoardWidgetWrapper;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -55,20 +57,25 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
 
     private int numWidgets;
 
-    private final ArrayList<DashBoardWidget> widgets;
+    private final ArrayList<DashBoardWidget> widgets = new ArrayList<DashBoardWidget>();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler2;
     private javax.swing.Box.Filler filler3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFooter;
     private javax.swing.JLabel lblHeader;
     private javax.swing.JLabel lblInfo;
-    private javax.swing.JPanel pnlCenter;
-    private javax.swing.JPanel pnlContent;
+    private javax.swing.JPanel panCenter;
+    private javax.swing.JPanel panCenterFiller;
+    private javax.swing.JPanel panContent;
+    private javax.swing.JPanel panLeft;
+    private javax.swing.JPanel panLeftFiller;
+    private javax.swing.JPanel panRight;
+    private javax.swing.JPanel panRightFiller;
     private javax.swing.JPanel pnlFooter;
     private javax.swing.JPanel pnlHeader;
     private javax.swing.JPanel pnlHeaderWidget;
-    private javax.swing.JPanel pnlLeft;
-    private javax.swing.JPanel pnlRight;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -79,16 +86,7 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
     private DashBoard() {
         initComponents();
 
-        this.widgets = new ArrayList<DashBoardWidget>();
-        this.lookup();
-
-        JPanel p;
-        for (int i = this.numWidgets; i < 9; i++) {
-            p = new JPanel();
-//            p.setOpaque(false);
-            p.setMinimumSize(new Dimension(100, 100));
-            this.addWidget(p, i % 3, (i - 1) % 3); // TODO: implement relative positioning
-        }
+        lookup();
 
         super.addHierarchyListener(new HierarchyListener() {
 
@@ -117,23 +115,21 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
      */
     private void lookup() {
         final Lookup lookUp = Lookup.getDefault();
-        final Collection<? extends DashBoardWidget> widgets = lookUp.lookupAll(DashBoardWidget.class);
+        final Collection<? extends DashBoardWidget> lookupWidgets = lookUp.lookupAll(
+                DashBoardWidget.class);
 
-        int numWidgets = 0;
+        for (final DashBoardWidget lookupWidget : lookupWidgets) {
+            lookupWidget.init();
 
-        Component widget;
-        for (final DashBoardWidget w : widgets) {
-            w.init();
-
-            widget = w.getWidget();
-
-            if (w.isHeaderWidget()) {
-                this.addHeaderWidget(widget);
+            if (lookupWidget.isHeaderWidget()) {
+                addHeaderWidget((AbstractDashBoardWidget)lookupWidget);
             } else {
-                this.addWidget(widget, w.getX(), w.getY());
+                addWidget(new DashBoardWidgetWrapper().wrapComponent((AbstractDashBoardWidget)lookupWidget),
+                    lookupWidget.getX(),
+                    lookupWidget.getY());
             }
 
-            this.widgets.add(w);
+            widgets.add(lookupWidget);
             numWidgets++;
 
             if (numWidgets == 9) {
@@ -141,6 +137,7 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
                 break;
             }
         }
+        panLeft.getComponent(2);
     }
 
     /**
@@ -157,8 +154,8 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
      *
      * @param  c  DOCUMENT ME!
      */
-    public void addHeaderWidget(final Component c) {
-        this.pnlHeaderWidget.add(c);
+    public void addHeaderWidget(final JPanel c) {
+        pnlHeaderWidget.add(c);
     }
 
     /**
@@ -168,40 +165,51 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
      * @param  x       DOCUMENT ME!
      * @param  y       DOCUMENT ME!
      */
-    public void addWidget(final Component widget, final int x, final int y) {
-        JPanel targetPanel = null;
+    private void addWidget(final JPanel widget, final int x, final int y) {
+        final JPanel targetPanel;
         switch (x) {
             case 0: {
-                targetPanel = this.pnlLeft;
+                targetPanel = panLeft;
                 break;
             }
             case 1: {
-                targetPanel = this.pnlCenter;
+                targetPanel = panCenter;
                 break;
             }
             case 2: {
-                targetPanel = this.pnlRight;
+                targetPanel = panRight;
                 break;
             }
             default: {
-                // TODO: introduce logging
+                targetPanel = null;
                 System.err.println("UNKNOWN PANEL: " + x);
-                this.addWidget(widget, x % 3, y);
+                addWidget(widget, x % 3, y);
             }
         }
 
-//        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
-
         if (targetPanel != null) {
-//            targetPanel.add((JComponent)cw.wrapComponent((JComponent)widget));
-            targetPanel.add(widget);
-            targetPanel.add(Box.createVerticalStrut(8));
+            final GridBagConstraints gridBagConstraints = new GridBagConstraints();
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = targetPanel.getComponentCount() - 1;
+            targetPanel.add(widget, gridBagConstraints);
 
-            this.numWidgets++;
+            numWidgets++;
 
             targetPanel.revalidate();
-            this.revalidate();
+            revalidate();
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        new JFrame().add(new DashBoard());
     }
 
     /**
@@ -225,10 +233,15 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
         filler3 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
-        pnlContent = new javax.swing.JPanel();
-        pnlLeft = new javax.swing.JPanel();
-        pnlCenter = new javax.swing.JPanel();
-        pnlRight = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
+        panContent = new javax.swing.JPanel();
+        panLeft = new javax.swing.JPanel();
+        panLeftFiller = new javax.swing.JPanel();
+        panCenter = new javax.swing.JPanel();
+        panCenterFiller = new javax.swing.JPanel();
+        panRight = new javax.swing.JPanel();
+        panRightFiller = new javax.swing.JPanel();
 
         pnlHeader.setOpaque(false);
         pnlHeader.setLayout(new java.awt.GridBagLayout());
@@ -287,63 +300,101 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
         pnlFooter.add(filler3, gridBagConstraints);
 
         setOpaque(false);
-        setLayout(new java.awt.BorderLayout());
+        setLayout(new java.awt.GridBagLayout());
 
-        pnlContent.setBorder(null);
-        pnlContent.setOpaque(false);
-        pnlContent.setLayout(new java.awt.GridBagLayout());
+        jScrollPane1.setOpaque(false);
 
-        pnlLeft.setBorder(null);
-        pnlLeft.setMaximumSize(new java.awt.Dimension(300, 1000000));
-        pnlLeft.setMinimumSize(new java.awt.Dimension(290, 50));
-        pnlLeft.setOpaque(false);
-        pnlLeft.setLayout(new javax.swing.BoxLayout(pnlLeft, javax.swing.BoxLayout.Y_AXIS));
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        panContent.setBorder(null);
+        panContent.setOpaque(false);
+        panContent.setLayout(new java.awt.GridBagLayout());
+
+        panLeft.setBorder(null);
+        panLeft.setMaximumSize(new java.awt.Dimension(300, 1000000));
+        panLeft.setMinimumSize(new java.awt.Dimension(290, 50));
+        panLeft.setOpaque(false);
+        panLeft.setLayout(new java.awt.GridBagLayout());
+
+        panLeftFiller.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.weighty = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        pnlContent.add(pnlLeft, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panLeft.add(panLeftFiller, gridBagConstraints);
 
-        pnlCenter.setBorder(null);
-        pnlCenter.setMaximumSize(new java.awt.Dimension(300, 1000000));
-        pnlCenter.setMinimumSize(new java.awt.Dimension(290, 50));
-        pnlCenter.setOpaque(false);
-        pnlCenter.setLayout(new javax.swing.BoxLayout(pnlCenter, javax.swing.BoxLayout.Y_AXIS));
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.weighty = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        pnlContent.add(pnlCenter, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        panContent.add(panLeft, gridBagConstraints);
 
-        pnlRight.setBorder(null);
-        pnlRight.setMaximumSize(new java.awt.Dimension(300, 1000000));
-        pnlRight.setMinimumSize(new java.awt.Dimension(290, 50));
-        pnlRight.setOpaque(false);
-        pnlRight.setLayout(new javax.swing.BoxLayout(pnlRight, javax.swing.BoxLayout.Y_AXIS));
+        panCenter.setBorder(null);
+        panCenter.setMaximumSize(new java.awt.Dimension(300, 1000000));
+        panCenter.setMinimumSize(new java.awt.Dimension(290, 50));
+        panCenter.setOpaque(false);
+        panCenter.setLayout(new java.awt.GridBagLayout());
+
+        panCenterFiller.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTH;
-        gridBagConstraints.weightx = 0.3;
-        gridBagConstraints.weighty = 0.3;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        pnlContent.add(pnlRight, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panCenter.add(panCenterFiller, gridBagConstraints);
 
-        add(pnlContent, java.awt.BorderLayout.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        panContent.add(panCenter, gridBagConstraints);
+
+        panRight.setBorder(null);
+        panRight.setMaximumSize(new java.awt.Dimension(300, 1000000));
+        panRight.setMinimumSize(new java.awt.Dimension(290, 50));
+        panRight.setOpaque(false);
+        panRight.setLayout(new java.awt.GridBagLayout());
+
+        panRightFiller.setOpaque(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 10;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        panRight.add(panRightFiller, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        panContent.add(panRight, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel1.add(panContent, gridBagConstraints);
+
+        jScrollPane1.setViewportView(jPanel1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(jScrollPane1, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
     public CidsBean getCidsBean() {
-        return this.cidsBean;
+        return cidsBean;
     }
 
     @Override
@@ -353,7 +404,7 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
 
     @Override
     public void dispose() {
-        for (final DashBoardWidget w : this.widgets) {
+        for (final DashBoardWidget w : widgets) {
             w.dispose();
         }
     }
@@ -375,7 +426,7 @@ public class DashBoard extends javax.swing.JPanel implements CidsBeanRenderer,
 
     @Override
     public JComponent getFooterComponent() {
-        return this.pnlFooter;
+        return pnlFooter;
     }
 
     @Override

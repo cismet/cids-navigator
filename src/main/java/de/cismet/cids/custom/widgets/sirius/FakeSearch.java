@@ -15,7 +15,7 @@ import Sirius.navigator.ui.DashBoardWidget;
 
 import org.openide.util.lookup.ServiceProvider;
 
-import java.awt.Component;
+import de.cismet.cids.custom.widgets.AbstractDashBoardWidget;
 
 /**
  * DOCUMENT ME!
@@ -24,12 +24,10 @@ import java.awt.Component;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = DashBoardWidget.class)
-public class FakeSearch extends javax.swing.JPanel implements DashBoardWidget {
+public class FakeSearch extends AbstractDashBoardWidget {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChange;
-    private javax.swing.Box.Filler filler1;
-    private javax.swing.Box.Filler filler2;
     private javax.swing.JTextField txtSearch;
     // End of variables declaration//GEN-END:variables
 
@@ -55,18 +53,11 @@ public class FakeSearch extends javax.swing.JPanel implements DashBoardWidget {
 
         txtSearch = new javax.swing.JTextField();
         btnChange = new javax.swing.JButton();
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 32767));
-        filler2 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 0),
-                new java.awt.Dimension(0, 32767));
 
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
 
         txtSearch.setText(org.openide.util.NbBundle.getMessage(FakeSearch.class, "FakeSearch.txtSearch.text")); // NOI18N
-        txtSearch.setMinimumSize(new java.awt.Dimension(100, 27));
         txtSearch.setPreferredSize(new java.awt.Dimension(100, 27));
         txtSearch.addActionListener(new java.awt.event.ActionListener() {
 
@@ -77,34 +68,19 @@ public class FakeSearch extends javax.swing.JPanel implements DashBoardWidget {
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.2;
-        gridBagConstraints.weighty = 0.1;
+        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         add(txtSearch, gridBagConstraints);
 
         btnChange.setText(org.openide.util.NbBundle.getMessage(FakeSearch.class, "FakeSearch.btnChange.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.1;
         gridBagConstraints.insets = new java.awt.Insets(0, 8, 0, 8);
         add(btnChange, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 0.2;
-        add(filler1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
-        gridBagConstraints.weighty = 0.2;
-        add(filler2, gridBagConstraints);
     }                                                                                                           // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -126,18 +102,13 @@ public class FakeSearch extends javax.swing.JPanel implements DashBoardWidget {
     }
 
     @Override
-    public Component getWidget() {
-        return this;
-    }
-
-    @Override
     public boolean isHeaderWidget() {
         return false;
     }
 
     @Override
     public int getX() {
-        return 2;
+        return 0;
     }
 
     @Override
@@ -147,5 +118,10 @@ public class FakeSearch extends javax.swing.JPanel implements DashBoardWidget {
 
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public String getTitle() {
+        return "Search";
     }
 }

@@ -23,22 +23,14 @@ import org.apache.log4j.Logger;
 import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
-import org.xhtmlrenderer.simple.FSScrollPane;
-import org.xhtmlrenderer.simple.XHTMLPanel;
-
 import java.awt.*;
 
-import java.io.IOException;
-
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-
-import javax.net.ssl.*;
 
 import javax.swing.*;
 
-import de.cismet.tools.gui.xhtmlrenderer.WebAccessManagerUserAgent;
+import de.cismet.cids.custom.widgets.AbstractDashBoardWidget;
 
 /**
  * DOCUMENT ME!
@@ -47,11 +39,11 @@ import de.cismet.tools.gui.xhtmlrenderer.WebAccessManagerUserAgent;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = DashBoardWidget.class)
-public class AdminMessagesWidget extends javax.swing.JPanel implements DashBoardWidget {
+public class AdminMessagesWidget extends AbstractDashBoardWidget {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final String ADMIN_MSG_URL = "file:///home/bfriedrich/Dropbox/Public/admin_msg_test/messages.html";
+    private static final String ADMIN_MSG_URL = "http://www.cismet.de";
 
     private static final Logger LOG = Logger.getLogger(AdminMessagesWidget.class);
 
@@ -62,8 +54,7 @@ public class AdminMessagesWidget extends javax.swing.JPanel implements DashBoard
 
     private final URL url;
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lblTitle;
-    private javax.swing.JPanel pnlContent;
+    private javax.swing.JPanel panContent;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -129,7 +120,7 @@ public class AdminMessagesWidget extends javax.swing.JPanel implements DashBoard
 
         this.htmlPane.setScrollBarPolicy(CalCons.V_AUTO);
 
-        this.pnlContent.add(this.htmlPane, BorderLayout.CENTER);
+        this.panContent.add(this.htmlPane, BorderLayout.CENTER);
 //
 //        this.xHTMLPanel1 = new XHTMLPanel();
 //        xHTMLPanel1.getSharedContext().setUserAgentCallback(new WebAccessManagerUserAgent());
@@ -153,42 +144,26 @@ public class AdminMessagesWidget extends javax.swing.JPanel implements DashBoard
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        final java.awt.GridBagConstraints gridBagConstraints;
 
-        lblTitle = new javax.swing.JLabel();
-        pnlContent = new javax.swing.JPanel();
+        panContent = new javax.swing.JPanel();
 
         setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        setMaximumSize(new java.awt.Dimension(500, 120));
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
 
-        lblTitle.setFont(new java.awt.Font("DejaVu Sans", 1, 18)); // NOI18N
-        lblTitle.setForeground(java.awt.Color.white);
-        lblTitle.setText(org.openide.util.NbBundle.getMessage(
-                AdminMessagesWidget.class,
-                "AdminMessagesWidget.lblTitle.text"));             // NOI18N
+        panContent.setMinimumSize(new java.awt.Dimension(10, 200));
+        panContent.setOpaque(false);
+        panContent.setPreferredSize(new java.awt.Dimension(10, 500));
+        panContent.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
-        add(lblTitle, gridBagConstraints);
-
-        pnlContent.setMinimumSize(new java.awt.Dimension(200, 100));
-        pnlContent.setOpaque(false);
-        pnlContent.setPreferredSize(new java.awt.Dimension(200, 100));
-        pnlContent.setLayout(new java.awt.BorderLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.weighty = 0.2;
-        gridBagConstraints.insets = new java.awt.Insets(0, 4, 4, 4);
-        add(pnlContent, gridBagConstraints);
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(panContent, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
@@ -215,11 +190,6 @@ public class AdminMessagesWidget extends javax.swing.JPanel implements DashBoard
     }
 
     @Override
-    public Component getWidget() {
-        return this;
-    }
-
-    @Override
     public boolean isHeaderWidget() {
         return false;
     }
@@ -236,5 +206,10 @@ public class AdminMessagesWidget extends javax.swing.JPanel implements DashBoard
 
     @Override
     public void dispose() {
+    }
+
+    @Override
+    public String getTitle() {
+        return "Admin Benachrichtungen";
     }
 }
