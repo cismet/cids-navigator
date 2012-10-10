@@ -51,16 +51,18 @@ public class EditorWrapper implements ComponentWrapper {
     public WrappedComponent wrapComponent(final JComponent component) {
         component.setBorder(new EmptyBorder(10, 10, 10, 10));
         final CoolEditor ced;
-        if (component instanceof RequestsFullSizeComponent) {
-            // tagging interface fue full size an umschliessende komponente "weitervererben"
-            ced = new FullSizeCoolEditor();
-        } else if ((component instanceof BlurredMapObjectRenderer)) {
+        if ((component instanceof BlurredMapObjectRenderer)) {
             if (!((BlurredMapObjectRenderer)component).usePainterCoolPanel) {
                 component.setBorder(new EmptyBorder(0, 0, 0, 0));
                 return (BlurredMapObjectRenderer)component;
             }
             final BlurredMapObjectRenderer cp = (BlurredMapObjectRenderer)component;
-            final BlurredMapWrapper wrappingComp = new BlurredMapWrapper();
+            final BlurredMapWrapper wrappingComp;
+            if (component instanceof RequestsFullSizeComponent) {
+                wrappingComp = new FullSizeBlurredMapWrapper();
+            } else {
+                wrappingComp = new BlurredMapWrapper();
+            }
             wrappingComp.setGeometry(cp.getGeometry());
             final JComponent p = cp.getPanInter();
             if (p != null) {
@@ -79,7 +81,12 @@ public class EditorWrapper implements ComponentWrapper {
             wrappingComp.setOriginalComponent(component);
             return (WrappedComponent)wrappingComp;
         } else {
-            ced = new CoolEditor();
+            if (component instanceof RequestsFullSizeComponent) {
+                // tagging interface fue full size an umschliessende komponente "weitervererben"
+                ced = new FullSizeCoolEditor();
+            } else {
+                ced = new CoolEditor();
+            }
         }
         if (component instanceof BorderProvider) {
             final BorderProvider borderProvider = (BorderProvider)component;
@@ -116,6 +123,17 @@ public class EditorWrapper implements ComponentWrapper {
      * @version  $Revision$, $Date$
      */
     private static final class FullSizeCoolEditor extends CoolEditor implements RequestsFullSizeComponent {
+
+        // existiert nur um FullSize tagging interface an die umschliessende Komponente zu "vererben"
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static final class FullSizeBlurredMapWrapper extends BlurredMapWrapper
+            implements RequestsFullSizeComponent {
 
         // existiert nur um FullSize tagging interface an die umschliessende Komponente zu "vererben"
     }
