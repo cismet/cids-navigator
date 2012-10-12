@@ -39,6 +39,7 @@ import Sirius.navigator.ui.widget.FloatingFrameConfigurator;
 
 import Sirius.server.middleware.types.*;
 import Sirius.server.newuser.UserException;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
@@ -833,29 +834,36 @@ public class Navigator extends JFrame {
      */
     private boolean hasPermission(final MetaClass[] classes,
             final Sirius.server.newuser.permission.Permission permission) {
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+        if (userGroup != null) {
+            final String key = userGroup.getKey().toString();
 
-        for (int i = 0; i < classes.length; i++) {
-            try {
-                // falsch aufgerufen schlob SessionManager.getSession().getUser().getUserGroup().getKey()
-                final PermissionHolder perm = classes[i].getPermissions();
-                if (logger.isDebugEnabled()) {
-                    logger.debug(" usergroup can edit ?? " + key + " permissions :: " + perm);               // NOI18N          //logger.debug(perm +" \n" +key);
-                }
-                if ((perm != null) && perm.hasPermission(key, permission))                                   // xxxxxxxxxxxxxxxxxxxxxx user????
-                {
+            for (int i = 0; i < classes.length; i++) {
+                try {
+                    // falsch aufgerufen schlob SessionManager.getSession().getUser().getUserGroup().getKey()
+                    final PermissionHolder perm = classes[i].getPermissions();
                     if (logger.isDebugEnabled()) {
-                        logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'"); // NOI18N
+                        logger.debug(" usergroup can edit ?? " + key + " permissions :: " + perm);               // NOI18N          //logger.debug(perm +" \n" +key);
                     }
-                    return true;
+                    if ((perm != null) && perm.hasPermission(key, permission))                                   // xxxxxxxxxxxxxxxxxxxxxx user????
+                    {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'"); // NOI18N
+                        }
+                        return true;
+                    }
+                } catch (final Exception exp) {
+                    logger.error("hasPermission(): could not check permissions", exp);                           // NOI18N
                 }
-            } catch (final Exception exp) {
-                logger.error("hasPermission(): could not check permissions", exp);                           // NOI18N
             }
-        }
 
-        logger.warn("permission '" + permission + "' not found, disabling editor"); // NOI18N
-        return false;
+            logger.warn("permission '" + permission + "' not found, disabling editor"); // NOI18N
+            return false;
+        } else {
+            logger.fatal("check for all userGroups");
+            // TODO check for all userGroups
+            return true;
+        }
     }
 
     @Override

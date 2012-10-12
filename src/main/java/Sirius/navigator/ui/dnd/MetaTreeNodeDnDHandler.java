@@ -19,6 +19,7 @@ import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.tree.*;
 
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
@@ -189,7 +190,11 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
         boolean nodeEditable = false;
 
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+        logger.fatal("check for all userGroups");
+        // TODO check for all userGroups
+
+        final String key = userGroup.getKey().toString();
 
         // Permission p = SessionManager.getSession().getWritePermission();
 

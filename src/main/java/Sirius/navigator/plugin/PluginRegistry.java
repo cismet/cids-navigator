@@ -15,6 +15,8 @@ import Sirius.navigator.plugin.ui.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.*;
 
+import Sirius.server.newuser.UserGroup;
+
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -171,9 +173,12 @@ public class PluginRegistry {
 
                 if ((pluginDescriptor.getUsers().size() == 0)
                             || pluginDescriptor.getUsers().contains(SessionManager.getSession().getUser().getName())) {
+                    logger.fatal("check for all userGroups");
+                    // TODO check for all userGroups
+                    final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
                     if ((pluginDescriptor.getUsergroups().size() == 0)
                                 || pluginDescriptor.getUsergroups().contains(
-                                    SessionManager.getSession().getUser().getUserGroup().toString())) {
+                                    userGroup.toString())) {
                         try {
                             this.loadPlugin(pluginDescriptor);
                         } catch (Throwable t) {
