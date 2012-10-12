@@ -20,6 +20,7 @@ import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 
 import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
@@ -258,7 +259,11 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                 final MetaClass[] cs = SessionManager.getProxy().getClasses();
                 final ArrayList filtered = new ArrayList();
 
-                final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+                final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+                logger.fatal("check for all userGroups");
+                // TODO check for all userGroups
+
+                final String key = userGroup.getKey().toString();
                 // Permission perm = SessionManager.getSession().getWritePermission();
 
                 // filtering
