@@ -368,50 +368,6 @@ public class LoginDialog extends JDialog {
         this.toFront();
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user    DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     * @throws  UserException        DOCUMENT ME!
-     */
-    protected void updateUserGroups(final String user, final String domain) throws ConnectionException, UserException {
-        cb_userGroup.removeAllItems();
-
-        if ((user == null) || (user.length() == 0) || (domain == null) || (domain.length() == 0)) {
-            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames();
-            userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
-        } else {
-            try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("retrieving usergroups for user '" + user + "' @ domain '" + domain + "'"); // NOI18N
-                }
-
-                final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(user, domain);
-                userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
-            } catch (UserException ue) {
-                JOptionPane.showMessageDialog(
-                    LoginDialog.this,
-                    org.openide.util.NbBundle.getMessage(
-                        LoginDialog.class,
-                        "LoginDialog.updateUserGroups().errorOptionPane.message"), // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        LoginDialog.class,
-                        "LoginDialog.updateUserGroups().errorOptionPane.title"), // NOI18N
-                    JOptionPane.ERROR_MESSAGE);
-                tf_name.setText("");                                             // NOI18N
-            }
-        }
-
-        cb_userGroup.addItem(null);
-
-        for (int i = 0; i < userGroupLSNames.length; i++) {
-            cb_userGroup.addItem(userGroupLSNames[i][0] + "@" + userGroupLSNames[i][1].trim()); // NOI18N
-        }
-    }
-
     //~ Inner Classes ----------------------------------------------------------
 
 // /**
@@ -548,7 +504,7 @@ public class LoginDialog extends JDialog {
          */
         @Override
         public void actionPerformed(final ActionEvent e) {
-            boolean noGroup = false;
+//            boolean noGroup = false;
             try {
                 if (e.getActionCommand().equals("ok")) {                                                                     // NOI18N
                     if (tf_name.getText().length() <= 0) {
@@ -571,7 +527,7 @@ public class LoginDialog extends JDialog {
                                 LoginDialog.class,
                                 "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingPasswordOptionPane.title"),   // NOI18N
                             JOptionPane.WARNING_MESSAGE);
-                    } else if ((cb_userGroup.getSelectedIndex() < 0) || (cb_userGroup.getSelectedItem() == null)) {
+//                    } else if ((cb_userGroup.getSelectedIndex() < 0) || (cb_userGroup.getSelectedItem() == null)) {
 //                        JOptionPane.showMessageDialog(
 //                            LoginDialog.this,
 //                            org.openide.util.NbBundle.getMessage(
@@ -581,34 +537,34 @@ public class LoginDialog extends JDialog {
 //                                LoginDialog.class,
 //                                "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingUsergroupOptionPane.title"),   // NOI18N
 //                            JOptionPane.WARNING_MESSAGE);
-                        noGroup = true;
+//                        noGroup = true;
                     } else if (cb_srv.getSelectedIndex() < 0) {
                         JOptionPane.showMessageDialog(
                             LoginDialog.this,
                             org.openide.util.NbBundle.getMessage(
                                 LoginDialog.class,
-                                "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingDomainOptionPane.message"), // NOI18N
+                                "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingDomainOptionPane.message"),   // NOI18N
                             org.openide.util.NbBundle.getMessage(
                                 LoginDialog.class,
-                                "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingDomainOptionPane.title"), // NOI18N
+                                "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingDomainOptionPane.title"),     // NOI18N
                             JOptionPane.WARNING_MESSAGE);
                     } else {
                         try {
-                            if (noGroup) {
-                                SessionManager.getSession()
-                                        .login(
-                                            cb_srv.getSelectedItem().toString(),
-                                            tf_name.getText(),
-                                            new String(pf_pass.getPassword()));
-                            } else {
-                                SessionManager.getSession()
-                                        .login(
-                                            userGroupLSNames[cb_userGroup.getSelectedIndex()][1],
-                                            userGroupLSNames[cb_userGroup.getSelectedIndex()][0],
-                                            cb_srv.getSelectedItem().toString(),
-                                            tf_name.getText(),
-                                            new String(pf_pass.getPassword()));
-                            }
+//                            if (noGroup) {
+                            SessionManager.getSession()
+                                    .login(
+                                        cb_srv.getSelectedItem().toString(),
+                                        tf_name.getText(),
+                                        new String(pf_pass.getPassword()));
+//                            } else {
+//                                SessionManager.getSession()
+//                                        .login(
+//                                            userGroupLSNames[cb_userGroup.getSelectedIndex()][1],
+//                                            userGroupLSNames[cb_userGroup.getSelectedIndex()][0],
+//                                            cb_srv.getSelectedItem().toString(),
+//                                            tf_name.getText(),
+//                                            new String(pf_pass.getPassword()));
+//                            }
                             LoginDialog.this.preferences.put(LoginDialog.this.PREF_NAME, tf_name.getText());
                             LoginDialog.this.preferences.put(
                                 LoginDialog.this.PREF_DOMAIN,
