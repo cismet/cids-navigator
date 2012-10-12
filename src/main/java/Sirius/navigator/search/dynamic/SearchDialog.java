@@ -20,6 +20,7 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 import Sirius.navigator.ui.tree.SearchSelectionTree;
 
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
 
@@ -404,7 +405,10 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
     public void setSearchProperties(final SearchPropertiesBean searchProperties) {
         logger.info("loading search properties"); // NOI18N
         final Collection userGroups = new LinkedList();
-        userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
+        logger.fatal("check for all userGroups");
+        // TODO check for all userGroups
+        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+        userGroups.add(userGroup.getKey());
 
         this.searchSelectionTree.setSelectedClassNodeKeys(searchProperties.getClassNodeKeys());
         this.searchFormManager.resetAllForms();
@@ -728,7 +732,9 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                         logger.debug("setting search forms enabled");                       // NOI18N
                     }
                     final Collection userGroups = new LinkedList();
-                    userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
+                    // TODO check for all userGroups
+                    final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+                    userGroups.add(userGroup.getKey());
 
                     SearchDialog.this.searchFormManager.setSearchFormsEnabled(SearchDialog.this.searchSelectionTree
                                 .getSelectedClassNodeKeys(),
@@ -760,7 +766,10 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                         logger.debug("setting search form enabled"); // NOI18N
                     }
                     final Collection userGroups = new LinkedList();
-                    userGroups.add(SessionManager.getSession().getUser().getUserGroup().getKey());
+                    logger.fatal("check for all userGroups");
+                    // TODO check for all userGroups
+                    final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+                    userGroups.add(userGroup.getKey());
 
                     SearchDialog.this.searchFormManager.setSearchFormEnabled((SearchForm)e.getItem(),
                         SearchDialog.this.searchSelectionTree.getSelectedClassNodeKeys(),

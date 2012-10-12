@@ -18,6 +18,7 @@ import Sirius.navigator.ui.attributes.editor.*;
 
 import Sirius.server.localserver.attribute.Attribute;
 import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
@@ -347,33 +348,40 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
 
     @Override
     public boolean isEditable(final java.util.EventObject anEvent) {
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+        if (userGroup != null) {
+            final String key = userGroup.getKey().toString();
 
-        try {
-            if (this.getValue() instanceof Attribute) {
-                // klasse besorgen
+            try {
+                if (this.getValue() instanceof Attribute) {
+                    // klasse besorgen
 
-                final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
+                    final MetaClass metaClass = SessionManager.getProxy()
+                                .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
 
-                return (!this.readOnly & !((Attribute)this.getValue()).isPrimaryKey())
-                            && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)
-                            && this.getMetaObject(this.getValue()).getBean()
-                            .hasObjectWritePermission(SessionManager.getSession().getUser());
-                    // return !this.readOnly & !((Attribute)this.getValue()).isPrimaryKey() &
-                    // ((Attribute)this.getValue()).getPermissions().hasPermission(key,Sirius.navigator.connection.SessionManager.getSession().getWritePermission());
-            } else {
-                final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
-                return (!this.readOnly
-                                & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION))
-                            && this.getMetaObject(this.getValue()).getBean()
-                            .hasObjectWritePermission(SessionManager.getSession().getUser());
+                    return (!this.readOnly & !((Attribute)this.getValue()).isPrimaryKey())
+                                && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)
+                                && this.getMetaObject(this.getValue()).getBean()
+                                .hasObjectWritePermission(SessionManager.getSession().getUser());
+                        // return !this.readOnly & !((Attribute)this.getValue()).isPrimaryKey() &
+                        // ((Attribute)this.getValue()).getPermissions().hasPermission(key,Sirius.navigator.connection.SessionManager.getSession().getWritePermission());
+                } else {
+                    final MetaClass metaClass = SessionManager.getProxy()
+                                .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
+                    return (!this.readOnly
+                                    & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION))
+                                && this.getMetaObject(this.getValue()).getBean()
+                                .hasObjectWritePermission(SessionManager.getSession().getUser());
+                }
+            } catch (Exception exp) {
+                logger.error("isEditable() could not check permissions of object " + this.getValue(), exp); // NOI18N
             }
-        } catch (Exception exp) {
-            logger.error("isEditable() could not check permissions of object " + this.getValue(), exp); // NOI18N
-        }
 
-        return false;
+            return false;
+        } else {
+            logger.fatal("check for all userGroups");
+            // TODO check for all userGroups
+            return true;
+        }
     }
 }
