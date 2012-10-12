@@ -27,6 +27,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.Permission;
 
 import org.apache.log4j.Logger;
@@ -842,31 +843,39 @@ public class MethodManager {
     public boolean checkPermission(final Node node, final Permission permission) {
         boolean hasPermission = false;
 
-        try {
-            final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
-            hasPermission = node.getPermissions().hasPermission(key, permission);
+        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+        if (userGroup != null) {
+            try {
+                final String key = userGroup.getKey().toString();
+                hasPermission = node.getPermissions().hasPermission(key, permission);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Permissions for node" + node + "   " + node.getPermissions() + "  with key" + key); // NOI18N
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Permissions for node" + node + "   " + node.getPermissions() + "  with key" + key); // NOI18N
+                }
+            } catch (Exception exp) {
+                logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node
+                            + "'",
+                    exp);                                                                                             // NOI18N
+                hasPermission = false;
             }
-        } catch (Exception exp) {
-            logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node + "'",
-                exp);                                                                                             // NOI18N
-            hasPermission = false;
-        }
 
-        if (!hasPermission) {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.checkPermission(Node,Permission).JOptionPane_anon.message"), // NOI18N
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.checkPermission(Node,Permission).JOptionPane_anon.title"), // NOI18N
-                JOptionPane.INFORMATION_MESSAGE);
-        }
+            if (!hasPermission) {
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.checkPermission(Node,Permission).JOptionPane_anon.message"), // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.checkPermission(Node,Permission).JOptionPane_anon.title"), // NOI18N
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
 
-        return hasPermission;
+            return hasPermission;
+        } else {
+            logger.fatal("check for all userGroups");
+            // TODO check for all userGroups
+            return true;
+        }
     }
 
     /**
@@ -880,38 +889,47 @@ public class MethodManager {
     public boolean checkPermission(final MetaObjectNode node, final Permission permission) {
         boolean hasPermission = false;
 
-        try {
-            final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
-            final MetaClass c = SessionManager.getProxy().getMetaClass(node.getClassId(), node.getDomain());
+        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
+        if (userGroup != null) {
+            try {
+                final String key = userGroup.getKey().toString();
+                final MetaClass c = SessionManager.getProxy().getMetaClass(node.getClassId(), node.getDomain());
 
-            // wenn MON dann editieren wenn Rechte am Knoten und and der Klasse
-            hasPermission = c.getPermissions().hasPermission(key, permission);
-            hasPermission &= node.getPermissions().hasPermission(key, permission);
-            // und am Objekt
-            hasPermission &= node.getObject().getBean().hasObjectWritePermission(SessionManager.getSession().getUser());
+                // wenn MON dann editieren wenn Rechte am Knoten und and der Klasse
+                hasPermission = c.getPermissions().hasPermission(key, permission);
+                hasPermission &= node.getPermissions().hasPermission(key, permission);
+                // und am Objekt
+                hasPermission &= node.getObject().getBean()
+                            .hasObjectWritePermission(SessionManager.getSession().getUser());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Check ClassPermissions for node" + node + "   " + c.getPermissions() + "  with key"
-                            + key); // NOI18N
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Check ClassPermissions for node" + node + "   " + c.getPermissions() + "  with key"
+                                + key); // NOI18N
+                }
+            } catch (Exception exp) {
+                logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node
+                            + "'",
+                    exp);               // NOI18N
+                hasPermission = false;
             }
-        } catch (Exception exp) {
-            logger.error("checkPermission(): could not check permission '" + permission + "' of node '" + node + "'",
-                exp);               // NOI18N
-            hasPermission = false;
-        }
 
-        if (!hasPermission) {
-            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.checkPermission(MetaObjectNode,Permission).JOptionPane_anon.message"), // NOI18N
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.checkPermission(MetaObjectNode,Permission).JOptionPane_anon.title"), // NOI18N
-                JOptionPane.INFORMATION_MESSAGE);
-        }
+            if (!hasPermission) {
+                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.checkPermission(MetaObjectNode,Permission).JOptionPane_anon.message"), // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.checkPermission(MetaObjectNode,Permission).JOptionPane_anon.title"), // NOI18N
+                    JOptionPane.INFORMATION_MESSAGE);
+            }
 
-        return hasPermission;
+            return hasPermission;
+        } else {
+            logger.fatal("check for all userGroups");
+            // TODO check for all userGroups
+            return true;
+        }
     }
 
     /**

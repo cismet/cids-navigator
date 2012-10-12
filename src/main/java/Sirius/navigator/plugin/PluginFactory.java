@@ -13,6 +13,7 @@ import Sirius.navigator.plugin.ui.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.embedded.*;
 
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.commons.digester.*;
@@ -1031,8 +1032,11 @@ public final class PluginFactory {
                     method = SessionManager.getProxy().getMethod(methodKey);
 
                     if (method != null) {
+                        logger.fatal("check for all userGroups");
+                        // TODO check for all userGroups
+                        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
                         if (method.getPermissions().hasPermission(
-                                        SessionManager.getSession().getUser().getUserGroup().getKey(),
+                                        userGroup.getKey(),
                                         PermissionHolder.READPERMISSION)) {
                             final PluginMenuItem menuItem = new PluginMenuItem(methodDescriptor.getMethod(), method);
 
@@ -1104,8 +1108,11 @@ public final class PluginFactory {
                 try {
                     method = SessionManager.getProxy().getMethod(methodKey);
                     if (method != null) {
+                        logger.fatal("check for all userGroups");
+                        // TODO check for all userGroups
+                        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
                         if (method.getPermissions().hasPermission(
-                                        SessionManager.getSession().getUser().getUserGroup().getKey(),
+                                        userGroup.getKey(),
                                         PermissionHolder.READPERMISSION)) {
                             final PluginMenuItem menuItem = new PluginMenuItem(methodDescriptor.getMethod(), method);
 

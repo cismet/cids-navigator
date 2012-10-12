@@ -57,13 +57,20 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
             throw new IllegalStateException("no session available"); // NOI18N
         }
 
-        try {
-            final User user = session.getUser();
-            final User queryUser = new User(-1, "", user.getDomain(), user.getUserGroup()); // NOI18N
+        final User user = session.getUser();
+        final UserGroup userGroup = user.getUserGroup();
+        if (userGroup != null) {
+            try {
+                final User queryUser = new User(-1, "", user.getDomain(), userGroup); // NOI18N
 
-            return session.getConnection().getConfigAttr(queryUser, key);
-        } catch (final ConnectionException e) {
-            LOG.error("could not get group config attr for key: " + key, e); // NOI18N
+                return session.getConnection().getConfigAttr(queryUser, key);
+            } catch (final ConnectionException e) {
+                LOG.error("could not get group config attr for key: " + key, e); // NOI18N
+                return null;
+            }
+        } else {
+            LOG.fatal("check for all userGroups");
+            // TODO check for all userGroups
             return null;
         }
     }
@@ -75,14 +82,21 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
             throw new IllegalStateException("no session available"); // NOI18N
         }
 
-        try {
-            final User user = session.getUser();
-            final UserGroup queryUg = new UserGroup(-1, "", user.getUserGroup().getDomain()); // NOI18N
-            final User queryUser = new User(-1, "", user.getDomain(), queryUg);               // NOI18N
+        final User user = session.getUser();
+        final UserGroup userGroup = user.getUserGroup();
+        if (userGroup != null) {
+            try {
+                final UserGroup queryUg = new UserGroup(-1, "", user.getUserGroup().getDomain()); // NOI18N
+                final User queryUser = new User(-1, "", user.getDomain(), queryUg);               // NOI18N
 
-            return session.getConnection().getConfigAttr(queryUser, key);
-        } catch (final ConnectionException e) {
-            LOG.error("could not get domain config attr for key: " + key, e); // NOI18N
+                return session.getConnection().getConfigAttr(queryUser, key);
+            } catch (final ConnectionException e) {
+                LOG.error("could not get domain config attr for key: " + key, e); // NOI18N
+                return null;
+            }
+        } else {
+            LOG.fatal("check for all userGroups");
+            // TODO check for all userGroups
             return null;
         }
     }
