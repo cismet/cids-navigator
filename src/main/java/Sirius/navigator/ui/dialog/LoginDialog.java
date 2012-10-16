@@ -551,11 +551,11 @@ public class LoginDialog extends JDialog {
                     } else {
                         try {
 //                            if (noGroup) {
-                            SessionManager.getSession()
-                                    .login(
-                                        cb_srv.getSelectedItem().toString(),
-                                        tf_name.getText(),
-                                        new String(pf_pass.getPassword()));
+                                SessionManager.getSession()
+                                        .login(
+                                            cb_srv.getSelectedItem().toString(),
+                                            tf_name.getText(),
+                                            new String(pf_pass.getPassword()));
 //                            } else {
 //                                SessionManager.getSession()
 //                                        .login(
