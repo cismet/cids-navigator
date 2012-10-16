@@ -17,6 +17,8 @@ import java.beans.PropertyChangeListener;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -81,7 +83,7 @@ public class ProgressDialog extends JDialog {
     public void show(final MultithreadedMethod method) {
         this.pack();
         this.progressPanel.invokeMethod(method);
-        super.show();
+        StaticSwingTools.showDialog(this);
     }
 
     /**
@@ -93,7 +95,7 @@ public class ProgressDialog extends JDialog {
     public void show(final MultithreadedMethod method, final Object arguments) {
         this.pack();
         this.progressPanel.invokeMethod(method, arguments);
-        super.show();
+        StaticSwingTools.showDialog(this);
     }
 
     //~ Inner Classes ----------------------------------------------------------

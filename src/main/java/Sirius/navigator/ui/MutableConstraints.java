@@ -167,6 +167,7 @@ public class MutableConstraints implements ComponentListener, PropertyChangeList
     public CustomView getView() {
         if (constraintView == null) {
             constraintView = new CustomView(getId(), getName(), getIcon(), getContainer());
+            constraintView.setMenuItemTooltip(getToolTip());
             if (component instanceof EmbededControlBar) {
                 ((EmbededControlBar)component).setControlBarVisible(false);
                 final Vector<AbstractButton> customButtons = ((EmbededControlBar)component).getControlBarButtons();

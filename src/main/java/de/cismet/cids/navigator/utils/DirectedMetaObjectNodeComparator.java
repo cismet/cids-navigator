@@ -83,55 +83,53 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
         String mos1 = mon1.toString();
         String mos2 = mon2.toString();
 
-        if ((mos1 == null) || (mos1.trim().length() == 0)) {
-            MetaObject mo1 = mon1.getObject();
-            try {
-                if (mo1 == null) {
-                    mo1 = SessionManager.getProxy()
-                                .getMetaObject(
-                                        ((MetaObjectNode)o1).getObjectId(),
-                                        o1.getClassId(),
-                                        o1.getDomain());
-                    mon1.setObject(mo1);
-                    mon1.setName(mo1.toString());
-                }
-            } catch (final ConnectionException e) {
-                LOG.error("Connection problem: ", e);
-            }
-            mos1 = mon1.toString();
-        }
-        if ((mos2 == null) || (mos2.trim().length() == 0)) {
-            try {
-                MetaObject mo2 = mon2.getObject();
-
-                if (mo2 == null) {
-                    mo2 = SessionManager.getProxy()
-                                .getMetaObject(
-                                        ((MetaObjectNode)o2).getObjectId(),
-                                        o2.getClassId(),
-                                        o2.getDomain());
-                    mon2.setObject(mo2);
-                    mon2.setName(mo2.toString());
-                }
-                mos2 = mon2.toString();
-            } catch (final ConnectionException e) {
-                LOG.error("Connection problem: ", e);
-            }
-        }
-
-        final String class1 = (mon1.getObject() != null) ? mon1.getObject().getClassKey() : "";
-        final String class2 = (mon2.getObject() != null) ? mon2.getObject().getClassKey() : "";
+        final String class1 = mon1.getClassId() + "@" + mon1.getDomain();
+        final String class2 = mon2.getClassId() + "@" + mon2.getDomain();
 
         if ((class1 != null) && (class2 != null)) {
             int comparison = class1.compareTo(class2);
 
             if ((comparison == 0) && (mos1 != null) && (mos2 != null)) {
+                if ((mos1 == null) || (mos1.trim().length() == 0)) {
+                    MetaObject mo1 = mon1.getObject();
+                    try {
+                        if (mo1 == null) {
+                            mo1 = SessionManager.getProxy()
+                                        .getMetaObject(
+                                                ((MetaObjectNode)o1).getObjectId(),
+                                                o1.getClassId(),
+                                                o1.getDomain());
+                            mon1.setObject(mo1);
+                            mon1.setName(mo1.toString());
+                        }
+                    } catch (final ConnectionException e) {
+                        LOG.error("Connection problem: ", e);
+                    }
+                    mos1 = mon1.toString();
+                }
+                if ((mos2 == null) || (mos2.trim().length() == 0)) {
+                    try {
+                        MetaObject mo2 = mon2.getObject();
+
+                        if (mo2 == null) {
+                            mo2 = SessionManager.getProxy()
+                                        .getMetaObject(
+                                                ((MetaObjectNode)o2).getObjectId(),
+                                                o2.getClassId(),
+                                                o2.getDomain());
+                            mon2.setObject(mo2);
+                            mon2.setName(mo2.toString());
+                        }
+                        mos2 = mon2.toString();
+                    } catch (final ConnectionException e) {
+                        LOG.error("Connection problem: ", e);
+                    }
+                }
                 comparison = mos1.compareTo(mos2);
             }
 
             return ascending ? comparison : (-1 * comparison);
         }
-
         return 0;
     }
 }

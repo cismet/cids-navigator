@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -59,6 +60,9 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
     private MetaClass mc = null;
     private Map<JCheckBox, MetaObject> boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
     private volatile boolean threadRunning = false;
+    private Color backgroundSelected = null;
+    private Color backgroundUnselected = null;
+    private boolean readOnly = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -180,7 +184,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                                     + " from "
                                     + foreignClass.getTableName();
 
-                        return MetaObjectCache.getInstance().getMetaObjectByQuery(query);
+                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query);
                     } else {
                         LOG.error("The meta class was not set.", new Throwable());
                     }
@@ -210,6 +214,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                                 boxToObjectMapping.put(box, tmpMc);
                             }
                             activateSelectedObjects();
+                            setReadOnly(readOnly);
                         }
                     } catch (Exception e) {
                         LOG.error("Error while filling a checkbox field.", e); // NOI18N
@@ -232,8 +237,20 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                 final MetaObject mo = boxToObjectMapping.get(tmp);
                 if ((mo != null) && selectedElements.contains(mo.getBean())) {
                     tmp.setSelected(true);
+
+                    if (backgroundSelected != null) {
+                        tmp.setOpaque(true);
+                        tmp.setContentAreaFilled(true);
+                        tmp.setBackground(backgroundSelected);
+                    }
                 } else {
                     tmp.setSelected(false);
+
+                    if (backgroundUnselected != null) {
+                        tmp.setOpaque(true);
+                        tmp.setContentAreaFilled(true);
+                        tmp.setBackground(backgroundUnselected);
+                    }
                 }
             }
         }
@@ -274,6 +291,19 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * @param  removeSelectedElements  DOCUMENT ME!
      */
     public void refreshCheckboxState(final FieldStateDecider decider, final boolean removeSelectedElements) {
+        refreshCheckboxState(decider, false, removeSelectedElements);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  decider                 DOCUMENT ME!
+     * @param  hideElements            DOCUMENT ME!
+     * @param  removeSelectedElements  DOCUMENT ME!
+     */
+    public void refreshCheckboxState(final FieldStateDecider decider,
+            final boolean hideElements,
+            final boolean removeSelectedElements) {
         CismetThreadPool.execute(new SwingWorker<Void, Void>() {
 
                 @Override
@@ -298,7 +328,16 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
                         while (it.hasNext()) {
                             final JCheckBox box = it.next();
-                            box.setEnabled(decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
+                            if (!hideElements) {
+                                box.setEnabled(
+                                    !readOnly
+                                            && decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
+                            } else {
+                                remove(box);
+                                if (decider.isCheckboxForClassActive(boxToObjectMapping.get(box))) {
+                                    add(box);
+                                }
+                            }
                             box.setSelected(false);
                             if (Thread.currentThread().isInterrupted()) {
                                 return;
@@ -327,6 +366,25 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
         } else {
             selectedElements.add(mo.getBean());
         }
+
+        final JCheckBox box = (JCheckBox)ae.getSource();
+        box.setOpaque(false);
+        box.setContentAreaFilled(false);
+
+        if (box.isSelected()) {
+            if (backgroundSelected != null) {
+                box.setOpaque(true);
+                box.setContentAreaFilled(true);
+                box.setBackground(backgroundSelected);
+            }
+        } else {
+            if (backgroundUnselected != null) {
+                box.setOpaque(true);
+                box.setContentAreaFilled(true);
+                box.setBackground(backgroundUnselected);
+            }
+        }
+
         propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
         propertyChangeSupport.firePropertyChange("selectedElements", null, mo.getBean());
     }
@@ -342,6 +400,57 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
         } else {
             threadRunning = true;
             return true;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  the backgroundSelected
+     */
+    public Color getBackgroundSelected() {
+        return backgroundSelected;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  backgroundSelected  the backgroundSelected to set
+     */
+    public void setBackgroundSelected(final Color backgroundSelected) {
+        this.backgroundSelected = backgroundSelected;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  the backgroundUnselected
+     */
+    public Color getBackgroundUnselected() {
+        return backgroundUnselected;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  backgroundUnselected  the backgroundUnselected to set
+     */
+    public void setBackgroundUnselected(final Color backgroundUnselected) {
+        this.backgroundUnselected = backgroundUnselected;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  readOnly  DOCUMENT ME!
+     */
+    public void setReadOnly(final boolean readOnly) {
+        this.readOnly = readOnly;
+        final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
+
+        while (it.hasNext()) {
+            final JCheckBox box = it.next();
+            box.setEnabled(!readOnly && box.isEnabled());
         }
     }
 }

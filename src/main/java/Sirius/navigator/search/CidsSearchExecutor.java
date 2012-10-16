@@ -45,6 +45,7 @@ public final class CidsSearchExecutor {
     private static final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
             CidsSearchExecutor.class);
     private static SearchProgressDialog searchProgressDialog;
+    private static SearchControlDialog searchControlDialog;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -54,19 +55,21 @@ public final class CidsSearchExecutor {
      * @param  search  DOCUMENT ME!
      */
     public static void searchAndDisplayResultsWithDialog(final CidsServerSearch search) {
-        final SearchControlDialog dialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(),
-                true,
-                search);
-        dialog.pack();
-        dialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getNavigator());
+        if (searchControlDialog == null) {
+            searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
+            searchControlDialog.pack();
+        }
+
+        searchControlDialog.setSearch(search);
+
         EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    dialog.startSearch();
+                    searchControlDialog.startSearch();
                 }
             });
-        dialog.setVisible(true);
+        StaticSwingTools.showDialog(searchControlDialog);
     }
 
     /**
@@ -101,10 +104,8 @@ public final class CidsSearchExecutor {
                                     };
                                 dscs.addPropertyChangeListener(cancelListener);
                                 getSearchProgressDialog().pack();
-                                getSearchProgressDialog().setLocationRelativeTo(
-                                    ComponentRegistry.getRegistry().getNavigator());
                                 getSearchProgressDialog().setLabelAnimation(true);
-                                getSearchProgressDialog().setVisible(true);
+                                StaticSwingTools.showDialog(getSearchProgressDialog());
                             }
                         });
 
@@ -151,16 +152,22 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
-     * @param   search                      DOCUMENT ME!
-     * @param   listener                    DOCUMENT ME!
-     * @param   searchResultsListener       DOCUMENT ME!
-     * @param   suppressEmptyResultMessage  DOCUMENT ME!
+     * @param   search                      The search to perform.
+     * @param   searchListener              A listener which will be informed about status changes of search thread.
+     *                                      Usually a SearchControlPanel.
+     * @param   searchResultsTreeListener   A listener which will be informed about status changes of the thread which
+     *                                      refreshes the SearchResultsTree. Usually the same SearchControlPanel as
+     *                                      listener.
+     * @param   suppressEmptyResultMessage  A flag indicating that the user shouldn't be informed about an empty result.
+     *                                      Since this message is generated in the called method to display the search
+     *                                      results in the SearchResultsTree this flag decides about calling thismethod
+     *                                      or not.
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResults(final CidsServerSearch search,
-            final PropertyChangeListener listener,
-            final PropertyChangeListener searchResultsListener,
+            final PropertyChangeListener searchListener,
+            final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
@@ -186,15 +193,16 @@ public final class CidsSearchExecutor {
 
                     result = nodes.toArray(new Node[0]);
                     if (!isCancelled()) {
-                        MethodManager.getManager()
-                                .showSearchResults(result, false, searchResultsListener, suppressEmptyResultMessage);
+                        if (!suppressEmptyResultMessage || (result.length > 0)) {
+                            MethodManager.getManager().showSearchResults(result, false, searchResultsTreeListener);
+                        }
                     }
 
                     return result;
                 }
             };
 
-        worker.addPropertyChangeListener(listener);
+        worker.addPropertyChangeListener(searchListener);
 
         CismetThreadPool.execute(worker);
 

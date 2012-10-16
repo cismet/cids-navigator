@@ -16,19 +16,16 @@ import Sirius.navigator.ui.attributes.editor.*;
 import Sirius.navigator.ui.dialog.DateChooser;
 
 import Sirius.server.localserver.attribute.Attribute;
-import Sirius.server.middleware.types.MetaObject;
 
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.event.*;
 
 import java.text.*;
 
 import java.util.*;
 
-import javax.swing.*;
-import javax.swing.event.*;
+import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -144,7 +141,7 @@ public class SimpleDateMetaAttributeEditor extends AbstractSimpleMetaAttributeEd
             }
             this.dateChooser.show((Date)object);
         } else {
-            this.dateChooser.show();
+            StaticSwingTools.showDialog(dateChooser);
         }
 
         if (this.dateChooser.isDateAccepted()) {

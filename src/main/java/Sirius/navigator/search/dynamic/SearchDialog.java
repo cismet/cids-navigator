@@ -43,6 +43,8 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.tree.TreePath;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -294,7 +296,6 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
 
             if (this.checkCompleteness(searchOptions)) {
                 this.searchProgressDialog.pack();
-                this.searchProgressDialog.setLocationRelativeTo(owner);
                 this.searchProgressDialog.show(classNodeKeys, searchOptions);
 
                 if (!this.searchProgressDialog.isCanceld()) {
@@ -381,25 +382,6 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
 
         final SearchContext searchContext = new SearchContext(this);
         final SearchFormFactory formFactory = new SearchFormFactory();
-
-        try {
-            final java.util.List searchCategories = formFactory.createSearchForms(PropertyManager.getManager()
-                            .getSearchFormPath(),
-                    "search.xml",
-                    searchContext);                                                                                      // NOI18N
-            logger.info(searchCategories.size() + " search categories loaded");                                          // NOI18N
-            this.searchFormManager.setSearchFormContainers(searchCategories);
-        } catch (Exception exp) {
-            logger.fatal("could create dynmaic search categories & forms", exp);                                         // NOI18N
-            ExceptionManager.getManager()
-                    .showExceptionDialog(
-                        ExceptionManager.FATAL,
-                        org.openide.util.NbBundle.getMessage(SearchDialog.class, "SearchDialog.loadSearchForms().name"), // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            SearchDialog.class,
-                            "SearchDialog.loadSearchForms().message"),                                                   // NOI18N
-                        exp);
-        }
     }
 
     /**
@@ -407,11 +389,10 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
      */
     public void showQueryProfilesManager() {
         if (!this.isShowing()) {
-            this.show();
+            StaticSwingTools.showDialog(this);
         }
 
-        this.queryProfileManager.setLocationRelativeTo(SearchDialog.this);
-        this.queryProfileManager.show();
+        StaticSwingTools.showDialog(this.queryProfileManager);
         this.queryProfileManager.toFront();
     }
 

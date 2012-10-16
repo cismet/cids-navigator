@@ -30,6 +30,8 @@ package Sirius.navigator.ui.dialog;
         History                 :
 
 *******************************************************************************/
+import Sirius.navigator.ui.ComponentRegistry;
+
 import org.apache.log4j.Logger;
 
 import java.awt.*;
@@ -37,6 +39,8 @@ import java.awt.event.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
+
+import de.cismet.tools.gui.StaticSwingTools;
 //import Sirius.navigator.connection.ConnectionHandler;
 
 /**
@@ -105,7 +109,9 @@ public class ErrorDialog extends JDialog implements ActionListener {
      * @param  errorType     DOCUMENT ME!
      */
     public ErrorDialog(final String errorMessage, final String stackTrace, final String errorType) {
-        super(new JFrame(), errorType, true);
+        super(ComponentRegistry.isRegistred() ? ComponentRegistry.getRegistry().getMainWindow() : new JFrame(),
+            errorType,
+            true);
         this.errorMessage = errorMessage;
         this.stackTrace = stackTrace;
         this.setErrorType(errorType);
@@ -279,7 +285,7 @@ public class ErrorDialog extends JDialog implements ActionListener {
                         org.openide.util.NbBundle.getMessage(
                             ErrorDialog.class,
                             "ErrorDialog.actionPerformed(ActionEvent).dialog.title")); // NOI18N
-                dialog.show();
+                StaticSwingTools.showDialog(dialog);
 
                 // _TA_if(optionPane.getValue().equals("Ja"))
                 if (optionPane.getValue().equals(

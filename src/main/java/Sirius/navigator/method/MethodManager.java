@@ -10,6 +10,7 @@ package Sirius.navigator.method;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
+import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.tools.CloneHelper;
 import Sirius.navigator.types.iterator.TreeNodeIterator;
 import Sirius.navigator.types.iterator.TreeNodeRestriction;
@@ -17,7 +18,6 @@ import Sirius.navigator.types.treenode.ClassTreeNode;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.dialog.AboutDialog;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
@@ -45,6 +45,8 @@ import javax.swing.tree.TreePath;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -61,6 +63,8 @@ public class MethodManager {
     public static final long OBJECT_NODE = 4;
     public static final long MULTIPLE = 8;
     public static final long CLASS_MULTIPLE = 16;
+    public static final long WRITE = 32;
+    public static final long SINGLE = 64;
 
     private static final Logger logger = Logger.getLogger(MethodManager.class);
 
@@ -135,18 +139,7 @@ public class MethodManager {
      */
     public void callSpecialTreeCommand() {
         if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof SearchResultsTree) {
-            if (
-                !((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeResultNodes(
-                            ComponentRegistry.getRegistry().getActiveCatalogue().getSelectedNodes())) {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.message"), // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.callSpecialTreeCommand().JOptionPane_anon1.title"), // NOI18N
-                    JOptionPane.INFORMATION_MESSAGE);
-            }
+            ((SearchResultsTree)ComponentRegistry.getRegistry().getActiveCatalogue()).removeSelectedResultNodes();
         } else if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof MetaCatalogueTree) {
             final DefaultMetaTreeNode[] selectedTreeNodes = ComponentRegistry.getRegistry()
                         .getActiveCatalogue()
@@ -181,53 +174,26 @@ public class MethodManager {
     }
 
     /**
-     * DOCUMENT ME!
-     */
-    public void showAboutDialog() {
-        final AboutDialog aboutDialog = ComponentRegistry.getRegistry().getAboutDialog();
-        aboutDialog.pack();
-        aboutDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        aboutDialog.show();
-    }
-
-    /**
      * Shows the options dialog.
      */
     public void showOptionsDialog() {
         final OptionsDialog optionsDialog = ComponentRegistry.getRegistry().getOptionsDialog();
         optionsDialog.pack();
-        optionsDialog.setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        optionsDialog.setVisible(true);
+        StaticSwingTools.showDialog(optionsDialog);
     }
 
     /**
      * DOCUMENT ME!
      */
     public void showQueryResultProfileManager() {
-        ComponentRegistry.getRegistry()
-                .getQueryResultProfileManager()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getQueryResultProfileManager().show();
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    public void showPasswordDialog() {
-        ComponentRegistry.getRegistry()
-                .getPasswordDialog()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getPasswordDialog().show();
+        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getQueryResultProfileManager());
     }
 
     /**
      * DOCUMENT ME!
      */
     public void showPluginManager() {
-        ComponentRegistry.getRegistry()
-                .getPluginManager()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getPluginManager().show();
+        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getPluginManager());
     }
 
     /**
@@ -235,13 +201,10 @@ public class MethodManager {
      */
     public void showSearchDialog() // throws Exception
     {
-        // this.showSearchDialog(false);
-
-        ComponentRegistry.getRegistry().getSearchDialog().pack();
-        ComponentRegistry.getRegistry()
-                .getSearchDialog()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
-        ComponentRegistry.getRegistry().getSearchDialog().show();
+        final ComponentRegistry cr = ComponentRegistry.getRegistry();
+        final SearchDialog dialog = cr.getSearchDialog();
+        dialog.pack();
+        StaticSwingTools.showDialog(dialog);
     }
 
     /**
@@ -249,12 +212,7 @@ public class MethodManager {
      */
     public void showQueryProfilesManager() // throws Exception
     {
-        // this.showSearchDialog(false);
-
         ComponentRegistry.getRegistry().getSearchDialog().pack();
-        ComponentRegistry.getRegistry()
-                .getSearchDialog()
-                .setLocationRelativeTo(ComponentRegistry.getRegistry().getMainWindow());
         ComponentRegistry.getRegistry().getSearchDialog().showQueryProfilesManager();
     }
 
@@ -307,8 +265,8 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  resultNodes  DOCUMENT ME!
-     * @param  append       DOCUMENT ME!
+     * @param  resultNodes  The results to display in the SearchResultsTree.
+     * @param  append       Whether to append the search results or not.
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append) {
@@ -339,7 +297,9 @@ public class MethodManager {
                     JOptionPane.WARNING_MESSAGE);
             }
         } else {
-            ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(resultNodes, append, listener);
+            ComponentRegistry.getRegistry()
+                    .getSearchResultsTree()
+                    .setResultNodes(resultNodes, append, searchResultsTreeListener);
             this.showSearchResults();
         }
     }
@@ -397,34 +357,55 @@ public class MethodManager {
      * @return  DOCUMENT ME!
      */
     public boolean deleteNode(final MetaCatalogueTree metaTree, final DefaultMetaTreeNode sourceNode) {
-        if (JOptionPane.YES_NO_OPTION
-                    == JOptionPane.showOptionDialog(
-                        ComponentRegistry.getRegistry().getMainWindow(),
+        return deleteNode(metaTree, sourceNode, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaTree      DOCUMENT ME!
+     * @param   sourceNode    DOCUMENT ME!
+     * @param   withQuestion  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean deleteNode(final MetaCatalogueTree metaTree,
+            final DefaultMetaTreeNode sourceNode,
+            final boolean withQuestion) {
+        boolean ans = false;
+
+        if (withQuestion) {
+            final int option = JOptionPane.showOptionDialog(
+                    ComponentRegistry.getRegistry().getMainWindow(),
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
+                        new Object[] { String.valueOf(sourceNode) }),                                                          // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"),             // NOI18N
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    new String[] {
                         org.openide.util.NbBundle.getMessage(
                             MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
-                            new Object[] { String.valueOf(sourceNode) }),                                              // NOI18N
+                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
                         org.openide.util.NbBundle.getMessage(
                             MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"), // NOI18N
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[] {
-                            org.openide.util.NbBundle.getMessage(
-                                MethodManager.class,
-                                "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
-                            org.openide.util.NbBundle.getMessage(
-                                MethodManager.class,
-                                "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
-                        },                                                                                             // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"))) // NOI18N
+                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
+                    },                                                                                                         // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"));
+            ans = (option == JOptionPane.YES_OPTION);
+        }
+
+        if (!withQuestion || ans)                                            // NOI18N
         {
             try {
                 if (logger.isInfoEnabled()) {
-                    logger.info("deleteNode() deleting node " + sourceNode);                                           // NOI18N
+                    logger.info("deleteNode() deleting node " + sourceNode); // NOI18N
                 }
 
                 ComponentRegistry.getRegistry()

@@ -38,6 +38,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -268,7 +270,7 @@ public class CoordinateChooser extends JDialog implements ActionListener {
             this.coordinates = new int[] { 0, 0, 0, 0 };
         }
 
-        this.show();
+        StaticSwingTools.showDialog(this);
     }
 
     @Override
@@ -278,6 +280,10 @@ public class CoordinateChooser extends JDialog implements ActionListener {
         koordinatenRW2TextField.setText(String.valueOf(this.coordinates[2]));
         koordinatenHW2TextField.setText(String.valueOf(this.coordinates[3]));
 
+        // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+        // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+        // setVisible(true) which internally calls JDialog show() -> endless recursion if
+        // StaticSwingTools.showDialog() is called here
         super.show();
     }
 

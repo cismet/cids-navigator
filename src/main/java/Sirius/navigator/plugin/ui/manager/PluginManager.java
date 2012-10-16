@@ -15,7 +15,6 @@ package Sirius.navigator.plugin.ui.manager;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.*;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.progress.*;
 
 import org.apache.log4j.Logger;
@@ -83,6 +82,10 @@ public class PluginManager extends javax.swing.JDialog {
         }
 
         this.setButtonsEnabled(pluginTree.getSelectedNode());
+        // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+        // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+        // setVisible(true) which internally calls JDialog show() -> endless recursion if
+        // StaticSwingTools.showDialog() is called here
         super.show();
     }
 

@@ -46,6 +46,7 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.netutil.Proxy;
 
@@ -398,6 +399,20 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
     }
 
     @Override
+    public MetaObject[] getMetaObject(final User usr, final Query query, final String domain)
+            throws ConnectionException {
+        try {
+            return connector.getMetaObject(usr, query);
+        } catch (final Exception e) {
+            final String message = "could not get metaobject for user, query, domain: " + usr + " :: " + query // NOI18N
+                        + " :: "                                                                               // NOI18N
+                        + domain;
+            LOG.error(message, e);
+            throw new ConnectionException(message, e);
+        }
+    }
+
+    @Override
     public MetaObject getMetaObject(final User user, final int objectID, final int classID, final String domain)
             throws ConnectionException {
         try {
@@ -422,6 +437,21 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
             return connector.getMetaObject(user, query);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, query: " + user + " :: " + query; // NOI18N
+            LOG.error(message, e);
+            throw new ConnectionException(message, e);
+        }
+    }
+
+    @Override
+    public MetaObject[] getMetaObjectByQuery(final User user, final String query, final String domain)
+            throws ConnectionException {
+        try {
+            return connector.getMetaObject(user, query, domain);
+        } catch (final Exception e) {
+            final String message = "could not get metaobject for user, query, domain: " + user + " :: " // NOI18N
+                        + query
+                        + " :: "                                                                        // NOI18N
+                        + domain;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
@@ -978,5 +1008,26 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + " || domain: " + domain + " || user: " + user + " || elements: " + elements, // NOI18N
                 e);
         }
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final Object body,
+            final ServerActionParameter... params) throws ConnectionException {
+        try {
+            return connector.executeTask(user, taskname, taskdomain, body, params);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could not executeTask: taskname: " + taskname + " || body: " + body
+                        + " || taskdomain: " + taskdomain
+                        + " || user: " + user,
+                e);
+        }
+    }
+
+    @Override
+    public CallServerService getCallServerService() {
+        return (CallServerService)connector;
     }
 }

@@ -26,6 +26,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * Die abstrakte Implementierung eines einfachen Editors.
  *
@@ -1000,8 +1002,7 @@ public abstract class AbstractSimpleEditor extends JPanel implements SimpleEdito
                         this.setContentPane((JComponent)complexChildEditorComponent);
 
                         this.pack();
-                        this.setLocationRelativeTo(null);
-                        this.show();
+                        StaticSwingTools.showDialog(this);
 
                         this.uiChanged();
                         return true;

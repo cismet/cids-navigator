@@ -38,6 +38,8 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -579,6 +581,10 @@ public abstract class ProfileManager extends JDialog implements ActionListener {
             optionUserGroup.setEnabled(groupProfileEnabled);
             optionUserGroup.setSelected(groupProfileEnabled & groupProfileSelected);
 
+            // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+            // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+            // setVisible(true) which internally calls JDialog show() -> endless recursion if
+            // StaticSwingTools.showDialog() is called here
             super.show();
         }
 
@@ -604,7 +610,7 @@ public abstract class ProfileManager extends JDialog implements ActionListener {
             optionUserGroup.setEnabled(groupProfileEnabled);
             optionUserGroup.setSelected(groupProfileEnabled & groupProfileSelected);
 
-            super.show();
+            StaticSwingTools.showDialog(this);
         }
 
         // FIXME inner class

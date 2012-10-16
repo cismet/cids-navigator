@@ -31,6 +31,8 @@ import javax.swing.*;
 
 import de.cismet.tools.CismetThreadPool;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -174,7 +176,7 @@ public class SearchProgressDialog extends javax.swing.JDialog {
             logger.debug("waiting for search thread to finish"); // NOI18N
         }                                                        // this.pack();
 
-        super.show();
+        StaticSwingTools.showDialog(this);
     }
 
     // .........................................................................

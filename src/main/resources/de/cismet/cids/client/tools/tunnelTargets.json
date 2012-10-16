@@ -1,0 +1,29 @@
+[
+    {
+        "targetExpressions":[
+            "^http://.*\\.wuppertal-intra\\.de.*"
+        ],
+        "targetGroupkey":"wuppertal-intra"
+    },
+    {
+        "targetExpressions":[
+            "^http://[sS]102[xX]283:8080.*",
+            "^http://[sS]102[xX]284:8399.*"
+        ],
+        "targetGroupkey":"alkis"
+    },
+    {
+        "targetExpressions":[
+            "^http://[sS]102is/Linkbase.*",
+            "^http://[sS]102[xX]284:8399.*"
+        ],
+        "targetGroupkey":"vermessung"
+    },
+    {
+        "targetExpressions":[
+            ".*"
+        ],
+        "targetGroupkey":"all"
+    }
+    
+]

@@ -50,8 +50,8 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
 
     //~ Instance fields --------------------------------------------------------
 
-    private ProxyOptionsPanel panProxyOptions;
-    private RESTfulReconnector reconnector;
+    private final ProxyOptionsPanel panProxyOptions;
+    private final RESTfulReconnector reconnector;
     private DefaultReconnectorErrorPanel errPan;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -182,13 +182,15 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        Proxy proxy = panProxyOptions.getProxy();
-        if (!proxy.isEnabled()) {
-            proxy = null;
-        }
+        final Proxy proxy = panProxyOptions.getProxy();
         reconnector.setProxy(proxy);
-        proxy.toPreferences();
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+
+        if (proxy == null) {
+            LOG.warn("proxy configuration not saved to preferences, proxy is null");
+        } else {
+            proxy.toPreferences();
+        }
+    } //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -197,5 +199,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
      */
     private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tbProxyActionPerformed
         panProxyOptionsWrapper.setVisible(tbProxy.isSelected());
+        this.validate();
     }                                                                           //GEN-LAST:event_tbProxyActionPerformed
 }

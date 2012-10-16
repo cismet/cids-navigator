@@ -40,6 +40,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * Dies ist ein Dialog ueber den ein Datum ausgewaehlt werden kann.
  *
@@ -364,6 +366,10 @@ public class DateChooser extends JDialog {
     public void show() {
         this.updateDays();
         this.pack();
+        // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+        // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+        // setVisible(true) which internally calls JDialog show() -> endless recursion if
+        // StaticSwingTools.showDialog() is called here
         super.show();
     }
 
@@ -375,7 +381,7 @@ public class DateChooser extends JDialog {
     public void show(final Date date) {
         this.setDate(date);
         this.pack();
-        super.show();
+        StaticSwingTools.showDialog(this);
     }
 
     /**
@@ -393,7 +399,7 @@ public class DateChooser extends JDialog {
         cal.set(2004, calendarMonth, 1);
         date = cal.getTime();
 
-        final SimpleDateFormat dateF = new SimpleDateFormat("MMMM", resources.getLocale()); // NOI18N
+        final SimpleDateFormat dateF = new SimpleDateFormat("MMMM"); // NOI18N
 
         monthName = dateF.format(date);
         return monthName;
@@ -414,7 +420,7 @@ public class DateChooser extends JDialog {
         cal.set(2001, 0, calendarDay);
         date = cal.getTime();
 
-        final SimpleDateFormat dateF = new SimpleDateFormat("E", resources.getLocale()); // NOI18N
+        final SimpleDateFormat dateF = new SimpleDateFormat("E"); // NOI18N
 
         dayName = dateF.format(date);
         return dayName;

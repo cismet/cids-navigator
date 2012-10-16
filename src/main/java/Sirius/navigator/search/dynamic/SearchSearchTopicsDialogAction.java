@@ -7,8 +7,6 @@
 ****************************************************/
 package Sirius.navigator.search.dynamic;
 
-import Sirius.navigator.ui.ComponentRegistry;
-
 import org.apache.log4j.Logger;
 
 import org.openide.util.NbBundle;
@@ -25,6 +23,10 @@ import javax.swing.JDialog;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.cismap.commons.interaction.CismapBroker;
+
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -37,6 +39,10 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(SearchSearchTopicsDialogAction.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private JDialog dialog;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -84,9 +90,14 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
 
     @Override
     public void actionPerformed(final ActionEvent e) {
-        final JDialog dialog = new SearchSearchTopicsDialog(ComponentRegistry.getRegistry().getMainWindow(), true);
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        if (dialog == null) {
+            if (CismapBroker.getInstance().getMetaSearch() == null) {
+                return;
+            }
+            dialog = CismapBroker.getInstance().getMetaSearch().getSearchDialog();
+        }
+
         dialog.pack();
+        StaticSwingTools.showDialog(dialog);
     }
 }

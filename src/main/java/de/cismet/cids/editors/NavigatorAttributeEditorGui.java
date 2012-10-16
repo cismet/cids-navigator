@@ -15,7 +15,6 @@ package de.cismet.cids.editors;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
-import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 import Sirius.navigator.ui.attributes.AttributeViewer;
@@ -40,6 +39,7 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 
@@ -49,7 +49,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
-import javax.swing.tree.DefaultTreeModel;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
@@ -58,6 +57,7 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.WrappedComponent;
 
 /**
@@ -83,6 +83,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private JComponent wrappedWaitingPanel;
     private BeanInitializer currentInitializer = null;
     private DisposableCidsBeanStore currentBeanStore = null;
+    private JComponent editorComponent = null;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;
@@ -128,7 +130,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
-                                        || !(backupObject.propertyEquals(editorObject))))
+                                        || editorObject.isChanged()))
                                 || (backupObject == null)) {
                         if (editorObject.getBean().hasObjectWritePermission(SessionManager.getSession().getUser())) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
@@ -177,7 +179,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
-                                        || !(backupObject.propertyEquals(editorObject))))
+                                        || editorObject.isChanged()))
                                 || (backupObject == null)) {
                         final int answer = JOptionPane.showConfirmDialog(
                                 NavigatorAttributeEditorGui.this,
@@ -241,16 +243,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      * DOCUMENT ME!
      */
     private void refreshSearchTree() {
-        final Node[] oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
+        final List<Node> oldNodes = ComponentRegistry.getRegistry().getSearchResultsTree().getResultNodes();
 
         if (oldNodes == null) {
             // The search result tree has no elements. So it should not be refreshed
             return;
         }
-        final Node[] newNodes = new Node[oldNodes.length];
+        final Node[] newNodes = new Node[oldNodes.size()];
 
-        for (int index = 0; index < oldNodes.length; index++) {
-            final Node node = oldNodes[index];
+        for (int index = 0; index < oldNodes.size(); index++) {
+            final Node node = oldNodes.get(index);
             if (node instanceof MetaObjectNode) {
                 // Bei MetaObjectNodes wird der Node neu erzeugt, damit der Name gleich dem ToString Wert des
                 // veränderten Objektes ist
@@ -280,13 +282,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         if (treePath != null) {
             try {
                 final MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
-
-                final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
-
-                ((DefaultTreeModel)metaCatalogueTree.getModel()).setRoot(rootTreeNode);
-                ((DefaultTreeModel)metaCatalogueTree.getModel()).reload();
-
-                metaCatalogueTree.exploreSubtree(treePath);
+                metaCatalogueTree.refreshTreePath(treePath);
             } catch (Exception e) {
                 log.error("Error when refreshing Tree", e); // NOI18N
             }
@@ -304,9 +300,19 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final int cid = orig.getMetaClass().getID();
             final String domain = orig.getDomain();
             final User user = SessionManager.getSession().getUser();
+            backupObject = null;
             backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
         } catch (Exception e) {
-            log.error("Error during Backupcreation. Cannot detect whether the objects is changed.", e); // NOI18N
+            log.error("Error during Backupcreation. Cannot detect whether the object is changed.", e); // NOI18N
+            JOptionPane.showMessageDialog(
+                NavigatorAttributeEditorGui.this,
+                org.openide.util.NbBundle.getMessage(
+                    NavigatorAttributeEditorGui.class,
+                    "NavigatorAttributeEditorGui.createBackup().exception.JOptionPane.message"),       // NOI18N
+                org.openide.util.NbBundle.getMessage(
+                    NavigatorAttributeEditorGui.class,
+                    "NavigatorAttributeEditorGui.createBackup().exception.JOptionPane.title"),         // NOI18N
+                JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -383,6 +389,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         }
         try {
             final CidsBean savedInstance = oldBean.persist();
+            ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
             if (closeEditor) {
                 final JOptionPane jop = new JOptionPane(
                         org.openide.util.NbBundle.getMessage(
@@ -406,12 +413,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                         });
                 t.setRepeats(false);
                 t.start();
-                dialog.setVisible(true);
+                StaticSwingTools.showDialog(dialog);
                 clear();
             } else {
 //                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
 //                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
-                ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
                 editorObject = savedInstance.getMetaObject();
                 createBackup(editorObject);
                 // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener propertyChangeListener = new
@@ -486,7 +492,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     @Override
     public void setTreeNode(final Object node) {
         if ((treeNode != null) && (editorObject != null) && (backupObject != null)) {
-            if (editorObject.getBean().hasArtificialChangeFlag() || !editorObject.propertyEquals(backupObject)) {
+            if (editorObject.getBean().hasArtificialChangeFlag() || editorObject.isChanged()) {
                 final int answer = JOptionPane.showConfirmDialog(
                         NavigatorAttributeEditorGui.this,
                         org.openide.util.NbBundle.getMessage(
@@ -519,13 +525,33 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         treeNode = node;
         if (treeNode instanceof ObjectTreeNode) {
 //            final DescriptionPane desc = ComponentRegistry.getRegistry().getDescriptionPane();
+            cancelButton.setEnabled(false);
+            commitButton.setEnabled(false);
             CismetThreadPool.execute(new SwingWorker<JComponent, Void>() {
 
                     @Override
                     protected JComponent doInBackground() throws Exception {
                         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
                         editorObject = otn.getMetaObject();
-                        createBackup(editorObject);
+                        backupObject = null;
+                        new Thread(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    try {
+                                        createBackup(editorObject);
+                                    } finally {
+                                        EventQueue.invokeLater(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    cancelButton.setEnabled(true);
+                                                    commitButton.setEnabled(true);
+                                                }
+                                            });
+                                    }
+                                }
+                            }).start();
 
 //                    editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
 //
@@ -554,6 +580,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 log.debug("editor:" + ed); // NOI18N
                             }
                             removeAndDisposeEditor();
+                            editorComponent = ed;
                             switchPanel.remove(scpEditor);
                             if (ed instanceof RequestsFullSizeComponent) {
                                 switchPanel.add(ed, BorderLayout.CENTER);
@@ -569,8 +596,6 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                 currentBeanStore = (DisposableCidsBeanStore)ed;
                                 currentInitializer = EditorBeanInitializerStore.getInstance()
                                             .getInitializer(editorObject.getMetaClass());
-                                cancelButton.setEnabled(true);
-                                commitButton.setEnabled(true);
                                 copyButton.setEnabled(true);
                                 if (currentInitializer != null) {
                                     // enable editor attribute paste only for NEW MOs
@@ -646,11 +671,17 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private void removeAndDisposeEditor() {
         if (currentBeanStore != null) {
             currentBeanStore.dispose();
-            currentBeanStore = null;
         }
-        scpEditor.getViewport().removeAll();
+        if (editorComponent instanceof RequestsFullSizeComponent) {
+            switchPanel.remove(editorComponent);
+//            switchPanel.removeAll();
+        } else {
+            scpEditor.getViewport().removeAll();
+        }
         // release the strong reference on the listener, so that the weak listener can be GCed.
         strongReferenceOnWeakListener = null;
+        currentBeanStore = null;
+        editorComponent = null;
     }
 
     @Override

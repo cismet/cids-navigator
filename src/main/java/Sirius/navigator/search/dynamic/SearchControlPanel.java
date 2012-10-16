@@ -23,17 +23,18 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import java.awt.Dimension;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.net.URL;
 
+import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 /**
@@ -59,6 +60,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
     private org.jdesktop.swingx.JXBusyLabel lblBusyIcon;
+    private javax.swing.Box.Filler strGap;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -105,10 +107,18 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         lblBusyIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
+        strGap = new javax.swing.Box.Filler(new java.awt.Dimension(5, 0),
+                new java.awt.Dimension(5, 25),
+                new java.awt.Dimension(5, 32767));
         btnSearchCancel = new javax.swing.JButton();
+
+        setMinimumSize(new java.awt.Dimension(125, 25));
+        setPreferredSize(new java.awt.Dimension(125, 25));
+        setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.TRAILING, 0, 0));
 
         lblBusyIcon.setEnabled(false);
         add(lblBusyIcon);
+        add(strGap);
 
         btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
                 SearchControlPanel.class,
@@ -117,9 +127,15 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 SearchControlPanel.class,
                 "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
         btnSearchCancel.setFocusPainted(false);
-        btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, 25));
-        btnSearchCancel.setMinimumSize(new java.awt.Dimension(65, 25));
-        btnSearchCancel.setPreferredSize(new java.awt.Dimension(100, 25));
+        btnSearchCancel.setMaximumSize(new java.awt.Dimension(
+                100,
+                (new Double(getMaximumSize().getHeight()).intValue())));
+        btnSearchCancel.setMinimumSize(new java.awt.Dimension(
+                100,
+                (new Double(getMinimumSize().getHeight()).intValue())));
+        btnSearchCancel.setPreferredSize(new java.awt.Dimension(
+                100,
+                (new Double(getPreferredSize().getHeight()).intValue())));
         btnSearchCancel.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -166,7 +182,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                     search,
                     this,
                     this,
-                    !listener.displaysEmptyResultMessage());
+                    listener.suppressEmptyResultMessage());
             searching = true;
             setControlsAccordingToState();
             listener.searchStarted();
@@ -219,15 +235,18 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
         if (SwingWorker.StateValue.DONE.equals(evt.getNewValue())) {
             if (source.isCancelled()) {
                 searching = false;
-                listener.searchCancelled();
+                listener.searchCanceled();
                 setControlsAccordingToState();
             } else {
-                Node[] result = null;
+                int results = 0;
 
                 try {
                     final Object obj = source.get();
                     if (obj instanceof Node[]) {
-                        result = (Node[])obj;
+                        results = ((Node[])obj).length;
+                    }
+                    if (obj instanceof Collection) {
+                        results = ((Collection)obj).size();
                     }
                 } catch (InterruptedException ex) {
                     LOG.error("Search result can't be get().", ex);
@@ -240,22 +259,26 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                             org.openide.util.NbBundle.getMessage(
                                 SearchControlPanel.class,
                                 "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.message"),
-                            ex.getLocalizedMessage(),
+                            null,
                             "ERROR",
-                            ex,
+                            ex.getCause(),
                             Level.WARNING,
                             null);
+
                     JXErrorPane.showDialog(getRootPane(), errorInfo);
                 }
 
-                if (result == null) {
-                    result = new Node[0];
-                }
-
-                if ((source.equals(searchThread) && (result.length == 0))
+                // SearchControlPanel is used as listener of the search thread and as a listener for the thread which
+                // refreshes the SearchResultsTree. So this point is reached by on of two conditions:
+                // - The search thread is done.
+                // - Refreshing the SearchResultsTree is done.
+                // SearchControlPanel can display normal mode only if:
+                // - Search is done and has no results (refreshing the SearchResultsTree is not started).
+                // - Or refreshing SearchResultsTree is done.
+                if ((source.equals(searchThread) && (results == 0))
                             || !source.equals(searchThread)) {
                     searching = false;
-                    listener.searchDone(result);
+                    listener.searchDone(results);
                     setControlsAccordingToState();
                 }
             }
@@ -278,5 +301,25 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
             LOG.info("Start search programmatically.");
         }
         btnSearchCancel.doClick();
+    }
+
+    @Override
+    public void setMaximumSize(final Dimension maximumSize) {
+        btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, (new Double(maximumSize.getHeight()).intValue())));
+        super.setMaximumSize(maximumSize);
+    }
+
+    @Override
+    public void setMinimumSize(final Dimension minimumSize) {
+        btnSearchCancel.setMinimumSize(new java.awt.Dimension(100, (new Double(minimumSize.getHeight()).intValue())));
+        super.setMinimumSize(minimumSize);
+    }
+
+    @Override
+    public void setPreferredSize(final Dimension preferredSize) {
+        btnSearchCancel.setPreferredSize(new java.awt.Dimension(
+                100,
+                (new Double(preferredSize.getHeight()).intValue())));
+        super.setPreferredSize(preferredSize);
     }
 }

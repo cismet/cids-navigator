@@ -37,6 +37,8 @@ import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 
 import de.cismet.tools.configuration.ConfigurationManager;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * This class is responsibility is to lookup all relevant search components, to initialize and to plug them into the
  * navigator gui.
@@ -187,7 +189,8 @@ public class CidsSearchInitializer {
             dialoge.setLocation((screenSize.width - dialoge.getWidth()) / 2,
                 (screenSize.height - dialoge.getHeight())
                         / 2);
-            dialoge.setVisible(true);
+
+            StaticSwingTools.showDialog(dialoge);
         }
     }
 }

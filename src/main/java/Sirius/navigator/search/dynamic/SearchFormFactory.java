@@ -16,23 +16,16 @@ import Sirius.navigator.plugin.*;
 import Sirius.navigator.resource.*;
 
 import org.apache.commons.digester.*;
-import org.apache.commons.logging.Log;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import org.xml.sax.*;
 
-import java.awt.*;
-
 import java.io.*;
-
-import java.lang.reflect.*;
 
 import java.net.*;
 
 import java.util.*;
-
-import javax.swing.*;
 
 /**
  * DOCUMENT ME!
@@ -49,7 +42,6 @@ public class SearchFormFactory {
     //~ Instance fields --------------------------------------------------------
 
     private final Logger logger;
-    private final Log log;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -61,7 +53,6 @@ public class SearchFormFactory {
 
         final Logger digesterLogger = Logger.getLogger(SearchFormFactory.LoadSearchFormsRuleSet.class);
         digesterLogger.setLevel(Level.WARN);
-        this.log = new org.apache.commons.logging.impl.Log4JLogger(digesterLogger);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -95,7 +86,6 @@ public class SearchFormFactory {
         final LinkedList searchFormContainerList = new LinkedList();
         final Digester digester = new Digester();
 
-        digester.setLogger(log);
         // digester.push(new SearchFormFactory.FactoryCore(searchFormManager));
         digester.push(new SearchFormFactory.FactoryCore(searchFormsPath, searchFormContainerList, searchContext));
         digester.addRuleSet(new LoadSearchFormsRuleSet());
@@ -506,7 +496,7 @@ public class SearchFormFactory {
          * @return  DOCUMENT ME!
          */
         private ResourceBundle getResourceBundle(final String resourceBundleName) {
-            final Locale locale = resource.getLocale();
+            final Locale locale = Locale.getDefault();
             if (logger.isDebugEnabled()) {
                 logger.debug("loading resource bundle '" + resourceBundleName + "' for locale '" + locale + "'"); // NOI18N
             }
@@ -519,8 +509,5 @@ public class SearchFormFactory {
                 return null;
             }
         }
-
-        /*public void initSearchFormManager()
-         * { this.searchFormManager.setSearchFormContainers(this.searchFormContainerList);}*/
     }
 }

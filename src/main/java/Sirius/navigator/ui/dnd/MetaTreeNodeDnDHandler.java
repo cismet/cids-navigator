@@ -172,7 +172,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                 dge,
                 this.getCursor(dge.getDragAction()),
                 this.getDragImage(),
-                this.dragPoint,
+                new Point(10, 0),
                 this.metaTransferable,
                 this);
         } else if (logger.isDebugEnabled()) {
@@ -477,28 +477,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             logger.error("Error while creating DragImages", e); // NOI18N
             return null;
         }
-//        try {
-//            if (dragPath != null) {
-//                Rectangle pathBounds = tree.getPathBounds(dragPath);
-//                TreeCellRenderer r = tree.getCellRenderer();
-//                DefaultTreeModel m = (DefaultTreeModel)tree.getModel();
-//                boolean nIsLeaf = m.isLeaf(dragPath.getLastPathComponent());
-//                JComponent lbl = (JComponent)r.getTreeCellRendererComponent(
-//                        tree,draggedNode, false ,
-//                        tree.isExpanded(dragPath), nIsLeaf, 0,false);
-//                lbl.setBounds(pathBounds);
-//                image = new BufferedImage(lbl.getWidth(), lbl.getHeight(),
-//                        java.awt.image.BufferedImage.TYPE_INT_ARGB_PRE);
-//                Graphics2D graphics = image.createGraphics();
-//                graphics.setComposite(
-//                        AlphaComposite.getInstance(
-//                        AlphaComposite.SRC_OVER, 0.5f));
-//                lbl.setOpaque(false);
-//                lbl.paint(graphics);
-//                graphics.dispose();
-//            }
-//        } catch (RuntimeException re) {}
-//        return image;
     }
     /**
      * DOCUMENT ME!
@@ -520,48 +498,10 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         final Point loc = e.getLocation();
         updateDragMark(tree, loc);
         paintImage(tree, loc);
-//        // Even if the mouse is not moving, this method is still invoked 10 times per second
-//        Point pt = e.getLocation();
-//        if (pt.equals(_ptLast))
-//            return;
-//
-//        _ptLast = pt;
-//
-//
-//        Graphics2D g2 = (Graphics2D) this.metaTree.getGraphics();
-//
-//        // If a drag image is not supported by the platform, then draw my own drag image
-//        if (!DragSource.isDragImageSupported()) {
-//            this.metaTree.paintImmediately(_raGhost.getBounds());     // Rub out the last ghost image and cue line
-//            // And remember where we are about to draw the new ghost image
-//            _raGhost.setRect(pt.x - this.dragPoint.x, pt.y - this.dragPoint.y, this.dragImage.getWidth(), this.dragImage.getHeight());
-//            g2.drawImage(this.dragImage, AffineTransform.getTranslateInstance(_raGhost.getX(), _raGhost.getY()), null);
-//        } else        // Just rub out the last cue line
-//            this.metaTree.paintImmediately(_raCueLine.getBounds());
-//
-//
-//
-//        TreePath path = this.metaTree.getClosestPathForLocation(pt.x, pt.y);
-//        if (!(path == _pathLast)) {
-//            _pathLast = path;
-//            //this.metaTree.setSelectionPath(path);
-//        }
-//
-//        // In any case draw (over the ghost image if necessary) a cue line indicating where a drop will occur
-//        Rectangle raPath = this.metaTree.getPathBounds(path);
-//        _raCueLine.setRect(0,  raPath.y+(int)raPath.getHeight(), this.metaTree.getWidth(), 2);
-//
-//        g2.setColor(_colorCueLine);
-//        g2.fill(_raCueLine);
-//
-//
-//        // And include the cue line in the area to be rubbed out next time
-//        _raGhost = _raGhost.createUnion(_raCueLine);
     }
 
     @Override
     public void dragOver(final DragSourceDragEvent dsde) {
-        // if(logger.isDebugEnabled())logger.debug("dragOver(DragSourceDragEvent)");
     }
 
     @Override
@@ -570,7 +510,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
             logger.debug("dragEnter(DropTargetDragEvent)"); // NOI18N
         }
         logger.info(dtde.getSource());
-        // this.thisTarget = true;
     }
 
     @Override
@@ -585,16 +524,12 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
     @Override
     public void dragExit(final DragSourceEvent dse) {
-        // if(logger.isDebugEnabled())logger.debug("dragExit(DragSourceEvent)");
         dse.getDragSourceContext().setCursor(DragSource.DefaultCopyNoDrop);
         metaTree.setSelectionPaths(dragPaths);
     }
 
     @Override
     public void dragExit(final DropTargetEvent dte) {
-        // if(logger.isDebugEnabled())logger.debug("dragExit(DropTargetEvent)");
-        // this.dragSourceContext.setCursor(DragSource.DefaultCopyNoDrop);
-        // this.thisTarget = false;
         if (!DragSource.isDragImageSupported()) {
             this.metaTree.repaint(); // this.dragImage.);
         }

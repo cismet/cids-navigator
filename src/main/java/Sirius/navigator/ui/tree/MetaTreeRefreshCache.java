@@ -21,10 +21,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
@@ -42,6 +46,7 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(MetaTreeRefreshCache.class);
+    private static final transient Pattern WC_PATTERN = Pattern.compile("(?<!\\\\)\\*{1}|(?<!\\\\)\\?{1}"); // NOI18N
 
     //~ Instance fields --------------------------------------------------------
 
@@ -67,15 +72,48 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * The cache allows wildcards in the artificalId string. There are two wildcard characters:
      *
      * @param   artificialId  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public DefaultMetaTreeNode get(final String artificialId) {
+    public Set<DefaultMetaTreeNode> get(final String artificialId) {
         if (valid) {
-            return nodeCache.get(artificialId);
+            final Set<DefaultMetaTreeNode> nodes = new HashSet<DefaultMetaTreeNode>();
+
+            final Matcher m = WC_PATTERN.matcher(artificialId);
+            if (m.find()) {
+                m.reset();
+                final StringBuilder regexbuilder = new StringBuilder();
+
+                int beginIndex = 0;
+                while (m.find()) {
+                    regexbuilder.append(Pattern.quote(artificialId.substring(beginIndex, m.start())));
+                    regexbuilder.append((artificialId.charAt(m.start()) == '*') ? ".*" : ".?"); // NOI18N
+
+                    beginIndex = m.end();
+                }
+
+                if (beginIndex < artificialId.length()) {
+                    regexbuilder.append(artificialId.substring(beginIndex));
+                }
+
+                final Pattern regex = Pattern.compile(regexbuilder.toString());
+
+                for (final String key : nodeCache.keySet()) {
+                    if (regex.matcher(key).matches()) {
+                        nodes.add(nodeCache.get(key));
+                    }
+                }
+            } else {
+                final DefaultMetaTreeNode node = nodeCache.get(artificialId);
+                if (node != null) {
+                    nodes.add(node);
+                }
+            }
+
+            return nodes;
         } else {
             LOG.warn("cache is invalid, tree ui probably not accurate anymore, perform manual tree refresh"); // NOI18N
         }
@@ -266,17 +304,32 @@ public final class MetaTreeRefreshCache implements TreeModelListener {
                                             + artificialId + "]"); // NOI18N
                             }
 
-                            if (nodeCache.containsKey(artificialId) == insert) {
-                                valid = false;
-                                nodeCache.clear();
+                            // as tree structure changed is also an insert, we should additionally inspect, if the node
+                            // to insert is deep equal to the already present node
+                            final DefaultMetaTreeNode cacheNode = nodeCache.get(artificialId);
 
-                                final String keyword = insert ? "already" : "not";                       // NOI18N
-                                final String message = "the artificial id is " + keyword + " in cache, " // NOI18N
-                                            + "cache corrupt or illegal tree, invalidating cache: "      // NOI18N
-                                            + artificialId;
+                            if ((cacheNode != null) == insert) {
+                                if ((cacheNode != null) && cacheNode.deepEquals(dmtn)) {
+                                    // there was a structural change, but the node itself was not changed at all, we can
+                                    // ignore the change and go on
 
-                                LOG.error(message);
-                                throw new IllegalStateException(message);
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("ignoring already present node: " + dmtn); // NOI18N
+                                    }
+
+                                    continue;
+                                } else {
+                                    valid = false;
+                                    nodeCache.clear();
+
+                                    final String keyword = insert ? "already" : "not";                       // NOI18N
+                                    final String message = "the artificial id is " + keyword + " in cache, " // NOI18N
+                                                + "cache corrupt or illegal tree, invalidating cache: "      // NOI18N
+                                                + artificialId;
+
+                                    LOG.error(message);
+                                    throw new IllegalStateException(message);
+                                }
                             }
 
                             if (insert) {

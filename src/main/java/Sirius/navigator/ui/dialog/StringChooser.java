@@ -40,6 +40,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 /**
  * DOCUMENT ME!
  *
@@ -220,10 +222,9 @@ public class StringChooser extends JDialog // implements ActionListener
             stringList.setSelectedIndex(-1);
         } else {
             stringList.removeAll();
-            // stringList.setListData(new String[]{naMessage});
         }
 
-        super.show();
+        StaticSwingTools.showDialog(this);
     }
 
     /**
@@ -246,8 +247,7 @@ public class StringChooser extends JDialog // implements ActionListener
     public void show(final Collection strings) {
         stringList.setListData(new Vector(strings));
         stringList.setSelectedIndex(-1);
-        super.show();
-        // this.show((String[])strings.toArray(new String[strings.size()]));
+        StaticSwingTools.showDialog(this);
     }
 
     /**

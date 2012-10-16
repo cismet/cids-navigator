@@ -17,7 +17,11 @@ import Sirius.server.middleware.types.Node;
 
 import org.apache.log4j.Logger;
 
+import java.util.HashMap;
+
 import javax.swing.ImageIcon;
+
+import de.cismet.tools.CurrentStackTrace;
 
 /**
  * DOCUMENT ME!
@@ -30,10 +34,33 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     private static final transient Logger LOG = Logger.getLogger(ObjectTreeNode.class);
     private static final ResourceManager resource = ResourceManager.getManager();
+    private static final HashMap<String, ImageIcon> iconCache = new HashMap<String, ImageIcon>();
 
     //~ Instance fields --------------------------------------------------------
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   autoload  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected ImageIcon nodeIcon;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   autoload  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    volatile Boolean metaObjectFilled = false;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   autoload  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     private MetaClass metaClass;
 
     //~ Constructors -----------------------------------------------------------
@@ -47,14 +74,20 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         super(MetaObjectNode);
 
         try {
-            final MetaClass metaClass = this.getMetaClass();
-            if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
-                this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
-            } else {
-                this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif"); // NOI18N
+            final MetaClass myMetaClass = this.getMetaClass();
+            final String classKey = myMetaClass.getID() + "@" + myMetaClass.getDomain();
+
+            nodeIcon = iconCache.get(classKey);
+            if (nodeIcon == null) {
+                if ((myMetaClass != null) && (myMetaClass.getObjectIconData().length > 0)) {
+                    this.nodeIcon = new ImageIcon(myMetaClass.getObjectIconData());
+                } else {
+                    this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif"); // NOI18N
+                }
+                iconCache.put(classKey, nodeIcon);
             }
         } catch (Exception exp) {
-            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");     // NOI18N
+            this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");         // NOI18N
         }
     }
 
@@ -186,25 +219,51 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      *
      * @return  DOCUMENT ME!
      */
-    public final synchronized MetaObject getMetaObject() {
-        if (this.getMetaObjectNode().getObject() == null) {
-            try {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("caching object node"); // NOI18N
+    public final MetaObject getMetaObject() {
+        return getMetaObject(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   autoload  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public final MetaObject getMetaObject(final boolean autoload) {
+        final MetaObjectNode mon = (MetaObjectNode)this.userObject;
+        MetaObject mo = mon.getObject();
+
+        if (!autoload) {
+            return mo;
+        }
+
+        if (mo == null) {
+            synchronized (metaObjectFilled) {
+                mo = mon.getObject();
+                if (mo == null) {
+                    try {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("caching object node", new CurrentStackTrace()); // NOI18N
+                        }
+                        final int oid = mon.getObjectId();
+                        final int cid = mon.getClassId();
+                        final String domain = mon.getDomain();
+                        final MetaObject metaObject = SessionManager.getProxy().getMetaObject(oid, cid, domain);
+                        mon.setObject(metaObject);
+                        metaObjectFilled = true;
+                        if ((mon.getName() == null) || mon.getName().equals("NameWirdGeladen")) {
+                            mon.setName(metaObject.toString());
+                        }
+                        mo = metaObject;
+                    } catch (final Throwable t) {
+                        LOG.error("could not retrieve meta object of node '" + userObject + "'", t);
+                    }
                 }
-                final MetaObject metaObject = SessionManager.getProxy()
-                            .getMetaObject(this.getMetaObjectNode().getObjectId(),
-                                this.getMetaObjectNode().getClassId(),
-                                this.getMetaObjectNode().getDomain());
-                this.getMetaObjectNode().setObject(metaObject);
-                if ((getNode().getName() == null) || getNode().getName().equals("NameWirdGeladen")) {
-                    getNode().setName(metaObject.toString());
-                }
-            } catch (final Throwable t) {
-                LOG.error("could not retrieve meta object of node '" + getMetaObjectNode() + "'", t);
             }
         }
-        return this.getMetaObjectNode().getObject();
+
+        return mo;
     }
 
     /**

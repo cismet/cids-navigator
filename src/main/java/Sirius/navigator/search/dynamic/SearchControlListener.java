@@ -7,11 +7,10 @@
 ****************************************************/
 package Sirius.navigator.search.dynamic;
 
-import Sirius.server.middleware.types.Node;
 import Sirius.server.search.CidsServerSearch;
 
 /**
- * DOCUMENT ME!
+ * A listener which is used by SearchControlPanel to customize the search process.
  *
  * @author   jweintraut
  * @version  $Revision$, $Date$
@@ -21,29 +20,30 @@ public interface SearchControlListener {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Has to assemble a CidsServerSearch which corresponds to the current user input.
      *
-     * @return  DOCUMENT ME!
+     * @return  A CidsServerSearch object reflecting the user input.
      */
     CidsServerSearch assembleSearch();
     /**
-     * DOCUMENT ME!
+     * Is invoked by SearchControlPanel as soon as the user clicks the search button.
      */
     void searchStarted();
     /**
-     * DOCUMENT ME!
+     * Is invoked by SearchControlPanel when the search is done. This means whether the search is done and didn't
+     * provide a result or the SearchResultsTree is updated.
      *
-     * @param  result  DOCUMENT ME!
+     * @param  numberOfResults  Count of result objects.
      */
-    void searchDone(final Node[] result);
+    void searchDone(int numberOfResults);
     /**
-     * DOCUMENT ME!
+     * Invoked by SearchControlPanel when the user canceled the search.
      */
-    void searchCancelled();
+    void searchCanceled();
     /**
-     * DOCUMENT ME!
+     * Tells the SearchControlPanel to suppress or display a message if no result was found.
      *
-     * @return  DOCUMENT ME!
+     * @return  <code>false</code> if SearchControlPanel should display a message if the search didn't provide a result.
      */
-    boolean displaysEmptyResultMessage();
+    boolean suppressEmptyResultMessage();
 }

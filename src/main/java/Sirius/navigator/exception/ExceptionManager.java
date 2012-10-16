@@ -9,6 +9,7 @@ package Sirius.navigator.exception;
 
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
+import Sirius.navigator.ui.ComponentRegistry;
 
 import org.apache.log4j.Logger;
 
@@ -19,6 +20,8 @@ import java.util.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 //import Sirius.navigator.NavigatorLogger;
 //import Sirius.navigator.connection.ConnectionHandler;
@@ -247,7 +250,9 @@ public class ExceptionManager {
             final String name,
             final String message,
             final Throwable exception) {
-        final JDialog exceptionDialog = new JDialog(new JFrame(), true);
+        final JFrame parentFrame = ComponentRegistry.isRegistred() ? ComponentRegistry.getRegistry().getMainWindow()
+                                                                   : new JFrame();
+        final JDialog exceptionDialog = new JDialog(parentFrame, true);
         doShowExceptionDialog(exceptionDialog, level, name, message, exception);
     }
 
@@ -371,7 +376,7 @@ public class ExceptionManager {
     private boolean doShowExitDialog(final JDialog exitDialog) {
         SwingUtilities.updateComponentTreeUI(exitDialog);
         exitDialog.setLocationRelativeTo(exitDialog.getOwner());
-        exitDialog.show();
+        StaticSwingTools.showDialog(exitDialog);
 
         if (exitOption.getValue().equals(
                         org.openide.util.NbBundle.getMessage(
@@ -414,8 +419,7 @@ public class ExceptionManager {
             exceptionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             exceptionDialog.setContentPane(exceptionPane);
             exceptionDialog.pack();
-            exceptionDialog.setLocationRelativeTo(exceptionDialog.getOwner());
-            exceptionDialog.show();
+            StaticSwingTools.showDialog(exceptionDialog);
         }
     }
 
@@ -445,7 +449,7 @@ public class ExceptionManager {
             exceptionDialog.setContentPane(exceptionPane);
             exceptionDialog.pack();
             exceptionDialog.setLocationRelativeTo(exceptionDialog.getOwner());
-            exceptionDialog.show();
+            StaticSwingTools.showDialog(exceptionDialog);
         }
     }
 

@@ -419,6 +419,9 @@ public final class MutableContainer implements GUIContainer {
      * @param  constraints  DOCUMENT ME!
      */
     private void doSelect(final MutableConstraints constraints) {
+        if (!constraints.getView().isClosable()) {
+            constraints.getView().restore();
+        }
         final JTabbedPane tabbedPane = this.getTabbedPaneAt(constraints.getPosition());
 
         if (constraints.getContainerType().equals(MutableConstraints.FLOATINGFRAME)) {

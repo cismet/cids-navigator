@@ -44,7 +44,6 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.plaf.*;
-import javax.swing.plaf.ToolBarUI;
 import javax.swing.plaf.basic.BasicToolBarUI;
 import javax.swing.plaf.metal.MetalToolBarUI;
 
@@ -525,6 +524,11 @@ public class FloatingFrame extends JToolBar {
      */
     private class FloatingFrameMenuBar extends EmbeddedContainer {
 
+        //~ Instance fields ----------------------------------------------------
+
+        /** LOGGER. */
+        private final transient Logger LOG = Logger.getLogger(FloatingFrameMenuBar.class);
+
         //~ Constructors -------------------------------------------------------
 
         /**
@@ -542,14 +546,14 @@ public class FloatingFrame extends JToolBar {
 
         @Override
         public void setVisible(final boolean visible) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("FloatingFrameMenuBar:setVisible(" + visible + ")"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("FloatingFrameMenuBar:setVisible(" + visible + ")"); // NOI18N
             }
             if (SwingUtilities.isEventDispatchThread()) {
                 doSetVisible(visible);
             } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("setVisible(): synchronizing method");           // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("setVisible(): synchronizing method");           // NOI18N
                 }
                 SwingUtilities.invokeLater(new Runnable() {
 
@@ -567,8 +571,8 @@ public class FloatingFrame extends JToolBar {
          * @param  visible  DOCUMENT ME!
          */
         private void doSetVisible(final boolean visible) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("FloatingFrameMenuBar:doSetVisible(" + visible + ")"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("FloatingFrameMenuBar:doSetVisible(" + visible + ")"); // NOI18N
             }
             if (this.isVisible() != visible) {
                 super.setVisible(visible);
@@ -579,14 +583,14 @@ public class FloatingFrame extends JToolBar {
                     this.removeComponents();
                 }
             } else {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
+                this.LOG.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
             }
         }
 
         @Override
         protected void addComponents() {
-            if (logger.isDebugEnabled()) {
-                logger.debug("FloatingFrameMenuBar:addComponents()");     // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("FloatingFrameMenuBar:addComponents()");        // NOI18N
             }
             final ComponentIterator iterator = this.iterator();
             while (iterator.hasNext()) {
@@ -595,7 +599,7 @@ public class FloatingFrame extends JToolBar {
                     if (component instanceof JMenu) {
                         FloatingFrame.this.menuBar.add((JMenu)component);
                     } else {
-                        this.logger.error("addComponents(): invalid object type '" + component.getClass().getName()
+                        this.LOG.error("addComponents(): invalid object type '" + component.getClass().getName()
                                     + "', 'javax.swing.JMenu' expected"); // NOI18N
                     }
                 }
@@ -606,8 +610,8 @@ public class FloatingFrame extends JToolBar {
 
         @Override
         protected void removeComponents() {
-            if (logger.isDebugEnabled()) {
-                logger.debug("FloatingFrameMenuBar:removeComponents()"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("FloatingFrameMenuBar:removeComponents()"); // NOI18N
             }
             FloatingFrame.this.menuBar.removeAll();
             FloatingFrame.this.rootPane.setJMenuBar(null);

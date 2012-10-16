@@ -44,6 +44,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.cismet.tools.gui.StaticSwingTools;
+
 // !!! MANU_NAV: !!!
 //[ISDS PD 12062002]import Sirius.Model.ISDSClient.*;
 
@@ -521,6 +523,10 @@ public class OptionsDialog extends JDialog implements ActionListener {
     public void show() {
         updateNavigatorPanel();
         this.pack();
+        // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
+        // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
+        // setVisible(true) which internally calls JDialog show() -> endless recursion if
+        // StaticSwingTools.showDialog() is called here
         super.show();
     }
 
