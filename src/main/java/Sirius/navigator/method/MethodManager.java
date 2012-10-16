@@ -270,7 +270,7 @@ public class MethodManager {
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append) {
-        showSearchResults(resultNodes, append, null, false);
+        showSearchResults(resultNodes, append, null);
     }
 
     /**
@@ -283,10 +283,8 @@ public class MethodManager {
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append,
-            final PropertyChangeListener listener,
-            final boolean suppressEmptyResultWarning) {
+            final PropertyChangeListener searchResultsTreeListener) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
-            if (!suppressEmptyResultWarning) {
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
                     org.openide.util.NbBundle.getMessage(
                         MethodManager.class,
@@ -295,7 +293,6 @@ public class MethodManager {
                         MethodManager.class,
                         "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
                     JOptionPane.WARNING_MESSAGE);
-            }
         } else {
             ComponentRegistry.getRegistry()
                     .getSearchResultsTree()

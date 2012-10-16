@@ -119,7 +119,7 @@ public final class CidsSearchExecutor {
 
                         final Node[] ret = aln.toArray(new Node[0]);
                         if (!isCancelled()) {
-                            MethodManager.getManager().showSearchResults(ret, false, searchResultsListener, false);
+                            MethodManager.getManager().showSearchResults(ret, false, searchResultsListener);
                         }
                         return ret;
                     }
