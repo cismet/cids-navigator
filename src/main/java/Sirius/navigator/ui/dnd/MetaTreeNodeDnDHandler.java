@@ -19,6 +19,7 @@ import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.tree.*;
 
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
@@ -181,6 +182,29 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node       DOCUMENT ME!
+     * @param   userGroup  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isNodeEditable(final DefaultMetaTreeNode node, final UserGroup userGroup) {
+        final String key = userGroup.getKey().toString();
+
+        // Permission p = SessionManager.getSession().getWritePermission();
+
+        try {
+            return node.isEditable(key, PermissionHolder.WRITEPERMISSION);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(" Node not editable");
+            }
+        } // NOI18N
+        return false;
+    }
+
     @Override
     public void drop(final DropTargetDropEvent dtde) {
         if (logger.isDebugEnabled()) {
@@ -188,31 +212,28 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
         metaTree.repaint();
 
+        final User user = SessionManager.getSession().getUser();
+        final UserGroup userGroup = user.getUserGroup();
+
         boolean nodeEditable = false;
-
-        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-        logger.fatal("check for all userGroups");
-        // TODO check for all userGroups
-
-        final String key = userGroup.getKey().toString();
-
-        // Permission p = SessionManager.getSession().getWritePermission();
-
-        try {
-            nodeEditable = this.metaTree.getSelectedNode().isEditable(key, PermissionHolder.WRITEPERMISSION);
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(" Node not editable");
+        if (userGroup != null) {
+            nodeEditable = isNodeEditable(metaTree.getSelectedNode(), userGroup);
+        } else {
+            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                if (isNodeEditable(metaTree.getSelectedNode(), potentialUserGroup)) {
+                    nodeEditable = true;
+                    break;
+                }
             }
-        } // NOI18N
+        }
 
-        if (this.metaTree.isEditable() && nodeEditable) {
+        if (metaTree.isEditable() && nodeEditable) {
             final Transferable transferable = dtde.getTransferable();
 
             try {
                 if (transferable.isDataFlavorSupported(MetaTreeNodeTransferable.dataFlavors[0])) {
                     final Point location = dtde.getLocation();
-                    final TreePath destinationPath = this.metaTree.getClosestPathForLocation(location.x, location.y);
+                    final TreePath destinationPath = metaTree.getClosestPathForLocation(location.x, location.y);
                     final DefaultMetaTreeNode sourceNode = (DefaultMetaTreeNode)transferable.getTransferData(
                             MetaTreeNodeTransferable.dataFlavors[0]);
                     final TreePath sourcePath = new TreePath(sourceNode.getPath());
@@ -230,7 +251,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                                 destinationNode.getNode(),
                                                 PermissionHolder.WRITEPERMISSION)) {
                                     dtde.dropComplete(MethodManager.getManager().copyNode(
-                                            this.metaTree,
+                                            metaTree,
                                             destinationNode,
                                             sourceNode));
                                 }
@@ -245,7 +266,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                                     sourceNode.getNode(),
                                                     PermissionHolder.WRITEPERMISSION)) {
                                         dtde.dropComplete(MethodManager.getManager().moveNode(
-                                                this.metaTree,
+                                                metaTree,
                                                 destinationNode,
                                                 sourceNode));
                                     }
@@ -262,7 +283,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                                     sourceNode.getNode(),
                                                     PermissionHolder.WRITEPERMISSION)) {
                                         dtde.dropComplete(MethodManager.getManager().linkNode(
-                                                this.metaTree,
+                                                metaTree,
                                                 destinationNode,
                                                 sourceNode));
                                     }
@@ -273,7 +294,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                             default: {
                                 logger.error("unsupported dnd operation: " + dtde.getDropAction());         // NOI18N
                                 JOptionPane.showMessageDialog(
-                                    this.metaTree,
+                                    metaTree,
                                     org.openide.util.NbBundle.getMessage(
                                         MetaTreeNodeDnDHandler.class,
                                         "MetaTreeNodeDnDHandler.drop().unsupportedOperationError.message"), // NOI18N
@@ -296,7 +317,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                     t);                                                                                     // NOI18N
 
                 JOptionPane.showMessageDialog(
-                    this.metaTree,
+                    metaTree,
                     org.openide.util.NbBundle.getMessage(
                         MetaTreeNodeDnDHandler.class,
                         "MetaTreeNodeDnDHandler.drop().unsupportedObjectError.message"), // NOI18N
@@ -309,7 +330,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         } else {
             logger.error("catalog is not editable");                                   // NOI18N
             JOptionPane.showMessageDialog(
-                this.metaTree,
+                metaTree,
                 org.openide.util.NbBundle.getMessage(
                     MetaTreeNodeDnDHandler.class,
                     "MetaTreeNodeDnDHandler.drop().notEditableError.message"),         // NOI18N
