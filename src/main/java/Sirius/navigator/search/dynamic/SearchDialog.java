@@ -20,6 +20,7 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 import Sirius.navigator.ui.tree.SearchSelectionTree;
 
 import Sirius.server.middleware.types.Node;
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserGroup;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
@@ -405,10 +406,15 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
     public void setSearchProperties(final SearchPropertiesBean searchProperties) {
         logger.info("loading search properties"); // NOI18N
         final Collection userGroups = new LinkedList();
-        logger.fatal("check for all userGroups");
-        // TODO check for all userGroups
-        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-        userGroups.add(userGroup.getKey());
+        final User user = SessionManager.getSession().getUser();
+        final UserGroup userGroup = user.getUserGroup();
+        if (userGroup != null) {
+            userGroups.add(userGroup.getKey());
+        } else {
+            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                userGroups.add(potentialUserGroup.getKey());
+            }
+        }
 
         this.searchSelectionTree.setSelectedClassNodeKeys(searchProperties.getClassNodeKeys());
         this.searchFormManager.resetAllForms();
@@ -732,10 +738,15 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                         logger.debug("setting search forms enabled");                       // NOI18N
                     }
                     final Collection userGroups = new LinkedList();
-                    // TODO check for all userGroups
-                    final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-                    userGroups.add(userGroup.getKey());
-
+                    final User user = SessionManager.getSession().getUser();
+                    final UserGroup userGroup = user.getUserGroup();
+                    if (userGroup != null) {
+                        userGroups.add(userGroup.getKey());
+                    } else {
+                        for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                            userGroups.add(potentialUserGroup.getKey());
+                        }
+                    }
                     SearchDialog.this.searchFormManager.setSearchFormsEnabled(SearchDialog.this.searchSelectionTree
                                 .getSelectedClassNodeKeys(),
                         userGroups);
@@ -766,10 +777,15 @@ public class SearchDialog extends JDialog implements StatusChangeSupport {
                         logger.debug("setting search form enabled"); // NOI18N
                     }
                     final Collection userGroups = new LinkedList();
-                    logger.fatal("check for all userGroups");
-                    // TODO check for all userGroups
-                    final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-                    userGroups.add(userGroup.getKey());
+                    final User user = SessionManager.getSession().getUser();
+                    final UserGroup userGroup = user.getUserGroup();
+                    if (userGroup != null) {
+                        userGroups.add(userGroup.getKey());
+                    } else {
+                        for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                            userGroups.add(potentialUserGroup.getKey());
+                        }
+                    }
 
                     SearchDialog.this.searchFormManager.setSearchFormEnabled((SearchForm)e.getItem(),
                         SearchDialog.this.searchSelectionTree.getSelectedClassNodeKeys(),

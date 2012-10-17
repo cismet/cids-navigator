@@ -15,6 +15,7 @@ import Sirius.navigator.plugin.ui.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.*;
 
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserGroup;
 
 import org.apache.log4j.Logger;
@@ -171,14 +172,21 @@ public class PluginRegistry {
                     }
                 }
 
-                if ((pluginDescriptor.getUsers().size() == 0)
-                            || pluginDescriptor.getUsers().contains(SessionManager.getSession().getUser().getName())) {
-                    logger.fatal("check for all userGroups");
-                    // TODO check for all userGroups
-                    final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-                    if ((pluginDescriptor.getUsergroups().size() == 0)
-                                || pluginDescriptor.getUsergroups().contains(
-                                    userGroup.toString())) {
+                final User user = SessionManager.getSession().getUser();
+                if (pluginDescriptor.getUsers().isEmpty() || pluginDescriptor.getUsers().contains(user.getName())) {
+                    final UserGroup userGroup = user.getUserGroup();
+                    boolean containsUserGroup = false;
+                    if (userGroup != null) {
+                        containsUserGroup = pluginDescriptor.getUsergroups().contains(userGroup.toString());
+                    } else {
+                        for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                            if (pluginDescriptor.getUsergroups().contains(potentialUserGroup.toString())) {
+                                containsUserGroup = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (pluginDescriptor.getUsergroups().isEmpty() || containsUserGroup) {
                         try {
                             this.loadPlugin(pluginDescriptor);
                         } catch (Throwable t) {
@@ -196,8 +204,8 @@ public class PluginRegistry {
                             pluginDescriptor.setLoaded(false);
                         }
                     } else {
-                        logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '"
-                                    + SessionManager.getSession().getUser().getUserGroup() + "'");         // NOI18N
+                        logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '" + userGroup
+                                    + "'");                                                                // NOI18N
                     }
                 } else {
                     logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no user  '"

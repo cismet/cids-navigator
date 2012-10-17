@@ -276,12 +276,12 @@ public final class MutablePopupMenu extends JPopupMenu {
                     dynamicObjectNode = false;
 
                     final User u = SessionManager.getSession().getUser();
-                    permission = permission && ((MetaNode)node).getPermissions().hasWritePermission(u.getUserGroup());
+                    permission = permission && ((MetaNode)node).getPermissions().hasWritePermission(u);
 
                     if (node.getClassId() > 0) {
                         final MetaClass metaClass = ClassCacheMultiple.getMetaClass(node.getDomain(),
                                 node.getClassId());
-                        permission = permission && metaClass.getPermissions().hasWritePermission(u.getUserGroup());
+                        permission = permission && metaClass.getPermissions().hasWritePermission(u);
                     }
 
                     try {

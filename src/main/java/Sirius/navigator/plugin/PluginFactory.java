@@ -13,6 +13,7 @@ import Sirius.navigator.plugin.ui.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.embedded.*;
 
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.PermissionHolder;
 
@@ -1032,12 +1033,25 @@ public final class PluginFactory {
                     method = SessionManager.getProxy().getMethod(methodKey);
 
                     if (method != null) {
-                        logger.fatal("check for all userGroups");
-                        // TODO check for all userGroups
-                        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-                        if (method.getPermissions().hasPermission(
-                                        userGroup.getKey(),
-                                        PermissionHolder.READPERMISSION)) {
+                        final User user = SessionManager.getSession().getUser();
+                        final UserGroup userGroup = user.getUserGroup();
+                        final boolean hasPermission;
+                        if (userGroup != null) {
+                            hasPermission = method.getPermissions()
+                                        .hasPermission(userGroup.getKey(), PermissionHolder.READPERMISSION);
+                        } else {
+                            boolean tmpPerm = false;
+                            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                                if (method.getPermissions().hasPermission(
+                                                potentialUserGroup.getKey(),
+                                                PermissionHolder.READPERMISSION)) {
+                                    tmpPerm = true;
+                                    break;
+                                }
+                            }
+                            hasPermission = tmpPerm;
+                        }
+                        if (hasPermission) {
                             final PluginMenuItem menuItem = new PluginMenuItem(methodDescriptor.getMethod(), method);
 
                             this.setItemProperties(menuItem, actionDescriptor);
@@ -1108,12 +1122,25 @@ public final class PluginFactory {
                 try {
                     method = SessionManager.getProxy().getMethod(methodKey);
                     if (method != null) {
-                        logger.fatal("check for all userGroups");
-                        // TODO check for all userGroups
-                        final UserGroup userGroup = SessionManager.getSession().getUser().getUserGroup();
-                        if (method.getPermissions().hasPermission(
-                                        userGroup.getKey(),
-                                        PermissionHolder.READPERMISSION)) {
+                        final User user = SessionManager.getSession().getUser();
+                        final UserGroup userGroup = user.getUserGroup();
+                        final boolean hasPermission;
+                        if (userGroup != null) {
+                            hasPermission = method.getPermissions()
+                                        .hasPermission(userGroup.getKey(), PermissionHolder.READPERMISSION);
+                        } else {
+                            boolean tmpPerm = false;
+                            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                                if (method.getPermissions().hasPermission(
+                                                potentialUserGroup.getKey(),
+                                                PermissionHolder.READPERMISSION)) {
+                                    tmpPerm = true;
+                                    break;
+                                }
+                            }
+                            hasPermission = tmpPerm;
+                        }
+                        if (hasPermission) {
                             final PluginMenuItem menuItem = new PluginMenuItem(methodDescriptor.getMethod(), method);
 
                             this.setItemProperties(menuItem, actionDescriptor);
