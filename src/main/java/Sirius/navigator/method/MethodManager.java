@@ -276,23 +276,22 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  resultNodes                 DOCUMENT ME!
-     * @param  append                      DOCUMENT ME!
-     * @param  listener                    DOCUMENT ME!
-     * @param  suppressEmptyResultWarning  DOCUMENT ME!
+     * @param  resultNodes                DOCUMENT ME!
+     * @param  append                     DOCUMENT ME!
+     * @param  searchResultsTreeListener  listener DOCUMENT ME!
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
-                JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"), // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
-                    JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getSearchDialog(),
+                org.openide.util.NbBundle.getMessage(
+                    MethodManager.class,
+                    "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.message"), // NOI18N
+                org.openide.util.NbBundle.getMessage(
+                    MethodManager.class,
+                    "MethodManager.showSearchResults(Node[],boolean).JOptionPane_anon.title"), // NOI18N
+                JOptionPane.WARNING_MESSAGE);
         } else {
             ComponentRegistry.getRegistry()
                     .getSearchResultsTree()
