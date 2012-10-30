@@ -7,15 +7,13 @@
 ****************************************************/
 package de.cismet.cids.tools.metaobjectrenderer;
 
-import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 
 import Sirius.server.middleware.types.MetaObject;
 
-import javax.swing.JComponent;
+import java.awt.BorderLayout;
 
-import de.cismet.tools.gui.FooterComponentProvider;
-import de.cismet.tools.gui.TitleComponentProvider;
+import javax.swing.JLabel;
 
 /**
  * DOCUMENT ME!
@@ -23,9 +21,7 @@ import de.cismet.tools.gui.TitleComponentProvider;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSizeComponent,
-    TitleComponentProvider,
-    FooterComponentProvider {
+public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSizeComponent {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -40,8 +36,10 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
     private javax.swing.JButton btnShowProblem;
     private javax.swing.JPanel defaultrendererComponent;
     private javax.swing.JPanel footerComponent;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblOopsIcon;
     private javax.swing.JLabel lblOopsText;
@@ -64,6 +62,7 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         initComponents();
         defaultComponent = (DefaultMetaObjectRenderer)new DefaultMetaObjectRenderer().getSingleRenderer(mo, title);
         spDefaultRenderer.setViewportView(defaultComponent);
+        jLabel3.setText(mo.getBean().toString());
 
         final StringBuilder result = new StringBuilder(throwable.toString()).append(NEW_LINE);
 
@@ -88,13 +87,15 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         stracktraceComponent = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tpErrorMessage = new javax.swing.JTextPane();
+        defaultrendererComponent = new javax.swing.JPanel();
+        spDefaultRenderer = new javax.swing.JScrollPane();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
         footerComponent = new javax.swing.JPanel();
         btnShowProblem = new javax.swing.JButton();
         btnDefaultRenderer = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        defaultrendererComponent = new javax.swing.JPanel();
-        spDefaultRenderer = new javax.swing.JScrollPane();
+        jPanel1 = new javax.swing.JPanel();
         panOpps = new javax.swing.JPanel();
         lblOopsText = new javax.swing.JLabel();
         lblOopsIcon = new javax.swing.JLabel();
@@ -108,6 +109,33 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
         jScrollPane1.setViewportView(tpErrorMessage);
 
         stracktraceComponent.add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        defaultrendererComponent.setOpaque(false);
+        defaultrendererComponent.setLayout(new java.awt.BorderLayout());
+
+        spDefaultRenderer.setOpaque(false);
+        defaultrendererComponent.add(spDefaultRenderer, java.awt.BorderLayout.CENTER);
+
+        setOpaque(false);
+        setLayout(new java.awt.GridBagLayout());
+
+        jPanel3.setOpaque(false);
+        jPanel3.setLayout(new java.awt.BorderLayout());
+
+        jPanel2.setOpaque(false);
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jLabel3.setFont(new java.awt.Font("Tahoma", 1, 18));
+        jLabel3.setForeground(new java.awt.Color(127, 127, 127));
+        jLabel3.setText(org.openide.util.NbBundle.getMessage(ErrorRenderer.class, "ErrorRenderer.jLabel3.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 10, 0);
+        jPanel2.add(jLabel3, gridBagConstraints);
+
+        jPanel3.add(jPanel2, java.awt.BorderLayout.NORTH);
 
         footerComponent.setOpaque(false);
         footerComponent.setLayout(new java.awt.GridBagLayout());
@@ -126,12 +154,12 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
+        gridBagConstraints.insets = new java.awt.Insets(10, 0, 0, 10);
         footerComponent.add(btnShowProblem, gridBagConstraints);
 
         btnDefaultRenderer.setText(org.openide.util.NbBundle.getMessage(
@@ -148,48 +176,34 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 0, 0);
         footerComponent.add(btnDefaultRenderer, gridBagConstraints);
 
-        jLabel1.setText(org.openide.util.NbBundle.getMessage(ErrorRenderer.class, "ErrorRenderer.jLabel1.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        footerComponent.add(jLabel1, gridBagConstraints);
+        jPanel3.add(footerComponent, java.awt.BorderLayout.SOUTH);
 
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(ErrorRenderer.class, "ErrorRenderer.jLabel2.text")); // NOI18N
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1.0;
-        footerComponent.add(jLabel2, gridBagConstraints);
-
-        defaultrendererComponent.setOpaque(false);
-        defaultrendererComponent.setLayout(new java.awt.BorderLayout());
-
-        spDefaultRenderer.setOpaque(false);
-        defaultrendererComponent.add(spDefaultRenderer, java.awt.BorderLayout.CENTER);
-
-        setOpaque(false);
-        setLayout(new java.awt.BorderLayout());
+        jPanel1.setOpaque(false);
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         panOpps.setOpaque(false);
         panOpps.setLayout(new java.awt.GridBagLayout());
 
-        lblOopsText.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        lblOopsText.setFont(new java.awt.Font("Ubuntu", 1, 18));                                     // NOI18N
         lblOopsText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblOopsText.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/de/cismet/cids/tools/metaobjectrenderer/error_text.png"))); // NOI18N
         lblOopsText.setText(org.openide.util.NbBundle.getMessage(
                 ErrorRenderer.class,
-                "ErrorRenderer.lblOopsText.text"));              // NOI18N
+                "ErrorRenderer.lblOopsText.text"));                                                  // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(25, 0, 0, 0);
         panOpps.add(lblOopsText, gridBagConstraints);
 
         lblOopsIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -200,12 +214,23 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
                 "ErrorRenderer.lblOopsIcon.text"));                                                    // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 25, 0);
         panOpps.add(lblOopsIcon, gridBagConstraints);
 
-        add(panOpps, java.awt.BorderLayout.CENTER);
+        jPanel1.add(panOpps, java.awt.BorderLayout.CENTER);
+
+        jPanel3.add(jPanel1, java.awt.BorderLayout.CENTER);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        add(jPanel3, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -214,8 +239,8 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
      * @param  evt  DOCUMENT ME!
      */
     private void btnDefaultRendererActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnDefaultRendererActionPerformed
-        removeAll();
-        add(defaultrendererComponent);
+        jPanel1.removeAll();
+        jPanel1.add(defaultrendererComponent, BorderLayout.CENTER);
         validate();
         repaint();
     }                                                                                      //GEN-LAST:event_btnDefaultRendererActionPerformed
@@ -226,19 +251,9 @@ public class ErrorRenderer extends javax.swing.JPanel implements RequestsFullSiz
      * @param  evt  DOCUMENT ME!
      */
     private void btnShowProblemActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnShowProblemActionPerformed
-        removeAll();
-        add(stracktraceComponent);
+        jPanel1.removeAll();
+        jPanel1.add(stracktraceComponent);
         validate();
         repaint();
     }                                                                                  //GEN-LAST:event_btnShowProblemActionPerformed
-
-    @Override
-    public JComponent getTitleComponent() {
-        return defaultComponent.getTitleComponent();
-    }
-
-    @Override
-    public JComponent getFooterComponent() {
-        return footerComponent;
-    }
 }
