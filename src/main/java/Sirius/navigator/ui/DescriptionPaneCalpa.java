@@ -16,6 +16,7 @@ import calpa.html.DefaultCalHTMLObserver;
 
 import java.awt.EventQueue;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 /**
@@ -113,28 +114,6 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     }
 
     /**
-     * Show a blank page.
-     */
-    @Override
-    public void clear() {
-        final Runnable clearRunnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    htmlPane.showHTMLDocument("");
-                    removeAndDisposeAllRendererFromPanel();
-                    repaint();
-                }
-            };
-
-        if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(clearRunnable);
-        } else {
-            clearRunnable.run();
-        }
-    }
-
-    /**
      * Loads the given URI and renders the referenced document. Shows an error page if loading causes an error.
      *
      * @param  page  An URI to an HTML document.
@@ -148,30 +127,53 @@ public class DescriptionPaneCalpa extends DescriptionPane {
                     page));
         }
 
-        try {
-            if ((page == null) || (page.trim().length() <= 0)) {
-                setPageFromContent(blankPage);
-            } else {
-                htmlPane.stopAll();
-                htmlPane.showHTMLDocument(new URL(page));
+        if ((page == null) || (page.trim().length() <= 0)) {
+            startNoDescriptionRenderer();
+        } else {
+            try {
+                final URL url = new URL(page);
+                final HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();
+                httpUrlConnection.setRequestMethod("HEAD");
+                httpUrlConnection.connect();
+                final int responseCode = httpUrlConnection.getResponseCode();
+                if (responseCode == 200) {
+                    htmlPane.stopAll();
+                    htmlPane.showHTMLDocument(url);
+                } else {
+                    setPageFromContent(
+                        errorPage,
+                        getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml")
+                                    .toString());
+
+                    statusChangeSupport.fireStatusChange(
+                        org.openide.util.NbBundle.getMessage(
+                            DescriptionPaneCalpa.class,
+                            "DescriptionPaneCalpa.setPageFromURI(String).error",
+                            page), // NOI18N
+                        Status.MESSAGE_POSITION_3,
+                        Status.ICON_DEACTIVATED,
+                        Status.ICON_ACTIVATED);
+                }
+            } catch (final Exception e) {
+                LOG.error(org.openide.util.NbBundle.getMessage(
+                        DescriptionPaneCalpa.class,
+                        "DescriptionPaneCalpa.setPageFromURI(String).error",
+                        page),
+                    e);   // NOI18N
+
+                setPageFromContent(
+                    errorPage,
+                    getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml").toString());
+
+                statusChangeSupport.fireStatusChange(
+                    org.openide.util.NbBundle.getMessage(
+                        DescriptionPaneCalpa.class,
+                        "DescriptionPaneCalpa.setPageFromURI(String).error",
+                        page), // NOI18N
+                    Status.MESSAGE_POSITION_3,
+                    Status.ICON_DEACTIVATED,
+                    Status.ICON_ACTIVATED);
             }
-        } catch (Exception e) {
-            LOG.error(org.openide.util.NbBundle.getMessage(
-                    DescriptionPaneCalpa.class,
-                    "DescriptionPaneCalpa.setPageFromURI(String).error",
-                    page),
-                e); // NOI18N
-
-            htmlPane.showHTMLDocument(""); // NOI18N
-
-            statusChangeSupport.fireStatusChange(
-                org.openide.util.NbBundle.getMessage(
-                    DescriptionPaneCalpa.class,
-                    "DescriptionPaneCalpa.setPageFromURI(String).error",
-                    page), // NOI18N
-                Status.MESSAGE_POSITION_3,
-                Status.ICON_DEACTIVATED,
-                Status.ICON_ACTIVATED);
         }
     }
 
