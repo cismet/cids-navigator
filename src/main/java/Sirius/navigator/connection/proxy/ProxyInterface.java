@@ -14,8 +14,6 @@ import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
-import Sirius.server.newuser.User;
-import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchResult;
 
@@ -23,6 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.CidsServerSearch;
 
 /**
  * Default implementation of the connection proxy interface.
