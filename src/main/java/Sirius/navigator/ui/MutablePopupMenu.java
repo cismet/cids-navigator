@@ -9,6 +9,7 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.NavigatorConcurrency;
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.method.MethodAvailability;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.interfaces.PluginMethod;
@@ -66,6 +67,7 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
@@ -272,6 +274,15 @@ public final class MutablePopupMenu extends JPopupMenu {
                         classNode = true;
                     }
                     dynamicObjectNode = false;
+
+                    final User u = SessionManager.getSession().getUser();
+                    permission = permission && ((MetaNode)node).getPermissions().hasWritePermission(u.getUserGroup());
+
+                    if (node.getClassId() > 0) {
+                        final MetaClass metaClass = ClassCacheMultiple.getMetaClass(node.getDomain(),
+                                node.getClassId());
+                        permission = permission && metaClass.getPermissions().hasWritePermission(u.getUserGroup());
+                    }
 
                     try {
                         final int classID = node.getClassId();
@@ -506,7 +517,7 @@ public final class MutablePopupMenu extends JPopupMenu {
          * Creates a new NewObjectMethod object.
          */
         public NewObjectMethod() {
-            super(MethodManager.CLASS_NODE + MethodManager.SINGLE);
+            super(MethodManager.CLASS_NODE + MethodManager.SINGLE + MethodManager.WRITE);
             this.pluginMethod = this;
 
             this.setText(org.openide.util.NbBundle.getMessage(
@@ -528,7 +539,7 @@ public final class MutablePopupMenu extends JPopupMenu {
         public void init(final int classID, final String domain) throws Exception {
             this.classID = classID;
             this.domain = domain;
-            metaClass = SessionManager.getProxy().getMetaClass(classID, domain);
+            metaClass = ClassCacheMultiple.getMetaClass(domain, classID);
             this.setText(org.openide.util.NbBundle.getMessage(
                     MutablePopupMenu.class,
                     "MutablePopupMenu.NewObjectMethod.text",
@@ -660,37 +671,41 @@ public final class MutablePopupMenu extends JPopupMenu {
                     }
                 }
 
-                final int option = JOptionPane.showOptionDialog(
-                        ComponentRegistry.getRegistry().getMainWindow(),
-                        org.openide.util.NbBundle.getMessage(
-                            MutablePopupMenu.class,
-                            "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.message",
-                            new Object[] { String.valueOf(selectedNodes.length) }),                        // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            MutablePopupMenu.class,
-                            "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.title"),             // NOI18N
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.QUESTION_MESSAGE,
-                        null,
-                        new String[] {
+                if (selectedNodes.length > 1) {
+                    final int option = JOptionPane.showOptionDialog(
+                            ComponentRegistry.getRegistry().getMainWindow(),
                             org.openide.util.NbBundle.getMessage(
                                 MutablePopupMenu.class,
-                                "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.option.commit"), // NOI18N
+                                "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.message",
+                                new Object[] { String.valueOf(selectedNodes.length) }),                        // NOI18N
                             org.openide.util.NbBundle.getMessage(
                                 MutablePopupMenu.class,
-                                "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.option.cancel")
-                        },                                                                                 // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            MutablePopupMenu.class,
-                            "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.option.cancel"));
-                if (option != JOptionPane.YES_OPTION) {
-                    return;
+                                "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.title"),             // NOI18N
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            new String[] {
+                                org.openide.util.NbBundle.getMessage(
+                                    MutablePopupMenu.class,
+                                    "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.option.commit"), // NOI18N
+                                org.openide.util.NbBundle.getMessage(
+                                    MutablePopupMenu.class,
+                                    "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.option.cancel")
+                            },                                                                                 // NOI18N
+                            org.openide.util.NbBundle.getMessage(
+                                MutablePopupMenu.class,
+                                "MutablePopupMenu.DeleteObjectMethod.invoke().JOptionPane.option.cancel"));
+                    if (option != JOptionPane.YES_OPTION) {
+                        return;
+                    }
                 }
 
                 boolean deleted = false;
                 for (final DefaultMetaTreeNode tmp : selectedNodes) {
-                    final boolean deletedSingleNode = MethodManager.getManager().deleteNode(currentTree, tmp, false);
+                    final boolean deletedSingleNode = MethodManager.getManager()
+                                .deleteNode(currentTree, tmp, (selectedNodes.length == 1));
                     deleted = deleted | deletedSingleNode;
+
                     if (deletedSingleNode) {
                         try {
                             MetaTreeNodeVisualization.getInstance().removeVisualization(tmp);
@@ -699,18 +714,19 @@ public final class MutablePopupMenu extends JPopupMenu {
                         }
                     }
                 }
+
                 if (deleted) {
                     ComponentRegistry.getRegistry().getDescriptionPane().clear();
                 }
             } else {
-                LOG.warn("cannot delete node, because there is no node selected."); // NOI18N
+                LOG.warn("cannot delete node, because there is no node selected.");                  // NOI18N
                 JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                     org.openide.util.NbBundle.getMessage(
                         MutablePopupMenu.class,
                         "MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.message"), // NOI18N
                     org.openide.util.NbBundle.getMessage(
                         MutablePopupMenu.class,
-                        "MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.title"), // NOI18N
+                        "MutablePopupMenu.DeleteObjectMethod.invoke().deleteObjectMessage.title"),   // NOI18N
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }

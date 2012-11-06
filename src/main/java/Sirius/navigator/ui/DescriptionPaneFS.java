@@ -101,31 +101,6 @@ public class DescriptionPaneFS extends DescriptionPane {
     }
 
     /**
-     * Show the blank page.
-     */
-    @Override
-    public void clear() {
-        final Runnable clearRunnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    setPageFromContent(
-                        blankPage,
-                        getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml")
-                                    .toString());
-                    removeAndDisposeAllRendererFromPanel();
-                    repaint();
-                }
-            };
-
-        if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(clearRunnable);
-        } else {
-            clearRunnable.run();
-        }
-    }
-
-    /**
      * Loads the given URI and renders the referenced XHTML document. Shows an error page if loading causes an error.
      *
      * @param  page  An URI to an XHTML document.
@@ -141,9 +116,7 @@ public class DescriptionPaneFS extends DescriptionPane {
 
         try {
             if ((page == null) || (page.trim().length() <= 0)) {
-                setPageFromContent(
-                    blankPage,
-                    getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml").toString());
+                startNoDescriptionRenderer();
             } else {
                 pageURI = page;
                 xHTMLPanel1.setDocument(page);

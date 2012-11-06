@@ -137,7 +137,7 @@ public class CidsObjectRendererFactory {
             }
         } catch (Throwable e) {
             log.error("Error during creating the renderer.", e); // NOI18N
-            rendererComp = new ErrorRenderer(e, mo, title);
+            return new ErrorRenderer(e, mo, title);
         }
 //                singleRenderer.put(mo.getMetaClass(), rendererComp);
         if ((cw != null) && !(rendererComp instanceof DoNotWrap)) {

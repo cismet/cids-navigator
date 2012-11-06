@@ -127,7 +127,6 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
         btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
                 SearchControlPanel.class,
                 "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
-        btnSearchCancel.setFocusPainted(false);
         btnSearchCancel.setMaximumSize(new java.awt.Dimension(
                 100,
                 (new Double(getMaximumSize().getHeight()).intValue())));

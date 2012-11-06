@@ -20,6 +20,7 @@ import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
+import Sirius.navigator.resource.PropertyManager;
 
 import Sirius.server.middleware.interfaces.proxy.CatalogueService;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
@@ -61,6 +62,8 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
 import de.cismet.cids.utils.jasperreports.CidsBeanDataSource;
+
+import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -136,6 +139,51 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass) throws Exception {
+        System.out.println("start");
+        // lookup des callservers
+        final Remote r;
+        final SearchService ss;
+        final CatalogueService cat;
+        final MetaService meta;
+        final UserService us;
+        final User u;
+
+        Log4JQuickConfig.configure4LumbermillOnLocalhost();
+        final ConnectionInfo info = new ConnectionInfo();
+        info.setCallserverURL("http://localhost:9986/callserver/binary");
+        info.setUsername(user);
+        info.setUsergroup(group);
+        info.setPassword(pass);
+        info.setUserDomain(domain);
+        info.setUsergroupDomain(domain);
+
+        final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
+                    .createConnection(
+                        "Sirius.navigator.connection.RESTfulConnection",
+                        info.getCallserverURL(),
+                        Proxy.fromPreferences());
+        final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
+        final ConnectionProxy conProxy = ConnectionFactory.getFactory()
+                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+        SessionManager.init(conProxy);
+
+        ClassCacheMultiple.setInstance(domain);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   domain    DOCUMENT ME!
      * @param   group     DOCUMENT ME!
      * @param   user      DOCUMENT ME!
@@ -155,6 +203,40 @@ public class DevelopmentTools {
             final int objectId) throws Exception {
         if (!SessionManager.isInitialized()) {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
+        }
+        System.out.println("MO abfragen");
+
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+
+        final MetaObject mo = SessionManager.getConnection()
+                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+        final CidsBean cidsBean = mo.getBean();
+        System.out.println("cidsBean erzeugt");
+        return cidsBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createCidsBeanFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId) throws Exception {
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromRestfulConnectionOnLocalhost(domain, group, user, pass);
         }
         System.out.println("MO abfragen");
 
