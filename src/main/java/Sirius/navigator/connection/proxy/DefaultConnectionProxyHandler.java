@@ -22,8 +22,6 @@ import Sirius.server.search.SearchResult;
 
 import Sirius.util.image.ImageHashMap;
 
-import java.io.File;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -36,7 +34,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.search.AbstractCidsServerSearch;
+import de.cismet.cids.server.search.CidsServerSearch;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -677,7 +675,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
-        public Collection customServerSearch(final AbstractCidsServerSearch serverSearch) throws ConnectionException {
+        public Collection customServerSearch(final CidsServerSearch serverSearch) throws ConnectionException {
             return connection.customServerSearch(session.getUser(), serverSearch);
         }
 
