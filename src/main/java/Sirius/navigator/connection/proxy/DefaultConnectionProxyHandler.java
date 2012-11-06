@@ -16,7 +16,6 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
-import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
@@ -37,6 +36,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.AbstractCidsServerSearch;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -677,7 +677,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
-        public Collection customServerSearch(final CidsServerSearch serverSearch) throws ConnectionException {
+        public Collection customServerSearch(final AbstractCidsServerSearch serverSearch) throws ConnectionException {
             return connection.customServerSearch(session.getUser(), serverSearch);
         }
 
