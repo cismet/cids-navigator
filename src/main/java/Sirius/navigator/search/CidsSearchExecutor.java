@@ -15,7 +15,6 @@ import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
 
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.CidsServerSearch;
 
 import java.awt.EventQueue;
 
@@ -26,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.SwingWorker;
+
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -54,7 +55,7 @@ public final class CidsSearchExecutor {
      *
      * @param  search  DOCUMENT ME!
      */
-    public static void searchAndDisplayResultsWithDialog(final CidsServerSearch search) {
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search) {
         if (searchControlDialog == null) {
             searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
             searchControlDialog.pack();
@@ -81,7 +82,7 @@ public final class CidsSearchExecutor {
      *
      * @return  DOCUMENT ME!
      */
-    public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final CidsServerSearch search,
+    public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener listener,
             final PropertyChangeListener searchResultsListener) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
@@ -165,7 +166,7 @@ public final class CidsSearchExecutor {
      *
      * @return  DOCUMENT ME!
      */
-    public static SwingWorker<Node[], Void> searchAndDisplayResults(final CidsServerSearch search,
+    public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage) {

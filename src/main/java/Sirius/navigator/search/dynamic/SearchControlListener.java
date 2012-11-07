@@ -7,7 +7,7 @@
 ****************************************************/
 package Sirius.navigator.search.dynamic;
 
-import Sirius.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 /**
  * A listener which is used by SearchControlPanel to customize the search process.
@@ -20,11 +20,11 @@ public interface SearchControlListener {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * Has to assemble a CidsServerSearch which corresponds to the current user input.
+     * Has to assemble a AbstractCidsServerSearch which corresponds to the current user input.
      *
-     * @return  A CidsServerSearch object reflecting the user input.
+     * @return  A AbstractCidsServerSearch object reflecting the user input.
      */
-    CidsServerSearch assembleSearch();
+    MetaObjectNodeServerSearch assembleSearch();
     /**
      * Is invoked by SearchControlPanel as soon as the user clicks the search button.
      */

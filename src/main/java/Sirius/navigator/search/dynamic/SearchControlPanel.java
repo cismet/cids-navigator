@@ -16,7 +16,6 @@ import Sirius.navigator.search.CidsSearchExecutor;
 import Sirius.navigator.ui.ComponentRegistry;
 
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.CidsServerSearch;
 
 import org.apache.log4j.Logger;
 
@@ -36,6 +35,8 @@ import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
+
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -171,7 +172,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 return;
             }
 
-            final CidsServerSearch search = listener.assembleSearch();
+            final MetaObjectNodeServerSearch search = listener.assembleSearch();
             if (search == null) {
                 LOG.warn("The listener didn't provide a search.");
                 return;
