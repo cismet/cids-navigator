@@ -7,6 +7,8 @@
 ****************************************************/
 package Sirius.navigator.connection;
 
+import Sirius.navigator.exception.ConnectionException;
+
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
@@ -83,6 +85,8 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
                 final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
                 error = (status == 503) || (status == 407);
             }
+        } else if (exception instanceof IllegalArgumentException) {
+            error = true;
         } else if (exception instanceof ClientHandlerException) {
             error = true;
         }
