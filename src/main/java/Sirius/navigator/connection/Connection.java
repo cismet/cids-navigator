@@ -20,7 +20,6 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.CidsServerSearch;
 import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
@@ -28,8 +27,6 @@ import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
-
-import java.io.File;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +36,7 @@ import javax.swing.Icon;
 
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.netutil.Proxy;
 
