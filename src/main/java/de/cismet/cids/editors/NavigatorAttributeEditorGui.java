@@ -195,6 +195,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                             clear();
                         }
                     } else {
+                        if (currentBeanStore instanceof EditorSaveListener) {
+                            ((EditorSaveListener)currentBeanStore).editorClosed(
+                                new EditorClosedEvent(
+                                    EditorSaveListener.EditorSaveStatus.CANCELED));
+                        }
                         clear();
                     }
                 }

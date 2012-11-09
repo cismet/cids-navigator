@@ -201,8 +201,7 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + userLsName
                         + " :: "                       // NOI18N
                         + userName
-                        + " :: "                       // NOI18N
-                        + password;
+                        + " :: ****";
             LOG.error(message, e);
             throw e;
         } catch (final Exception e) {
@@ -214,8 +213,7 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + userLsName
                         + " :: "                       // NOI18N
                         + userName
-                        + " :: "                       // NOI18N
-                        + password;
+                        + " :: ****";                  // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }
