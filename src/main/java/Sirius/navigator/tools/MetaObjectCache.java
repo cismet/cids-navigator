@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 
 import java.lang.ref.SoftReference;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -36,11 +37,11 @@ public class MetaObjectCache {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final transient ReentrantReadWriteLock rwLock;
     // we're soft-referencing the whole array so that we can be sure that the whole array will be collected and not only
     // single items of the array. if there is a need for additional cache access methods we'll have to change the data
     // store anyway
     private final transient Map<Integer, SoftReference<MetaObject[]>> cache;
+    private final transient Map<Integer, ReentrantReadWriteLock> locks;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -48,8 +49,8 @@ public class MetaObjectCache {
      * Creates a new MetaSearchCache object.
      */
     private MetaObjectCache() {
-        rwLock = new ReentrantReadWriteLock();
         cache = new HashMap<Integer, SoftReference<MetaObject[]>>();
+        locks = new HashMap<Integer, ReentrantReadWriteLock>();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -74,13 +75,13 @@ public class MetaObjectCache {
      */
     public MetaObject[] get(final String query) {
         try {
-            rwLock.readLock().lock();
+            getLock(query.intern().hashCode()).readLock().lock();
 
             final SoftReference<MetaObject[]> objs = cache.get(query.intern().hashCode());
 
             return (objs == null) ? null : objs.get();
         } finally {
-            rwLock.readLock().unlock();
+            getLock(query.intern().hashCode()).readLock().unlock();
         }
     }
 
@@ -94,24 +95,32 @@ public class MetaObjectCache {
      */
     public void put(final String query, final MetaObject[] value) {
         try {
-            rwLock.writeLock().lock();
+            getLock(query.intern().hashCode()).writeLock().lock();
 
             cache.put(query.intern().hashCode(), new SoftReference<MetaObject[]>(value));
         } finally {
-            rwLock.writeLock().unlock();
+            getLock(query.intern().hashCode()).writeLock().unlock();
         }
     }
 
     /**
      * Completely wipes the cache content.
      */
-    public void clearCache() {
+    public synchronized void clearCache() {
         try {
-            rwLock.writeLock().lock();
+            final Collection<ReentrantReadWriteLock> c = getAllLocks();
+
+            for (final ReentrantReadWriteLock tmp : c) {
+                tmp.writeLock().lock();
+            }
 
             cache.clear();
         } finally {
-            rwLock.writeLock().unlock();
+            final Collection<ReentrantReadWriteLock> c = getAllLocks();
+
+            for (final ReentrantReadWriteLock tmp : c) {
+                tmp.writeLock().unlock();
+            }
         }
     }
 
@@ -124,13 +133,13 @@ public class MetaObjectCache {
      */
     public MetaObject[] clearCache(final String query) {
         try {
-            rwLock.writeLock().lock();
+            getLock(query.intern().hashCode()).writeLock().lock();
 
             final SoftReference<MetaObject[]> objs = cache.put(query.intern().hashCode(), null);
 
             return (objs == null) ? null : objs.get();
         } finally {
-            rwLock.writeLock().unlock();
+            getLock(query.intern().hashCode()).writeLock().unlock();
         }
     }
 
@@ -202,7 +211,7 @@ public class MetaObjectCache {
         MetaObject[] cachedObjects = null;
         Lock lock = null;
         try {
-            lock = rwLock.readLock();
+            lock = getLock(qHash).readLock();
             lock.lock();
 
             SoftReference<MetaObject[]> objs = cache.get(qHash);
@@ -210,7 +219,7 @@ public class MetaObjectCache {
 
             if ((cachedObjects == null) || forceReload) {
                 lock.unlock();
-                lock = rwLock.writeLock();
+                lock = getLock(qHash).writeLock();
                 lock.lock();
 
                 final boolean wasEmpty = cachedObjects == null;
@@ -251,6 +260,33 @@ public class MetaObjectCache {
         }
 
         return cachedObjects;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   hash  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private synchronized ReentrantReadWriteLock getLock(final int hash) {
+        ReentrantReadWriteLock lock = locks.get(hash);
+
+        if (lock == null) {
+            lock = new ReentrantReadWriteLock();
+            locks.put(hash, lock);
+        }
+
+        return lock;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private synchronized Collection<ReentrantReadWriteLock> getAllLocks() {
+        return locks.values();
     }
 
     //~ Inner Classes ----------------------------------------------------------
