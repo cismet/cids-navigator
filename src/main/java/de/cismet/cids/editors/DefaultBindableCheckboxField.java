@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
+import javax.swing.border.EmptyBorder;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
@@ -210,6 +211,8 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                                 box.addActionListener(DefaultBindableCheckboxField.this);
                                 box.setOpaque(false);
                                 box.setContentAreaFilled(false);
+                                box.setFocusPainted(false);
+                                box.setBorder(new EmptyBorder(2, 2, 0, 2));
                                 add(box);
                                 boxToObjectMapping.put(box, tmpMc);
                             }
