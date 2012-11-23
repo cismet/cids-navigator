@@ -15,9 +15,14 @@ package Sirius.navigator.ui.dnd;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.tree.*;
 
+import Sirius.server.middleware.types.MetaObjectNode;
+
 import org.apache.log4j.Logger;
 
 import java.awt.datatransfer.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DOCUMENT ME!
@@ -34,6 +39,7 @@ public class MetaTreeNodeTransferable implements MetaTransferable {
     //~ Instance fields --------------------------------------------------------
 
     private MetaCatalogueTree metaCatalogueTree;
+    private List<DefaultMetaTreeNode> metaNodes;
 
     /** Holds value of property transferAction. */
     private int transferAction;
@@ -49,6 +55,16 @@ public class MetaTreeNodeTransferable implements MetaTransferable {
         this.metaCatalogueTree = metaCatalogueTree;
     }
 
+    /**
+     * Creates a new instance of MetaTreeNodeTransferable. If you use this constructor, the getTransferData method will
+     * not return the selected node of a tree, but the given metaTreeNodes
+     *
+     * @param  metaNode  DOCUMENT ME!
+     */
+    public MetaTreeNodeTransferable(final List<DefaultMetaTreeNode> metaNode) {
+        this.metaNodes = metaNode;
+    }
+
     //~ Methods ----------------------------------------------------------------
 
     @Override
@@ -57,10 +73,18 @@ public class MetaTreeNodeTransferable implements MetaTransferable {
             if (getTransferDataFlavors()[0].equals(flavor)) {
                 // Logger.getLogger(MetaTreeNodeTransferable.class).debug("getTransferData(): MetaTreeNode");
 
-                return this.metaCatalogueTree.getSelectedNode();
+                if (this.metaCatalogueTree != null) {
+                    return this.metaCatalogueTree.getSelectedNode();
+                } else {
+                    return this.metaNodes.get(0);
+                }
             } else if (getTransferDataFlavors()[1].equals(flavor)) {
                 // Logger.getLogger(MetaTreeNodeTransferable.class).debug("getTransferData(): Collection of nodes");
-                return this.metaCatalogueTree.getSelectedNodes();
+                if (this.metaCatalogueTree != null) {
+                    return this.metaCatalogueTree.getSelectedNodes();
+                } else {
+                    return metaNodes;
+                }
             } else {
                 Logger.getLogger(MetaTreeNodeTransferable.class).warn("getTransferData(): UnsupportedFlavorException"); // NOI18N
                 throw new UnsupportedFlavorException(flavor);
