@@ -570,6 +570,179 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param  to             DOCUMENT ME!
      * @param  optionalTitle  DOCUMENT ME!
      */
+    public void gotoMetaObjects(final MetaObject[] to, final String optionalTitle) {
+        if (to.length == 1) {
+            gotoMetaObject(to[0], optionalTitle);
+        } else {
+            if (worker != null) {
+                worker.cancel(true);
+                worker = null;
+            }
+            showObjects();
+            clear();
+
+            worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
+
+                    final List<JComponent> all = new ArrayList<JComponent>();
+                    boolean multipleClasses = false;
+                    boolean initialized = false;
+
+                    @Override
+                    protected SelfDisposingPanel doInBackground() throws Exception {
+                        final MultiMap objectsByClass = new MultiMap();
+                        for (final MetaObject object : to) {
+                            if (object != null) {
+                                objectsByClass.put(object.getMetaClass(), object);
+                            }
+                        }
+                        final Iterator it = objectsByClass.keySet().iterator();
+                        multipleClasses = objectsByClass.keySet().size() > 1;
+                        while (it.hasNext() && !isCancelled()) {
+                            final Object key = it.next();
+                            final List<MetaObject> list = (List<MetaObject>)objectsByClass.get(key);
+
+                            final List<MetaObject> toColl = new ArrayList<MetaObject>();
+                            for (final MetaObject mo : to) {
+                                toColl.add(mo);
+                            }
+                            final MetaClass mc = ((MetaObject)toColl.toArray()[0]).getMetaClass();
+
+                            // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden
+                            // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
+                            JComponent aggrRendererTester = null;
+
+                            if (list.size() > 1) {
+                                aggrRendererTester = CidsObjectRendererFactory.getInstance()
+                                            .getAggregationRenderer(toColl, mc.getName() + " (" + toColl.size() + ")"); // NOI18N
+                            }
+                            if (aggrRendererTester == null) {
+                                LOG.warn("AggregationRenderer was null. Will use SingleRenderer");                      // NOI18N
+                                for (final Object object : list) {
+                                    final ObjectTreeNode otn = (ObjectTreeNode)object;
+                                    final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
+                                            CidsObjectRendererFactory.getInstance().getSingleRenderer(
+                                                otn.getMetaObject(),
+                                                otn.getMetaClass().getName()
+                                                        + ": "
+                                                        + otn));
+                                    final CidsBean bean = otn.getMetaObject().getBean();
+                                    final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+
+                                            @Override
+                                            public void propertyChange(final PropertyChangeEvent evt) {
+                                                comp.repaint();
+                                            }
+                                        };
+                                    bean.addPropertyChangeListener(WeakListeners.propertyChange(
+                                            propertyChangeListener,
+                                            bean));
+                                    comp.setStrongListenerReference(propertyChangeListener);
+                                    publish(comp);
+                                }
+                            } else {
+                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
+                                publish(comp);
+                            }
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        all.clear();
+                        if (worker == this) {
+                            worker = null;
+                        }
+                    }
+
+                    @Override
+                    protected void process(final List<SelfDisposingPanel> chunks) {
+                        int y = all.size();
+
+                        if (!initialized) {
+                            showsWaitScreen = false;
+                            removeAndDisposeAllRendererFromPanel();
+                            gridBagConstraints = new java.awt.GridBagConstraints();
+                            gridBagConstraints.gridx = 0;
+                            gridBagConstraints.gridy = 0;
+                            gridBagConstraints.weightx = 1;
+                            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                            initialized = true;
+                        }
+
+                        if ((chunks.size() == 1) && (y == 0)) {
+                            final SelfDisposingPanel sdp = chunks.get(0);
+                            if (sdp instanceof RequestsFullSizeComponent) {
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info("Renderer is FullSize Component!"); // NOI18N
+                                }
+
+                                fullScreenRenderer = true;
+
+                                panObjects.remove(scpRenderer);
+                                panObjects.add(panRenderer, BorderLayout.CENTER);
+
+                                panRenderer.setLayout(new BorderLayout());
+                                panRenderer.add(sdp, BorderLayout.CENTER);
+                            } else {
+                                fullScreenRenderer = false;
+
+                                panObjects.remove(panRenderer);
+                                panObjects.add(scpRenderer, BorderLayout.CENTER);
+                                scpRenderer.setViewportView(panRenderer);
+
+                                panRenderer.setLayout(new GridBagLayout());
+                                panRenderer.add(sdp, gridBagConstraints);
+                            }
+                            sdp.startChecking();
+                            panRenderer.revalidate();
+                            revalidate();
+                            repaint();
+                        } else {
+                            if (fullScreenRenderer) {
+                                fullScreenRenderer = false;
+
+                                panObjects.remove(panRenderer);
+                                panObjects.add(scpRenderer, BorderLayout.CENTER);
+
+                                scpRenderer.setViewportView(panRenderer);
+
+                                panRenderer.setLayout(new GridBagLayout());
+                            }
+
+                            for (final SelfDisposingPanel comp : chunks) {
+                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                                gridBagConstraints.gridx = 0;
+                                gridBagConstraints.gridy = y;
+                                gridBagConstraints.weightx = 1;
+                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                panRenderer.add(comp, gridBagConstraints);
+
+                                comp.startChecking();
+
+                                panRenderer.revalidate();
+                                panRenderer.repaint();
+
+                                y++;
+                            }
+                        }
+                        all.addAll(chunks);
+                    }
+                };
+            if (worker != null) {
+                CismetThreadPool.execute(worker);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  to             DOCUMENT ME!
+     * @param  optionalTitle  DOCUMENT ME!
+     */
     public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
         final CidsMetaObjectBreadCrumb crumb = new CidsMetaObjectBreadCrumb(to) {
 
