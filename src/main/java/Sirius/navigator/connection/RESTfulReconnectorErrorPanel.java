@@ -28,7 +28,11 @@
  */
 package Sirius.navigator.connection;
 
+import de.cismet.reconnector.ReconnectorErrorPanelWithApply;
 import java.awt.BorderLayout;
+import java.awt.Container;
+
+import javax.swing.JDialog;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
@@ -42,7 +46,7 @@ import de.cismet.reconnector.DefaultReconnectorErrorPanel;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
+public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements ReconnectorErrorPanelWithApply {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -56,8 +60,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel errPanWrapper;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JPanel panProxyOptionsWrapper;
@@ -104,8 +106,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         java.awt.GridBagConstraints gridBagConstraints;
 
         panProxyOptionsWrapper = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         errPanWrapper = new javax.swing.JPanel();
@@ -114,24 +114,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         setLayout(new java.awt.GridBagLayout());
 
         panProxyOptionsWrapper.setLayout(new java.awt.BorderLayout());
-
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
-
-        jButton1.setText(org.openide.util.NbBundle.getMessage(
-                RESTfulReconnectorErrorPanel.class,
-                "RESTfulReconnectorErrorPanel.jButton1.text")); // NOI18N
-        jButton1.setPreferredSize(new java.awt.Dimension(80, 30));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-        jPanel1.add(jButton1);
-
-        panProxyOptionsWrapper.add(jPanel1, java.awt.BorderLayout.SOUTH);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -176,12 +158,8 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         add(tbProxy, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    @Override
+    public void apply() {
         final Proxy proxy = panProxyOptions.getProxy();
         reconnector.setProxy(proxy);
 
@@ -190,15 +168,23 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel {
         } else {
             proxy.toPreferences();
         }
-    } //GEN-LAST:event_jButton1ActionPerformed
+    }
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tbProxyActionPerformed
+    private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbProxyActionPerformed
         panProxyOptionsWrapper.setVisible(tbProxy.isSelected());
-        this.validate();
-    }                                                                           //GEN-LAST:event_tbProxyActionPerformed
+
+        // hochpendeln bis JDialog
+        Container parent = this;
+        do {
+            parent = parent.getParent();
+        } while ((parent != null) && !(parent instanceof JDialog));
+        if (parent != null) {
+            ((JDialog)parent).pack();
+        }
+    }//GEN-LAST:event_tbProxyActionPerformed
 }
