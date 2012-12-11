@@ -26,6 +26,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import de.cismet.tools.StaticDebuggingTools;
+
 /**
  * Der Login Dialog in dem Benutzername, Passwort und Localserver angegeben werden muessen. Der Dialog ist modal, ein
  * Klick auf 'Abbrechen' beendet das Programm sofort.
@@ -37,15 +39,21 @@ public class LoginDialog extends JDialog {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    private static final String HOMEFILE_USERGROUP_IS_OPTIONAL = "cismetUsergroupOptional";   // NOI18N
+    private static final String HOMEFILE_USERGROUP_IS_FORBIDDEN = "cismetUsergroupForbidden"; // NOI18N
+
     private static final String PREF_NAME = "username";       // NOI18N
     private static final String PREF_DOMAIN = "domain";       // NOI18N
     private static final String PREF_USERGROUP = "usergroup"; // NOI18N
+
     private static final Logger LOG = Logger.getLogger(LoginDialog.class);
 
     //~ Instance fields --------------------------------------------------------
 
     private String[][] userGroupLSNames;
     private Preferences preferences;
+    private boolean userGroupIsOptional = StaticDebuggingTools.checkHomeForFile(HOMEFILE_USERGROUP_IS_OPTIONAL);
+    private boolean userGroupIsForbidden = StaticDebuggingTools.checkHomeForFile(HOMEFILE_USERGROUP_IS_FORBIDDEN);
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -71,29 +79,40 @@ public class LoginDialog extends JDialog {
      */
     public LoginDialog(final java.awt.Frame owner) {
         super(owner, true);
-        this.preferences = Preferences.userNodeForPackage(this.getClass());
-        this.setAlwaysOnTop(true);
+        preferences = Preferences.userNodeForPackage(getClass());
+
+        setAlwaysOnTop(true);
 
         // So kann der Dialog nich ueber |X| geschlossen werden!
-        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         initComponents();
 
-        this.pack();
-        this.setResizable(false);
+        lbl_usr.setVisible(!userGroupIsForbidden);
+        cb_userGroup.setVisible(!userGroupIsForbidden);
 
-        EventQueue.invokeLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    LoginDialog.this.requestFocus();
-                    LoginDialog.this.toFront();
-                    tf_name.requestFocus();
-                }
-            });
+        pack();
+        setResizable(false);
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void setVisible(final boolean b) {
+        super.setVisible(b);
+
+        if (b) {
+            EventQueue.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        requestFocus();
+                        toFront();
+                        tf_name.requestFocus();
+                    }
+                });
+        }
+    }
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -458,27 +477,27 @@ public class LoginDialog extends JDialog {
                 cb_srv.addItem(domains[i]);
             }
 
-            final String name = this.preferences.get(PREF_NAME, null);
+            final String name = preferences.get(PREF_NAME, null);
             if ((name != null) && (name.length() > 0)) {
                 tf_name.setText(name);
             }
 
-            final String domain = this.preferences.get(PREF_DOMAIN, null);
+            final String domain = preferences.get(PREF_DOMAIN, null);
             if ((domain != null) && (domain.length() > 0)) {
                 cb_srv.setSelectedItem(domain);
             }
 
-            this.updateUserGroups(tf_name.getText(), cb_srv.getSelectedItem().toString());
+            updateUserGroups(tf_name.getText(), cb_srv.getSelectedItem().toString());
 
-            final String usergroup = this.preferences.get(PREF_USERGROUP, null);
+            final String usergroup = preferences.get(PREF_USERGROUP, null);
             if ((usergroup != null) && (usergroup.length() > 0)) {
-                this.cb_userGroup.setSelectedItem(usergroup);
+                cb_userGroup.setSelectedItem(usergroup);
             }
 
             if ((name != null) && (name.length() > 0)) {
-                this.pf_pass.requestFocus();
+                pf_pass.requestFocus();
             } else {
-                this.tf_name.requestFocus();
+                tf_name.requestFocus();
             }
         } catch (Throwable t) {
             LOG.fatal("fatal error during login", t);                                                          // NOI18N
@@ -492,14 +511,14 @@ public class LoginDialog extends JDialog {
             System.exit(1);
         }
 
-        this.pack();
+        pack();
 
         // NOTE: This call can not be substituted by StaticSwingTools.showDialog(this) because
         // show() method overwrites JDialog.show(). StaticSwingTools.showDialog() calls
         // setVisible(true) which internally calls JDialog show() -> endless recursion if
         // StaticSwingTools.showDialog() is called here
         super.show();
-        this.toFront();
+        toFront();
     }
 
     /**
@@ -545,7 +564,7 @@ public class LoginDialog extends JDialog {
                             LoginDialog.class,
                             "LoginDialog.LoginListener.actionPerformed(ActionEvent).missingPasswordOptionPane.title"),    // NOI18N
                         JOptionPane.WARNING_MESSAGE);
-                } else if (cb_userGroup.getSelectedIndex() < 0) {
+                } else if (!userGroupIsForbidden && (cb_userGroup.getSelectedIndex() < 0)) {
                     JOptionPane.showMessageDialog(
                         LoginDialog.this,
                         org.openide.util.NbBundle.getMessage(
@@ -568,29 +587,33 @@ public class LoginDialog extends JDialog {
                 } else {
                     try {
                         final int selectedUserGroupIndex = cb_userGroup.getSelectedIndex();
-                        if (selectedUserGroupIndex == 0) {                                                                // usergroup == null;
+                        if (userGroupIsForbidden || (userGroupIsOptional && (selectedUserGroupIndex == 0))) {             // usergroup == null;
                             SessionManager.getSession()
                                     .login(
                                         cb_srv.getSelectedItem().toString(),
                                         tf_name.getText(),
                                         new String(pf_pass.getPassword()));
                         } else {
+                            final int userGroupLSNameIndex = (userGroupIsOptional) ? (selectedUserGroupIndex - 1)
+                                                                                   : selectedUserGroupIndex;
                             SessionManager.getSession()
                                     .login(
-                                        userGroupLSNames[selectedUserGroupIndex - 1][1],
-                                        userGroupLSNames[selectedUserGroupIndex - 1][0],
+                                        userGroupLSNames[userGroupLSNameIndex][1],
+                                        userGroupLSNames[userGroupLSNameIndex][0],
                                         cb_srv.getSelectedItem().toString(),
                                         tf_name.getText(),
                                         new String(pf_pass.getPassword()));
                         }
 
-                        LoginDialog.this.preferences.put(LoginDialog.PREF_NAME, tf_name.getText());
-                        LoginDialog.this.preferences.put(
+                        preferences.put(LoginDialog.PREF_NAME, tf_name.getText());
+                        preferences.put(
                             PREF_DOMAIN,
                             cb_srv.getSelectedItem().toString());
-                        LoginDialog.this.preferences.put(
-                            LoginDialog.PREF_USERGROUP,
-                            cb_userGroup.getSelectedItem().toString());
+                        if (cb_userGroup.getSelectedItem() != null) {
+                            preferences.put(LoginDialog.PREF_USERGROUP, cb_userGroup.getSelectedItem().toString());
+                        } else {
+                            preferences.put(LoginDialog.PREF_USERGROUP, "");
+                        }
 
                         dispose();
                     } catch (UserException u) {
@@ -659,6 +682,8 @@ public class LoginDialog extends JDialog {
             }
         } catch (ConnectionException cexp) {
             ExceptionManager.getManager().showExceptionDialog(LoginDialog.this, cexp);
+        } catch (final Exception ex) {
+            LOG.fatal("bla", ex);
         }
     }
 
@@ -699,10 +724,14 @@ public class LoginDialog extends JDialog {
             }
         }
 
-        cb_userGroup.addItem("[keine]");
+        if (!userGroupIsForbidden) {
+            if (userGroupIsOptional) {
+                cb_userGroup.addItem("[keine]");
+            }
 
-        for (int i = 0; i < userGroupLSNames.length; i++) {
-            cb_userGroup.addItem(userGroupLSNames[i][0] + "@" + userGroupLSNames[i][1].trim()); // NOI18N
+            for (int i = 0; i < userGroupLSNames.length; i++) {
+                cb_userGroup.addItem(userGroupLSNames[i][0] + "@" + userGroupLSNames[i][1].trim()); // NOI18N
+            }
         }
     }
 
