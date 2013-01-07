@@ -18,14 +18,25 @@ import Sirius.navigator.ui.dnd.MetaTreeNodeTransferable;
 import Sirius.server.middleware.types.MetaObjectNode;
 
 import java.awt.Component;
-import java.awt.dnd.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.*;
 
 import de.cismet.cids.dynamics.CidsBean;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DragGestureEvent;
+import java.awt.dnd.DragGestureListener;
+import java.awt.dnd.DragGestureRecognizer;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.dnd.DragSourceEvent;
+import java.awt.dnd.DragSourceListener;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
 
 /**
  * A list that can display cidsBeans with their icon and name and allows the drag operation.
@@ -33,7 +44,7 @@ import de.cismet.cids.dynamics.CidsBean;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class CidsBeanList extends JList<CidsBean> implements DragSourceListener, DragGestureListener {
+public class CidsBeanList extends JList implements DragSourceListener, DragGestureListener {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -56,7 +67,7 @@ public class CidsBeanList extends JList<CidsBean> implements DragSourceListener,
         setCellRenderer(new DefaultListCellRenderer() {
 
                 @Override
-                public Component getListCellRendererComponent(final JList<?> list,
+                public Component getListCellRendererComponent(final JList list,
                         final Object value,
                         final int index,
                         final boolean isSelected,
