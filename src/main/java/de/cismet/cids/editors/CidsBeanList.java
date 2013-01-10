@@ -18,12 +18,6 @@ import Sirius.navigator.ui.dnd.MetaTreeNodeTransferable;
 import Sirius.server.middleware.types.MetaObjectNode;
 
 import java.awt.Component;
-
-import java.util.ArrayList;
-import java.util.List;
-
-
-import de.cismet.cids.dynamics.CidsBean;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragGestureEvent;
 import java.awt.dnd.DragGestureListener;
@@ -33,10 +27,16 @@ import java.awt.dnd.DragSourceDragEvent;
 import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.DragSourceEvent;
 import java.awt.dnd.DragSourceListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JList;
+
+import de.cismet.cids.dynamics.CidsBean;
 
 /**
  * A list that can display cidsBeans with their icon and name and allows the drag operation.
