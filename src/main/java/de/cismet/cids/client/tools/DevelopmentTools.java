@@ -20,7 +20,6 @@ import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
-import Sirius.navigator.resource.PropertyManager;
 
 import Sirius.server.middleware.interfaces.proxy.CatalogueService;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
@@ -58,6 +57,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
+import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
@@ -352,6 +353,33 @@ public class DevelopmentTools {
         }
         System.out.println("CidsBeans erzeugt.");
         return cidsBeans;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   search  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static ArrayList<ArrayList> executeServerSearch(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final CidsServerSearch search) throws Exception {
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
+        }
+        final Collection res = SessionManager.getConnection()
+                    .customServerSearch(SessionManager.getSession().getUser(), search);
+
+        return (ArrayList<ArrayList>)res;
     }
 
     /**

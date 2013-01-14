@@ -7,7 +7,6 @@
 ****************************************************/
 package de.cismet.reconnector;
 
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 
@@ -191,30 +190,30 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
         reconnector.doCancel();
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnRetryActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRetryActionPerformed
+    private void btnRetryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnRetryActionPerformed
         if (errorComponent instanceof ReconnectorErrorPanelWithApply) {
             ((ReconnectorErrorPanelWithApply)errorComponent).apply();
         }
         reconnector.doReconnect();
-    }//GEN-LAST:event_btnRetryActionPerformed
+    }                                                                            //GEN-LAST:event_btnRetryActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnExitActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExitActionPerformed
+    private void btnExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnExitActionPerformed
         System.exit(1);
-    }//GEN-LAST:event_btnExitActionPerformed
+    }                                                                           //GEN-LAST:event_btnExitActionPerformed
 
     @Override
     public void connecting() {

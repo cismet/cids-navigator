@@ -28,7 +28,6 @@
  */
 package Sirius.navigator.connection;
 
-import de.cismet.reconnector.ReconnectorErrorPanelWithApply;
 import java.awt.BorderLayout;
 import java.awt.Container;
 
@@ -39,6 +38,7 @@ import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 import de.cismet.netutil.Proxy;
 
 import de.cismet.reconnector.DefaultReconnectorErrorPanel;
+import de.cismet.reconnector.ReconnectorErrorPanelWithApply;
 
 /**
  * DOCUMENT ME!
@@ -175,7 +175,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbProxyActionPerformed
+    private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tbProxyActionPerformed
         panProxyOptionsWrapper.setVisible(tbProxy.isSelected());
 
         // hochpendeln bis JDialog
@@ -186,5 +186,5 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         if (parent != null) {
             ((JDialog)parent).pack();
         }
-    }//GEN-LAST:event_tbProxyActionPerformed
+    } //GEN-LAST:event_tbProxyActionPerformed
 }
