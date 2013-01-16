@@ -29,6 +29,7 @@ import Sirius.server.newuser.User;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
 import java.awt.BorderLayout;
@@ -603,10 +604,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                             .getInitializer(editorObject.getMetaClass());
                                 copyButton.setEnabled(true);
                                 if (currentInitializer != null) {
-                                    // enable editor attribute paste only for NEW MOs
+                                    // enable editor attribute paste only for NEW MOs and initializers which implement
+                                    // the BeanInitializerForcePaste interface
                                     final boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus()
                                                 == MetaObject.NEW;
-                                    pasteButton.setEnabled(isNewBean);
+                                    pasteButton.setEnabled(
+                                        isNewBean
+                                                || (currentInitializer instanceof BeanInitializerForcePaste));
                                 }
                             }
                             final CidsBean bean = editorObject.getBean();
@@ -912,8 +916,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 EditorBeanInitializerStore.getInstance()
                         .registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
             }
-            // enable editor attribute paste only for new MOs
-            pasteButton.setEnabled((currentInitializer != null) && isNewBean);
+            // enable editor attribute paste only for new MOs and initializers which implement the
+            // BeanInitializerForcePaste interface
+            pasteButton.setEnabled((currentInitializer != null)
+                        && (isNewBean || (currentInitializer instanceof BeanInitializerForcePaste)));
         }
     } //GEN-LAST:event_copyButtonActionPerformed
 
@@ -925,11 +931,23 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pasteButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
-            try {
-                EditorBeanInitializerStore.getInstance().initialize(bean);
-            } catch (Exception ex) {
-                log.error(ex, ex);
+
+            final int res = JOptionPane.showConfirmDialog(StaticSwingTools.getFirstParentFrame(this),
+                    NbBundle.getMessage(
+                        NavigatorAttributeEditorGui.class,
+                        "NavigatorAttributeEditorGui.pasteButtonActionPerformed.message"),
+                    NbBundle.getMessage(
+                        NavigatorAttributeEditorGui.class,
+                        "NavigatorAttributeEditorGui.pasteButtonActionPerformed.title"),
+                    JOptionPane.OK_CANCEL_OPTION);
+
+            if (res == JOptionPane.OK_OPTION) {
+                try {
+                    EditorBeanInitializerStore.getInstance().initialize(bean);
+                } catch (Exception ex) {
+                    log.error(ex, ex);
+                }
             }
         }
-    }                                                                               //GEN-LAST:event_pasteButtonActionPerformed
+    } //GEN-LAST:event_pasteButtonActionPerformed
 }
