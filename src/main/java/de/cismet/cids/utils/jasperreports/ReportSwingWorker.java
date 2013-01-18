@@ -13,17 +13,11 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfImportedPage;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfWriter;
-
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
-import net.sf.jasperreports.engine.JasperReport;
-import net.sf.jasperreports.engine.util.JRLoader;
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.tools.BrowserLauncher;
+import de.cismet.tools.gui.StaticSwingTools;
 
 import java.awt.Frame;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -31,22 +25,21 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-
-import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.tools.BrowserLauncher;
-
-import de.cismet.tools.gui.StaticSwingTools;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRLoader;
 
 /**
  * DOCUMENT ME!
@@ -68,6 +61,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
     private final ReportSwingWorkerDialog dialog;
     private final boolean withDialog;
     private String directory;
+    private HashMap parameters = new HashMap();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -127,6 +121,15 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
         this(cidsBeans, compiledReport, true, parent, directory);
     }
 
+    public ReportSwingWorker(final List<Collection<CidsBean>> cidsBeansList,
+            final List<String> compiledReportList,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory) {
+        this(cidsBeansList, compiledReportList, withDialog, parent, directory, new HashMap());
+    }
+    
+    
     /**
      * Creates a new ReportSwingWorker object.
      *
@@ -140,11 +143,13 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final List<String> compiledReportList,
             final boolean withDialog,
             final Frame parent,
-            final String directory) {
+            final String directory,
+            final HashMap parameters) {
         this.cidsBeansList = cidsBeansList;
         this.compiledReportList = compiledReportList;
         this.withDialog = withDialog;
         this.directory = directory;
+        this.parameters = parameters;
         if (withDialog) {
             dialog = new ReportSwingWorkerDialog(parent, true);
         } else {
@@ -152,6 +157,14 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
         }
     }
 
+    public ReportSwingWorker(final Collection<CidsBean> cidsBeans,
+            final String compiledReport,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory) {
+        this(cidsBeans, compiledReport, withDialog, parent, directory, new HashMap());
+    }    
+    
     /**
      * Creates a new ReportSwingWorker object.
      *
@@ -165,13 +178,15 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final String compiledReport,
             final boolean withDialog,
             final Frame parent,
-            final String directory) {
+            final String directory,
+            final HashMap parameters) {
         this.cidsBeansList = new ArrayList<Collection<CidsBean>>();
         this.cidsBeansList.add(cidsBeans);
         this.compiledReportList = new ArrayList<String>();
         this.compiledReportList.add(compiledReport);
         this.withDialog = withDialog;
         this.directory = directory;
+        this.parameters = parameters;
         if (withDialog) {
             dialog = new ReportSwingWorkerDialog(parent, true);
         } else {
@@ -214,7 +229,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 // daten vorbereiten
                 final JRDataSource dataSource = new CidsBeanDataSource(beans);
                 // print aus report und daten erzeugen
-                final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+                final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
                 // quer- bzw hochformat übernehmen
                 jasperPrint.setOrientation(jasperReport.getOrientation());
 
