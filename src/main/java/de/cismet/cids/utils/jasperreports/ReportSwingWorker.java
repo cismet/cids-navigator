@@ -220,7 +220,13 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             ReportHelper.concatPDFs(ins, out, true);
 
             // zusammengefügten pdfStream in Datei schreiben
-            final File file = new File(directory, "report.pdf");
+            File file = new File(directory, "report.pdf");
+            int index = 0;
+
+            while (file.exists()) {
+                file = new File(directory, "report" + (++index) + ".pdf");
+            }
+
             file.getParentFile().mkdirs();
             fos = new FileOutputStream(file);
             fos.write(out.toByteArray());
