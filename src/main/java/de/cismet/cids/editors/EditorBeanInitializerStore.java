@@ -109,7 +109,8 @@ public class EditorBeanInitializerStore {
             if (initializer != null) {
                 initializer.initializeBean(toInitialize);
             }
+        } else {
+            throw new IllegalArgumentException("Bean to initialize was null!"); // NOI18N
         }
-        throw new IllegalArgumentException("Bean to initialize was null!"); // NOI18N
     }
 }
