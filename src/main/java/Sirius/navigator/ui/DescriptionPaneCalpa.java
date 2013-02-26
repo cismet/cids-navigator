@@ -14,8 +14,6 @@ import calpa.html.CalHTMLPane;
 import calpa.html.CalHTMLPreferences;
 import calpa.html.DefaultCalHTMLObserver;
 
-import java.awt.EventQueue;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -132,6 +130,7 @@ public class DescriptionPaneCalpa extends DescriptionPane {
         } else {
             try {
                 final URL url = new URL(page);
+
                 final HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();
                 httpUrlConnection.setRequestMethod("HEAD");
                 httpUrlConnection.connect();
