@@ -79,7 +79,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
-import de.cismet.tools.BlacklistClassloading;
+import de.cismet.commons.classloading.BlacklistClassloading;
 
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
