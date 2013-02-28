@@ -316,8 +316,9 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * DOCUMENT ME!
      *
      * @param  decider                 DOCUMENT ME!
-     * @param  hideElements            Elements which are not accepted by the decider should be shown as unenabled, if hideElements is false. 
-     *                                 Otherwise, the elements should not be shown, if they are not accepted by the decider.
+     * @param  hideElements            Elements which are not accepted by the decider should be shown as unenabled, if
+     *                                 hideElements is false. Otherwise, the elements should not be shown, if they are
+     *                                 not accepted by the decider.
      * @param  removeSelectedElements  DOCUMENT ME!
      */
     public void refreshCheckboxState(final FieldStateDecider decider,
