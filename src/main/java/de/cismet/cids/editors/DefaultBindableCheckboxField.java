@@ -28,6 +28,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +66,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
     private Color backgroundSelected = null;
     private Color backgroundUnselected = null;
     private boolean readOnly = false;
+    private Comparator<MetaObject> comparator;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -71,6 +74,15 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * Creates a new CustomReferencedCheckboxField object.
      */
     public DefaultBindableCheckboxField() {
+    }
+
+    /**
+     * Creates a new CustomReferencedCheckboxField object.
+     *
+     * @param  comparator  DOCUMENT ME!
+     */
+    public DefaultBindableCheckboxField(final Comparator<MetaObject> comparator) {
+        this.comparator = comparator;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -200,6 +212,9 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                         DefaultBindableCheckboxField.this.removeAll();
 
                         if (metaObjects != null) {
+                            if (comparator != null) {
+                                Arrays.sort(metaObjects, comparator);
+                            }
                             JCheckBox box = null;
                             DefaultBindableCheckboxField.this.setLayout(new GridLayout(metaObjects.length, 1));
                             if (LOG.isDebugEnabled()) {
@@ -301,7 +316,9 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * DOCUMENT ME!
      *
      * @param  decider                 DOCUMENT ME!
-     * @param  hideElements            DOCUMENT ME!
+     * @param  hideElements            Elements which are not accepted by the decider should be shown as unenabled, if
+     *                                 hideElements is false. Otherwise, the elements should not be shown, if they are
+     *                                 not accepted by the decider.
      * @param  removeSelectedElements  DOCUMENT ME!
      */
     public void refreshCheckboxState(final FieldStateDecider decider,
@@ -324,19 +341,36 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                 @Override
                 protected void done() {
                     try {
-                        final Iterator<JCheckBox> it = boxToObjectMapping.keySet().iterator();
+                        final JCheckBox[] boxes = boxToObjectMapping.keySet()
+                                    .toArray(new JCheckBox[boxToObjectMapping.keySet().size()]);
+
+                        if (comparator != null) {
+                            Arrays.sort(boxes, new Comparator<JCheckBox>() {
+
+                                    @Override
+                                    public int compare(final JCheckBox o1, final JCheckBox o2) {
+                                        final MetaObject m1 = boxToObjectMapping.get(o1);
+                                        final MetaObject m2 = boxToObjectMapping.get(o2);
+
+                                        return comparator.compare(m1, m2);
+                                    }
+                                });
+                        }
+
                         if (removeSelectedElements) {
                             selectedElements.clear();
                         }
 
-                        while (it.hasNext()) {
-                            final JCheckBox box = it.next();
+                        if (hideElements) {
+                            removeAll();
+                        }
+
+                        for (final JCheckBox box : boxes) {
                             if (!hideElements) {
                                 box.setEnabled(
                                     !readOnly
                                             && decider.isCheckboxForClassActive(boxToObjectMapping.get(box)));
                             } else {
-                                remove(box);
                                 if (decider.isCheckboxForClassActive(boxToObjectMapping.get(box))) {
                                     add(box);
                                 }
