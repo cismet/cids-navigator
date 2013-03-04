@@ -273,7 +273,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             fos.write(out.toByteArray());
 
             // Datei über Browser öffnen
-            BrowserLauncher.openURL("file:///" + file);
+            BrowserLauncher.openURL(file.toURI().toURL().toString());
             return true;
         } catch (IOException ex) {
             LOG.error("Export to PDF-Stream failed.", ex);
