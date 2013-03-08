@@ -1,12 +1,10 @@
-/**
- * *************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- * 
-* ... and it just works.
- * 
-***************************************************
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package atest;
 
 /**
@@ -42,20 +40,21 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 /**
  * DOCUMENT ME!
  *
- * @author thorsten
- * @version $Revision$, $Date$
+ * @author   thorsten
+ * @version  $Revision$, $Date$
  */
 public class JSONTest {
 
     //~ Static fields/initializers ---------------------------------------------
+
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(JSONTest.class);
     static ObjectMapper mapper = new ObjectMapper();
     /**
      * DOCUMENT ME!
      *
-     * @param args DOCUMENT ME!
+     * @param   args  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     static final String DOMAIN = "WRRL_DB_MV";
     static final String GROUP = "Administratoren";
@@ -65,12 +64,13 @@ public class JSONTest {
     static final String FOLDER = "/Users/thorsten/tmp/jsontest/";
 
     //~ Methods ----------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *
-     * @param args DOCUMENT ME!
+     * @param   args  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void main(final String[] args) throws Exception {
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
@@ -88,12 +88,12 @@ public class JSONTest {
     /**
      * DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void checkAll() throws Exception {
         DevelopmentTools.initSessionManagerFromRMIConnectionOnLocalhost(DOMAIN, GROUP, USER, PASS);
         final ArrayList allTables = new ArrayList(ClassCacheMultiple.getTableNameHashtableOfClassesForOneDomain(
-                DOMAIN).keySet());
+                    DOMAIN).keySet());
         final String[] tables = new String[allTables.size()];
         for (int i = 0; i < tables.length; ++i) {
             tables[i] = allTables.get(i).toString();
@@ -104,9 +104,9 @@ public class JSONTest {
     /**
      * DOCUMENT ME!
      *
-     * @param tables DOCUMENT ME!
+     * @param   tables  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void check(final String... tables) throws Exception {
         System.out.println("go:");
@@ -135,11 +135,11 @@ public class JSONTest {
     /**
      * DOCUMENT ME!
      *
-     * @param dbBean DOCUMENT ME!
+     * @param   dbBean  DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static boolean checkBean(final CidsBean dbBean) throws Exception {
         long start = System.currentTimeMillis();
@@ -154,14 +154,14 @@ public class JSONTest {
         if (true || !first.equals(jsonBeanJson)) {
             FileUtils.writeStringToFile(new File(
                     FOLDER
-                    + dbBean.getCidsObjectKey().replaceAll("/", "")
-                    + ".dbBean.json"),
-                    first);
+                            + dbBean.getCidsObjectKey().replaceAll("/", "")
+                            + ".dbBean.json"),
+                first);
             FileUtils.writeStringToFile(new File(
                     FOLDER
-                    + jsonBean.getCidsObjectKey().replaceAll("/", "")
-                    + ".jsonBean.json"),
-                    jsonBeanJson);
+                            + jsonBean.getCidsObjectKey().replaceAll("/", "")
+                            + ".jsonBean.json"),
+                jsonBeanJson);
             return false;
         } else {
             return true;
