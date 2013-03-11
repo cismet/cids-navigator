@@ -22,6 +22,8 @@ import Sirius.navigator.ui.*;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.Exceptions;
+
 import java.applet.*;
 
 import java.awt.*;
@@ -352,15 +354,6 @@ public class PluginContext {
         }
 
         /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public AppletContext getAppletContext() {
-            return PropertyManager.getManager().getAppletContext();
-        }
-
-        /**
          * Translates a meta attribute name into a meta attribute id.
          *
          * <p>XML descriptor</p>
@@ -518,7 +511,11 @@ public class PluginContext {
          * @param  url  DOCUMENT ME!
          */
         public void showDocumentInDefaultBrowser(final URL url) {
-            PropertyManager.getManager().getAppletContext().showDocument(url, "_blank"); // NOI18N
+            try {
+                de.cismet.tools.BrowserLauncher.openURL(url.toString());
+            } catch (Exception ex) {
+                logger.error("Cannot open the url:" + url, ex);
+            }
         }
 
         /**
