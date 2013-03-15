@@ -31,7 +31,6 @@ package Sirius.navigator.resource;
  *
  *******************************************************************************/
 import Sirius.navigator.connection.ConnectionInfo;
-import Sirius.navigator.tools.BrowserControl;
 import Sirius.navigator.ui.LAFManager;
 import Sirius.navigator.ui.progress.*;
 
@@ -1290,19 +1289,6 @@ public final class PropertyManager {
      */
     public Properties getProperties() {
         return this.properties;
-    }
-
-    /**
-     * Getter for property appletContext.
-     *
-     * @return  Value of property appletContext.
-     */
-    public AppletContext getAppletContext() {
-        if (this.appletContext == null) {
-            return BrowserControl.getControl();
-        } else {
-            return this.appletContext;
-        }
     }
 
     /**
