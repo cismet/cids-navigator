@@ -330,7 +330,6 @@ public class DevelopmentTools {
         }
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
-        System.out.println("bauen ...");
         final String query = "SELECT "
                     + mc.getID()
                     + ", "
@@ -343,7 +342,6 @@ public class DevelopmentTools {
                     + mc.getPrimaryKey()
                     + " "
                     + limitS;
-        System.out.println("Query: " + query);
         final MetaObject[] metaObjects = SessionManager.getConnection()
                     .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
@@ -351,7 +349,6 @@ public class DevelopmentTools {
             final MetaObject metaObject = metaObjects[i];
             cidsBeans[i] = metaObject.getBean();
         }
-        System.out.println("CidsBeans erzeugt.");
         return cidsBeans;
     }
 

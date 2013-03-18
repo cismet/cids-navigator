@@ -15,13 +15,10 @@ import Sirius.navigator.connection.SessionManager;
 
 import Sirius.server.newuser.User;
 
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.JsonMappingException;
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.openide.util.Exceptions;
 
-import java.io.*;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
