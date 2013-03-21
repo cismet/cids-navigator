@@ -35,8 +35,6 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.tools.CismetThreadPool;
 
-import de.cismet.tools.collections.HashArrayList;
-
 /**
  * Der SearchTree dient zum Anzeigen von Suchergebnissen. Neben der Funktionalit\u00E4t, die er von GenericMetaTree
  * erbt, bietet er zusaetzlich noch die Moeglichkeit, die Suchergebnisse schrittweise anzuzeigen. D.h. es wird immer nur
@@ -54,7 +52,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     //~ Instance fields --------------------------------------------------------
 
     private boolean empty = true;
-    private HashArrayList<Node> resultNodes = new HashArrayList<Node>();
+    private ArrayList<Node> resultNodes = new ArrayList<Node>();
     private final RootTreeNode rootNode;
     private Thread runningNameLoader = null;
     private SwingWorker<ArrayList<DefaultMetaTreeNode>, Void> refreshWorker;
@@ -105,7 +103,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             resultNodes.clear();
         } else {
             empty = false;
-            resultNodes = new HashArrayList<Node>(Arrays.asList(nodes));
+            resultNodes = new ArrayList<Node>(Arrays.asList(nodes));
         }
 
         if (resultNodes.size() > 0) {
@@ -172,7 +170,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             resultNodes.addAll(Arrays.asList(nodes));
         } else {
             this.clear();
-            resultNodes = new HashArrayList<Node>(Arrays.asList(nodes));
+            resultNodes = new ArrayList<Node>(Arrays.asList(nodes));
         }
 
         empty = false;
