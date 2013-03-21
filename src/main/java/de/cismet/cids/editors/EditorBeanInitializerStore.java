@@ -11,11 +11,10 @@ import Sirius.server.middleware.types.MetaClass;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.tools.collections.TypeSafeCollections;
 
 /**
  * DOCUMENT ME!
@@ -31,7 +30,6 @@ public class EditorBeanInitializerStore {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EditorBeanInitializerStore.class);
     private final Map<MetaClass, BeanInitializer> initializerStore;
 
     //~ Constructors -----------------------------------------------------------
@@ -40,7 +38,7 @@ public class EditorBeanInitializerStore {
      * Creates a new EditorBeanInitializerStore object.
      */
     private EditorBeanInitializerStore() {
-        initializerStore = TypeSafeCollections.newHashMap();
+        initializerStore = new HashMap<MetaClass, BeanInitializer>();
     }
 
     //~ Methods ----------------------------------------------------------------

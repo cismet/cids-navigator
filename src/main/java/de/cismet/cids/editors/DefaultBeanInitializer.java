@@ -9,13 +9,14 @@ package de.cismet.cids.editors;
 
 import Sirius.server.middleware.types.MetaClass;
 
+import org.apache.log4j.Logger;
+
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import de.cismet.cids.dynamics.CidsBean;
-
-import de.cismet.tools.collections.TypeSafeCollections;
 
 /**
  * DOCUMENT ME!
@@ -30,9 +31,10 @@ public class DefaultBeanInitializer implements BeanInitializer {
     protected static final String GEOM_TABLE_NAME = "geom";      // NOI18N
     protected static final String GEOM_FIELD_NAME = "geo_field"; // NOI18N
 
+    protected static final Logger LOG = Logger.getLogger(DefaultBeanInitializer.class);
+
     //~ Instance fields --------------------------------------------------------
 
-    protected final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DefaultBeanInitializer.class);
     protected final MetaClass metaClass;
     protected final String primaryKeyField;
     protected final Map<String, Object> simpleProperties;
@@ -49,9 +51,9 @@ public class DefaultBeanInitializer implements BeanInitializer {
     public DefaultBeanInitializer(final CidsBean template) {
         metaClass = template.getMetaObject().getMetaClass();
         primaryKeyField = metaClass.getPrimaryKey().toLowerCase();
-        simpleProperties = TypeSafeCollections.newHashMap();
-        complexProperties = TypeSafeCollections.newHashMap();
-        arrayProperties = TypeSafeCollections.newHashMap();
+        simpleProperties = new HashMap<String, Object>();
+        complexProperties = new HashMap<String, CidsBean>();
+        arrayProperties = new HashMap<String, Collection<CidsBean>>();
         initPropertyMaps(template);
     }
 

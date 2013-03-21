@@ -14,6 +14,7 @@ package de.cismet.cids.tools.metaobjectrenderer;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.JComponent;
@@ -23,8 +24,6 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.utils.ClassloadingHelper;
-
-import de.cismet.tools.collections.TypeSafeCollections;
 
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
@@ -161,7 +160,6 @@ public class CidsObjectRendererFactory {
         if (moCollection.size() == 1) {
             return getSingleRenderer(moCollection.iterator().next(), title);
         } else {
-//            final boolean isEDT = EventQueue.isDispatchThread();
             final MetaObject mo = moCollection.iterator().next();
             final MetaClass mc = mo.getMetaClass();
             JComponent resultReferenceHolder = null;
@@ -172,17 +170,14 @@ public class CidsObjectRendererFactory {
                 if (rendererClass != null) {
                     final Collection<CidsBean> beans;
                     if (CidsBeanAggregationRenderer.class.isAssignableFrom(rendererClass)) {
-                        beans = TypeSafeCollections.newArrayList(moCollection.size());
+                        beans = new ArrayList<CidsBean>(moCollection.size());
                         for (final MetaObject currentMO : moCollection) {
                             beans.add(currentMO.getBean());
                         }
                     } else {
                         beans = null;
                     }
-//                final Runnable aggregationRendererCreator = new Runnable() {
-//
-//                    @Override
-//                    public void run() {
+
                     try {
                         final Object rendererInstanceObject = rendererClass.newInstance();
                         if (beans != null) {
