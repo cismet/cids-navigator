@@ -20,6 +20,8 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import org.apache.log4j.Logger;
+
 import org.openide.util.WeakListeners;
 
 import java.awt.BorderLayout;
@@ -47,12 +49,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
@@ -74,8 +77,6 @@ import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
 
 import de.cismet.tools.CismetThreadPool;
 
-import de.cismet.tools.collections.MultiMap;
-
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.CoolEditor;
 import de.cismet.tools.gui.WrappedComponent;
@@ -94,7 +95,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     //~ Static fields/initializers ---------------------------------------------
 
     protected static final ResourceManager RESOURCE = ResourceManager.getManager();
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DescriptionPane.class);
+    private static final Logger LOG = Logger.getLogger(DescriptionPane.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -133,7 +134,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         BufferedReader reader = null;
         try {
             final StringBuffer welcomeBuffer = new StringBuffer();
-            String welcomeString = null;
+            String welcomeString;
             reader = new BufferedReader(new InputStreamReader(
                         RESOURCE.getNavigatorResourceAsStream("doc/welcome.html"))); // NOI18N
 
@@ -143,7 +144,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             this.welcomePage = welcomeBuffer.toString();
 
             final StringBuffer errorBuffer = new StringBuffer();
-            String errorString = null;
+            String errorString;
             reader = new BufferedReader(new InputStreamReader(
                         RESOURCE.getNavigatorResourceAsStream("doc/error.xhtml"), // NOI18N
                         "UTF-8")); // NOI18N
@@ -323,24 +324,31 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                     @Override
                     protected SelfDisposingPanel doInBackground() throws Exception {
-                        final MultiMap objectsByClass = new MultiMap();
+                        final Map<MetaClass, LinkedHashSet<DefaultMetaTreeNode>> objectsByClass =
+                            new HashMap<MetaClass, LinkedHashSet<DefaultMetaTreeNode>>();
                         for (final Object object : objects) {
                             if ((object != null) && !((DefaultMetaTreeNode)object).isWaitNode()
                                         && !((DefaultMetaTreeNode)object).isRootNode()
                                         && !((DefaultMetaTreeNode)object).isPureNode()
                                         && ((DefaultMetaTreeNode)object).isObjectNode()) {
                                 final ObjectTreeNode n = (ObjectTreeNode)object;
-                                objectsByClass.put(n.getMetaClass(), n);
+                                final MetaClass key = n.getMetaClass();
+                                LinkedHashSet<DefaultMetaTreeNode> nodes = objectsByClass.get(key);
+                                if (nodes == null) {
+                                    nodes = new LinkedHashSet<DefaultMetaTreeNode>();
+                                    objectsByClass.put(key, nodes);
+                                }
+                                nodes.add(n);
                             }
                         }
-                        final Iterator it = objectsByClass.keySet().iterator();
+                        final Iterator<MetaClass> it = objectsByClass.keySet().iterator();
                         multipleClasses = objectsByClass.keySet().size() > 1;
                         while (it.hasNext() && !isCancelled()) {
-                            final Object key = it.next();
-                            final List l = (List)objectsByClass.get(key);
+                            final MetaClass key = it.next();
+                            final Collection nodes = (Collection)objectsByClass.get(key);
 
                             final List<MetaObject> v = new ArrayList<MetaObject>();
-                            for (final Object o : l) {
+                            for (final Object o : nodes) {
                                 v.add(((ObjectTreeNode)o).getMetaObject());
                             }
                             final MetaClass mc = ((MetaObject)v.toArray()[0]).getMetaClass();
@@ -349,13 +357,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
                             JComponent aggrRendererTester = null;
 
-                            if (l.size() > 1) {
+                            if (nodes.size() > 1) {
                                 aggrRendererTester = CidsObjectRendererFactory.getInstance()
                                             .getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")"); // NOI18N
                             }
                             if (aggrRendererTester == null) {
                                 LOG.warn("AggregationRenderer was null. Will use SingleRenderer");            // NOI18N
-                                for (final Object object : l) {
+                                for (final Object object : nodes) {
                                     final ObjectTreeNode otn = (ObjectTreeNode)object;
                                     final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
                                             CidsObjectRendererFactory.getInstance().getSingleRenderer(
@@ -589,17 +597,24 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                     @Override
                     protected SelfDisposingPanel doInBackground() throws Exception {
-                        final MultiMap objectsByClass = new MultiMap();
+                        final Map<MetaClass, LinkedHashSet<MetaObject>> objectsByClass =
+                            new HashMap<MetaClass, LinkedHashSet<MetaObject>>();
                         for (final MetaObject object : to) {
                             if (object != null) {
-                                objectsByClass.put(object.getMetaClass(), object);
+                                final MetaClass key = object.getMetaClass();
+                                LinkedHashSet<MetaObject> nodes = objectsByClass.get(key);
+                                if (nodes == null) {
+                                    nodes = new LinkedHashSet<MetaObject>();
+                                    objectsByClass.put(key, nodes);
+                                }
+                                nodes.add(object);
                             }
                         }
-                        final Iterator it = objectsByClass.keySet().iterator();
+                        final Iterator<MetaClass> it = objectsByClass.keySet().iterator();
                         multipleClasses = objectsByClass.keySet().size() > 1;
                         while (it.hasNext() && !isCancelled()) {
-                            final Object key = it.next();
-                            final List<MetaObject> list = (List<MetaObject>)objectsByClass.get(key);
+                            final MetaClass key = it.next();
+                            final Collection<MetaObject> list = objectsByClass.get(key);
 
                             final List<MetaObject> toColl = new ArrayList<MetaObject>();
                             for (final MetaObject mo : to) {
