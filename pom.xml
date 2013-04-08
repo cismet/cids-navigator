@@ -18,9 +18,9 @@
     <description>!!! description pending !!!</description>
     <licenses>
         <license>
-            <name>GNU Lesser General Public License</name>
+            <name>GNU General Public License</name>
             <distribution>repo</distribution>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+            <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
         </license>
     </licenses>
     

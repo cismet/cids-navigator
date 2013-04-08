@@ -112,4 +112,4 @@ An application, based on cids components and tools described in this document, a
 License
 =======
 
-cids-navigator is distributed under [LGPLv3](https://github.com/cismet/cids-navigator/blob/dev/LICENSE)
+cids-navigator is distributed under [GPLv3](https://github.com/cismet/cids-navigator/blob/dev/LICENSE)
