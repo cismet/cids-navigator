@@ -255,8 +255,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 @Override
                 public void run() {
                     removeAndDisposeAllRendererFromPanel();
-                    startNoDescriptionRenderer();
-//                    repaint();
                 }
             };
 
