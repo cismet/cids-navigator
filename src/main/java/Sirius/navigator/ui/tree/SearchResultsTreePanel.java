@@ -46,6 +46,8 @@ public class SearchResultsTreePanel extends JPanel {
     private JButton clearButton;
     private JPopupMenuButton saveAllButton;
     private JCheckBox showDirectlyInMap;
+    private JCheckBox showDirectlyInRenderer;
+
     private JToggleButton tbnSort;
 
     //~ Constructors -----------------------------------------------------------
@@ -168,6 +170,33 @@ public class SearchResultsTreePanel extends JPanel {
                 SearchResultsTreePanel.class,
                 "SearchResultsTreePanel.showDirectInMapLabel.tooltipText")); // NOI18N
         toolBar.add(showDirectlyInMapLabel);
+
+        showDirectlyInRenderer = new JCheckBox();
+        showDirectlyInRenderer.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    searchResultsTree.setSyncWithRenderer(showDirectlyInRenderer.isSelected());
+                }
+            });
+        showDirectlyInRenderer.setSelected(false);
+        toolBar.add(showDirectlyInRenderer);
+        final JLabel showDirectlyInRendererLabel = new JLabel(new javax.swing.ImageIcon(
+                    getClass().getResource("/Sirius/navigator/resource/imgx/descriptionpane_icon.gif"))); // NOI18N
+        showDirectlyInMapLabel.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final MouseEvent e) {
+                    if (e.getClickCount() > 1) {
+                        searchResultsTree.syncWithRenderer(true);
+                    }
+                }
+            });
+
+        showDirectlyInRendererLabel.setToolTipText(org.openide.util.NbBundle.getMessage(
+                SearchResultsTreePanel.class,
+                "SearchResultsTreePanel.showDirectInRendererLabel.tooltipText")); // NOI18N
+        toolBar.add(showDirectlyInRendererLabel);
     }
 
     /**
