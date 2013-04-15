@@ -184,6 +184,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         } else {
             wrappedWaitingPanel = null;
         }
+
+        startNoDescriptionRenderer();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -311,7 +313,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 worker = null;
             }
             showObjects();
-            clear();
 
             worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
@@ -467,8 +468,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                         all.addAll(chunks);
                     }
                 };
-            if (worker != null) {
+            if ((worker != null) && (objects != null) && (objects.size() > 0)) {
                 CismetThreadPool.execute(worker);
+            } else {
+                clear();
+                startNoDescriptionRenderer();
             }
         }
     }
