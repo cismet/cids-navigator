@@ -133,6 +133,13 @@ public class SearchResultsTree extends MetaCatalogueTree {
             if (log.isDebugEnabled()) {
                 log.debug("syncWithMap");                                                   // NOI18N
             }
+            if (!isSyncWithRenderer()) {
+                PluginRegistry.getRegistry()
+                        .getPluginDescriptor("cismap")
+                        .getUIDescriptor("cismap")
+                        .getView()
+                        .makeVisible();
+            }
             try {
                 final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
                 final List<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
@@ -170,25 +177,10 @@ public class SearchResultsTree extends MetaCatalogueTree {
             if (log.isDebugEnabled()) {
                 log.debug("syncWithRenderer"); // NOI18N
             }
+            if (!isSyncWithMap()) {
+                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.DESCRIPTION_PANE);
+            }
             setSelectionInterval(0, getRowCount());
-//            try {
-//                DescriptionPane desrPane = ComponentRegistry.getRegistry().getDescriptionPane();
-//                final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
-//                final List<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
-//                final DefaultTreeModel dtm = (DefaultTreeModel) getModel();
-//
-//                for (int i = 0; i < ((DefaultMetaTreeNode) dtm.getRoot()).getChildCount(); ++i) {
-//                    if (resultNodes.get(i) instanceof MetaObjectNode) {
-//                        final DefaultMetaTreeNode otn = (DefaultMetaTreeNode) ((DefaultMetaTreeNode) dtm.getRoot())
-//                                .getChildAt(i);
-//                        v.add(otn);
-//                    }
-//                }
-//                desrPane.setNodesDescriptions(v);
-//
-//            } catch (Throwable t) {
-//                log.warn("Fehler beim synchronisieren der Suchergebnisse mit der Karte", t); // NOI18N
-//            }
         }
     }
 

@@ -8,6 +8,8 @@
 package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.method.*;
+import Sirius.navigator.plugin.PluginRegistry;
+import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -47,7 +49,6 @@ public class SearchResultsTreePanel extends JPanel {
     private JPopupMenuButton saveAllButton;
     private JCheckBox showDirectlyInMap;
     private JCheckBox showDirectlyInRenderer;
-
     private JToggleButton tbnSort;
 
     //~ Constructors -----------------------------------------------------------
@@ -162,6 +163,14 @@ public class SearchResultsTreePanel extends JPanel {
                 public void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() > 1) {
                         searchResultsTree.syncWithMap(true);
+                        if (searchResultsTree.isSyncWithRenderer()) {
+                            // Because in this case the map is not brought to front by default
+                            PluginRegistry.getRegistry()
+                                    .getPluginDescriptor("cismap")
+                                    .getUIDescriptor("cismap")
+                                    .getView()
+                                    .makeVisible();
+                        }
                     }
                 }
             });
@@ -183,12 +192,18 @@ public class SearchResultsTreePanel extends JPanel {
         toolBar.add(showDirectlyInRenderer);
         final JLabel showDirectlyInRendererLabel = new JLabel(new javax.swing.ImageIcon(
                     getClass().getResource("/Sirius/navigator/resource/imgx/descriptionpane_icon.gif"))); // NOI18N
-        showDirectlyInMapLabel.addMouseListener(new MouseAdapter() {
+        showDirectlyInRendererLabel.addMouseListener(new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() > 1) {
                         searchResultsTree.syncWithRenderer(true);
+                        if (searchResultsTree.isSyncWithMap()) {
+                            // Because in this case the renderer is not brought to front by default
+                            ComponentRegistry.getRegistry()
+                                    .getGUIContainer()
+                                    .select(ComponentRegistry.DESCRIPTION_PANE);
+                        }
                     }
                 }
             });
