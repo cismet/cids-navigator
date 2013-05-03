@@ -7,29 +7,20 @@
 ****************************************************/
 package Sirius.navigator.ui.status;
 
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
+ * Copyright (c) : EIG (Environmental Informatics Group) http://www.htw-saarland.de/eig Prof. Dr. Reiner Guettler Prof.
+ * Dr. Ralf Denzer
  *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
+ * HTWdS Hochschule fuer Technik und Wirtschaft des Saarlandes Goebenstr. 40 66117 Saarbruecken Germany
  *
- * Programmers          :       Pascal
+ * Programmers : Pascal
  *
- * Project                      :       WuNDA 2
- * Filename             :
- * Version                      :       1.0
- * Purpose                      :
- * Created                      :       16.02.2000
- * History                      :
+ * Project : WuNDA 2 Filename : Version : 1.0 Purpose : Created : 16.02.2000 History :
  *
- *******************************************************************************/
+ ******************************************************************************
+ */
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.widget.MutableImageLabel;
 
@@ -39,6 +30,8 @@ import java.awt.*;
 
 import javax.swing.*;
 import javax.swing.border.*;
+
+import de.cismet.tools.gui.downloadmanager.DownloadManagerStatusPanel;
 
 /**
  * DOCUMENT ME!
@@ -50,7 +43,6 @@ public class MutableStatusBar extends JPanel {
     //~ Static fields/initializers ---------------------------------------------
 
     protected static final Logger logger = Logger.getLogger(MutableStatusBar.class);
-
     private static final ResourceManager resource = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
@@ -58,7 +50,6 @@ public class MutableStatusBar extends JPanel {
     private JLabel status_1;
     private JLabel status_2;
     private JLabel status_3;
-
     private MutableImageLabel greenStatusIcon;
     private MutableImageLabel redStatusIcon;
 
@@ -102,6 +93,11 @@ public class MutableStatusBar extends JPanel {
                 new EmptyBorder(0, 2, 0, 2)));
         status_3.setPreferredSize(new Dimension(300, 16));
 
+        final DownloadManagerStatusPanel downloadStatusPanel = new DownloadManagerStatusPanel();
+        downloadStatusPanel.setBorder(new CompoundBorder(
+                new SoftBevelBorder(SoftBevelBorder.LOWERED),
+                new EmptyBorder(0, 2, 0, 2)));
+
         greenStatusIcon = new MutableImageLabel(
                 resource.getIcon("green_off.gif"),
                 resource.getIcon("green_on.gif"));
@@ -133,15 +129,17 @@ public class MutableStatusBar extends JPanel {
         this.add(status_3, constraints);
 
         constraints.gridx++;
-        if (greenStatusIcon != null) {
-            this.add(greenStatusIcon, constraints);
-        }
-
+        this.add(downloadStatusPanel);
         constraints.insets = new Insets(0, 0, 0, 0);
-        constraints.gridx++;
-        if (redStatusIcon != null) {
-            this.add(redStatusIcon, constraints);
-        }
+
+//        constraints.gridx++;
+//        if (greenStatusIcon != null) {
+//            this.add(greenStatusIcon, constraints);
+//        }
+//        constraints.gridx++;
+//        if (redStatusIcon != null) {
+//            this.add(redStatusIcon, constraints);
+//        }
     }
 
     /**
