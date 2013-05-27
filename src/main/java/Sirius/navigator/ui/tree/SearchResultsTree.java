@@ -11,6 +11,8 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.DescriptionPane;
 
 import Sirius.server.middleware.types.*;
 
@@ -61,6 +63,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private boolean syncWithMap = false;
     private boolean ascending = true;
     private final WaitTreeNode waitTreeNode = new WaitTreeNode();
+    private boolean syncWithRenderer;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -130,6 +133,13 @@ public class SearchResultsTree extends MetaCatalogueTree {
             if (log.isDebugEnabled()) {
                 log.debug("syncWithMap");                                                   // NOI18N
             }
+            if (!isSyncWithRenderer()) {
+                PluginRegistry.getRegistry()
+                        .getPluginDescriptor("cismap")
+                        .getUIDescriptor("cismap")
+                        .getView()
+                        .makeVisible();
+            }
             try {
                 final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
                 final List<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
@@ -147,6 +157,30 @@ public class SearchResultsTree extends MetaCatalogueTree {
             } catch (Throwable t) {
                 log.warn("Fehler beim synchronisieren der Suchergebnisse mit der Karte", t); // NOI18N
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void syncWithRenderer() {
+        syncWithRenderer(isSyncWithRenderer());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  sync  DOCUMENT ME!
+     */
+    public void syncWithRenderer(final boolean sync) {
+        if (sync) {
+            if (log.isDebugEnabled()) {
+                log.debug("syncWithRenderer"); // NOI18N
+            }
+            if (!isSyncWithMap()) {
+                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.DESCRIPTION_PANE);
+            }
+            setSelectionInterval(0, getRowCount());
         }
     }
 
@@ -474,6 +508,24 @@ public class SearchResultsTree extends MetaCatalogueTree {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isSyncWithRenderer() {
+        return syncWithRenderer;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  syncWithRenderer  syncWithMap DOCUMENT ME!
+     */
+    public void setSyncWithRenderer(final boolean syncWithRenderer) {
+        this.syncWithRenderer = syncWithRenderer;
+    }
+
+    /**
      * Changes the sort order to ascending or descending according to the given parameter.
      *
      * @param  ascending  Whether to sort ascending ( <code>true</code>) or descending ( <code>false</code>).
@@ -592,6 +644,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                         if (initialFill) {
                             syncWithMap();
+                            syncWithRenderer();
                             checkForDynamicNodes();
                         }
                     }
