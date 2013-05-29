@@ -60,6 +60,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
     private final ReportSwingWorkerDialog dialog;
     private final boolean withDialog;
     private String directory;
+    private HashMap parameters = new HashMap();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -133,15 +134,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final boolean withDialog,
             final Frame parent,
             final String directory) {
-        this.cidsBeansList = cidsBeansList;
-        this.compiledReportList = compiledReportList;
-        this.withDialog = withDialog;
-        this.directory = directory;
-        if (withDialog) {
-            dialog = new ReportSwingWorkerDialog(parent, true);
-        } else {
-            dialog = null;
-        }
+        this(cidsBeansList, compiledReportList, withDialog, parent, directory, new HashMap());
     }
 
     /**
@@ -158,12 +151,60 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final boolean withDialog,
             final Frame parent,
             final String directory) {
+        this(cidsBeans, compiledReport, withDialog, parent, directory, new HashMap());
+    }
+
+    /**
+     * Creates a new ReportSwingWorker object.
+     *
+     * @param  cidsBeansList       DOCUMENT ME!
+     * @param  compiledReportList  DOCUMENT ME!
+     * @param  withDialog          DOCUMENT ME!
+     * @param  parent              DOCUMENT ME!
+     * @param  directory           DOCUMENT ME!
+     * @param  parameters          DOCUMENT ME!
+     */
+    public ReportSwingWorker(final List<Collection<CidsBean>> cidsBeansList,
+            final List<String> compiledReportList,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory,
+            final HashMap parameters) {
+        this.cidsBeansList = cidsBeansList;
+        this.compiledReportList = compiledReportList;
+        this.withDialog = withDialog;
+        this.directory = directory;
+        this.parameters = parameters;
+        if (withDialog) {
+            dialog = new ReportSwingWorkerDialog(parent, true);
+        } else {
+            dialog = null;
+        }
+    }
+
+    /**
+     * Creates a new ReportSwingWorker object.
+     *
+     * @param  cidsBeans       DOCUMENT ME!
+     * @param  compiledReport  DOCUMENT ME!
+     * @param  withDialog      DOCUMENT ME!
+     * @param  parent          DOCUMENT ME!
+     * @param  directory       DOCUMENT ME!
+     * @param  parameters      DOCUMENT ME!
+     */
+    public ReportSwingWorker(final Collection<CidsBean> cidsBeans,
+            final String compiledReport,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory,
+            final HashMap parameters) {
         this.cidsBeansList = new ArrayList<Collection<CidsBean>>();
         this.cidsBeansList.add(cidsBeans);
         this.compiledReportList = new ArrayList<String>();
         this.compiledReportList.add(compiledReport);
         this.withDialog = withDialog;
         this.directory = directory;
+        this.parameters = parameters;
         if (withDialog) {
             dialog = new ReportSwingWorkerDialog(parent, true);
         } else {
@@ -206,7 +247,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 // daten vorbereiten
                 final JRDataSource dataSource = new CidsBeanDataSource(beans);
                 // print aus report und daten erzeugen
-                final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+                final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
                 // quer- bzw hochformat übernehmen
                 jasperPrint.setOrientation(jasperReport.getOrientation());
 
