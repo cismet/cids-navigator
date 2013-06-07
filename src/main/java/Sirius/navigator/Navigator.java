@@ -85,6 +85,8 @@ import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
 import de.cismet.netutil.Proxy;
 
+import de.cismet.remote.RESTRemoteControlStarter;
+
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
@@ -116,7 +118,6 @@ public class Navigator extends JFrame {
                                                                          : "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
-
     private static volatile boolean startupFinished = false;
 
     //~ Instance fields --------------------------------------------------------
@@ -858,6 +859,11 @@ public class Navigator extends JFrame {
         return false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  visible  DOCUMENT ME!
+     */
     @Override
     public void setVisible(final boolean visible) {
         if (logger.isInfoEnabled()) {
@@ -913,6 +919,9 @@ public class Navigator extends JFrame {
     }
     // .........................................................................
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void dispose() {
         if (logger.isInfoEnabled()) {
@@ -1125,114 +1134,11 @@ public class Navigator extends JFrame {
      * DOCUMENT ME!
      */
     private void initHttpServer() {
-        final Thread t = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            final Server server = new Server();
-                            final Connector connector = new SelectChannelConnector();
-                            connector.setPort(propertyManager.getHttpInterfacePort());
-                            server.setConnectors(new Connector[] { connector });
-
-                            final Handler param = new AbstractHandler() {
-
-                                    @Override
-                                    public void handle(final String target,
-                                            final HttpServletRequest request,
-                                            final HttpServletResponse response,
-                                            final int dispatch) throws IOException, ServletException {
-                                        final Request base_request = (request instanceof Request)
-                                            ? (Request)request : HttpConnection.getCurrentConnection().getRequest();
-                                        base_request.setHandled(true);
-                                        response.setContentType("text/html");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 // NOI18N
-                                        response.setStatus(HttpServletResponse.SC_OK);
-                                        response.getWriter()
-                                                .println(
-                                                    "<html><head><title>HTTP interface</title></head><body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"80%\"><tr><td width=\"30%\" align=\"center\" valign=\"middle\"><img border=\"0\" src=\"http://www.cismet.de/images/cismetLogo250M.png\" ><br></td><td width=\"%\">&nbsp;</td><td width=\"50%\" align=\"left\" valign=\"middle\"><font face=\"Arial\" size=\"3\" color=\"#1c449c\">... and <b><font face=\"Arial\" size=\"3\" color=\"#1c449c\">http://</font></b> just works</font><br><br><br></td></tr></table></body></html>"); // NOI18N
-                                    }
-                                };
-
-                            final Handler hello = new AbstractHandler() {
-
-                                    @Override
-                                    public void handle(final String target,
-                                            final HttpServletRequest request,
-                                            final HttpServletResponse response,
-                                            final int dispatch) throws IOException, ServletException {
-                                        try {
-                                            if (request.getLocalAddr().equals(request.getRemoteAddr())) {
-                                                if (logger.isInfoEnabled()) {
-                                                    logger.info("HttpInterface asked");                                                 // NOI18N
-                                                }
-                                                if (target.equalsIgnoreCase("/executeSearch")) {                                        // NOI18N
-                                                    final String query = request.getParameter("query");                                 // NOI18N
-                                                    final String domain = request.getParameter("domain");                               // NOI18N
-                                                    final String classId = request.getParameter("classId");                             // NOI18N
-                                                    final HashMap dataBeans = ComponentRegistry.getRegistry()
-                                                                .getSearchDialog()
-                                                                .getSearchFormManager()
-                                                                .getFormDataBeans();
-                                                    final Object object = dataBeans.get(query + "@" + domain);                          // NOI18N
-                                                    final HashMap<String, String> params =
-                                                        new HashMap<String, String>();
-                                                    final Set keys = request.getParameterMap().keySet();
-                                                    final Iterator it = keys.iterator();
-                                                    while (it.hasNext()) {
-                                                        final String key = it.next().toString();
-                                                        if (!(key.equalsIgnoreCase("query")
-                                                                        || key.equalsIgnoreCase("domain")
-                                                                        || key.equalsIgnoreCase("classId"))) {                          // NOI18N
-                                                            params.put(key, request.getParameter(key));
-                                                        }
-                                                    }
-                                                    if (object != null) {
-                                                        final FormDataBean parambean = (FormDataBean)object;
-                                                        for (final String key : params.keySet()) {
-                                                            parambean.setBeanParameter(key, params.get(key));
-                                                        }
-                                                        final List v = new ArrayList();
-                                                        final String cid = classId + "@" + domain;                                      // NOI18N
-                                                        v.add(cid);
-                                                        final LinkedList searchFormData = new LinkedList();
-                                                        searchFormData.add(parambean);
-                                                        ComponentRegistry.getRegistry()
-                                                                .getSearchDialog()
-                                                                .search(v, searchFormData, Navigator.this, false);
-                                                    }
-                                                }
-                                                if (target.equalsIgnoreCase("/showAkuk")) {                                             // NOI18N
-                                                    final String domain = request.getParameter("domain");                               // NOI18N
-                                                    final String classId = request.getParameter("classId");                             // NOI18N
-                                                    final String objectIds = request.getParameter("objectIds");                         // NOI18N
-                                                } else {
-                                                    logger.warn("Unknown Target: " + target);                                           // NOI18N
-                                                }
-                                            } else {
-                                                logger.warn(
-                                                    "Sombody tries to access the HTTP Interface from a different Terminal. Rejected."); // NOI18N
-                                            }
-                                        } catch (Throwable t) {
-                                            logger.error("Error while handling HttpRequests", t);                                       // NOI18N
-                                        }
-                                    }
-                                };
-
-                            final HandlerCollection handlers = new HandlerCollection();
-                            handlers.setHandlers(new Handler[] { param, hello });
-                            server.setHandler(handlers);
-
-                            server.start();
-                            server.join();
-                        } catch (Throwable t) {
-                            logger.error(
-                                "Error in  Navigator HttpInterface on port "
-                                        + propertyManager.getHttpInterfacePort(),
-                                t); // NOI18N
-                        }
-                    }
-                });
-        CismetThreadPool.execute(t);
+        try {
+            RESTRemoteControlStarter.initRestRemoteControlMethods(propertyManager.getHttpInterfacePort());
+        } catch (Throwable e) {
+            logger.error("Error during initializion of remote control server", e);
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -1250,6 +1156,9 @@ public class Navigator extends JFrame {
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void run() {
             if (startupFinished) {
