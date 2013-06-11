@@ -30,10 +30,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.*;
 import java.awt.image.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
 /**
@@ -67,6 +72,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 //    private TreePath[] cachedTreePaths; //DND Fehlverhalten Workaround
 
     private TreePath[] cachedTreePaths; // DND Fehlverhalten Workaround
+    private TreePath[] lastCachedTreePaths; // DND Fehlverhalten Workaround
     private int insertAreaHeight = 8;
     private Rectangle lastRowBounds;
     private Object lastNode = null;
@@ -90,24 +96,29 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
         this.metaTree = metaTree;
         this.dragSource = DragSource.getDefaultDragSource();
-        metaTree.addMouseListener(new MouseAdapter() {                                  // DND Fehlverhalten Workaround
-                @Override
-                public void mouseReleased(final MouseEvent e) {                         // DND Fehlverhalten Workaround
-                    cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths(); // DND Fehlverhalten Workaround
+        metaTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+            //DND Fehlverhalten Workaround
+            @Override
+            public void valueChanged(TreeSelectionEvent e) {                
+                java.util.List<TreePath> path = new ArrayList<TreePath>();;
+                
+                if (cachedTreePaths != null) {
+                    path.addAll( Arrays.asList(cachedTreePaths) );
                 }
-            });
+                
+                for (TreePath tmpPath : e.getPaths()) {
+                    if (e.isAddedPath(tmpPath) ) {
+                        path.add(tmpPath);
+                    } else {
+                        path.remove(tmpPath);
+                    }
+                }
+                lastCachedTreePaths = cachedTreePaths;
+                cachedTreePaths = path.toArray(new TreePath[path.size()]);
+            }
+        });
 
-//        metaTree.addMouseListener(new MouseAdapter() {                                       //DND Fehlverhalten Workaround
-//                public void mouseReleased(MouseEvent e) {                           //DND Fehlverhalten Workaround
-//                    cachedTreePaths= metaTree.getSelectionPaths();       //DND Fehlverhalten Workaround
-//                }
-//            });
         final int sourceActions = DnDConstants.ACTION_COPY_OR_MOVE;
-//        if(this.metaTree instanceof SearchResultsTree) {
-//            sourceActions = DnDConstants.ACTION_COPY;// & InputEvent.BUTTON3_MASK;
-//        } else {
-//            sourceActions = DnDConstants.ACTION_COPY_OR_MOVE + DnDConstants.ACTION_LINK;// & InputEvent.BUTTON3_MASK;
-//        }
 
         _colorCueLine = new Color(SystemColor.controlShadow.getRed(),
                 SystemColor.controlShadow.getGreen(),
@@ -118,26 +129,12 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                 this.metaTree,
                 sourceActions,
                 this);
-//        if(!(this.metaTree instanceof SearchResultsTree)) {
-//            DropTarget dropTarget = new DropTarget(this.metaTree, this);
-//        }
     }
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void dragGestureRecognized(final DragGestureEvent dge) {
-//        metaTree.setSelectionPaths(cachedTreePaths); //DND Fehlverhalten Workaround
-//        TreePath selPath = metaTree.getPathForLocation((int)dge.getDragOrigin().getX(),(int)dge.getDragOrigin().getY());//DND Fehlverhalten Workaround
-//
-//        if ((dge.getTriggerEvent().getModifiers()& (dge.getTriggerEvent().CTRL_MASK | dge.getTriggerEvent().SHIFT_MASK) ) !=0) {//DND Fehlverhalten Workaround
-//            metaTree.setSelectionPaths(cachedTreePaths); //DND Fehlverhalten Workaround /
-//            metaTree.addSelectionPath(selPath);          //DND Fehlverhalten Workaround
-//            cachedTreePaths= metaTree.getSelectionPaths();//DND Fehlverhalten Workaround
-//        } else {
-//            metaTree.setSelectionPath(selPath);//DND Fehlverhalten Workaround
-//        }
-
         if (logger.isDebugEnabled()) {
             logger.debug("dragGestureRecognized()"); // NOI18N
         }
@@ -147,12 +144,17 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                 (int)dge.getDragOrigin().getY());                        // DND Fehlverhalten Workaround
 
         if ((dge.getTriggerEvent().getModifiers()
-                        & (dge.getTriggerEvent().CTRL_MASK | dge.getTriggerEvent().SHIFT_MASK)) != 0) { // DND Fehlverhalten Workaround
+                        & (dge.getTriggerEvent().CTRL_MASK)) != 0) {                                    // DND Fehlverhalten Workaround
             metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths);                            // DND Fehlverhalten Workaround /
             metaTree.getSelectionModel().addSelectionPath(selPath);                                     // DND Fehlverhalten Workaround
             cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();                         // DND Fehlverhalten Workaround
+        } else if ((dge.getTriggerEvent().getModifiers() & dge.getTriggerEvent().SHIFT_MASK) != 0) {
+            metaTree.getSelectionModel().addSelectionPaths(cachedTreePaths);                            // DND Fehlverhalten Workaround
+            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();                         // DND Fehlverhalten Workaround
         } else {
-            metaTree.getSelectionModel().setSelectionPath(selPath);                                     // DND Fehlverhalten Workaround
+            if (contains(lastCachedTreePaths, selPath)) {
+                metaTree.getSelectionModel().setSelectionPaths(lastCachedTreePaths);                    // DND Fehlverhalten Workaround
+            }
         }
 
         if (this.metaTree.getSelectedNode() != null) {
@@ -180,6 +182,16 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    private boolean contains(TreePath[] list, TreePath path) {
+        for (TreePath tmpPath : list) {
+            if (tmpPath.equals(path)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     @Override
     public void drop(final DropTargetDropEvent dtde) {
         if (logger.isDebugEnabled()) {
