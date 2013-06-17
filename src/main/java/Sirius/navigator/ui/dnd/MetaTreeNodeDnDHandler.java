@@ -203,6 +203,9 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     }
 
     private boolean contains(TreePath[] list, TreePath path) {
+        if (list == null) {
+            return false;
+        }
         for (TreePath tmpPath : list) {
             if (tmpPath.equals(path)) {
                 return true;
