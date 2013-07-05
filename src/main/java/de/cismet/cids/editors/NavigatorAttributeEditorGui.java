@@ -370,7 +370,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     /**
      * DOCUMENT ME!
      */
-    private void saveIt() {
+    public void saveIt() {
         saveIt(true);
     }
 
@@ -379,7 +379,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      *
      * @param  closeEditor  DOCUMENT ME!
      */
-    private void saveIt(final boolean closeEditor) {
+    public void saveIt(final boolean closeEditor) {
         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
         final MetaObject mo = otn.getMetaObject();
         final CidsBean oldBean = mo.getBean();
