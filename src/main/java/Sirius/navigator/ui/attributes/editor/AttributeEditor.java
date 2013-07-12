@@ -216,7 +216,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     /**
      * DOCUMENT ME!
      */
-    private void cancel() {
+    public void cancel() {
         if (editor != null) {
             editor.cancelEditing();
 
