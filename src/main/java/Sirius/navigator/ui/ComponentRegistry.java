@@ -52,6 +52,8 @@ public class ComponentRegistry {
     private CoordinateChooser coordinateChooser = null;
     /** Holds value of property navigator. */
     private Navigator navigator = null;
+    /** Holds value of property mainFrame. */
+    private JFrame mainFrame = null;
     /** Holds value of property searchDialog. */
     private SearchDialog searchDialog = null;
     /** Holds value of property searchResultsTree. */
@@ -106,7 +108,49 @@ public class ComponentRegistry {
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
+        this((JFrame)navigator,
+            guiContainer,
+            mutableMenuBar,
+            mutableToolBar,
+            mutablePopupMenu,
+            catalogueTree,
+            searchResultsTree,
+            attributeViewer,
+            attributeEditor,
+            searchDialog,
+            descriptionPane);
         this.navigator = navigator;
+    }
+
+    /**
+     * Creates a new ComponentRegistry object.
+     *
+     * @param   mainFrame          DOCUMENT ME!
+     * @param   guiContainer       DOCUMENT ME!
+     * @param   mutableMenuBar     DOCUMENT ME!
+     * @param   mutableToolBar     DOCUMENT ME!
+     * @param   mutablePopupMenu   DOCUMENT ME!
+     * @param   catalogueTree      DOCUMENT ME!
+     * @param   searchResultsTree  DOCUMENT ME!
+     * @param   attributeViewer    DOCUMENT ME!
+     * @param   attributeEditor    DOCUMENT ME!
+     * @param   searchDialog       DOCUMENT ME!
+     * @param   descriptionPane    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private ComponentRegistry(final JFrame mainFrame,
+            final GUIContainer guiContainer,
+            final MutableMenuBar mutableMenuBar,
+            final MutableToolBar mutableToolBar,
+            final MutablePopupMenu mutablePopupMenu,
+            final MetaCatalogueTree catalogueTree,
+            final SearchResultsTree searchResultsTree,
+            final AttributeViewer attributeViewer,
+            final AttributeEditor attributeEditor,
+            final SearchDialog searchDialog,
+            final DescriptionPane descriptionPane) throws Exception {
+        this.mainFrame = mainFrame;
         this.guiContainer = guiContainer;
         this.mutableMenuBar = mutableMenuBar;
         this.mutableToolBar = mutableToolBar;
@@ -188,6 +232,54 @@ public class ComponentRegistry {
 
     /**
      * DOCUMENT ME!
+     *
+     * @param   mainFrame          DOCUMENT ME!
+     * @param   mutableContainer   DOCUMENT ME!
+     * @param   mutableMenuBar     DOCUMENT ME!
+     * @param   mutableToolBar     DOCUMENT ME!
+     * @param   mutablePopupMenu   DOCUMENT ME!
+     * @param   catalogueTree      DOCUMENT ME!
+     * @param   searchResultsTree  DOCUMENT ME!
+     * @param   attributeViewer    DOCUMENT ME!
+     * @param   attributeEditor    DOCUMENT ME!
+     * @param   searchDialog       DOCUMENT ME!
+     * @param   descriptionPane    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static final void registerComponents(final JFrame mainFrame,
+            final GUIContainer mutableContainer,
+            final MutableMenuBar mutableMenuBar,
+            final MutableToolBar mutableToolBar,
+            final MutablePopupMenu mutablePopupMenu,
+            final MetaCatalogueTree catalogueTree,
+            final SearchResultsTree searchResultsTree,
+            final AttributeViewer attributeViewer,
+            final AttributeEditor attributeEditor,
+            final SearchDialog searchDialog,
+            final DescriptionPane descriptionPane) throws Exception {
+        synchronized (blocker) {
+            if (!isRegistred()) {
+                // Logger.getLogger(ComponentRegistry.class).debug("creating singelton ComponentRegistry instance");
+                registry = new ComponentRegistry(
+                        mainFrame,
+                        mutableContainer,
+                        mutableMenuBar,
+                        mutableToolBar,
+                        mutablePopupMenu,
+                        catalogueTree,
+                        searchResultsTree,
+                        attributeViewer,
+                        attributeEditor,
+                        searchDialog,
+                        descriptionPane);
+                registry.registred = true;
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
      */
     public static final void destroy() {
         synchronized (blocker) {
@@ -231,7 +323,7 @@ public class ComponentRegistry {
      * @return  DOCUMENT ME!
      */
     public JFrame getMainWindow() {
-        return navigator;
+        return mainFrame;
     }
 
     /**
