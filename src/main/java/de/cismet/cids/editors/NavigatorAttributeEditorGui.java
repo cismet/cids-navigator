@@ -377,6 +377,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     /**
      * DOCUMENT ME!
      *
+     * @param  savedBean  DOCUMENT ME!
+     */
+    protected void executeAfterSuccessfullSave(final CidsBean savedBean) {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  closeEditor  DOCUMENT ME!
      */
     private void saveIt(final boolean closeEditor) {
@@ -452,6 +460,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             }
             refreshTree();
             refreshSearchTree();
+            executeAfterSuccessfullSave(savedInstance);
         } catch (Exception ex) {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
