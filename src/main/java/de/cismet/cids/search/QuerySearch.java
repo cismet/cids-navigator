@@ -11,6 +11,7 @@
  */
 package de.cismet.cids.search;
 
+import Sirius.navigator.actiontag.ActionTagProtected;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.search.dynamic.SearchControlListener;
@@ -19,6 +20,8 @@ import Sirius.navigator.search.dynamic.SearchControlPanel;
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
+
+import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
 
@@ -37,8 +40,6 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -49,8 +50,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
-
-import de.cismet.cids.client.tools.DevelopmentTools;
 
 import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
@@ -66,18 +65,18 @@ import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsWindowSearch.class)
-public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch, SearchControlListener {
+public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
+    SearchControlListener,
+    ActionTagProtected {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    private static transient Logger LOG = Logger.getLogger(QuerySearch.class);
     public static final String PROP_ATTRIBUTES = "attributes"; // NOI18N
     public static final String PROP_VALUES = "values";         // NOI18N
     public static final String PROP_SELECT_COMMAND = "selectCommand";
     public static final String PROP_COUNT = "count";
-
-    private static final String DOMAIN = "WRRL_DB_MV"; /*
-                                                        * static final String GROUP = "Administratoren"; static final
-                                                        * String USER = "admin";static final String PASS = "kif";*/
+    private static final String ACTION_TAG = "navigator.querybuilder.searchdialogue@";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -227,7 +226,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
      */
     private static List<MetaClass> GetClasses() throws Exception {
         // DevelopmentTools.initSessionManagerFromRMIConnectionOnLocalhost(DOMAIN, GROUP, USER, PASS);
-        final MetaClass[] metaClass = SessionManager.getProxy().getClasses(DOMAIN);
+        final MetaClass[] metaClass = SessionManager.getProxy()
+                    .getClasses(SessionManager.getSession().getUser().getDomain());
         final List<MetaClass> metaClassesWithAttribute = new LinkedList<MetaClass>();
         for (final MetaClass mClass : metaClass) {
             if (!mClass.getAttributeByName("Queryable").isEmpty()) {
@@ -265,7 +265,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     private static List<String> GetValuesFromAttribute(final MetaClass metaClass, final MemberAttributeInfo attribute) {
         final List<String> values = new ArrayList<String>();
         try {
-            final CidsServerSearch search = new DistinctValuesSearch(metaClass.getTableName(),
+            final CidsServerSearch search = new DistinctValuesSearch(SessionManager.getSession().getUser().getDomain(),
+                    metaClass.getTableName(),
                     attribute.getFieldName());
             final Collection resultCollection = SessionManager.getProxy()
                         .customServerSearch(SessionManager.getSession().getUser(), search);
@@ -306,7 +307,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     private static int GetCount(final MetaClass metaClass, final String whereClause) {
         // int values = -1;
         try {
-            final CidsServerSearch search = new QueryEditorSearch(metaClass.getTableName(),
+            final CidsServerSearch search = new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
+                    metaClass.getTableName(),
                     whereClause,
                     metaClass.getId());
             final Collection resultCollection = SessionManager.getProxy()
@@ -389,7 +391,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                     str = " " + str;
                 }
             } catch (BadLocationException ex) {
-                Logger.getLogger(QuerySearch.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.fatal("Fatal", ex);
                 str = " " + str;
             }
         }
@@ -823,7 +825,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
         threadPool.submit(new Runnable() {
@@ -831,7 +833,13 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                 @Override
                 public void run() {
                     final ClassAttribute[] classAttributes = metaClass.getAttribs();
-                    queryableValues = classAttributes[0].getOptions().keySet();
+                    for(ClassAttribute attribute : classAttributes)
+                    {
+                        if("Queryable".equals(attribute.getName())) {
+                            queryableValues = attribute.getOptions().keySet();
+                            break;
+                        }
+                    }
                     final List<MemberAttributeInfo> newAttributes = GetAttributesFromClass(metaClass);
                     SwingUtilities.invokeLater(new Runnable() {
 
@@ -856,14 +864,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         final List<String> old = values;
         values = new LinkedList<String>();
         firePropertyChange(PROP_VALUES, old, values);
-    } //GEN-LAST:event_jLayerCBActionPerformed
+    }//GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -890,7 +898,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
             });
 
         jLabel2.setText("Einzelwerte von " + attributeInfo.getName());
-    } //GEN-LAST:event_jGetValuesBnActionPerformed
+    }//GEN-LAST:event_jGetValuesBnActionPerformed
 
     @Override
     public JComponent getSearchWindowComponent() {
@@ -901,7 +909,10 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     public MetaObjectNodeServerSearch getServerSearch() {
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
-        return new QueryEditorSearch(metaClass.getTableName(), jTextArea1.getText(), metaClass.getId());
+        return new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
+                metaClass.getTableName(),
+                jTextArea1.getText(),
+                metaClass.getId());
     }
 
     @Override
@@ -929,6 +940,22 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     @Override
     public boolean suppressEmptyResultMessage() {
         return false;
+    }
+
+    @Override
+    public boolean checkActionTag() {
+        boolean result;
+        try {
+            result = SessionManager.getConnection()
+                        .getConfigAttr(SessionManager.getSession().getUser(),
+                                ACTION_TAG
+                                + SessionManager.getSession().getUser().getDomain())
+                        != null;
+        } catch (ConnectionException ex) {
+            LOG.error("Can not check ActionTag!", ex);
+            result = false;
+        }
+        return result;
     }
 
     //~ Inner Classes ----------------------------------------------------------
