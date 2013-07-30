@@ -110,10 +110,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     private javax.swing.JLabel jCommandLb;
     private javax.swing.JLabel jGeheZuLb;
     private javax.swing.JButton jGetValuesBn;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox jLayerCB;
     private javax.swing.JLabel jLayerLb;
     private javax.swing.JComboBox jMethodCB;
     private javax.swing.JLabel jMethodLb;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanelTasten;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -135,6 +137,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     public QuerySearch() throws Exception {
         classes = GetClasses();
         initComponents();
+        jGeheZuLb.setVisible(false);
+        jTextField1.setVisible(false);
         jAttributesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jAttributesLi.addMouseListener(new MouseAdapterImpl());
         jValuesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -172,6 +176,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
             });
         jButton13.addActionListener(new ActionListenerImpl());
         jButton14.addActionListener(new ActionListenerImpl());
+        jGetValuesBn.setEnabled(false);
         jAttributesLi.addListSelectionListener(new ListSelectionListener() {
 
                 @Override
@@ -181,7 +186,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                     }
                     if (!((attributes == null) || (jAttributesLi.getSelectedIndex() == -1))) {
                         final MemberAttributeInfo attributeInfo = attributes.get(jAttributesLi.getSelectedIndex());
-                        if (queryableValues.contains(String.valueOf(attributeInfo.getId()))) {
+                        if (queryableValues.contains(attributeInfo.getFieldName())) {
                             jGetValuesBn.setEnabled(true);
                             return;
                         }
@@ -191,6 +196,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
             });
         if (classes.size() > 0) {
             jLayerCB.setSelectedIndex(0);
+        }
+        if (GetMethods().size() > 0) {
+            jMethodCB.setSelectedIndex(0);
         }
         pnlSearchCancel = new SearchControlPanel(this);
         final Dimension max = pnlSearchCancel.getMaximumSize();
@@ -283,7 +291,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     private static Vector<String> GetMethods() {
         final Vector<String> methods = new Vector<String>();
         // methods.add(null);
-        // methods.add("Select * from "+ className+" where");
+        methods.add("In Suchergebnissen anzeigen");
         return methods;
     }
 
@@ -468,6 +476,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         jGeheZuLb = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         panCommand = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -578,7 +588,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
@@ -724,6 +734,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridheight = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(jPanelTasten, gridBagConstraints);
 
@@ -734,7 +745,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
@@ -750,7 +761,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         add(jCommandLb, gridBagConstraints);
@@ -765,7 +776,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         add(jGetValuesBn, gridBagConstraints);
@@ -773,23 +784,36 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         jGeheZuLb.setText("Gehe zu:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.weightx = 0.2;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         add(jGeheZuLb, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         add(jTextField1, gridBagConstraints);
+
+        panCommand.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(panCommand, gridBagConstraints);
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+        jPanel1.add(jLabel2);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        add(jPanel1, gridBagConstraints);
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
@@ -827,6 +851,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                         });
                 }
             });
+
+        jLabel2.setText("");
+        final List<String> old = values;
+        values = new LinkedList<String>();
+        firePropertyChange(PROP_VALUES, old, values);
     } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
@@ -860,9 +889,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                 }
             });
 
-        /*
-         * List<String> old = values; values = source.GetValuesFromAttribute((MetaClass)jComboBox2.getSelectedItem(),
-         * attributes.get(jList1.getSelectedIndex())); super.firePropertyChange(PROP_VALUES, old, values);*/
+        jLabel2.setText("Einzelwerte von " + attributeInfo.getName());
     } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     @Override
