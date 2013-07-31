@@ -370,6 +370,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     /**
      * DOCUMENT ME!
      */
+    public void cancelEditing() {
+        if (currentBeanStore instanceof EditorSaveListener) {
+            ((EditorSaveListener)currentBeanStore).editorClosed(
+                new EditorClosedEvent(
+                    EditorSaveListener.EditorSaveStatus.CANCELED));
+        }
+        clear();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
     private void saveIt() {
         saveIt(true);
     }
@@ -726,6 +738,15 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     @Override
     public boolean isChanged() {
         return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObject getEditorObject() {
+        return editorObject;
     }
 
     /**
