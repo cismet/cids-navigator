@@ -379,19 +379,19 @@ public class MethodManager {
 
         if (withQuestion) {
             final int option;
-            if (isTreeNodeAlsoOpenInEditor(sourceNode)) {
-                option = showOptionDialogDeleteCurrentlyEditedNode(sourceNode);
-                if (option == JOptionPane.YES_OPTION) {
-                    final AttributeEditor editor = ComponentRegistry.getRegistry().getAttributeEditor();
-                    if (editor instanceof NavigatorAttributeEditorGui) {
-                        ((NavigatorAttributeEditorGui)editor).cancelEditing();
-                    } else {
-                        ComponentRegistry.getRegistry().getAttributeEditor().cancel();
-                    }
+            final boolean nodeCurrentlyEdited = isTreeNodeAlsoOpenInEditor(sourceNode);
+            option = showOptionDialogDeleteNode(sourceNode, nodeCurrentlyEdited);
+
+            // discard the editor
+            if (nodeCurrentlyEdited && (option == JOptionPane.YES_OPTION)) {
+                final AttributeEditor editor = ComponentRegistry.getRegistry().getAttributeEditor();
+                if (editor instanceof NavigatorAttributeEditorGui) {
+                    ((NavigatorAttributeEditorGui)editor).cancelEditing();
+                } else {
+                    ComponentRegistry.getRegistry().getAttributeEditor().cancel();
                 }
-            } else {
-                option = showOptionDialogDeleteNode(sourceNode);
             }
+
             ans = (option == JOptionPane.YES_OPTION);
         }
 
@@ -473,67 +473,41 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param   sourceNode  DOCUMENT ME!
+     * @param   sourceNode           DOCUMENT ME!
+     * @param   nodeCurrentlyEdited  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private int showOptionDialogDeleteCurrentlyEditedNode(final DefaultMetaTreeNode sourceNode) {
+    private int showOptionDialogDeleteNode(final DefaultMetaTreeNode sourceNode, final boolean nodeCurrentlyEdited) {
+        final String suffix = nodeCurrentlyEdited ? ".currentlyEdited" : "";
         return JOptionPane.showOptionDialog(
                 ComponentRegistry.getRegistry().getMainWindow(),
                 org.openide.util.NbBundle.getMessage(
                     MethodManager.class,
-                    "MethodManager.showOptionDialogDeleteCurrentlyEditedNode(DefaultMetaTreeNode).JOptionPane_anon.message",
-                    new Object[] { String.valueOf(sourceNode) }),                                                                   // NOI18N
+                    "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.message"
+                            + suffix,
+                    new Object[] { String.valueOf(sourceNode) }), // NOI18N
                 org.openide.util.NbBundle.getMessage(
                     MethodManager.class,
-                    "MethodManager.showOptionDialogDeleteCurrentlyEditedNode(DefaultMetaTreeNode).JOptionPane_anon.title"),         // NOI18N
+                    "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.title"
+                            + suffix), // NOI18N
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 new String[] {
                     org.openide.util.NbBundle.getMessage(
                         MethodManager.class,
-                        "MethodManager.showOptionDialogDeleteCurrentlyEditedNode(DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
+                        "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.option.commit"
+                                + suffix), // NOI18N
                     org.openide.util.NbBundle.getMessage(
                         MethodManager.class,
-                        "MethodManager.showOptionDialogDeleteCurrentlyEditedNode(DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
-                },                                                                                                                  // NOI18N
+                        "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.option.cancel"
+                                + suffix)
+                },                     // NOI18N
                 org.openide.util.NbBundle.getMessage(
                     MethodManager.class,
-                    "MethodManager.showOptionDialogDeleteCurrentlyEditedNode(DefaultMetaTreeNode).JOptionPane_anon.option.commit"));
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   sourceNode  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private int showOptionDialogDeleteNode(final DefaultMetaTreeNode sourceNode) {
-        return JOptionPane.showOptionDialog(
-                ComponentRegistry.getRegistry().getMainWindow(),
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
-                    new Object[] { String.valueOf(sourceNode) }),                                                      // NOI18N
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"),         // NOI18N
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                new String[] {
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
-                },                                                                                                     // NOI18N
-                org.openide.util.NbBundle.getMessage(
-                    MethodManager.class,
-                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"));
+                    "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.option.commit"
+                            + suffix));
     }
 
     /**

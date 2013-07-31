@@ -755,10 +755,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        java.awt.GridBagConstraints gridBagConstraints;
+        final java.awt.GridBagConstraints gridBagConstraints;
 
-        javax.swing.JToggleButton pinButton = new javax.swing.JToggleButton();
-        javax.swing.JToggleButton editButton = new javax.swing.JToggleButton();
+        final javax.swing.JToggleButton pinButton = new javax.swing.JToggleButton();
+        final javax.swing.JToggleButton editButton = new javax.swing.JToggleButton();
         editorScrollPane = new javax.swing.JScrollPane();
         lblEditorCreation = new javax.swing.JLabel();
         controlBar = new javax.swing.JPanel();
@@ -772,7 +772,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         jButton1 = new javax.swing.JButton();
 
         pinButton.setIcon(resources.getIcon("attr_pin_off.gif"));
-        pinButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.pinButton.tooltip")); // NOI18N
+        pinButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.pinButton.tooltip")); // NOI18N
         pinButton.setActionCommand("pin");
         pinButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pinButton.setContentAreaFilled(false);
@@ -785,7 +787,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         pinButton.setSelectedIcon(resources.getIcon("attr_pin_on.gif"));
 
         editButton.setIcon(resources.getIcon("objekt_bearbeiten.gif"));
-        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.editButton.tooltip")); // NOI18N
+        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.editButton.tooltip")); // NOI18N
         editButton.setActionCommand("edit");
         editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         editButton.setContentAreaFilled(false);
@@ -800,12 +804,15 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         editorScrollPane.setPreferredSize(new java.awt.Dimension(250, 150));
 
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblEditorCreation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+        lblEditorCreation.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
         commitButton.setIcon(resources.getIcon("save_objekt.gif"));
-        commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.commitButton.tooltip")); // NOI18N
+        commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.commitButton.tooltip")); // NOI18N
         commitButton.setActionCommand("commit");
         commitButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         commitButton.setContentAreaFilled(false);
@@ -820,7 +827,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         controlBar.add(commitButton, gridBagConstraints);
 
         cancelButton.setIcon(resources.getIcon("zurueck_objekt.gif"));
-        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.cancelButton.tooltip")); // NOI18N
+        cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.cancelButton.tooltip")); // NOI18N
         cancelButton.setActionCommand("cancel");
         cancelButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         cancelButton.setContentAreaFilled(false);
@@ -833,7 +842,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         controlBar.add(cancelButton, new java.awt.GridBagConstraints());
 
         copyButton.setIcon(resources.getIcon("document-copy.png"));
-        copyButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.copyButton.tooltip")); // NOI18N
+        copyButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.copyButton.tooltip")); // NOI18N
         copyButton.setActionCommand("cancel");
         copyButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         copyButton.setContentAreaFilled(false);
@@ -844,14 +855,18 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         copyButton.setPreferredSize(new java.awt.Dimension(16, 16));
         copyButton.setRolloverIcon(resources.getIcon("document-copy.png"));
         copyButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                copyButtonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    copyButtonActionPerformed(evt);
+                }
+            });
         controlBar.add(copyButton, new java.awt.GridBagConstraints());
 
         pasteButton.setIcon(resources.getIcon("clipboard-paste.png"));
-        pasteButton.setToolTipText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.pasteButton.tooltip")); // NOI18N
+        pasteButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.pasteButton.tooltip")); // NOI18N
         pasteButton.setActionCommand("paste");
         pasteButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         pasteButton.setContentAreaFilled(false);
@@ -862,10 +877,12 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
         pasteButton.setPreferredSize(new java.awt.Dimension(16, 16));
         pasteButton.setRolloverIcon(resources.getIcon("clipboard-paste.png"));
         pasteButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                pasteButtonActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    pasteButtonActionPerformed(evt);
+                }
+            });
         controlBar.add(pasteButton, new java.awt.GridBagConstraints());
 
         add(controlBar, java.awt.BorderLayout.NORTH);
@@ -875,39 +892,43 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
         panDebug.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        jButton1.setText(org.openide.util.NbBundle.getMessage(NavigatorAttributeEditorGui.class, "NavigatorAttributeEditorGui.jButton1.text")); // NOI18N
+        jButton1.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.jButton1.text")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
         panDebug.add(jButton1);
 
         switchPanel.add(panDebug, java.awt.BorderLayout.NORTH);
 
         add(switchPanel, java.awt.BorderLayout.CENTER);
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         if ((getTreeNode() != null) && (getTreeNode() instanceof ObjectTreeNode)) {
             final MetaObject mo = ((ObjectTreeNode)getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());              // NOI18N
             EditorBeanInitializerStore.getInstance()
                     .registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
+    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {      //GEN-FIRST:event_copyButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
             final boolean isNewBean = bean.getMetaObject().getStatus() == MetaObject.NEW;
@@ -930,14 +951,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             pasteButton.setEnabled((currentInitializer != null)
                         && (isNewBean || (currentInitializer instanceof BeanInitializerForcePaste)));
         }
-    }//GEN-LAST:event_copyButtonActionPerformed
+    } //GEN-LAST:event_copyButtonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
+    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pasteButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
 
@@ -958,5 +979,5 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 }
             }
         }
-    }//GEN-LAST:event_pasteButtonActionPerformed
+    } //GEN-LAST:event_pasteButtonActionPerformed
 }
