@@ -24,6 +24,7 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
@@ -56,6 +57,17 @@ public final class CidsSearchExecutor {
      * @param  search  DOCUMENT ME!
      */
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search) {
+        searchAndDisplayResultsWithDialog(search, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  search      DOCUMENT ME!
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     */
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final boolean simpleSort) {
         if (searchControlDialog == null) {
             searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
             searchControlDialog.pack();
@@ -67,7 +79,7 @@ public final class CidsSearchExecutor {
 
                 @Override
                 public void run() {
-                    searchControlDialog.startSearch();
+                    searchControlDialog.startSearch(simpleSort);
                 }
             });
         StaticSwingTools.showDialog(searchControlDialog);
@@ -153,6 +165,28 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
+     * @param   search                      DOCUMENT ME!
+     * @param   searchListener              DOCUMENT ME!
+     * @param   searchResultsTreeListener   DOCUMENT ME!
+     * @param   suppressEmptyResultMessage  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
+            final PropertyChangeListener searchListener,
+            final PropertyChangeListener searchResultsTreeListener,
+            final boolean suppressEmptyResultMessage) {
+        return searchAndDisplayResults(
+                search,
+                searchListener,
+                searchResultsTreeListener,
+                suppressEmptyResultMessage,
+                false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   search                      The search to perform.
      * @param   searchListener              A listener which will be informed about status changes of search thread.
      *                                      Usually a SearchControlPanel.
@@ -163,13 +197,15 @@ public final class CidsSearchExecutor {
      *                                      Since this message is generated in the called method to display the search
      *                                      results in the SearchResultsTree this flag decides about calling thismethod
      *                                      or not.
+     * @param   simpleSort                  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
-            final boolean suppressEmptyResultMessage) {
+            final boolean suppressEmptyResultMessage,
+            final boolean simpleSort) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 @Override
@@ -195,7 +231,8 @@ public final class CidsSearchExecutor {
                     result = nodes.toArray(new Node[0]);
                     if (!isCancelled()) {
                         if (!suppressEmptyResultMessage || (result.length > 0)) {
-                            MethodManager.getManager().showSearchResults(result, false, searchResultsTreeListener);
+                            MethodManager.getManager()
+                                    .showSearchResults(result, false, searchResultsTreeListener, simpleSort);
                         }
                     }
 

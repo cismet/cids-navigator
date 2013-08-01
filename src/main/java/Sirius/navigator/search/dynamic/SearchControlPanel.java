@@ -14,6 +14,7 @@ package Sirius.navigator.search.dynamic;
 
 import Sirius.navigator.search.CidsSearchExecutor;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.middleware.types.Node;
 
@@ -57,12 +58,13 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     private boolean searching = false;
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
+    // End of variables declaration                   
+    private boolean simpleSort;
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton btnSearchCancel;
     private org.jdesktop.swingx.JXBusyLabel lblBusyIcon;
     private javax.swing.Box.Filler strGap;
-    // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
 
@@ -151,7 +153,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
         if (LOG.isInfoEnabled()) {
             LOG.info((searching ? "Cancel" : "Search") + " button was clicked.");
         }
@@ -178,16 +180,18 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 return;
             }
 
+            ComponentRegistry.getRegistry().getSearchResultsTree().addPropertyChangeListener("browse", this);
             searchThread = CidsSearchExecutor.searchAndDisplayResults(
                     search,
                     this,
                     this,
-                    listener.suppressEmptyResultMessage());
+                    listener.suppressEmptyResultMessage(),
+                    simpleSort);
             searching = true;
             setControlsAccordingToState();
             listener.searchStarted();
         }
-    } //GEN-LAST:event_btnSearchCancelActionPerformed
+    }//GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -297,10 +301,21 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      * DOCUMENT ME!
      */
     public void startSearch() {
+        startSearch(false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     */
+    public void startSearch(final boolean simpleSort) {
         if (LOG.isInfoEnabled()) {
             LOG.info("Start search programmatically.");
         }
+        this.simpleSort = simpleSort;
         btnSearchCancel.doClick();
+        this.simpleSort = false;
     }
 
     @Override
