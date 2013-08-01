@@ -100,6 +100,7 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean useFlyingSaucer = false;
+    private boolean useFxWebComp = false;
     private boolean useWebView = false;
     private boolean enableSearchDialog = false;
     private boolean usePainterCoolPanel = true;
@@ -138,6 +139,7 @@ public final class PropertyManager {
         setConnectionInfoSaveable(false);
 
         setUseFlyingSaucer(false);
+        setUseFxWebComp(false);
         setUseWebView(false);
         setEnableSearchDialog(false);
 
@@ -748,6 +750,43 @@ public final class PropertyManager {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isUseFxWebComp() {
+        return useFxWebComp;
+    }
+
+    /**
+     * Setter for property useFlyingSaucer.
+     *
+     * @param  useFxWebComp  useFlyingSaucer String containing 'true'/'false' or '1'/'0'.
+     */
+    public void setUseFxWebComp(final String useFxWebComp) {
+        if ((useFxWebComp != null) && (useFxWebComp.equalsIgnoreCase(TRUE) || useFxWebComp.equals("1"))) {
+            this.setUseFxWebComp(true);
+        } else if ((useFxWebComp != null)
+                    && (useFxWebComp.equalsIgnoreCase(FALSE) || useFxWebComp.equals("0"))) {
+            this.setUseFxWebComp(false);
+        } else {
+            this.setUseFxWebComp(false);
+            logger.warn("setUseFxWebComp(): invalid property 'useFxWebComp': '" + useFxWebComp
+                        + "', setting default value to '"
+                        + this.useFxWebComp + "'");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  useFxWebComp  DOCUMENT ME!
+     */
+    public void setUseFxWebComp(final boolean useFxWebComp) {
+        this.useFxWebComp = useFxWebComp;
+    }
+
+    /**
      * Setter for property useWebView.
      *
      * @param  useWebView  String containing 'true'/'false' or '1'/'0'.
@@ -898,6 +937,8 @@ public final class PropertyManager {
             this.connectionInfo.setUsername(value);
         } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
             this.setUseFlyingSaucer(value);
+        } else if (property.equalsIgnoreCase("useFxWebComp")) {
+            this.setUseFxWebComp(value);
         } else if (property.equalsIgnoreCase("useWebView")) {             // NOI18N
             this.setUseWebView(value);
         } else if (property.equalsIgnoreCase("enableSearchDialog")) {     // NOI18N
