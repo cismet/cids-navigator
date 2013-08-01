@@ -299,7 +299,8 @@ public class MethodManager {
      * @param  append                     Whether to append the search results or not.
      * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
      *                                    Usually a SearchControlPanel.
-     * @param  simpleSort                 if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param  simpleSort                 if true, sorts the search results alphabetically. Usually set to false, as a
+     *                                    more specific sorting order is wished.
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append,

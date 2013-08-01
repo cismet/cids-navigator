@@ -166,20 +166,20 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosing(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
         if (allowUserToCloseDialog) {
             setVisible(false);
         }
-    }//GEN-LAST:event_formWindowClosing
+    }                                                                      //GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         setVisible(false);
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -222,7 +222,8 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     /**
      * DOCUMENT ME!
      *
-     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
      */
     public void startSearch(final boolean simpleSort) {
         pnlSearchCancel.startSearch(simpleSort);

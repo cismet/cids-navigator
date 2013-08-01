@@ -58,13 +58,14 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     private boolean searching = false;
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
-    // End of variables declaration                   
+
     private boolean simpleSort;
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
     private org.jdesktop.swingx.JXBusyLabel lblBusyIcon;
     private javax.swing.Box.Filler strGap;
+    // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
 
@@ -153,7 +154,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
         if (LOG.isInfoEnabled()) {
             LOG.info((searching ? "Cancel" : "Search") + " button was clicked.");
         }
@@ -173,7 +174,6 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 LOG.error("Search should be started, but listener is null.");
                 return;
             }
-
             final MetaObjectNodeServerSearch search = listener.assembleSearch();
             if (search == null) {
                 LOG.warn("The listener didn't provide a search.");
@@ -191,7 +191,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
             setControlsAccordingToState();
             listener.searchStarted();
         }
-    }//GEN-LAST:event_btnSearchCancelActionPerformed
+    } //GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -307,7 +307,8 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     /**
      * DOCUMENT ME!
      *
-     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
      */
     public void startSearch(final boolean simpleSort) {
         if (LOG.isInfoEnabled()) {

@@ -64,7 +64,8 @@ public final class CidsSearchExecutor {
      * DOCUMENT ME!
      *
      * @param  search      DOCUMENT ME!
-     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
      */
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final boolean simpleSort) {
@@ -197,7 +198,8 @@ public final class CidsSearchExecutor {
      *                                      Since this message is generated in the called method to display the search
      *                                      results in the SearchResultsTree this flag decides about calling thismethod
      *                                      or not.
-     * @param   simpleSort                  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param   simpleSort                  if true, sorts the search results alphabetically. Usually set to false, as a
+     *                                      more specific sorting order is wished.
      *
      * @return  DOCUMENT ME!
      */
