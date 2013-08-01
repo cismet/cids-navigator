@@ -651,6 +651,8 @@ public class Navigator extends JFrame {
 
         if (PropertyManager.getManager().isUseFlyingSaucer()) {
             descriptionPane = new DescriptionPaneFS();
+        } else if (PropertyManager.getManager().isUseFxWebComp()) {
+            descriptionPane = new DescriptionPaneFX();
         } else {
             descriptionPane = new DescriptionPaneCalpa();
         }

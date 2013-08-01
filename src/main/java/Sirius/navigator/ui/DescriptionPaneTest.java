@@ -29,7 +29,7 @@ public class DescriptionPaneTest extends javax.swing.JFrame {
 
     //~ Instance fields --------------------------------------------------------
 
-    private DescriptionPaneFS pnlDescription;
+    private DescriptionPaneFX pnlDescription;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGo;
     private javax.swing.JButton btnOpenFile;
@@ -45,7 +45,8 @@ public class DescriptionPaneTest extends javax.swing.JFrame {
     public DescriptionPaneTest() {
         initComponents();
 
-        pnlDescription = new DescriptionPaneFS();
+        pnlDescription = new DescriptionPaneFX();
+        pnlDescription.showHTML();
         add(pnlDescription, BorderLayout.CENTER);
     }
 
