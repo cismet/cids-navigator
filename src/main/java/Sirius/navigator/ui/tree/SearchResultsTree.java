@@ -202,7 +202,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      * @param  nodes       Ergebnisse, die im SearchTree angezeigt werden sollen.
      * @param  append      Ergebnisse anhaengen.
      * @param  listener    DOCUMENT ME!
-     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
      */
     public void setResultNodes(final Node[] nodes,
             final boolean append,
@@ -257,7 +258,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
      *
      * @param  initialFill  sort DOCUMENT ME!
      * @param  listener     DOCUMENT ME!
-     * @param  simpleSort   if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+     * @param  simpleSort   if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                      sorting order is wished.
      */
     private void refreshTree(final boolean initialFill,
             final PropertyChangeListener listener,
@@ -612,7 +614,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         }
 
         /**
-         * 
+         *
          * @param initialFill
          * @param simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
          */
