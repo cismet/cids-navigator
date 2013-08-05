@@ -69,7 +69,7 @@
       </AuxValues>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
-          <GridBagConstraints gridX="0" gridY="2" gridWidth="0" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="5" insetsRight="5" anchor="10" weightX="1.0" weightY="0.0"/>
+          <GridBagConstraints gridX="0" gridY="2" gridWidth="0" gridHeight="1" fill="2" ipadX="0" ipadY="0" insetsTop="5" insetsLeft="5" insetsBottom="5" insetsRight="5" anchor="10" weightX="1.0" weightY="1.0"/>
         </Constraint>
       </Constraints>
 
@@ -78,10 +78,7 @@
         <Component class="javax.swing.JList" name="jAttributesLi">
           <Properties>
             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new javax.swing.AbstractListModel() {&#xa;    String[] strings = {};&#xa;    public int getSize() { return strings.length; }&#xa;    public Object getElementAt(int i) { return strings[i]; }&#xa;}" type="code"/>
-            </Property>
-            <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-              <Dimension value="[100, 80]"/>
+              <Connection code="new javax.swing.AbstractListModel() {&#xa;    Object[] objects = {};&#xa;    public int getSize() { return objects.length; }&#xa;    public Object getElementAt(int i) { return objects[i]; }&#xa;}" type="code"/>
             </Property>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[100, 80]"/>
@@ -93,6 +90,13 @@
           <BindingProperties>
             <BindingProperty name="elements" source="Form" sourcePath="${attributes}" target="jAttributesLi" targetPath="elements" updateStrategy="0" immediately="false">
               <BindingParameter name="DISPLAY" value="${name}"/>
+              <Property name="nullValue" type="java.util.List" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                <ComponentRef name="null"/>
+              </Property>
+              <Property name="incompletePathValue" type="java.util.List" editor="org.netbeans.modules.form.ComponentChooserEditor">
+                <ComponentRef name="null"/>
+              </Property>
+              <Property name="name" type="java.lang.String" value=""/>
             </BindingProperty>
           </BindingProperties>
         </Component>
@@ -113,7 +117,7 @@
         <Component class="javax.swing.JList" name="jValuesLi">
           <Properties>
             <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="new javax.swing.AbstractListModel() {&#xa;    String[] strings = {};&#xa;    public int getSize() { return strings.length; }&#xa;    public Object getElementAt(int i) { return strings[i]; }&#xa;}" type="code"/>
+              <Connection code="new javax.swing.AbstractListModel() {&#xa;    Object[] objects = {};&#xa;    public int getSize() { return objects.length; }&#xa;    public Object getElementAt(int i) { return objects[i]; }&#xa;}" type="code"/>
             </Property>
           </Properties>
           <BindingProperties>
