@@ -30,10 +30,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.*;
 import java.awt.image.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
 import java.util.Vector;
 
 import javax.swing.*;
@@ -71,7 +71,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     private Vector<MutableTreeNode> draggedNodes = new Vector<MutableTreeNode>();
 //    private TreePath[] cachedTreePaths; //DND Fehlverhalten Workaround
 
-    private TreePath[] cachedTreePaths; // DND Fehlverhalten Workaround
+    private TreePath[] cachedTreePaths;     // DND Fehlverhalten Workaround
     private TreePath[] lastCachedTreePaths; // DND Fehlverhalten Workaround
     private boolean autoSelection = false;
     private boolean valueChanged = false;
@@ -100,40 +100,41 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         this.dragSource = DragSource.getDefaultDragSource();
         metaTree.addMouseListener(new MouseAdapter() {
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (!valueChanged) {
-                    lastCachedTreePaths = cachedTreePaths;
-                }
-                valueChanged = false;
-            }
-            
-        });
-        metaTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
-            //DND Fehlverhalten Workaround
-            @Override
-            public void valueChanged(TreeSelectionEvent e) {
-                if (autoSelection) {
-                    return;
-                }
-                java.util.List<TreePath> path = new ArrayList<TreePath>();;
-                valueChanged = true;
-                
-                if (cachedTreePaths != null) {
-                    path.addAll( Arrays.asList(cachedTreePaths) );
-                }
-                
-                for (TreePath tmpPath : e.getPaths()) {
-                    if (e.isAddedPath(tmpPath) ) {
-                        path.add(tmpPath);
-                    } else {
-                        path.remove(tmpPath);
+                @Override
+                public void mousePressed(final MouseEvent e) {
+                    if (!valueChanged) {
+                        lastCachedTreePaths = cachedTreePaths;
                     }
+                    valueChanged = false;
                 }
-                lastCachedTreePaths = cachedTreePaths;
-                cachedTreePaths = path.toArray(new TreePath[path.size()]);
-            }
-        });
+            });
+        metaTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+
+                // DND Fehlverhalten Workaround
+                @Override
+                public void valueChanged(final TreeSelectionEvent e) {
+                    if (autoSelection) {
+                        return;
+                    }
+                    final java.util.List<TreePath> path = new ArrayList<TreePath>();
+                    ;
+                    valueChanged = true;
+
+                    if (cachedTreePaths != null) {
+                        path.addAll(Arrays.asList(cachedTreePaths));
+                    }
+
+                    for (final TreePath tmpPath : e.getPaths()) {
+                        if (e.isAddedPath(tmpPath)) {
+                            path.add(tmpPath);
+                        } else {
+                            path.remove(tmpPath);
+                        }
+                    }
+                    lastCachedTreePaths = cachedTreePaths;
+                    cachedTreePaths = path.toArray(new TreePath[path.size()]);
+                }
+            });
 
         final int sourceActions = DnDConstants.ACTION_COPY_OR_MOVE;
 
@@ -162,16 +163,16 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
         autoSelection = true;
         if ((dge.getTriggerEvent().getModifiers()
-                        & (dge.getTriggerEvent().CTRL_MASK)) != 0) {                                    // DND Fehlverhalten Workaround
-            metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths);                            // DND Fehlverhalten Workaround /
-            metaTree.getSelectionModel().addSelectionPath(selPath);                                     // DND Fehlverhalten Workaround
-            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();                         // DND Fehlverhalten Workaround
+                        & (dge.getTriggerEvent().CTRL_MASK)) != 0) {                 // DND Fehlverhalten Workaround
+            metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths);         // DND Fehlverhalten Workaround /
+            metaTree.getSelectionModel().addSelectionPath(selPath);                  // DND Fehlverhalten Workaround
+            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();      // DND Fehlverhalten Workaround
         } else if ((dge.getTriggerEvent().getModifiers() & dge.getTriggerEvent().SHIFT_MASK) != 0) {
-            metaTree.getSelectionModel().addSelectionPaths(cachedTreePaths);                            // DND Fehlverhalten Workaround
-            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();                         // DND Fehlverhalten Workaround
+            metaTree.getSelectionModel().addSelectionPaths(cachedTreePaths);         // DND Fehlverhalten Workaround
+            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();      // DND Fehlverhalten Workaround
         } else {
             if (contains(lastCachedTreePaths, selPath)) {
-                metaTree.getSelectionModel().setSelectionPaths(lastCachedTreePaths);                    // DND Fehlverhalten Workaround
+                metaTree.getSelectionModel().setSelectionPaths(lastCachedTreePaths); // DND Fehlverhalten Workaround
                 cachedTreePaths = lastCachedTreePaths;
             }
         }
@@ -202,19 +203,27 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
-    private boolean contains(TreePath[] list, TreePath path) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   list  DOCUMENT ME!
+     * @param   path  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean contains(final TreePath[] list, final TreePath path) {
         if (list == null) {
             return false;
         }
-        for (TreePath tmpPath : list) {
+        for (final TreePath tmpPath : list) {
             if (tmpPath.equals(path)) {
                 return true;
             }
         }
-        
+
         return false;
     }
-    
+
     @Override
     public void drop(final DropTargetDropEvent dtde) {
         if (logger.isDebugEnabled()) {

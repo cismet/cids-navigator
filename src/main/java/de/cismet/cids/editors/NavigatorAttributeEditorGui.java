@@ -370,8 +370,28 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     /**
      * DOCUMENT ME!
      */
+    public void cancelEditing() {
+        if (currentBeanStore instanceof EditorSaveListener) {
+            ((EditorSaveListener)currentBeanStore).editorClosed(
+                new EditorClosedEvent(
+                    EditorSaveListener.EditorSaveStatus.CANCELED));
+        }
+        clear();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
     private void saveIt() {
         saveIt(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  savedBean  DOCUMENT ME!
+     */
+    protected void executeAfterSuccessfullSave(final CidsBean savedBean) {
     }
 
     /**
@@ -452,6 +472,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             }
             refreshTree();
             refreshSearchTree();
+            executeAfterSuccessfullSave(savedInstance);
         } catch (Exception ex) {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
@@ -717,6 +738,15 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     @Override
     public boolean isChanged() {
         return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObject getEditorObject() {
+        return editorObject;
     }
 
     /**
