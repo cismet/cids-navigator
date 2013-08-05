@@ -1028,9 +1028,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                 if (selectedObject instanceof MemberAttributeInfo) {
                     if (((MemberAttributeInfo)selectedObject).getJavaclassname().equals(
                                     com.vividsolutions.jts.geom.Geometry.class.getName())) {
-                        value = "'" + (String)selectedObject + "'";
+                        value = "'" + ((MemberAttributeInfo)selectedObject).getFieldName() + "'";
                     } else {
-                        value = (String)selectedObject;
+                        value = ((MemberAttributeInfo)selectedObject).getFieldName();
                     }
                 } else {
                     if (e.getSource() == jValuesLi) {
