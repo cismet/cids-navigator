@@ -493,10 +493,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
 
         jLayerCB.setModel(new javax.swing.DefaultComboBoxModel(classes.toArray()));
         jLayerCB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jLayerCBActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jLayerCBActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -525,15 +527,28 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         add(jMethodCB, gridBagConstraints);
 
         jAttributesLi.setModel(new javax.swing.AbstractListModel() {
-            Object[] objects = {};
-            public int getSize() { return objects.length; }
-            public Object getElementAt(int i) { return objects[i]; }
-        });
-        jAttributesLi.setMinimumSize(new java.awt.Dimension(100, 80));
-        jAttributesLi.setPreferredSize(new java.awt.Dimension(100, 80));
+
+                Object[] objects = {};
+
+                @Override
+                public int getSize() {
+                    return objects.length;
+                }
+                @Override
+                public Object getElementAt(final int i) {
+                    return objects[i];
+                }
+            });
+        jAttributesLi.setVisibleRowCount(0);
 
         org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create("${attributes}");
-        org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, eLProperty, jAttributesLi, "");
+        org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings
+                    .createJListBinding(
+                        org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                        this,
+                        eLProperty,
+                        jAttributesLi,
+                        "");
         jListBinding.setDetailBinding(org.jdesktop.beansbinding.ELProperty.create("${name}"));
         jListBinding.setSourceNullValue(null);
         jListBinding.setSourceUnreadableValue(null);
@@ -545,20 +560,33 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane1, gridBagConstraints);
 
         jValuesLi.setModel(new javax.swing.AbstractListModel() {
-            Object[] objects = {};
-            public int getSize() { return objects.length; }
-            public Object getElementAt(int i) { return objects[i]; }
-        });
+
+                Object[] objects = {};
+
+                @Override
+                public int getSize() {
+                    return objects.length;
+                }
+                @Override
+                public Object getElementAt(final int i) {
+                    return objects[i];
+                }
+            });
+        jValuesLi.setVisibleRowCount(0);
 
         eLProperty = org.jdesktop.beansbinding.ELProperty.create("${values}");
-        jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, eLProperty, jValuesLi);
+        jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                eLProperty,
+                jValuesLi);
         bindingGroup.addBinding(jListBinding);
 
         jScrollPane2.setViewportView(jValuesLi);
@@ -728,7 +756,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane3, gridBagConstraints);
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${selectCommand}"), jCommandLb, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${selectCommand}"),
+                jCommandLb,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -740,10 +773,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
 
         jGetValuesBn.setText("Einzelwerte anfordern");
         jGetValuesBn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jGetValuesBnActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jGetValuesBnActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -786,14 +821,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         add(jPanel1, gridBagConstraints);
 
         bindingGroup.bind();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
         threadPool.submit(new Runnable() {
@@ -801,9 +836,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                 @Override
                 public void run() {
                     final ClassAttribute[] classAttributes = metaClass.getAttribs();
-                    for(ClassAttribute attribute : classAttributes)
-                    {
-                        if("Queryable".equals(attribute.getName())) {
+                    for (final ClassAttribute attribute : classAttributes) {
+                        if ("Queryable".equals(attribute.getName())) {
                             queryableValues = attribute.getOptions().keySet();
                             break;
                         }
@@ -832,20 +866,21 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         final List<String> old = values;
         values = new LinkedList<String>();
         firePropertyChange(PROP_VALUES, old, values);
-    }//GEN-LAST:event_jLayerCBActionPerformed
+    } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
 
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
-        final MemberAttributeInfo attributeInfo = /*(MemberAttributeInfo)jAttributesLi.getSelectedValue();//*/attributes.get(jAttributesLi.getSelectedIndex());
+        final MemberAttributeInfo attributeInfo = /*(MemberAttributeInfo)jAttributesLi.getSelectedValue();//*/ attributes
+                    .get(jAttributesLi.getSelectedIndex());
 
         threadPool.submit(new Runnable() {
 
@@ -866,7 +901,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
             });
 
         jLabel2.setText("Einzelwerte von " + attributeInfo.getName());
-    }//GEN-LAST:event_jGetValuesBnActionPerformed
+    } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     @Override
     public JComponent getSearchWindowComponent() {
@@ -990,14 +1025,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         @Override
         public void mouseClicked(final MouseEvent e) {
             if (e.getClickCount() == 2) {
-                JList source = ((JList)e.getSource());
+                final JList source = ((JList)e.getSource());
                 Object selectedObject = source.getSelectedValue();
                 String value = (String)selectedObject;
 
-                if(e.getSource() == jAttributesLi) {
+                if (e.getSource() == jAttributesLi) {
                     selectedObject = attributes.get(jAttributesLi.getSelectedIndex());
                 } // TODO remove hack
-                
+
                 if (selectedObject instanceof MemberAttributeInfo) {
                     if (((MemberAttributeInfo)selectedObject).getJavaclassname().equals(
                                     com.vividsolutions.jts.geom.Geometry.class.getName())) {
