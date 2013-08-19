@@ -76,7 +76,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     public static final String PROP_VALUES = "values";         // NOI18N
     public static final String PROP_SELECT_COMMAND = "selectCommand";
     public static final String PROP_COUNT = "count";
-    private static final String ACTION_TAG = "navigator.querybuilder.searchdialogue@";
+    public static final String ACTION_TAG = "navigator.querybuilder.searchdialogue@";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -828,7 +828,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
         threadPool.submit(new Runnable() {
@@ -866,14 +866,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         final List<String> old = values;
         values = new LinkedList<String>();
         firePropertyChange(PROP_VALUES, old, values);
-    } //GEN-LAST:event_jLayerCBActionPerformed
+    }//GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -901,7 +901,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
             });
 
         jLabel2.setText("Einzelwerte von " + attributeInfo.getName());
-    } //GEN-LAST:event_jGetValuesBnActionPerformed
+    }//GEN-LAST:event_jGetValuesBnActionPerformed
 
     @Override
     public JComponent getSearchWindowComponent() {
@@ -920,7 +920,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
 
     @Override
     public ImageIcon getIcon() {
-        return null;
+        return new ImageIcon(this.getClass().getResource("/de/cismet/cids/search/binocular.png"));
     }
 
     @Override
