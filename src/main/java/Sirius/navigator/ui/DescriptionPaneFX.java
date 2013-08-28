@@ -143,7 +143,6 @@ public class DescriptionPaneFX extends DescriptionPane {
                 }
                 // ToDo: set the WebView content based on Convention? or Configuartion?
                 setPageFromURI(widgetUrl, o.getBean());
-                showHTML();
             } else {
                 breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
 
@@ -204,6 +203,13 @@ public class DescriptionPaneFX extends DescriptionPane {
                                                     ex); // NOI18N
                                             }
                                         }
+                                        SwingUtilities.invokeLater(new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    showHTML();
+                                                }
+                                            });
                                     }
                                 }
                             });
