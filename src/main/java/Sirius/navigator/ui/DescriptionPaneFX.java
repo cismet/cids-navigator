@@ -1,12 +1,10 @@
-/**
- * *************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- * 
-* ... and it just works.
- * 
-***************************************************
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package Sirius.navigator.ui;
 
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
@@ -37,6 +35,7 @@ import netscape.javascript.JSObject;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.Exceptions;
 
 import javax.swing.SwingUtilities;
 
@@ -48,21 +47,29 @@ import de.cismet.cids.dynamics.CidsBean;
  * WebAccessUserAgent which acts as an adapter for WebAccessManager. In order to read invalid XHTML documents or HTML
  * documents, Tagsoup is used as XMLReader.
  *
- * @author daniel
- * @version $Revision$, $Date$
+ * @author   daniel
+ * @version  $Revision$, $Date$
  */
 public class DescriptionPaneFX extends DescriptionPane {
 
     //~ Static fields/initializers ---------------------------------------------
+
     private static JFXPanel browserFxPanel;
     private static final Logger LOG = Logger.getLogger(DescriptionPaneFX.class);
+
     //~ Instance fields --------------------------------------------------------
+
     private WebEngine webEng = null;
     private WebView webView;
     private JSObject cidsBeanService;
     private Pane browserPane;
+    private boolean newWidgetGetsLoaded = false;
+    private boolean newWidgetisLoaded = false;
+    private String oldWidgetUrl = "";
+    private CidsBean currBean;
 
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates a new DescriptionPaneFX object.
      */
@@ -70,37 +77,34 @@ public class DescriptionPaneFX extends DescriptionPane {
         Platform.setImplicitExit(false);
         browserFxPanel = new JFXPanel();
         Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                browserPane = createBrowser();
-                final Scene scene = new Scene(browserPane);
-//                browserFxPanel.set
-                browserFxPanel.setScene(scene);
-            }
-        });
+
+                @Override
+                public void run() {
+                    browserPane = createBrowser();
+
+                    final Scene scene = new Scene(browserPane);
+                    browserFxPanel.setScene(scene);
+                }
+            });
         add(browserFxPanel, "html");
-
-        /*
-         *  shortcut mouse listener for enabling firefox
-         */
-
     }
 
     //~ Methods ----------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *
-     * @param engine DOCUMENT ME!
+     * @param  engine  DOCUMENT ME!
      */
     private static void enableFirebug(final WebEngine engine) {
         engine.executeScript(
-                "if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite-debug.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/firebug-lite-debug.js' + '#startOpened');}");
+            "if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite-debug.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/firebug-lite-debug.js' + '#startOpened');}");
     }
 
     /**
      * can only be called on FX application Thread !
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
     private Pane createBrowser() {
         webView = new WebView();
@@ -129,25 +133,38 @@ public class DescriptionPaneFX extends DescriptionPane {
     @Override
     protected void performSetNode(final DefaultMetaTreeNode n) {
         final String descriptionURL = n.getDescription();
+        newWidgetGetsLoaded = false;
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
-            final MetaObject o = ((ObjectTreeNode) n).getMetaObject();
+            final MetaObject o = ((ObjectTreeNode)n).getMetaObject();
+            /*
+             * conventional: isHtmlWidget is the class attribute that tells us if we want to use an HTML renderer and
+             * where we can find it.
+             */
             final ClassAttribute widgetAttribute = o.getMetaClass().getClassAttribute("isHtmlWidget");
             if (widgetAttribute != null) {
-                final String widgetUrl = (String) widgetAttribute.getValue();
+                final String widgetUrl = (String)widgetAttribute.getValue();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("loading html widget from url '" + widgetUrl + "' for bean " + o.getBean().getMOString()); // NOI18N
                 }
+
                 // ToDo: set the WebView content based on Convention? or Configuartion?
-                setPageFromURI(widgetUrl, o.getBean());
+                if (oldWidgetUrl.equals(widgetUrl)) {
+                    injectCidsBean(o.getBean());
+                } else {
+                    newWidgetGetsLoaded = true;
+                    setPageFromURI(widgetUrl, o.getBean());
+                }
+                oldWidgetUrl = widgetUrl;
                 showHTML();
             } else {
                 breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
-                    @Override
-                    public void crumbActionPerformed(final java.awt.event.ActionEvent e) {
-                        startSingleRendererWorker(o, n.toString());
-                    }
-                });
+
+                        @Override
+                        public void crumbActionPerformed(final java.awt.event.ActionEvent e) {
+                            startSingleRendererWorker(o, n.toString());
+                        }
+                    });
                 startSingleRendererWorker(n);
             }
         } else if (n.isPureNode() && (n.getDescription() != null)) {
@@ -156,8 +173,10 @@ public class DescriptionPaneFX extends DescriptionPane {
             }
             setPageFromURI(descriptionURL);
             showHTML();
+            oldWidgetUrl = "";
         } else {
             startNoDescriptionRenderer();
+            oldWidgetUrl = "";
         }
         showsWaitScreen = false;
     }
@@ -165,52 +184,54 @@ public class DescriptionPaneFX extends DescriptionPane {
     /**
      * DOCUMENT ME!
      *
-     * @param page DOCUMENT ME!
-     * @param bean DOCUMENT ME!
+     * @param  page  DOCUMENT ME!
+     * @param  bean  DOCUMENT ME!
      */
     private void setPageFromURI(final String page, final CidsBean bean) {
         Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                webEng.load(page);
-                if (bean != null) {
+
+                @Override
+                public void run() {
+                    webEng.load(page);
                     /*
                      * If loading of the page is finished, we inject the cidsBean
                      */
                     webEng.getLoadWorker().stateProperty().addListener(
-                            new ChangeListener<Worker.State>() {
-                        @Override
-                        public void changed(final ObservableValue<? extends Worker.State> ov,
-                                final Worker.State oldState,
-                                final Worker.State newState) {
-                            if ((newState == Worker.State.SUCCEEDED) && (oldState != Worker.State.SUCCEEDED)) {
-                                try {
-                                    final boolean bridgeRegistered = registerJ2JSBridge();
-                                    if (bridgeRegistered) {
-                                        injectCidsBean(bean);
+                        new ChangeListener<Worker.State>() {
 
-                                        webEng.getLoadWorker().stateProperty().removeListener(this);
-                                    }
-                                } catch (JSException ex) {
-                                    if (LOG.isDebugEnabled()) {
-                                        LOG.debug(
-                                                "Could not register Bridge Object for communication between Java and JavaScript",
-                                                ex); // NOI18N
+                            @Override
+                            public void changed(final ObservableValue<? extends Worker.State> ov,
+                                    final Worker.State oldState,
+                                    final Worker.State newState) {
+                                if (newWidgetGetsLoaded) {
+                                    if ((newState == Worker.State.SUCCEEDED) && (oldState != Worker.State.SUCCEEDED)) {
+                                        // our bridge.
+                                        try {
+                                            Thread.sleep(2000);
+//                                            enableFirebug(webEng);
+                                            final boolean bridgeRegistered = registerJ2JSBridge(bean);
+                                            if (bridgeRegistered) {
+                                                newWidgetGetsLoaded = false;
+                                                injectCidsBean(bean);
+                                            }
+                                            webEng.getLoadWorker().stateProperty().removeListener(this);
+                                        } catch (Exception ex) {
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
+
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                DescriptionPaneFX.this.invalidate();
+                                DescriptionPaneFX.this.repaint();
+                            }
+                        });
                 }
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        DescriptionPaneFX.this.invalidate();
-                        DescriptionPaneFX.this.repaint();
-                    }
-                });
-            }
-        });
+            });
     }
 
     @Override
@@ -221,24 +242,41 @@ public class DescriptionPaneFX extends DescriptionPane {
     /**
      * DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @param   bean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private boolean registerJ2JSBridge() {
+    private boolean registerJ2JSBridge(final CidsBean bean) {
         /*
          * per convention we assume that there is an Object with name beanManager ToDo: maybe we can add the Bridge
          * Object directyl to the window with a conventional name check out what is better
          */
-        cidsBeanService = (JSObject) webEng.executeScript("beanManager");
+// final Runnable r = new Runnable() {
+
+//                @Override
+//                public void run() {
+        cidsBeanService = (JSObject)webEng.executeScript("window.beanManager");
         cidsBeanService.setMember("jBridge", new J2JSBridge());
-        return cidsBeanService != null;
+//                }
+//            };
+//        if (Platform.isFxApplicationThread()) {
+//            r.run();
+//        } else {
+//            Platform.runLater(r);
+//        }
+        return true;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param bean DOCUMENT ME!
+     * @param  bean  DOCUMENT ME!
      */
     private void injectCidsBean(final CidsBean bean) {
+//        final Runnable r = new Runnable() {
+//
+//                @Override
+//                public void run() {
         try {
             /*
              * per convention we assume that the object we bind the bridge to has an method injectBean see the comment
@@ -248,26 +286,36 @@ public class DescriptionPaneFX extends DescriptionPane {
         } catch (Exception e) {
             LOG.fatal("could not inject bean in HTML 5 Widget", e);
         }
+//                }
+//            };
+//
+//        if (Platform.isFxApplicationThread()) {
+//            r.run();
+//        } else {
+//            Platform.runLater(r);
+//        }
     }
 
     @Override
     public void setPageFromContent(final String page) {
         Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                webEng.loadContent(page);
-            }
-        });
+
+                @Override
+                public void run() {
+                    webEng.loadContent(page);
+                }
+            });
     }
 
     @Override
     public void setPageFromContent(final String page,
             final String baseURL) {
         Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                webEng.load(page);
-            }
-        });
+
+                @Override
+                public void run() {
+                    webEng.load(page);
+                }
+            });
     }
 }
