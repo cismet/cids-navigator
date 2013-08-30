@@ -76,7 +76,7 @@ public class DescriptionPaneFX extends DescriptionPane {
                 public void run() {
                     browserPane = createBrowser();
                     final Scene scene = new Scene(browserPane);
-//                browserFxPanel.set
+                    scene.getStylesheets().add(this.getClass().getResource("javaFxContextMenu.css").toExternalForm());
                     browserFxPanel.setScene(scene);
                 }
             });
@@ -241,7 +241,7 @@ public class DescriptionPaneFX extends DescriptionPane {
          * per convention we assume that there is an Object with name beanManager ToDo: maybe we can add the Bridge
          * Object directyl to the window with a conventional name check out what is better
          */
-        cidsBeanService = (JSObject)webEng.executeScript("beanManager");
+        cidsBeanService = (JSObject)webEng.executeScript("ci.beanManager");
         cidsBeanService.setMember("jBridge", new J2JSBridge());
         return cidsBeanService != null;
     }

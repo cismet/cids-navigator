@@ -1,0 +1,10 @@
+.context-menu {
+    -fx-skin: "Sirius.navigator.ui.CustomContextMenuSkin";
+    -fx-background-color: white;
+    -fx-border-color: #000; 
+    /*-fx-border-width: 1px;*/ 
+    /*-fx-border-insets: 0.5px;*/ 
+    /*-fx-border-style: solid;*/
+    /*-fx-background-insets: 0.5; "*/
+    /*-fx-background-radius: 2;*/ 
+}
