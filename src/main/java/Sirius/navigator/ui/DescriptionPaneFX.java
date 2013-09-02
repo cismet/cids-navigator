@@ -22,9 +22,13 @@ import javafx.concurrent.Worker;
 
 import javafx.embed.swing.JFXPanel;
 
+import javafx.event.EventHandler;
+
 import javafx.geometry.Insets;
 
 import javafx.scene.Scene;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
@@ -76,16 +80,25 @@ public class DescriptionPaneFX extends DescriptionPane {
                 public void run() {
                     browserPane = createBrowser();
                     final Scene scene = new Scene(browserPane);
+                    /*
+                     *  shortcut mouse listener for enabling firefox ToDo. make the shortcut configurable
+                     */
+                    scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+
+                            @Override
+                            public void handle(final MouseEvent event) {
+                                // TODO Auto-generated method stub
+                                if (event.isControlDown() && event.isAltDown()
+                                            && event.getButton().equals(MouseButton.SECONDARY)) {
+                                    enableFirebug(webEng);
+                                }
+                            }
+                        });
                     scene.getStylesheets().add(this.getClass().getResource("javaFxContextMenu.css").toExternalForm());
                     browserFxPanel.setScene(scene);
                 }
             });
         add(browserFxPanel, "html");
-
-        /*
-         *  shortcut mouse listener for enabling firefox
-         */
-
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -242,7 +255,7 @@ public class DescriptionPaneFX extends DescriptionPane {
          * Object directyl to the window with a conventional name check out what is better
          */
         cidsBeanService = (JSObject)webEng.executeScript("ci.beanManager");
-        cidsBeanService.setMember("jBridge", new J2JSBridge());
+        cidsBeanService.setMember("jBridge", new NavigatorJsBridgeImpl());
         return cidsBeanService != null;
     }
 
