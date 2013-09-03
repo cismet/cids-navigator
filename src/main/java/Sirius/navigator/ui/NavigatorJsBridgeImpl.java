@@ -13,6 +13,8 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import org.apache.log4j.Logger;
+
 import org.openide.util.Exceptions;
 
 import java.util.ArrayList;
@@ -28,6 +30,10 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @version  $Revision$, $Date$
  */
 public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger LOG = Logger.getLogger(NavigatorJsBridgeImpl.class);
 
     //~ Methods ----------------------------------------------------------------
 
@@ -95,6 +101,7 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
         if ((domain == null) || (classKey == null) || domain.equals(classKey)) {
             return "";
         }
+        LOG.fatal("searching all Objects for domain / class: " + domain + "/" + classKey);
         final MetaClass MB_MC = ClassCacheMultiple.getMetaClass(domain, classKey);
         String query = "SELECT " + MB_MC.getID() + ", " + MB_MC.getPrimaryKey() + " ";
         query += "FROM " + MB_MC.getTableName();
@@ -107,7 +114,7 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
             }
             return CidsBean.toJSONString(false, beans);
         } catch (ConnectionException ex) {
-            Exceptions.printStackTrace(ex);
+            LOG.error("can not fetch meta objects / cidsBeans for class/domain "+domain+"/"+classKey,ex);
         }
         return "";
     }

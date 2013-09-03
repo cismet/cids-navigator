@@ -135,6 +135,12 @@ public class DescriptionPaneFX extends DescriptionPane {
 // });
 
         webEng = webView.getEngine();
+//        webEng.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State newState) {
+//
+//            }
+//        });
 
         final BorderPane pane = new BorderPane();
         pane.setPadding(new Insets(5));
@@ -201,7 +207,10 @@ public class DescriptionPaneFX extends DescriptionPane {
                                 public void changed(final ObservableValue<? extends Worker.State> ov,
                                         final Worker.State oldState,
                                         final Worker.State newState) {
-                                    if ((newState == Worker.State.SUCCEEDED) && (oldState != Worker.State.SUCCEEDED)) {
+                                    if (newState == Worker.State.FAILED) {
+                                        startNoDescriptionRenderer();
+                                    } else if ((newState == Worker.State.SUCCEEDED)
+                                                && (oldState != Worker.State.SUCCEEDED)) {
                                         try {
                                             final boolean bridgeRegistered = registerJ2JSBridge();
                                             if (bridgeRegistered) {
@@ -210,11 +219,9 @@ public class DescriptionPaneFX extends DescriptionPane {
                                                 webEng.getLoadWorker().stateProperty().removeListener(this);
                                             }
                                         } catch (JSException ex) {
-                                            if (LOG.isDebugEnabled()) {
-                                                LOG.debug(
-                                                    "Could not register Bridge Object for communication between Java and JavaScript",
-                                                    ex); // NOI18N
-                                            }
+                                            LOG.error(
+                                                "Could not register Bridge Object for communication between Java and JavaScript",
+                                                ex); // NOI18N
                                         }
                                         SwingUtilities.invokeLater(new Runnable() {
 
@@ -254,7 +261,7 @@ public class DescriptionPaneFX extends DescriptionPane {
          * per convention we assume that there is an Object with name beanManager ToDo: maybe we can add the Bridge
          * Object directyl to the window with a conventional name check out what is better
          */
-        cidsBeanService = (JSObject)webEng.executeScript("ci.beanManager");
+        cidsBeanService = (JSObject)webEng.executeScript("ci");
         cidsBeanService.setMember("jBridge", new NavigatorJsBridgeImpl());
         return cidsBeanService != null;
     }
@@ -270,7 +277,8 @@ public class DescriptionPaneFX extends DescriptionPane {
              * per convention we assume that the object we bind the bridge to has an method injectBean see the comment
              * for registerJ2JSBridge
              */
-            cidsBeanService.call("injectBean", bean.toJSONString(false));
+            final JSObject beanManagerObj = (JSObject)cidsBeanService.getMember("beanManager");
+            beanManagerObj.call("injectBean", bean.toJSONString(false));
         } catch (Exception e) {
             LOG.fatal("could not inject bean in HTML 5 Widget", e);
         }
