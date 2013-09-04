@@ -63,7 +63,7 @@ public class DescriptionPaneFX extends DescriptionPane {
 
     private WebEngine webEng = null;
     private WebView webView;
-    private JSObject cidsBeanService;
+    private JSObject cidsJs;
     private Pane browserPane;
 
     //~ Constructors -----------------------------------------------------------
@@ -261,9 +261,9 @@ public class DescriptionPaneFX extends DescriptionPane {
          * per convention we assume that there is an Object with name beanManager ToDo: maybe we can add the Bridge
          * Object directyl to the window with a conventional name check out what is better
          */
-        cidsBeanService = (JSObject)webEng.executeScript("ci");
-        cidsBeanService.setMember("jBridge", new NavigatorJsBridgeImpl());
-        return cidsBeanService != null;
+        cidsJs = (JSObject)webEng.executeScript("ci");
+        cidsJs.setMember("jBridge", new NavigatorJsBridgeImpl());
+        return cidsJs != null;
     }
 
     /**
@@ -277,8 +277,9 @@ public class DescriptionPaneFX extends DescriptionPane {
              * per convention we assume that the object we bind the bridge to has an method injectBean see the comment
              * for registerJ2JSBridge
              */
-            final JSObject beanManagerObj = (JSObject)cidsBeanService.getMember("beanManager");
-            beanManagerObj.call("injectBean", bean.toJSONString(false));
+//            final JSObject beanManagerObj = (JSObject)cidsBeanService.getMember("beanManager");
+//            beanManagerObj.call("injectBean", bean.toJSONString(false));
+            cidsJs.call("injectBean", bean.toJSONString(false));
         } catch (Exception e) {
             LOG.fatal("could not inject bean in HTML 5 Widget", e);
         }
