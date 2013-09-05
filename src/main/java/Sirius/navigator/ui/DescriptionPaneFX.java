@@ -65,6 +65,7 @@ public class DescriptionPaneFX extends DescriptionPane {
     private WebView webView;
     private JSObject cidsJs;
     private Pane browserPane;
+    private NavigatorJsBridgeImpl bridge = new NavigatorJsBridgeImpl();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -108,7 +109,9 @@ public class DescriptionPaneFX extends DescriptionPane {
      *
      * @param  engine  DOCUMENT ME!
      */
-    private static void enableFirebug(final WebEngine engine) {
+    private void enableFirebug(final WebEngine engine) {
+//        final String classMap = bridge.getClass("WUNDA_BLAU", "VERMESSUNG_RISS", null, null);
+//        LOG.fatal("result of getClass: " + classMap);
         engine.executeScript(
             "if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite-debug.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/firebug-lite-debug.js' + '#startOpened');}");
     }
@@ -135,12 +138,15 @@ public class DescriptionPaneFX extends DescriptionPane {
 // });
 
         webEng = webView.getEngine();
-//        webEng.getLoadWorker().stateProperty().addListener(new ChangeListener<Worker.State>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Worker.State> observableValue, Worker.State state, Worker.State newState) {
-//
-//            }
-//        });
+        webEng.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
+
+                @Override
+                public void changed(final ObservableValue<? extends Throwable> ov,
+                        final Throwable t,
+                        final Throwable t1) {
+                    LOG.error("Error in Wb Engine Load Worker", t);
+                }
+            });
 
         final BorderPane pane = new BorderPane();
         pane.setPadding(new Insets(5));
@@ -262,7 +268,8 @@ public class DescriptionPaneFX extends DescriptionPane {
          * Object directyl to the window with a conventional name check out what is better
          */
         cidsJs = (JSObject)webEng.executeScript("ci");
-        cidsJs.setMember("jBridge", new NavigatorJsBridgeImpl());
+//        cidsJs.setMember("jBridge", bridge);
+        cidsJs.call("setBackend", bridge);
         return cidsJs != null;
     }
 
@@ -277,11 +284,11 @@ public class DescriptionPaneFX extends DescriptionPane {
              * per convention we assume that the object we bind the bridge to has an method injectBean see the comment
              * for registerJ2JSBridge
              */
-//            final JSObject beanManagerObj = (JSObject)cidsBeanService.getMember("beanManager");
-//            beanManagerObj.call("injectBean", bean.toJSONString(false));
+// final JSObject beanManagerObj = (JSObject)cidsBeanService.getMember("beanManager");
+// beanManagerObj.call("injectBean", bean.toJSONString(false));
             cidsJs.call("injectBean", bean.toJSONString(false));
         } catch (Exception e) {
-            LOG.fatal("could not inject bean in HTML 5 Widget", e);
+            LOG.error("could not inject bean in HTML 5 Widget", e);
         }
     }
 

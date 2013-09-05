@@ -70,7 +70,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getEmptyInstanceOfClasspublic(String domain, String classKey, String role, String authorization);
+    String getEmptyInstanceOfClass(String domain, String classKey, String role, String authorization);
 
     /**
      * DOCUMENT ME!

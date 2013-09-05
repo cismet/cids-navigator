@@ -13,11 +13,19 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
 
+import java.io.IOException;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -34,6 +42,11 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(NavigatorJsBridgeImpl.class);
+    static final ObjectMapper mapper = new ObjectMapper();
+
+    static {
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -51,8 +64,18 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
 
     @Override
     public String getClass(final String domain, final String classKey, final String role, final String authorization) {
-        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-        // Tools | Templates.
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, classKey);
+        String jsonString = "";
+        try {
+            jsonString = mapper.writeValueAsString(mc);
+        } catch (JsonGenerationException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (JsonMappingException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return jsonString;
     }
 
     @Override
@@ -61,8 +84,19 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
             final int offset,
             final String role,
             final String authorization) {
-        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-        // Tools | Templates.
+        final HashMap map = ClassCacheMultiple.getTableNameHashtableOfClassesForOneDomain(domain);
+
+        String jsonMap = "";
+        try {
+            jsonMap = mapper.writeValueAsString(map);
+        } catch (JsonGenerationException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (JsonMappingException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        return jsonMap;
     }
 
     @Override
@@ -76,7 +110,7 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
     }
 
     @Override
-    public String getEmptyInstanceOfClasspublic(final String domain,
+    public String getEmptyInstanceOfClass(final String domain,
             final String classKey,
             final String role,
             final String authorization) {
@@ -101,7 +135,18 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
         if ((domain == null) || (classKey == null) || domain.equals(classKey)) {
             return "";
         }
-        LOG.fatal("searching all Objects for domain / class: " + domain + "/" + classKey);
+        if ((role != null) || (expand != null) || (level != null) || (fields != null)
+                    || (profile != null)
+                    || (filter != null)
+                    || (authorization != null)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(
+                    "at the moment only domain and classKey parameter are taken into account. ALL other parameters are ignored");
+            }
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("searching all Objects for domain / class: " + domain + "/" + classKey);
+        }
         final MetaClass MB_MC = ClassCacheMultiple.getMetaClass(domain, classKey);
         String query = "SELECT " + MB_MC.getID() + ", " + MB_MC.getPrimaryKey() + " ";
         query += "FROM " + MB_MC.getTableName();
@@ -114,7 +159,7 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
             }
             return CidsBean.toJSONString(false, beans);
         } catch (ConnectionException ex) {
-            LOG.error("can not fetch meta objects / cidsBeans for class/domain "+domain+"/"+classKey,ex);
+            LOG.error("can not fetch meta objects / cidsBeans for class/domain " + domain + "/" + classKey, ex);
         }
         return "";
     }
