@@ -58,7 +58,7 @@ public final class PropertyManager {
     public static final String SORT_ID_TOKEN = "%id%";
     public static final int MIN_SERVER_THREADS = 3;
     public static final int MAX_SERVER_THREADS = 10;
-    public static final String FX_HTML_RENDERER = "FxWebView";
+    public static final String FX_HTML_RENDERER = "fxWebView";
     public static final String CALPA_HTML_RENDERER = "calpa";
     public static final String FLYING_SAUCER_HTML_RENDERER = "flyingSaucer";
 
@@ -144,6 +144,7 @@ public final class PropertyManager {
 
         setUseFlyingSaucer(false);
         setUseWebView(false);
+        setDescriptionPaneHtmlRenderer(PropertyManager.CALPA_HTML_RENDERER);
         setEnableSearchDialog(false);
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
@@ -740,6 +741,9 @@ public final class PropertyManager {
      */
     public void setUseFlyingSaucer(final boolean useFlyingSaucer) {
         this.useFlyingSaucer = useFlyingSaucer;
+        if (useFlyingSaucer) {
+            setDescriptionPaneHtmlRenderer(PropertyManager.FLYING_SAUCER_HTML_RENDERER);
+        }
         properties.setProperty("setUseFlyingSaucer", String.valueOf(this.useFlyingSaucer)); // NOI18N
     }
 
@@ -781,6 +785,9 @@ public final class PropertyManager {
      */
     public void setUseWebView(final boolean useWebView) {
         this.useWebView = useWebView;
+        if (useWebView) {
+            setDescriptionPaneHtmlRenderer(PropertyManager.FX_HTML_RENDERER);
+        }
         properties.setProperty("useWebView", String.valueOf(this.useWebView)); // NOI18N
     }
 
@@ -914,7 +921,7 @@ public final class PropertyManager {
             this.setUseFlyingSaucer(value);
         } else if (property.equalsIgnoreCase("useWebView")) {                                  // NOI18N
             logger.warn(
-                "Property useFlyingSaucer is deprecated and should be replaced with Property " // NOI18N
+                "Property useWebView is deprecated and should be replaced with Property "      // NOI18N
                         + "navigator.descriptionPane.htmlRenderer=FxWebView");                 // NOI18N
             this.setUseWebView(value);
         } else if (property.equalsIgnoreCase("enableSearchDialog")) {                          // NOI18N
@@ -1389,15 +1396,15 @@ public final class PropertyManager {
      */
     public void setDescriptionPaneHtmlRenderer(final String htmlRenderer) {
         this.descriptionPaneHtmlRenderer = htmlRenderer;
-        if (descriptionPaneHtmlRenderer.equals(PropertyManager.CALPA_HTML_RENDERER)) {
-            this.setUseWebView(false);
-            this.setUseFlyingSaucer(false);
-        } else if (descriptionPaneHtmlRenderer.equals(PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
-            this.setUseFlyingSaucer(true);
-            this.setUseWebView(false);
+        if (descriptionPaneHtmlRenderer.equals(PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
+//            this.setUseFlyingSaucer(true);
+//            this.setUseWebView(false);
         } else if (descriptionPaneHtmlRenderer.equals(PropertyManager.FX_HTML_RENDERER)) {
-            this.setUseWebView(true);
-            this.setUseFlyingSaucer(false);
+//            this.setUseWebView(true);
+//            this.setUseFlyingSaucer(false);
+        } else {
+//            this.setUseFlyingSaucer(false);
+//            this.setUseWebView(false);
         }
     }
 
