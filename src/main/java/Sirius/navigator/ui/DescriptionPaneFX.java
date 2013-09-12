@@ -11,6 +11,7 @@ import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
+import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
 import javafx.application.Platform;
@@ -51,16 +52,12 @@ public class DescriptionPaneFX extends DescriptionPane {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static JFXPanel browserFxPanel;
     private static final Logger LOG = Logger.getLogger(DescriptionPaneFX.class);
 
     //~ Instance fields --------------------------------------------------------
 
+    private FXBrowserPane browserPanel = new FXBrowserPane();
     private WebEngine webEng = null;
-    private WebView webView;
-    private JSObject cidsJs;
-    private Pane browserPane;
-    private NavigatorJsBridgeImpl bridge = new NavigatorJsBridgeImpl();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -68,86 +65,11 @@ public class DescriptionPaneFX extends DescriptionPane {
      * Creates a new DescriptionPaneFX object.
      */
     public DescriptionPaneFX() {
-        Platform.setImplicitExit(false);
-        browserFxPanel = new JFXPanel();
-        Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    browserPane = createBrowser();
-                    final Scene scene = new Scene(browserPane);
-                    /*
-                     *  shortcut mouse listener for enabling firefox ToDo. make the shortcut configurable
-                     */
-                    scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
-
-                            @Override
-                            public void handle(final MouseEvent event) {
-                                // TODO Auto-generated method stub
-                                if (event.isControlDown() && event.isAltDown()
-                                            && event.getButton().equals(MouseButton.SECONDARY)) {
-                                    enableFirebug(webEng);
-                                }
-                            }
-                        });
-                    scene.getStylesheets().add(this.getClass().getResource("javaFxContextMenu.css").toExternalForm());
-                    browserFxPanel.setScene(scene);
-                }
-            });
-        add(browserFxPanel, "html");
+        webEng = browserPanel.getWebEngine();
+        add(browserPanel, "html");
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  engine  DOCUMENT ME!
-     */
-    private void enableFirebug(final WebEngine engine) {
-//        final String classMap = bridge.getClass("WUNDA_BLAU", "VERMESSUNG_RISS", null, null);
-//        LOG.fatal("result of getClass: " + classMap);
-        engine.executeScript(
-            "if (!document.getElementById('FirebugLite')){E = document['createElement' + 'NS'] && document.documentElement.namespaceURI;E = E ? document['createElement' + 'NS'](E, 'script') : document['createElement']('script');E['setAttribute']('id', 'FirebugLite');E['setAttribute']('src', 'https://getfirebug.com/' + 'firebug-lite-debug.js' + '#startOpened');E['setAttribute']('FirebugLite', '4');(document['getElementsByTagName']('head')[0] || document['getElementsByTagName']('body')[0]).appendChild(E);E = new Image;E['setAttribute']('src', 'https://getfirebug.com/firebug-lite-debug.js' + '#startOpened');}");
-    }
-
-    /**
-     * can only be called on FX application Thread !
-     *
-     * @return  DOCUMENT ME!
-     */
-    private Pane createBrowser() {
-        webView = new WebView();
-//         disabling the context menue
-        // custom context menue are not possible atm see https://javafx-jira.kenai.com/browse/RT-20306
-        webView.setContextMenuEnabled(false);
-
-        // disabling scoll bars
-// view.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
-// public void onChanged(ListChangeListener.Change<? extends Node> change) {
-// Set<Node> deadSeaScrolls = view.lookupAll(".scroll-bar");
-// for (Node scroll : deadSeaScrolls) {
-// scroll.setVisible(false);
-// }
-// }
-// });
-
-        webEng = webView.getEngine();
-        webEng.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
-
-                @Override
-                public void changed(final ObservableValue<? extends Throwable> ov,
-                        final Throwable t,
-                        final Throwable t1) {
-                    LOG.error("Error in Wb Engine Load Worker", t);
-                }
-            });
-
-        final BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(5));
-        pane.setCenter(webView);
-        return pane;
-    }
 
     @Override
     protected void performSetNode(final DefaultMetaTreeNode n) {
@@ -197,54 +119,53 @@ public class DescriptionPaneFX extends DescriptionPane {
                 @Override
                 public void run() {
 //                    InputStream is = WebAccessManager.getInstance().doRequest(new URL(uri));
-//                    webEng.loadContent(page);
-                    webEng.load(page);
+//                    browserPanel.getWebEngine()().loadContent(page);
+                    browserPanel.getWebEngine().load(page);
                     if (bean != null) {
                         /*
                          * If loading of the page is finished, we inject the cidsBean
                          */
-                        webEng.getLoadWorker().stateProperty().addListener(
-                            new ChangeListener<Worker.State>() {
+                        browserPanel.getWebEngine()
+                                .getLoadWorker()
+                                .stateProperty()
+                                .addListener(
+                                    new ChangeListener<Worker.State>() {
 
-                                @Override
-                                public void changed(final ObservableValue<? extends Worker.State> ov,
-                                        final Worker.State oldState,
-                                        final Worker.State newState) {
-                                    if (newState == Worker.State.FAILED) {
-                                        startNoDescriptionRenderer();
-                                    } else if ((newState == Worker.State.SUCCEEDED)
+                                        @Override
+                                        public void changed(final ObservableValue<? extends Worker.State> ov,
+                                                final Worker.State oldState,
+                                                final Worker.State newState) {
+                                            if (newState == Worker.State.FAILED) {
+                                                startNoDescriptionRenderer();
+                                            } else if ((newState == Worker.State.SUCCEEDED)
                                                 && (oldState != Worker.State.SUCCEEDED)) {
-                                        try {
-                                            final boolean bridgeRegistered = registerJ2JSBridge();
-                                            if (bridgeRegistered) {
-                                                injectCidsBean(bean);
+                                                final boolean bridgeRegistered = browserPanel.registerJ2JSBridge();
+                                                if (bridgeRegistered) {
+                                                    browserPanel.injectCidsBean(bean);
 
-                                                webEng.getLoadWorker().stateProperty().removeListener(this);
-                                            }
-                                        } catch (JSException ex) {
-                                            LOG.error(
-                                                "Could not register Bridge Object for communication between Java and JavaScript",
-                                                ex); // NOI18N
-                                        }
-                                        SwingUtilities.invokeLater(new Runnable() {
-
-                                                @Override
-                                                public void run() {
-                                                    showHTML();
+                                                    browserPanel.getWebEngine()
+                                                        .getLoadWorker()
+                                                        .stateProperty()
+                                                        .removeListener(this);
                                                 }
-                                            });
-                                    }
-                                }
-                            });
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
+                                                SwingUtilities.invokeLater(new Runnable() {
 
-                            @Override
-                            public void run() {
-                                DescriptionPaneFX.this.invalidate();
-                                DescriptionPaneFX.this.repaint();
-                            }
-                        });
+                                                        @Override
+                                                        public void run() {
+                                                            showHTML();
+                                                        }
+                                                    });
+                                            }
+                                        }
+                                    });
+                    }
+//                SwingUtilities.invokeLater(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        DescriptionPaneFX.this.invalidate();
+//                        DescriptionPaneFX.this.repaint();
+//                    }
+//                });
                 }
             });
     }
@@ -254,48 +175,13 @@ public class DescriptionPaneFX extends DescriptionPane {
         setPageFromURI(page, null);
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private boolean registerJ2JSBridge() {
-        /*
-         * per convention we assume that there is an Object with name beanManager ToDo: maybe we can add the Bridge
-         * Object directyl to the window with a conventional name check out what is better
-         */
-        cidsJs = (JSObject)webEng.executeScript("ci");
-//        cidsJs.setMember("jBridge", bridge);
-        cidsJs.call("setBackend", bridge);
-        return cidsJs != null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  bean  DOCUMENT ME!
-     */
-    private void injectCidsBean(final CidsBean bean) {
-        try {
-            /*
-             * per convention we assume that the object we bind the bridge to has an method injectBean see the comment
-             * for registerJ2JSBridge
-             */
-// final JSObject beanManagerObj = (JSObject)cidsBeanService.getMember("beanManager");
-// beanManagerObj.call("injectBean", bean.toJSONString(false));
-            cidsJs.call("injectBean", bean.toJSONString(false));
-        } catch (Exception e) {
-            LOG.error("could not inject bean in HTML 5 Widget", e);
-        }
-    }
-
     @Override
     public void setPageFromContent(final String page) {
         Platform.runLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    webEng.loadContent(page);
+                    browserPanel.getWebEngine().loadContent(page);
                 }
             });
     }
@@ -307,7 +193,7 @@ public class DescriptionPaneFX extends DescriptionPane {
 
                 @Override
                 public void run() {
-                    webEng.load(page);
+                    browserPanel.getWebEngine().load(page);
                 }
             });
     }

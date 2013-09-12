@@ -27,7 +27,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getClass(String domain, String classKey, String role, String authorization);
+    Object getClass(String domain, String classKey, String role, String authorization);
 
     /**
      * DOCUMENT ME!
@@ -40,7 +40,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getAllClasses(String domain, int limit, int offset, String role, String authorization);
+    Object getAllClasses(String domain, int limit, int offset, String role, String authorization);
 
     /**
      * DOCUMENT ME!
@@ -53,7 +53,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getClassForAttributeKey(String domain,
+    Object getAttribute(String domain,
             String classKey,
             String attributeKey,
             String role,
@@ -70,7 +70,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getEmptyInstanceOfClass(String domain, String classKey, String role, String authorization);
+    Object getEmptyInstanceOfClass(String domain, String classKey, String role, String authorization);
 
     /**
      * DOCUMENT ME!
@@ -90,7 +90,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getAllObjectsOfClass(String domain,
+    Object getAllObjectsOfClass(String domain,
             String classKey,
             String role,
             int limit,
@@ -115,7 +115,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String createNewObject(String object,
+    Object createNewObject(String object,
             String domain,
             String classKey,
             boolean requestResultingInstance,
@@ -135,11 +135,11 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String updateOrCreateObject(String object,
+    Object updateOrCreateObject(String object,
             String domain,
             String classKey,
             String objectId,
-            int requestResultingInstance,
+            boolean requestResultingInstance,
             String role,
             String auhtorization);
 
@@ -154,7 +154,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String deleteObject(String domain, String classKey, String objectId, String role, String authorization);
+    Object deleteObject(String domain, String classKey, String objectId, String role, String authorization);
 
     /**
      * DOCUMENT ME!
@@ -173,7 +173,7 @@ public interface NavigatorJsBridge {
      *
      * @return  DOCUMENT ME!
      */
-    String getObject(String domain,
+    Object getObject(String domain,
             String classKey,
             String objectId,
             String version,

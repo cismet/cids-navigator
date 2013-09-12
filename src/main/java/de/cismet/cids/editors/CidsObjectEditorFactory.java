@@ -18,6 +18,7 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
 
+import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.localserver.attribute.ObjectAttribute;
 import Sirius.server.middleware.types.MetaClass;
@@ -51,7 +52,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -321,6 +321,11 @@ public class CidsObjectEditorFactory {
      * @return  DOCUMENT ME!
      */
     private JComponent getObjectEditor(final MetaClass metaClass) {
+        final ClassAttribute htmlRendererAttrib = metaClass.getClassAttribute("isHtmlWidget");
+        if (htmlRendererAttrib != null) {
+            final String widgetUrl = (String)htmlRendererAttrib.getValue();
+            return new HtmlWidgetEditor(widgetUrl);
+        }
         final Class<?> editorClass = ClassloadingHelper.getDynamicClass(
                 metaClass,
                 ClassloadingHelper.CLASS_TYPE.EDITOR);
