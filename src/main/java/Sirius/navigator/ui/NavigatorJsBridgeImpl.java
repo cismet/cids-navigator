@@ -25,6 +25,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.log4j.Logger;
 
+import org.jfree.util.Log;
+
 import org.openide.util.Exceptions;
 
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Observable;
 
 import de.cismet.cids.client.tools.DevelopmentTools;
 
@@ -45,7 +48,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
-public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
+public class NavigatorJsBridgeImpl extends Observable implements NavigatorJsBridge {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -53,6 +56,29 @@ public class NavigatorJsBridgeImpl implements NavigatorJsBridge {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * public void updateCidsBean(String jsonBean){ this.notifyObservers(jsonBean); }.
+     *
+     * @param  jsonBean  DOCUMENT ME!
+     */
+    public void updateCidsBean(final String jsonBean) {
+        try {
+            final CidsBean bean = CidsBean.createNewCidsBeanFromJSON(false, jsonBean);
+            this.setChanged();
+            this.notifyObservers(bean);
+        } catch (Exception ex) {
+            Log.error("Could not create cidsBean of jsonString: " + jsonBean, ex);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void setChangeFlag() {
+        this.setChanged();
+        this.notifyObservers();
+    }
 
     @Override
     public Object getClass(final String domain,

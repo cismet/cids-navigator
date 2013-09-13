@@ -11,6 +11,7 @@
  */
 package de.cismet.cids.tools.metaobjectrenderer;
 
+import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
@@ -21,6 +22,7 @@ import javax.swing.JComponent;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
+import de.cismet.cids.editors.HtmlWidgetEditor;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
@@ -117,7 +119,17 @@ public class CidsObjectRendererFactory {
                 } else {
                     bean = null;
                 }
-                final Object o = rendererClass.newInstance();
+                final Object o;
+                final MetaClass metaClass = mo.getMetaClass();
+                final ClassAttribute htmlRendererAttrib = metaClass.getClassAttribute("isHtmlWidget");
+                if ((htmlRendererAttrib != null) && (htmlRendererAttrib.getValue() != null)
+                            && !htmlRendererAttrib.getValue().equals("")) {
+                    final String widgetUrl = (String)htmlRendererAttrib.getValue();
+                    o = new HtmlWidgetRenderer(widgetUrl);
+                } else {
+                    o = rendererClass.newInstance();
+                }
+
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
                     renderer.setTitle(title);

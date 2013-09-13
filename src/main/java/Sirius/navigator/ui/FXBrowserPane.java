@@ -31,12 +31,9 @@ import netscape.javascript.JSObject;
 
 import org.apache.log4j.Logger;
 
-import org.jfree.util.Log;
-
-import org.openide.util.Exceptions;
-
 import java.awt.BorderLayout;
-import java.awt.Dimension;
+
+import java.util.Observer;
 
 import javax.swing.JPanel;
 
@@ -179,9 +176,10 @@ public class FXBrowserPane extends JPanel {
     /**
      * DOCUMENT ME!
      *
-     * @param  bean  DOCUMENT ME!
+     * @param  bean      DOCUMENT ME!
+     * @param  editable  DOCUMENT ME!
      */
-    public void injectCidsBean(final CidsBean bean) {
+    public void injectCidsBean(final CidsBean bean, final boolean editable) {
         Platform.runLater(new Runnable() {
 
                 @Override
@@ -191,7 +189,10 @@ public class FXBrowserPane extends JPanel {
                          * per convention we assume that the object we bind the bridge to (CidsJS) has an method
                          * injectBean see the comment for registerJ2JSBridge
                          */
-                        cidsJs.call("injectBean", CidsBean.getCidsBeanObjectMapper().writeValueAsString(bean));
+                        cidsJs.call(
+                            "injectBean",
+                            CidsBean.getCidsBeanObjectMapper().writeValueAsString(bean),
+                            editable);
                     } catch (Exception e) {
                         LOG.error("could not inject bean in HTML 5 Widget", e);
                     }
@@ -227,5 +228,23 @@ public class FXBrowserPane extends JPanel {
         }
 
         return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  o  DOCUMENT ME!
+     */
+    public void addBridgeObserver(final Observer o) {
+        bridge.addObserver(o);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  o  DOCUMENT ME!
+     */
+    public void removeBridgeObserver(final Observer o) {
+        bridge.deleteObserver(o);
     }
 }

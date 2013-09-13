@@ -11,11 +11,9 @@ import Sirius.navigator.ui.DescriptionPaneFX;
 import Sirius.navigator.ui.FXBrowserPane;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javafx.application.Platform;
 
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 import javafx.concurrent.Worker;
@@ -25,20 +23,17 @@ import org.apache.log4j.Logger;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import java.util.AbstractList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import javax.swing.JPanel;
 
 import de.cismet.cids.dynamics.CidsBean;
-import de.cismet.cids.dynamics.DisposableCidsBeanStore;
+
+import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
 
 import de.cismet.tools.gui.DoNotWrap;
 
@@ -50,8 +45,10 @@ import de.cismet.tools.gui.DoNotWrap;
  */
 public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
     RequestsFullSizeComponent,
-    DisposableCidsBeanStore,
-    EditorSaveListener {
+    CidsBeanRenderer,
+    EditorSaveListener,
+    PropertyChangeListener,
+    Observer {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -62,6 +59,9 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
     boolean bridgeRegistered = false;
     private FXBrowserPane browserPanel = new FXBrowserPane();
     private CidsBean cb = null;
+    private boolean editable;
+    private String title = "";
+    private boolean hasChanged = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -71,6 +71,25 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
      * @param  url  DOCUMENT ME!
      */
     public HtmlWidgetEditor(final String url) {
+        this(url, true);
+    }
+
+    /**
+     * Creates a new HtmlWidgetEditor object.
+     *
+     * @param  url       DOCUMENT ME!
+     * @param  editable  DOCUMENT ME!
+     */
+    public HtmlWidgetEditor(final String url, final boolean editable) {
+        this.editable = editable;
+        final Observer observer = new Observer() {
+
+                @Override
+                public void update(final Observable o, final Object arg) {
+                    HtmlWidgetEditor.this.update(o, arg);
+                }
+            };
+        browserPanel.addBridgeObserver(observer);
         this.setLayout(new BorderLayout());
         this.setPreferredSize(new Dimension(5000, 500));
         add(browserPanel, BorderLayout.CENTER);
@@ -90,6 +109,7 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
                                         if (newState == Worker.State.FAILED) {
                                             // ToDo: show an error page
                                             LOG.fatal("Can not load editor at " + url + ". showing default error page");
+                                            // browserPanel.loadErrorPage();
                                         } else if ((newState == Worker.State.SUCCEEDED)
                                             && (oldState != Worker.State.SUCCEEDED)) {
                                             bridgeRegistered = browserPanel.registerJ2JSBridge();
@@ -111,8 +131,9 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
     @Override
     public void setCidsBean(final CidsBean cidsBean) {
         this.cb = cidsBean;
+        this.cb.addPropertyChangeListener(this);
 //        ToDO: setting the change flag only if the bean has changed instead of always setting the change flag
-        cb.setArtificialChangeFlag(true);
+//        cb.setArtificialChangeFlag(true);
         Platform.runLater(new Runnable() {
 
                 @Override
@@ -120,7 +141,7 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
                     final double totalWork = browserPanel.getWebEngine().getLoadWorker().getTotalWork();
                     final double workDone = browserPanel.getWebEngine().getLoadWorker().getWorkDone();
                     if ((totalWork == workDone) && bridgeRegistered) {
-                        browserPanel.injectCidsBean(cb);
+                        browserPanel.injectCidsBean(cb, editable);
                     } else {
                         browserPanel.getWebEngine()
                                 .getLoadWorker()
@@ -136,7 +157,7 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
                                                 if (!bridgeRegistered) {
                                                     bridgeRegistered = browserPanel.registerJ2JSBridge();
                                                 }
-                                                browserPanel.injectCidsBean(cb);
+                                                browserPanel.injectCidsBean(cb, editable);
                                                 browserPanel.getWebEngine()
                                                 .getLoadWorker()
                                                 .stateProperty()
@@ -165,29 +186,32 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
         return true;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   args  beanToUpdate DOCUMENT ME!
-     *
-     * @throws  IOException  DOCUMENT ME!
-     * @throws  Exception    DOCUMENT ME!
-     */
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   args  DOCUMENT ME!
-     *
-     * @throws  IOException  DOCUMENT ME!
-     * @throws  Exception    DOCUMENT ME!
-     */
-    public static void main(final String[] args) throws IOException, Exception {
-        final InputStream is = HtmlWidgetEditor.class.getClassLoader()
-                    .getResourceAsStream("de/cismet/cids/editors/test.json");
-        final ObjectMapper mapper = new ObjectMapper();
-        final JsonNode json = mapper.readTree(is);
-        final String s = json.toString();
-        final CidsBean cb = CidsBean.createNewCidsBeanFromJSON(false, s);
-        System.out.println("CidsBean " + cb);
+    @Override
+    public String getTitle() {
+        return title;
+    }
+
+    @Override
+    public void setTitle(final String title) {
+        this.title = title;
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent evt) {
+        if (bridgeRegistered) {
+            browserPanel.injectCidsBean(cb, editable);
+        }
+    }
+
+    @Override
+    public void update(final Observable o, final Object arg) {
+        if (!hasChanged) {
+//            if (arg instanceof CidsBean) {
+//                final CidsBean newBean = (CidsBean)arg;
+//                cb.bulkUpdate(newBean);
+//            }
+            cb.setArtificialChangeFlag(true);
+            hasChanged = true;
+        }
     }
 }
