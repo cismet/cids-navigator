@@ -659,7 +659,18 @@ public class Navigator extends JFrame {
             descriptionPane = new DescriptionPaneFS();
         } else if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
                         PropertyManager.FX_HTML_RENDERER)) {
-            descriptionPane = new DescriptionPaneFX();
+            try {
+                descriptionPane = new DescriptionPaneFX();
+//            } catch (NoClassDefFoundError e) {
+            } catch (Error e) {
+                logger.error("Error during initialisation of Java FX Description Pane. Using Calpa as fallback.", e);
+                descriptionPane = new DescriptionPaneCalpa();
+            } catch (Exception e) {
+                logger.error(
+                    "Exception during initialisation of Java FX Description Pane. Using Calpa as fallback.",
+                    e);
+                descriptionPane = new DescriptionPaneCalpa();
+            }
         } else {
             descriptionPane = new DescriptionPaneCalpa();
         }

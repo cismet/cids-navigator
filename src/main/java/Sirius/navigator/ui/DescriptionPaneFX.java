@@ -7,12 +7,9 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
-
 import javafx.application.Platform;
 
-
 import javafx.embed.swing.JFXPanel;
-
 
 import javafx.geometry.Insets;
 
@@ -22,17 +19,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 
-
 import org.apache.log4j.Logger;
 
 import javax.swing.SwingUtilities;
 
-
 /**
- * ToDo adapt comment An implementation of DescriptionPane which uses JavaFX WebKit Component to render XHTML content.
- * The retrieval of XHTML documents is done by WebAccessManager. Therefore FLying Saucer is configured to use
- * WebAccessUserAgent which acts as an adapter for WebAccessManager. In order to read invalid XHTML documents or HTML
- * documents, Tagsoup is used as XMLReader.
+ * An implementation of DescriptionPane which uses JavaFX WebKit Component to render XHTML content.
  *
  * @author   daniel
  * @version  $Revision$, $Date$
