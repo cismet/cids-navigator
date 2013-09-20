@@ -922,7 +922,7 @@ public final class PropertyManager {
         } else if (property.equalsIgnoreCase("useWebView")) {                                  // NOI18N
             logger.warn(
                 "Property useWebView is deprecated and should be replaced with Property "      // NOI18N
-                        + "navigator.descriptionPane.htmlRenderer=FxWebView");                 // NOI18N
+                        + "navigator.descriptionPane.htmlRenderer=fxWebView");                 // NOI18N
             this.setUseWebView(value);
         } else if (property.equalsIgnoreCase("enableSearchDialog")) {                          // NOI18N
             this.setEnableSearchDialog(value);
