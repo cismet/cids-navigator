@@ -7,7 +7,6 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
-
 import javafx.application.Platform;
 
 import javafx.scene.web.WebEngine;
@@ -45,41 +44,6 @@ public class DescriptionPaneFX extends DescriptionPane {
 
     //~ Methods ----------------------------------------------------------------
 
-// @Override
-// protected void performSetNode(final DefaultMetaTreeNode n) {
-// final String descriptionURL = n.getDescription();
-// // besorge MO zum parametrisieren der URL
-// if (n.isObjectNode()) {
-// final MetaObject o = ((ObjectTreeNode)n).getMetaObject();
-// final ClassAttribute widgetAttribute = o.getMetaClass().getClassAttribute("isHtmlWidget");
-// if (widgetAttribute != null) {
-// final String widgetUrl = (String)widgetAttribute.getValue();
-// if (LOG.isDebugEnabled()) {
-// LOG.debug("loading html widget from url '" + widgetUrl + "' for bean " + o.getBean().getMOString()); // NOI18N
-// }
-// // ToDo: set the WebView content based on Convention? or Configuartion?
-// setPageFromURI(widgetUrl, o.getBean());
-// } else {
-// breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
-//
-// @Override
-// public void crumbActionPerformed(final java.awt.event.ActionEvent e) {
-// startSingleRendererWorker(o, n.toString());
-// }
-// });
-// startSingleRendererWorker(n);
-// }
-// } else if (n.isPureNode() && (n.getDescription() != null)) {
-// if (LOG.isDebugEnabled()) {
-// LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
-// }
-// setPageFromURI(descriptionURL);
-// showHTML();
-// } else {
-// startNoDescriptionRenderer();
-// }
-// showsWaitScreen = false;
-// }
     @Override
     public void setPageFromURI(final String page) {
         Platform.runLater(new Runnable() {

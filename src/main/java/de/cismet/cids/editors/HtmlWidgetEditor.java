@@ -7,28 +7,35 @@
 ****************************************************/
 package de.cismet.cids.editors;
 
+import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.DescriptionPaneFX;
 import Sirius.navigator.ui.FXBrowserPane;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 
 import javafx.application.Platform;
 
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 
 import javafx.concurrent.Worker;
 
 import org.apache.log4j.Logger;
 
+
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.CountDownLatch;
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -56,12 +63,16 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
 
     //~ Instance fields --------------------------------------------------------
 
+    public CountDownLatch initLatch = new CountDownLatch(1);
+    protected javax.swing.JLabel lblRendererCreationWaitingLabel;
     boolean bridgeRegistered = false;
-    private FXBrowserPane browserPanel = new FXBrowserPane();
+    private FXBrowserPane browserPanel;
     private CidsBean cb = null;
     private boolean editable;
     private String title = "";
     private boolean hasChanged = false;
+    private final CardLayout cardLayout;
+//    private boolean keepOnMovin = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -82,6 +93,12 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
      */
     public HtmlWidgetEditor(final String url, final boolean editable) {
         this.editable = editable;
+        this.setOpaque(false);
+        final JComponent descPane = ComponentRegistry.getRegistry().getDescriptionPane();
+        this.setSize(descPane.getSize());
+        browserPanel = new FXBrowserPane(descPane.getSize().height, descPane.getSize().width);
+        this.setPreferredSize(descPane.getPreferredSize());
+        this.setMinimumSize(descPane.getMinimumSize());
         final Observer observer = new Observer() {
 
                 @Override
@@ -90,9 +107,9 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
                 }
             };
         browserPanel.addBridgeObserver(observer);
-        this.setLayout(new BorderLayout());
-        this.setPreferredSize(new Dimension(5000, 500));
-        add(browserPanel, BorderLayout.CENTER);
+        browserPanel.setOpaque(false);
+        this.setMinimumSize(new Dimension(500, 500));
+        this.setPreferredSize(new Dimension(5000, 5000));
         Platform.runLater(new Runnable() {
 
                 @Override
@@ -106,19 +123,53 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
                                     public void changed(final ObservableValue<? extends Worker.State> ov,
                                             final Worker.State oldState,
                                             final Worker.State newState) {
+                                        if (!bridgeRegistered) {
+                                            bridgeRegistered = browserPanel.registerJ2JSBridge();
+                                            if ((cb != null) && bridgeRegistered) {
+                                                browserPanel.injectCidsBean(cb, editable);
+                                            }
+                                        }
                                         if (newState == Worker.State.FAILED) {
                                             // ToDo: show an error page
                                             LOG.fatal("Can not load editor at " + url + ". showing default error page");
                                             // browserPanel.loadErrorPage();
-                                        } else if ((newState == Worker.State.SUCCEEDED)
-                                            && (oldState != Worker.State.SUCCEEDED)) {
-                                            bridgeRegistered = browserPanel.registerJ2JSBridge();
                                         }
                                     }
                                 });
                     browserPanel.getWebEngine().load(url);
                 }
             });
+        cardLayout = new CardLayout();
+        final JPanel htmlPanel = new JPanel();
+        htmlPanel.setLayout(new BorderLayout());
+        htmlPanel.add(browserPanel, BorderLayout.CENTER);
+        this.setLayout(cardLayout);
+        final JPanel waitPanel = new JPanel();
+
+        waitPanel.setLayout(new GridBagLayout());
+//        waitPanel.setBackground(Color.GREEN);
+        lblRendererCreationWaitingLabel = new javax.swing.JLabel();
+        lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+//        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
+//        final JComponent wrappedComp = (JComponent)cw.wrapComponent(lblRendererCreationWaitingLabel);
+        final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.weightx = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        waitPanel.add(new JLabel(""), gridBagConstraints);
+//        add(waitPanel, "waitPanel");
+        add(htmlPanel, "htmlPanel");
+//        cardLayout.show(this, "waitPanel");
+        cardLayout.show(this, "htmlPanel");
+//        this.setLayout(new BorderLayout());
+//        this.setBorder(new EmptyBorder(10, 10, 10, 10));
+        this.setOpaque(true);
+//        this.setBackground(Color.red);
+//        add(browserPanel, BorderLayout.CENTER);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -141,30 +192,7 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
                     final double totalWork = browserPanel.getWebEngine().getLoadWorker().getTotalWork();
                     final double workDone = browserPanel.getWebEngine().getLoadWorker().getWorkDone();
                     if ((totalWork == workDone) && bridgeRegistered) {
-                        browserPanel.injectCidsBean(cb, editable);
-                    } else {
-                        browserPanel.getWebEngine()
-                                .getLoadWorker()
-                                .stateProperty()
-                                .addListener(new javafx.beans.value.ChangeListener<Worker.State>() {
-
-                                        @Override
-                                        public void changed(final ObservableValue<? extends Worker.State> ov,
-                                                final Worker.State oldState,
-                                                final Worker.State newState) {
-                                            if ((newState == Worker.State.SUCCEEDED)
-                                                && (oldState != Worker.State.SUCCEEDED)) {
-                                                if (!bridgeRegistered) {
-                                                    bridgeRegistered = browserPanel.registerJ2JSBridge();
-                                                }
-                                                browserPanel.injectCidsBean(cb, editable);
-                                                browserPanel.getWebEngine()
-                                                .getLoadWorker()
-                                                .stateProperty()
-                                                .removeListener(this);
-                                            }
-                                        }
-                                    });
+//                        browserPanel.injectCidsBean(cb, editable);
                     }
                 }
             });
@@ -205,11 +233,12 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
 
     @Override
     public void update(final Observable o, final Object arg) {
+        if (arg instanceof String) {
+            if (arg.equals("showHTML")) {
+                initLatch.countDown();
+            }
+        }
         if (!hasChanged) {
-//            if (arg instanceof CidsBean) {
-//                final CidsBean newBean = (CidsBean)arg;
-//                cb.bulkUpdate(newBean);
-//            }
             cb.setArtificialChangeFlag(true);
             hasChanged = true;
         }

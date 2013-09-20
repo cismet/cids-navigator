@@ -20,6 +20,7 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import org.openide.util.Exceptions;
 import org.openide.util.WeakListeners;
 
 import java.awt.BorderLayout;
@@ -47,23 +48,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
+import de.cismet.cids.editors.HtmlWidgetEditor;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 
@@ -82,6 +83,8 @@ import de.cismet.tools.gui.WrappedComponent;
 import de.cismet.tools.gui.breadcrumb.BreadCrumb;
 import de.cismet.tools.gui.breadcrumb.DefaultBreadCrumbModel;
 import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
+
+import static java.awt.image.ImageObserver.WIDTH;
 
 /**
  * DOCUMENT ME!
@@ -110,6 +113,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected LinkStyleBreadCrumbGui breadCrumbGui;
     // will only be accessed in EDT !
     private transient boolean fullScreenRenderer;
+    private HtmlWidgetEditor widgetEditor;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -853,7 +857,16 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                         jComp = NoDescriptionRenderer.getInstance();
                     } else {
                         jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
-
+                        if (jComp instanceof HtmlWidgetEditor) {
+                            widgetEditor = (HtmlWidgetEditor)jComp;
+                            if (widgetEditor != null) {
+                                if (!widgetEditor.initLatch.await(10, TimeUnit.SECONDS)) {
+                                    LOG.fatal("Error during initialisation of HtmlWidget Editor. Timeout!");
+                                }
+                            }
+                        } else {
+                            widgetEditor = null;
+                        }
                         if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
                             ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
                         } else if ((jComp instanceof WrappedComponent)
@@ -923,6 +936,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 panRenderer.setLayout(new GridBagLayout());
                                 panRenderer.add(sdp, gridBagConstraints);
                             }
+
                             sdp.startChecking();
                             panRenderer.revalidate();
                             revalidate();

@@ -75,6 +75,14 @@ public class NavigatorJsBridgeImpl extends Observable implements NavigatorJsBrid
     /**
      * DOCUMENT ME!
      */
+    public void showHTMLComponent() {
+        LOG.fatal("Angular app completely initialised");
+        this.setChanged();
+        this.notifyObservers("showHTML");
+    }
+    /**
+     * DOCUMENT ME!
+     */
     public void setChangeFlag() {
         this.setChanged();
         this.notifyObservers();

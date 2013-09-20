@@ -32,10 +32,13 @@ import netscape.javascript.JSObject;
 import org.apache.log4j.Logger;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 
 import java.util.Observer;
 
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -51,13 +54,13 @@ public class FXBrowserPane extends JPanel {
 
     private static JFXPanel browserFxPanel;
     private static final Logger LOG = Logger.getLogger(FXBrowserPane.class);
+    private static final int BORDER_INSET = 5;
 
     //~ Instance fields --------------------------------------------------------
 
     private WebEngine webEng = null;
     private WebView webView;
     private JSObject cidsJs;
-    private Pane browserPane;
     private NavigatorJsBridgeImpl bridge = new NavigatorJsBridgeImpl();
 
     //~ Constructors -----------------------------------------------------------
@@ -66,14 +69,25 @@ public class FXBrowserPane extends JPanel {
      * Creates a new FXBrowserPane object.
      */
     public FXBrowserPane() {
+        this(0, 0);
+    }
+
+    /**
+     * Creates a new FXBrowserPane object.
+     *
+     * @param  height  DOCUMENT ME!
+     * @param  width   DOCUMENT ME!
+     */
+    public FXBrowserPane(final int height, final int width) {
+        this.setOpaque(false);
         Platform.setImplicitExit(false);
         browserFxPanel = new JFXPanel();
         Platform.runLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    browserPane = createBrowser();
-                    final Scene scene = new Scene(browserPane);
+                    createBrowser(height, width);
+                    final Scene scene = new Scene(webView);
                     /*
                      *  shortcut mouse listener for enabling firefox ToDo. make the shortcut configurable
                      */
@@ -92,9 +106,9 @@ public class FXBrowserPane extends JPanel {
                     browserFxPanel.setScene(scene);
                 }
             });
-//        this.setPreferredSize(new Dimension(5000, 5000));
-//        this.setMinimumSize(new Dimension(5000, 5000));
+
         this.setLayout(new BorderLayout());
+        this.setBorder(new EmptyBorder(BORDER_INSET, BORDER_INSET, BORDER_INSET, BORDER_INSET));
         add(browserFxPanel, BorderLayout.CENTER);
     }
 
@@ -115,10 +129,14 @@ public class FXBrowserPane extends JPanel {
     /**
      * can only be called on FX application Thread !
      *
-     * @return  DOCUMENT ME!
+     * @param  height  DOCUMENT ME!
+     * @param  width   DOCUMENT ME!
      */
-    private Pane createBrowser() {
+    private void createBrowser(final int height, final int width) {
         webView = new WebView();
+        if ((height > 0) && (width > 0)) {
+            webView.setPrefSize(width - (2 * BORDER_INSET), height - (2 * BORDER_INSET));
+        }
 //         disabling the context menue
         // custom context menue are not possible atm see https://javafx-jira.kenai.com/browse/RT-20306
         webView.setContextMenuEnabled(false);
@@ -134,6 +152,17 @@ public class FXBrowserPane extends JPanel {
 // });
 
         webEng = webView.getEngine();
+        webEng.getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
+
+                @Override
+                public void changed(final ObservableValue<? extends Number> ov, final Number t, final Number t1) {
+                    final double totalWork = webEng.getLoadWorker().getTotalWork();
+                    final double workDone = webEng.getLoadWorker().getWorkDone();
+                    if (workDone == totalWork) {
+                        LOG.fatal("JavaFX WebView: Page totally loaded!");
+                    }
+                }
+            });
         webEng.getLoadWorker().exceptionProperty().addListener(new ChangeListener<Throwable>() {
 
                 @Override
@@ -143,11 +172,6 @@ public class FXBrowserPane extends JPanel {
                     LOG.error("Error in Wb Engine Load Worker", t);
                 }
             });
-
-        final BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(5));
-        pane.setCenter(webView);
-        return pane;
     }
 
     /**
