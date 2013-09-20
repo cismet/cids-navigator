@@ -49,7 +49,6 @@ public class DescriptionPaneFX extends DescriptionPane {
      * Creates a new DescriptionPaneFX object.
      */
     public DescriptionPaneFX() {
-        LOG.fatal("JavaFX WebView Description Pane");
         Platform.setImplicitExit(false);
         browserFxPanel = new JFXPanel();
         Platform.runLater(new Runnable() {
