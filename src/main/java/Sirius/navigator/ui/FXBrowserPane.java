@@ -238,6 +238,15 @@ public class FXBrowserPane extends JPanel {
      *
      * @return  DOCUMENT ME!
      */
+    public WebView getWebView() {
+        return webView;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public CidsBean getCidsBean() {
         final String jsonBean = (String)cidsJs.call("retrieveBean");
         if (LOG.isDebugEnabled()) {

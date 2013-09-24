@@ -21,7 +21,8 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import netscape.javascript.JSObject;
 
 import org.apache.log4j.Logger;
 
@@ -80,12 +81,26 @@ public class NavigatorJsBridgeImpl extends Observable implements NavigatorJsBrid
         this.setChanged();
         this.notifyObservers("showHTML");
     }
+
     /**
      * DOCUMENT ME!
      */
     public void setChangeFlag() {
         this.setChanged();
         this.notifyObservers();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   classKey  DOCUMENT ME!
+     * @param   options   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Object getClass(final String domain, final String classKey, final JSObject options) {
+        return this.getClass(domain, classKey, null, null);
     }
 
     @Override
@@ -195,6 +210,19 @@ public class NavigatorJsBridgeImpl extends Observable implements NavigatorJsBrid
             LOG.error("Error during creation of new CidsBean", ex);
         }
         return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   classKey  DOCUMENT ME!
+     * @param   options   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Object getAllObjectsOfClass(final String domain, final String classKey, final JSObject options) {
+        return this.getAllObjectsOfClass(domain, classKey, null, 0, 0, null, null, null, null, null, false, null);
     }
 
     @Override
