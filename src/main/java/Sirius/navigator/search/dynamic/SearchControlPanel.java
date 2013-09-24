@@ -14,6 +14,7 @@ package Sirius.navigator.search.dynamic;
 
 import Sirius.navigator.search.CidsSearchExecutor;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.middleware.types.Node;
 
@@ -57,6 +58,8 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     private boolean searching = false;
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
+
+    private boolean simpleSort;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -171,18 +174,19 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 LOG.error("Search should be started, but listener is null.");
                 return;
             }
-
             final MetaObjectNodeServerSearch search = listener.assembleSearch();
             if (search == null) {
                 LOG.warn("The listener didn't provide a search.");
                 return;
             }
 
+            ComponentRegistry.getRegistry().getSearchResultsTree().addPropertyChangeListener("browse", this);
             searchThread = CidsSearchExecutor.searchAndDisplayResults(
                     search,
                     this,
                     this,
-                    listener.suppressEmptyResultMessage());
+                    listener.suppressEmptyResultMessage(),
+                    simpleSort);
             searching = true;
             setControlsAccordingToState();
             listener.searchStarted();
@@ -297,10 +301,22 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      * DOCUMENT ME!
      */
     public void startSearch() {
+        startSearch(false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     */
+    public void startSearch(final boolean simpleSort) {
         if (LOG.isInfoEnabled()) {
             LOG.info("Start search programmatically.");
         }
+        this.simpleSort = simpleSort;
         btnSearchCancel.doClick();
+        this.simpleSort = false;
     }
 
     @Override
