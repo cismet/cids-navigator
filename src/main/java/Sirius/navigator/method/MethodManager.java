@@ -306,6 +306,26 @@ public class MethodManager {
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean simpleSort) {
+        showSearchResults(resultNodes, append, searchResultsTreeListener, simpleSort, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  resultNodes                The results to display in the SearchResultsTree.
+     * @param  append                     Whether to append the search results or not.
+     * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
+     *                                    Usually a SearchControlPanel.
+     * @param  simpleSort                 if true, sorts the search results alphabetically. Usually set to false, as a
+     *                                    more specific sorting order is wished.
+     * @param  sortActive                 if false, no sort will be done (the value of simpleSort will be ignored, if
+     *                                    sortActive is false)
+     */
+    public void showSearchResults(final Node[] resultNodes,
+            final boolean append,
+            final PropertyChangeListener searchResultsTreeListener,
+            final boolean simpleSort,
+            final boolean sortActive) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
             JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                 org.openide.util.NbBundle.getMessage(
@@ -318,7 +338,7 @@ public class MethodManager {
         } else {
             ComponentRegistry.getRegistry()
                     .getSearchResultsTree()
-                    .setResultNodes(resultNodes, append, searchResultsTreeListener, simpleSort);
+                    .setResultNodes(resultNodes, append, searchResultsTreeListener, simpleSort, sortActive);
             this.showSearchResults();
         }
     }
