@@ -102,6 +102,11 @@ import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
+import static Sirius.navigator.Navigator.NAVIGATOR_HOME;
+import static Sirius.navigator.Navigator.NAVIGATOR_HOME_DIR;
+
+import static java.awt.Frame.MAXIMIZED_BOTH;
+
 /**
  * DOCUMENT ME!
  *
@@ -649,8 +654,23 @@ public class Navigator extends JFrame {
             325,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_325")); // NOI18N
 
-        if (PropertyManager.getManager().isUseFlyingSaucer()) {
+        if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
             descriptionPane = new DescriptionPaneFS();
+        } else if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FX_HTML_RENDERER)) {
+            try {
+                descriptionPane = new DescriptionPaneFX();
+//            } catch (NoClassDefFoundError e) {
+            } catch (Error e) {
+                logger.error("Error during initialisation of Java FX Description Pane. Using Calpa as fallback.", e);
+                descriptionPane = new DescriptionPaneCalpa();
+            } catch (Exception e) {
+                logger.error(
+                    "Exception during initialisation of Java FX Description Pane. Using Calpa as fallback.",
+                    e);
+                descriptionPane = new DescriptionPaneCalpa();
+            }
         } else {
             descriptionPane = new DescriptionPaneCalpa();
         }
@@ -780,7 +800,7 @@ public class Navigator extends JFrame {
         this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new ClosingListener());
+        this.addWindowListener(new Navigator.ClosingListener());
     }
 
     /**
@@ -1015,7 +1035,7 @@ public class Navigator extends JFrame {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
+        Runtime.getRuntime().addShutdownHook(new Navigator.NavigatorShutdown());
         Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
 
         // There is no way to adjust the Locale using the Jnlp file.
@@ -1152,7 +1172,7 @@ public class Navigator extends JFrame {
 
         //~ Static fields/initializers -----------------------------------------
 
-        private static final transient Logger LOG = Logger.getLogger(NavigatorShutdown.class);
+        private static final transient Logger LOG = Logger.getLogger(Navigator.NavigatorShutdown.class);
 
         //~ Methods ------------------------------------------------------------
 
