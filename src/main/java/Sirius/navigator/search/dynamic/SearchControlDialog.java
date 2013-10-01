@@ -211,11 +211,22 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     public CidsServerSearch getSearch() {
         return search;
     }
+
     /**
      * DOCUMENT ME!
      */
     public void startSearch() {
-        pnlSearchCancel.startSearch();
+        startSearch(false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     */
+    public void startSearch(final boolean simpleSort) {
+        pnlSearchCancel.startSearch(simpleSort);
     }
 
     @Override

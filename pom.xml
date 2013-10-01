@@ -87,6 +87,13 @@
             <artifactId>calpahtml</artifactId>
             <version>2_04</version>
         </dependency>
+         <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>javafx</artifactId>
+            <version>2.2</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/lib/jfxrt.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
