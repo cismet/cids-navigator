@@ -204,6 +204,8 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     }
 
     /**
+     * DOCUMENT ME!
+     *
      * @param   list  DOCUMENT ME!
      * @param   path  DOCUMENT ME!
      *
