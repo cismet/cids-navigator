@@ -1,12 +1,10 @@
-/**
- * *************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- * 
-* ... and it just works.
- * 
-***************************************************
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.cids.editors;
 
 import Sirius.navigator.ui.ComponentRegistry;
@@ -53,20 +51,23 @@ import de.cismet.tools.gui.DoNotWrap;
 /**
  * DOCUMENT ME!
  *
- * @author daniel
- * @version $Revision$, $Date$
+ * @author   daniel
+ * @version  $Revision$, $Date$
  */
 public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
-        RequestsFullSizeComponent,
-        CidsBeanRenderer,
-        EditorSaveListener,
-        PropertyChangeListener,
-        Observer,
-        InitialisationLocker {
+    RequestsFullSizeComponent,
+    CidsBeanRenderer,
+    EditorSaveListener,
+    PropertyChangeListener,
+    Observer,
+    InitialisationLocker {
 
     //~ Static fields/initializers ---------------------------------------------
+
     private static final Logger LOG = Logger.getLogger(DescriptionPaneFX.class);
+
     //~ Instance fields --------------------------------------------------------
+
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
     boolean bridgeRegistered = false;
     private FXBrowserPane browserPanel;
@@ -79,10 +80,11 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
 //    private boolean keepOnMovin = false;
 
     //~ Constructors -----------------------------------------------------------
+
     /**
      * Creates a new HtmlWidgetEditor object.
      *
-     * @param url DOCUMENT ME!
+     * @param  url  DOCUMENT ME!
      */
     public HtmlWidgetEditor(final String url) {
         this(url, true);
@@ -91,8 +93,8 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
     /**
      * Creates a new HtmlWidgetEditor object.
      *
-     * @param url DOCUMENT ME!
-     * @param editable DOCUMENT ME!
+     * @param  url       DOCUMENT ME!
+     * @param  editable  DOCUMENT ME!
      */
     public HtmlWidgetEditor(final String url, final boolean editable) {
         this.editable = editable;
@@ -103,42 +105,45 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
         this.setPreferredSize(descPane.getPreferredSize());
         this.setMinimumSize(descPane.getMinimumSize());
         final Observer observer = new Observer() {
-            @Override
-            public void update(final Observable o, final Object arg) {
-                HtmlWidgetEditor.this.update(o, arg);
-            }
-        };
+
+                @Override
+                public void update(final Observable o, final Object arg) {
+                    HtmlWidgetEditor.this.update(o, arg);
+                }
+            };
         browserPanel.addBridgeObserver(observer);
         browserPanel.setOpaque(false);
         this.setMinimumSize(new Dimension(500, 500));
         this.setPreferredSize(new Dimension(5000, 5000));
         Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                browserPanel.getWebEngine()
-                        .getLoadWorker()
-                        .stateProperty()
-                        .addListener(new javafx.beans.value.ChangeListener<Worker.State>() {
-                    @Override
-                    public void changed(final ObservableValue<? extends Worker.State> ov,
-                            final Worker.State oldState,
-                            final Worker.State newState) {
-                        if (!bridgeRegistered) {
-                            bridgeRegistered = browserPanel.registerJ2JSBridge();
-                            if ((cb != null) && bridgeRegistered) {
-                                browserPanel.injectCidsBean(cb, editable);
-                            }
-                        }
-                        if (newState == Worker.State.FAILED) {
-                            // ToDo: show an error page
-                            LOG.fatal("Can not load editor at " + url + ". showing default error page");
-                            // browserPanel.loadErrorPage();
-                        }
-                    }
-                });
-                browserPanel.getWebEngine().load(url);
-            }
-        });
+
+                @Override
+                public void run() {
+                    browserPanel.getWebEngine()
+                            .getLoadWorker()
+                            .stateProperty()
+                            .addListener(new javafx.beans.value.ChangeListener<Worker.State>() {
+
+                                    @Override
+                                    public void changed(final ObservableValue<? extends Worker.State> ov,
+                                            final Worker.State oldState,
+                                            final Worker.State newState) {
+                                        if (!bridgeRegistered) {
+                                            bridgeRegistered = browserPanel.registerJ2JSBridge();
+                                            if ((cb != null) && bridgeRegistered) {
+                                                browserPanel.injectCidsBean(cb, editable);
+                                            }
+                                        }
+                                        if (newState == Worker.State.FAILED) {
+                                            // ToDo: show an error page
+                                            LOG.fatal("Can not load editor at " + url + ". showing default error page");
+                                            // browserPanel.loadErrorPage();
+                                        }
+                                    }
+                                });
+                    browserPanel.getWebEngine().load(url);
+                }
+            });
         cardLayout = new CardLayout();
         final JPanel htmlPanel = new JPanel();
         htmlPanel.setLayout(new BorderLayout());
@@ -173,6 +178,7 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
     }
 
     //~ Methods ----------------------------------------------------------------
+
     @Override
     public CidsBean getCidsBean() {
         return cb;
@@ -185,15 +191,16 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
 //        ToDO: setting the change flag only if the bean has changed instead of always setting the change flag
 //        cb.setArtificialChangeFlag(true);
         Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                final double totalWork = browserPanel.getWebEngine().getLoadWorker().getTotalWork();
-                final double workDone = browserPanel.getWebEngine().getLoadWorker().getWorkDone();
-                if ((totalWork == workDone) && bridgeRegistered) {
+
+                @Override
+                public void run() {
+                    final double totalWork = browserPanel.getWebEngine().getLoadWorker().getTotalWork();
+                    final double workDone = browserPanel.getWebEngine().getLoadWorker().getWorkDone();
+                    if ((totalWork == workDone) && bridgeRegistered) {
 //                        browserPanel.injectCidsBean(cb, editable);
+                    }
                 }
-            }
-        });
+            });
     }
 
     @Override
@@ -234,12 +241,13 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
         if (arg instanceof String) {
             if (arg.equals("showHTML")) {
                 browserPanel.getWebView().snapshot(new Callback<SnapshotResult, Void>() {
-                    @Override
-                    public Void call(final SnapshotResult p) {
-                        initLatch.countDown();
-                        return null;
-                    }
-                }, null, null);
+
+                        @Override
+                        public Void call(final SnapshotResult p) {
+                            initLatch.countDown();
+                            return null;
+                        }
+                    }, null, null);
             }
         }
         if (!hasChanged) {
