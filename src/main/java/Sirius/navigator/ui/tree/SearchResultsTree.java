@@ -11,6 +11,8 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.types.treenode.*;
+import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.DescriptionPane;
 
 import Sirius.server.middleware.types.*;
 
@@ -27,8 +29,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
+
+import de.cismet.cids.client.tools.DevelopmentTools;
 
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
@@ -61,6 +66,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private boolean syncWithMap = false;
     private boolean ascending = true;
     private final WaitTreeNode waitTreeNode = new WaitTreeNode();
+    private boolean syncWithRenderer;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -130,6 +136,13 @@ public class SearchResultsTree extends MetaCatalogueTree {
             if (log.isDebugEnabled()) {
                 log.debug("syncWithMap");                                                   // NOI18N
             }
+            if (!isSyncWithRenderer()) {
+                PluginRegistry.getRegistry()
+                        .getPluginDescriptor("cismap")
+                        .getUIDescriptor("cismap")
+                        .getView()
+                        .makeVisible();
+            }
             try {
                 final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
                 final List<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
@@ -151,14 +164,91 @@ public class SearchResultsTree extends MetaCatalogueTree {
     }
 
     /**
-     * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.<br>
-     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt werden
+     * DOCUMENT ME!
+     */
+    public void syncWithRenderer() {
+        syncWithRenderer(isSyncWithRenderer());
+    }
+
+    /**
+     * DOCUMENT ME!
      *
-     * @param  nodes     Ergebnisse, die im SearchTree angezeigt werden sollen.
-     * @param  append    Ergebnisse anhaengen.
+     * @param  sync  DOCUMENT ME!
+     */
+    public void syncWithRenderer(final boolean sync) {
+        if (sync) {
+            if (log.isDebugEnabled()) {
+                log.debug("syncWithRenderer"); // NOI18N
+            }
+            if (!isSyncWithMap()) {
+                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.DESCRIPTION_PANE);
+            }
+            setSelectionInterval(0, getRowCount());
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nodes     DOCUMENT ME!
+     * @param  append    DOCUMENT ME!
      * @param  listener  DOCUMENT ME!
      */
     public void setResultNodes(final Node[] nodes, final boolean append, final PropertyChangeListener listener) {
+        setResultNodes(nodes, append, listener, false);
+    }
+
+    /**
+     * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.<br>
+     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt werden
+     *
+     * @param  nodes       Ergebnisse, die im SearchTree angezeigt werden sollen.
+     * @param  append      Ergebnisse anhaengen.
+     * @param  listener    DOCUMENT ME!
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     */
+    public void setResultNodes(final Node[] nodes,
+            final boolean append,
+            final PropertyChangeListener listener,
+            final boolean simpleSort) {
+        setResultNodes(nodes, append, listener, simpleSort, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        final JFrame frame = new JFrame();
+        try {
+            final SearchResultsTree tree = new SearchResultsTree();
+            frame.setSize(100, 100);
+            frame.setVisible(true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    }
+
+    /**
+     * Setzt die ResultNodes fuer den Suchbaum, d.h. die Ergebnisse der Suche.<br>
+     * Diese Ergebnisse koennen an eine bereits vorhandene Ergebnissmenge angehaengt werden
+     *
+     * @param  nodes       Ergebnisse, die im SearchTree angezeigt werden sollen.
+     * @param  append      Ergebnisse anhaengen.
+     * @param  listener    DOCUMENT ME!
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     * @param  sortActive  if false, no sort will be done (the value of simpleSort will be ignored, if sortActive is
+     *                     false)
+     */
+    public void setResultNodes(final Node[] nodes,
+            final boolean append,
+            final PropertyChangeListener listener,
+            final boolean simpleSort,
+            final boolean sortActive) {
         if (log.isInfoEnabled()) {
             log.info("[SearchResultsTree] " + (append ? "appending" : "setting") + " '" + nodes.length + "' nodes"); // NOI18N
         }
@@ -176,7 +266,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         }
 
         empty = false;
-        refreshTree(true, listener);
+        refreshTree(true, listener, simpleSort, sortActive);
 
         if (!getModel().getRoot().equals(rootNode)) {
             ((DefaultTreeModel)getModel()).setRoot(rootNode);
@@ -196,10 +286,40 @@ public class SearchResultsTree extends MetaCatalogueTree {
     /**
      * DOCUMENT ME!
      *
-     * @param  initialFill  sort DOCUMENT ME!
+     * @param  initialFill  DOCUMENT ME!
      * @param  listener     DOCUMENT ME!
      */
     private void refreshTree(final boolean initialFill, final PropertyChangeListener listener) {
+        refreshTree(initialFill, listener, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  initialFill  DOCUMENT ME!
+     * @param  listener     DOCUMENT ME!
+     * @param  simpleSort   DOCUMENT ME!
+     */
+    private void refreshTree(final boolean initialFill,
+            final PropertyChangeListener listener,
+            final boolean simpleSort) {
+        refreshTree(initialFill, listener, simpleSort, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  initialFill  sort DOCUMENT ME!
+     * @param  listener     DOCUMENT ME!
+     * @param  simpleSort   if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                      sorting order is wished.
+     * @param  sortActive   simpleSort if false, no sort will be done (the value of simpleSort will be ignored, if
+     *                      sortActive is false)
+     */
+    private void refreshTree(final boolean initialFill,
+            final PropertyChangeListener listener,
+            final boolean simpleSort,
+            final boolean sortActive) {
         if ((refreshWorker != null) && !refreshWorker.isDone()) {
             log.warn("Refreshing search result tree is triggered while another refresh process is still not done.");
             refreshWorker.cancel(true);
@@ -215,7 +335,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                     defaultTreeModel.nodeStructureChanged(rootNode);
 
-                    refreshWorker = new RefreshTreeWorker(initialFill);
+                    refreshWorker = new RefreshTreeWorker(initialFill, simpleSort, sortActive);
                     refreshWorker.addPropertyChangeListener(listener);
                     CismetThreadPool.execute(refreshWorker);
                 }
@@ -474,6 +594,24 @@ public class SearchResultsTree extends MetaCatalogueTree {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isSyncWithRenderer() {
+        return syncWithRenderer;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  syncWithRenderer  syncWithMap DOCUMENT ME!
+     */
+    public void setSyncWithRenderer(final boolean syncWithRenderer) {
+        this.syncWithRenderer = syncWithRenderer;
+    }
+
+    /**
      * Changes the sort order to ascending or descending according to the given parameter.
      *
      * @param  ascending  Whether to sort ascending ( <code>true</code>) or descending ( <code>false</code>).
@@ -517,6 +655,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
         //~ Instance fields ----------------------------------------------------
         private boolean initialFill = false;
         private DirectedMetaObjectNodeComparator comparator;
+        private boolean simpleSort = false;
+        private boolean sortActive = true;
 
         //~ Constructors -------------------------------------------------------
         /**
@@ -530,13 +670,34 @@ public class SearchResultsTree extends MetaCatalogueTree {
             comparator = new DirectedMetaObjectNodeComparator(ascending);
         }
 
+        /**
+         *
+         * @param initialFill
+         * @param simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+         */
+        public RefreshTreeWorker(final boolean initialFill, boolean simpleSort) {
+            this(initialFill, simpleSort, true);
+        }
+
+        /**
+         *
+         * @param initialFill
+         * @param simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+         * @param sortActive  if false, no sort will be done (the value of simpleSort will be ignored, if sortActive is false)
+         */
+        public RefreshTreeWorker(final boolean initialFill, boolean simpleSort, boolean sortActive) {
+            this.initialFill = initialFill;
+            comparator = new DirectedMetaObjectNodeComparator(ascending);
+            this.simpleSort = simpleSort;
+            this.sortActive = sortActive;
+        }
+
         //~ Methods ------------------------------------------------------------
         @Override
         protected ArrayList<DefaultMetaTreeNode> doInBackground() throws Exception {
-            if (!isCancelled()) {
+            if (!isCancelled() && sortActive) {
                 Collections.sort(resultNodes, comparator);
             }
-
 
             final ArrayList<DefaultMetaTreeNode> nodesToAdd = new ArrayList<DefaultMetaTreeNode>(resultNodes.size());
 
@@ -592,7 +753,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                         if (initialFill) {
                             syncWithMap();
+                            syncWithRenderer();
                             checkForDynamicNodes();
+                            if(simpleSort && sortActive){
+                                SearchResultsTree.this.sort(true);
+                            }
                         }
                     }
                 }

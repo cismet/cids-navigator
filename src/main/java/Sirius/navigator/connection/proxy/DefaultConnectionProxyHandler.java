@@ -46,7 +46,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final ProxyInterface proxyHandler;
+    protected ProxyInterface proxyHandler;
     protected ImageHashMap iconCache = null;
     protected ClassAndMethodCache classAndMethodCache = null;
     protected HashMap objectCache = new HashMap();
@@ -322,7 +322,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
      *
      * @version  $Revision$, $Date$
      */
-    class DefaultConnectionProxy implements ProxyInterface {
+    protected class DefaultConnectionProxy implements ProxyInterface {
 
         //~ Methods ------------------------------------------------------------
 

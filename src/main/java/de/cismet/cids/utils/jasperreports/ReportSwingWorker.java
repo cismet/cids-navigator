@@ -7,13 +7,6 @@
 ****************************************************/
 package de.cismet.cids.utils.jasperreports;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.pdf.BaseFont;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfImportedPage;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfWriter;
-
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -30,7 +23,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -68,6 +60,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
     private final ReportSwingWorkerDialog dialog;
     private final boolean withDialog;
     private String directory;
+    private HashMap parameters = new HashMap();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -141,15 +134,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final boolean withDialog,
             final Frame parent,
             final String directory) {
-        this.cidsBeansList = cidsBeansList;
-        this.compiledReportList = compiledReportList;
-        this.withDialog = withDialog;
-        this.directory = directory;
-        if (withDialog) {
-            dialog = new ReportSwingWorkerDialog(parent, true);
-        } else {
-            dialog = null;
-        }
+        this(cidsBeansList, compiledReportList, withDialog, parent, directory, new HashMap());
     }
 
     /**
@@ -166,12 +151,60 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final boolean withDialog,
             final Frame parent,
             final String directory) {
+        this(cidsBeans, compiledReport, withDialog, parent, directory, new HashMap());
+    }
+
+    /**
+     * Creates a new ReportSwingWorker object.
+     *
+     * @param  cidsBeansList       DOCUMENT ME!
+     * @param  compiledReportList  DOCUMENT ME!
+     * @param  withDialog          DOCUMENT ME!
+     * @param  parent              DOCUMENT ME!
+     * @param  directory           DOCUMENT ME!
+     * @param  parameters          DOCUMENT ME!
+     */
+    public ReportSwingWorker(final List<Collection<CidsBean>> cidsBeansList,
+            final List<String> compiledReportList,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory,
+            final HashMap parameters) {
+        this.cidsBeansList = cidsBeansList;
+        this.compiledReportList = compiledReportList;
+        this.withDialog = withDialog;
+        this.directory = directory;
+        this.parameters = parameters;
+        if (withDialog) {
+            dialog = new ReportSwingWorkerDialog(parent, true);
+        } else {
+            dialog = null;
+        }
+    }
+
+    /**
+     * Creates a new ReportSwingWorker object.
+     *
+     * @param  cidsBeans       DOCUMENT ME!
+     * @param  compiledReport  DOCUMENT ME!
+     * @param  withDialog      DOCUMENT ME!
+     * @param  parent          DOCUMENT ME!
+     * @param  directory       DOCUMENT ME!
+     * @param  parameters      DOCUMENT ME!
+     */
+    public ReportSwingWorker(final Collection<CidsBean> cidsBeans,
+            final String compiledReport,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory,
+            final HashMap parameters) {
         this.cidsBeansList = new ArrayList<Collection<CidsBean>>();
         this.cidsBeansList.add(cidsBeans);
         this.compiledReportList = new ArrayList<String>();
         this.compiledReportList.add(compiledReport);
         this.withDialog = withDialog;
         this.directory = directory;
+        this.parameters = parameters;
         if (withDialog) {
             dialog = new ReportSwingWorkerDialog(parent, true);
         } else {
@@ -214,7 +247,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 // daten vorbereiten
                 final JRDataSource dataSource = new CidsBeanDataSource(beans);
                 // print aus report und daten erzeugen
-                final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+                final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
                 // quer- bzw hochformat übernehmen
                 jasperPrint.setOrientation(jasperReport.getOrientation());
 
@@ -225,16 +258,22 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 outTmp.close();
             }
             // pdfStreams zu einem einzelnen pdfStream zusammenfügen
-            concatPDFs(ins, out, true);
+            ReportHelper.concatPDFs(ins, out, true);
 
             // zusammengefügten pdfStream in Datei schreiben
-            final File file = new File(directory, "report.pdf");
+            File file = new File(directory, "report.pdf");
+            int index = 0;
+
+            while (file.exists()) {
+                file = new File(directory, "report" + (++index) + ".pdf");
+            }
+
             file.getParentFile().mkdirs();
             fos = new FileOutputStream(file);
             fos.write(out.toByteArray());
 
             // Datei über Browser öffnen
-            BrowserLauncher.openURL("file:///" + file);
+            BrowserLauncher.openURL(file.toURI().toURL().toString());
             return true;
         } catch (IOException ex) {
             LOG.error("Export to PDF-Stream failed.", ex);
@@ -279,81 +318,6 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 "Beim Generieren des Reports ist ein Fehler aufgetreten.",
                 "Fehler!",
                 JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  streamOfPDFFiles  DOCUMENT ME!
-     * @param  outputStream      DOCUMENT ME!
-     * @param  paginate          DOCUMENT ME!
-     */
-    private static void concatPDFs(final List<InputStream> streamOfPDFFiles,
-            final OutputStream outputStream,
-            final boolean paginate) {
-        int totalNumOfPages = 0;
-        final Document document = new Document();
-        final List<InputStream> inputStreams = streamOfPDFFiles;
-        final List<PdfReader> pdfReaders = new ArrayList<PdfReader>();
-
-        try {
-            final PdfWriter writer = PdfWriter.getInstance(document, outputStream);
-
-            for (final InputStream pdf : inputStreams) {
-                final PdfReader pdfReader = new PdfReader(pdf);
-                pdfReaders.add(pdfReader);
-                totalNumOfPages += pdfReader.getNumberOfPages();
-            }
-
-            document.open();
-            final BaseFont baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-            final PdfContentByte contentByte = writer.getDirectContent();
-
-            PdfImportedPage page;
-            int currentPageNumber = 0;
-
-            for (final PdfReader pdfReader : pdfReaders) {
-                int currentNumOfPages = 0;
-                while (currentNumOfPages < pdfReader.getNumberOfPages()) {
-                    currentNumOfPages++;
-                    currentPageNumber++;
-
-                    document.setPageSize(pdfReader.getPageSizeWithRotation(currentNumOfPages));
-                    document.newPage();
-
-                    page = writer.getImportedPage(pdfReader, currentNumOfPages);
-                    contentByte.addTemplate(page, 0, 0);
-
-                    if (paginate) {
-                        contentByte.beginText();
-                        contentByte.setFontAndSize(baseFont, 9);
-                        contentByte.showTextAligned(
-                            PdfContentByte.ALIGN_CENTER,
-                            currentPageNumber
-                                    + " of "
-                                    + totalNumOfPages,
-                            520,
-                            5,
-                            0);
-                        contentByte.endText();
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            LOG.error("error while merging pdfs", ex);
-        } finally {
-            if (document.isOpen()) {
-                document.close();
-            }
-            try {
-                if (outputStream != null) {
-                    outputStream.flush();
-                    outputStream.close();
-                }
-            } catch (IOException ex) {
-                LOG.error("error whil closing pdfstream", ex);
-            }
         }
     }
 }

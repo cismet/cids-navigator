@@ -7,31 +7,21 @@
 ****************************************************/
 package Sirius.navigator.resource;
 
-/*******************************************************************************
+/**
+ * *****************************************************************************
  *
- * Copyright (c)        :       EIG (Environmental Informatics Group)
- * http://www.htw-saarland.de/eig
- * Prof. Dr. Reiner Guettler
- * Prof. Dr. Ralf Denzer
+ * Copyright (c) : EIG (Environmental Informatics Group) http://www.htw-saarland.de/eig Prof. Dr. Reiner Guettler Prof.
+ * Dr. Ralf Denzer
  *
- * HTWdS
- * Hochschule fuer Technik und Wirtschaft des Saarlandes
- * Goebenstr. 40
- * 66117 Saarbruecken
- * Germany
+ * HTWdS Hochschule fuer Technik und Wirtschaft des Saarlandes Goebenstr. 40 66117 Saarbruecken Germany
  *
- * Programmers          :       Pascal
+ * Programmers : Pascal
  *
- * Project                      :       WuNDA 2
- * Filename             :
- * Version                      :       1.0
- * Purpose                      :
- * Created                      :       01.10.1999
- * History                      :
+ * Project : WuNDA 2 Filename : Version : 1.0 Purpose : Created : 01.10.1999 History :
  *
- *******************************************************************************/
+ ******************************************************************************
+ */
 import Sirius.navigator.connection.ConnectionInfo;
-import Sirius.navigator.tools.BrowserControl;
 import Sirius.navigator.ui.LAFManager;
 import Sirius.navigator.ui.progress.*;
 
@@ -60,7 +50,6 @@ public final class PropertyManager {
 
     private static final Logger logger = Logger.getLogger(PropertyManager.class);
     private static final PropertyManager manager = new PropertyManager();
-
     private static final String HEADER = "Navigator Configuration File";
     public static final String TRUE = "true";
     public static final String FALSE = "false";
@@ -69,6 +58,9 @@ public final class PropertyManager {
     public static final String SORT_ID_TOKEN = "%id%";
     public static final int MIN_SERVER_THREADS = 3;
     public static final int MAX_SERVER_THREADS = 10;
+    public static final String FX_HTML_RENDERER = "fxWebView";
+    public static final String CALPA_HTML_RENDERER = "calpa";
+    public static final String FLYING_SAUCER_HTML_RENDERER = "flyingSaucer";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -100,11 +92,23 @@ public final class PropertyManager {
     private final ProgressObserver sharedProgressObserver;
     private boolean editable;
     private boolean autoClose = false;
+    /**
+     * DOCUMENT ME!
+     *
+     * @deprecated  use {@link descriptionPaneHtmlRenderer} instead
+     */
+    @Deprecated
     private boolean useFlyingSaucer = false;
+    /**
+     * DOCUMENT ME!
+     *
+     * @deprecated  use {@link descriptionPaneHtmlRenderer} instead
+     */
+    @Deprecated
     private boolean useWebView = false;
+    private String descriptionPaneHtmlRenderer = null;
     private boolean enableSearchDialog = false;
     private boolean usePainterCoolPanel = true;
-
     private transient String proxyURL;
     private transient String proxyUsername;
     private transient String proxyPassword;
@@ -140,6 +144,7 @@ public final class PropertyManager {
 
         setUseFlyingSaucer(false);
         setUseWebView(false);
+        setDescriptionPaneHtmlRenderer(PropertyManager.CALPA_HTML_RENDERER);
         setEnableSearchDialog(false);
 
         connectionInfo.setCallserverURL("rmi://192.168.0.12/callServer"); // NOI18N
@@ -736,14 +741,20 @@ public final class PropertyManager {
      */
     public void setUseFlyingSaucer(final boolean useFlyingSaucer) {
         this.useFlyingSaucer = useFlyingSaucer;
+        if (useFlyingSaucer) {
+            setDescriptionPaneHtmlRenderer(PropertyManager.FLYING_SAUCER_HTML_RENDERER);
+        }
         properties.setProperty("setUseFlyingSaucer", String.valueOf(this.useFlyingSaucer)); // NOI18N
     }
 
     /**
      * Getter for property useFlyingSaucer.
      *
-     * @return  Value of property useFlyingSaucer.
+     * @return      Value of property useFlyingSaucer.
+     *
+     * @deprecated  use {@link getDescriptionPaneHtmlRenderer()} instead
      */
+    @Deprecated
     public boolean isUseFlyingSaucer() {
         return this.useFlyingSaucer;
     }
@@ -774,14 +785,20 @@ public final class PropertyManager {
      */
     public void setUseWebView(final boolean useWebView) {
         this.useWebView = useWebView;
+        if (useWebView) {
+            setDescriptionPaneHtmlRenderer(PropertyManager.FX_HTML_RENDERER);
+        }
         properties.setProperty("useWebView", String.valueOf(this.useWebView)); // NOI18N
     }
 
     /**
      * Getter for property useWebView.
      *
-     * @return  Value of property useWebView.
+     * @return      Value of property useWebView.
+     *
+     * @deprecated  use {@link getDescriptionPaneHtmlRenderer()} instead
      */
+    @Deprecated
     public boolean isUseWebView() {
         return this.useWebView;
     }
@@ -857,51 +874,57 @@ public final class PropertyManager {
             /*if(property.equalsIgnoreCase("title"))
              * { this.setTitle(value); }else*/
         }
-        if (property.equalsIgnoreCase("width")) {                         // NOI18N
+        if (property.equalsIgnoreCase("width")) {                                              // NOI18N
             this.setWidth(value);
-        } else if (property.equalsIgnoreCase("height")) {                 // NOI18N
+        } else if (property.equalsIgnoreCase("height")) {                                      // NOI18N
             this.setHeight(value);
-        } else if (property.equalsIgnoreCase("maximizeWindow")) {         // NOI18N
+        } else if (property.equalsIgnoreCase("maximizeWindow")) {                              // NOI18N
             this.setMaximizeWindow(value);
-        } else if (property.equalsIgnoreCase("advancedLayout")) {         // NOI18N
+        } else if (property.equalsIgnoreCase("advancedLayout")) {                              // NOI18N
             this.setAdvancedLayout(value);
-        } else if (property.equalsIgnoreCase("lookAndFeel")) {            // NOI18N
+        } else if (property.equalsIgnoreCase("lookAndFeel")) {                                 // NOI18N
             this.setLookAndFeel(value);
-        } else if (property.equalsIgnoreCase("autoLogin")) {              // NOI18N
+        } else if (property.equalsIgnoreCase("autoLogin")) {                                   // NOI18N
             this.setAutoLogin(value);
-        } else if (property.equalsIgnoreCase("connectionClass")) {        // NOI18N
+        } else if (property.equalsIgnoreCase("connectionClass")) {                             // NOI18N
             this.setConnectionClass(value);
-        } else if (property.equalsIgnoreCase("connectionProxyClass")) {   // NOI18N
+        } else if (property.equalsIgnoreCase("connectionProxyClass")) {                        // NOI18N
             this.setConnectionProxyClass(value);
-        } else if (property.equalsIgnoreCase("maxConnections")) {         // NOI18N
+        } else if (property.equalsIgnoreCase("maxConnections")) {                              // NOI18N
             this.setMaxConnections(value);
-        } else if (property.equalsIgnoreCase("sortChildren")) {           // NOI18N
+        } else if (property.equalsIgnoreCase("sortChildren")) {                                // NOI18N
             this.setSortChildren(value);
-        } else if (property.equalsIgnoreCase("sortAscending")) {          // NOI18N
+        } else if (property.equalsIgnoreCase("sortAscending")) {                               // NOI18N
             this.setSortAscending(value);
-        } else if (property.equalsIgnoreCase("saveable")) {               // NOI18N
+        } else if (property.equalsIgnoreCase("saveable")) {                                    // NOI18N
             this.setSaveable(value);
-        } else if (property.equalsIgnoreCase("loadable")) {               // NOI18N
+        } else if (property.equalsIgnoreCase("loadable")) {                                    // NOI18N
             this.setLoadable(value);
-        } else if (property.equalsIgnoreCase("connectionInfoSaveable")) { // NOI18N
+        } else if (property.equalsIgnoreCase("connectionInfoSaveable")) {                      // NOI18N
             this.setConnectionInfoSaveable(value);
-        } else if (property.equalsIgnoreCase("callserverURL")) {          // NOI18N
+        } else if (property.equalsIgnoreCase("callserverURL")) {                               // NOI18N
             this.connectionInfo.setCallserverURL(value);
-        } else if (property.equalsIgnoreCase("password")) {               // NOI18N
+        } else if (property.equalsIgnoreCase("password")) {                                    // NOI18N
             this.connectionInfo.setPassword(value);
-        } else if (property.equalsIgnoreCase("userDomain")) {             // NOI18N
+        } else if (property.equalsIgnoreCase("userDomain")) {                                  // NOI18N
             this.connectionInfo.setUserDomain(value);
-        } else if (property.equalsIgnoreCase("usergroup")) {              // NOI18N
+        } else if (property.equalsIgnoreCase("usergroup")) {                                   // NOI18N
             this.connectionInfo.setUsergroup(value);
-        } else if (property.equalsIgnoreCase("usergroupDomain")) {        // NOI18N
+        } else if (property.equalsIgnoreCase("usergroupDomain")) {                             // NOI18N
             this.connectionInfo.setUsergroupDomain(value);
-        } else if (property.equalsIgnoreCase("username")) {               // NOI18N
+        } else if (property.equalsIgnoreCase("username")) {                                    // NOI18N
             this.connectionInfo.setUsername(value);
-        } else if (property.equalsIgnoreCase("useFlyingSaucer")) {        // NOI18N
+        } else if (property.equalsIgnoreCase("useFlyingSaucer")) {                             // NOI18N
+            logger.warn(
+                "Property useFlyingSaucer is deprecated and should be replaced with Property " // NOI18N
+                        + "navigator.descriptionPane.htmlRenderer=fylingSaucer");              // NOI18N
             this.setUseFlyingSaucer(value);
-        } else if (property.equalsIgnoreCase("useWebView")) {             // NOI18N
+        } else if (property.equalsIgnoreCase("useWebView")) {                                  // NOI18N
+            logger.warn(
+                "Property useWebView is deprecated and should be replaced with Property "      // NOI18N
+                        + "navigator.descriptionPane.htmlRenderer=fxWebView");                 // NOI18N
             this.setUseWebView(value);
-        } else if (property.equalsIgnoreCase("enableSearchDialog")) {     // NOI18N
+        } else if (property.equalsIgnoreCase("enableSearchDialog")) {                          // NOI18N
             this.setEnableSearchDialog(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
@@ -911,6 +934,8 @@ public final class PropertyManager {
             this.setProxyPassword(value);
         } else if (property.equals("navigator.proxy.domain")) {
             this.setProxyDomain(value);
+        } else if (property.equals("navigator.descriptionPane.htmlRenderer")) {
+            this.setDescriptionPaneHtmlRenderer(value);
         }
     }
 
@@ -1293,19 +1318,6 @@ public final class PropertyManager {
     }
 
     /**
-     * Getter for property appletContext.
-     *
-     * @return  Value of property appletContext.
-     */
-    public AppletContext getAppletContext() {
-        if (this.appletContext == null) {
-            return BrowserControl.getControl();
-        } else {
-            return this.appletContext;
-        }
-    }
-
-    /**
      * Getter for property sharedProgressObserver.
      *
      * @return  Value of property sharedProgressObserver.
@@ -1375,6 +1387,34 @@ public final class PropertyManager {
      */
     public void setAutoClose(final boolean autoClose) {
         this.autoClose = autoClose;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  htmlRenderer  DOCUMENT ME!
+     */
+    public void setDescriptionPaneHtmlRenderer(final String htmlRenderer) {
+        this.descriptionPaneHtmlRenderer = htmlRenderer;
+        if (descriptionPaneHtmlRenderer.equals(PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
+//            this.setUseFlyingSaucer(true);
+//            this.setUseWebView(false);
+        } else if (descriptionPaneHtmlRenderer.equals(PropertyManager.FX_HTML_RENDERER)) {
+//            this.setUseWebView(true);
+//            this.setUseFlyingSaucer(false);
+        } else {
+//            this.setUseFlyingSaucer(false);
+//            this.setUseWebView(false);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getDescriptionPaneHtmlRenderer() {
+        return this.descriptionPaneHtmlRenderer;
     }
 
     //~ Inner Classes ----------------------------------------------------------

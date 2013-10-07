@@ -18,10 +18,12 @@ import Sirius.navigator.types.treenode.ClassTreeNode;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.localserver.method.Method;
+import Sirius.server.middleware.types.DefaultMetaObject;
 import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -44,6 +46,10 @@ import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
@@ -278,14 +284,50 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  resultNodes                The results to display in the SearchResultsTree.
-     * @param  append                     Whether to append the search results or not.
-     * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
-     *                                    Usually a SearchControlPanel.
+     * @param  resultNodes                DOCUMENT ME!
+     * @param  append                     DOCUMENT ME!
+     * @param  searchResultsTreeListener  DOCUMENT ME!
      */
     public void showSearchResults(final Node[] resultNodes,
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener) {
+        showSearchResults(resultNodes, append, searchResultsTreeListener, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  resultNodes                The results to display in the SearchResultsTree.
+     * @param  append                     Whether to append the search results or not.
+     * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
+     *                                    Usually a SearchControlPanel.
+     * @param  simpleSort                 if true, sorts the search results alphabetically. Usually set to false, as a
+     *                                    more specific sorting order is wished.
+     */
+    public void showSearchResults(final Node[] resultNodes,
+            final boolean append,
+            final PropertyChangeListener searchResultsTreeListener,
+            final boolean simpleSort) {
+        showSearchResults(resultNodes, append, searchResultsTreeListener, simpleSort, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  resultNodes                The results to display in the SearchResultsTree.
+     * @param  append                     Whether to append the search results or not.
+     * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
+     *                                    Usually a SearchControlPanel.
+     * @param  simpleSort                 if true, sorts the search results alphabetically. Usually set to false, as a
+     *                                    more specific sorting order is wished.
+     * @param  sortActive                 if false, no sort will be done (the value of simpleSort will be ignored, if
+     *                                    sortActive is false)
+     */
+    public void showSearchResults(final Node[] resultNodes,
+            final boolean append,
+            final PropertyChangeListener searchResultsTreeListener,
+            final boolean simpleSort,
+            final boolean sortActive) {
         if ((resultNodes == null) || (resultNodes.length < 1)) {
             JOptionPane.showMessageDialog(ComponentRegistry.getRegistry().getMainWindow(),
                 org.openide.util.NbBundle.getMessage(
@@ -298,7 +340,7 @@ public class MethodManager {
         } else {
             ComponentRegistry.getRegistry()
                     .getSearchResultsTree()
-                    .setResultNodes(resultNodes, append, searchResultsTreeListener);
+                    .setResultNodes(resultNodes, append, searchResultsTreeListener, simpleSort, sortActive);
             this.showSearchResults();
         }
     }
@@ -374,29 +416,20 @@ public class MethodManager {
         boolean ans = false;
 
         if (withQuestion) {
-            final int option = JOptionPane.showOptionDialog(
-                    ComponentRegistry.getRegistry().getMainWindow(),
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.message",
-                        new Object[] { String.valueOf(sourceNode) }),                                                          // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.title"),             // NOI18N
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    new String[] {
-                        org.openide.util.NbBundle.getMessage(
-                            MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"), // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            MethodManager.class,
-                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.cancel")
-                    },                                                                                                         // NOI18N
-                    org.openide.util.NbBundle.getMessage(
-                        MethodManager.class,
-                        "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).JOptionPane_anon.option.commit"));
+            final int option;
+            final boolean nodeCurrentlyEdited = isTreeNodeAlsoOpenInEditor(sourceNode);
+            option = showOptionDialogDeleteNode(sourceNode, nodeCurrentlyEdited);
+
+            // discard the editor
+            if (nodeCurrentlyEdited && (option == JOptionPane.YES_OPTION)) {
+                final AttributeEditor editor = ComponentRegistry.getRegistry().getAttributeEditor();
+                if (editor instanceof NavigatorAttributeEditorGui) {
+                    ((NavigatorAttributeEditorGui)editor).cancelEditing();
+                } else {
+                    ComponentRegistry.getRegistry().getAttributeEditor().cancel();
+                }
+            }
+
             ans = (option == JOptionPane.YES_OPTION);
         }
 
@@ -445,6 +478,74 @@ public class MethodManager {
         }
 
         return false;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sourceNode  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isTreeNodeAlsoOpenInEditor(final DefaultMetaTreeNode sourceNode) {
+        final Node selectedNode = sourceNode.getNode();
+        if (!(selectedNode instanceof MetaObjectNode)) {
+            return false;
+        }
+        final MetaObject selectedObject = ((MetaObjectNode)selectedNode).getObject();
+        final CidsBean selectedBeanInTree = selectedObject.getBean();
+
+        final AttributeEditor editor = ComponentRegistry.getRegistry().getAttributeEditor();
+        if (!(editor instanceof NavigatorAttributeEditorGui)) {
+            return false;
+        }
+        final MetaObject objectInEditor = ((NavigatorAttributeEditorGui)editor).getEditorObject();
+        if (objectInEditor == null) {
+            return false;
+        }
+        final CidsBean beanInEditor = objectInEditor.getBean();
+
+        return selectedBeanInTree.equals(beanInEditor);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   sourceNode           DOCUMENT ME!
+     * @param   nodeCurrentlyEdited  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private int showOptionDialogDeleteNode(final DefaultMetaTreeNode sourceNode, final boolean nodeCurrentlyEdited) {
+        final String suffix = nodeCurrentlyEdited ? ".currentlyEdited" : "";
+        return JOptionPane.showOptionDialog(
+                ComponentRegistry.getRegistry().getMainWindow(),
+                org.openide.util.NbBundle.getMessage(
+                    MethodManager.class,
+                    "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.message"
+                            + suffix,
+                    new Object[] { String.valueOf(sourceNode) }), // NOI18N
+                org.openide.util.NbBundle.getMessage(
+                    MethodManager.class,
+                    "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.title"
+                            + suffix), // NOI18N
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                new String[] {
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.option.commit"
+                                + suffix), // NOI18N
+                    org.openide.util.NbBundle.getMessage(
+                        MethodManager.class,
+                        "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.option.cancel"
+                                + suffix)
+                },                     // NOI18N
+                org.openide.util.NbBundle.getMessage(
+                    MethodManager.class,
+                    "MethodManager.showOptionDialogDeleteNode(DefaultMetaTreeNode,boolean).JOptionPane_anon.option.commit"
+                            + suffix));
     }
 
     /**

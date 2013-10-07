@@ -16,6 +16,13 @@
 
     <name>cids Navigator</name>
     <description>!!! description pending !!!</description>
+    <licenses>
+        <license>
+            <name>GNU General Public License</name>
+            <distribution>repo</distribution>
+            <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+        </license>
+    </licenses>
     
     <prerequisites>
         <maven>3</maven>
@@ -79,6 +86,13 @@
             <groupId>calpa.html</groupId>
             <artifactId>calpahtml</artifactId>
             <version>2_04</version>
+        </dependency>
+         <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>javafx</artifactId>
+            <version>2.2</version>
+            <scope>system</scope>
+            <systemPath>${java.home}/lib/jfxrt.jar</systemPath>
         </dependency>
     </dependencies>
 

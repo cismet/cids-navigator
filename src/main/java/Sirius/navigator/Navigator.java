@@ -87,6 +87,8 @@ import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
 import de.cismet.netutil.Proxy;
 
+import de.cismet.remote.RESTRemoteControlStarter;
+
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
@@ -101,6 +103,11 @@ import de.cismet.tools.gui.DefaultPopupMenuListener;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+
+import static Sirius.navigator.Navigator.NAVIGATOR_HOME;
+import static Sirius.navigator.Navigator.NAVIGATOR_HOME_DIR;
+
+import static java.awt.Frame.MAXIMIZED_BOTH;
 
 /**
  * DOCUMENT ME!
@@ -118,7 +125,6 @@ public class Navigator extends JFrame {
                                                                          : "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
-
     private static volatile boolean startupFinished = false;
 
     //~ Instance fields --------------------------------------------------------
@@ -650,8 +656,23 @@ public class Navigator extends JFrame {
             325,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_325")); // NOI18N
 
-        if (PropertyManager.getManager().isUseFlyingSaucer()) {
+        if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
             descriptionPane = new DescriptionPaneFS();
+        } else if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FX_HTML_RENDERER)) {
+            try {
+                descriptionPane = new DescriptionPaneFX();
+//            } catch (NoClassDefFoundError e) {
+            } catch (Error e) {
+                logger.error("Error during initialisation of Java FX Description Pane. Using Calpa as fallback.", e);
+                descriptionPane = new DescriptionPaneCalpa();
+            } catch (Exception e) {
+                logger.error(
+                    "Exception during initialisation of Java FX Description Pane. Using Calpa as fallback.",
+                    e);
+                descriptionPane = new DescriptionPaneCalpa();
+            }
         } else {
             descriptionPane = new DescriptionPaneCalpa();
         }
@@ -781,7 +802,7 @@ public class Navigator extends JFrame {
         this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new ClosingListener());
+        this.addWindowListener(new Navigator.ClosingListener());
     }
 
     /**
@@ -883,6 +904,11 @@ public class Navigator extends JFrame {
         return false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  visible  DOCUMENT ME!
+     */
     @Override
     public void setVisible(final boolean visible) {
         if (logger.isInfoEnabled()) {
@@ -938,6 +964,9 @@ public class Navigator extends JFrame {
     }
     // .........................................................................
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void dispose() {
         if (logger.isInfoEnabled()) {
@@ -1031,7 +1060,7 @@ public class Navigator extends JFrame {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
+        Runtime.getRuntime().addShutdownHook(new Navigator.NavigatorShutdown());
         Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
 
         // There is no way to adjust the Locale using the Jnlp file.
@@ -1150,114 +1179,11 @@ public class Navigator extends JFrame {
      * DOCUMENT ME!
      */
     private void initHttpServer() {
-        final Thread t = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            final Server server = new Server();
-                            final Connector connector = new SelectChannelConnector();
-                            connector.setPort(propertyManager.getHttpInterfacePort());
-                            server.setConnectors(new Connector[] { connector });
-
-                            final Handler param = new AbstractHandler() {
-
-                                    @Override
-                                    public void handle(final String target,
-                                            final HttpServletRequest request,
-                                            final HttpServletResponse response,
-                                            final int dispatch) throws IOException, ServletException {
-                                        final Request base_request = (request instanceof Request)
-                                            ? (Request)request : HttpConnection.getCurrentConnection().getRequest();
-                                        base_request.setHandled(true);
-                                        response.setContentType("text/html");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 // NOI18N
-                                        response.setStatus(HttpServletResponse.SC_OK);
-                                        response.getWriter()
-                                                .println(
-                                                    "<html><head><title>HTTP interface</title></head><body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"80%\"><tr><td width=\"30%\" align=\"center\" valign=\"middle\"><img border=\"0\" src=\"http://www.cismet.de/images/cismetLogo250M.png\" ><br></td><td width=\"%\">&nbsp;</td><td width=\"50%\" align=\"left\" valign=\"middle\"><font face=\"Arial\" size=\"3\" color=\"#1c449c\">... and <b><font face=\"Arial\" size=\"3\" color=\"#1c449c\">http://</font></b> just works</font><br><br><br></td></tr></table></body></html>"); // NOI18N
-                                    }
-                                };
-
-                            final Handler hello = new AbstractHandler() {
-
-                                    @Override
-                                    public void handle(final String target,
-                                            final HttpServletRequest request,
-                                            final HttpServletResponse response,
-                                            final int dispatch) throws IOException, ServletException {
-                                        try {
-                                            if (request.getLocalAddr().equals(request.getRemoteAddr())) {
-                                                if (logger.isInfoEnabled()) {
-                                                    logger.info("HttpInterface asked");                                                 // NOI18N
-                                                }
-                                                if (target.equalsIgnoreCase("/executeSearch")) {                                        // NOI18N
-                                                    final String query = request.getParameter("query");                                 // NOI18N
-                                                    final String domain = request.getParameter("domain");                               // NOI18N
-                                                    final String classId = request.getParameter("classId");                             // NOI18N
-                                                    final HashMap dataBeans = ComponentRegistry.getRegistry()
-                                                                .getSearchDialog()
-                                                                .getSearchFormManager()
-                                                                .getFormDataBeans();
-                                                    final Object object = dataBeans.get(query + "@" + domain);                          // NOI18N
-                                                    final HashMap<String, String> params =
-                                                        new HashMap<String, String>();
-                                                    final Set keys = request.getParameterMap().keySet();
-                                                    final Iterator it = keys.iterator();
-                                                    while (it.hasNext()) {
-                                                        final String key = it.next().toString();
-                                                        if (!(key.equalsIgnoreCase("query")
-                                                                        || key.equalsIgnoreCase("domain")
-                                                                        || key.equalsIgnoreCase("classId"))) {                          // NOI18N
-                                                            params.put(key, request.getParameter(key));
-                                                        }
-                                                    }
-                                                    if (object != null) {
-                                                        final FormDataBean parambean = (FormDataBean)object;
-                                                        for (final String key : params.keySet()) {
-                                                            parambean.setBeanParameter(key, params.get(key));
-                                                        }
-                                                        final List v = new ArrayList();
-                                                        final String cid = classId + "@" + domain;                                      // NOI18N
-                                                        v.add(cid);
-                                                        final LinkedList searchFormData = new LinkedList();
-                                                        searchFormData.add(parambean);
-                                                        ComponentRegistry.getRegistry()
-                                                                .getSearchDialog()
-                                                                .search(v, searchFormData, Navigator.this, false);
-                                                    }
-                                                }
-                                                if (target.equalsIgnoreCase("/showAkuk")) {                                             // NOI18N
-                                                    final String domain = request.getParameter("domain");                               // NOI18N
-                                                    final String classId = request.getParameter("classId");                             // NOI18N
-                                                    final String objectIds = request.getParameter("objectIds");                         // NOI18N
-                                                } else {
-                                                    logger.warn("Unknown Target: " + target);                                           // NOI18N
-                                                }
-                                            } else {
-                                                logger.warn(
-                                                    "Sombody tries to access the HTTP Interface from a different Terminal. Rejected."); // NOI18N
-                                            }
-                                        } catch (Throwable t) {
-                                            logger.error("Error while handling HttpRequests", t);                                       // NOI18N
-                                        }
-                                    }
-                                };
-
-                            final HandlerCollection handlers = new HandlerCollection();
-                            handlers.setHandlers(new Handler[] { param, hello });
-                            server.setHandler(handlers);
-
-                            server.start();
-                            server.join();
-                        } catch (Throwable t) {
-                            logger.error(
-                                "Error in  Navigator HttpInterface on port "
-                                        + propertyManager.getHttpInterfacePort(),
-                                t); // NOI18N
-                        }
-                    }
-                });
-        CismetThreadPool.execute(t);
+        try {
+            RESTRemoteControlStarter.initRestRemoteControlMethods(propertyManager.getHttpInterfacePort());
+        } catch (Throwable e) {
+            logger.error("Error during initializion of remote control server", e);
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -1271,10 +1197,13 @@ public class Navigator extends JFrame {
 
         //~ Static fields/initializers -----------------------------------------
 
-        private static final transient Logger LOG = Logger.getLogger(NavigatorShutdown.class);
+        private static final transient Logger LOG = Logger.getLogger(Navigator.NavigatorShutdown.class);
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void run() {
             if (startupFinished) {
