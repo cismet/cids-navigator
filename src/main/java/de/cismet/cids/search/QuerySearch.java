@@ -58,6 +58,7 @@ import de.cismet.cids.server.search.builtin.DistinctValuesSearch;
 import de.cismet.cids.server.search.builtin.QueryEditorSearch;
 
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
+import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
 
 /**
  * DOCUMENT ME!
@@ -66,7 +67,7 @@ import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsWindowSearch.class)
-public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
+public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry,
     SearchControlListener,
     ActionTagProtected {
 
