@@ -18,7 +18,9 @@
   <SubComponents>
     <Component class="javax.swing.JLabel" name="jLayerLb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Layer:"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cismet/cids/search/Bundle.properties" key="QuerySearch.jLayerLb.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -43,7 +45,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jMethodLb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Methode:"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cismet/cids/search/Bundle.properties" key="QuerySearch.jMethodLb.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -314,7 +318,9 @@
     </Component>
     <Component class="javax.swing.JButton" name="jGetValuesBn">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Einzelwerte anfordern"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cismet/cids/search/Bundle.properties" key="QuerySearch.jGetValuesBn.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jGetValuesBnActionPerformed"/>
@@ -327,7 +333,9 @@
     </Component>
     <Component class="javax.swing.JLabel" name="jGeheZuLb">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Gehe zu:"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cismet/cids/search/Bundle.properties" key="QuerySearch.jGeheZuLb.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
       </Properties>
       <Constraints>
         <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout" value="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout$GridBagConstraintsDescription">
@@ -364,7 +372,7 @@
         <Property name="alignment" type="int" value="0"/>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="jLabel2">
+        <Component class="javax.swing.JLabel" name="jlEinzelwerteAnzeigen">
         </Component>
       </SubComponents>
     </Container>

@@ -24,6 +24,7 @@ import Sirius.server.middleware.types.MetaClass;
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -109,7 +110,6 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     private javax.swing.JLabel jCommandLb;
     private javax.swing.JLabel jGeheZuLb;
     private javax.swing.JButton jGetValuesBn;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JComboBox jLayerCB;
     private javax.swing.JLabel jLayerLb;
     private javax.swing.JComboBox jMethodCB;
@@ -122,6 +122,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JList jValuesLi;
+    private javax.swing.JLabel jlEinzelwerteAnzeigen;
     private javax.swing.JPanel panCommand;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
@@ -136,6 +137,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
     public QuerySearch() throws Exception {
         classes = GetClasses();
         initComponents();
+        jMethodCB.setVisible(false);
+        jMethodLb.setVisible(false);
         jGeheZuLb.setVisible(false);
         jTextField1.setVisible(false);
         jAttributesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -375,7 +378,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
      */
     @Override
     public String getName() {
-        return "Query-Editor";
+        return NbBundle.getMessage(QuerySearch.class, "QuerySearch.getName()");
     }
 
     /**
@@ -479,11 +482,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         jTextField1 = new javax.swing.JTextField();
         panCommand = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
+        jlEinzelwerteAnzeigen = new javax.swing.JLabel();
 
         setLayout(new java.awt.GridBagLayout());
 
-        jLayerLb.setText("Layer:");
+        jLayerLb.setText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "QuerySearch.jLayerLb.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -507,7 +510,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jLayerCB, gridBagConstraints);
 
-        jMethodLb.setText("Methode:");
+        jMethodLb.setText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "QuerySearch.jMethodLb.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -771,7 +774,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         add(jCommandLb, gridBagConstraints);
 
-        jGetValuesBn.setText("Einzelwerte anfordern");
+        jGetValuesBn.setText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "QuerySearch.jGetValuesBn.text")); // NOI18N
         jGetValuesBn.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -786,7 +789,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         add(jGetValuesBn, gridBagConstraints);
 
-        jGeheZuLb.setText("Gehe zu:");
+        jGeheZuLb.setText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "QuerySearch.jGeheZuLb.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 5;
@@ -801,7 +804,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         add(jTextField1, gridBagConstraints);
 
-        panCommand.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+        panCommand.setLayout(new java.awt.FlowLayout(2));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
@@ -809,8 +812,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         add(panCommand, gridBagConstraints);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
-        jPanel1.add(jLabel2);
+        jPanel1.setLayout(new java.awt.FlowLayout(0));
+        jPanel1.add(jlEinzelwerteAnzeigen);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -828,7 +831,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
         threadPool.submit(new Runnable() {
@@ -862,18 +865,18 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                 }
             });
 
-        jLabel2.setText("");
+        jlEinzelwerteAnzeigen.setText("");
         final List<String> old = values;
         values = new LinkedList<String>();
         firePropertyChange(PROP_VALUES, old, values);
-    }//GEN-LAST:event_jLayerCBActionPerformed
+    } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -900,8 +903,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearch,
                 }
             });
 
-        jLabel2.setText("Einzelwerte von " + attributeInfo.getName());
-    }//GEN-LAST:event_jGetValuesBnActionPerformed
+        jlEinzelwerteAnzeigen.setText(NbBundle.getMessage(
+                QuerySearch.class,
+                "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
+                attributeInfo.getName()));
+    } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     @Override
     public JComponent getSearchWindowComponent() {
