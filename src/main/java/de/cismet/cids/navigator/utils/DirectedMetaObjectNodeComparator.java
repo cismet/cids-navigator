@@ -10,6 +10,8 @@ package de.cismet.cids.navigator.utils;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
+import Sirius.server.middleware.types.MetaClassNode;
+import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
@@ -64,7 +66,9 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
             return 0;
         }
 
-        if (!(o1 instanceof MetaObjectNode) || !(o2 instanceof MetaObjectNode)) {
+        if (!isSupported(o1) || !isSupported(o2)) {
+            LOG.warn("The DirectedMetaObjectNodeComparator should compare a node of an unknown type. Types: "
+                        + o1.getClass().getName() + " and " + o2.getClass().getName());
             return 0;
         }
         if ((o1 == null) && (o2 == null)) {
@@ -77,20 +81,18 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
             return ascending ? 1 : -1;
         }
 
-        final MetaObjectNode mon1 = (MetaObjectNode)o1;
-        final MetaObjectNode mon2 = (MetaObjectNode)o2;
+        String mos1 = o1.toString();
+        String mos2 = o2.toString();
 
-        String mos1 = mon1.toString();
-        String mos2 = mon2.toString();
-
-        final String class1 = mon1.getClassId() + "@" + mon1.getDomain();
-        final String class2 = mon2.getClassId() + "@" + mon2.getDomain();
+        final String class1 = o1.getClassId() + "@" + o1.getDomain();
+        final String class2 = o2.getClassId() + "@" + o2.getDomain();
 
         if ((class1 != null) && (class2 != null)) {
             int comparison = class1.compareTo(class2);
 
             if ((comparison == 0) && (mos1 != null) && (mos2 != null)) {
-                if ((mos1 == null) || (mos1.trim().length() == 0)) {
+                if (((mos1 == null) || (mos1.trim().length() == 0)) && (o1 instanceof MetaObjectNode)) {
+                    final MetaObjectNode mon1 = (MetaObjectNode)o1;
                     MetaObject mo1 = mon1.getObject();
                     try {
                         if (mo1 == null) {
@@ -107,8 +109,9 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                     }
                     mos1 = mon1.toString();
                 }
-                if ((mos2 == null) || (mos2.trim().length() == 0)) {
+                if (((mos2 == null) || (mos2.trim().length() == 0)) && (o2 instanceof MetaObjectNode)) {
                     try {
+                        final MetaObjectNode mon2 = (MetaObjectNode)o2;
                         MetaObject mo2 = mon2.getObject();
 
                         if (mo2 == null) {
@@ -125,11 +128,31 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                         LOG.error("Connection problem: ", e);
                     }
                 }
-                comparison = mos1.compareTo(mos2);
+
+                if ((mos1 == null) && (mos2 == null)) {
+                    comparison = 0;
+                } else if (mos1 == null) {
+                    comparison = -1;
+                } else if (mos2 == null) {
+                    comparison = 1;
+                } else {
+                    comparison = mos1.compareTo(mos2);
+                }
             }
 
             return ascending ? comparison : (-1 * comparison);
         }
         return 0;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   n  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isSupported(final Node n) {
+        return ((n instanceof MetaObjectNode) || (n instanceof MetaNode) || (n instanceof MetaClassNode));
     }
 }
