@@ -194,9 +194,7 @@ public class Navigator extends JFrame {
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
         this.exceptionManager = ExceptionManager.getManager();
-        UIManager.put("Table.selectionBackground", new Color(195, 212, 232));
-        UIManager.put("Tree.selectionBackground", new Color(195, 212, 232));
-
+        StaticSwingTools.tweakUI();
         this.init();
 
         startupFinished = true;
