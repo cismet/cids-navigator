@@ -18,6 +18,74 @@ public interface NavigatorJsBridge {
     //~ Methods ----------------------------------------------------------------
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   domain         DOCUMENT ME!
+     * @param   classKey       DOCUMENT ME!
+     * @param   role           DOCUMENT ME!
+     * @param   authorization  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    Object getEmptyInstanceOfClass(String domain, String classKey, String role, String authorization);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllSearches();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getSearch();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getSearchResults();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllPermissions();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getPermission();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllConfigAttributes();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getConfigAttribute();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllSubscriptions();
+
+    /**
      * methods of /classes resource of cids rest api.
      *
      * @param   domain         DOCUMENT ME!
@@ -58,19 +126,62 @@ public interface NavigatorJsBridge {
             String attributeKey,
             String role,
             String authorization);
-    // methods of /enitities resource of cids rest api
 
     /**
      * DOCUMENT ME!
      *
-     * @param   domain         DOCUMENT ME!
-     * @param   classKey       DOCUMENT ME!
-     * @param   role           DOCUMENT ME!
-     * @param   authorization  DOCUMENT ME!
+     * @return  DOCUMENT ME!
+     */
+    String addNode();
+
+    /**
+     * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    Object getEmptyInstanceOfClass(String domain, String classKey, String role, String authorization);
+    String getAllRootNodes();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getChildrenOfNode();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getNode();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String validateUser();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllRoles();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getRole();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getEmptyInstanceOfClass();
 
     /**
      * DOCUMENT ME!
@@ -184,4 +295,60 @@ public interface NavigatorJsBridge {
             String profile,
             boolean omitNUllValues,
             String authorization);
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String createNewTask();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllRunningTasks();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getTaskStatus();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String cancelTask();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllTaskResults();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getTaskResult();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAction();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getAllActions();
 }
