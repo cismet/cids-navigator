@@ -56,6 +56,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.*;
 
@@ -193,7 +194,7 @@ public class Navigator extends JFrame {
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
         this.exceptionManager = ExceptionManager.getManager();
-
+        StaticSwingTools.tweakUI();
         this.init();
 
         startupFinished = true;
