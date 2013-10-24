@@ -58,6 +58,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.*;
 
@@ -195,6 +196,8 @@ public class Navigator extends JFrame {
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
         this.exceptionManager = ExceptionManager.getManager();
+        UIManager.put("Table.selectionBackground", new Color(195, 212, 232));
+        UIManager.put("Tree.selectionBackground", new Color(195, 212, 232));
 
         this.init();
 
