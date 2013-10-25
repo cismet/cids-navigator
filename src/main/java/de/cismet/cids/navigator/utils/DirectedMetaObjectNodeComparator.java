@@ -87,10 +87,14 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
         final String class1 = o1.getClassId() + "@" + o1.getDomain();
         final String class2 = o2.getClassId() + "@" + o2.getDomain();
 
-        if ((class1 != null) && (class2 != null)) {
-            int comparison = class1.compareTo(class2);
+        if (((class1 != null) && (class2 != null)) || ((class1 == null) && (class2 == null))) {
+            int comparison = 0;
 
-            if ((comparison == 0) && (mos1 != null) && (mos2 != null)) {
+            if (!((class1 == null) && (class2 == null))) {
+                comparison = class1.compareTo(class2);
+            }
+
+            if ((comparison == 0)) {
                 if (((mos1 == null) || (mos1.trim().length() == 0)) && (o1 instanceof MetaObjectNode)) {
                     final MetaObjectNode mon1 = (MetaObjectNode)o1;
                     MetaObject mo1 = mon1.getObject();
@@ -137,6 +141,12 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                     comparison = 1;
                 } else {
                     comparison = mos1.compareTo(mos2);
+                }
+            } else {
+                if (class1 == null) {
+                    comparison = -1;
+                } else if (class2 == null) {
+                    comparison = 1;
                 }
             }
 
