@@ -146,12 +146,19 @@ public class URLParameterizer extends StringParameterizer {
         final String[] tokens = getTokens(url);
         final String[] values = new String[tokens.length];
         final Sirius.server.localserver.attribute.Attribute[] attributeArray = null;
-        UserGroup userGroup = null;
-
-        final int id = 0;
+        final UserGroup userGroup;
 
         if (user != null) {
-            userGroup = user.getUserGroup();
+            UserGroup tmpUserGroup = user.getUserGroup();
+            if (tmpUserGroup == null) {
+                for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                    tmpUserGroup = potentialUserGroup;
+                    break;
+                }
+            }
+            userGroup = tmpUserGroup;
+        } else {
+            userGroup = null;
         }
 
         for (int i = 0; i < tokens.length; i++) {
