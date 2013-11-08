@@ -18,6 +18,8 @@ import Sirius.navigator.ui.attributes.editor.*;
 
 import Sirius.server.localserver.attribute.Attribute;
 import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.User;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
@@ -343,11 +345,16 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         return null;
     }
 
-// DefaultComplexMetaAttributeEditorMethoden ...........................................
-
-    @Override
-    public boolean isEditable(final java.util.EventObject anEvent) {
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+    /**
+     * DefaultComplexMetaAttributeEditorMethoden ...........................................
+     *
+     * @param   anEvent    DOCUMENT ME!
+     * @param   userGroup  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isEditable(final EventObject anEvent, final UserGroup userGroup) {
+        final String key = userGroup.getKey().toString();
 
         try {
             if (this.getValue() instanceof Attribute) {
@@ -375,5 +382,21 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isEditable(final EventObject anEvent) {
+        final User user = SessionManager.getSession().getUser();
+        final UserGroup userGroup = user.getUserGroup();
+        if (userGroup != null) {
+            return isEditable(anEvent, userGroup);
+        } else {
+            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                if (isEditable(anEvent, potentialUserGroup)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

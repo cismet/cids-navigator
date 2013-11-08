@@ -38,7 +38,9 @@ import Sirius.navigator.ui.tree.SearchResultsTreePanel;
 import Sirius.navigator.ui.widget.FloatingFrameConfigurator;
 
 import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
@@ -853,9 +855,32 @@ public class Navigator extends JFrame {
      *
      * @return  DOCUMENT ME!
      */
-    private boolean hasPermission(final MetaClass[] classes,
-            final Sirius.server.newuser.permission.Permission permission) {
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+    private boolean hasPermission(final MetaClass[] classes, final Permission permission) {
+        final User user = SessionManager.getSession().getUser();
+        final UserGroup userGroup = user.getUserGroup();
+        if (userGroup != null) {
+            return hasPermission(classes, permission, userGroup);
+        } else {
+            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                if (hasPermission(classes, permission, potentialUserGroup)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classes     DOCUMENT ME!
+     * @param   permission  DOCUMENT ME!
+     * @param   userGroup   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean hasPermission(final MetaClass[] classes, final Permission permission, final UserGroup userGroup) {
+        final String key = userGroup.getKey().toString();
 
         for (int i = 0; i < classes.length; i++) {
             try {

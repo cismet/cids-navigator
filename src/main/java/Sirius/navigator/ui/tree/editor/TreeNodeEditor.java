@@ -20,6 +20,8 @@ import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 
 import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.User;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
@@ -251,6 +253,26 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         pack();
     } // </editor-fold>//GEN-END:initComponents
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  filtered   DOCUMENT ME!
+     * @param  cs         DOCUMENT ME!
+     * @param  userGroup  DOCUMENT ME!
+     */
+    private void addToFiltered(final ArrayList filtered, final MetaClass cs, final UserGroup userGroup) {
+        try {
+            final String key = userGroup.getKey().toString();
+            if (cs.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)) {
+                filtered.add(cs);
+            }
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("filter for " + cs); // NOI18N
+            }
+        }
+    }
+
     @Override
     public void show() {
         if (this.classBox.getModel().getSize() == 0) {
@@ -258,18 +280,18 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                 final MetaClass[] cs = SessionManager.getProxy().getClasses();
                 final ArrayList filtered = new ArrayList();
 
-                final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+                final User user = SessionManager.getSession().getUser();
+                final UserGroup userGroup = user.getUserGroup();
+
                 // Permission perm = SessionManager.getSession().getWritePermission();
 
                 // filtering
                 for (int i = 0; i < cs.length; i++) {
-                    try {
-                        if (cs[i].getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)) {
-                            filtered.add(cs[i]);
-                        }
-                    } catch (Exception e) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("filter for " + cs[i]); // NOI18N
+                    if (userGroup != null) {
+                        addToFiltered(filtered, cs[i], userGroup);
+                    } else {
+                        for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                            addToFiltered(filtered, cs[i], potentialUserGroup);
                         }
                     }
                 }
