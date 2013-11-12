@@ -446,6 +446,14 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 scpRenderer.setViewportView(panRenderer);
 
                                 panRenderer.setLayout(new GridBagLayout());
+
+                                // the first renderer was added with a BorderLayout constraint,
+                                // but now it needs GridBagConstraints
+                                if (panRenderer.getComponentCount() == 1) {
+                                    final Component firstRenderer = panRenderer.getComponent(0);
+                                    panRenderer.remove(firstRenderer);
+                                    panRenderer.add(firstRenderer, gridBagConstraints);
+                                }
                             }
 
                             for (final SelfDisposingPanel comp : chunks) {
