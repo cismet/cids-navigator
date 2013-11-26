@@ -139,7 +139,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
         final Node node = this.getNode();
 
         final Node[] c = SessionManager.getProxy().getChildren(node, SessionManager.getSession().getUser());
-        if (node.isDynamic() && node.isSqlSort()) {
+        if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
             return c;
         }
 
