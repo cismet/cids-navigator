@@ -573,7 +573,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                 assert thisNode != null : "DefaultMetaTreeNode without backing node: " + node; // NOI18N
 
-                if (thisNode.isSqlSort() && thisNode.isDynamic()) {
+                if (thisNode.isSqlSort() && (thisNode.getDynamicChildrenStatement() != null)) {
                     if (LOG.isInfoEnabled()) {
                         LOG.info("these children are sorted via SQL, thus soft refresh is not possible: " + thisNode); // NOI18N
                     }
