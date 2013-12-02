@@ -352,7 +352,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         public Node[] getChildren(final Node node) throws ConnectionException {
             final Node[] c = connection.getChildren(node, session.getUser());
 
-            if (node.isDynamic() && node.isSqlSort()) {
+            if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
                 return c;
             }
 
