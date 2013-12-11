@@ -197,7 +197,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
 
         assert newNode != null : "received DefaultMetaTreeNode without backing Node: " + toAdd; // NOI18N
 
-        for (int i = 0; (children != null) && (i < children.size()); ++i) {
+        for (int i = 0; i < children.size(); ++i) {
             final TreeNode tn = getChildAt(i);
             if (tn instanceof DefaultMetaTreeNode) {
                 final DefaultMetaTreeNode dmtn = (DefaultMetaTreeNode)tn;
