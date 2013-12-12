@@ -315,6 +315,15 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    protected Comparator<CidsBean> getComparator() {
+        return comparator;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   mc           DOCUMENT ME!
      * @param   nullable     DOCUMENT ME!
      * @param   onlyUsed     DOCUMENT ME!
