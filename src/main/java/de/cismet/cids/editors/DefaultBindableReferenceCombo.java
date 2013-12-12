@@ -156,7 +156,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      * @param  mc           DOCUMENT ME!
      * @param  forceReload  DOCUMENT ME!
      */
-    private void init(final MetaClass mc, final boolean forceReload) {
+    protected void init(final MetaClass mc, final boolean forceReload) {
         if (!isFakeModel() && (mc != null)) {
             CismetThreadPool.execute(new SwingWorker<DefaultComboBoxModel, Void>() {
 
