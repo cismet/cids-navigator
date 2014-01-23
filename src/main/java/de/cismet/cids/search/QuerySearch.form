@@ -387,6 +387,14 @@
         <Property name="alignment" type="int" value="0"/>
       </Layout>
       <SubComponents>
+        <Component class="org.jdesktop.swingx.JXBusyLabel" name="lblBusyValueIcon">
+          <Properties>
+            <Property name="enabled" type="boolean" value="false"/>
+          </Properties>
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20))"/>
+          </AuxValues>
+        </Component>
         <Component class="javax.swing.JLabel" name="jlEinzelwerteAnzeigen">
         </Component>
       </SubComponents>
