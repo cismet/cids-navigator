@@ -10,6 +10,7 @@ package Sirius.navigator.ui.dialog;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
+import Sirius.navigator.resource.PropertyManager;
 
 import Sirius.server.newuser.UserException;
 
@@ -26,8 +27,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import de.cismet.tools.StaticDebuggingTools;
-
 /**
  * Der Login Dialog in dem Benutzername, Passwort und Localserver angegeben werden muessen. Der Dialog ist modal, ein
  * Klick auf 'Abbrechen' beendet das Programm sofort.
@@ -39,9 +38,6 @@ public class LoginDialog extends JDialog {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final String HOMEFILE_USERGROUP_IS_OPTIONAL = "cismetUsergroupOptional";   // NOI18N
-    private static final String HOMEFILE_USERGROUP_IS_FORBIDDEN = "cismetUsergroupForbidden"; // NOI18N
-
     private static final String PREF_NAME = "username";       // NOI18N
     private static final String PREF_DOMAIN = "domain";       // NOI18N
     private static final String PREF_USERGROUP = "usergroup"; // NOI18N
@@ -52,8 +48,10 @@ public class LoginDialog extends JDialog {
 
     private String[][] userGroupLSNames;
     private Preferences preferences;
-    private boolean userGroupIsOptional = StaticDebuggingTools.checkHomeForFile(HOMEFILE_USERGROUP_IS_OPTIONAL);
-    private boolean userGroupIsForbidden = StaticDebuggingTools.checkHomeForFile(HOMEFILE_USERGROUP_IS_FORBIDDEN);
+    private boolean userGroupIsOptional = PropertyManager.getManager().getPermissionModus()
+                == PropertyManager.PermissionModus.OPTIONAL;
+    private boolean userGroupIsForbidden = PropertyManager.getManager().getPermissionModus()
+                == PropertyManager.PermissionModus.FORBIDDEN;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
