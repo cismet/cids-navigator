@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
+import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
 import java.awt.Component;
@@ -131,7 +132,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator) {
-        final String[] s = new String[] { null };
+        final String[] s = new String[] {
+                NbBundle.getMessage(DefaultBindableReferenceCombo.class, "DefaultBindableReferenceCombo.loading")
+            };
         setModel(new DefaultComboBoxModel(s));
 
         this.nullable = nullable;
