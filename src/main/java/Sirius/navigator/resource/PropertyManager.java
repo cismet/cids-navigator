@@ -62,6 +62,20 @@ public final class PropertyManager {
     public static final String CALPA_HTML_RENDERER = "calpa";
     public static final String FLYING_SAUCER_HTML_RENDERER = "flyingSaucer";
 
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static enum PermissionModus {
+
+        //~ Enum constants -----------------------------------------------------
+
+        MANDATORY, OPTIONAL, FORBIDDEN
+    }
+
     //~ Instance fields --------------------------------------------------------
 
     private final Properties properties;
@@ -92,6 +106,8 @@ public final class PropertyManager {
     private final ProgressObserver sharedProgressObserver;
     private boolean editable;
     private boolean autoClose = false;
+    private PermissionModus permissionModus = PermissionModus.MANDATORY;
+
     /**
      * DOCUMENT ME!
      *
@@ -246,6 +262,46 @@ public final class PropertyManager {
      */
     public int getWidth() {
         return this.width;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  permissionModus  DOCUMENT ME!
+     */
+    public void setPermissionModus(final String permissionModus) {
+        final PermissionModus modus;
+        if ("explicitUsergoupForbidden".equals(permissionModus)) {
+            modus = PermissionModus.FORBIDDEN;
+        } else if ("explicitUsergroupOptional".equals(permissionModus)) {
+            modus = PermissionModus.OPTIONAL;
+        } else {
+            modus = PermissionModus.MANDATORY;
+        }
+        try {
+            this.setPermissionModus(modus);
+        } catch (Exception exp) {
+            logger.warn("setPermissionModus(): invalid property 'permissionModus': '" + exp.getMessage() + "'"); // NOI18N
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  permissionModus  DOCUMENT ME!
+     */
+    public void setPermissionModus(final PermissionModus permissionModus) {
+        this.permissionModus = permissionModus;
+        properties.setProperty("navigator.usergroup.rule", String.valueOf(permissionModus)); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public PermissionModus getPermissionModus() {
+        return permissionModus;
     }
 
     /**
@@ -926,6 +982,8 @@ public final class PropertyManager {
             this.setUseWebView(value);
         } else if (property.equalsIgnoreCase("enableSearchDialog")) {                          // NOI18N
             this.setEnableSearchDialog(value);
+        } else if (property.equalsIgnoreCase("navigator.usergroup.rule")) {                    // NOI18N
+            this.setPermissionModus(value);
         } else if (property.equals("navigator.proxy.url")) {
             this.setProxyURL(value);
         } else if (property.equals("navigator.proxy.username")) {
