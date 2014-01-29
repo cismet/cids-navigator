@@ -72,6 +72,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     private boolean onlyUsed;
     private Comparator<CidsBean> comparator;
     private String nullValueRepresentation;
+    private String sortingColumn;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -112,6 +113,16 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * Creates a new DefaultBindableReferenceCombo object.
      *
+     * @param  mc             DOCUMENT ME!
+     * @param  sortingcolumn  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo(final MetaClass mc, final String sortingcolumn) {
+        this(mc, false, false, BEAN_TOSTRING_COMPARATOR, sortingcolumn);
+    }
+
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     *
      * @param  mc        DOCUMENT ME!
      * @param  nullable  DOCUMENT ME!
      * @param  onlyUsed  DOCUMENT ME!
@@ -132,6 +143,23 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator) {
+        this(mc, nullable, onlyUsed, BEAN_TOSTRING_COMPARATOR, null);
+    }
+
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     *
+     * @param  mc             DOCUMENT ME!
+     * @param  nullable       DOCUMENT ME!
+     * @param  onlyUsed       DOCUMENT ME!
+     * @param  comparator     DOCUMENT ME!
+     * @param  sortingColumn  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator,
+            final String sortingColumn) {
         final String[] s = new String[] {
                 NbBundle.getMessage(DefaultBindableReferenceCombo.class, "DefaultBindableReferenceCombo.loading")
             };
@@ -141,6 +169,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         this.onlyUsed = onlyUsed;
         this.comparator = comparator;
         this.nullValueRepresentation = " ";
+        this.sortingColumn = sortingColumn;
         this.mocL = new MetaObjectChangeListenerImpl();
 
         this.setRenderer(new DefaultBindableReferenceComboRenderer());
@@ -156,6 +185,24 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
+     * @param  sortingColumn  DOCUMENT ME!
+     */
+    public void setSortingColumn(final String sortingColumn) {
+        this.sortingColumn = sortingColumn;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getSortingColumn() {
+        return sortingColumn;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  mc           DOCUMENT ME!
      * @param  forceReload  DOCUMENT ME!
      */
@@ -165,7 +212,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
                     @Override
                     protected DefaultComboBoxModel doInBackground() throws Exception {
-                        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload);
+                        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, sortingColumn);
                     }
 
                     @Override
@@ -340,12 +387,39 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload) {
+        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc             DOCUMENT ME!
+     * @param   nullable       DOCUMENT ME!
+     * @param   onlyUsed       DOCUMENT ME!
+     * @param   comparator     DOCUMENT ME!
+     * @param   forceReload    DOCUMENT ME!
+     * @param   sortingColumn  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator,
+            final boolean forceReload,
+            final String sortingColumn) {
         if (mc != null) {
             final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                 // NOI18N
-            String orderBy = "";                                                                             // NOI18N
-            if (ca != null) {
-                final String value = ca.getValue().toString();
-                orderBy = " order by " + value;                                                              // NOI18N
+            final String orderBy;                                                                            // NOI18N
+            if (sortingColumn == null) {
+                if (ca != null) {
+                    final String value = ca.getValue().toString();
+                    orderBy = " order by " + value;                                                          // NOI18N
+                } else {
+                    orderBy = "";
+                }
+            } else {
+                orderBy = " order by " + sortingColumn;
             }
             String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName(); // NOI18N
             if (onlyUsed) {
@@ -368,7 +442,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             for (final MetaObject mo : metaObjects) {
                 cbv.add(mo.getBean());
             }
-            if (ca == null) {
+            if (orderBy.length() == 0) {
                 // Sorts the model using String comparison on the bean's toString()
                 Collections.sort(cbv, comparator);
             }
