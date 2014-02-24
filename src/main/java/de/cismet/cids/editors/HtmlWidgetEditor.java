@@ -27,9 +27,8 @@ import org.apache.log4j.Logger;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -39,7 +38,6 @@ import java.util.Observer;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -151,21 +149,21 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
         this.setLayout(cardLayout);
         final JPanel waitPanel = new JPanel();
 
-        waitPanel.setLayout(new GridBagLayout());
+//        waitPanel.setLayout(new GridBagLayout());
 //        waitPanel.setBackground(Color.GREEN);
-        lblRendererCreationWaitingLabel = new javax.swing.JLabel();
-        lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+//        lblRendererCreationWaitingLabel = new javax.swing.JLabel();
+//        lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+//        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
+//                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 //        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
 //        final JComponent wrappedComp = (JComponent)cw.wrapComponent(lblRendererCreationWaitingLabel);
-        final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.weightx = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        waitPanel.add(new JLabel(""), gridBagConstraints);
+//        final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+//        gridBagConstraints.gridx = 0;
+//        gridBagConstraints.gridy = 0;
+//        gridBagConstraints.weightx = 1;
+//        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+//        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+//        waitPanel.add(new JLabel(""), gridBagConstraints);
 //        add(waitPanel, "waitPanel");
         add(htmlPanel, "htmlPanel");
 //        cardLayout.show(this, "waitPanel");

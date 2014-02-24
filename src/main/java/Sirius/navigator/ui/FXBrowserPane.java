@@ -16,15 +16,15 @@ import javafx.embed.swing.JFXPanel;
 
 import javafx.event.EventHandler;
 
-import javafx.geometry.Insets;
-
 import javafx.scene.Scene;
+import javafx.scene.SnapshotResult;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
+
+import javafx.util.Callback;
 
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
@@ -33,7 +33,6 @@ import org.apache.log4j.Logger;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 
 import java.util.Observer;
 
