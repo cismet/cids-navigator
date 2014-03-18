@@ -90,6 +90,7 @@ public class CallServerTunnel implements Tunnel {
             case GET_REQUEST_NO_TUNNEL: {
                 return false;
             }
+            case HEAD_REQUEST:
             case GET_REQUEST:
             case POST_REQUEST: {
                 try {
