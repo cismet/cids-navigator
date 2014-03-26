@@ -321,7 +321,7 @@ public class CidsObjectEditorFactory {
      * @return  DOCUMENT ME!
      */
     private JComponent getObjectEditor(final MetaClass metaClass) {
-        final ClassAttribute htmlRendererAttrib = metaClass.getClassAttribute("isHtmlWidget");
+        final ClassAttribute htmlRendererAttrib = metaClass.getClassAttribute("isHtmlEditor");
         if (htmlRendererAttrib != null) {
             final String widgetUrl = (String)htmlRendererAttrib.getValue();
             return new HtmlWidgetEditor(widgetUrl);

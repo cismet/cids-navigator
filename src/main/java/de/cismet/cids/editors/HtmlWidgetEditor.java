@@ -62,7 +62,7 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger LOG = Logger.getLogger(DescriptionPaneFX.class);
+    private static final Logger LOG = Logger.getLogger(HtmlWidgetEditor.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -147,32 +147,9 @@ public class HtmlWidgetEditor extends JPanel implements DoNotWrap,
         htmlPanel.setLayout(new BorderLayout());
         htmlPanel.add(browserPanel, BorderLayout.CENTER);
         this.setLayout(cardLayout);
-        final JPanel waitPanel = new JPanel();
-
-//        waitPanel.setLayout(new GridBagLayout());
-//        waitPanel.setBackground(Color.GREEN);
-//        lblRendererCreationWaitingLabel = new javax.swing.JLabel();
-//        lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-//        lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
-//                getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
-//        final ComponentWrapper cw = CidsObjectEditorFactory.getInstance().getComponentWrapper();
-//        final JComponent wrappedComp = (JComponent)cw.wrapComponent(lblRendererCreationWaitingLabel);
-//        final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-//        gridBagConstraints.gridx = 0;
-//        gridBagConstraints.gridy = 0;
-//        gridBagConstraints.weightx = 1;
-//        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-//        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-//        waitPanel.add(new JLabel(""), gridBagConstraints);
-//        add(waitPanel, "waitPanel");
         add(htmlPanel, "htmlPanel");
-//        cardLayout.show(this, "waitPanel");
         cardLayout.show(this, "htmlPanel");
-//        this.setLayout(new BorderLayout());
-//        this.setBorder(new EmptyBorder(10, 10, 10, 10));
         this.setOpaque(true);
-//        this.setBackground(Color.red);
-//        add(browserPanel, BorderLayout.CENTER);
     }
 
     //~ Methods ----------------------------------------------------------------

@@ -104,9 +104,7 @@ public class CidsObjectRendererFactory {
 //        anstelle iner hashmap eine multimap und dann über addnotify die instanz des renderers aus dem cahe entferne und bei removenotify (wenn der renderer
         // nicht mehr bebraucht wird) wieder dem cache zur verfuegung zu stellen. problem ist, das es noch keine
         // gemeinsame oberklasse für die renderer gibt
-
         // insert Ooops here
-
         final JComponent componentReferenceHolder;
         JComponent rendererComp = null;
         try {
@@ -121,7 +119,7 @@ public class CidsObjectRendererFactory {
                 }
                 final Object o;
                 final MetaClass metaClass = mo.getMetaClass();
-                final ClassAttribute htmlRendererAttrib = metaClass.getClassAttribute("isHtmlWidget");
+                final ClassAttribute htmlRendererAttrib = metaClass.getClassAttribute("isHtmlRenderer");
                 if ((htmlRendererAttrib != null) && (htmlRendererAttrib.getValue() != null)
                             && !htmlRendererAttrib.getValue().equals("")) {
                     final String widgetUrl = (String)htmlRendererAttrib.getValue();
@@ -196,7 +194,15 @@ public class CidsObjectRendererFactory {
 //                    @Override
 //                    public void run() {
                     try {
-                        final Object rendererInstanceObject = rendererClass.newInstance();
+                        final Object rendererInstanceObject;
+                        final ClassAttribute htmlRendererAttrib = mc.getClassAttribute("isHtmlAggregationRenderer");
+                        if ((htmlRendererAttrib != null) && (htmlRendererAttrib.getValue() != null)
+                                    && !htmlRendererAttrib.getValue().equals("")) {
+                            final String widgetUrl = (String)htmlRendererAttrib.getValue();
+                            rendererInstanceObject = new HtmlWidgetRenderer(widgetUrl);
+                        } else {
+                            rendererInstanceObject = rendererClass.newInstance();
+                        }
                         if (beans != null) {
                             final CidsBeanAggregationRenderer rendererComp = (CidsBeanAggregationRenderer)
                                 rendererInstanceObject;
