@@ -17,14 +17,10 @@ import javafx.embed.swing.JFXPanel;
 import javafx.event.EventHandler;
 
 import javafx.scene.Scene;
-import javafx.scene.SnapshotResult;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
-
-import javafx.util.Callback;
 
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
@@ -32,8 +28,8 @@ import netscape.javascript.JSObject;
 import org.apache.log4j.Logger;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 
+import java.util.Collection;
 import java.util.Observer;
 
 import javax.swing.JPanel;
@@ -149,7 +145,6 @@ public class FXBrowserPane extends JPanel {
 // }
 // }
 // });
-
         webEng = webView.getEngine();
         webEng.getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
 
@@ -218,6 +213,31 @@ public class FXBrowserPane extends JPanel {
                             editable);
                     } catch (Exception e) {
                         LOG.error("could not inject bean in HTML 5 Widget", e);
+                    }
+                }
+            });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  beans  DOCUMENT ME!
+     */
+    public void injectCidsBeans(final Collection<CidsBean> beans) {
+        Platform.runLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        /*
+                         * per convention we assume that the object we bind the bridge to (CidsJS) has an method
+                         * injectBean see the comment for registerJ2JSBridge
+                         */
+                        cidsJs.call(
+                            "injectBeans",
+                            CidsBean.getCidsBeanObjectMapper().writeValueAsString(beans));
+                    } catch (Exception e) {
+                        LOG.error("could not inject bean collection in HTML 5 Widget", e);
                     }
                 }
             });
