@@ -51,7 +51,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.swing.AbstractAction;
@@ -74,6 +73,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
+
+import de.cismet.commons.concurrency.CismetExecutors;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -137,7 +138,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 TreeModelListener.class,
                 refreshCache,
                 defaultTreeModel));
-        this.treePool = Executors.newFixedThreadPool(
+        this.treePool = CismetExecutors.newFixedThreadPool(
                 maxThreadCount,
                 NavigatorConcurrency.createThreadFactory("meta-tree")); // NOI18N
 
@@ -569,13 +570,17 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         @Override
         public void run() {
             synchronized (node) {
+                if (node.getParent() == null) {
+                    return;
+                }
                 final Node thisNode = node.getNode();
 
                 assert thisNode != null : "DefaultMetaTreeNode without backing node: " + node; // NOI18N
 
                 if (thisNode.isSqlSort() && (thisNode.getDynamicChildrenStatement() != null)) {
                     if (LOG.isInfoEnabled()) {
-                        LOG.info("these children are sorted via SQL, thus soft refresh is not possible: " + thisNode); // NOI18N
+                        LOG.info("these children are sorted via SQL, thus soft refresh is not possible: "
+                                    + thisNode); // NOI18N
                     }
 
                     node.refreshChildren();
@@ -638,18 +643,20 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                     @Override
                     public void run() {
-                        final int index = node.removeNode(toRemove);
+                        if (node.getParent() != null) {
+                            final int index = node.removeNode(toRemove);
 
-                        if (index == -1) {
-                            throw new IllegalStateException(
-                                "trying to remove a node that is not present: [node=" // NOI18N
-                                        + node
-                                        + "|removalCandidate="                        // NOI18N
-                                        + toRemove
-                                        + "]");                                       // NOI18N
+                            if (index == -1) {
+                                throw new IllegalStateException(
+                                    "trying to remove a node that is not present: [node=" // NOI18N
+                                            + node
+                                            + "|removalCandidate="                        // NOI18N
+                                            + toRemove
+                                            + "]");                                       // NOI18N
+                            }
+                            defaultTreeModel.nodesWereRemoved(node, new int[] { index }, new Object[] { toRemove });
+                            defaultTreeModel.nodeStructureChanged(node);
                         }
-                        defaultTreeModel.nodesWereRemoved(node, new int[] { index }, new Object[] { toRemove });
-                        defaultTreeModel.nodeStructureChanged(node);
                     }
                 });
         }
@@ -709,7 +716,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * Knoten der bereits expandiert wurde (d.h. dessen Children bereits vom Server geladen wurden) muss die Funktion
      * <b>explore()</b> nicht mehr ausgefuehrt werden.
      *
-     * <p> <b>Wenn der DefaultMetaTree Multithreading benutzen soll, wird an den expandierten Knoten eine <b>
+     * <p><b>Wenn der DefaultMetaTree Multithreading benutzen soll, wird an den expandierten Knoten eine <b>
      * DefaultMetaTreeNode</b> vom Typ <b>WaitNode</b> aengehaengt. Anschliessend wird <b>nodeStructureChanged(node)</b>
      * aufgerufen, um diesen Knoten anzuzeigen.<br>
      * Die <b>WaitNode</b> wird zwar sofort innerhalb der <b>explore</b> Funktion der selektierten <b>
