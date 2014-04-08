@@ -21,6 +21,8 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cismap.commons.featureservice.FeatureServiceUtilities;
 import de.cismet.cismap.commons.featureservice.WebFeatureService;
+import de.cismet.cismap.commons.featureservice.factory.AbstractFeatureFactory;
+import de.cismet.cismap.commons.featureservice.factory.FeatureFactory;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.SelectionListener;
@@ -53,6 +55,7 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
     private QuerySearch querySearch;
     private boolean searching = false;
     private SearchAndSelectThread searchThread;
+    private Object lastLayer;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -69,9 +72,16 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
 
         if (searching) {
             if (searchThread != null) {
+                if (lastLayer instanceof AbstractFeatureService) {
+                    FeatureFactory ff = ((AbstractFeatureService)lastLayer).getFeatureFactory();
+                    if (ff instanceof AbstractFeatureFactory) {
+                        ((AbstractFeatureFactory)ff).waitUntilInterruptedIsAllowed();
+                    }
+                }
                 searchThread.cancel(true);
             }
         } else {
+            lastLayer = layer;
             searchThread = new SearchAndSelectThread(layer, query);
             CismetExecutors.newSingleThreadExecutor().submit(searchThread);
             
@@ -114,6 +124,9 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
                 } catch (Exception ex) {
                     LOG.error("Error while retrieving features", ex);
                 }
+            } else if (layer instanceof AbstractFeatureService) {
+                AbstractFeatureService fs = (AbstractFeatureService)layer;
+                features = fs.getFeatureFactory().createFeatures(query, CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null);
             }
             
             return features;
