@@ -1072,6 +1072,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         taQuery.setText("");
     }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
 
+    private void jMethodCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
+
+    }//GEN-LAST:event_jMethodCBItemStateChanged
+
+    private void jLayerCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jLayerCBItemStateChanged
+        taQuery.setText("");
+    }//GEN-LAST:event_jLayerCBItemStateChanged
+
     /**
      * DOCUMENT ME!
      *
