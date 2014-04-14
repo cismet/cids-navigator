@@ -14,7 +14,6 @@ package Sirius.navigator.search.dynamic;
 
 import Sirius.navigator.search.CidsSearchExecutor;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.middleware.types.Node;
 
@@ -31,6 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 
 import java.util.Collection;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
@@ -55,6 +55,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
 
     private SearchControlListener listener;
     private SwingWorker<Node[], Void> searchThread;
+    private SwingWorker<Boolean, Void> searchPreparationThread;
     private boolean searching = false;
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
@@ -168,6 +169,11 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
             if (searchThread != null) {
                 searchThread.cancel(true);
             }
+
+            if (searchPreparationThread != null) {
+                searchPreparationThread.cancel(true);
+            }
+
             ComponentRegistry.getRegistry().getSearchResultsTree().cancelNodeLoading();
         } else {
             if (listener == null) {
@@ -180,18 +186,67 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 return;
             }
 
-            ComponentRegistry.getRegistry().getSearchResultsTree().addPropertyChangeListener("browse", this);
-            searchThread = CidsSearchExecutor.searchAndDisplayResults(
-                    search,
-                    this,
-                    this,
-                    listener.suppressEmptyResultMessage(),
-                    simpleSort);
             searching = true;
             setControlsAccordingToState();
             listener.searchStarted();
+
+            searchPreparationThread = new SwingWorker<Boolean, Void>() {
+
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        return SearchControlPanel.this.checkIfSearchShouldBeStarted(this, search);
+                    }
+
+                    @Override
+                    protected void done() {
+                        boolean startSearch = false;
+                        try {
+                            startSearch = get();
+                        } catch (InterruptedException ex) {
+                            LOG.error("Could not start search.", ex);
+                        } catch (ExecutionException ex) {
+                            LOG.error("Could not start search.", ex);
+                        } catch (CancellationException ex) {
+                            LOG.info("Search cancelled.", ex);
+                        }
+
+                        if (startSearch) {
+                            ComponentRegistry.getRegistry()
+                                    .getSearchResultsTree()
+                                    .addPropertyChangeListener("browse", SearchControlPanel.this);
+                            searchThread = CidsSearchExecutor.searchAndDisplayResults(
+                                    search,
+                                    SearchControlPanel.this,
+                                    SearchControlPanel.this,
+                                    listener.suppressEmptyResultMessage(),
+                                    simpleSort);
+                        } else {
+                            searching = false;
+                            setControlsAccordingToState();
+                            listener.searchCanceled();
+                        }
+                    }
+                };
+            searchPreparationThread.execute();
         }
     } //GEN-LAST:event_btnSearchCancelActionPerformed
+
+    /**
+     * This method is called before the search is actually started and gives a possibility to abort the search. In the
+     * default implementation it always returns true, but subclasses can override this method.
+     *
+     * <p>Note: the method is called in the doInBackground() of a SwingWorker and therefor not in the EDT</p>
+     *
+     * @param   calledBySwingWorker  the SwingWorker instance by which this method was called, to check e.g. if the
+     *                               SwingWorker was canceled
+     * @param   search               the search, which will be started or aborted later on
+     *
+     * @return  true: the search will be started. False: the search will be aborted
+     */
+    public boolean checkIfSearchShouldBeStarted(final SwingWorker calledBySwingWorker,
+            final MetaObjectNodeServerSearch search) {
+        return true;
+    }
 
     /**
      * DOCUMENT ME!
