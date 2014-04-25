@@ -511,7 +511,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         }
         return methods;
     }
-
+    
     /**
      * DOCUMENT ME!
      *
