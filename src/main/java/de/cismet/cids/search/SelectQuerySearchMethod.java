@@ -120,13 +120,13 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
                     Document d = builder.build(new StringReader(query));      
                     filterElement.addContent((Element)d.getRootElement().clone());
                     queryElement.addContent(0, filterElement);
-                    features = wfs.getFeatureFactory().createFeatures(FeatureServiceUtilities.elementToString(e), CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null);
+                    features = wfs.getFeatureFactory().createFeatures(FeatureServiceUtilities.elementToString(e), CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null, 0, 0, null);
                 } catch (Exception ex) {
                     LOG.error("Error while retrieving features", ex);
                 }
             } else if (layer instanceof AbstractFeatureService) {
                 AbstractFeatureService fs = (AbstractFeatureService)layer;
-                features = fs.getFeatureFactory().createFeatures(query, CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null);
+                features = fs.getFeatureFactory().createFeatures(query, CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null, 0, 0, null);
             }
             
             return features;
