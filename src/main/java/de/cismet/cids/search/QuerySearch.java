@@ -1096,7 +1096,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         if (source == jAttributesLi) {
                             value = ((FeatureServiceAttribute)selectedObject).getName();
                         } else {
-                            value = "'" + selectedObject.toString() + "'";
+                            if (selectedObject instanceof MetaObject) {
+                                value = String.valueOf(((MetaObject)selectedObject).getID());
+                            } else {
+                                value = "'" + selectedObject.toString() + "'";
+                            }
                         } 
                    }
                 }
