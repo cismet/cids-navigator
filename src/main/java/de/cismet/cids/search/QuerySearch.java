@@ -79,6 +79,7 @@ import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.TreeSet;
 import org.jdesktop.swingx.MultiSplitLayout;
@@ -116,6 +117,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private ActiveLayerModel model;
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
+    private String[] methodList;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -150,16 +152,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * Creates new form StandaloneStart.
      */
     public QuerySearch() {
-        this(null);
+        this(null, null);
     }
 
     /**
      * Creates new form StandaloneStart.
      *
      * @param  model  DOCUMENT ME!
+     * @param  methodList  only the method of this list can be used, if they can be found by the lookup.
+     *                      If the methodList == null, all methods can  be used
      */
-    public QuerySearch(final ActiveLayerModel model) {
+    public QuerySearch(final ActiveLayerModel model, String[] methodList) {
         this.model = model;
+        this.methodList = methodList;
         services = getFeatureServices(model);
         classes = GetClasses();
         layers = new ArrayList<Object>(services);
@@ -417,15 +422,20 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     .lookupAll(QuerySearchMethod.class);
         
         final Vector<QuerySearchMethod> methods = new Vector<QuerySearchMethod>();
+        if (methodList != null) {
+            Arrays.sort(methodList);
+        }
         
         for (QuerySearchMethod method : searchMethods) {
-            method.setQuerySearch(this);
-            methods.add(method);
+            if (methodList == null ||  Arrays.binarySearch(methodList, method.getClass().getName()) >= 0) {
+                method.setQuerySearch(this);
+                methods.add(method);
+            }
         }
         
         return methods;
     }
-
+    
     /**
      * DOCUMENT ME!
      *
@@ -894,7 +904,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                             XBoundingBox bounds = new XBoundingBox(ZoomToLayerWorker.getServiceBounds(afs));
                             final CrsTransformer trans = new CrsTransformer(model.getSrs().getCode());
                             bounds = trans.transformBoundingBox(bounds);
-                            allFeatures = afs.getFeatureFactory().createFeatures(afs.getQuery(), bounds, null);
+                            allFeatures = afs.getFeatureFactory().createFeatures(afs.getQuery(), bounds, null, 0, 0, null);
                         } catch (Exception e) {
                             allFeatures = afs.getFeatureFactory().getLastCreatedFeatures();
                         }
