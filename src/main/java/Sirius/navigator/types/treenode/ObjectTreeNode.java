@@ -159,7 +159,13 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
             } else {
                 // Implicitly stores toString in getNode().setName(...) for future use.
                 // See implementation of getMetaObject().
-                toString = getMetaObject().toString();
+                final MetaObject m = getMetaObject();
+
+                if (m != null) {
+                    toString = m.toString();
+                } else {
+                    toString = "null";
+                }
             }
         }
         return toString;
@@ -257,7 +263,13 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                         }
                         mo = metaObject;
                     } catch (final Throwable t) {
-                        LOG.error("could not retrieve meta object of node '" + userObject + "'", t);
+                        String nodeName = String.valueOf(userObject);
+
+                        if (mon != null) {
+                            nodeName += " (class: " + mon.getClassId() + ", object: " + mon.getObjectId() + ")";
+                        }
+
+                        LOG.error("could not retrieve meta object of node '" + nodeName + "'", t);
                     }
                 }
             }
