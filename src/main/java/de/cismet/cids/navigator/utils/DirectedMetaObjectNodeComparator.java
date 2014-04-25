@@ -105,8 +105,10 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                                                 ((MetaObjectNode)o1).getObjectId(),
                                                 o1.getClassId(),
                                                 o1.getDomain());
-                            mon1.setObject(mo1);
-                            mon1.setName(mo1.toString());
+                            if (mo1 != null) {
+                                mon1.setObject(mo1);
+                                mon1.setName(mo1.toString());
+                            }
                         }
                     } catch (final ConnectionException e) {
                         LOG.error("Connection problem: ", e);
@@ -124,8 +126,10 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                                                 ((MetaObjectNode)o2).getObjectId(),
                                                 o2.getClassId(),
                                                 o2.getDomain());
-                            mon2.setObject(mo2);
-                            mon2.setName(mo2.toString());
+                            if (mo2 != null) {
+                                mon2.setObject(mo2);
+                                mon2.setName(mo2.toString());
+                            }
                         }
                         mos2 = mon2.toString();
                     } catch (final ConnectionException e) {
