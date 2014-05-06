@@ -304,13 +304,15 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     }
 
     /**
-     * DOCUMENT ME!
+     * Refreshes every node on a tree path. The refresh of each node happens in an individual RefreshWorker. Those
+     * workers are wrapped in Futures, which are put in a set. That set will be returned. If nothing will be refreshed
+     * or if something went wrong, an empty set will be returned.
      *
-     * @param   treePath  DOCUMENT ME!
+     * @param   treePath  the treePath to refresh
      *
-     * @return  DOCUMENT ME!
+     * @return  a set with Futures in which the refresh of each node happens
      */
-    public Future refreshTreePath(final TreePath treePath) {
+    public Set<Future> refreshTreePath(final TreePath treePath) {
         final Set<Future> futures = new HashSet<Future>();
         final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
@@ -345,12 +347,12 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 futures.add(treePool.submit(new RefreshWorker(node)));
 //                }
             }
-            return null;
+            return futures;
         } else {
             LOG.warn("could not explore subtree"); // NOI18N
         }
 
-        return null;
+        return futures;
     }
 
     /**
