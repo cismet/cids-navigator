@@ -316,7 +316,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         final Set<Future> futures = new HashSet<Future>();
         final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
-        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
 
         if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
@@ -337,15 +336,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
             while (childrenIterator.hasNext()) {
                 final DefaultMetaTreeNode node = childrenIterator.next();
-//                if ((node == null) || !node.isExplored()) {
-//                    // we won't do anything, the node is not in cache or has not been explored yet, so an update would
-//                    // be pointless
-//                } else {
-//                    if (LOG.isDebugEnabled()) {
-//                        LOG.debug("refresh node: " + node);
-//                    }
                 futures.add(treePool.submit(new RefreshWorker(node)));
-//                }
             }
             return futures;
         } else {
