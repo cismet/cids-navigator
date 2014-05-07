@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -304,53 +305,39 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     }
 
     /**
-     * DOCUMENT ME!
+     * Refreshes every node on a tree path. The refresh of each node happens in an individual RefreshWorker. Those
+     * workers are wrapped in Futures, which are put in a set. That set will be returned. If nothing will be refreshed
+     * or if something went wrong, an empty set will be returned.
      *
-     * @param   treePath  DOCUMENT ME!
+     * @param   treePath  the treePath to refresh
      *
-     * @return  DOCUMENT ME!
+     * @return  a set with Futures in which the refresh of each node happens
      */
-    public Future refreshTreePath(final TreePath treePath) {
+    public Set<Future> refreshTreePath(final TreePath treePath) {
         final Set<Future> futures = new HashSet<Future>();
         final Object[] nodes = treePath.getPath();
-        final Object rootNode = this.getModel().getRoot();
-        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
 
-        if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
+        if ((nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("exploring subtree: " + nodes.length);                                                        // NOI18N
+                LOG.debug("exploring subtree: " + nodes.length); // NOI18N
             }
-            final List<?> nodeList = Arrays.asList(nodes);
-            for (final Object o : nodeList) {
-                if (!(o instanceof DefaultMetaTreeNode)) {
-                    nodeList.remove(o);
-                    LOG.warn("Node " + o                                                                                // NOI18N
+
+            // ignore root node, therefor start index is 1
+            for (int i = 1; i < nodes.length; ++i) {
+                if (nodes[i] instanceof DefaultMetaTreeNode) {
+                    final DefaultMetaTreeNode node = (DefaultMetaTreeNode)nodes[i];
+                    futures.add(treePool.submit(new RefreshWorker(node)));
+                } else {
+                    LOG.warn("Node " + nodes[i] // NOI18N
                                 + " is not instance of DefaultMetaTreeNode and has been removed from the Collection."); // NOI18N
                 }
             }
-            final Iterator<DefaultMetaTreeNode> childrenIterator = (Iterator<DefaultMetaTreeNode>)nodeList.iterator();
-
-            // Root Node entfernen
-            childrenIterator.next();
-
-            while (childrenIterator.hasNext()) {
-                final DefaultMetaTreeNode node = childrenIterator.next();
-//                if ((node == null) || !node.isExplored()) {
-//                    // we won't do anything, the node is not in cache or has not been explored yet, so an update would
-//                    // be pointless
-//                } else {
-//                    if (LOG.isDebugEnabled()) {
-//                        LOG.debug("refresh node: " + node);
-//                    }
-                futures.add(treePool.submit(new RefreshWorker(node)));
-//                }
-            }
-            return null;
+            return futures;
         } else {
             LOG.warn("could not explore subtree"); // NOI18N
         }
 
-        return null;
+        return futures;
     }
 
     /**
