@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -315,28 +316,21 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     public Set<Future> refreshTreePath(final TreePath treePath) {
         final Set<Future> futures = new HashSet<Future>();
         final Object[] nodes = treePath.getPath();
-        final Object rootNode = this.getModel().getRoot();
 
-        if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
+        if ((nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("exploring subtree: " + nodes.length);                                                        // NOI18N
+                LOG.debug("exploring subtree: " + nodes.length); // NOI18N
             }
-            final List<?> nodeList = Arrays.asList(nodes);
-            for (final Object o : nodeList) {
-                if (!(o instanceof DefaultMetaTreeNode)) {
-                    nodeList.remove(o);
-                    LOG.warn("Node " + o                                                                                // NOI18N
+
+            // ignore root node, therefor start index is 1
+            for (int i = 1; i < nodes.length; ++i) {
+                if (nodes[i] instanceof DefaultMetaTreeNode) {
+                    final DefaultMetaTreeNode node = (DefaultMetaTreeNode)nodes[i];
+                    futures.add(treePool.submit(new RefreshWorker(node)));
+                } else {
+                    LOG.warn("Node " + nodes[i] // NOI18N
                                 + " is not instance of DefaultMetaTreeNode and has been removed from the Collection."); // NOI18N
                 }
-            }
-            final Iterator<DefaultMetaTreeNode> childrenIterator = (Iterator<DefaultMetaTreeNode>)nodeList.iterator();
-
-            // Root Node entfernen
-            childrenIterator.next();
-
-            while (childrenIterator.hasNext()) {
-                final DefaultMetaTreeNode node = childrenIterator.next();
-                futures.add(treePool.submit(new RefreshWorker(node)));
             }
             return futures;
         } else {
