@@ -13,13 +13,10 @@ package de.cismet.cids.utils.multibean;
 
 import org.jdesktop.observablecollections.ObservableList;
 import org.jdesktop.observablecollections.ObservableListListener;
-import org.jdesktop.swingx.JXDatePicker;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,18 +26,9 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.ImageIcon;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JFormattedTextField;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
-
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.cids.utils.CidsBeanDeepPropertyListener;
 
 /**
  * DOCUMENT ME!
@@ -48,72 +36,159 @@ import de.cismet.cids.dynamics.CidsBean;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class MultiBeanHelper {
+public class MultiBeanHelper implements PropertyChangeListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(MultiBeanHelper.class);
-    public static final String DIFFERENT_VALUE = "<html><i>unterschiedliche Werte</i>";
+    public static final String EVENT_NAME = "refreshed";
 
     //~ Instance fields --------------------------------------------------------
 
-    private ImageIcon warning = new ImageIcon(getClass().getResource(
-                "/de/cismet/cids/utils/multibean/warning.png"));
-
     private final Collection<CidsBean> beans = new ArrayList<CidsBean>();
     private final Lock lock = new ReentrantLock();
-    private final PropertyChangeListener beansListener;
-    private final PropertyChangeListener dummyListener;
+    private final HashMap<String, CidsBeanDeepPropertyListener> cidsBeanFollowerMap =
+        new HashMap<String, CidsBeanDeepPropertyListener>();
+    private final HashMap<String, CidsBeanDeepPropertyListener> dummyBeanFollowerMap =
+        new HashMap<String, CidsBeanDeepPropertyListener>();
     private final Map<String, ObservableListListener> listListenerMap = new HashMap<String, ObservableListListener>();
     private final Map<String, Object> valuesAllEqualsMap = new HashMap<String, Object>();
-    private final Map<String, EmbeddedMultiBeanDisplay> componentMap = new HashMap<String, EmbeddedMultiBeanDisplay>();
+    private final Collection<String> attachedProperties = new ArrayList<String>();
 
     private CidsBean dummyBean;
 
-    //~ Constructors -----------------------------------------------------------
-
-    /**
-     * Creates a new MultiBindingHelper object.
-     */
-    public MultiBeanHelper() {
-        this.beansListener = new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    lock.lock();
-                    try {
-                        final String propertyName = evt.getPropertyName();
-                        fillValuesAllEqualsMap(propertyName);
-                    } catch (final Exception ex) {
-                        LOG.error("error while setting property on dummybean", ex);
-                    } finally {
-                        lock.unlock();
-                    }
-                }
-            };
-
-        this.dummyListener = new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(final PropertyChangeEvent evt) {
-                    if (evt.getSource().equals(dummyBean)) {
-                        for (final CidsBean bean : beans) {
-                            final String propertyName = evt.getPropertyName();
-                            final Object value = evt.getNewValue();
-                            if (!(value instanceof ObservableList)) {
-                                try {
-                                    bean.setProperty(propertyName, value);
-                                } catch (final Exception ex) {
-                                    LOG.error("error while setting property on collection bean", ex);
-                                }
-                            }
-                        }
-                    }
-                }
-            };
-    }
+    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
+    public void addPropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  listener  DOCUMENT ME!
+     */
+    public void removePropertyChangeListener(final PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    public final void deattachCidsBeanTrigger(final CidsBean cidsBean) {
+        for (final String property : getAttachedProperties()) {
+            removeTriggerProperty(cidsBeanFollowerMap, property);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    public final void attachCidsBeanTrigger(final CidsBean cidsBean) {
+        for (final String attachedProperty : getAttachedProperties()) {
+            addTriggerProperty(cidsBeanFollowerMap, attachedProperty, cidsBean);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    public final void deattachDummyBeanTrigger(final CidsBean cidsBean) {
+        for (final String property : getAttachedProperties()) {
+            removeTriggerProperty(dummyBeanFollowerMap, property);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cidsBean  DOCUMENT ME!
+     */
+    public final void attachDummyBeanTrigger(final CidsBean cidsBean) {
+        for (final String attachedProperty : getAttachedProperties()) {
+            addTriggerProperty(dummyBeanFollowerMap, attachedProperty, cidsBean);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  followerMap  DOCUMENT ME!
+     * @param  property     DOCUMENT ME!
+     * @param  cidsBean     DOCUMENT ME!
+     */
+    private void addTriggerProperty(final HashMap<String, CidsBeanDeepPropertyListener> followerMap,
+            final String property,
+            final CidsBean cidsBean) {
+        final CidsBeanDeepPropertyListener follower = new CidsBeanDeepPropertyListener(cidsBean, property);
+        followerMap.put(property, follower);
+        follower.addPropertyChangeListener(this);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  followerMap  DOCUMENT ME!
+     * @param  property     DOCUMENT ME!
+     */
+    public final void removeTriggerProperty(final HashMap<String, CidsBeanDeepPropertyListener> followerMap,
+            final String property) {
+        final CidsBeanDeepPropertyListener follower = followerMap.remove(property);
+        if (follower != null) {
+            follower.removePropertyChangeListener(this);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Collection<String> getAttachedProperties() {
+        return attachedProperties;
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void refillAttachedProperties() {
+        attachedProperties.clear();
+        attachedProperties.addAll(createCidsBeanPropertiesPath(null, dummyBean));
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   path      DOCUMENT ME!
+     * @param   cidsBean  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static Collection<String> createCidsBeanPropertiesPath(final String path, final CidsBean cidsBean) {
+        final Collection coll = new ArrayList();
+        for (final String propertyName : cidsBean.getPropertyNames()) {
+            final String subPath = (path == null) ? propertyName : (path + "." + propertyName);
+            if (cidsBean.getProperty(propertyName) instanceof CidsBean) {
+                coll.addAll(createCidsBeanPropertiesPath(subPath, (CidsBean)cidsBean.getProperty(propertyName)));
+            } else {
+                coll.add(subPath);
+            }
+        }
+        return coll;
+    }
 
     /**
      * DOCUMENT ME!
@@ -121,23 +196,24 @@ public class MultiBeanHelper {
      * @param  dummyBean  DOCUMENT ME!
      */
     public void setDummyBean(final CidsBean dummyBean) {
+        deattachDummyBeanTrigger(dummyBean);
+
         final CidsBean old = this.dummyBean;
         if (old != null) {
-            for (final String propertyName : old.getPropertyNames()) {
+            for (final String propertyName : getAttachedProperties()) {
                 if (listListenerMap.containsKey(propertyName)) {
                     listListenerMap.remove(propertyName);
                 }
             }
-            old.removePropertyChangeListener(dummyListener);
         }
 
         this.dummyBean = dummyBean;
+        refillAttachedProperties();
 
         if (dummyBean != null) {
-            for (final String propertyName : dummyBean.getPropertyNames()) {
+            for (final String propertyName : getAttachedProperties()) {
                 final Object value = dummyBean.getProperty(propertyName);
                 if ((value != null) && (value instanceof ObservableList)) {
-                    final ObservableList list = (ObservableList)value;
                     final ObservableListListener listener = new ObservableListListener() {
 
                             @Override
@@ -179,7 +255,7 @@ public class MultiBeanHelper {
                 }
             }
 
-            dummyBean.addPropertyChangeListener(dummyListener);
+            attachDummyBeanTrigger(dummyBean);
         }
     }
 
@@ -190,7 +266,10 @@ public class MultiBeanHelper {
      *
      * @return  DOCUMENT ME!
      */
-    private Boolean fillValuesAllEqualsMap(final String propertyName) {
+    private boolean fillValuesAllEqualsMap(final String propertyName) {
+        if (valuesAllEqualsMap.containsKey(propertyName)) {
+            valuesAllEqualsMap.remove(propertyName);
+        }
         final Object propValue = dummyBean.getProperty(propertyName);
         if (propValue instanceof ObservableList) {
             return false;
@@ -216,72 +295,9 @@ public class MultiBeanHelper {
             if (valuesAllEquals) {
                 valuesAllEqualsMap.put(propertyName, value);
             }
-            refreshComponent(propertyName);
+            propertyChangeSupport.firePropertyChange(EVENT_NAME, null, propertyName);
             return valuesAllEquals;
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  component     DOCUMENT ME!
-     * @param  propertyName  DOCUMENT ME!
-     */
-    public void registerComponentForProperty(final JComponent component, final String propertyName) {
-        if ((component instanceof JTextField) || (component instanceof JTextArea)) {
-            final EmbeddedMultiBeanDisplay overlay = EmbeddedMultiBeanDisplay.getEmbeddedDisplayFor(component);
-            overlay.setIcon(warning);
-            overlay.setText(DIFFERENT_VALUE);
-            component.setLayout(new BorderLayout());
-            component.add(overlay, BorderLayout.WEST);
-            componentMap.put(propertyName, overlay);
-        } else if (component instanceof JComboBox) {
-            final ListCellRenderer rend = ((JComboBox)component).getRenderer();
-            ((JComboBox)component).setRenderer(new DefaultListCellRenderer() {
-
-                    @Override
-                    public Component getListCellRendererComponent(final JList<?> list,
-                            final Object value,
-                            final int index,
-                            final boolean isSelected,
-                            final boolean cellHasFocus) {
-                        final JLabel comp = (JLabel)rend.getListCellRendererComponent(
-                                list,
-                                value,
-                                index,
-                                isSelected,
-                                cellHasFocus);
-                        if (!isValuesAllEquals(propertyName)) {
-                            comp.setIcon(warning);
-                        }
-                        return comp;
-                    }
-                });
-        } else if (component instanceof JXDatePicker) {
-            final JFormattedTextField jft = ((JXDatePicker)component).getEditor();
-            final EmbeddedMultiBeanDisplay overlay = EmbeddedMultiBeanDisplay.getEmbeddedDisplayFor(jft);
-            overlay.setIcon(warning);
-            overlay.setText("<unterschiedliche Werte>");
-            jft.setLayout(new BorderLayout());
-            jft.add(overlay, BorderLayout.WEST);
-            componentMap.put(propertyName, overlay);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  propertyName  DOCUMENT ME!
-     */
-    private void refreshComponent(final String propertyName) {
-        final EmbeddedMultiBeanDisplay component = componentMap.get(propertyName);
-        // if (component instanceof JComponent) {
-        if ((component != null) && !isValuesAllEquals(propertyName)) {
-            component.doOverlay(true);
-        } else if (component != null) {
-            component.doOverlay(false);
-        }
-        // }
     }
 
     /**
@@ -290,7 +306,7 @@ public class MultiBeanHelper {
     private void refillValuesAllEqualsMap() {
         valuesAllEqualsMap.clear();
         if (dummyBean != null) {
-            for (final String propertyName : dummyBean.getPropertyNames()) {
+            for (final String propertyName : getAttachedProperties()) {
                 final Object value = dummyBean.getProperty(propertyName);
                 if (value instanceof ObservableList) {
                     final ObservableList dummyList = (ObservableList)value;
@@ -312,7 +328,7 @@ public class MultiBeanHelper {
      *
      * @return  DOCUMENT ME!
      */
-    public Boolean isValuesAllEquals(final String propertyName) {
+    public boolean isValuesAllEquals(final String propertyName) {
         return valuesAllEqualsMap.containsKey(propertyName);
     }
 
@@ -331,11 +347,9 @@ public class MultiBeanHelper {
      * @param  beans  DOCUMENT ME!
      */
     public void setBeans(final Collection<CidsBean> beans) {
-        final Collection<CidsBean> old = this.beans;
-        for (final CidsBean bean : old) {
-            bean.removePropertyChangeListener(beansListener);
+        for (final CidsBean bean : this.beans) {
+            deattachCidsBeanTrigger(bean);
         }
-
         this.beans.clear();
         clearDummy();
         if (beans != null) {
@@ -353,7 +367,7 @@ public class MultiBeanHelper {
         }
 
         for (final CidsBean bean : beans) {
-            bean.addPropertyChangeListener(beansListener);
+            attachCidsBeanTrigger(bean);
         }
     }
 
@@ -361,7 +375,7 @@ public class MultiBeanHelper {
      * DOCUMENT ME!
      */
     private void clearDummy() {
-        for (final String propertyName : dummyBean.getPropertyNames()) {
+        for (final String propertyName : getAttachedProperties()) {
             if (!(dummyBean.getProperty(propertyName) instanceof ObservableList)) {
                 try {
                     dummyBean.setProperty(propertyName, null);
@@ -379,5 +393,40 @@ public class MultiBeanHelper {
      */
     public CidsBean getDummyBean() {
         return dummyBean;
+    }
+
+    @Override
+    public void propertyChange(final PropertyChangeEvent evt) {
+        if ((evt.getSource() instanceof CidsBeanDeepPropertyListener)
+                    && cidsBeanFollowerMap.containsKey(evt.getPropertyName())) {
+            final CidsBeanDeepPropertyListener follower = (CidsBeanDeepPropertyListener)evt.getSource();
+            if (follower.getBean().equals(dummyBean)) {
+                for (final CidsBean bean : beans) {
+                    final String propertyName = evt.getPropertyName();
+                    final Object value = evt.getNewValue();
+                    if (!(value instanceof ObservableList)) {
+                        try {
+                            lock.lock();
+                            bean.setProperty(propertyName, value);
+                        } catch (final Exception ex) {
+                            LOG.error("error while setting property on collection bean", ex);
+                        } finally {
+                            lock.unlock();
+                        }
+                    }
+                }
+            } else if (beans.contains(follower.getBean())) {
+                if (lock.tryLock()) {
+                    try {
+                        final String propertyName = evt.getPropertyName();
+                        fillValuesAllEqualsMap(propertyName);
+                    } catch (final Exception ex) {
+                        LOG.error("error while setting property on dummybean", ex);
+                    } finally {
+                        lock.unlock();
+                    }
+                }
+            }
+        }
     }
 }
