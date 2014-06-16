@@ -98,6 +98,11 @@ public class MutableStatusBar extends JPanel {
                 new SoftBevelBorder(SoftBevelBorder.LOWERED),
                 new EmptyBorder(0, 2, 0, 2)));
 
+        final ExceptionNotificationStatusPanel notificationStatusPanel = new ExceptionNotificationStatusPanel();
+        notificationStatusPanel.setBorder(new CompoundBorder(
+                new SoftBevelBorder(SoftBevelBorder.LOWERED),
+                new EmptyBorder(0, 2, 0, 2)));
+
         greenStatusIcon = new MutableImageLabel(
                 resource.getIcon("green_off.gif"),
                 resource.getIcon("green_on.gif"));
@@ -129,7 +134,10 @@ public class MutableStatusBar extends JPanel {
         this.add(status_3, constraints);
 
         constraints.gridx++;
-        this.add(downloadStatusPanel);
+        this.add(downloadStatusPanel, constraints);
+
+        constraints.gridx++;
+        this.add(notificationStatusPanel, constraints);
         constraints.insets = new Insets(0, 0, 0, 0);
 
 //        constraints.gridx++;
