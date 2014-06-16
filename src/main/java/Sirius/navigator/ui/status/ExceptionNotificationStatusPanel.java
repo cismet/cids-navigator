@@ -15,15 +15,18 @@ import org.jdesktop.swingx.error.ErrorInfo;
 
 import org.openide.util.NbBundle;
 
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
 
 import java.util.logging.Level;
 
+import javax.swing.JFrame;
 import javax.swing.Timer;
 
 import de.cismet.tools.gui.StaticSwingTools;
-import javax.swing.JFrame;
 
 /**
  * DOCUMENT ME!
@@ -42,6 +45,8 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private org.jdesktop.swingx.JXHyperlink hlErrorIcon;
+    private javax.swing.JPanel pnlDisabled;
+    private javax.swing.JPanel pnlIcon;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -72,28 +77,73 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-
+        pnlDisabled = new javax.swing.JPanel();
+        pnlIcon = new javax.swing.JPanel();
         hlErrorIcon = new org.jdesktop.swingx.JXHyperlink();
 
-        setLayout(new java.awt.GridLayout(1, 0));
+        setLayout(new java.awt.CardLayout());
 
-        hlErrorIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/resource/img/exclamation-red-frame.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(hlErrorIcon, org.openide.util.NbBundle.getMessage(ExceptionNotificationStatusPanel.class, "ExceptionNotificationStatusPanel.hlErrorIcon.text")); // NOI18N
-        hlErrorIcon.setEnabled(false);
+        pnlDisabled.setLayout(new java.awt.GridLayout());
+        add(pnlDisabled, "DISABLED");
+
+        pnlIcon.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnlIcon.setMaximumSize(new java.awt.Dimension(17, 16));
+        pnlIcon.setMinimumSize(new java.awt.Dimension(17, 16));
+        pnlIcon.setPreferredSize(new java.awt.Dimension(17, 16));
+        pnlIcon.addMouseListener(new java.awt.event.MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent evt) {
+                    pnlIconMouseClicked(evt);
+                }
+            });
+        pnlIcon.setLayout(new java.awt.GridLayout());
+
+        hlErrorIcon.setIcon(new javax.swing.ImageIcon(
+                getClass().getResource("/Sirius/navigator/resource/img/exclamation-red-frame.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            hlErrorIcon,
+            org.openide.util.NbBundle.getMessage(
+                ExceptionNotificationStatusPanel.class,
+                "ExceptionNotificationStatusPanel.hlErrorIcon.text"));                                // NOI18N
         hlErrorIcon.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                hlErrorIconActionPerformed(evt);
-            }
-        });
-        add(hlErrorIcon);
-    }// </editor-fold>//GEN-END:initComponents
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    hlErrorIconActionPerformed(evt);
+                }
+            });
+        pnlIcon.add(hlErrorIcon);
+
+        add(pnlIcon, "ICON");
+        pnlIcon.addMouseListener(new MouseAdapter() {
+            });
+        pnlIcon.addMouseMotionListener(new MouseMotionAdapter() {
+            });
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void hlErrorIconActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlErrorIconActionPerformed
+    private void hlErrorIconActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_hlErrorIconActionPerformed
+        showErrorPanel();
+    }                                                                               //GEN-LAST:event_hlErrorIconActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void pnlIconMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_pnlIconMouseClicked
+        showErrorPanel();
+    }                                                                       //GEN-LAST:event_pnlIconMouseClicked
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void showErrorPanel() {
         final ErrorInfo ei = new ErrorInfo(
                 NbBundle.getMessage(
                     ExceptionNotificationStatusPanel.class,
@@ -105,7 +155,21 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
                 Level.ALL,
                 null);
         JXErrorPane.showDialog(StaticSwingTools.getParentFrameIfNotNull(this), ei);
-    }//GEN-LAST:event_hlErrorIconActionPerformed
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  card  DOCUMENT ME!
+     */
+    private void showCardPanel(final Boolean card) {
+        String cardStr = "DISABLED";
+        if (card != null) {
+            cardStr = "ICON";
+            hlErrorIcon.setVisible(card);
+        }
+        ((CardLayout)this.getLayout()).show(this, cardStr);
+    }
 
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {
@@ -122,14 +186,19 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
         uncaughtException = error;
         flashTimer.restart();
     }
-    
-    public static void main(String[] args) {
-        JFrame frame = new JFrame();
-        ExceptionNotificationStatusPanel panel = new ExceptionNotificationStatusPanel();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        final JFrame frame = new JFrame();
+        frame.setSize(50, 50);
+        final ExceptionNotificationStatusPanel panel = new ExceptionNotificationStatusPanel();
         frame.add(panel);
         frame.setVisible(true);
         panel.anErrorOccurred(null, new NullPointerException());
-        
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -149,11 +218,11 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
 
         @Override
         public void actionPerformed(final ActionEvent ae) {
-            hlErrorIcon.setEnabled((counter % 2) == 0);
+            showCardPanel((counter % 2) == 0);
             counter++;
             if (counter > 10) {
                 counter = 0;
-                hlErrorIcon.setEnabled(true);
+                showCardPanel(true);
                 ((Timer)ae.getSource()).stop();
                 steadyTimer.restart();
             }
@@ -171,7 +240,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
 
         @Override
         public void actionPerformed(final ActionEvent ae) {
-            hlErrorIcon.setEnabled(false);
+            showCardPanel(null);
         }
     }
 }
