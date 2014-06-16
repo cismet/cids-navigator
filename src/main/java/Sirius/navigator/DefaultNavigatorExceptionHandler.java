@@ -20,8 +20,26 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(DefaultNavigatorExceptionHandler.class);
+    private static final DefaultNavigatorExceptionHandler INSTANCE = new DefaultNavigatorExceptionHandler();
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DefaultNavigatorExceptionHandler object.
+     */
+    private DefaultNavigatorExceptionHandler() {
+    }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static DefaultNavigatorExceptionHandler getInstance() {
+        return INSTANCE;
+    }
 
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {

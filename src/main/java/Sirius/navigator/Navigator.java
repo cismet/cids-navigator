@@ -1062,7 +1062,7 @@ public class Navigator extends JFrame {
      */
     public static void main(final String[] args) {
         Runtime.getRuntime().addShutdownHook(new Navigator.NavigatorShutdown());
-        Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
+        Thread.setDefaultUncaughtExceptionHandler(DefaultNavigatorExceptionHandler.getInstance());
 
         // There is no way to adjust the Locale using the Jnlp file.
         try {
