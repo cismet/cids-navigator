@@ -29,10 +29,11 @@ import javax.swing.Timer;
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
- * A small panel shown in the status bar. At the start of the Navigator the panel is empty, if an uncaught exception
- * occurs than an error-icon flashes a few times and afterwards is steady for 30 seconds. After the 30 seconds the icon
- * disappears again. With a click on that icon an error dialog is shown, which contains the stack trace of that uncaught
- * exception. After the dialog is closed, the icon disappears, except another exception occurs.<br/>
+ * A small panel shown in the status bar, with a click on a icon a error dialog is shown.At the start of the Navigator
+ * the panel is empty, if an uncaught exception occurs than an error-icon flashes a few times and afterwards is steady
+ * for 30 seconds. After the 30 seconds the icon disappears again. With a click on that icon an error dialog is shown,
+ * which contains the stack trace of that uncaught exception. After the dialog is closed, the icon disappears, except
+ * another exception occurs.<br/>
  * To be notified about the uncaught exceptions ExceptionNotificationStatusPanel is a listener of
  * DefaultNavigatorExceptionHandler.
  *
@@ -162,7 +163,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
                 null,
                 null,
                 uncaughtException,
-                Level.ALL,
+                Level.SEVERE,
                 null);
         JXErrorPane.showDialog(StaticSwingTools.getParentFrameIfNotNull(this), ei);
         if (shownException == uncaughtException) {
