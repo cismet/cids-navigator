@@ -167,7 +167,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
             // hide the icon
             flashTimer.stop();
             steadyTimer.stop();
-            showCardPanel(null);
+            letIconFlashOrShowAnEmptyPanel(null);
             this.setVisible(false);
         }
     }
@@ -183,10 +183,15 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
      *   <li>True - show the error icon</li>
      *   <li>False - show the empty panel and hide the error icon</li>
      * </ul>
+     * <br/>
+     *
+     * <p><b>Note:</b> To show the disabled panel is actually not needed at the moment as the whole panel disappears if
+     * no error dialog is available. Although this might be useful for future implementations and was therefor not
+     * removed.</p>
      *
      * @param  card  DOCUMENT ME!
      */
-    private void showCardPanel(final Boolean card) {
+    private void letIconFlashOrShowAnEmptyPanel(final Boolean card) {
         String cardStr = "DISABLED";
         if (card != null) {
             cardStr = "ICON";
@@ -234,11 +239,11 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
         @Override
         public void actionPerformed(final ActionEvent ae) {
             if (flashTimer.isRunning()) {
-                showCardPanel((counter % 2) == 0);
+                letIconFlashOrShowAnEmptyPanel((counter % 2) == 0);
                 counter++;
                 if (counter > 10) {
                     counter = 0;
-                    showCardPanel(true);
+                    letIconFlashOrShowAnEmptyPanel(true);
                     ((Timer)ae.getSource()).stop();
                     steadyTimer.restart();
                 }
@@ -257,7 +262,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
 
         @Override
         public void actionPerformed(final ActionEvent ae) {
-            showCardPanel(null);
+            letIconFlashOrShowAnEmptyPanel(null);
             ExceptionNotificationStatusPanel.this.setVisible(false);
         }
     }
