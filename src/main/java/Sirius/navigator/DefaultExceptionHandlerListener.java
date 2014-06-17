@@ -13,7 +13,7 @@ package Sirius.navigator;
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
  */
-public interface DefaultNavigatorExceptionHandlerListener {
+public interface DefaultExceptionHandlerListener {
 
     //~ Methods ----------------------------------------------------------------
 

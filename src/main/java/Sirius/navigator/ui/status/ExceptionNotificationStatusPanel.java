@@ -7,8 +7,8 @@
 ****************************************************/
 package Sirius.navigator.ui.status;
 
+import Sirius.navigator.DefaultExceptionHandlerListener;
 import Sirius.navigator.DefaultNavigatorExceptionHandler;
-import Sirius.navigator.DefaultNavigatorExceptionHandlerListener;
 
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
@@ -40,10 +40,9 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
  * @see      DefaultNavigatorExceptionHandler
- * @see      DefaultNavigatorExceptionHandlerListener
+ * @see      DefaultExceptionHandlerListener
  */
-public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
-        implements DefaultNavigatorExceptionHandlerListener {
+public class ExceptionNotificationStatusPanel extends javax.swing.JPanel implements DefaultExceptionHandlerListener {
 
     //~ Instance fields --------------------------------------------------------
 

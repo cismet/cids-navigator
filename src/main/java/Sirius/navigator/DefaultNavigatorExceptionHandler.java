@@ -9,7 +9,6 @@ package Sirius.navigator;
 
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
@@ -27,8 +26,7 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
 
     //~ Instance fields --------------------------------------------------------
 
-    private final HashSet<DefaultNavigatorExceptionHandlerListener> listeners =
-        new HashSet<DefaultNavigatorExceptionHandlerListener>();
+    private final HashSet<DefaultExceptionHandlerListener> listeners = new HashSet<DefaultExceptionHandlerListener>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -51,7 +49,7 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
 
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {
-        for (final DefaultNavigatorExceptionHandlerListener listener : listeners) {
+        for (final DefaultExceptionHandlerListener listener : listeners) {
             listener.uncaughtException(thread, error);
         }
 
@@ -77,7 +75,7 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
      *
      * @param  listener  DOCUMENT ME!
      */
-    public void addListener(final DefaultNavigatorExceptionHandlerListener listener) {
+    public void addListener(final DefaultExceptionHandlerListener listener) {
         listeners.add(listener);
     }
 
@@ -86,7 +84,7 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
      *
      * @param  listener  DOCUMENT ME!
      */
-    public void removeListener(final DefaultNavigatorExceptionHandlerListener listener) {
+    public void removeListener(final DefaultExceptionHandlerListener listener) {
         listeners.remove(listener);
     }
 }
