@@ -8,7 +8,6 @@
 package Sirius.navigator.ui.status;
 
 import Sirius.navigator.DefaultExceptionHandlerListener;
-import Sirius.navigator.DefaultNavigatorExceptionHandler;
 
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
@@ -34,12 +33,11 @@ import de.cismet.tools.gui.StaticSwingTools;
  * for 30 seconds. After the 30 seconds the icon disappears again. With a click on that icon an error dialog is shown,
  * which contains the stack trace of that uncaught exception. After the dialog is closed, the icon disappears, except
  * another exception occurs.<br/>
- * To be notified about the uncaught exceptions ExceptionNotificationStatusPanel is a listener of
- * DefaultNavigatorExceptionHandler.
+ * To be notified about the uncaught exceptions ExceptionNotificationStatusPanel can be added as a listener to various
+ * ExceptionHandler.
  *
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
- * @see      DefaultNavigatorExceptionHandler
  * @see      DefaultExceptionHandlerListener
  */
 public class ExceptionNotificationStatusPanel extends javax.swing.JPanel implements DefaultExceptionHandlerListener {
@@ -63,7 +61,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
      */
     public ExceptionNotificationStatusPanel() {
         initComponents();
-        DefaultNavigatorExceptionHandler.getInstance().addListener(this);
+        this.setVisible(false);
 
         flashTimer = new Timer(500, new FlashHandler());
         flashTimer.setRepeats(true);
@@ -170,6 +168,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
             flashTimer.stop();
             steadyTimer.stop();
             showCardPanel(null);
+            this.setVisible(false);
         }
     }
 
@@ -199,6 +198,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {
         uncaughtException = error;
+        this.setVisible(true);
         flashTimer.restart();
     }
 
@@ -257,9 +257,8 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel impleme
 
         @Override
         public void actionPerformed(final ActionEvent ae) {
-            if (steadyTimer.isRunning()) {
-                showCardPanel(null);
-            }
+            showCardPanel(null);
+            ExceptionNotificationStatusPanel.this.setVisible(false);
         }
     }
 }
