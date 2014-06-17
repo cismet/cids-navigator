@@ -180,16 +180,6 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
 
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {
-        anErrorOccurred(thread, error);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  thread  DOCUMENT ME!
-     * @param  error   DOCUMENT ME!
-     */
-    public void anErrorOccurred(final Thread thread, final Throwable error) {
         uncaughtException = error;
         flashTimer.restart();
     }
@@ -205,7 +195,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
         final ExceptionNotificationStatusPanel panel = new ExceptionNotificationStatusPanel();
         frame.add(panel);
         frame.setVisible(true);
-        panel.anErrorOccurred(null, new NullPointerException("Some error message."));
+        panel.uncaughtException(null, new NullPointerException("Some error message."));
     }
 
     //~ Inner Classes ----------------------------------------------------------
