@@ -59,12 +59,10 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
         DefaultNavigatorExceptionHandler.getInstance().addListener(this);
 
         flashTimer = new Timer(500, new FlashHandler());
-        flashTimer.setCoalesce(true);
         flashTimer.setRepeats(true);
         flashTimer.setInitialDelay(0);
 
         steadyTimer = new Timer(30 * 1000, new SteadyHandler());
-        steadyTimer.setCoalesce(true);
         steadyTimer.setRepeats(false);
     }
 
@@ -127,34 +125,43 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void hlErrorIconActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_hlErrorIconActionPerformed
+    private void hlErrorIconActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlErrorIconActionPerformed
         showErrorPanel();
-    }                                                                               //GEN-LAST:event_hlErrorIconActionPerformed
+    }//GEN-LAST:event_hlErrorIconActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pnlIconMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_pnlIconMouseClicked
+    private void pnlIconMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlIconMouseClicked
         showErrorPanel();
-    }                                                                       //GEN-LAST:event_pnlIconMouseClicked
+    }//GEN-LAST:event_pnlIconMouseClicked
 
     /**
      * DOCUMENT ME!
      */
     private void showErrorPanel() {
+        final Throwable shownException = uncaughtException;
+        final String basicMessage = NbBundle.getMessage(
+                ExceptionNotificationStatusPanel.class,
+                "ExceptionNotificationStatusPanel.hlErrorIconActionPerformed().error.basicMessage");
         final ErrorInfo ei = new ErrorInfo(
                 NbBundle.getMessage(
                     ExceptionNotificationStatusPanel.class,
                     "ExceptionNotificationStatusPanel.hlErrorIconActionPerformed().error.title"),
-                uncaughtException.getMessage(),
+                basicMessage,
                 null,
                 null,
                 uncaughtException,
                 Level.ALL,
                 null);
         JXErrorPane.showDialog(StaticSwingTools.getParentFrameIfNotNull(this), ei);
+        if (shownException == uncaughtException) {
+            flashTimer.stop();
+            steadyTimer.stop();
+            showCardPanel(null);
+        }
     }
 
     /**
@@ -198,7 +205,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
         final ExceptionNotificationStatusPanel panel = new ExceptionNotificationStatusPanel();
         frame.add(panel);
         frame.setVisible(true);
-        panel.anErrorOccurred(null, new NullPointerException());
+        panel.anErrorOccurred(null, new NullPointerException("Some error message."));
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -218,13 +225,15 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
 
         @Override
         public void actionPerformed(final ActionEvent ae) {
-            showCardPanel((counter % 2) == 0);
-            counter++;
-            if (counter > 10) {
-                counter = 0;
-                showCardPanel(true);
-                ((Timer)ae.getSource()).stop();
-                steadyTimer.restart();
+            if (flashTimer.isRunning()) {
+                showCardPanel((counter % 2) == 0);
+                counter++;
+                if (counter > 10) {
+                    counter = 0;
+                    showCardPanel(true);
+                    ((Timer)ae.getSource()).stop();
+                    steadyTimer.restart();
+                }
             }
         }
     }
@@ -240,7 +249,9 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
 
         @Override
         public void actionPerformed(final ActionEvent ae) {
-            showCardPanel(null);
+            if (steadyTimer.isRunning()) {
+                showCardPanel(null);
+            }
         }
     }
 }
