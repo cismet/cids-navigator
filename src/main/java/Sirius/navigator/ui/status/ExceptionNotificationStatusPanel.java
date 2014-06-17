@@ -29,10 +29,17 @@ import javax.swing.Timer;
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
- * DOCUMENT ME!
+ * A small panel shown in the status bar. At the start of the Navigator the panel is empty, if an uncaught exception
+ * occurs than an error-icon flashes a few times and afterwards is steady for 30 seconds. After the 30 seconds the icon
+ * disappears again. With a click on that icon an error dialog is shown, which contains the stack trace of that uncaught
+ * exception. After the dialog is closed, the icon disappears, except another exception occurs.<br/>
+ * To be notified about the uncaught exceptions ExceptionNotificationStatusPanel is a listener of
+ * DefaultNavigatorExceptionHandler.
  *
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
+ * @see      DefaultNavigatorExceptionHandler
+ * @see      DefaultNavigatorExceptionHandlerListener
  */
 public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
         implements DefaultNavigatorExceptionHandlerListener {
@@ -125,21 +132,22 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void hlErrorIconActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hlErrorIconActionPerformed
+    private void hlErrorIconActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_hlErrorIconActionPerformed
         showErrorPanel();
-    }//GEN-LAST:event_hlErrorIconActionPerformed
+    }                                                                               //GEN-LAST:event_hlErrorIconActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pnlIconMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlIconMouseClicked
+    private void pnlIconMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_pnlIconMouseClicked
         showErrorPanel();
-    }//GEN-LAST:event_pnlIconMouseClicked
+    }                                                                       //GEN-LAST:event_pnlIconMouseClicked
 
     /**
-     * DOCUMENT ME!
+     * Shows the error panel, if another exception occurs while the panel is shown, then the icon is not hidden
+     * afterwards.
      */
     private void showErrorPanel() {
         final Throwable shownException = uncaughtException;
@@ -158,6 +166,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
                 null);
         JXErrorPane.showDialog(StaticSwingTools.getParentFrameIfNotNull(this), ei);
         if (shownException == uncaughtException) {
+            // hide the icon
             flashTimer.stop();
             steadyTimer.stop();
             showCardPanel(null);
@@ -165,7 +174,16 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
     }
 
     /**
-     * DOCUMENT ME!
+     * This method allows the flashing of the icon and it is possible to click on the empty panel and show the error
+     * dialog. Whereas the disabled panel does not have a click listener.<br/>
+     * <br/>
+     * The argument card can have three states:
+     *
+     * <ul>
+     *   <li>null - show the disabled panel</li>
+     *   <li>True - show the error icon</li>
+     *   <li>False - show the empty panel and hide the error icon</li>
+     * </ul>
      *
      * @param  card  DOCUMENT ME!
      */
@@ -201,7 +219,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
     //~ Inner Classes ----------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * The ActionListener of the flashTimer. Let the icon appear/disappear a few times and the start the steadyTimer.
      *
      * @version  $Revision$, $Date$
      */
@@ -229,7 +247,7 @@ public class ExceptionNotificationStatusPanel extends javax.swing.JPanel
     }
 
     /**
-     * DOCUMENT ME!
+     * The ActionListener of the steadyTimer.
      *
      * @version  $Revision$, $Date$
      */
