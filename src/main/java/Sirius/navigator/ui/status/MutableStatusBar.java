@@ -21,6 +21,7 @@ package Sirius.navigator.ui.status;
  *
  ******************************************************************************
  */
+import Sirius.navigator.DefaultNavigatorExceptionHandler;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.widget.MutableImageLabel;
 
@@ -99,9 +100,7 @@ public class MutableStatusBar extends JPanel {
                 new EmptyBorder(0, 2, 0, 2)));
 
         final ExceptionNotificationStatusPanel notificationStatusPanel = new ExceptionNotificationStatusPanel();
-        notificationStatusPanel.setBorder(new CompoundBorder(
-                new SoftBevelBorder(SoftBevelBorder.LOWERED),
-                new EmptyBorder(0, 2, 0, 2)));
+        DefaultNavigatorExceptionHandler.getInstance().addListener(notificationStatusPanel);
 
         greenStatusIcon = new MutableImageLabel(
                 resource.getIcon("green_off.gif"),
