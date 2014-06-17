@@ -21,6 +21,7 @@ package Sirius.navigator.ui.status;
  *
  ******************************************************************************
  */
+import Sirius.navigator.DefaultNavigatorExceptionHandler;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.widget.MutableImageLabel;
 
@@ -32,6 +33,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import de.cismet.tools.gui.downloadmanager.DownloadManagerStatusPanel;
+import de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel;
 
 /**
  * DOCUMENT ME!
@@ -98,6 +100,9 @@ public class MutableStatusBar extends JPanel {
                 new SoftBevelBorder(SoftBevelBorder.LOWERED),
                 new EmptyBorder(0, 2, 0, 2)));
 
+        final ExceptionNotificationStatusPanel notificationStatusPanel = new ExceptionNotificationStatusPanel();
+        DefaultNavigatorExceptionHandler.getInstance().addListener(notificationStatusPanel);
+
         greenStatusIcon = new MutableImageLabel(
                 resource.getIcon("green_off.gif"),
                 resource.getIcon("green_on.gif"));
@@ -129,7 +134,10 @@ public class MutableStatusBar extends JPanel {
         this.add(status_3, constraints);
 
         constraints.gridx++;
-        this.add(downloadStatusPanel);
+        this.add(downloadStatusPanel, constraints);
+
+        constraints.gridx++;
+        this.add(notificationStatusPanel, constraints);
         constraints.insets = new Insets(0, 0, 0, 0);
 
 //        constraints.gridx++;
