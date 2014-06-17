@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 
 import java.util.HashSet;
 
+import de.cismet.tools.gui.exceptionnotification.DefaultExceptionHandlerListener;
+
 /**
  * DOCUMENT ME!
  *

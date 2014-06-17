@@ -33,6 +33,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 import de.cismet.tools.gui.downloadmanager.DownloadManagerStatusPanel;
+import de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel;
 
 /**
  * DOCUMENT ME!
