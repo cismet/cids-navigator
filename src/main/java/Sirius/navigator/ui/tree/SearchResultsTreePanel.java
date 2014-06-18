@@ -9,7 +9,6 @@ package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.PluginRegistry;
-import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -132,7 +131,6 @@ public class SearchResultsTreePanel extends JPanel {
         clearButton.setMargin(new Insets(4, 4, 4, 4));
         clearButton.addActionListener(toolBarListener);
         toolBar.add(clearButton);
-        toolBar.addSeparator();
 
         // saveAllButton = new JButton(resources.getIcon("saveall24.gif"));
         saveAllButton = new JPopupMenuButton();
