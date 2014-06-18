@@ -354,6 +354,7 @@ public class MutableMenuBar extends JMenuBar {
         item.setToolTipText(org.openide.util.NbBundle.getMessage(
                 MutableMenuBar.class,
                 "MutableMenuBar.searchMenu.showResults.tooltip"));            // NOI18N);
+        doNotShowThisMenuItemAsItsFunctionalityIsBroken(item);
 
         // search result profiles .....................................................
         menu.add(item = new JMenuItem(
@@ -383,6 +384,7 @@ public class MutableMenuBar extends JMenuBar {
             item.setIcon(resources.getIcon("searchresultprofiles16.gif"));           // NOI18N
             item.setActionCommand("search.profiles");                                // NOI18N
             item.addActionListener(itemListener);
+            doNotShowThisMenuItemAsItsFunctionalityIsBroken(item);
         }
 
         searchMenu = menu;
