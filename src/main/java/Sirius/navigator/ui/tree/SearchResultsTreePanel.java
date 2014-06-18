@@ -144,6 +144,7 @@ public class SearchResultsTreePanel extends JPanel {
         saveAllButton.setActionCommand("saveall");                 // NOI18N
         saveAllButton.setMargin(new Insets(4, 4, 4, 4));
         saveAllButton.addActionListener(toolBarListener);
+        doNotShowThisButtonAsItsFunctionalityIsBroken(saveAllButton);
         toolBar.add(saveAllButton);
 
         showDirectlyInMap = new JCheckBox();
