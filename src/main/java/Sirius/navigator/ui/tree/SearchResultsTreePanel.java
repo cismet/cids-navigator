@@ -215,6 +215,16 @@ public class SearchResultsTreePanel extends JPanel {
     }
 
     /**
+     * The functionality of the buttons hidden with this method is broken. Therefore that functionality needs to be
+     * fixed before the items can become visible again.
+     *
+     * @param  button  menuItem
+     */
+    private void doNotShowThisButtonAsItsFunctionalityIsBroken(final JButton button) {
+        button.setVisible(false);
+    }
+
+    /**
      * DOCUMENT ME!
      */
     public void setButtonsEnabled() {
