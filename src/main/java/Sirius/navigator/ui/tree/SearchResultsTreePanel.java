@@ -9,7 +9,6 @@ package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.PluginRegistry;
-import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -132,7 +131,6 @@ public class SearchResultsTreePanel extends JPanel {
         clearButton.setMargin(new Insets(4, 4, 4, 4));
         clearButton.addActionListener(toolBarListener);
         toolBar.add(clearButton);
-        toolBar.addSeparator();
 
         // saveAllButton = new JButton(resources.getIcon("saveall24.gif"));
         saveAllButton = new JPopupMenuButton();
@@ -144,6 +142,7 @@ public class SearchResultsTreePanel extends JPanel {
         saveAllButton.setActionCommand("saveall");                 // NOI18N
         saveAllButton.setMargin(new Insets(4, 4, 4, 4));
         saveAllButton.addActionListener(toolBarListener);
+        doNotShowThisButtonAsItsFunctionalityIsBroken(saveAllButton);
         toolBar.add(saveAllButton);
 
         showDirectlyInMap = new JCheckBox();
@@ -212,6 +211,16 @@ public class SearchResultsTreePanel extends JPanel {
                 SearchResultsTreePanel.class,
                 "SearchResultsTreePanel.showDirectInRendererLabel.tooltipText")); // NOI18N
         toolBar.add(showDirectlyInRendererLabel);
+    }
+
+    /**
+     * The functionality of the buttons hidden with this method is broken. Therefore that functionality needs to be
+     * fixed before the items can become visible again.
+     *
+     * @param  button  menuItem
+     */
+    private void doNotShowThisButtonAsItsFunctionalityIsBroken(final JButton button) {
+        button.setVisible(false);
     }
 
     /**
