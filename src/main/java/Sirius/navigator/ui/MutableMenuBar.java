@@ -436,6 +436,16 @@ public class MutableMenuBar extends JMenuBar {
     }
 
     /**
+     * The functionality of the menu items hidden with this method is broken. Therefore that functionality needs to be
+     * fixed before the items can become visible again.
+     *
+     * @param  menuItem  DOCUMENT ME!
+     */
+    private void doNotShowThisMenuItemAsItsFunctionalityIsBroken(final JMenuItem menuItem) {
+        menuItem.setVisible(false);
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param  viewItem  DOCUMENT ME!
