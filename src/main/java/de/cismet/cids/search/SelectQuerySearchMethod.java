@@ -7,18 +7,26 @@
 ****************************************************/
 package de.cismet.cids.search;
 
+import org.apache.log4j.Logger;
 
-import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.input.SAXBuilder;
+
+import org.openide.util.NbBundle;
+
+import java.io.StringReader;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.SwingWorker;
+
 import de.cismet.cismap.commons.features.DefaultFeatureCollection;
 import de.cismet.cismap.commons.features.Feature;
 import de.cismet.cismap.commons.features.FeatureWithId;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
-
-import org.apache.log4j.Logger;
-
-
-import javax.swing.SwingWorker;
-
 import de.cismet.cismap.commons.featureservice.FeatureServiceUtilities;
 import de.cismet.cismap.commons.featureservice.WebFeatureService;
 import de.cismet.cismap.commons.featureservice.factory.AbstractFeatureFactory;
@@ -27,15 +35,8 @@ import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.piccolo.PFeature;
 import de.cismet.cismap.commons.gui.piccolo.eventlistener.SelectionListener;
 import de.cismet.cismap.commons.interaction.CismapBroker;
+
 import de.cismet.commons.concurrency.CismetExecutors;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
-import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -73,7 +74,7 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
         if (searching) {
             if (searchThread != null) {
                 if (lastLayer instanceof AbstractFeatureService) {
-                    FeatureFactory ff = ((AbstractFeatureService)lastLayer).getFeatureFactory();
+                    final FeatureFactory ff = ((AbstractFeatureService)lastLayer).getFeatureFactory();
                     if (ff instanceof AbstractFeatureFactory) {
                         ((AbstractFeatureFactory)ff).waitUntilInterruptedIsAllowed();
                     }
@@ -84,70 +85,106 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
             lastLayer = layer;
             searchThread = new SearchAndSelectThread(layer, query);
             CismetExecutors.newSingleThreadExecutor().submit(searchThread);
-            
+
             searching = true;
             querySearch.setControlsAccordingToState(searching);
         }
     }
-    
+
     @Override
     public String toString() {
         return NbBundle.getMessage(SearchQuerySearchMethod.class, "SelectQuerySearchMethod.toString");
     }
 
-    
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     private class SearchAndSelectThread extends SwingWorker<List<FeatureWithId>, Void> {
+
+        //~ Instance fields ----------------------------------------------------
+
         private Object layer;
         private String query;
 
-        public SearchAndSelectThread(Object layer, String query) {
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new SearchAndSelectThread object.
+         *
+         * @param  layer  DOCUMENT ME!
+         * @param  query  DOCUMENT ME!
+         */
+        public SearchAndSelectThread(final Object layer, final String query) {
             this.layer = layer;
             this.query = query;
         }
 
+        //~ Methods ------------------------------------------------------------
+
         @Override
         protected List<FeatureWithId> doInBackground() throws Exception {
             List<FeatureWithId> features = null;
-            
+
             if (layer instanceof WebFeatureService) {
-                WebFeatureService wfs  = (WebFeatureService)layer;
+                final WebFeatureService wfs = (WebFeatureService)layer;
                 try {
-                    Element e = (Element)wfs.getQueryElement().clone();
-                    Element queryElement = e.getChild("Query", Namespace.getNamespace("wfs", "http://www.opengis.net/wfs"));
+                    final Element e = (Element)wfs.getQueryElement().clone();
+                    final Element queryElement = e.getChild(
+                            "Query",
+                            Namespace.getNamespace("wfs", "http://www.opengis.net/wfs"));
                     queryElement.removeChild("Filter", Namespace.getNamespace("ogc", "http://www.opengis.net/ogc"));
-                    Element filterElement = new Element("Filter", Namespace.getNamespace("ogc", "http://www.opengis.net/ogc"));
-                    SAXBuilder builder = new SAXBuilder();
-                    Document d = builder.build(new StringReader(query));      
+                    final Element filterElement = new Element(
+                            "Filter",
+                            Namespace.getNamespace("ogc", "http://www.opengis.net/ogc"));
+                    final SAXBuilder builder = new SAXBuilder();
+                    final Document d = builder.build(new StringReader(query));
                     filterElement.addContent((Element)d.getRootElement().clone());
                     queryElement.addContent(0, filterElement);
-                    features = wfs.getFeatureFactory().createFeatures(FeatureServiceUtilities.elementToString(e), CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null, 0, 0, null);
+                    features = wfs.getFeatureFactory()
+                                .createFeatures(FeatureServiceUtilities.elementToString(e),
+                                        CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(),
+                                        null,
+                                        0,
+                                        0,
+                                        null);
                 } catch (Exception ex) {
                     LOG.error("Error while retrieving features", ex);
                 }
             } else if (layer instanceof AbstractFeatureService) {
-                AbstractFeatureService fs = (AbstractFeatureService)layer;
-                features = fs.getFeatureFactory().createFeatures(query, CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(), null, 0, 0, null);
+                final AbstractFeatureService fs = (AbstractFeatureService)layer;
+                features = fs.getFeatureFactory()
+                            .createFeatures(
+                                    query,
+                                    CismapBroker.getInstance().getMappingComponent().getCurrentBoundingBox(),
+                                    null,
+                                    0,
+                                    0,
+                                    null);
             }
-            
+
             return features;
         }
 
         @Override
         protected void done() {
             try {
-                List<FeatureWithId> features = get(); 
-                
+                final List<FeatureWithId> features = get();
+
                 if (isCancelled()) {
                     return;
                 }
 
-                if (features != null && layer instanceof AbstractFeatureService) {
-                    AbstractFeatureService service = (AbstractFeatureService)layer;
+                if ((features != null) && (layer instanceof AbstractFeatureService)) {
+                    final AbstractFeatureService service = (AbstractFeatureService)layer;
                     final List<Feature> toBeSelected = new ArrayList<Feature>();
                     final List<Feature> toBeUnselected = new ArrayList<Feature>();
                     for (final Object featureObject : service.getPNode().getChildrenReference()) {
                         final PFeature feature = (PFeature)featureObject;
-                        FeatureWithId featureWithId = (FeatureWithId)feature.getFeature();
+                        final FeatureWithId featureWithId = (FeatureWithId)feature.getFeature();
                         if (isCancelled()) {
                             return;
                         }
@@ -186,16 +223,23 @@ public class SelectQuerySearchMethod implements QuerySearchMethod {
             searching = false;
             querySearch.setControlsAccordingToState(searching);
         }
-        
-        private boolean isFeatureInList(FeatureWithId f, List<FeatureWithId> list) {
-            for (FeatureWithId tmp : list) {
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   f     DOCUMENT ME!
+         * @param   list  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        private boolean isFeatureInList(final FeatureWithId f, final List<FeatureWithId> list) {
+            for (final FeatureWithId tmp : list) {
                 if (tmp.getId() == f.getId()) {
                     return true;
                 }
             }
 
             return false;
-        }        
+        }
     }
-
 }
