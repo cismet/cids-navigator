@@ -8,7 +8,7 @@
 package de.cismet.cids.search;
 
 /**
- * DOCUMENT ME!
+ * All methods, which should be used in the QueryŚearch, must implement this interface.
  *
  * @author   therter
  * @version  $Revision$, $Date$
@@ -18,17 +18,17 @@ public interface QuerySearchMethod {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Set the QuerySearch object, that uses this QuerySearchMethod object.
      *
-     * @param  search  DOCUMENT ME!
+     * @param  search  the QuerySearch object, that uses this QuerySearchMethod object
      */
     void setQuerySearch(QuerySearch search);
 
     /**
-     * DOCUMENT ME!
+     * starts this QuerySearchMethod with the given parameter.
      *
-     * @param  layer  DOCUMENT ME!
-     * @param  query  DOCUMENT ME!
+     * @param  layer  the layer that should be used. This is either an AbstractFeatureService or a cids meta object
+     * @param  query  the query as string
      */
     void actionPerformed(Object layer, String query);
 }

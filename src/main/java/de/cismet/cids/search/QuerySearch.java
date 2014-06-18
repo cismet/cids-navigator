@@ -23,7 +23,10 @@ import Sirius.server.middleware.types.MetaObject;
 
 import org.apache.log4j.Logger;
 
+import org.jdesktop.swingx.MultiSplitLayout;
+
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 import java.awt.Component;
@@ -37,12 +40,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -79,11 +84,6 @@ import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.TreeSet;
-import org.jdesktop.swingx.MultiSplitLayout;
-import org.openide.util.Lookup;
 
 /**
  * DOCUMENT ME!
@@ -158,11 +158,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * Creates new form StandaloneStart.
      *
-     * @param  model  DOCUMENT ME!
-     * @param  methodList  only the method of this list can be used, if they can be found by the lookup.
-     *                      If the methodList == null, all methods can  be used
+     * @param  model       the layer model to be use
+     * @param  methodList  only the method of this list can be used, if they can be found by the lookup. If the
+     *                     methodList == null, all methods can be used
      */
-    public QuerySearch(final ActiveLayerModel model, String[] methodList) {
+    public QuerySearch(final ActiveLayerModel model, final String[] methodList) {
         this.model = model;
         this.methodList = methodList;
         services = getFeatureServices(model);
@@ -170,8 +170,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         layers = new ArrayList<Object>(services);
         layers.addAll(classes);
         initComponents();
-        jMethodCB.setVisible( (jMethodCB.getModel().getSize() > 1) );
-        jMethodLb.setVisible( (jMethodCB.getModel().getSize() > 1) );
+        jMethodCB.setVisible((jMethodCB.getModel().getSize() > 1));
+        jMethodLb.setVisible((jMethodCB.getModel().getSize() > 1));
         jGeheZuLb.setVisible(false);
         jTextField1.setVisible(false);
         jAttributesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -420,22 +420,22 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private Vector<QuerySearchMethod> getMethods() {
         final Collection<? extends QuerySearchMethod> searchMethods = Lookup.getDefault()
                     .lookupAll(QuerySearchMethod.class);
-        
+
         final Vector<QuerySearchMethod> methods = new Vector<QuerySearchMethod>();
         if (methodList != null) {
             Arrays.sort(methodList);
         }
-        
-        for (QuerySearchMethod method : searchMethods) {
-            if (methodList == null ||  Arrays.binarySearch(methodList, method.getClass().getName()) >= 0) {
+
+        for (final QuerySearchMethod method : searchMethods) {
+            if ((methodList == null) || (Arrays.binarySearch(methodList, method.getClass().getName()) >= 0)) {
                 method.setQuerySearch(this);
                 methods.add(method);
             }
         }
-        
+
         return methods;
     }
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -566,7 +566,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         panCommand = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         lblBusyIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
-        strGap = new javax.swing.Box.Filler(new java.awt.Dimension(5, 0), new java.awt.Dimension(5, 25), new java.awt.Dimension(5, 32767));
+        strGap = new javax.swing.Box.Filler(new java.awt.Dimension(5, 0),
+                new java.awt.Dimension(5, 25),
+                new java.awt.Dimension(5, 32767));
         btnSearchCancel = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         lblBusyValueIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
@@ -584,15 +586,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         jLayerCB.setModel(new javax.swing.DefaultComboBoxModel(layers.toArray()));
         jLayerCB.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jLayerCBItemStateChanged(evt);
-            }
-        });
+
+                @Override
+                public void itemStateChanged(final java.awt.event.ItemEvent evt) {
+                    jLayerCBItemStateChanged(evt);
+                }
+            });
         jLayerCB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jLayerCBActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jLayerCBActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
@@ -612,10 +618,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         jMethodCB.setModel(new javax.swing.DefaultComboBoxModel(getMethods()));
         jMethodCB.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jMethodCBItemStateChanged(evt);
-            }
-        });
+
+                @Override
+                public void itemStateChanged(final java.awt.event.ItemEvent evt) {
+                    jMethodCBItemStateChanged(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -628,14 +636,28 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         jScrollPane1.setMinimumSize(new java.awt.Dimension(258, 40));
 
         jAttributesLi.setModel(new javax.swing.AbstractListModel() {
-            Object[] objects = {};
-            public int getSize() { return objects.length; }
-            public Object getElementAt(int i) { return objects[i]; }
-        });
+
+                Object[] objects = {};
+
+                @Override
+                public int getSize() {
+                    return objects.length;
+                }
+                @Override
+                public Object getElementAt(final int i) {
+                    return objects[i];
+                }
+            });
         jAttributesLi.setVisibleRowCount(0);
 
         org.jdesktop.beansbinding.ELProperty eLProperty = org.jdesktop.beansbinding.ELProperty.create("${attributes}");
-        org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, eLProperty, jAttributesLi, "");
+        org.jdesktop.swingbinding.JListBinding jListBinding = org.jdesktop.swingbinding.SwingBindings
+                    .createJListBinding(
+                        org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                        this,
+                        eLProperty,
+                        jAttributesLi,
+                        "");
         jListBinding.setDetailBinding(org.jdesktop.beansbinding.ELProperty.create("${name}"));
         jListBinding.setSourceNullValue(null);
         jListBinding.setSourceUnreadableValue(null);
@@ -656,14 +678,26 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         jScrollPane2.setMinimumSize(new java.awt.Dimension(258, 40));
 
         jValuesLi.setModel(new javax.swing.AbstractListModel() {
-            Object[] objects = {};
-            public int getSize() { return objects.length; }
-            public Object getElementAt(int i) { return objects[i]; }
-        });
+
+                Object[] objects = {};
+
+                @Override
+                public int getSize() {
+                    return objects.length;
+                }
+                @Override
+                public Object getElementAt(final int i) {
+                    return objects[i];
+                }
+            });
         jValuesLi.setVisibleRowCount(0);
 
         eLProperty = org.jdesktop.beansbinding.ELProperty.create("${values}");
-        jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, eLProperty, jValuesLi);
+        jListBinding = org.jdesktop.swingbinding.SwingBindings.createJListBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                eLProperty,
+                jValuesLi);
         bindingGroup.addBinding(jListBinding);
 
         jScrollPane2.setViewportView(jValuesLi);
@@ -700,7 +734,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane3, gridBagConstraints);
 
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, this, org.jdesktop.beansbinding.ELProperty.create("${selectCommand}"), jCommandLb, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        final org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${selectCommand}"),
+                jCommandLb,
+                org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -712,10 +751,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         jGetValuesBn.setText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "QuerySearch.jGetValuesBn.text")); // NOI18N
         jGetValuesBn.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jGetValuesBnActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jGetValuesBnActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 5;
@@ -748,16 +789,22 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         jPanel2.add(lblBusyIcon);
         jPanel2.add(strGap);
 
-        btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "SearchControlPanel.btnSearchCancel.text")); // NOI18N
-        btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(QuerySearch.class, "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
+        btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
+                QuerySearch.class,
+                "SearchControlPanel.btnSearchCancel.text"));        // NOI18N
+        btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
+                QuerySearch.class,
+                "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
         btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, 25));
         btnSearchCancel.setMinimumSize(new java.awt.Dimension(100, 25));
         btnSearchCancel.setPreferredSize(new java.awt.Dimension(100, 25));
         btnSearchCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSearchCancelActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnSearchCancelActionPerformed(evt);
+                }
+            });
         jPanel2.add(btnSearchCancel);
 
         panCommand.add(jPanel2);
@@ -785,14 +832,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         add(jPanel1, gridBagConstraints);
 
         bindingGroup.bind();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
         if (jLayerCB.getSelectedItem() instanceof MetaClass) {
             final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
@@ -846,14 +893,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         firePropertyChange(PROP_VALUES, old, values);
 
         fillButtonPanel();
-    }//GEN-LAST:event_jLayerCBActionPerformed
+    } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -904,7 +951,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                             XBoundingBox bounds = new XBoundingBox(ZoomToLayerWorker.getServiceBounds(afs));
                             final CrsTransformer trans = new CrsTransformer(model.getSrs().getCode());
                             bounds = trans.transformBoundingBox(bounds);
-                            allFeatures = afs.getFeatureFactory().createFeatures(afs.getQuery(), bounds, null, 0, 0, null);
+                            allFeatures = afs.getFeatureFactory()
+                                        .createFeatures(afs.getQuery(), bounds, null, 0, 0, null);
                         } catch (Exception e) {
                             allFeatures = afs.getFeatureFactory().getLastCreatedFeatures();
                         }
@@ -941,25 +989,34 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
                 attributeName));
-    }//GEN-LAST:event_jGetValuesBnActionPerformed
+    } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
         final QuerySearchMethod method = getSelectedMethod();
         method.actionPerformed(jLayerCB.getSelectedItem(), taQuery.getText());
-    }//GEN-LAST:event_btnSearchCancelActionPerformed
+    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
 
-    private void jMethodCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
+    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
 
-    }//GEN-LAST:event_jMethodCBItemStateChanged
-
-    private void jLayerCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jLayerCBItemStateChanged
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
         taQuery.setText("");
-    }//GEN-LAST:event_jLayerCBItemStateChanged
+    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
 
     /**
      * DOCUMENT ME!
@@ -1101,8 +1158,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                             } else {
                                 value = "'" + selectedObject.toString() + "'";
                             }
-                        } 
-                   }
+                        }
+                    }
                 }
                 AppendString(value);
             }
