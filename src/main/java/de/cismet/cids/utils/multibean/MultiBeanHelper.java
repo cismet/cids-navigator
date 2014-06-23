@@ -16,15 +16,12 @@ import org.jdesktop.observablecollections.ObservableListListener;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -46,7 +43,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
     //~ Instance fields --------------------------------------------------------
 
     private final Collection<CidsBean> beans = new ArrayList<CidsBean>();
-    private final Lock lock = new ReentrantLock();
+    private boolean isLocked = false;
     private final HashMap<String, CidsBeanDeepPropertyListener> cidsBeanFollowerMap =
         new HashMap<String, CidsBeanDeepPropertyListener>();
     private final HashMap<String, CidsBeanDeepPropertyListener> dummyBeanFollowerMap =
@@ -54,10 +51,10 @@ public class MultiBeanHelper implements PropertyChangeListener {
     private final Map<String, ObservableListListener> listListenerMap = new HashMap<String, ObservableListListener>();
     private final Map<String, Object> valuesAllEqualsMap = new HashMap<String, Object>();
     private final Collection<String> attachedProperties = new ArrayList<String>();
+    private final Collection<MultiBeanHelperListener> listeners = new ArrayList<MultiBeanHelperListener>();
 
     private CidsBean dummyBean;
-
-    private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+    private boolean loading = false;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -66,8 +63,8 @@ public class MultiBeanHelper implements PropertyChangeListener {
      *
      * @param  listener  DOCUMENT ME!
      */
+    @Deprecated
     public void addPropertyChangeListener(final PropertyChangeListener listener) {
-        propertyChangeSupport.addPropertyChangeListener(listener);
     }
 
     /**
@@ -75,8 +72,8 @@ public class MultiBeanHelper implements PropertyChangeListener {
      *
      * @param  listener  DOCUMENT ME!
      */
+    @Deprecated
     public void removePropertyChangeListener(final PropertyChangeListener listener) {
-        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 
     /**
@@ -208,9 +205,9 @@ public class MultiBeanHelper implements PropertyChangeListener {
         }
 
         this.dummyBean = dummyBean;
-        refillAttachedProperties();
 
         if (dummyBean != null) {
+            refillAttachedProperties();
             for (final String propertyName : getAttachedProperties()) {
                 final Object value = dummyBean.getProperty(propertyName);
                 if ((value != null) && (value instanceof ObservableList)) {
@@ -295,7 +292,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
             if (valuesAllEquals) {
                 valuesAllEqualsMap.put(propertyName, value);
             }
-            propertyChangeSupport.firePropertyChange(EVENT_NAME, null, propertyName);
+            fireAllEqualsChanged(propertyName, valuesAllEquals);
             return valuesAllEquals;
         }
     }
@@ -304,6 +301,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
      * DOCUMENT ME!
      */
     private void refillValuesAllEqualsMap() {
+        fireRefillAllEqualsMapStarted();
         valuesAllEqualsMap.clear();
         if (dummyBean != null) {
             for (final String propertyName : getAttachedProperties()) {
@@ -319,6 +317,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
                 fillValuesAllEqualsMap(propertyName);
             }
         }
+        fireRefillAllEqualsMapDone();
     }
 
     /**
@@ -401,32 +400,111 @@ public class MultiBeanHelper implements PropertyChangeListener {
                     && cidsBeanFollowerMap.containsKey(evt.getPropertyName())) {
             final CidsBeanDeepPropertyListener follower = (CidsBeanDeepPropertyListener)evt.getSource();
             if (follower.getBean().equals(dummyBean)) {
-                for (final CidsBean bean : beans) {
-                    final String propertyName = evt.getPropertyName();
-                    final Object value = evt.getNewValue();
-                    if (!(value instanceof ObservableList)) {
-                        try {
-                            lock.lock();
-                            bean.setProperty(propertyName, value);
-                        } catch (final Exception ex) {
-                            LOG.error("error while setting property on collection bean", ex);
-                        } finally {
-                            lock.unlock();
+                if (!isLocked) {
+                    try {
+                        isLocked = true;
+                        for (final CidsBean bean : beans) {
+                            try {
+                                final String propertyName = evt.getPropertyName();
+                                final Object value = evt.getNewValue();
+                                if (!(value instanceof ObservableList)) {
+                                    bean.setProperty(propertyName, value);
+                                }
+                            } catch (final Exception ex) {
+                                LOG.error("error while setting property on collection bean", ex);
+                            }
                         }
+                    } finally {
+                        isLocked = false;
                     }
                 }
             } else if (beans.contains(follower.getBean())) {
-                if (lock.tryLock()) {
+                if (!isLocked) {
                     try {
+                        isLocked = true;
                         final String propertyName = evt.getPropertyName();
                         fillValuesAllEqualsMap(propertyName);
                     } catch (final Exception ex) {
                         LOG.error("error while setting property on dummybean", ex);
                     } finally {
-                        lock.unlock();
+                        isLocked = false;
                     }
                 }
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   listener  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean addListener(final MultiBeanHelperListener listener) {
+        return listeners.add(listener);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   listener  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean removeListener(final MultiBeanHelperListener listener) {
+        return listeners.remove(listener);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void fireRefillAllEqualsMapStarted() {
+        setLoading(true);
+        for (final MultiBeanHelperListener listener : listeners) {
+            listener.refillAllEqualsMapStarted();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void fireRefillAllEqualsMapDone() {
+        setLoading(false);
+        for (final MultiBeanHelperListener listener : listeners) {
+            listener.refillAllEqualsMapDone();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  propertyName  event DOCUMENT ME!
+     * @param  allEquals     DOCUMENT ME!
+     */
+    public void fireAllEqualsChanged(final String propertyName, final boolean allEquals) {
+        if (!isLoading()) {
+            for (final MultiBeanHelperListener listener : listeners) {
+                listener.allEqualsChanged(propertyName, allEquals);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isLoading() {
+        return loading;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  loading  DOCUMENT ME!
+     */
+    private void setLoading(final boolean loading) {
+        this.loading = loading;
     }
 }

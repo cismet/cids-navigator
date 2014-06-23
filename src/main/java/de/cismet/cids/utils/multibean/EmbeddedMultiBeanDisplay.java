@@ -23,9 +23,6 @@ import java.awt.Graphics2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -36,32 +33,43 @@ import javax.swing.JList;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
+import javax.swing.text.JTextComponent;
 
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class EmbeddedMultiBeanDisplay extends JLabel implements PropertyChangeListener {
+public class EmbeddedMultiBeanDisplay extends JLabel {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger LOG = Logger.getLogger(EmbeddedMultiBeanDisplay.class);
     private static final String DIFFERENT_VALUE = "<html><i>unterschiedliche Werte</i>";
+    private static final String LOADING = "<html><i>wird geladen</i>";
 
     private static final int ALPHA_MAX = 255;
     private static final int ALPHA_MIN = 0;
-    private static final Map<JComponent, EmbeddedMultiBeanDisplay> MB_MAP = new HashMap();
 
     public static ImageIcon ICON_WARNING = new ImageIcon(MultiBeanHelper.class.getResource(
                 "/de/cismet/cids/utils/multibean/warning.png"));
-    private static final Map<String, EmbeddedMultiBeanDisplay> componentMap =
-        new HashMap<String, EmbeddedMultiBeanDisplay>();
 
     //~ Instance fields --------------------------------------------------------
 
     private int alpha = ALPHA_MIN;
-    private final MultiBeanHelper multiBeanHelper;
+    private boolean enabled = true;
+    private boolean editable = true;
+    private final PropertyChangeListener enableListener = new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(final PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals("enabled")) {
+                    enabled = (Boolean)evt.getNewValue();
+                }
+                if (evt.getPropertyName().equals("editable")) {
+                    editable = (Boolean)evt.getNewValue();
+                }
+            }
+        };
 
     //~ Constructors -----------------------------------------------------------
 
@@ -69,41 +77,28 @@ public class EmbeddedMultiBeanDisplay extends JLabel implements PropertyChangeLi
      * Creates a new EmbeddedValidatorDisplay object.
      *
      * @param  component        DOCUMENT ME!
+     * @param  propertyName     DOCUMENT ME!
      * @param  multiBeanHelper  DOCUMENT ME!
      */
-    private EmbeddedMultiBeanDisplay(final JComponent component, final MultiBeanHelper multiBeanHelper) {
+    private EmbeddedMultiBeanDisplay(final JComponent component,
+            final String propertyName,
+            final MultiBeanHelper multiBeanHelper) {
         setHorizontalAlignment(RIGHT);
         setVerticalAlignment(TOP);
         setCursor(Cursor.getPredefinedCursor(0));
         setVisible(false);
         // setToolTipText("unterschiedliche Werte");
 
-        this.multiBeanHelper = multiBeanHelper;
-        multiBeanHelper.addPropertyChangeListener(this);
-    }
+        setIcon(EmbeddedMultiBeanDisplay.ICON_WARNING);
+        setText(DIFFERENT_VALUE);
 
-    //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  component        DOCUMENT ME!
-     * @param  propertyName     DOCUMENT ME!
-     * @param  multiBeanHelper  DOCUMENT ME!
-     */
-    public static void registerComponentForProperty(final JComponent component,
-            final String propertyName,
-            final MultiBeanHelper multiBeanHelper) {
-        final EmbeddedMultiBeanDisplay overlay;
         if ((component instanceof JTextField) || (component instanceof JTextArea)) {
-            overlay = EmbeddedMultiBeanDisplay.getEmbeddedDisplayFor(component, multiBeanHelper);
-            overlay.setIcon(EmbeddedMultiBeanDisplay.ICON_WARNING);
-            overlay.setText(DIFFERENT_VALUE);
             if (!(component.getLayout() instanceof BorderLayout)) {
                 component.setLayout(new BorderLayout());
             }
-            component.add(overlay, BorderLayout.WEST);
+            component.add(this, BorderLayout.WEST);
         } else if (component instanceof JComboBox) {
+            setVisible(true);
             final ListCellRenderer rend = ((JComboBox)component).getRenderer();
             ((JComboBox)component).setRenderer(new DefaultListCellRenderer() {
 
@@ -119,42 +114,78 @@ public class EmbeddedMultiBeanDisplay extends JLabel implements PropertyChangeLi
                                 index,
                                 isSelected,
                                 cellHasFocus);
-                        if (!multiBeanHelper.isValuesAllEquals(propertyName) && (value == null)
-                                    && !multiBeanHelper.getBeans().isEmpty()) {
-                            comp.setIcon(EmbeddedMultiBeanDisplay.ICON_WARNING);
-                            comp.setText(DIFFERENT_VALUE);
+                        if ((value == null)
+                                    && (multiBeanHelper.isLoading()
+                                        || (!multiBeanHelper.getBeans().isEmpty() && !multiBeanHelper.isLoading()
+                                            && !multiBeanHelper.isValuesAllEquals(propertyName)))) {
+                            comp.setIcon(EmbeddedMultiBeanDisplay.this.getIcon());
+                            comp.setText(EmbeddedMultiBeanDisplay.this.getText());
                         }
                         return comp;
                     }
                 });
-            overlay = null;
         } else if (component instanceof JXDatePicker) {
             final JFormattedTextField jft = ((JXDatePicker)component).getEditor();
-            overlay = EmbeddedMultiBeanDisplay.getEmbeddedDisplayFor(jft, multiBeanHelper);
-            overlay.setIcon(EmbeddedMultiBeanDisplay.ICON_WARNING);
-            overlay.setText(DIFFERENT_VALUE);
             jft.setLayout(new BorderLayout());
-            jft.add(overlay, BorderLayout.WEST);
-        } else {
-            overlay = null;
+            jft.add(this, BorderLayout.WEST);
         }
-        componentMap.put(propertyName, overlay);
+
+        multiBeanHelper.addListener(new MultiBeanHelperListener() {
+
+                @Override
+                public void refillAllEqualsMapStarted() {
+                    setText(LOADING);
+                    component.removePropertyChangeListener(enableListener);
+                    if (component instanceof JTextComponent) {
+                        ((JTextComponent)component).setEditable(false);
+                    }
+                    component.setEnabled(false);
+                    component.addPropertyChangeListener(enableListener);
+                    doOverlay(true);
+                }
+
+                @Override
+                public void refillAllEqualsMapDone() {
+                    setText(DIFFERENT_VALUE);
+                    component.removePropertyChangeListener(enableListener);
+                    component.setEnabled(enabled);
+                    if (component instanceof JTextComponent) {
+                        ((JTextComponent)component).setEditable(editable);
+                    }
+                    component.addPropertyChangeListener(enableListener);
+                    doOverlay(!multiBeanHelper.isValuesAllEquals(propertyName));
+                }
+
+                @Override
+                public void allEqualsChanged(final String propertyNameAllEqualsChanged, final boolean allEquals) {
+                    if ((!multiBeanHelper.isLoading() && propertyNameAllEqualsChanged.equals(propertyName))
+                                || multiBeanHelper.isLoading()) {
+                        doOverlay(!allEquals);
+                    }
+                }
+            });
+
+        component.addPropertyChangeListener(enableListener);
+
+        enabled = component.isEnabled();
+        if (component instanceof JTextComponent) {
+            editable = ((JTextComponent)component).isEditable();
+        }
     }
+
+    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
      *
-     * @param  propertyName  DOCUMENT ME!
+     * @param  component        DOCUMENT ME!
+     * @param  propertyName     DOCUMENT ME!
+     * @param  multiBeanHelper  DOCUMENT ME!
      */
-    private void refreshComponent(final String propertyName) {
-        final EmbeddedMultiBeanDisplay component = componentMap.get(propertyName);
-        // if (component instanceof JComponent) {
-        if ((component != null) && !multiBeanHelper.isValuesAllEquals(propertyName)) {
-            component.doOverlay(true);
-        } else if (component != null) {
-            component.doOverlay(false);
-        }
-        // }
+    public static void registerComponentForProperty(final JComponent component,
+            final String propertyName,
+            final MultiBeanHelper multiBeanHelper) {
+        final EmbeddedMultiBeanDisplay overlay = new EmbeddedMultiBeanDisplay(component, propertyName, multiBeanHelper);
     }
 
     /**
@@ -165,12 +196,10 @@ public class EmbeddedMultiBeanDisplay extends JLabel implements PropertyChangeLi
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static EmbeddedMultiBeanDisplay getEmbeddedDisplayFor(final JComponent component,
             final MultiBeanHelper multiBeanHelper) {
-        if (!MB_MAP.containsKey(component)) {
-            MB_MAP.put(component, new EmbeddedMultiBeanDisplay(component, multiBeanHelper));
-        }
-        return (EmbeddedMultiBeanDisplay)MB_MAP.get(component);
+        return null;
     }
 
     @Override
@@ -215,13 +244,5 @@ public class EmbeddedMultiBeanDisplay extends JLabel implements PropertyChangeLi
             alpha = ALPHA_MAX;
         }
         this.alpha = alpha;
-    }
-
-    @Override
-    public void propertyChange(final PropertyChangeEvent evt) {
-        if (multiBeanHelper.equals(evt.getSource()) && MultiBeanHelper.EVENT_NAME.equals(evt.getPropertyName())) {
-            final String propertyName = (String)evt.getNewValue();
-            refreshComponent(propertyName);
-        }
     }
 }
