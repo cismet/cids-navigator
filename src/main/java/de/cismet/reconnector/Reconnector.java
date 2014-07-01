@@ -104,7 +104,7 @@ public abstract class Reconnector<S extends Object> {
     /**
      * Abbrechen.
      */
-    public void doAbbort() {
+    public void doAbort() {
         reconnectorDialog.setVisible(false);
         isReconnecting = false;
     }
@@ -139,6 +139,13 @@ public abstract class Reconnector<S extends Object> {
                 LOG.debug("nichts zum Abbrechen");
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void doIgnore() {
+        reconnectorDialog.dispose();
     }
 
     /**
@@ -190,7 +197,7 @@ public abstract class Reconnector<S extends Object> {
 
                     @Override
                     public void windowClosing(final WindowEvent we) {
-                        doAbbort();
+                        doAbort();
                     }
                 });
             reconnectorDialog.setAlwaysOnTop(true);

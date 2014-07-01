@@ -35,6 +35,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnIgnore;
     private javax.swing.JButton btnRetry;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labTryingToConnect;
@@ -113,6 +114,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panError = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         btnExit = new javax.swing.JButton();
+        btnIgnore = new javax.swing.JButton();
         btnRetry = new javax.swing.JButton();
 
         panProgress.setMinimumSize(new java.awt.Dimension(200, 88));
@@ -169,6 +171,17 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
             });
         jPanel1.add(btnExit);
 
+        btnIgnore.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "ignore")); // NOI18N
+        btnIgnore.setPreferredSize(new java.awt.Dimension(125, 29));
+        btnIgnore.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnIgnoreActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnIgnore);
+
         btnRetry.setText(bundle.getString("retry")); // NOI18N
         btnRetry.setPreferredSize(new java.awt.Dimension(125, 29));
         btnRetry.addActionListener(new java.awt.event.ActionListener() {
@@ -214,6 +227,15 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
     private void btnExitActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnExitActionPerformed
         System.exit(1);
     }                                                                           //GEN-LAST:event_btnExitActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnIgnoreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnIgnoreActionPerformed
+        reconnector.doAbort();
+    }                                                                             //GEN-LAST:event_btnIgnoreActionPerformed
 
     @Override
     public void connecting() {
