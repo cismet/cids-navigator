@@ -409,6 +409,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
                                 final Object value = evt.getNewValue();
                                 if (!(value instanceof ObservableList)) {
                                     bean.setProperty(propertyName, value);
+                                    fireAllEqualsChanged(propertyName, true);
                                 }
                             } catch (final Exception ex) {
                                 LOG.error("error while setting property on collection bean", ex);
