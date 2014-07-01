@@ -21,6 +21,8 @@ import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.MultiSplitLayout;
@@ -82,6 +84,7 @@ import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
+import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
 
@@ -118,6 +121,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
     private String[] methodList;
+    private QuerySearchMethod[] additionalMethods;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -152,7 +156,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * Creates new form StandaloneStart.
      */
     public QuerySearch() {
-        this(null, null);
+        this(null, new String[] { "de.cismet.cids.search.SearchQuerySearchMethod" });
     }
 
     /**
@@ -163,12 +167,51 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *                     methodList == null, all methods can be used
      */
     public QuerySearch(final ActiveLayerModel model, final String[] methodList) {
+        this(model, methodList, null);
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model          the layer model to be use
+     * @param  methodList     only the method of this list can be used, if they can be found by the lookup. If the
+     *                        methodList == null, all methods can be used
+     * @param  choosenLayers  DOCUMENT ME!
+     */
+    public QuerySearch(final ActiveLayerModel model,
+            final String[] methodList,
+            final AbstractFeatureService[] choosenLayers) {
+        this(model, methodList, choosenLayers, null);
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model              the layer model to be use
+     * @param  methodList         only the method of this list can be used, if they can be found by the lookup. If the
+     *                            methodList == null, all methods can be used
+     * @param  choosenLayers      DOCUMENT ME!
+     * @param  additionalMethods  DOCUMENT ME!
+     */
+    public QuerySearch(final ActiveLayerModel model,
+            final String[] methodList,
+            final AbstractFeatureService[] choosenLayers,
+            final QuerySearchMethod[] additionalMethods) {
         this.model = model;
         this.methodList = methodList;
-        services = getFeatureServices(model);
-        classes = GetClasses();
-        layers = new ArrayList<Object>(services);
-        layers.addAll(classes);
+        this.additionalMethods = additionalMethods;
+        
+        if (choosenLayers == null) {
+            services = getFeatureServices(model);
+            classes = GetClasses();
+            layers = new ArrayList<Object>(services);
+            layers.addAll(classes);
+        } else {
+            layers = new ArrayList<Object>(Arrays.asList(choosenLayers));
+            services = new ArrayList<AbstractFeatureService>();
+            services.addAll(Arrays.asList(choosenLayers));
+            classes = new ArrayList<MetaClass>();
+        }
         initComponents();
         jMethodCB.setVisible((jMethodCB.getModel().getSize() > 1));
         jMethodLb.setVisible((jMethodCB.getModel().getSize() > 1));
@@ -433,6 +476,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             }
         }
 
+        if (additionalMethods != null) {
+            for (final QuerySearchMethod method : additionalMethods) {
+                method.setQuerySearch(this);
+                methods.add(method);
+            }
+        }
         return methods;
     }
 
@@ -839,7 +888,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
         if (jLayerCB.getSelectedItem() instanceof MetaClass) {
             final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
@@ -893,14 +942,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         firePropertyChange(PROP_VALUES, old, values);
 
         fillButtonPanel();
-    } //GEN-LAST:event_jLayerCBActionPerformed
+    }//GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -948,9 +997,22 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     public void run() {
                         List allFeatures;
                         try {
-                            XBoundingBox bounds = new XBoundingBox(ZoomToLayerWorker.getServiceBounds(afs));
-                            final CrsTransformer trans = new CrsTransformer(model.getSrs().getCode());
-                            bounds = trans.transformBoundingBox(bounds);
+                            final Geometry g = ZoomToLayerWorker.getServiceBounds(afs);
+                            XBoundingBox bounds = null;
+
+                            if (g != null) {
+                                bounds = new XBoundingBox(g);
+                                String crs;
+                                
+                                if (model != null) {
+                                    crs = model.getSrs().getCode();
+                                } else {
+                                    crs = CismapBroker.getInstance().getSrs().getCode();
+                                }
+
+                                final CrsTransformer trans = new CrsTransformer(crs);
+                                bounds = trans.transformBoundingBox(bounds);
+                            }
                             allFeatures = afs.getFeatureFactory()
                                         .createFeatures(afs.getQuery(), bounds, null, 0, 0, null);
                         } catch (Exception e) {
@@ -989,34 +1051,34 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
                 attributeName));
-    } //GEN-LAST:event_jGetValuesBnActionPerformed
+    }//GEN-LAST:event_jGetValuesBnActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
         final QuerySearchMethod method = getSelectedMethod();
         method.actionPerformed(jLayerCB.getSelectedItem(), taQuery.getText());
-    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
+    }//GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
-    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
+    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
+    }//GEN-LAST:event_jMethodCBItemStateChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
+    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jLayerCBItemStateChanged
         taQuery.setText("");
-    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
+    }//GEN-LAST:event_jLayerCBItemStateChanged
 
     /**
      * DOCUMENT ME!
