@@ -156,7 +156,11 @@ public class CallServerTunnel implements Tunnel {
                             parameterSAP,
                             methodSAP,
                             optionsSAP);
-        return new ByteArrayInputStream(result);
+        if (result != null) {
+            return new ByteArrayInputStream(result);
+        } else {
+            return null;
+        }
     }
 
     @Override
