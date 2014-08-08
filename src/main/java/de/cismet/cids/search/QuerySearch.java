@@ -122,6 +122,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private ImageIcon iconCancel;
     private String[] methodList;
     private QuerySearchMethod[] additionalMethods;
+    private String currentlyExpandedAttribute;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -956,7 +957,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         }
 
         final Object attributeObject = attributes.get(jAttributesLi.getSelectedIndex());
-        String attributeName = "";
+        currentlyExpandedAttribute = "";
 
         if (attributeObject instanceof MemberAttributeInfo) {
             final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
@@ -984,7 +985,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     }
                 });
 
-            attributeName = attributeInfo.getName();
+            currentlyExpandedAttribute = attributeInfo.getName();
         } else if (attributeObject instanceof FeatureServiceAttribute) {
             lblBusyValueIcon.setEnabled(true);
             lblBusyValueIcon.setBusy(true);
@@ -1045,13 +1046,13 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     }
                 });
 
-            attributeName = attributeInfo.getName();
+            currentlyExpandedAttribute = attributeInfo.getName();
         }
 
         jlEinzelwerteAnzeigen.setText(NbBundle.getMessage(
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
-                attributeName));
+                currentlyExpandedAttribute));
     } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     /**
@@ -1210,7 +1211,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                             final String v = ((FeatureServiceAttribute)selectedObject).getName();
                             value = ((AbstractFeatureService)layer).decoratePropertyName(v);
                         } else {
-                            value = ((AbstractFeatureService)layer).decoratePropertyValue(selectedObject.toString());
+                            value = ((AbstractFeatureService)layer).decoratePropertyValue(
+                                    currentlyExpandedAttribute,
+                                    selectedObject.toString());
                         }
                     } else {
                         if (source == jAttributesLi) {
