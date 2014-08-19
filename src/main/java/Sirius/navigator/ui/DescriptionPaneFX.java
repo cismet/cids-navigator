@@ -98,13 +98,6 @@ public class DescriptionPaneFX extends DescriptionPane {
         popupMenu.add(mnuItem_openInExternalBrowser);
         browserFxPanel.add(popupMenu);
         browserFxPanel.addMouseListener(new PopupListener(popupMenu));
-        browserFxPanel.addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(final java.awt.event.MouseEvent e) {
-                    LOG.fatal("Mouse clicked on JFXPanel");
-                }
-            });
     }
 
     //~ Methods ----------------------------------------------------------------
