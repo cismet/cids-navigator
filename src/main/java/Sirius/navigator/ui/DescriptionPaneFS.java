@@ -71,7 +71,7 @@ public class DescriptionPaneFS extends DescriptionPane {
      */
     private void initComponents() {
         fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
-        xHTMLPanel1 = new org.xhtmlrenderer.simple.XHTMLPanel();
+        xHTMLPanel1 = new FSXHtmlPanel();
         popupMenu = new JPopupMenu();
         final LinkListener ll = new LinkListener() {
 
