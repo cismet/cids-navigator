@@ -11,8 +11,9 @@ import Sirius.navigator.ui.status.Status;
 
 import org.xhtmlrenderer.extend.NamespaceHandler;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
+import org.xhtmlrenderer.swing.BasicPanel;
+import org.xhtmlrenderer.swing.LinkListener;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -72,6 +73,16 @@ public class DescriptionPaneFS extends DescriptionPane {
         fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
         xHTMLPanel1 = new org.xhtmlrenderer.simple.XHTMLPanel();
         popupMenu = new JPopupMenu();
+        final LinkListener ll = new LinkListener() {
+
+                @Override
+                public void linkClicked(final BasicPanel panel, final String uri) {
+                    if (!pageURI.endsWith("html")) {
+                        pageURI = panel.getURL().toString();
+                    }
+                }
+            };
+        ((BasicPanel)xHTMLPanel1).addMouseTrackingListener(ll);
 
         fSScrollPane1.setViewportView(xHTMLPanel1);
         mnuItem_openInExternalBrowser = new JMenuItem(org.openide.util.NbBundle.getMessage(

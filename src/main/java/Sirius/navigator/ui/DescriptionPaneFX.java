@@ -21,7 +21,14 @@ import javafx.scene.web.WebView;
 
 import org.apache.log4j.Logger;
 
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+
+import de.cismet.tools.BrowserLauncher;
 
 /**
  * An implementation of DescriptionPane which uses JavaFX WebKit Component to render XHTML content.
@@ -41,6 +48,8 @@ public class DescriptionPaneFX extends DescriptionPane {
     private WebEngine webEng = null;
     private WebView webView;
     private Pane browserPane;
+    private JPopupMenu popupMenu;
+    private JMenuItem mnuItem_openInExternalBrowser;
 //    private NavigatorJsBridgeImpl bridge = new NavigatorJsBridgeImpl();
 
     //~ Constructors -----------------------------------------------------------
@@ -61,6 +70,36 @@ public class DescriptionPaneFX extends DescriptionPane {
                 }
             });
         add(browserFxPanel, "html");
+        popupMenu = new JPopupMenu();
+        mnuItem_openInExternalBrowser = new JMenuItem(org.openide.util.NbBundle.getMessage(
+                    DescriptionPaneFS.class,
+                    "DescriptionPaneFS.btn_openInSystemBrowser.text"),
+                new javax.swing.ImageIcon(
+                    getClass().getResource("/Sirius/navigator/ui/world.png")));
+        mnuItem_openInExternalBrowser.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent e) {
+                    final String pageURI = webEng.getLocation();
+                    if ((pageURI != null) && (pageURI.trim().length() > 0)) {
+                        try {
+                            de.cismet.tools.BrowserLauncher.openURL(pageURI);
+                        } catch (Exception ex) {
+                            LOG.error("Couldn't open URI '" + pageURI + "' in external browser.", ex);
+                        }
+                    }
+                }
+            });
+        popupMenu.add(mnuItem_openInExternalBrowser);
+        browserFxPanel.add(popupMenu);
+        browserFxPanel.addMouseListener(new PopupListener(popupMenu));
+        browserFxPanel.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final java.awt.event.MouseEvent e) {
+                    LOG.fatal("Mouse clicked on JFXPanel");
+                }
+            });
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -85,12 +124,26 @@ public class DescriptionPaneFX extends DescriptionPane {
 // }
 // }
 // });
-
         webEng = webView.getEngine();
         final BorderPane pane = new BorderPane();
         pane.setPadding(new Insets(5));
         pane.setCenter(webView);
         return pane;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  url  DOCUMENT ME!
+     */
+    private void openInSystemBrowser(final String url) {
+        try {
+            if (url != null) {
+                BrowserLauncher.openURL(url);
+            }
+        } catch (Exception ex) {
+            LOG.error(ex.getMessage(), ex);
+        }
     }
 
     @Override
