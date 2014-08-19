@@ -25,7 +25,7 @@ public class FSXHtmlPanel extends XHTMLPanel {
 
     @Override
     protected void setDocumentRelative(final String filename) {
-        if (!filename.endsWith("html")) {
+        if (!filename.endsWith("html") && (!filename.startsWith("#"))) {
             final String currUrl = this.getURL().toString();
             final String baseUrl = currUrl.substring(0, currUrl.lastIndexOf("/") + 1);
             BrowserLauncher.openURLorFile(baseUrl + filename);
