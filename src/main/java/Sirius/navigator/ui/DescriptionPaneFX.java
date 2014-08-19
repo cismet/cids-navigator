@@ -9,6 +9,11 @@ package Sirius.navigator.ui;
 
 import javafx.application.Platform;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+
+import javafx.concurrent.Worker.State;
+
 import javafx.embed.swing.JFXPanel;
 
 import javafx.geometry.Insets;
@@ -93,13 +98,6 @@ public class DescriptionPaneFX extends DescriptionPane {
         popupMenu.add(mnuItem_openInExternalBrowser);
         browserFxPanel.add(popupMenu);
         browserFxPanel.addMouseListener(new PopupListener(popupMenu));
-        browserFxPanel.addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(final java.awt.event.MouseEvent e) {
-                    LOG.fatal("Mouse clicked on JFXPanel");
-                }
-            });
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -125,6 +123,21 @@ public class DescriptionPaneFX extends DescriptionPane {
 // }
 // });
         webEng = webView.getEngine();
+        // if a link is clicked that does not represent a html document, we open the document in the system browser
+        webEng.getLoadWorker().stateProperty().addListener(
+            new ChangeListener<State>() {
+
+                @Override
+                public void changed(final ObservableValue ov, final State oldState, final State newState) {
+                    if (newState == State.RUNNING) {
+                        final String url = webEng.getLocation();
+                        if (!url.endsWith(("html"))) {
+                            openInSystemBrowser(url);
+                        }
+                    }
+                }
+            });
+
         final BorderPane pane = new BorderPane();
         pane.setPadding(new Insets(5));
         pane.setCenter(webView);
