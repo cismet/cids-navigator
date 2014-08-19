@@ -77,9 +77,7 @@ public class DescriptionPaneFS extends DescriptionPane {
 
                 @Override
                 public void linkClicked(final BasicPanel panel, final String uri) {
-                    if (!pageURI.endsWith("html")) {
-                        pageURI = panel.getURL().toString();
-                    }
+                    pageURI = panel.getURL().toString();
                 }
             };
         ((BasicPanel)xHTMLPanel1).addMouseTrackingListener(ll);
