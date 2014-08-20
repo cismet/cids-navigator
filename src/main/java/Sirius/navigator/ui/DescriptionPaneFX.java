@@ -26,8 +26,14 @@ import javafx.scene.web.WebView;
 
 import org.apache.log4j.Logger;
 
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
+import org.w3c.dom.html.HTMLAnchorElement;
+
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -123,17 +129,15 @@ public class DescriptionPaneFX extends DescriptionPane {
 // }
 // });
         webEng = webView.getEngine();
-        // if a link is clicked that does not represent a html document, we open the document in the system browser
+        // every time a new document was loaded, we need to add listeners to the a elements in that document, that check
+        // if that link represents a non hml document we want to open in the system browser
         webEng.getLoadWorker().stateProperty().addListener(
             new ChangeListener<State>() {
 
                 @Override
                 public void changed(final ObservableValue ov, final State oldState, final State newState) {
-                    if (newState == State.RUNNING) {
-                        final String url = webEng.getLocation();
-                        if (!url.endsWith(("html"))) {
-                            openInSystemBrowser(url);
-                        }
+                    if (newState == State.SUCCEEDED) {
+                        addClickListenerToLinks();
                     }
                 }
             });
@@ -142,6 +146,32 @@ public class DescriptionPaneFX extends DescriptionPane {
         pane.setPadding(new Insets(5));
         pane.setCenter(webView);
         return pane;
+    }
+
+    /**
+     * this method adds a EventListener to each link element in the loaded document. The added EventListner checks if
+     * the href of the link points to a non html document or anchor and if so opens he url in the external browser
+     */
+    private void addClickListenerToLinks() {
+        final NodeList nodeList = webEng.getDocument().getElementsByTagName("a");
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            final Node node = nodeList.item(i);
+            final EventTarget eventTarget = (EventTarget)node;
+            eventTarget.addEventListener("click", new EventListener() {
+
+                    @Override
+                    public void handleEvent(final Event evt) {
+                        final EventTarget target = evt.getCurrentTarget();
+                        final HTMLAnchorElement anchorElement = (HTMLAnchorElement)target;
+                        final String href = anchorElement.getHref();
+
+                        if ((href != null) && !href.endsWith("html") && !href.contains("#")) {
+                            openInSystemBrowser(href);
+                            evt.preventDefault();
+                        }
+                    }
+                }, false);
+        }
     }
 
     /**
