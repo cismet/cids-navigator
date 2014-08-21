@@ -5,13 +5,11 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Sirius.navigator.ui.attributes.renderer;
 
-import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
+import org.apache.commons.lang.StringUtils;
+
+import org.openide.util.NbBundle;
 
 import javax.swing.JComponent;
 
@@ -41,6 +39,13 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements TitleCo
      */
     public NoDescriptionRenderer() {
         initComponents();
+        final String textIconPath = NbBundle.getMessage(
+                NoDescriptionRenderer.class,
+                "NoDescriptionRenderer.nodescription_text");
+        if (StringUtils.isNotBlank(textIconPath)) {
+            lblText.setIcon(new javax.swing.ImageIcon(
+                    getClass().getResource(textIconPath)));
+        }
     }
 
     //~ Methods ----------------------------------------------------------------
