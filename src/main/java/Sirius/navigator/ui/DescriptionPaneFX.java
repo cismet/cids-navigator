@@ -41,6 +41,8 @@ import javax.swing.SwingUtilities;
 
 import de.cismet.tools.BrowserLauncher;
 
+import de.cismet.tools.gui.FXWebViewPanel;
+
 /**
  * An implementation of DescriptionPane which uses JavaFX WebKit Component to render XHTML content.
  *
@@ -51,14 +53,11 @@ public class DescriptionPaneFX extends DescriptionPane {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static JFXPanel browserFxPanel;
+    private static FXWebViewPanel browserPanel;
     private static final Logger LOG = Logger.getLogger(DescriptionPaneFX.class);
 
     //~ Instance fields --------------------------------------------------------
 
-    private WebEngine webEng = null;
-    private WebView webView;
-    private Pane browserPane;
     private JPopupMenu popupMenu;
     private JMenuItem mnuItem_openInExternalBrowser;
 //    private NavigatorJsBridgeImpl bridge = new NavigatorJsBridgeImpl();
@@ -70,17 +69,8 @@ public class DescriptionPaneFX extends DescriptionPane {
      */
     public DescriptionPaneFX() {
         Platform.setImplicitExit(false);
-        browserFxPanel = new JFXPanel();
-        Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    browserPane = createBrowser();
-                    final Scene scene = new Scene(browserPane);
-                    browserFxPanel.setScene(scene);
-                }
-            });
-        add(browserFxPanel, "html");
+        browserPanel = new FXWebViewPanel();
+        add(browserPanel, "html");
         popupMenu = new JPopupMenu();
         mnuItem_openInExternalBrowser = new JMenuItem(org.openide.util.NbBundle.getMessage(
                     DescriptionPaneFS.class,
@@ -91,143 +81,47 @@ public class DescriptionPaneFX extends DescriptionPane {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent e) {
-                    final String pageURI = webEng.getLocation();
-                    if ((pageURI != null) && (pageURI.trim().length() > 0)) {
-                        try {
-                            de.cismet.tools.BrowserLauncher.openURL(pageURI);
-                        } catch (Exception ex) {
-                            LOG.error("Couldn't open URI '" + pageURI + "' in external browser.", ex);
+                    final WebEngine webEng = browserPanel.getWebEngine();
+                    if (webEng != null) {
+                        final String pageURI = webEng.getLocation();
+                        if ((pageURI != null) && (pageURI.trim().length() > 0)) {
+                            try {
+                                de.cismet.tools.BrowserLauncher.openURL(pageURI);
+                            } catch (Exception ex) {
+                                LOG.error("Couldn't open URI '" + pageURI + "' in external browser.", ex);
+                            }
                         }
                     }
                 }
             });
         popupMenu.add(mnuItem_openInExternalBrowser);
-        browserFxPanel.add(popupMenu);
-        browserFxPanel.addMouseListener(new PopupListener(popupMenu));
+        browserPanel.add(popupMenu);
+        browserPanel.addMouseListener(new PopupListener(popupMenu));
     }
 
     //~ Methods ----------------------------------------------------------------
 
-    /**
-     * can only be called on FX application Thread !
-     *
-     * @return  DOCUMENT ME!
-     */
-    private Pane createBrowser() {
-        webView = new WebView();
-//         disabling the context menue
-        // custom context menue are not possible atm see https://javafx-jira.kenai.com/browse/RT-20306
-        webView.setContextMenuEnabled(false);
-
-        // disabling scoll bars
-// view.getChildrenUnmodifiable().addListener(new ListChangeListener<Node>() {
-// public void onChanged(ListChangeListener.Change<? extends Node> change) {
-// Set<Node> deadSeaScrolls = view.lookupAll(".scroll-bar");
-// for (Node scroll : deadSeaScrolls) {
-// scroll.setVisible(false);
-// }
-// }
-// });
-        webEng = webView.getEngine();
-        // every time a new document was loaded, we need to add listeners to the a elements in that document, that check
-        // if that link represents a non hml document we want to open in the system browser
-        webEng.getLoadWorker().stateProperty().addListener(
-            new ChangeListener<State>() {
-
-                @Override
-                public void changed(final ObservableValue ov, final State oldState, final State newState) {
-                    if (newState == State.SUCCEEDED) {
-                        addClickListenerToLinks();
-                    }
-                }
-            });
-
-        final BorderPane pane = new BorderPane();
-        pane.setPadding(new Insets(5));
-        pane.setCenter(webView);
-        return pane;
-    }
-
-    /**
-     * this method adds a EventListener to each link element in the loaded document. The added EventListner checks if
-     * the href of the link points to a non html document or anchor and if so opens he url in the external browser
-     */
-    private void addClickListenerToLinks() {
-        final NodeList nodeList = webEng.getDocument().getElementsByTagName("a");
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            final Node node = nodeList.item(i);
-            final EventTarget eventTarget = (EventTarget)node;
-            eventTarget.addEventListener("click", new EventListener() {
-
-                    @Override
-                    public void handleEvent(final Event evt) {
-                        final EventTarget target = evt.getCurrentTarget();
-                        final HTMLAnchorElement anchorElement = (HTMLAnchorElement)target;
-                        final String href = anchorElement.getHref();
-
-                        if ((href != null) && !href.endsWith("html") && !href.contains("#")) {
-                            openInSystemBrowser(href);
-                            evt.preventDefault();
-                        }
-                    }
-                }, false);
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  url  DOCUMENT ME!
-     */
-    private void openInSystemBrowser(final String url) {
-        try {
-            if (url != null) {
-                BrowserLauncher.openURL(url);
-            }
-        } catch (Exception ex) {
-            LOG.error(ex.getMessage(), ex);
-        }
-    }
-
     @Override
     public void setPageFromURI(final String page) {
-        Platform.runLater(new Runnable() {
+        browserPanel.loadUrl(page);
+        SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    webEng.load(page);
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                DescriptionPaneFX.this.invalidate();
-                                DescriptionPaneFX.this.repaint();
-                            }
-                        });
+                    DescriptionPaneFX.this.invalidate();
+                    DescriptionPaneFX.this.repaint();
                 }
             });
     }
 
     @Override
     public void setPageFromContent(final String page) {
-        Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    webEng.loadContent(page);
-                }
-            });
+        browserPanel.loadContent(page);
     }
 
     @Override
     public void setPageFromContent(final String page,
             final String baseURL) {
-        Platform.runLater(new Runnable() {
-
-                @Override
-                public void run() {
-                    webEng.load(page);
-                }
-            });
+        browserPanel.loadContent(page);
     }
 }
