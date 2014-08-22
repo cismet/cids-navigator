@@ -32,9 +32,9 @@ import java.util.HashMap;
 import de.cismet.cids.server.actions.HttpTunnelAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
-import de.cismet.netutil.tunnel.TunnelTargetGroup;
+import de.cismet.commons.security.Tunnel;
 
-import de.cismet.security.Tunnel;
+import de.cismet.netutil.tunnel.TunnelTargetGroup;
 
 /**
  * DOCUMENT ME!
