@@ -5,13 +5,11 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package Sirius.navigator.ui.attributes.renderer;
 
-import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
+import org.apache.commons.lang.StringUtils;
+
+import org.openide.util.NbBundle;
 
 import javax.swing.JComponent;
 
@@ -29,8 +27,8 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements TitleCo
 
     private static NoDescriptionRenderer INSTANCE = new NoDescriptionRenderer();
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel lblIcon;
+    private javax.swing.JLabel lblText;
     private javax.swing.JLabel lblTitle;
     // End of variables declaration//GEN-END:variables
 
@@ -41,6 +39,13 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements TitleCo
      */
     public NoDescriptionRenderer() {
         initComponents();
+        final String textIconPath = NbBundle.getMessage(
+                NoDescriptionRenderer.class,
+                "NoDescriptionRenderer.nodescription_text");
+        if (StringUtils.isNotBlank(textIconPath)) {
+            lblText.setIcon(new javax.swing.ImageIcon(
+                    getClass().getResource(textIconPath)));
+        }
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -64,8 +69,8 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements TitleCo
         java.awt.GridBagConstraints gridBagConstraints;
 
         lblTitle = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        lblIcon = new javax.swing.JLabel();
+        lblText = new javax.swing.JLabel();
 
         lblTitle.setFont(new java.awt.Font("Tahoma", 1, 18));
         lblTitle.setForeground(new java.awt.Color(255, 255, 255));
@@ -76,29 +81,29 @@ public class NoDescriptionRenderer extends javax.swing.JPanel implements TitleCo
         setOpaque(false);
         setLayout(new java.awt.GridBagLayout());
 
-        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel2.setIcon(new javax.swing.ImageIcon(
+        lblIcon.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblIcon.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/ui/attributes/renderer/nodescription_icon.png"))); // NOI18N
-        jLabel2.setText(org.openide.util.NbBundle.getMessage(
+        lblIcon.setText(org.openide.util.NbBundle.getMessage(
                 NoDescriptionRenderer.class,
-                "NoDescriptionRenderer.jLabel2.text"));                                                      // NOI18N
+                "NoDescriptionRenderer.lblIcon.text"));                                                      // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 25, 10);
-        add(jLabel2, gridBagConstraints);
+        add(lblIcon, gridBagConstraints);
 
-        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setIcon(new javax.swing.ImageIcon(
+        lblText.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblText.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/ui/attributes/renderer/nodescription_text.png"))); // NOI18N
-        jLabel3.setText(org.openide.util.NbBundle.getMessage(
+        lblText.setText(org.openide.util.NbBundle.getMessage(
                 NoDescriptionRenderer.class,
-                "NoDescriptionRenderer.jLabel3.text"));                                                      // NOI18N
+                "NoDescriptionRenderer.lblText.text"));                                                      // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.insets = new java.awt.Insets(25, 10, 10, 10);
-        add(jLabel3, gridBagConstraints);
+        add(lblText, gridBagConstraints);
     }                                                                                                        // </editor-fold>//GEN-END:initComponents
 
     @Override
