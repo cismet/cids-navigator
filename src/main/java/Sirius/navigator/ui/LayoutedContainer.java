@@ -874,15 +874,6 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                 in.close();
                 rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                 rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
-                if (isInit) {
-                    final int count = viewMap.getViewCount();
-                    for (int i = 0; i < count; i++) {
-                        final View current = viewMap.getViewAtIndex(i);
-                        if (current.isUndocked()) {
-                            current.dock();
-                        }
-                    }
-                }
                 if (logger.isDebugEnabled()) {
                     logger.debug("Loading Layout successfull");                                      // NOI18N
                 }
