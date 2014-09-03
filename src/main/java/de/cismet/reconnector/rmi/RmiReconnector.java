@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.reconnector.rmi;
 
+import org.openide.util.NbBundle;
+
 import java.net.MalformedURLException;
 
 import java.rmi.ConnectException;
@@ -18,7 +20,6 @@ import java.rmi.ServerException;
 
 import de.cismet.reconnector.Reconnector;
 import de.cismet.reconnector.ReconnectorException;
-import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -91,17 +92,17 @@ public class RmiReconnector<R extends Remote> extends Reconnector<R> {
             return (R)Naming.lookup(serviceUrl);
         } catch (NotBoundException nbe) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("[NetworkError] could not connect to '" + serviceUrl + "'", nbe); //NOI18N
+                LOG.debug("[NetworkError] could not connect to '" + serviceUrl + "'", nbe); // NOI18N
             }
             throw new ReconnectorException(LOOKUP_FAILED);
         } catch (MalformedURLException mue) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("'" + serviceUrl + "' is not a valid URL", mue); //NOI18N
+                LOG.debug("'" + serviceUrl + "' is not a valid URL", mue);                  // NOI18N
             }
             throw new ReconnectorException(LOOKUP_FAILED);
         } catch (RemoteException re) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("[ServerError] could not connect to '" + serviceUrl + "'", re); //NOI18N
+                LOG.debug("[ServerError] could not connect to '" + serviceUrl + "'", re);   // NOI18N
             }
             throw new ReconnectorException(LOOKUP_FAILED);
         }
