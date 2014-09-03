@@ -28,6 +28,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -132,11 +133,11 @@ public abstract class Reconnector<S extends Object> {
             connectorWorker.cancel(true);
             connectorWorker = null;
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Verbindungsvorgang abgebrochen");
+                LOG.debug("Verbindungsvorgang abgebrochen"); //NOI18N
             }
         } else {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("nichts zum Abbrechen");
+                LOG.debug("nichts zum Abbrechen"); //NOI18N
             }
         }
     }
@@ -189,7 +190,8 @@ public abstract class Reconnector<S extends Object> {
                 dialogOwner = null;
             }
 
-            reconnectorDialog = new JDialog(dialogOwner, "Verbindungsfehler", true);
+            String title = NbBundle.getMessage(Reconnector.class, "Reconnector.useDialog().reconnectorDialog.title");
+            reconnectorDialog = new JDialog(dialogOwner, title, true);
             reconnectorDialog.setResizable(true);
             reconnectorDialog.setMinimumSize(new Dimension(400, 150));
             reconnectorDialog.setContentPane(createReconnectorPanel());
@@ -293,11 +295,11 @@ public abstract class Reconnector<S extends Object> {
                     serviceFailed(ex);
                 } catch (final InvocationTargetException ex) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Exception while invocation", ex);
+                        LOG.debug("Exception while invocation", ex); //NOI18N
                     }
                     targetEx = ex.getTargetException();
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Wrapped Exception", targetEx);
+                        LOG.debug("Wrapped Exception", targetEx); //NOI18N
                     }
                     serviceFailed(getReconnectorException(targetEx));
                 }
