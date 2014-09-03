@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.reconnector;
 
+import org.openide.util.NbBundle;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 
@@ -24,8 +26,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ReconnectorPanel.class);
 
-    private static final String CONNECTION_CANCELED = java.util.ResourceBundle.getBundle("de/cismet/reconnector/Bundle")
-                .getString("connection_canceled");
+    private static final String CONNECTION_CANCELED = NbBundle.getMessage(
+            ReconnectorPanel.class,
+            "connection_canceled");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -130,8 +133,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         panProgress.add(pb, gridBagConstraints);
 
-        final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("de/cismet/reconnector/Bundle"); // NOI18N
-        btnCancel.setText(bundle.getString("cancel"));                                                              // NOI18N
+        btnCancel.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "cancel")); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -146,7 +148,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         panProgress.add(btnCancel, gridBagConstraints);
 
-        labTryingToConnect.setText(bundle.getString("trying_to_connect")); // NOI18N
+        labTryingToConnect.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "trying_to_connect")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -160,7 +162,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panError.setLayout(new java.awt.BorderLayout());
         panRetry.add(panError, java.awt.BorderLayout.CENTER);
 
-        btnExit.setText("Beenden");
+        btnExit.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "stop")); // NOI18N
         btnExit.setPreferredSize(new java.awt.Dimension(125, 29));
         btnExit.addActionListener(new java.awt.event.ActionListener() {
 
@@ -182,7 +184,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
             });
         jPanel1.add(btnIgnore);
 
-        btnRetry.setText(bundle.getString("retry")); // NOI18N
+        btnRetry.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "retry")); // NOI18N
         btnRetry.setPreferredSize(new java.awt.Dimension(125, 29));
         btnRetry.addActionListener(new java.awt.event.ActionListener() {
 
