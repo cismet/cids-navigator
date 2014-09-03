@@ -18,6 +18,7 @@ import java.rmi.ServerException;
 
 import de.cismet.reconnector.Reconnector;
 import de.cismet.reconnector.ReconnectorException;
+import org.openide.util.NbBundle;
 
 /**
  * DOCUMENT ME!
@@ -31,14 +32,10 @@ public class RmiReconnector<R extends Remote> extends Reconnector<R> {
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RmiReconnector.class);
 
-    public static final String WRONG_VERSION = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
-                .getString("wrong_version");
-    public static final String CONNECTION_LOST = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
-                .getString("connection_lost");
-    public static final String LOOKUP_FAILED = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
-                .getString("lookup_failed");
-    public static final String UNKNOWN = java.util.ResourceBundle.getBundle("de/cismet/reconnector/rmi/Bundle")
-                .getString("unknown_error");
+    public static final String WRONG_VERSION = NbBundle.getMessage(RmiReconnector.class, "wrong_version");
+    public static final String CONNECTION_LOST = NbBundle.getMessage(RmiReconnector.class, "connection_lost");
+    public static final String LOOKUP_FAILED = NbBundle.getMessage(RmiReconnector.class, "lookup_failed");
+    public static final String UNKNOWN = NbBundle.getMessage(RmiReconnector.class, "unknown_error");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -94,17 +91,17 @@ public class RmiReconnector<R extends Remote> extends Reconnector<R> {
             return (R)Naming.lookup(serviceUrl);
         } catch (NotBoundException nbe) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("[NetworkError] could not connect to '" + serviceUrl + "'", nbe);
+                LOG.debug("[NetworkError] could not connect to '" + serviceUrl + "'", nbe); //NOI18N
             }
             throw new ReconnectorException(LOOKUP_FAILED);
         } catch (MalformedURLException mue) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("'" + serviceUrl + "' is not a valid URL", mue);
+                LOG.debug("'" + serviceUrl + "' is not a valid URL", mue); //NOI18N
             }
             throw new ReconnectorException(LOOKUP_FAILED);
         } catch (RemoteException re) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("[ServerError] could not connect to '" + serviceUrl + "'", re);
+                LOG.debug("[ServerError] could not connect to '" + serviceUrl + "'", re); //NOI18N
             }
             throw new ReconnectorException(LOOKUP_FAILED);
         }
