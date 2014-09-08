@@ -40,7 +40,7 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.actions.DownloadFileAction;
+import de.cismet.cids.server.actions.BandwidthTestAction;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -79,7 +79,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     private long startTimeMs;
     private long stopTimeMs;
     private final String domain;
-    private final String fileName;
+    private final Integer fileSizeInMb;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
@@ -96,13 +96,13 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     /**
      * Creates a new BandwithTesterDialog object.
      *
-     * @param  domain    DOCUMENT ME!
-     * @param  fileName  DOCUMENT ME!
+     * @param  domain        DOCUMENT ME!
+     * @param  fileSizeInMb  DOCUMENT ME!
      */
-    public BandwithTesterDialog(final String domain, final String fileName) {
+    public BandwithTesterDialog(final String domain, final Integer fileSizeInMb) {
         super(new javax.swing.JFrame(), true);
         this.domain = domain;
-        this.fileName = fileName;
+        this.fileSizeInMb = fileSizeInMb;
         initComponents();
     }
 
@@ -135,13 +135,21 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(btnStartDownload, org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.btnStartDownload.text")); // NOI18N
-        btnStartDownload.setActionCommand(org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.btnStartDownload.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnStartDownload,
+            org.openide.util.NbBundle.getMessage(
+                BandwithTesterDialog.class,
+                "BandwithTesterDialog.btnStartDownload.text"));          // NOI18N
+        btnStartDownload.setActionCommand(org.openide.util.NbBundle.getMessage(
+                BandwithTesterDialog.class,
+                "BandwithTesterDialog.btnStartDownload.actionCommand")); // NOI18N
         btnStartDownload.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnStartDownloadActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnStartDownloadActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -149,7 +157,9 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 10);
         jPanel2.add(btnStartDownload, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jLabel1,
+            org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.jLabel1.text")); // NOI18N
         jLabel1.setMinimumSize(new java.awt.Dimension(300, 70));
         jLabel1.setPreferredSize(new java.awt.Dimension(300, 70));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -162,7 +172,9 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
         gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
         jPanel2.add(jLabel1, gridBagConstraints);
 
-        jProgressBar1.setString(org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.jProgressBar1.string")); // NOI18N
+        jProgressBar1.setString(org.openide.util.NbBundle.getMessage(
+                BandwithTesterDialog.class,
+                "BandwithTesterDialog.jProgressBar1.string")); // NOI18N
         jProgressBar1.setStringPainted(true);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -177,12 +189,16 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
 
         jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
 
-        org.openide.awt.Mnemonics.setLocalizedText(btnClose, org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.btnClose.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnClose,
+            org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.btnClose.text")); // NOI18N
         btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCloseActionPerformed(evt);
-            }
-        });
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnCloseActionPerformed(evt);
+                }
+            });
         jPanel3.add(btnClose);
 
         jPanel1.add(jPanel3, java.awt.BorderLayout.SOUTH);
@@ -194,23 +210,23 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
         getContentPane().add(jPanel1, gridBagConstraints);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartDownloadActionPerformed
+    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnStartDownloadActionPerformed
         downloadStarted();
 
         new SwingWorker<byte[], Object>() {
@@ -218,7 +234,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                 @Override
                 protected byte[] doInBackground() throws Exception {
                     startTimeMs = System.currentTimeMillis();
-                    final byte[] ret = downloadFile(domain, fileName);
+                    final byte[] ret = downloadTestFile(domain, fileSizeInMb);
                     stopTimeMs = System.currentTimeMillis();
                     return ret;
                 }
@@ -233,8 +249,12 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                         downloadAborted(ex);
                         LOG.error("error while executing swingworker", ex);
                         final ErrorInfo errorInfo = new ErrorInfo(
-                                org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.error.title"),
-                                org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.error.message")
+                                org.openide.util.NbBundle.getMessage(
+                                    BandwithTesterDialog.class,
+                                    "BandwithTesterDialog.error.title"),
+                                org.openide.util.NbBundle.getMessage(
+                                    BandwithTesterDialog.class,
+                                    "BandwithTesterDialog.error.message")
                                         + ex.getCause().getMessage(),
                                 null,
                                 null,
@@ -245,7 +265,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_btnStartDownloadActionPerformed
+    } //GEN-LAST:event_btnStartDownloadActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -253,7 +273,9 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     private void downloadStarted() {
         jProgressBar1.setIndeterminate(true);
         btnStartDownload.setEnabled(false);
-        jProgressBar1.setString(org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwidthTesterDialog.jProgressBar1.string.running"));
+        jProgressBar1.setString(org.openide.util.NbBundle.getMessage(
+                BandwithTesterDialog.class,
+                "BandwidthTesterDialog.jProgressBar1.string.running"));
     }
 
     /**
@@ -264,7 +286,9 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     private void downloadAborted(final Exception ex) {
         btnStartDownload.setEnabled(true);
         jProgressBar1.setIndeterminate(false);
-        jProgressBar1.setString(org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwidthTesterDialog.jProgressBar1.string.error") + ex.getLocalizedMessage());
+        jProgressBar1.setString(org.openide.util.NbBundle.getMessage(
+                BandwithTesterDialog.class,
+                "BandwidthTesterDialog.jProgressBar1.string.error") + ex.getLocalizedMessage());
     }
 
     /**
@@ -295,7 +319,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
 
         final String callServerURL = args[0];
         final String domain = args[1];
-        final String testFile = args[2]; // "/home/cismet/webspace/cidsDistribution/bandwithTest5MB.zip"
+        final Integer fileSize = Integer.valueOf(args[2]);
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -303,7 +327,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                 @Override
                 public void run() {
                     try {
-                        final BandwithTesterDialog dialog = new BandwithTesterDialog(domain, testFile);
+                        final BandwithTesterDialog dialog = new BandwithTesterDialog(domain, fileSize);
                         dialog.login(callServerURL, domain);
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
@@ -318,8 +342,12 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                     } catch (final Exception ex) {
                         LOG.fatal("Fehler beim Starten des Bandbreiten-Testers.", ex);
                         final ErrorInfo errorInfo = new ErrorInfo(
-                                org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.login.error.title"),
-                                org.openide.util.NbBundle.getMessage(BandwithTesterDialog.class, "BandwithTesterDialog.login.error.message"),
+                                org.openide.util.NbBundle.getMessage(
+                                    BandwithTesterDialog.class,
+                                    "BandwithTesterDialog.login.error.title"),
+                                org.openide.util.NbBundle.getMessage(
+                                    BandwithTesterDialog.class,
+                                    "BandwithTesterDialog.login.error.message"),
                                 null,
                                 null,
                                 ex,
@@ -335,20 +363,18 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     /**
      * DOCUMENT ME!
      *
-     * @param   domain    DOCUMENT ME!
-     * @param   fileName  DOCUMENT ME!
+     * @param   domain        DOCUMENT ME!
+     * @param   fileSizeInMb  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    private byte[] downloadFile(final String domain, final String fileName) throws Exception {
-        final DownloadFileAction dfa = new DownloadFileAction();
-
+    private byte[] downloadTestFile(final String domain, final int fileSizeInMb) throws Exception {
         final Object ret = SessionManager.getProxy().executeTask(
-                dfa.getTaskName(),
+                BandwidthTestAction.TASK_NAME,
                 domain,
-                fileName);
+                fileSizeInMb);
 
         if (ret instanceof Exception) {
             throw (Exception)ret;
