@@ -7,13 +7,6 @@
 ****************************************************/
 package de.cismet.cids.client.tools;
 
-/***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
@@ -45,7 +38,9 @@ import java.rmi.Remote;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -449,6 +444,20 @@ public class DevelopmentTools {
      * @throws  Exception  DOCUMENT ME!
      */
     public static void showReportForBeans(final String path, final Collection c) throws Exception {
+        showReportForBeans(path, c, Collections.EMPTY_MAP);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   path        DOCUMENT ME!
+     * @param   c           DOCUMENT ME!
+     * @param   parameters  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void showReportForBeans(final String path, final Collection c, final Map parameters)
+            throws Exception {
         System.out.print("Lade JasperReport ...");
         final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
                     path));
@@ -467,7 +476,7 @@ public class DevelopmentTools {
         }
         System.out.print("Fülle Report ...");
         // print aus report und daten erzeugen
-        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 //        JasperExportManager.exportReportToPdfFile(jasperPrint, "/Users/thorsten/xxx.pdf");
 
         System.out.print(" gefüllt.\nZeige Report an ...");
