@@ -25,8 +25,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.log4j.Logger;
 
-import org.jdesktop.swingx.MultiSplitLayout;
-
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
@@ -42,7 +40,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +57,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -123,6 +119,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private String[] methodList;
     private QuerySearchMethod[] additionalMethods;
     private String currentlyExpandedAttribute;
+    private String searchButtonName = org.openide.util.NbBundle.getMessage(
+            SearchControlPanel.class,
+            "SearchControlPanel.btnSearchCancel.text");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -371,31 +370,6 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
     /**
      * Retrieves all feature services from the model.
-     *
-     * @param   model  DOCUMENT ME!
-     *
-     * @return  all feature services from the model
-     */
-    private List<AbstractFeatureService> getFeatureServices(final ActiveLayerModel model) {
-        final List<AbstractFeatureService> list = new ArrayList<AbstractFeatureService>();
-
-        if (model != null) {
-            final TreeMap<Integer, MapService> map = model.getMapServices();
-
-            for (final Integer key : map.keySet()) {
-                final MapService service = map.get(key);
-
-                if (service instanceof AbstractFeatureService) {
-                    list.add((AbstractFeatureService)service);
-                }
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * DOCUMENT ME!
      *
      * @param   model  DOCUMENT ME!
      *
@@ -1107,25 +1081,6 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         taQuery.setText("");
     }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
 
-    private void jMethodCBItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
-    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
-        taQuery.setText("");
-    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
-
     /**
      * DOCUMENT ME!
      *
@@ -1182,6 +1137,16 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     }
 
     /**
+     * Set the name of the search button.
+     *
+     * @param  newName  the new name of the search button
+     */
+    public void setSearchButtonName(final String newName) {
+        searchButtonName = newName;
+        btnSearchCancel.setText(newName);
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param  searching  DOCUMENT ME!
@@ -1198,9 +1163,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             lblBusyIcon.setEnabled(true);
             lblBusyIcon.setBusy(true);
         } else {
-            btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
-                    SearchControlPanel.class,
-                    "SearchControlPanel.btnSearchCancel.text"));               // NOI18N
+            btnSearchCancel.setText(searchButtonName);                         // NOI18N
             btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
                     SearchControlPanel.class,
                     "SearchControlPanel.btnSearchCancel.toolTipText"));        // NOI18N
