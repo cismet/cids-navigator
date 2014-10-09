@@ -14,7 +14,6 @@ package de.cismet.cids.search;
 import Sirius.navigator.actiontag.ActionTagProtected;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.navigator.search.dynamic.SearchControlListener;
 import Sirius.navigator.search.dynamic.SearchControlPanel;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -22,17 +21,21 @@ import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.log4j.Logger;
 
 import org.openide.util.Exceptions;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,7 +43,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,7 +57,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -68,6 +73,17 @@ import de.cismet.cids.server.search.builtin.QueryEditorSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
 
+import de.cismet.cismap.commons.CrsTransformer;
+import de.cismet.cismap.commons.XBoundingBox;
+import de.cismet.cismap.commons.features.FeatureServiceFeature;
+import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
+import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
+import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
+import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
+import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
+import de.cismet.cismap.commons.rasterservice.MapService;
+
 /**
  * DOCUMENT ME!
  *
@@ -75,9 +91,7 @@ import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsWindowSearch.class)
-public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry,
-    SearchControlListener,
-    ActionTagProtected {
+public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry, ActionTagProtected {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -91,31 +105,27 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     //~ Instance fields --------------------------------------------------------
 
     ExecutorService threadPool = Executors.newCachedThreadPool();
-    private List<MemberAttributeInfo> attributes;
+    private List<? extends Object> attributes;
     private List<Object> values;
     private String selectCommand;
     private List<MetaClass> classes;
+    private List<AbstractFeatureService> services;
+    private List<Object> layers;
     private Set<String> queryableValues;
     private int count = 0;
-
-    private SearchControlPanel pnlSearchCancel;
+    private ActiveLayerModel model;
+    private ImageIcon iconSearch;
+    private ImageIcon iconCancel;
+    private String[] methodList;
+    private QuerySearchMethod[] additionalMethods;
+    private String currentlyExpandedAttribute;
+    private String searchButtonName = org.openide.util.NbBundle.getMessage(
+            SearchControlPanel.class,
+            "SearchControlPanel.btnSearchCancel.text");
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnSearchCancel;
     private javax.swing.JList jAttributesLi;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton12;
-    private javax.swing.JButton jButton13;
-    private javax.swing.JButton jButton14;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton5;
-    private javax.swing.JButton jButton6;
-    private javax.swing.JButton jButton7;
-    private javax.swing.JButton jButton8;
-    private javax.swing.JButton jButton9;
     private javax.swing.JLabel jCommandLb;
     private javax.swing.JLabel jGeheZuLb;
     private javax.swing.JButton jGetValuesBn;
@@ -124,16 +134,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private javax.swing.JComboBox jMethodCB;
     private javax.swing.JLabel jMethodLb;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanelTasten;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JList jValuesLi;
     private javax.swing.JLabel jlEinzelwerteAnzeigen;
+    private org.jdesktop.swingx.JXBusyLabel lblBusyIcon;
     private org.jdesktop.swingx.JXBusyLabel lblBusyValueIcon;
     private javax.swing.JPanel panCommand;
+    private javax.swing.Box.Filler strGap;
+    private javax.swing.JTextArea taQuery;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
@@ -141,53 +154,76 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
     /**
      * Creates new form StandaloneStart.
-     *
-     * @throws  Exception  DOCUMENT ME!
      */
-    public QuerySearch() throws Exception {
-        classes = GetClasses();
+    public QuerySearch() {
+        this(null, new String[] { "de.cismet.cids.search.SearchQuerySearchMethod" });
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model       the layer model to be use
+     * @param  methodList  only the method of this list can be used, if they can be found by the lookup. If the
+     *                     methodList == null, all methods can be used
+     */
+    public QuerySearch(final ActiveLayerModel model, final String[] methodList) {
+        this(model, methodList, null);
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model          the layer model to be use
+     * @param  methodList     only the method of this list can be used, if they can be found by the lookup. If the
+     *                        methodList == null, all methods can be used
+     * @param  choosenLayers  the available layers. If null, all layers from the model and all configured cids layer
+     *                        will be available
+     */
+    public QuerySearch(final ActiveLayerModel model,
+            final String[] methodList,
+            final AbstractFeatureService[] choosenLayers) {
+        this(model, methodList, choosenLayers, null);
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model              the layer model to be use
+     * @param  methodList         only the method of this list can be used, if they can be found by the lookup. If the
+     *                            methodList == null, all methods can be used
+     * @param  choosenLayers      the available layers. If null, all layers from the model and all configured cids layer
+     *                            will be available
+     * @param  additionalMethods  additional methods that should be used
+     */
+    public QuerySearch(final ActiveLayerModel model,
+            final String[] methodList,
+            final AbstractFeatureService[] choosenLayers,
+            final QuerySearchMethod[] additionalMethods) {
+        this.model = model;
+        this.methodList = methodList;
+        this.additionalMethods = additionalMethods;
+
+        if (choosenLayers == null) {
+            services = getFeatureServices(model);
+            classes = GetClasses();
+            layers = new ArrayList<Object>(services);
+            layers.addAll(classes);
+        } else {
+            layers = new ArrayList<Object>(Arrays.asList(choosenLayers));
+            services = new ArrayList<AbstractFeatureService>();
+            services.addAll(Arrays.asList(choosenLayers));
+            classes = new ArrayList<MetaClass>();
+        }
         initComponents();
-        jMethodCB.setVisible(false);
-        jMethodLb.setVisible(false);
+        jMethodCB.setVisible((jMethodCB.getModel().getSize() > 1));
+        jMethodLb.setVisible((jMethodCB.getModel().getSize() > 1));
         jGeheZuLb.setVisible(false);
         jTextField1.setVisible(false);
         jAttributesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jAttributesLi.addMouseListener(new MouseAdapterImpl());
         jValuesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jValuesLi.addMouseListener(new MouseAdapterImpl());
-        jButton1.addActionListener(new ActionListenerImpl());
-        jButton2.addActionListener(new ActionListenerImpl());
-        jButton3.addActionListener(new ActionListenerImpl());
-        jButton4.addActionListener(new ActionListenerImpl());
-        jButton5.addActionListener(new ActionListenerImpl());
-        jButton6.addActionListener(new ActionListenerImpl());
-        jButton7.addActionListener(new ActionListenerImpl());
-        jButton8.addActionListener(new ActionListenerImpl());
-        jButton9.addActionListener(new ActionListenerImpl());
-        jButton10.addActionListener(new ActionListenerImpl());
-        jButton11.addActionListener(new ActionListenerImpl());
-        jButton12.addActionListener(new ActionListenerImpl((short)-1) {
 
-                @Override
-                public void actionPerformed(final ActionEvent e) {
-                    if (jTextArea1.getSelectionEnd() == 0) {
-                        super.actionPerformed(e);
-                    } else {
-                        final int start = jTextArea1.getSelectionStart();
-                        final int end = jTextArea1.getSelectionEnd();
-                        jTextArea1.insert("(", start);
-                        jTextArea1.insert(")", end + 1);
-                        // jTextArea1.setCaretPosition(end + 2);
-                        if (start == end) {
-                            CorrectCarret(posCorrection);
-                        } else {
-                            CorrectCarret((short)2);
-                        }
-                    }
-                }
-            });
-        jButton13.addActionListener(new ActionListenerImpl());
-        jButton14.addActionListener(new ActionListenerImpl());
         jGetValuesBn.setEnabled(false);
         jAttributesLi.addListSelectionListener(new ListSelectionListener() {
 
@@ -197,8 +233,15 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         return;
                     }
                     if (!((attributes == null) || (jAttributesLi.getSelectedIndex() == -1))) {
-                        final MemberAttributeInfo attributeInfo = attributes.get(jAttributesLi.getSelectedIndex());
-                        if (queryableValues.contains(attributeInfo.getFieldName())) {
+                        final Object attributeObject = attributes.get(jAttributesLi.getSelectedIndex());
+
+                        if (attributeObject instanceof MemberAttributeInfo) {
+                            final MemberAttributeInfo attributeInfo = (MemberAttributeInfo)attributeObject;
+                            if (queryableValues.contains(attributeInfo.getFieldName())) {
+                                jGetValuesBn.setEnabled(true);
+                                return;
+                            }
+                        } else if (attributeObject instanceof FeatureServiceAttribute) {
                             jGetValuesBn.setEnabled(true);
                             return;
                         }
@@ -209,9 +252,10 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         if (classes.size() > 0) {
             jLayerCB.setSelectedIndex(0);
         }
-        if (GetMethods().size() > 0) {
+        if (getMethods().size() > 0) {
             jMethodCB.setSelectedIndex(0);
         }
+
         jValuesLi.setCellRenderer(new DefaultListCellRenderer() {
 
                 @Override
@@ -236,43 +280,117 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 }
             });
 
-        pnlSearchCancel = new SearchControlPanel(this);
-        final Dimension max = pnlSearchCancel.getMaximumSize();
-        final Dimension min = pnlSearchCancel.getMinimumSize();
-        final Dimension pre = pnlSearchCancel.getPreferredSize();
-        pnlSearchCancel.setMaximumSize(new java.awt.Dimension(
-                new Double(max.getWidth()).intValue(),
-                new Double(max.getHeight() + 5).intValue()));
-        pnlSearchCancel.setMinimumSize(new java.awt.Dimension(
-                new Double(min.getWidth()).intValue(),
-                new Double(min.getHeight() + 5).intValue()));
-        pnlSearchCancel.setPreferredSize(new java.awt.Dimension(
-                new Double(pre.getWidth() + 6).intValue(),
-                new Double(pre.getHeight() + 5).intValue()));
-        panCommand.add(pnlSearchCancel);
+        final URL iconSearchUrl = getClass().getResource(
+                "/Sirius/navigator/search/dynamic/SearchControlPanel_btnSearchCancel.png");
+        if (iconSearchUrl != null) {
+            this.iconSearch = new ImageIcon(iconSearchUrl);
+        } else {
+            this.iconSearch = new ImageIcon();
+        }
+
+        final URL iconCancelUrl = getClass().getResource(
+                "/Sirius/navigator/search/dynamic/SearchControlPanel_btnSearchCancel_cancel.png");
+        if (iconCancelUrl != null) {
+            this.iconCancel = new ImageIcon(iconCancelUrl);
+        } else {
+            this.iconCancel = new ImageIcon();
+        }
+
+        jLayerCBActionPerformed(null);
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
+     * fills the buttons panel with the buttons from the seleced service.
      */
-    private static List<MetaClass> GetClasses() throws Exception {
-        // DevelopmentTools.initSessionManagerFromRMIConnectionOnLocalhost(DOMAIN, GROUP, USER, PASS);
-        final MetaClass[] metaClass = SessionManager.getProxy()
-                    .getClasses(SessionManager.getSession().getUser().getDomain());
-        final List<MetaClass> metaClassesWithAttribute = new LinkedList<MetaClass>();
-        for (final MetaClass mClass : metaClass) {
-            if (!mClass.getAttributeByName("Queryable").isEmpty()) {
-                metaClassesWithAttribute.add(mClass);
+    private void fillButtonPanel() {
+        final Object layer = jLayerCB.getSelectedItem();
+        List<DefaultQueryButtonAction> queryButtons;
+        int x = 0;
+        int y = 0;
+        jPanelTasten.removeAll();
+
+        if (layer instanceof AbstractFeatureService) {
+            queryButtons = ((AbstractFeatureService)layer).getQueryButtons();
+        } else {
+            queryButtons = AbstractFeatureService.SQL_QUERY_BUTTONS;
+        }
+
+        for (final DefaultQueryButtonAction buttonAction : queryButtons) {
+            final JButton button = new JButton(buttonAction.getText());
+            button.addActionListener(buttonAction);
+            final GridBagConstraints constraint = new GridBagConstraints(
+                    x,
+                    y,
+                    buttonAction.getWidth(),
+                    1,
+                    1,
+                    0,
+                    GridBagConstraints.CENTER,
+                    GridBagConstraints.HORIZONTAL,
+                    new Insets(2, 2, 2, 2),
+                    0,
+                    0);
+            jPanelTasten.add(button, constraint);
+            buttonAction.setQueryTextArea(taQuery);
+            x += buttonAction.getWidth();
+            if (x > 5) {
+                x = 0;
+                ++y;
             }
         }
 
+        jPanelTasten.invalidate();
+        jPanelTasten.revalidate();
+        jPanelTasten.repaint();
+    }
+
+    /**
+     * Retrieves all configured cids layer classes.
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static List<MetaClass> GetClasses() {
+        final List<MetaClass> metaClassesWithAttribute = new LinkedList<MetaClass>();
+
+        try {
+            final MetaClass[] metaClass = SessionManager.getProxy()
+                        .getClasses(SessionManager.getSession().getUser().getDomain());
+            for (final MetaClass mClass : metaClass) {
+                if (!mClass.getAttributeByName("Queryable").isEmpty()) {
+                    metaClassesWithAttribute.add(mClass);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("Error while retrieving classes", e);
+        }
         return metaClassesWithAttribute;
+    }
+
+    /**
+     * Retrieves all feature services from the model.
+     *
+     * @param   model  DOCUMENT ME!
+     *
+     * @return  all feature services from the model
+     */
+    private List<AbstractFeatureService> getFeatureServices(final ActiveLayerModel model) {
+        final List<AbstractFeatureService> list = new ArrayList<AbstractFeatureService>();
+
+        if (model != null) {
+            final TreeMap<Integer, MapService> map = model.getMapServices();
+
+            for (final Integer key : map.keySet()) {
+                final MapService service = map.get(key);
+
+                if (service instanceof AbstractFeatureService) {
+                    list.add((AbstractFeatureService)service);
+                }
+            }
+        }
+
+        return list;
     }
 
     /**
@@ -343,10 +461,28 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @return  DOCUMENT ME!
      */
-    private static Vector<String> GetMethods() {
-        final Vector<String> methods = new Vector<String>();
-        // methods.add(null);
-        methods.add("In Suchergebnissen anzeigen");
+    private Vector<QuerySearchMethod> getMethods() {
+        final Collection<? extends QuerySearchMethod> searchMethods = Lookup.getDefault()
+                    .lookupAll(QuerySearchMethod.class);
+
+        final Vector<QuerySearchMethod> methods = new Vector<QuerySearchMethod>();
+        if (methodList != null) {
+            Arrays.sort(methodList);
+        }
+
+        for (final QuerySearchMethod method : searchMethods) {
+            if ((methodList == null) || (Arrays.binarySearch(methodList, method.getClass().getName()) >= 0)) {
+                method.setQuerySearch(this);
+                methods.add(method);
+            }
+        }
+
+        if (additionalMethods != null) {
+            for (final QuerySearchMethod method : additionalMethods) {
+                method.setQuerySearch(this);
+                methods.add(method);
+            }
+        }
         return methods;
     }
 
@@ -391,7 +527,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @return  DOCUMENT ME!
      */
-    public List<MemberAttributeInfo> getAttributes() {
+    public List<? extends Object> getAttributes() {
         return attributes;
     }
 
@@ -439,9 +575,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      */
     private void AppendString(String str) {
         // jTextArea1.append(str + " ");
-        if ((jTextArea1.getText() != null) && !jTextArea1.getText().isEmpty()) {
+        if ((taQuery.getText() != null) && !taQuery.getText().isEmpty()) {
             try {
-                if (!jTextArea1.getText(jTextArea1.getCaretPosition() - 1, 1).contains("(")) {
+                if (!taQuery.getText(taQuery.getCaretPosition() - 1, 1).contains("(")) {
                     str = " " + str;
                 }
             } catch (BadLocationException ex) {
@@ -449,47 +585,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 str = " " + str;
             }
         }
-        jTextArea1.insert(str, jTextArea1.getCaretPosition());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  str  DOCUMENT ME!
-     */
-    private void WriteOver(final String str) {
-        String text1 = jTextArea1.getText().substring(0, jTextArea1.getSelectionStart());
-        String text2 = jTextArea1.getText().substring(jTextArea1.getSelectionEnd());
-        if (text1.length() >= 1) {
-            switch (text1.charAt(text1.length() - 1)) {
-                case ' ':
-                case '(': {
-                    text1 = text1 + " ";
-                    break;
-                }
-            }
-        }
-        if (text2.length() >= 1) {
-            switch (text2.charAt(0)) {
-                case ' ':
-                case '(': {
-                    text2 = " " + text2;
-                    break;
-                }
-            }
-        }
-        jTextArea1.setText(text1 + str + text2);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  change  DOCUMENT ME!
-     */
-    private void CorrectCarret(final short change) {
-        if (change != 0) {
-            jTextArea1.setCaretPosition(jTextArea1.getCaretPosition() + change);
-        }
+        taQuery.insert(str, taQuery.getCaretPosition());
     }
 
     /**
@@ -511,27 +607,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         jScrollPane2 = new javax.swing.JScrollPane();
         jValuesLi = new javax.swing.JList();
         jPanelTasten = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
-        jButton5 = new javax.swing.JButton();
-        jButton6 = new javax.swing.JButton();
-        jButton7 = new javax.swing.JButton();
-        jButton8 = new javax.swing.JButton();
-        jButton9 = new javax.swing.JButton();
-        jButton10 = new javax.swing.JButton();
-        jButton11 = new javax.swing.JButton();
-        jButton12 = new javax.swing.JButton();
-        jButton13 = new javax.swing.JButton();
-        jButton14 = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        taQuery = new javax.swing.JTextArea();
         jCommandLb = new javax.swing.JLabel();
         jGetValuesBn = new javax.swing.JButton();
         jGeheZuLb = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         panCommand = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        lblBusyIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
+        strGap = new javax.swing.Box.Filler(new java.awt.Dimension(5, 0),
+                new java.awt.Dimension(5, 25),
+                new java.awt.Dimension(5, 32767));
+        btnSearchCancel = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
         lblBusyValueIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
         jlEinzelwerteAnzeigen = new javax.swing.JLabel();
@@ -546,7 +634,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         gridBagConstraints.insets = new java.awt.Insets(5, 8, 5, 5);
         add(jLayerLb, gridBagConstraints);
 
-        jLayerCB.setModel(new javax.swing.DefaultComboBoxModel(classes.toArray()));
+        jLayerCB.setModel(new javax.swing.DefaultComboBoxModel(layers.toArray()));
+        jLayerCB.addItemListener(new java.awt.event.ItemListener() {
+
+                @Override
+                public void itemStateChanged(final java.awt.event.ItemEvent evt) {
+                    jLayerCBItemStateChanged(evt);
+                }
+            });
         jLayerCB.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -571,7 +666,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         gridBagConstraints.insets = new java.awt.Insets(5, 8, 5, 5);
         add(jMethodLb, gridBagConstraints);
 
-        jMethodCB.setModel(new javax.swing.DefaultComboBoxModel(GetMethods()));
+        jMethodCB.setModel(new javax.swing.DefaultComboBoxModel(getMethods()));
+        jMethodCB.addItemListener(new java.awt.event.ItemListener() {
+
+                @Override
+                public void itemStateChanged(final java.awt.event.ItemEvent evt) {
+                    jMethodCBItemStateChanged(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
@@ -661,140 +763,6 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         add(jScrollPane2, gridBagConstraints);
 
         jPanelTasten.setLayout(new java.awt.GridBagLayout());
-
-        jButton1.setText("=");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton1, gridBagConstraints);
-
-        jButton2.setText("<>");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton2, gridBagConstraints);
-
-        jButton3.setText("Like");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton3, gridBagConstraints);
-
-        jButton4.setText(">");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton4, gridBagConstraints);
-
-        jButton5.setText(">=");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton5, gridBagConstraints);
-
-        jButton6.setText("And");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton6, gridBagConstraints);
-
-        jButton7.setText("<");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton7, gridBagConstraints);
-
-        jButton8.setText("<=");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton8, gridBagConstraints);
-
-        jButton9.setText("Or");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton9, gridBagConstraints);
-
-        jButton10.setText("_");
-        jButton10.setMargin(new java.awt.Insets(2, 4, 2, 4));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 1);
-        jPanelTasten.add(jButton10, gridBagConstraints);
-
-        jButton11.setText("%");
-        jButton11.setMargin(new java.awt.Insets(2, 2, 2, 2));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 0.5;
-        gridBagConstraints.insets = new java.awt.Insets(2, 1, 2, 2);
-        jPanelTasten.add(jButton11, gridBagConstraints);
-
-        jButton12.setText("()");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton12, gridBagConstraints);
-
-        jButton13.setText("Not");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 4;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton13, gridBagConstraints);
-
-        jButton14.setText("Is");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
-        jPanelTasten.add(jButton14, gridBagConstraints);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 3;
@@ -804,16 +772,15 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         jScrollPane3.setMinimumSize(new java.awt.Dimension(262, 87));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jTextArea1.setMinimumSize(new java.awt.Dimension(20, 22));
-        jScrollPane3.setViewportView(jTextArea1);
+        taQuery.setColumns(20);
+        taQuery.setRows(5);
+        jScrollPane3.setViewportView(taQuery);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(jScrollPane3, gridBagConstraints);
 
@@ -863,11 +830,41 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         add(jTextField1, gridBagConstraints);
 
         panCommand.setLayout(new java.awt.FlowLayout(2));
+
+        jPanel2.setMinimumSize(new java.awt.Dimension(125, 25));
+        jPanel2.setPreferredSize(new java.awt.Dimension(185, 30));
+        jPanel2.setLayout(new java.awt.FlowLayout(4, 0, 0));
+
+        lblBusyIcon.setEnabled(false);
+        jPanel2.add(lblBusyIcon);
+        jPanel2.add(strGap);
+
+        btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
+                QuerySearch.class,
+                "SearchControlPanel.btnSearchCancel.text"));        // NOI18N
+        btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
+                QuerySearch.class,
+                "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
+        btnSearchCancel.setMaximumSize(new java.awt.Dimension(100, 25));
+        btnSearchCancel.setMinimumSize(new java.awt.Dimension(100, 25));
+        btnSearchCancel.setPreferredSize(new java.awt.Dimension(100, 25));
+        btnSearchCancel.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnSearchCancelActionPerformed(evt);
+                }
+            });
+        jPanel2.add(btnSearchCancel);
+
+        panCommand.add(jPanel2);
+
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         add(panCommand, gridBagConstraints);
 
         jPanel1.setLayout(new java.awt.FlowLayout(0));
@@ -893,43 +890,59 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * @param  evt  DOCUMENT ME!
      */
     private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
-        final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
+        if (jLayerCB.getSelectedItem() instanceof MetaClass) {
+            final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
-        threadPool.submit(new Runnable() {
+            threadPool.submit(new Runnable() {
 
-                @Override
-                public void run() {
-                    final ClassAttribute[] classAttributes = metaClass.getAttribs();
-                    for (final ClassAttribute attribute : classAttributes) {
-                        if ("Queryable".equals(attribute.getName())) {
-                            queryableValues = attribute.getOptions().keySet();
-                            break;
-                        }
-                    }
-                    final List<MemberAttributeInfo> newAttributes = GetAttributesFromClass(metaClass);
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                final List<MemberAttributeInfo> old = attributes;
-                                attributes = newAttributes;
-                                if (attributes != old) {
-                                    firePropertyChange(PROP_ATTRIBUTES, old, attributes);
-                                }
-                                final String old2 = selectCommand;
-                                selectCommand = String.format(
-                                        "SELECT * FROM %s WHERE",
-                                        jLayerCB.getSelectedItem().toString());
-                                firePropertyChange(PROP_SELECT_COMMAND, old2, selectCommand);
+                    @Override
+                    public void run() {
+                        final ClassAttribute[] classAttributes = metaClass.getAttribs();
+                        for (final ClassAttribute attribute : classAttributes) {
+                            if ("Queryable".equals(attribute.getName())) {
+                                queryableValues = attribute.getOptions().keySet();
+                                break;
                             }
-                        });
-                }
-            });
+                        }
+                        final List<MemberAttributeInfo> newAttributes = GetAttributesFromClass(metaClass);
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    final List<? extends Object> old = attributes;
+                                    attributes = newAttributes;
+                                    if (attributes != old) {
+                                        firePropertyChange(PROP_ATTRIBUTES, old, attributes);
+                                    }
+                                    final String old2 = selectCommand;
+                                    selectCommand = String.format(
+                                            "SELECT * FROM %s WHERE",
+                                            jLayerCB.getSelectedItem().toString());
+                                    firePropertyChange(PROP_SELECT_COMMAND, old2, selectCommand);
+                                }
+                            });
+                    }
+                });
+        } else if (jLayerCB.getSelectedItem() instanceof AbstractFeatureService) {
+            final AbstractFeatureService afs = (AbstractFeatureService)jLayerCB.getSelectedItem();
+            final Map<String, FeatureServiceAttribute> newAttribMap = afs.getFeatureServiceAttributes();
+            final List<FeatureServiceAttribute> newAttributes = new ArrayList<FeatureServiceAttribute>(
+                    newAttribMap.values());
+
+            final List<? extends Object> old = attributes;
+            attributes = newAttributes;
+
+            if (attributes != old) {
+                firePropertyChange(PROP_ATTRIBUTES, old, attributes);
+            }
+        }
 
         jlEinzelwerteAnzeigen.setText("");
         final List<Object> old = values;
         values = new LinkedList<Object>();
         firePropertyChange(PROP_VALUES, old, values);
+
+        fillButtonPanel();
     } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
@@ -942,37 +955,150 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             return;
         }
 
-        final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
-        final MemberAttributeInfo attributeInfo = /*(MemberAttributeInfo)jAttributesLi.getSelectedValue();//*/ attributes
-                    .get(jAttributesLi.getSelectedIndex());
+        final Object attributeObject = attributes.get(jAttributesLi.getSelectedIndex());
+        currentlyExpandedAttribute = "";
 
-        threadPool.submit(new Runnable() {
+        if (attributeObject instanceof MemberAttributeInfo) {
+            final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
+            final MemberAttributeInfo attributeInfo = (MemberAttributeInfo)attributeObject;
 
-                @Override
-                public void run() {
-                    lblBusyValueIcon.setEnabled(true);
-                    lblBusyValueIcon.setBusy(true);
-                    final List<Object> newValues = GetValuesFromAttribute(metaClass, attributeInfo);
+            threadPool.submit(new Runnable() {
 
-                    SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        lblBusyValueIcon.setEnabled(true);
+                        lblBusyValueIcon.setBusy(true);
+                        final List<Object> newValues = GetValuesFromAttribute(metaClass, attributeInfo);
 
-                            @Override
-                            public void run() {
-                                final List<Object> old = values;
-                                values = newValues;
-                                lblBusyValueIcon.setEnabled(false);
-                                lblBusyValueIcon.setBusy(false);
-                                firePropertyChange(PROP_VALUES, old, values);
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    final List<Object> old = values;
+                                    values = newValues;
+                                    lblBusyValueIcon.setEnabled(false);
+                                    lblBusyValueIcon.setBusy(false);
+                                    firePropertyChange(PROP_VALUES, old, values);
+                                }
+                            });
+                    }
+                });
+
+            currentlyExpandedAttribute = attributeInfo.getName();
+        } else if (attributeObject instanceof FeatureServiceAttribute) {
+            lblBusyValueIcon.setEnabled(true);
+            lblBusyValueIcon.setBusy(true);
+            final AbstractFeatureService afs = (AbstractFeatureService)jLayerCB.getSelectedItem();
+            final FeatureServiceAttribute attributeInfo = (FeatureServiceAttribute)attributeObject;
+            jGetValuesBn.setEnabled(false);
+
+            threadPool.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        List allFeatures;
+                        try {
+                            final Geometry g = ZoomToLayerWorker.getServiceBounds(afs);
+                            XBoundingBox bounds = null;
+
+                            if (g != null) {
+                                bounds = new XBoundingBox(g);
+                                String crs;
+
+                                if (model != null) {
+                                    crs = model.getSrs().getCode();
+                                } else {
+                                    crs = CismapBroker.getInstance().getSrs().getCode();
+                                }
+
+                                final CrsTransformer trans = new CrsTransformer(crs);
+                                bounds = trans.transformBoundingBox(bounds);
                             }
-                        });
-                }
-            });
+                            allFeatures = afs.getFeatureFactory()
+                                        .createFeatures(afs.getQuery(), bounds, null, 0, 0, null);
+                        } catch (Exception e) {
+                            allFeatures = afs.getFeatureFactory().getLastCreatedFeatures();
+                        }
+
+                        final TreeSet set = new TreeSet();
+                        for (final Object tmp : allFeatures) {
+                            final FeatureServiceFeature tmpFeature = (FeatureServiceFeature)tmp;
+                            final Object attrValue = tmpFeature.getProperty(attributeInfo.getName());
+
+                            if (attrValue != null) {
+                                set.add(attrValue);
+                            }
+                        }
+
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                                @Override
+                                public void run() {
+                                    final List<Object> old = values;
+                                    values = new ArrayList<Object>(set);
+                                    lblBusyValueIcon.setEnabled(false);
+                                    lblBusyValueIcon.setBusy(false);
+                                    jGetValuesBn.setEnabled(true);
+                                    firePropertyChange(PROP_VALUES, old, values);
+                                }
+                            });
+                    }
+                });
+
+            currentlyExpandedAttribute = attributeInfo.getName();
+        }
 
         jlEinzelwerteAnzeigen.setText(NbBundle.getMessage(
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
-                attributeInfo.getName()));
+                currentlyExpandedAttribute));
     } //GEN-LAST:event_jGetValuesBnActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+        final QuerySearchMethod method = getSelectedMethod();
+        method.actionPerformed(jLayerCB.getSelectedItem(), taQuery.getText());
+    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
+    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
+        taQuery.setText("");
+    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public QuerySearchMethod getSelectedMethod() {
+        return (QuerySearchMethod)jMethodCB.getSelectedItem();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  busy  DOCUMENT ME!
+     */
+    public void setBusy(final boolean busy) {
+        lblBusyIcon.setEnabled(busy);
+        lblBusyIcon.setBusy(busy);
+    }
 
     @Override
     public JComponent getSearchWindowComponent() {
@@ -985,35 +1111,13 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         return new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
                 metaClass.getTableName(),
-                jTextArea1.getText(),
+                taQuery.getText(),
                 metaClass.getId());
     }
 
     @Override
     public ImageIcon getIcon() {
         return new ImageIcon(this.getClass().getResource("/de/cismet/cids/search/binocular.png"));
-    }
-
-    @Override
-    public MetaObjectNodeServerSearch assembleSearch() {
-        return getServerSearch();
-    }
-
-    @Override
-    public void searchStarted() {
-    }
-
-    @Override
-    public void searchDone(final int numberOfResults) {
-    }
-
-    @Override
-    public void searchCanceled() {
-    }
-
-    @Override
-    public boolean suppressEmptyResultMessage() {
-        return false;
     }
 
     @Override
@@ -1032,49 +1136,44 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         return result;
     }
 
-    //~ Inner Classes ----------------------------------------------------------
+    /**
+     * Set the name of the search button.
+     *
+     * @param  newName  the new name of the search button
+     */
+    public void setSearchButtonName(final String newName) {
+        searchButtonName = newName;
+        btnSearchCancel.setText(newName);
+    }
 
     /**
      * DOCUMENT ME!
      *
-     * @version  $Revision$, $Date$
+     * @param  searching  DOCUMENT ME!
      */
-    private class ActionListenerImpl implements ActionListener {
-
-        //~ Instance fields ----------------------------------------------------
-
-        protected short posCorrection = 0;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new ActionListenerImpl object.
-         */
-        public ActionListenerImpl() {
-        }
-
-        /**
-         * Creates a new ActionListenerImpl object.
-         *
-         * @param  posCorrection  DOCUMENT ME!
-         */
-        public ActionListenerImpl(final short posCorrection) {
-            this.posCorrection = posCorrection;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            if (jTextArea1.getSelectionEnd() == jTextArea1.getSelectionStart()) {
-                AppendString(((JButton)e.getSource()).getText());
-                CorrectCarret(posCorrection);
-            } else {
-                WriteOver(((JButton)e.getSource()).getText());
-                CorrectCarret(posCorrection);
-            }
+    public void setControlsAccordingToState(final boolean searching) {
+        if (searching) {
+            btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
+                    SearchControlPanel.class,
+                    "SearchControlPanel.btnSearchCancel_cancel.text"));        // NOI18N
+            btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
+                    SearchControlPanel.class,
+                    "SearchControlPanel.btnSearchCancel_cancel.toolTipText")); // NOI18N
+            btnSearchCancel.setIcon(iconCancel);
+            lblBusyIcon.setEnabled(true);
+            lblBusyIcon.setBusy(true);
+        } else {
+            btnSearchCancel.setText(searchButtonName);                         // NOI18N
+            btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
+                    SearchControlPanel.class,
+                    "SearchControlPanel.btnSearchCancel.toolTipText"));        // NOI18N
+            btnSearchCancel.setIcon(iconSearch);
+            lblBusyIcon.setEnabled(false);
+            lblBusyIcon.setBusy(false);
         }
     }
+
+    //~ Inner Classes ----------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -1098,7 +1197,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             if (e.getClickCount() == 2) {
                 final JList source = ((JList)e.getSource());
                 Object selectedObject = source.getSelectedValue();
-                String value = String.valueOf(selectedObject);
+                String value;
 
                 if (e.getSource() == jAttributesLi) {
                     selectedObject = attributes.get(jAttributesLi.getSelectedIndex());
@@ -1112,11 +1211,26 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         value = ((MemberAttributeInfo)selectedObject).getFieldName();
                     }
                 } else {
-                    if (e.getSource() == jValuesLi) {
-                        if (selectedObject instanceof MetaObject) {
-                            value = String.valueOf(((MetaObject)selectedObject).getID());
+                    final Object layer = jLayerCB.getSelectedItem();
+
+                    if (layer instanceof AbstractFeatureService) {
+                        if (source == jAttributesLi) {
+                            final String v = ((FeatureServiceAttribute)selectedObject).getName();
+                            value = ((AbstractFeatureService)layer).decoratePropertyName(v);
                         } else {
-                            value = "'" + (String)selectedObject + "'";
+                            value = ((AbstractFeatureService)layer).decoratePropertyValue(
+                                    currentlyExpandedAttribute,
+                                    selectedObject.toString());
+                        }
+                    } else {
+                        if (source == jAttributesLi) {
+                            value = ((FeatureServiceAttribute)selectedObject).getName();
+                        } else {
+                            if (selectedObject instanceof MetaObject) {
+                                value = String.valueOf(((MetaObject)selectedObject).getID());
+                            } else {
+                                value = "'" + selectedObject.toString() + "'";
+                            }
                         }
                     }
                 }
