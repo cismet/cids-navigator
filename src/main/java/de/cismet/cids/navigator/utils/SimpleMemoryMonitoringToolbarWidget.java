@@ -29,7 +29,26 @@ public class SimpleMemoryMonitoringToolbarWidget extends AbstractAction implemen
 
     //~ Static fields/initializers ---------------------------------------------
 
-    static final boolean visible = StaticDebuggingTools.checkHomeForFile("cismetMemoryMonitoring");
+    static boolean visible = StaticDebuggingTools.checkHomeForFile("cismetMemoryMonitoring");
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final Timer timer = new Timer(300, new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    final Runtime runtime = Runtime.getRuntime();
+
+                    final long memory = (long)(runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024;
+                    final long totmem = (long)runtime.totalMemory() / 1024 / 1024;
+                    SimpleMemoryMonitoringToolbarWidget.this.putValue(
+                        Action.NAME,
+                        StringUtils.leftPad(Long.toString(memory), 4, '0')
+                                + "MB/"
+                                + StringUtils.leftPad(Long.toString(totmem), 4, '0')
+                                + "MB");
+                }
+            });
 
     //~ Constructors -----------------------------------------------------------
 
@@ -38,25 +57,9 @@ public class SimpleMemoryMonitoringToolbarWidget extends AbstractAction implemen
      */
     public SimpleMemoryMonitoringToolbarWidget() {
         this.putValue(Action.NAME, "Memory");
+
         if (isVisible()) {
-            new Timer(300, new ActionListener() {
-
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        if (isVisible()) {
-                            final Runtime runtime = Runtime.getRuntime();
-
-                            final long memory = (long)(runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024;
-                            final long totmem = (long)runtime.totalMemory() / 1024 / 1024;
-                            SimpleMemoryMonitoringToolbarWidget.this.putValue(
-                                Action.NAME,
-                                StringUtils.leftPad(Long.toString(memory), 4, '0')
-                                        + "MB/"
-                                        + StringUtils.leftPad(Long.toString(totmem), 4, '0')
-                                        + "MB");
-                        }
-                    }
-                }).start();
+            timer.start();
         }
     }
 
@@ -78,8 +81,17 @@ public class SimpleMemoryMonitoringToolbarWidget extends AbstractAction implemen
         return "ZZZ";
     }
 
+    /**
+     * DOCUMENT ME!
+     */
+    public void startTimer() {
+        if (!timer.isRunning()) {
+            timer.start();
+        }
+    }
+
     @Override
-    public boolean isVisible() {
+    public final boolean isVisible() {
         return visible;
     }
 }
