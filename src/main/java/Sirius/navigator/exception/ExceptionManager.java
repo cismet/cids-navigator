@@ -415,7 +415,7 @@ public class ExceptionManager {
         synchronized (exceptionPane) {
             exceptionPane.init(exceptionDialog, level, message, exception);
             exceptionDialog.setTitle(name);
-            exceptionDialog.setResizable(false);
+            exceptionDialog.setResizable(true);
             exceptionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             exceptionDialog.setContentPane(exceptionPane);
             exceptionDialog.pack();
@@ -444,7 +444,7 @@ public class ExceptionManager {
         synchronized (exceptionPane) {
             exceptionPane.init(exceptionDialog, level, message, detailMessages);
             exceptionDialog.setTitle(name);
-            exceptionDialog.setResizable(false);
+            exceptionDialog.setResizable(true);
             exceptionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             exceptionDialog.setContentPane(exceptionPane);
             exceptionDialog.pack();
@@ -501,7 +501,7 @@ public class ExceptionManager {
             constraints.fill = GridBagConstraints.NONE;
             constraints.gridheight = 1;
             constraints.gridwidth = 1;
-            constraints.weightx = 0.5;
+            constraints.weightx = 0;
             constraints.weighty = 0.0;
             constraints.gridy = 0;
             constraints.gridx = 0;
@@ -515,7 +515,7 @@ public class ExceptionManager {
 
             // MESSAGE =============================================================
             constraints.fill = GridBagConstraints.BOTH;
-            constraints.weightx = 0.5;
+            constraints.weightx = 1;
             constraints.gridx++;
             messageLabel = new JLabel();
             messageLabel.setBorder(new EmptyBorder(20, 20, 20, 20));
