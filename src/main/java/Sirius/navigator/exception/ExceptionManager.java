@@ -25,7 +25,6 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 //import Sirius.navigator.NavigatorLogger;
 //import Sirius.navigator.connection.ConnectionHandler;
-
 /**
  * DOCUMENT ME!
  *
@@ -463,6 +462,11 @@ public class ExceptionManager {
      */
     private class ExceptionPane extends JPanel {
 
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final String MESSAGE_TEMPLATE =
+            "<html><table width=\"500\" border=0><tr><td>%s</td></tr></table></html>";
+
         //~ Instance fields ----------------------------------------------------
 
         private JDialog parent = null;
@@ -638,7 +642,11 @@ public class ExceptionManager {
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
-            messageLabel.setText(message);
+            if (message.startsWith("<html>")) {
+                messageLabel.setText(message);
+            } else {
+                messageLabel.setText(String.format(MESSAGE_TEMPLATE, message));
+            }
         }
 
         /**
@@ -668,7 +676,11 @@ public class ExceptionManager {
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
-            messageLabel.setText(message);
+            if (message.startsWith("<html>")) {
+                messageLabel.setText(message);
+            } else {
+                messageLabel.setText(String.format(MESSAGE_TEMPLATE, message));
+            }
         }
 
         /**
@@ -707,7 +719,11 @@ public class ExceptionManager {
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
-            messageLabel.setText(message);
+            if (message.startsWith("<html>")) {
+                messageLabel.setText(message);
+            } else {
+                messageLabel.setText(String.format(MESSAGE_TEMPLATE, message));
+            }
         }
 
         //~ Inner Classes ------------------------------------------------------
