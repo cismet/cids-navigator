@@ -8,6 +8,7 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.exception.SqlConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
@@ -35,6 +36,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 
 import java.rmi.RemoteException;
+
+import java.sql.SQLException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -468,7 +471,17 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + " :: "                                                                // NOI18N
                         + metaObject;
             LOG.error(message, e);
-            throw new ConnectionException(message, e);
+            /*
+             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
+             * visualised with a custom error dialog by the MethodManager
+             */
+            final Throwable initialCause = getTopInitialCause(e);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException(message, e);
+            }
         }
     }
 
@@ -484,7 +497,17 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + " :: "                                                           // NOI18N
                         + query;
             LOG.error(message, e);
-            throw new ConnectionException(message, e);
+            /*
+             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
+             * visualised with a custom error dialog by the MethodManager
+             */
+            final Throwable initialCause = getTopInitialCause(e);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException(message, e);
+            }
         }
     }
 
@@ -501,7 +524,17 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + " :: "                                                                // NOI18N
                         + metaObject;
             LOG.error(message, e);
-            throw new ConnectionException(message, e);
+            /*
+             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
+             * visualised with a custom error dialog by the MethodManager
+             */
+            final Throwable initialCause = getTopInitialCause(e);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException(message, e);
+            }
         }
     }
 
@@ -518,7 +551,17 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
                         + " :: "                                                                // NOI18N
                         + metaObject;
             LOG.error(message, e);
-            throw new ConnectionException(message, e);
+            /*
+             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
+             * visualised with a custom error dialog by the MethodManager
+             */
+            final Throwable initialCause = getTopInitialCause(e);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException(message, e);
+            }
         }
     }
 
@@ -914,6 +957,21 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
             final String message = "error during custom search";
             throw new ConnectionException(message, e);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   e  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Throwable getTopInitialCause(final Exception e) {
+        Throwable initialCause = e.getCause();
+        while (initialCause.getCause() != null) {
+            initialCause = initialCause.getCause();
+        }
+        return initialCause;
     }
 
     /**
