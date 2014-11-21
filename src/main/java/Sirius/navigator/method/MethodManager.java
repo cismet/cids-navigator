@@ -10,6 +10,7 @@ package Sirius.navigator.method;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
+import Sirius.navigator.exception.SqlConnectionException;
 import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.tools.CloneHelper;
 import Sirius.navigator.types.iterator.TreeNodeIterator;
@@ -23,7 +24,6 @@ import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.localserver.method.Method;
-import Sirius.server.middleware.types.DefaultMetaObject;
 import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 
 import java.beans.PropertyChangeListener;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -346,7 +347,6 @@ public class MethodManager {
     }
 
     // Tree Operationen ........................................................
-
     /**
      * destinationNode = parentNode.
      *
@@ -463,17 +463,37 @@ public class MethodManager {
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-                ExceptionManager.getManager()
-                        .showExceptionDialog(
-                            ExceptionManager.WARNING,
-                            org.openide.util.NbBundle.getMessage(
-                                MethodManager.class,
-                                "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.title"), // NOI18N
-                            org.openide.util.NbBundle.getMessage(
-                                MethodManager.class,
-                                "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.message",
-                                sourceNode), // NOI18N
-                            exp);
+                if (exp instanceof SqlConnectionException) {
+                    final ArrayList<String> messages = new ArrayList<String>();
+                    messages.add(exp.getMessage());
+                    for (final StackTraceElement elem : exp.getStackTrace()) {
+                        messages.add(elem.toString());
+                    }
+                    ExceptionManager.getManager()
+                            .showExceptionDialog(
+                                ExceptionManager.WARNING,
+                                org.openide.util.NbBundle.getMessage(
+                                    MethodManager.class,
+                                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.title"),
+                                org.openide.util.NbBundle.getMessage(
+                                    MethodManager.class,
+                                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.sql.message",
+                                    sourceNode,
+                                    exp.getMessage()),
+                                messages);
+                } else {
+                    ExceptionManager.getManager()
+                            .showExceptionDialog(
+                                ExceptionManager.WARNING,
+                                org.openide.util.NbBundle.getMessage(
+                                    MethodManager.class,
+                                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.title"), // NOI18N
+                                org.openide.util.NbBundle.getMessage(
+                                    MethodManager.class,
+                                    "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).ExceptionManager_anon.message",
+                                    sourceNode), // NOI18N
+                                exp);
+                }
             }
         }
 
@@ -724,6 +744,7 @@ public class MethodManager {
 
         return false;
     }
+
     /**
      * TreeNode Merhoden.
      *
