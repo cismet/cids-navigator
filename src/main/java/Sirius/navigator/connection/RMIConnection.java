@@ -8,6 +8,7 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.exception.SqlConnectionException;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -36,6 +37,8 @@ import org.apache.log4j.Logger;
 import java.io.File;
 
 import java.rmi.RemoteException;
+
+import java.sql.SQLException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -499,10 +502,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return ((MetaService)callserver).insertMetaObject(user, query, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not insert / update MetaObject '" + query + "'", re);
-            throw new ConnectionException("[[ServerError] could not insert / update MetaObject '" + query + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] could not insert / update MetaObject '" + query + "': "
+                            + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -513,10 +522,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return ((MetaService)callserver).insertMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not insert MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] could not insert MetaObject '" + MetaObject + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] could not insert MetaObject '" + MetaObject + "': "
+                            + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -527,10 +542,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return ((MetaService)callserver).updateMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not update MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] could not update MetaObject '" + MetaObject + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] could not update MetaObject '" + MetaObject + "': "
+                            + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -541,10 +562,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return ((MetaService)callserver).deleteMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] deleteMetaObject(): could not delete MetaObject '"
-                        + MetaObject + "': " + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            /*
+             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
+             * visualised with a custom error dialog by the MethodManager
+             */
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] deleteMetaObject(): could not delete MetaObject '"
+                            + MetaObject + "': " + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -876,6 +907,21 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                 ConnectionException.ERROR,
                 re.getCause());
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   e  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Throwable getTopInitialCause(final Exception e) {
+        Throwable initialCause = e.getCause();
+        while (initialCause.getCause() != null) {
+            initialCause = initialCause.getCause();
+        }
+        return initialCause;
     }
 
     /**

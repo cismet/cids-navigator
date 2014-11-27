@@ -25,7 +25,6 @@ import de.cismet.tools.gui.StaticSwingTools;
 
 //import Sirius.navigator.NavigatorLogger;
 //import Sirius.navigator.connection.ConnectionHandler;
-
 /**
  * DOCUMENT ME!
  *
@@ -415,7 +414,7 @@ public class ExceptionManager {
         synchronized (exceptionPane) {
             exceptionPane.init(exceptionDialog, level, message, exception);
             exceptionDialog.setTitle(name);
-            exceptionDialog.setResizable(false);
+            exceptionDialog.setResizable(true);
             exceptionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             exceptionDialog.setContentPane(exceptionPane);
             exceptionDialog.pack();
@@ -444,7 +443,7 @@ public class ExceptionManager {
         synchronized (exceptionPane) {
             exceptionPane.init(exceptionDialog, level, message, detailMessages);
             exceptionDialog.setTitle(name);
-            exceptionDialog.setResizable(false);
+            exceptionDialog.setResizable(true);
             exceptionDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
             exceptionDialog.setContentPane(exceptionPane);
             exceptionDialog.pack();
@@ -462,6 +461,11 @@ public class ExceptionManager {
      * @version  $Revision$, $Date$
      */
     private class ExceptionPane extends JPanel {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final String MESSAGE_TEMPLATE =
+            "<html><table width=\"500\" border=0><tr><td>%s</td></tr></table></html>";
 
         //~ Instance fields ----------------------------------------------------
 
@@ -501,7 +505,7 @@ public class ExceptionManager {
             constraints.fill = GridBagConstraints.NONE;
             constraints.gridheight = 1;
             constraints.gridwidth = 1;
-            constraints.weightx = 0.5;
+            constraints.weightx = 0;
             constraints.weighty = 0.0;
             constraints.gridy = 0;
             constraints.gridx = 0;
@@ -515,7 +519,7 @@ public class ExceptionManager {
 
             // MESSAGE =============================================================
             constraints.fill = GridBagConstraints.BOTH;
-            constraints.weightx = 0.5;
+            constraints.weightx = 1;
             constraints.gridx++;
             messageLabel = new JLabel();
             messageLabel.setBorder(new EmptyBorder(20, 20, 20, 20));
@@ -638,7 +642,11 @@ public class ExceptionManager {
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
-            messageLabel.setText(message);
+            if (message.startsWith("<html>")) {
+                messageLabel.setText(message);
+            } else {
+                messageLabel.setText(String.format(MESSAGE_TEMPLATE, message));
+            }
         }
 
         /**
@@ -668,7 +676,11 @@ public class ExceptionManager {
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
-            messageLabel.setText(message);
+            if (message.startsWith("<html>")) {
+                messageLabel.setText(message);
+            } else {
+                messageLabel.setText(String.format(MESSAGE_TEMPLATE, message));
+            }
         }
 
         /**
@@ -707,7 +719,11 @@ public class ExceptionManager {
 
             detailsButton.setSelected(false);
             detailsPanel.setVisible(false);
-            messageLabel.setText(message);
+            if (message.startsWith("<html>")) {
+                messageLabel.setText(message);
+            } else {
+                messageLabel.setText(String.format(MESSAGE_TEMPLATE, message));
+            }
         }
 
         //~ Inner Classes ------------------------------------------------------
