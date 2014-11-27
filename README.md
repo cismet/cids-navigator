@@ -1,4 +1,5 @@
-Java Swing Client for the cids system.
+Java Swing Client for the cids system [![Build Status](http://ci.cismet.de/buildStatus/icon?job=cids-navigator)](https://ci.cismet.de/job/cids-navigator/)
+======
 
 #cids README
 ![Figure 0](http://www.cismet.de/images/faq-images/fis_wasser1.png)
