@@ -322,6 +322,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                     @Override
                     protected SelfDisposingPanel doInBackground() throws Exception {
+                        Thread.currentThread().setName("DescriptionPane setNodesDescriptions()");
                         final MultiMap objectsByClass = new MultiMap();
                         for (final Object object : objects) {
                             if ((object != null) && !((DefaultMetaTreeNode)object).isWaitNode()
@@ -599,6 +600,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                     @Override
                     protected SelfDisposingPanel doInBackground() throws Exception {
+                        Thread.currentThread().setName("CidsSearchExecutor gotoMetaObjects()");
                         final MultiMap objectsByClass = new MultiMap();
                         for (final MetaObject object : to) {
                             if (object != null) {
@@ -847,6 +849,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected SelfDisposingPanel doInBackground() throws Exception {
+                    Thread.currentThread().setName("CidsSearchExecutor startSingleRendererWorker()");
                     final JComponent jComp;
                     final boolean isNoDescriptionRenderer = (o == null) && (node == null);
                     if (isNoDescriptionRenderer) {

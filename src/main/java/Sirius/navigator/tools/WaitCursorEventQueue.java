@@ -97,6 +97,15 @@ public final class WaitCursorEventQueue extends EventQueue {
         private Object source;
         private Component parent;
 
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new WaitCursorTimer object.
+         */
+        public WaitCursorTimer() {
+            super("WaitCursorTimer");
+        }
+
         //~ Methods ------------------------------------------------------------
 
         /**

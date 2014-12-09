@@ -678,7 +678,7 @@ public class BlurredMapObjectRenderer extends CustomMetaObjectRenderer implement
                                     }
                                 });
                         }
-                    });
+                    }, "BlurredMapObjectRenderer createBackground()");
             CismetThreadPool.execute(t);
         }
     }

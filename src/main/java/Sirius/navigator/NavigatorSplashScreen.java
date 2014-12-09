@@ -319,7 +319,7 @@ public class NavigatorSplashScreen extends JFrame {
 
         @Override
         protected void doInvoke() {
-            final Thread t = new Thread() {
+            final Thread t = new Thread("NavigatorSplashScreen doInvoke()") {
 
                     @Override
                     public void run() {

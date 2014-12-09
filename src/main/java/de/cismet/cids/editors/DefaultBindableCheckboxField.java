@@ -181,6 +181,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
                 @Override
                 protected MetaObject[] doInBackground() throws Exception {
+                    Thread.currentThread().setName("DefaultBindableCheckboxField setMetaClass()");
                     while (!setThreadRunning()) {
                         try {
                             Thread.sleep(20);
@@ -328,6 +329,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
 
                 @Override
                 protected Void doInBackground() throws Exception {
+                    Thread.currentThread().setName("DefaultBindableCheckBoxField refreshCheckboxState()");
                     while (!setThreadRunning()) {
                         try {
                             Thread.sleep(20);
