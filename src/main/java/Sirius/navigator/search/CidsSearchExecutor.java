@@ -104,6 +104,7 @@ public final class CidsSearchExecutor {
 
                 @Override
                 protected Node[] doInBackground() throws Exception {
+                    Thread.currentThread().setName("CidsSearchExecutor searchAndDisplayResultsWithDialog()");
                     EventQueue.invokeLater(new Runnable() {
 
                             @Override
@@ -212,6 +213,8 @@ public final class CidsSearchExecutor {
 
                 @Override
                 protected Node[] doInBackground() throws Exception {
+                    Thread.currentThread().setName("CidsSearchExecutor searchAndDisplayResults()");
+
                     Node[] result = null;
                     final Collection searchResult = SessionManager.getProxy()
                                 .customServerSearch(SessionManager.getSession().getUser(), search);

@@ -836,6 +836,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
          * @param  defaultTreeModel  DOCUMENT ME!
          */
         public TreeExploreThread(final DefaultMetaTreeNode selectedNode, final DefaultTreeModel defaultTreeModel) {
+            super("TreeExploreThread");
             if (LOG.isDebugEnabled()) {
                 LOG.debug("<THREAD>: TreeExploreThread"); // NOI18N
             }
@@ -920,6 +921,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
          */
         public SubTreeExploreThread(final DefaultMetaTreeNode rootNode,
                 final Iterator<DefaultMetaTreeNode> childrenNodes) {
+            super("SubTreeExploreThread");
             this.node = rootNode;
             this.childrenNodes = childrenNodes;
         }

@@ -157,6 +157,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
 
                 @Override
                 protected MetaObject[] doInBackground() throws Exception {
+                    Thread.currentThread().setName("DefaultBindableRadioButtonField setMetaClass()");
                     while (!setThreadRunning()) {
                         try {
                             Thread.sleep(50);
@@ -265,6 +266,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
 
                 @Override
                 protected Void doInBackground() throws Exception {
+                    Thread.currentThread().setName("DefaultBindableRadioButtonField refreshCheckboxState");
                     while (!setThreadRunning()) {
                         try {
                             Thread.sleep(50);

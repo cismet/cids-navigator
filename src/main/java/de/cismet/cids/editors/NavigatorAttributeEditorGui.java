@@ -558,6 +558,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
                     @Override
                     protected JComponent doInBackground() throws Exception {
+                        Thread.currentThread().setName("NavigatorAttributeEditorGui setTreeNode()");
                         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
                         editorObject = otn.getMetaObject();
                         backupObject = null;

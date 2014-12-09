@@ -544,7 +544,7 @@ public class CoolPanel extends CustomMetaObjectRenderer implements ComponentList
                                     }
                                 });
                         }
-                    });
+                    }, "CoolPanel createBackground()");
             CismetThreadPool.execute(t);
         }
     }

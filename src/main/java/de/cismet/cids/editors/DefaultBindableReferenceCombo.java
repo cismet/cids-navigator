@@ -212,6 +212,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
                     @Override
                     protected DefaultComboBoxModel doInBackground() throws Exception {
+                        Thread.currentThread().setName("DefaultBindableReferenceCombo init()");
                         return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, sortingColumn);
                     }
 

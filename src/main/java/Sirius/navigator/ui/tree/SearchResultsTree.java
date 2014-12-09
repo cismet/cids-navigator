@@ -352,7 +352,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
             runningNameLoader.interrupt();
         }
 
-        final Thread t = new Thread() {
+        final Thread t = new Thread("SearchResultsTree checkForDynamicNodes()") {
 
                 @Override
                 public void run() {
@@ -695,6 +695,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         //~ Methods ------------------------------------------------------------
         @Override
         protected ArrayList<DefaultMetaTreeNode> doInBackground() throws Exception {
+            Thread.currentThread().setName("RefreshTreeWorker");
             if (!isCancelled() && sortActive) {
                 Collections.sort(resultNodes, comparator);
             }

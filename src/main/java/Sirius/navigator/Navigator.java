@@ -1200,6 +1200,15 @@ public class Navigator extends JFrame {
 
         private static final transient Logger LOG = Logger.getLogger(Navigator.NavigatorShutdown.class);
 
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new NavigatorShutdown object.
+         */
+        public NavigatorShutdown() {
+            super("NavigatorShutdown");
+        }
+
         //~ Methods ------------------------------------------------------------
 
         /**

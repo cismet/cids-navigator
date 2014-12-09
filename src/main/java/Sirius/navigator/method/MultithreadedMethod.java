@@ -77,10 +77,8 @@ public abstract class MultithreadedMethod {
      * @param  object  DOCUMENT ME!
      */
     public final void invoke(final Object object) {
-        final Thread thread = threadVar.get();
-
         if (threadVar.get() == null) {
-            threadVar.set(new Thread(new DoInvokeThread())); // , "MultithreadedMethod"));
+            threadVar.set(new Thread(new DoInvokeThread(), "MultithreadedMethod"));
             this.init(object);
             CismetThreadPool.execute(threadVar.get());
         }
