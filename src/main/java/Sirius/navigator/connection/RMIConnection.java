@@ -34,6 +34,8 @@ import Sirius.util.image.ImageHashMap;
 
 import org.apache.log4j.Logger;
 
+import java.awt.GraphicsEnvironment;
+
 import java.io.File;
 
 import java.rmi.RemoteException;
@@ -109,7 +111,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
      */
     private Reconnector<CallServerService> createReconnector(final String callserverURL) {
         reconnector = new RmiReconnector<CallServerService>(CallServerService.class, callserverURL);
-        reconnector.useDialog(true, null);
+        reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
 

@@ -33,6 +33,8 @@ import Sirius.util.image.ImageHashMap;
 
 import org.apache.log4j.Logger;
 
+import java.awt.GraphicsEnvironment;
+
 import java.io.File;
 
 import java.rmi.RemoteException;
@@ -116,7 +118,7 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
      */
     private Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
         reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
-        reconnector.useDialog(true, null);
+        reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
 
