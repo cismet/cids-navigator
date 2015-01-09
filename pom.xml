@@ -90,7 +90,6 @@
     </dependencies>
 
     <build>
-        <finalName>cidsNavigator</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
