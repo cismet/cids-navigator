@@ -7,6 +7,7 @@
 ****************************************************/
 package de.cismet.cids.search;
 
+import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.search.CidsSearchExecutor;
 import Sirius.navigator.search.dynamic.SearchControlPanel;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -18,18 +19,21 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+import de.cismet.cids.server.search.builtin.QueryEditorCountStatement;
 
 /**
  * DOCUMENT ME!
@@ -49,6 +53,7 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
     private QuerySearch querySearch;
     private boolean searching = false;
     private SwingWorker<Node[], Void> searchThread;
+    private SwingWorker<Long, Void> searchCountThread;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -67,17 +72,52 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
             if (searchThread != null) {
                 searchThread.cancel(true);
             }
+            if (searchCountThread != null) {
+                searchCountThread.cancel(true);
+            }
             ComponentRegistry.getRegistry().getSearchResultsTree().cancelNodeLoading();
         } else {
             final MetaObjectNodeServerSearch search = querySearch.getServerSearch();
 
             ComponentRegistry.getRegistry().getSearchResultsTree().addPropertyChangeListener("browse", this);
+
             searchThread = CidsSearchExecutor.searchAndDisplayResults(
                     search,
                     this,
                     this,
                     false,
                     true);
+
+            if (querySearch.getPanginationPanel().getParent() != null) {
+                searchCountThread = new SwingWorker<Long, Void>() {
+
+                        @Override
+                        protected Long doInBackground() throws Exception {
+                            final List<Long> result = (List<Long>)SessionManager.getProxy()
+                                        .customServerSearch(
+                                                SessionManager.getSession().getUser(),
+                                                new QueryEditorCountStatement(
+                                                    SessionManager.getSession().getUser().getDomain(),
+                                                    querySearch.getMetaClass().getTableName(),
+                                                    querySearch.getWhereCause()));
+                            return result.get(0);
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                final Long count = get();
+                                if (!isCancelled()) {
+                                    querySearch.getPanginationPanel().setTotal(count);
+                                }
+                            } catch (final Exception ex) {
+                                LOG.error(ex, ex);
+                            }
+                        }
+                    };
+                searchCountThread.execute();
+            }
+
             searching = true;
             querySearch.setControlsAccordingToState(searching);
         }

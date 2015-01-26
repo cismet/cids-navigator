@@ -32,6 +32,8 @@ import org.openide.util.NbBundle;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -84,6 +86,8 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
 
+import de.cismet.tools.gui.PaginationPanel;
+
 /**
  * DOCUMENT ME!
  *
@@ -91,12 +95,15 @@ import de.cismet.cismap.commons.rasterservice.MapService;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsWindowSearch.class)
-public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry, ActionTagProtected {
+public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry,
+    ActionTagProtected,
+    ActionListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static transient Logger LOG = Logger.getLogger(QuerySearch.class);
     public static final String PROP_ATTRIBUTES = "attributes"; // NOI18N
+    public static final String PROP_METACLASS = "metaclass";
     public static final String PROP_VALUES = "values";         // NOI18N
     public static final String PROP_SELECT_COMMAND = "selectCommand";
     public static final String PROP_COUNT = "count";
@@ -122,6 +129,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private String searchButtonName = org.openide.util.NbBundle.getMessage(
             SearchControlPanel.class,
             "SearchControlPanel.btnSearchCancel.text");
+    private MetaClass metaClass;
+
+    private final boolean paginationEnabled;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -135,6 +145,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private javax.swing.JLabel jMethodLb;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanelTasten;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -145,6 +157,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private org.jdesktop.swingx.JXBusyLabel lblBusyIcon;
     private org.jdesktop.swingx.JXBusyLabel lblBusyValueIcon;
     private javax.swing.JPanel panCommand;
+    private de.cismet.tools.gui.PaginationPanel panPagination;
     private javax.swing.Box.Filler strGap;
     private javax.swing.JTextArea taQuery;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
@@ -153,36 +166,85 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates new form StandaloneStart.
+     * Creates a new QuerySearch object.
      */
     public QuerySearch() {
-        this(null, new String[] { "de.cismet.cids.search.SearchQuerySearchMethod" });
+        this(false);
     }
 
     /**
      * Creates new form StandaloneStart.
      *
-     * @param  model       the layer model to be use
-     * @param  methodList  only the method of this list can be used, if they can be found by the lookup. If the
-     *                     methodList == null, all methods can be used
+     * @param  paginationEnabled  DOCUMENT ME!
+     */
+    public QuerySearch(final boolean paginationEnabled) {
+        this(null, new String[] { "de.cismet.cids.search.SearchQuerySearchMethod" }, paginationEnabled);
+    }
+
+    /**
+     * Creates a new QuerySearch object.
+     *
+     * @param  model       DOCUMENT ME!
+     * @param  methodList  DOCUMENT ME!
      */
     public QuerySearch(final ActiveLayerModel model, final String[] methodList) {
-        this(model, methodList, null);
+        this(model, methodList, false);
     }
 
     /**
-     * Creates new form StandaloneStart.
+     * Creates a new QuerySearch object.
      *
-     * @param  model          the layer model to be use
-     * @param  methodList     only the method of this list can be used, if they can be found by the lookup. If the
-     *                        methodList == null, all methods can be used
-     * @param  choosenLayers  the available layers. If null, all layers from the model and all configured cids layer
-     *                        will be available
+     * @param  model          DOCUMENT ME!
+     * @param  methodList     DOCUMENT ME!
+     * @param  choosenLayers  DOCUMENT ME!
      */
     public QuerySearch(final ActiveLayerModel model,
             final String[] methodList,
             final AbstractFeatureService[] choosenLayers) {
-        this(model, methodList, choosenLayers, null);
+        this(model, methodList, choosenLayers, null, false);
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model              the layer model to be use
+     * @param  methodList         only the method of this list can be used, if they can be found by the lookup. If the
+     *                            methodList == null, all methods can be used
+     * @param  paginationEnabled  DOCUMENT ME!
+     */
+    public QuerySearch(final ActiveLayerModel model, final String[] methodList, final boolean paginationEnabled) {
+        this(model, methodList, null, paginationEnabled);
+    }
+
+    /**
+     * Creates a new QuerySearch object.
+     *
+     * @param  model              DOCUMENT ME!
+     * @param  methodList         DOCUMENT ME!
+     * @param  choosenLayers      DOCUMENT ME!
+     * @param  additionalMethods  DOCUMENT ME!
+     */
+    public QuerySearch(final ActiveLayerModel model,
+            final String[] methodList,
+            final AbstractFeatureService[] choosenLayers,
+            final QuerySearchMethod[] additionalMethods) {
+        this(model, methodList, choosenLayers, null, false);
+    }
+
+    /**
+     * Creates new form StandaloneStart.
+     *
+     * @param  model              the layer model to be use
+     * @param  methodList         only the method of this list can be used, if they can be found by the lookup. If the
+     *                            methodList == null, all methods can be used
+     * @param  choosenLayers      the available layers. If null, all layers from the model and all configured cids layer
+     * @param  paginationEnabled  will be available
+     */
+    public QuerySearch(final ActiveLayerModel model,
+            final String[] methodList,
+            final AbstractFeatureService[] choosenLayers,
+            final boolean paginationEnabled) {
+        this(model, methodList, choosenLayers, null, paginationEnabled);
     }
 
     /**
@@ -194,14 +256,17 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * @param  choosenLayers      the available layers. If null, all layers from the model and all configured cids layer
      *                            will be available
      * @param  additionalMethods  additional methods that should be used
+     * @param  paginationEnabled  DOCUMENT ME!
      */
     public QuerySearch(final ActiveLayerModel model,
             final String[] methodList,
             final AbstractFeatureService[] choosenLayers,
-            final QuerySearchMethod[] additionalMethods) {
+            final QuerySearchMethod[] additionalMethods,
+            final boolean paginationEnabled) {
         this.model = model;
         this.methodList = methodList;
         this.additionalMethods = additionalMethods;
+        this.paginationEnabled = paginationEnabled;
 
         if (choosenLayers == null) {
             services = getFeatureServices(model);
@@ -300,6 +365,31 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void actionPerformed(final ActionEvent e) {
+        if (e.getSource().equals(panPagination)) {
+            performSearch();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public PaginationPanel getPanginationPanel() {
+        return panPagination;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaClass getMetaClass() {
+        return metaClass;
+    }
 
     /**
      * fills the buttons panel with the buttons from the seleced service.
@@ -620,9 +710,12 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 new java.awt.Dimension(5, 25),
                 new java.awt.Dimension(5, 32767));
         btnSearchCancel = new javax.swing.JButton();
+        jPanel6 = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         lblBusyValueIcon = new org.jdesktop.swingx.JXBusyLabel(new java.awt.Dimension(20, 20));
         jlEinzelwerteAnzeigen = new javax.swing.JLabel();
+        panPagination = new de.cismet.tools.gui.PaginationPanel(this);
 
         setLayout(new java.awt.GridBagLayout());
 
@@ -829,15 +922,21 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         add(jTextField1, gridBagConstraints);
 
-        panCommand.setLayout(new java.awt.FlowLayout(2));
+        panCommand.setLayout(new java.awt.GridBagLayout());
 
         jPanel2.setMinimumSize(new java.awt.Dimension(125, 25));
-        jPanel2.setPreferredSize(new java.awt.Dimension(185, 30));
-        jPanel2.setLayout(new java.awt.FlowLayout(4, 0, 0));
+        jPanel2.setPreferredSize(new java.awt.Dimension(185, 25));
+        jPanel2.setLayout(new java.awt.GridBagLayout());
 
         lblBusyIcon.setEnabled(false);
-        jPanel2.add(lblBusyIcon);
-        jPanel2.add(strGap);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(lblBusyIcon, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(strGap, gridBagConstraints);
 
         btnSearchCancel.setText(org.openide.util.NbBundle.getMessage(
                 QuerySearch.class,
@@ -855,19 +954,39 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     btnSearchCancelActionPerformed(evt);
                 }
             });
-        jPanel2.add(btnSearchCancel);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(btnSearchCancel, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jPanel6, gridBagConstraints);
 
-        panCommand.add(jPanel2);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        panCommand.add(jPanel2, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        panCommand.add(jPanel4, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 5);
         add(panCommand, gridBagConstraints);
 
-        jPanel1.setLayout(new java.awt.FlowLayout(0));
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         lblBusyValueIcon.setEnabled(false);
         jPanel1.add(lblBusyValueIcon);
@@ -881,8 +1000,29 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         add(jPanel1, gridBagConstraints);
 
+        if (paginationEnabled) {
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 9;
+            gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
+            add(panPagination, gridBagConstraints);
+        }
+
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  metaClass  DOCUMENT ME!
+     */
+    private void setMetaClass(final MetaClass metaClass) {
+        final MetaClass old = this.metaClass;
+        this.metaClass = metaClass;
+        firePropertyChange(PROP_METACLASS, old, this.metaClass);
+    }
 
     /**
      * DOCUMENT ME!
@@ -890,8 +1030,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * @param  evt  DOCUMENT ME!
      */
     private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
+        setMetaClass(null);
         if (jLayerCB.getSelectedItem() instanceof MetaClass) {
-            final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
+            setMetaClass((MetaClass)jLayerCB.getSelectedItem());
 
             threadPool.submit(new Runnable() {
 
@@ -1060,9 +1201,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * @param  evt  DOCUMENT ME!
      */
     private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+        if (panPagination.getParent() != null) {
+            panPagination.reset();
+        }
+        performSearch();
+    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void performSearch() {
         final QuerySearchMethod method = getSelectedMethod();
         method.actionPerformed(jLayerCB.getSelectedItem(), taQuery.getText());
-    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
+    }
 
     /**
      * DOCUMENT ME!
@@ -1105,14 +1256,33 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         return this;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getWhereCause() {
+        return taQuery.getText();
+    }
+
     @Override
     public MetaObjectNodeServerSearch getServerSearch() {
         final MetaClass metaClass = (MetaClass)jLayerCB.getSelectedItem();
 
-        return new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
-                metaClass.getTableName(),
-                taQuery.getText(),
-                metaClass.getId());
+        if (panPagination.getParent() != null) {
+            return new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
+                    metaClass.getTableName(),
+                    getWhereCause(),
+                    metaClass.getId(),
+                    panPagination.getPageSize(),
+                    (panPagination.getPage() - 1)
+                            * panPagination.getPageSize());
+        } else {
+            return new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
+                    metaClass.getTableName(),
+                    taQuery.getText(),
+                    metaClass.getId());
+        }
     }
 
     @Override
@@ -1162,6 +1332,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             btnSearchCancel.setIcon(iconCancel);
             lblBusyIcon.setEnabled(true);
             lblBusyIcon.setBusy(true);
+            panPagination.setEnabled(false);
         } else {
             btnSearchCancel.setText(searchButtonName);                         // NOI18N
             btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
@@ -1170,6 +1341,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             btnSearchCancel.setIcon(iconSearch);
             lblBusyIcon.setEnabled(false);
             lblBusyIcon.setBusy(false);
+            panPagination.setEnabled(true);
         }
     }
 
