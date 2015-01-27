@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -81,10 +80,9 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
     private javax.swing.JPanel jPanel18;
     private javax.swing.JPanel jPanel19;
     private javax.swing.JPanel jPanel2;
@@ -99,6 +97,7 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JSplitPane jSplitPane2;
     private javax.swing.JTable jTable1;
     private javax.swing.JToggleButton jToggleButton1;
     private de.cismet.tools.gui.PaginationPanel paginationPanel1;
@@ -203,14 +202,20 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        jSplitPane2 = new javax.swing.JSplitPane();
         jPanel1 = new javax.swing.JPanel();
+        querySearch1 = querySearch;
         jPanel9 = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
+        jPanel8 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable1 = new javax.swing.JTable();
         jPanel7 = new javax.swing.JPanel();
+        jPanel12 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
@@ -231,22 +236,28 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         tblToDisplay = new javax.swing.JTable();
         jScrollPane3 = new javax.swing.JScrollPane();
         tblToHide = new javax.swing.JTable();
-        jPanel8 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jPanel16 = new javax.swing.JPanel();
-        jPanel17 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         paginationPanel1 = querySearch.getPanginationPanel();
         jToggleButton1 = new javax.swing.JToggleButton();
-        querySearch1 = querySearch;
 
         setTitle(org.openide.util.NbBundle.getMessage(
                 QuerySearchResultsActionDialog.class,
                 "QuerySearchResultsActionDialog.title")); // NOI18N
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
+        jSplitPane2.setBorder(null);
+
         jPanel1.setLayout(new java.awt.GridBagLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 6, 5, 0);
+        jPanel1.add(querySearch1, gridBagConstraints);
+
+        jSplitPane2.setLeftComponent(jPanel1);
 
         jPanel9.setLayout(new java.awt.GridBagLayout());
 
@@ -310,14 +321,32 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 10, 5);
         jPanel9.add(jPanel5, gridBagConstraints);
 
-        jSplitPane1.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
-        jSplitPane1.setDividerLocation(300);
+        jSplitPane1.setBorder(null);
+        jSplitPane1.setDividerLocation(320);
         jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
+        jPanel8.setLayout(new java.awt.GridBagLayout());
+
+        jTable1.setAutoCreateRowSorter(true);
+        jTable1.setModel(tableModel);
+        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jScrollPane1.setViewportView(jTable1);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel8.add(jScrollPane1, gridBagConstraints);
+
+        jSplitPane1.setBottomComponent(jPanel8);
+
         jPanel7.setLayout(new java.awt.GridBagLayout());
+
+        jPanel12.setLayout(new java.awt.GridBagLayout());
 
         jPanel4.setMaximumSize(new java.awt.Dimension(50, 2147483647));
         jPanel4.setLayout(new java.awt.GridBagLayout());
@@ -453,8 +482,7 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        jPanel7.add(jPanel4, gridBagConstraints);
+        jPanel12.add(jPanel4, gridBagConstraints);
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -588,8 +616,7 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.VERTICAL;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
-        jPanel7.add(jPanel2, gridBagConstraints);
+        jPanel12.add(jPanel2, gridBagConstraints);
 
         tblToDisplay.setModel(attrToDisplayTableModel);
         jScrollPane2.setViewportView(tblToDisplay);
@@ -600,8 +627,8 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 0);
-        jPanel7.add(jScrollPane2, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        jPanel12.add(jScrollPane2, gridBagConstraints);
 
         tblToHide.setModel(attrToHideTableModel);
         jScrollPane3.setViewportView(tblToHide);
@@ -612,45 +639,17 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 5);
-        jPanel7.add(jScrollPane3, gridBagConstraints);
-
-        jSplitPane1.setRightComponent(jPanel7);
-
-        jPanel8.setLayout(new java.awt.GridBagLayout());
-
-        jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(tableModel);
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jScrollPane1.setViewportView(jTable1);
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 5);
+        jPanel12.add(jScrollPane3, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        jPanel8.add(jScrollPane1, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel7.add(jPanel12, gridBagConstraints);
 
-        jPanel16.setLayout(new java.awt.GridBagLayout());
-
-        jPanel17.setMaximumSize(new java.awt.Dimension(150, 25));
-        jPanel17.setMinimumSize(new java.awt.Dimension(150, 25));
-        jPanel17.setPreferredSize(new java.awt.Dimension(150, 25));
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        gridBagConstraints.weightx = 1.0;
-        jPanel16.add(jPanel17, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
-        jPanel8.add(jPanel16, gridBagConstraints);
-
-        jSplitPane1.setTopComponent(jPanel8);
+        jSplitPane1.setTopComponent(jPanel7);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -660,7 +659,6 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints.ipady = 1;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
         jPanel9.add(jSplitPane1, gridBagConstraints);
 
         jPanel3.setLayout(new java.awt.GridBagLayout());
@@ -693,29 +691,16 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        gridBagConstraints.insets = new java.awt.Insets(10, 5, 0, 5);
         jPanel9.add(jPanel3, gridBagConstraints);
 
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(jPanel9, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weighty = 1.0;
-        jPanel1.add(querySearch1, gridBagConstraints);
+        jSplitPane2.setRightComponent(jPanel9);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 0, 5);
-        getContentPane().add(jPanel1, gridBagConstraints);
+        getContentPane().add(jSplitPane2, gridBagConstraints);
 
         pack();
     } // </editor-fold>//GEN-END:initComponents
@@ -797,13 +782,13 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
      */
     private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         if (jToggleButton1.isSelected()) {
-            jSplitPane1.getBottomComponent().setVisible(true);
+            jSplitPane1.getTopComponent().setVisible(true);
             jSplitPane1.setDividerLocation(dividerLocation);
             jSplitPane1.setDividerSize((Integer)UIManager.get("SplitPane.dividerSize"));
         } else {
             dividerLocation = jSplitPane1.getDividerLocation();
             jSplitPane1.setDividerSize(0);
-            jSplitPane1.getBottomComponent().setVisible(false);
+            jSplitPane1.getTopComponent().setVisible(false);
         }
     }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
