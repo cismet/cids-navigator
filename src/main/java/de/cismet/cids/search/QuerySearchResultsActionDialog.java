@@ -173,6 +173,8 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
                 }
             }
             tableModel.setMetaClass(metaClass);
+            tableModel.setCidsBeans(null);
+            paginationPanel1.setTotal(0);
             tableModel.refresh();
             for (int i = 0; i < tableModel.getColumnCount(); i++) {
                 jTable1.getColumnModel().getColumn(i).setMinWidth(50);
@@ -799,12 +801,12 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
      */
     private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
         action.setMetaClass(getMetaClass());
-        action.setBeans(((QuerySearchResultsActionDialog.MyTableModel)tableModel).getCidsBeans());
         action.setWhereCause(querySearch.getWhereCause());
-        final HashMap<MemberAttributeInfo, String> maiNames = new HashMap<MemberAttributeInfo, String>();
+        final HashMap<String, String> maiNames = new HashMap<String, String>();
         for (final MemberAttributeInfo mai : maisToDisplay.get(getMetaClass())) {
-            maiNames.put(mai, attrNames.get(mai));
+            maiNames.put(mai.getFieldName(), attrNames.get(mai));
         }
+        action.setMais((List<MemberAttributeInfo>)maisToDisplay.get(getMetaClass()));
         action.setMaiNames(maiNames);
         action.doAction();
     }                                                                            //GEN-LAST:event_jButton7ActionPerformed

@@ -13,8 +13,6 @@ import Sirius.server.middleware.types.MetaClass;
 import java.util.HashMap;
 import java.util.List;
 
-import de.cismet.cids.dynamics.CidsBean;
-
 /**
  * DOCUMENT ME!
  *
@@ -26,8 +24,8 @@ public abstract class QuerySearchResultsAction {
     //~ Instance fields --------------------------------------------------------
 
     private MetaClass metaClass;
-    private List<CidsBean> beans;
-    private HashMap<MemberAttributeInfo, String> maiNames;
+    private List<MemberAttributeInfo> mais;
+    private HashMap<String, String> maiNames;
     private String whereCause;
 
     //~ Methods ----------------------------------------------------------------
@@ -48,8 +46,26 @@ public abstract class QuerySearchResultsAction {
      *
      * @return  DOCUMENT ME!
      */
-    public HashMap<MemberAttributeInfo, String> getMaiNames() {
+    public HashMap<String, String> getMaiNames() {
         return maiNames;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<MemberAttributeInfo> getMais() {
+        return mais;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mais  DOCUMENT ME!
+     */
+    public void setMais(final List<MemberAttributeInfo> mais) {
+        this.mais = mais;
     }
 
     /**
@@ -57,7 +73,7 @@ public abstract class QuerySearchResultsAction {
      *
      * @param  maiNames  DOCUMENT ME!
      */
-    public void setMaiNames(final HashMap<MemberAttributeInfo, String> maiNames) {
+    public void setMaiNames(final HashMap<String, String> maiNames) {
         this.maiNames = maiNames;
     }
 
@@ -77,24 +93,6 @@ public abstract class QuerySearchResultsAction {
      */
     public MetaClass getMetaClass() {
         return metaClass;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  beans  DOCUMENT ME!
-     */
-    public void setBeans(final List<CidsBean> beans) {
-        this.beans = beans;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public List<CidsBean> getBeans() {
-        return beans;
     }
 
     /**
