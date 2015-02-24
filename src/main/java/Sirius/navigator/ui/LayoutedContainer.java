@@ -622,10 +622,10 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         final Vector<View> tabbedPane = this.getViewsAtPosition(constraints.getPosition());
 
         if (constraints.getContainerType().equals(MutableConstraints.FLOATINGFRAME)) {
-            tabbedPane.remove(((FloatingFrame)constraints.getContainer()).getFloatingPanel());
+            tabbedPane.remove(constraints.getView());
             this.removeFloatingFrame(constraints);
         } else {
-            tabbedPane.remove(constraints.getContainer());
+            tabbedPane.remove(constraints.getView());
         }
     }
 
