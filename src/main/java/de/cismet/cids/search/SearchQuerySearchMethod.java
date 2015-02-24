@@ -62,6 +62,15 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
         this.querySearch = querySearch;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isSearching() {
+        return searching;
+    }
+
     @Override
     public void actionPerformed(final Object layer, final String query) {
         if (LOG.isInfoEnabled()) {
