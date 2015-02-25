@@ -7,7 +7,6 @@
 ****************************************************/
 package de.cismet.cids.search;
 
-import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 
 import java.util.HashMap;
@@ -24,8 +23,8 @@ public abstract class QuerySearchResultsAction {
     //~ Instance fields --------------------------------------------------------
 
     private MetaClass metaClass;
-    private List<MemberAttributeInfo> mais;
-    private HashMap<String, String> maiNames;
+    private List<String> attributeKeys;
+    private HashMap<String, String> attributeNames;
     private String whereCause;
 
     //~ Methods ----------------------------------------------------------------
@@ -46,8 +45,8 @@ public abstract class QuerySearchResultsAction {
      *
      * @return  DOCUMENT ME!
      */
-    public HashMap<String, String> getMaiNames() {
-        return maiNames;
+    public HashMap<String, String> getAttributeNames() {
+        return attributeNames;
     }
 
     /**
@@ -55,26 +54,26 @@ public abstract class QuerySearchResultsAction {
      *
      * @return  DOCUMENT ME!
      */
-    public List<MemberAttributeInfo> getMais() {
-        return mais;
+    public List<String> getAttributeKeys() {
+        return attributeKeys;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  mais  DOCUMENT ME!
+     * @param  attributeKeys  DOCUMENT ME!
      */
-    public void setMais(final List<MemberAttributeInfo> mais) {
-        this.mais = mais;
+    public void setAttributeKeys(final List<String> attributeKeys) {
+        this.attributeKeys = attributeKeys;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  maiNames  DOCUMENT ME!
+     * @param  attributeNames  DOCUMENT ME!
      */
-    public void setMaiNames(final HashMap<String, String> maiNames) {
-        this.maiNames = maiNames;
+    public void setAttributeNames(final HashMap<String, String> attributeNames) {
+        this.attributeNames = attributeNames;
     }
 
     /**

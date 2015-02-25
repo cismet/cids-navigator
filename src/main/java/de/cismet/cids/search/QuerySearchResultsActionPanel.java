@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.EventObject;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultListCellRenderer;
@@ -65,11 +66,10 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final List<QuerySearchResultsAction> actions = new ArrayList<QuerySearchResultsAction>();
     private QuerySearchResultsAction selectedAction;
 
-    private final HashMap<MemberAttributeInfo, String> attrNames = new HashMap<MemberAttributeInfo, String>();
-    private final Multimap<MetaClass, MemberAttributeInfo> maisToDisplay = ArrayListMultimap.create();
+    private final HashMap<String, String> attributeNames = new HashMap<String, String>();
+    private final Multimap<MetaClass, String> attributesToDisplay = ArrayListMultimap.create();
 
     private final QuerySearch querySearch = new QuerySearch(true);
     private final MyAttrToHideTableModel attrToHideTableModel = new MyAttrToHideTableModel();
@@ -189,12 +189,12 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
             });
 
         final MyAttrTableCellRenderer cellRenderer = new MyAttrTableCellRenderer();
-        tblToDisplay.setDefaultRenderer(MemberAttributeInfo.class, cellRenderer);
-        tblToHide.setDefaultRenderer(MemberAttributeInfo.class, cellRenderer);
+        tblToDisplay.setDefaultRenderer(String.class, cellRenderer);
+        tblToHide.setDefaultRenderer(String.class, cellRenderer);
 
         final MyAttrTableCellEditor cellEditor = new MyAttrTableCellEditor();
-        tblToDisplay.setDefaultEditor(MemberAttributeInfo.class, cellEditor);
-        tblToHide.setDefaultEditor(MemberAttributeInfo.class, cellEditor);
+        tblToDisplay.setDefaultEditor(String.class, cellEditor);
+        tblToHide.setDefaultEditor(String.class, cellEditor);
 
         jToggleButton1ActionPerformed(null);
         metaClassChanged(getMetaClass());
@@ -238,7 +238,6 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
                 }
             });
 
-        this.actions.addAll(actions);
         jComboBox1.addItem(null);
         for (final QuerySearchResultsAction action : actions) {
             jComboBox1.addItem(action);
@@ -799,12 +798,12 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
             final QuerySearchResultsAction action = selectedAction;
             action.setMetaClass(getMetaClass());
             action.setWhereCause(querySearch.getWhereCause());
-            final HashMap<String, String> maiNames = new HashMap<String, String>();
-            for (final MemberAttributeInfo mai : maisToDisplay.get(getMetaClass())) {
-                maiNames.put(mai.getFieldName(), attrNames.get(mai));
+            final HashMap<String, String> attributeNamesToExport = new HashMap<String, String>();
+            for (final String attributeKey : (Collection<String>)attributesToDisplay.get(getMetaClass())) {
+                attributeNamesToExport.put(attributeKey, attributeNames.get(attributeKey));
             }
-            action.setMais((List<MemberAttributeInfo>)maisToDisplay.get(getMetaClass()));
-            action.setMaiNames(maiNames);
+            action.setAttributeKeys((List<String>)attributesToDisplay.get(getMetaClass()));
+            action.setAttributeNames(attributeNamesToExport);
             action.doAction();
         }
     }                                                                            //GEN-LAST:event_jButton7ActionPerformed
@@ -816,15 +815,15 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      */
     private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         int firstIndex = -1;
-        final Collection<MemberAttributeInfo> toAdd = new ArrayList<MemberAttributeInfo>();
+        final Collection<String> toAdd = new ArrayList<String>();
         for (final int selectedIndex : tblToHide.getSelectedRows()) {
             if (firstIndex < 0) {
                 firstIndex = selectedIndex;
             }
-            final MemberAttributeInfo selectedMai = attrToHideTableModel.getElementAt(selectedIndex);
-            toAdd.add(selectedMai);
+            final String selectedKey = attrToHideTableModel.getElementAt(selectedIndex);
+            toAdd.add(selectedKey);
         }
-        maisToDisplay.get(getMetaClass()).addAll(toAdd);
+        attributesToDisplay.get(getMetaClass()).addAll(toAdd);
 
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
@@ -846,16 +845,15 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      */
     private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         int firstIndex = -1;
-        final Collection<MemberAttributeInfo> toRemove = new ArrayList<MemberAttributeInfo>();
+        final Collection<String> toRemove = new ArrayList<String>();
         for (final int selectedIndex : tblToDisplay.getSelectedRows()) {
             if (firstIndex < 0) {
                 firstIndex = selectedIndex;
             }
-            final MemberAttributeInfo selectedMai = attrToDisplayTableModel.getElementAt(
-                    selectedIndex);
-            toRemove.add(selectedMai);
+            final String selectedKey = attrToDisplayTableModel.getElementAt(selectedIndex);
+            toRemove.add(selectedKey);
         }
-        maisToDisplay.get(getMetaClass()).removeAll(toRemove);
+        attributesToDisplay.get(getMetaClass()).removeAll(toRemove);
 
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
@@ -876,7 +874,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
-        maisToDisplay.get(getMetaClass()).addAll(attrToHideTableModel.getAllElements());
+        attributesToDisplay.get(getMetaClass()).addAll(attrToHideTableModel.getAllElements());
 
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
@@ -893,7 +891,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton9ActionPerformed
-        maisToDisplay.get(getMetaClass()).removeAll(attrToDisplayTableModel.getAllElements());
+        attributesToDisplay.get(getMetaClass()).removeAll(attrToDisplayTableModel.getAllElements());
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
 
@@ -1004,17 +1002,17 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      */
     private void jButton10ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton10ActionPerformed
         final int[] selectedIndices = tblToDisplay.getSelectedRows();
-        final Collection<MemberAttributeInfo> toMove = new ArrayList<MemberAttributeInfo>();
+        final Collection<String> toMove = new ArrayList<String>();
         if ((selectedIndices.length > 0)
                     && (selectedIndices[selectedIndices.length - 1] < (attrToDisplayTableModel.getSize() - 1))) {
             for (int index = selectedIndices.length - 1; index >= 0; index--) {
                 final int selectedIndex = selectedIndices[index];
-                final MemberAttributeInfo selectedMai = attrToDisplayTableModel.getElementAt(
+                final String selectedKey = attrToDisplayTableModel.getElementAt(
                         selectedIndex);
-                toMove.add(selectedMai);
+                toMove.add(selectedKey);
             }
-            maisToDisplay.get(getMetaClass()).removeAll(toMove);
-            maisToDisplay.get(getMetaClass()).addAll(toMove);
+            attributesToDisplay.get(getMetaClass()).removeAll(toMove);
+            attributesToDisplay.get(getMetaClass()).addAll(toMove);
 
             attrToDisplayTableModel.refresh();
 
@@ -1063,25 +1061,53 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
     /**
      * DOCUMENT ME!
      *
+     * @param  defaultAttributeNames  DOCUMENT ME!
+     */
+    public void addDefaultAttributeNames(final HashMap<String, String> defaultAttributeNames) {
+        attributeNames.putAll(defaultAttributeNames);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  metaClass              DOCUMENT ME!
+     * @param  defaultAttributeOrder  DOCUMENT ME!
+     */
+    public void setDefaultAttributeOrder(final MetaClass metaClass, final List<String> defaultAttributeOrder) {
+        attributesToDisplay.get(metaClass).clear();
+        for (final String attributeToDisplay : defaultAttributeOrder) {
+//            if (attributeNames.containsKey(attributeToDisplay)) {
+            attributesToDisplay.put(metaClass, attributeToDisplay);
+//            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  metaClass  DOCUMENT ME!
      */
     private void metaClassChanged(final MetaClass metaClass) {
         if (metaClass != null) {
             final HashMap map = metaClass.getMemberAttributeInfos();
-//        final List<MemberAttributeInfo> attributes = new ArrayList<MemberAttributeInfo>(map.size());
 
-            final boolean addToDisplay = maisToDisplay.get(metaClass).isEmpty();
             for (final Object o : map.entrySet()) {
                 final MemberAttributeInfo mai = (MemberAttributeInfo)((java.util.Map.Entry)o).getValue();
-//                final String field_Name = mai.getFieldName();
-                final String name = mai.getName();
-                if (attrNames.get(mai) == null) {
-                    attrNames.put(mai, name);
-                    if (addToDisplay) {
-                        maisToDisplay.put(metaClass, mai);
-                    }
+                final String key = mai.getKey().toString();
+                if (attributeNames.get(key) == null) {
+                    final String name = mai.getName();
+                    attributeNames.put(key, name);
                 }
             }
+
+            if (attributesToDisplay.get(metaClass).isEmpty()) {
+                for (final String attributeToDisplay : (Set<String>)metaClass.getMemberAttributeInfos().keySet()) {
+                    attributesToDisplay.put(metaClass, attributeToDisplay);
+                }
+            }
+
+            attributesToDisplay.get(metaClass);
+
             tableModel.setMetaClass(metaClass);
             tableModel.setCidsBeans(null);
             paginationPanel1.setTotal(0);
@@ -1153,7 +1179,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          */
         @Override
         public int getColumnCount() {
-            return getMais().size();
+            return getKeys().size();
         }
 
         /**
@@ -1165,7 +1191,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          */
         @Override
         public String getColumnName(final int column) {
-            return attrNames.get(getMai(column));
+            return attributeNames.get(getKey(column));
         }
 
         /**
@@ -1293,12 +1319,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
             if (cidsBean == null) {
                 return null;
             }
-            if ((columnIndex < 0) || (columnIndex >= getMais().size())) {
+            if ((columnIndex < 0) || (columnIndex >= getKeys().size())) {
                 return null;
             }
 
-            final MemberAttributeInfo mai = getMai(columnIndex);
-            final Object o = cidsBeans.get(rowIndex).getProperty(mai.getFieldName().toLowerCase());
+            final String key = getKey(columnIndex);
+            final MemberAttributeInfo mai = (MemberAttributeInfo)getMetaClass().getMemberAttributeInfos().get(key);
+            final String fieldName = mai.getFieldName().toLowerCase();
+            final Object o = cidsBeans.get(rowIndex).getProperty(fieldName);
             if (o != null) {
                 return o.toString();
             } else {
@@ -1311,8 +1339,8 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          *
          * @return  DOCUMENT ME!
          */
-        private List<MemberAttributeInfo> getMais() {
-            return (List<MemberAttributeInfo>)maisToDisplay.get(metaClass);
+        private List<String> getKeys() {
+            return (List<String>)attributesToDisplay.get(metaClass);
         }
 
         /**
@@ -1322,8 +1350,8 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          *
          * @return  DOCUMENT ME!
          */
-        private MemberAttributeInfo getMai(final int index) {
-            return getMais().get(index);
+        private String getKey(final int index) {
+            return getKeys().get(index);
         }
 
         /**
@@ -1345,7 +1373,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
         @Override
         public Class<?> getColumnClass(final int columnIndex) {
-            return MemberAttributeInfo.class;
+            return String.class;
         }
 
         @Override
@@ -1359,8 +1387,8 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          *
          * @return  DOCUMENT ME!
          */
-        public List<MemberAttributeInfo> getAllElements() {
-            return (List<MemberAttributeInfo>)maisToDisplay.get(getMetaClass());
+        public List<String> getAllElements() {
+            return (List<String>)attributesToDisplay.get(getMetaClass());
         }
 
         @Override
@@ -1375,18 +1403,18 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          *
          * @return  DOCUMENT ME!
          */
-        public MemberAttributeInfo getElementAt(final int index) {
+        public String getElementAt(final int index) {
             if ((index < 0) || (index > getSize())) {
                 return null;
             }
-            return maisToDisplay.get(getMetaClass()).toArray(new MemberAttributeInfo[0])[index];
+            return attributesToDisplay.get(getMetaClass()).toArray(new String[0])[index];
         }
 
         @Override
         public void setValueAt(final Object aValue, final int row, final int column) {
-            final MemberAttributeInfo mai = getElementAt(row);
+            final String key = getElementAt(row);
             final String newName = (String)aValue;
-            attrNames.put(mai, newName);
+            attributeNames.put(key, newName);
             refresh();
             tableModel.refresh();
         }
@@ -1402,7 +1430,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          * @return  DOCUMENT ME!
          */
         public int getSize() {
-            return maisToDisplay.get(getMetaClass()).size();
+            return attributesToDisplay.get(getMetaClass()).size();
         }
 
         @Override
@@ -1429,7 +1457,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
         @Override
         public Class<?> getColumnClass(final int columnIndex) {
-            return MemberAttributeInfo.class;
+            return String.class;
         }
 
         @Override
@@ -1444,13 +1472,15 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          *
          * @return  DOCUMENT ME!
          */
-        public List<MemberAttributeInfo> getAllElements() {
+        public List<String> getAllElements() {
             if (getMetaClass() == null) {
-                return new ArrayList<MemberAttributeInfo>();
+                return new ArrayList<String>();
             } else {
-                final List<MemberAttributeInfo> allElements = new ArrayList<MemberAttributeInfo>(getMetaClass()
-                                .getMemberAttributeInfos().values());
-                allElements.removeAll(maisToDisplay.get(getMetaClass()));
+                final List<String> allElements = new ArrayList<String>();
+                for (final Object o : getMetaClass().getMemberAttributeInfos().values()) {
+                    allElements.add(((MemberAttributeInfo)o).getKey().toString());
+                }
+                allElements.removeAll(attributesToDisplay.get(getMetaClass()));
                 return allElements;
             }
         }
@@ -1462,9 +1492,9 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
         @Override
         public void setValueAt(final Object aValue, final int row, final int column) {
-            final MemberAttributeInfo mai = getElementAt(row);
+            final String key = getElementAt(row);
             final String newName = (String)aValue;
-            attrNames.put(mai, newName);
+            attributeNames.put(key, newName);
             refresh();
         }
 
@@ -1475,7 +1505,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
          *
          * @return  DOCUMENT ME!
          */
-        public MemberAttributeInfo getElementAt(final int index) {
+        public String getElementAt(final int index) {
             return getAllElements().get(index);
         }
 
@@ -1530,11 +1560,17 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
                     row,
                     column);
 
-            if (value instanceof MemberAttributeInfo) {
-                final String name = attrNames.get((MemberAttributeInfo)value);
-                final String fieldName = ((MemberAttributeInfo)value).getFieldName();
-                ((JLabel)component).setText(name);
-                ((JLabel)component).setToolTipText(fieldName);
+            if (value instanceof String) {
+                try {
+                    final String name = attributeNames.get((String)value);
+                    final MemberAttributeInfo mai = (MemberAttributeInfo)getMetaClass().getMemberAttributeInfos()
+                                .get(value);
+                    final String fieldName = mai.getFieldName();
+                    ((JLabel)component).setText(name);
+                    ((JLabel)component).setToolTipText(fieldName);
+                } catch (final Exception ex) {
+                    LOG.fatal(ex, ex);
+                }
             }
 
             return component;
@@ -1560,7 +1596,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
                 final boolean isSelected,
                 final int rowIndex,
                 final int vColIndex) {
-            final String name = attrNames.get((MemberAttributeInfo)value);
+            final String name = attributeNames.get((String)value);
             ((JTextField)component).setText(name);
             return component;
         }
