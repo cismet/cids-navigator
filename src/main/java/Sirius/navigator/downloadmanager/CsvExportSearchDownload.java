@@ -10,8 +10,7 @@ package Sirius.navigator.downloadmanager;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.PrintWriter;
 
 import java.util.Collection;
 import java.util.List;
@@ -79,14 +78,7 @@ public class CsvExportSearchDownload extends AbstractDownload {
             return;
         }
 
-        final String csv = ((header != null)
-                ? (CsvExportSearchStatement.implode(
-                        header.toArray(new String[0]),
-                        CsvExportSearchStatement.CSV_SEPARATOR) + "\n") : "")
-                    + CsvExportSearchStatement.implode(csvColl.toArray(new String[0]), "\n");
-        final byte[] content = csv.getBytes();
-
-        if ((content == null) || (content.length <= 0)) {
+        if ((csvColl == null) || (csvColl.isEmpty())) {
             log.info("Downloaded content seems to be empty..");
 
             if (status == State.RUNNING) {
@@ -97,18 +89,27 @@ public class CsvExportSearchDownload extends AbstractDownload {
             return;
         }
 
-        FileOutputStream out = null;
+        PrintWriter writer = null;
         try {
-            out = new FileOutputStream(fileToSaveTo);
-            out.write(content);
-        } catch (final IOException ex) {
+            writer = new PrintWriter(fileToSaveTo);
+
+            if (header != null) {
+                final String headerCsv = CsvExportSearchStatement.implode(header.toArray(new String[0]),
+                        CsvExportSearchStatement.CSV_SEPARATOR);
+                writer.println(headerCsv);
+            }
+            for (final String csvLine : csvColl) {
+                writer.println(csvLine);
+            }
+        } catch (final Exception ex) {
             log.warn("Couldn't write downloaded content to file '" + fileToSaveTo + "'.", ex);
             error(ex);
             return;
         } finally {
-            if (out != null) {
+            if (writer != null) {
                 try {
-                    out.close();
+                    writer.flush();
+                    writer.close();
                 } catch (Exception e) {
                 }
             }
