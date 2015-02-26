@@ -50,6 +50,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ReportSwingWorker.class);
+    private static final String FILE_EXTENSION = ".pdf";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -61,6 +62,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
     private final boolean withDialog;
     private String directory;
     private HashMap parameters = new HashMap();
+    private String filename = "report";
 
     //~ Constructors -----------------------------------------------------------
 
@@ -170,16 +172,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final Frame parent,
             final String directory,
             final HashMap parameters) {
-        this.cidsBeansList = cidsBeansList;
-        this.compiledReportList = compiledReportList;
-        this.withDialog = withDialog;
-        this.directory = directory;
-        this.parameters = parameters;
-        if (withDialog) {
-            dialog = new ReportSwingWorkerDialog(parent, true);
-        } else {
-            dialog = null;
-        }
+        this(cidsBeansList, compiledReportList, withDialog, parent, directory, parameters, null);
     }
 
     /**
@@ -198,6 +191,60 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             final Frame parent,
             final String directory,
             final HashMap parameters) {
+        this(cidsBeans, compiledReport, withDialog, parent, directory, parameters, null);
+    }
+
+    /**
+     * Creates a new ReportSwingWorker object.
+     *
+     * @param  cidsBeansList       DOCUMENT ME!
+     * @param  compiledReportList  DOCUMENT ME!
+     * @param  withDialog          DOCUMENT ME!
+     * @param  parent              DOCUMENT ME!
+     * @param  directory           DOCUMENT ME!
+     * @param  parameters          DOCUMENT ME!
+     * @param  reportName          The name of the report file without extension
+     */
+    public ReportSwingWorker(final List<Collection<CidsBean>> cidsBeansList,
+            final List<String> compiledReportList,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory,
+            final HashMap parameters,
+            final String reportName) {
+        this.cidsBeansList = cidsBeansList;
+        this.compiledReportList = compiledReportList;
+        this.withDialog = withDialog;
+        this.directory = directory;
+        this.parameters = parameters;
+        if (withDialog) {
+            dialog = new ReportSwingWorkerDialog(parent, true);
+        } else {
+            dialog = null;
+        }
+        if (reportName != null) {
+            this.filename = reportName;
+        }
+    }
+
+    /**
+     * Creates a new ReportSwingWorker object.
+     *
+     * @param  cidsBeans       DOCUMENT ME!
+     * @param  compiledReport  DOCUMENT ME!
+     * @param  withDialog      DOCUMENT ME!
+     * @param  parent          DOCUMENT ME!
+     * @param  directory       DOCUMENT ME!
+     * @param  parameters      DOCUMENT ME!
+     * @param  reportName      The name of the report file without extension
+     */
+    public ReportSwingWorker(final Collection<CidsBean> cidsBeans,
+            final String compiledReport,
+            final boolean withDialog,
+            final Frame parent,
+            final String directory,
+            final HashMap parameters,
+            final String reportName) {
         this.cidsBeansList = new ArrayList<Collection<CidsBean>>();
         this.cidsBeansList.add(cidsBeans);
         this.compiledReportList = new ArrayList<String>();
@@ -209,6 +256,10 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             dialog = new ReportSwingWorkerDialog(parent, true);
         } else {
             dialog = null;
+        }
+
+        if (reportName != null) {
+            this.filename = reportName;
         }
     }
 
@@ -233,7 +284,6 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 });
         }
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-
         FileOutputStream fos = null;
         try {
             final List<InputStream> ins = new ArrayList<InputStream>();
@@ -261,11 +311,11 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             ReportHelper.concatPDFs(ins, out, true);
 
             // zusammengefügten pdfStream in Datei schreiben
-            File file = new File(directory, "report.pdf");
+            File file = new File(directory, filename + FILE_EXTENSION);
             int index = 0;
 
             while (file.exists()) {
-                file = new File(directory, "report" + (++index) + ".pdf");
+                file = new File(directory, filename + (++index) + FILE_EXTENSION);
             }
 
             file.getParentFile().mkdirs();
@@ -273,7 +323,10 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
             fos.write(out.toByteArray());
 
             // Datei über Browser öffnen
-            BrowserLauncher.openURL(file.toURI().toURL().toString());
+
+            if (withDialog) {
+                BrowserLauncher.openURL(file.toURI().toURL().toString());
+            }
             return true;
         } catch (IOException ex) {
             LOG.error("Export to PDF-Stream failed.", ex);
@@ -312,7 +365,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
         if (withDialog) {
             dialog.setVisible(false);
         }
-        if (error) {
+        if (error && withDialog) {
             JOptionPane.showMessageDialog(
                 dialog.getParent(),
                 "Beim Generieren des Reports ist ein Fehler aufgetreten.",
