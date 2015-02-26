@@ -120,4 +120,13 @@ public class QuerySearchResultsActionDialog extends javax.swing.JDialog {
     public void setSearchResults(final List<CidsBean> results) {
         querySearchResultsActionPanel1.setSearchResults(results);
     }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public QuerySearchResultsActionPanel getQuerySearchResultsActionPanel() {
+        return querySearchResultsActionPanel1;
+    }
 }
