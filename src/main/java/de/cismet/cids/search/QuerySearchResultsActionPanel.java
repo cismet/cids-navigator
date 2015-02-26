@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.Action;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -75,6 +76,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
     private final MyAttrToHideTableModel attrToHideTableModel = new MyAttrToHideTableModel();
     private final MyAttrToDisplayTableModel attrToDisplayTableModel = new MyAttrToDisplayTableModel();
     private final MyTableModel tableModel = new MyTableModel();
+    private final Action closeAction;
 
     private int dividerLocation = 0;
 
@@ -125,6 +127,16 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      * Creates a new QuerySearchResultsActionPanel object.
      */
     public QuerySearchResultsActionPanel() {
+        this((Action)null);
+    }
+
+    /**
+     * Creates a new QuerySearchResultsActionPanel object.
+     *
+     * @param  closeAction  DOCUMENT ME!
+     */
+    public QuerySearchResultsActionPanel(final Action closeAction) {
+        this.closeAction = closeAction;
         initComponents();
     }
 
@@ -134,15 +146,38 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      * @param  action  DOCUMENT ME!
      */
     public QuerySearchResultsActionPanel(final QuerySearchResultsAction action) {
-        this(Arrays.asList(action));
+        this(action, (Action)null);
+    }
+
+    /**
+     * Creates a new QuerySearchResultsActionPanel object.
+     *
+     * @param  actions  DOCUMENT ME!
+     */
+    public QuerySearchResultsActionPanel(final List<QuerySearchResultsAction> actions) {
+        this(actions, (Action)null);
+    }
+
+    /**
+     * Creates a new QuerySearchResultsActionPanel object.
+     *
+     * @param  action       DOCUMENT ME!
+     * @param  closeAction  DOCUMENT ME!
+     */
+    public QuerySearchResultsActionPanel(final QuerySearchResultsAction action, final Action closeAction) {
+        this(Arrays.asList(action), closeAction);
     }
 
     /**
      * Creates new form QuerySearchResultsActionPanel.
      *
-     * @param  actions  DOCUMENT ME!
+     * @param  actions      DOCUMENT ME!
+     * @param  closeAction  DOCUMENT ME!
      */
-    public QuerySearchResultsActionPanel(final List<QuerySearchResultsAction> actions) {
+    public QuerySearchResultsActionPanel(final List<QuerySearchResultsAction> actions,
+            final Action closeAction) {
+        this.closeAction = closeAction;
+
         initComponents();
 
         final SearchResultsTree searchResultsTree = ComponentRegistry.getRegistry().getSearchResultsTree();
@@ -327,28 +362,24 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
         gridBagConstraints.weightx = 1.0;
         jPanel5.add(jPanel6, gridBagConstraints);
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jButton1,
-            org.openide.util.NbBundle.getMessage(
-                QuerySearchResultsActionPanel.class,
-                "QuerySearchResultsActionPanel.jButton1.text")); // NOI18N
-        jButton1.setMaximumSize(new java.awt.Dimension(126, 25));
-        jButton1.setMinimumSize(new java.awt.Dimension(126, 25));
-        jButton1.setPreferredSize(new java.awt.Dimension(126, 25));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
-        jPanel5.add(jButton1, gridBagConstraints);
+        if (closeAction != null) {
+            jButton1.setAction(closeAction);
+            org.openide.awt.Mnemonics.setLocalizedText(
+                jButton1,
+                org.openide.util.NbBundle.getMessage(
+                    QuerySearchResultsActionPanel.class,
+                    "QuerySearchResultsActionPanel.jButton1.text")); // NOI18N
+            jButton1.setMaximumSize(new java.awt.Dimension(126, 25));
+            jButton1.setMinimumSize(new java.awt.Dimension(126, 25));
+            jButton1.setPreferredSize(new java.awt.Dimension(126, 25));
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 3;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+            gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
+            jPanel5.add(jButton1, gridBagConstraints);
+        }
 
         org.openide.awt.Mnemonics.setLocalizedText(
             jButton7,
@@ -778,15 +809,6 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
     public QuerySearch getQuerySearch() {
         return querySearch;
     }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        setVisible(false);
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
