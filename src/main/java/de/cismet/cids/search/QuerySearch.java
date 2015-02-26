@@ -314,6 +314,31 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     jGetValuesBn.setEnabled(false);
                 }
             });
+
+        jAttributesLi.setCellRenderer(new DefaultListCellRenderer() {
+
+                @Override
+                public Component getListCellRendererComponent(final JList<?> list,
+                        final Object value,
+                        final int index,
+                        final boolean isSelected,
+                        final boolean cellHasFocus) {
+                    final Component component = super.getListCellRendererComponent(
+                            list,
+                            value,
+                            index,
+                            isSelected,
+                            cellHasFocus); // To change body of generated methods, choose Tools | Templates.
+                    final Object attributeObject = attributes.get(index);
+
+                    if (attributeObject instanceof MemberAttributeInfo) {
+                        final MemberAttributeInfo mai = (MemberAttributeInfo)attributeObject;
+                        ((JLabel)component).setText(mai.getFieldName());
+                        ((JLabel)component).setToolTipText(mai.getName());
+                    }
+                    return component;
+                }
+            });
         if (classes.size() > 0) {
             jLayerCB.setSelectedIndex(0);
         }
@@ -799,8 +824,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                         this,
                         eLProperty,
-                        jAttributesLi,
-                        "");
+                        jAttributesLi);
         jListBinding.setDetailBinding(org.jdesktop.beansbinding.ELProperty.create("${name}"));
         jListBinding.setSourceNullValue(null);
         jListBinding.setSourceUnreadableValue(null);
