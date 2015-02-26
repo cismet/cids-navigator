@@ -515,11 +515,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @return  DOCUMENT ME!
      */
-    private static List<MemberAttributeInfo> GetAttributesFromClass(final MetaClass metaClass) {
+    public static List<MemberAttributeInfo> getAttributesFromClass(final MetaClass metaClass) {
         final HashMap map = metaClass.getMemberAttributeInfos();
         final List<MemberAttributeInfo> attributes = new ArrayList<MemberAttributeInfo>(map.size());
         for (final Object o : map.entrySet()) {
-            attributes.add((MemberAttributeInfo)((java.util.Map.Entry)o).getValue());
+            final MemberAttributeInfo mai = (MemberAttributeInfo)((java.util.Map.Entry)o).getValue();
+            if (!mai.isExtensionAttribute()) {
+                attributes.add(mai);
+            }
         }
         return attributes;
     }
@@ -1069,7 +1072,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                                 break;
                             }
                         }
-                        final List<MemberAttributeInfo> newAttributes = GetAttributesFromClass(metaClass);
+                        final List<MemberAttributeInfo> newAttributes = getAttributesFromClass(metaClass);
                         SwingUtilities.invokeLater(new Runnable() {
 
                                 @Override

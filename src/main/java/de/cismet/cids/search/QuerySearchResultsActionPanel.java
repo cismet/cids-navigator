@@ -828,7 +828,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
+    private void jButton7ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton7ActionPerformed
         if (selectedAction != null) {
             final QuerySearchResultsAction action = selectedAction;
             action.setMetaClass(getMetaClass());
@@ -841,14 +841,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
             action.setAttributeNames(attributeNamesToExport);
             action.doAction();
         }
-    }//GEN-LAST:event_jButton7ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton7ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
         int firstIndex = -1;
         final Collection<String> toAdd = new ArrayList<String>();
         for (final int selectedIndex : tblToHide.getSelectedRows()) {
@@ -871,14 +871,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
         tblToHide.clearSelection();
 
         tableModel.refresh();
-    }//GEN-LAST:event_jButton4ActionPerformed
+    } //GEN-LAST:event_jButton4ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+    private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         int firstIndex = -1;
         final Collection<String> toRemove = new ArrayList<String>();
         for (final int selectedIndex : tblToDisplay.getSelectedRows()) {
@@ -901,14 +901,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
         }
 
         tableModel.refresh();
-    }//GEN-LAST:event_jButton5ActionPerformed
+    } //GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+    private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
         attributesToDisplay.get(getMetaClass()).addAll(attrToHideTableModel.getAllElements());
 
         attrToHideTableModel.refresh();
@@ -918,14 +918,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
         tblToDisplay.clearSelection();
 
         tableModel.refresh();
-    }//GEN-LAST:event_jButton6ActionPerformed
+    } //GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+    private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton9ActionPerformed
         attributesToDisplay.get(getMetaClass()).removeAll(attrToDisplayTableModel.getAllElements());
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
@@ -934,14 +934,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
         tblToDisplay.clearSelection();
 
         tableModel.refresh();
-    }//GEN-LAST:event_jButton9ActionPerformed
+    } //GEN-LAST:event_jButton9ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         final int[] selectedIndices = tblToDisplay.getSelectedRows();
         if ((selectedIndices.length > 0) && (selectedIndices[0] > 0)) {
             final int[] newSelectedIndices = new int[selectedIndices.length];
@@ -965,14 +965,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
             tableModel.refresh();
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    } //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         final int[] selectedIndices = tblToDisplay.getSelectedRows();
         final int[] newSelectedIndices = new int[selectedIndices.length];
         if ((selectedIndices.length > 0)
@@ -997,14 +997,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
             tableModel.refresh();
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    } //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    private void jButton8ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton8ActionPerformed
         final int[] selectedIndices = tblToDisplay.getSelectedRows();
         if ((selectedIndices.length > 0) && (selectedIndices[0] > 0)) {
             final int[] newSelectedIndices = new int[selectedIndices.length];
@@ -1028,14 +1028,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
             tableModel.refresh();
         }
-    }//GEN-LAST:event_jButton8ActionPerformed
+    } //GEN-LAST:event_jButton8ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton10ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
+    private void jButton10ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton10ActionPerformed
         final int[] selectedIndices = tblToDisplay.getSelectedRows();
         final Collection<String> toMove = new ArrayList<String>();
         if ((selectedIndices.length > 0)
@@ -1061,14 +1061,14 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
             tableModel.refresh();
         }
-    }//GEN-LAST:event_jButton10ActionPerformed
+    } //GEN-LAST:event_jButton10ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         if (jToggleButton1.isSelected()) {
             jSplitPane1.getTopComponent().setVisible(true);
             jSplitPane1.setDividerLocation(dividerLocation);
@@ -1078,20 +1078,20 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
             jSplitPane1.setDividerSize(0);
             jSplitPane1.getTopComponent().setVisible(false);
         }
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jComboBox1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+    private void jComboBox1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jComboBox1ActionPerformed
         if (jComboBox1.getSelectedItem() != null) {
             selectedAction = (QuerySearchResultsAction)jComboBox1.getSelectedItem();
             jButton7.setText(selectedAction.getName());
             jComboBox1.setSelectedItem(null);
         }
-    }//GEN-LAST:event_jComboBox1ActionPerformed
+    }                                                                              //GEN-LAST:event_jComboBox1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1124,20 +1124,16 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      */
     private void metaClassChanged(final MetaClass metaClass) {
         if (metaClass != null) {
-            final HashMap map = metaClass.getMemberAttributeInfos();
-
-            for (final Object o : map.entrySet()) {
-                final MemberAttributeInfo mai = (MemberAttributeInfo)((java.util.Map.Entry)o).getValue();
+            final List<MemberAttributeInfo> mais = QuerySearch.getAttributesFromClass(metaClass);
+            final boolean toDisplayIsEmpty = attributesToDisplay.get(metaClass).isEmpty();
+            for (final MemberAttributeInfo mai : mais) {
                 final String key = mai.getKey().toString();
                 if (attributeNames.get(key) == null) {
                     final String name = mai.getName();
                     attributeNames.put(key, name);
                 }
-            }
-
-            if (attributesToDisplay.get(metaClass).isEmpty()) {
-                for (final String attributeToDisplay : (Set<String>)metaClass.getMemberAttributeInfos().keySet()) {
-                    attributesToDisplay.put(metaClass, attributeToDisplay);
+                if (toDisplayIsEmpty) {
+                    attributesToDisplay.put(metaClass, key);
                 }
             }
 
@@ -1516,8 +1512,8 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
                 return new ArrayList<String>();
             } else {
                 final List<String> allElements = new ArrayList<String>();
-                for (final Object o : getMetaClass().getMemberAttributeInfos().values()) {
-                    allElements.add(((MemberAttributeInfo)o).getKey().toString());
+                for (final MemberAttributeInfo mais : QuerySearch.getAttributesFromClass(getMetaClass())) {
+                    allElements.add(mais.getKey().toString());
                 }
                 allElements.removeAll(attributesToDisplay.get(getMetaClass()));
                 return allElements;
