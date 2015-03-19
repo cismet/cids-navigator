@@ -219,16 +219,17 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * Creates a new QuerySearch object.
      *
-     * @param  model              DOCUMENT ME!
-     * @param  methodList         DOCUMENT ME!
-     * @param  choosenLayers      DOCUMENT ME!
-     * @param  additionalMethods  DOCUMENT ME!
+     * @param  model              the layer model to be use
+     * @param  methodList         only the method of this list can be used, if they can be found by the lookup. If the
+     *                            methodList == null, all methods can be used
+     * @param  choosenLayers      if choosenLayers is not null, only the layers from this list will be used
+     * @param  additionalMethods  additional methods, which can also be used
      */
     public QuerySearch(final ActiveLayerModel model,
             final String[] methodList,
             final AbstractFeatureService[] choosenLayers,
             final QuerySearchMethod[] additionalMethods) {
-        this(model, methodList, choosenLayers, null, false);
+        this(model, methodList, choosenLayers, additionalMethods, false);
     }
 
     /**
@@ -699,7 +700,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     str = " " + str;
                 }
             } catch (BadLocationException ex) {
-                LOG.fatal("Fatal", ex);
+                LOG.error("Error while appending string", ex);
                 str = " " + str;
             }
         }
@@ -1096,6 +1097,17 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             final Map<String, FeatureServiceAttribute> newAttribMap = afs.getFeatureServiceAttributes();
             final List<FeatureServiceAttribute> newAttributes = new ArrayList<FeatureServiceAttribute>(
                     newAttribMap.values());
+
+            if (afs.getCalculatedAttributes() != null) {
+                for (final String attrName : afs.getCalculatedAttributes()) {
+                    for (int i = 0; i < newAttributes.size(); ++i) {
+                        if (newAttributes.get(i).getName().equals(attrName)) {
+                            newAttributes.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
 
             final List<? extends Object> old = attributes;
             attributes = newAttributes;
