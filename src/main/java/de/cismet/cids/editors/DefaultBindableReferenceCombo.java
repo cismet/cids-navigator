@@ -262,9 +262,12 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     }
 
     @Override
-    public void setSelectedItem(final Object anObject) {
+    public void setSelectedItem(Object anObject) {
         if (isFakeModel()) {
             setModel(new DefaultComboBoxModel(new Object[] { anObject }));
+        }
+        if (!(anObject instanceof CidsBean)) {
+            anObject = null;
         }
         super.setSelectedItem(anObject);
         cidsBean = (CidsBean)anObject;
