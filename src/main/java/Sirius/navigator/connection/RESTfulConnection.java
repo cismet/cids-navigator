@@ -37,6 +37,8 @@ import java.awt.GraphicsEnvironment;
 
 import java.io.File;
 
+import java.lang.invoke.MethodHandles;
+
 import java.rmi.RemoteException;
 
 import java.sql.SQLException;
@@ -63,7 +65,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public final class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
+public class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -72,10 +74,11 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
 
     //~ Instance fields --------------------------------------------------------
 
+    protected Reconnector<CallServerService> reconnector;
+
     private final transient boolean isLWMOEnabled;
 
     private transient CallServerService connector;
-    private Reconnector<CallServerService> reconnector;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -116,7 +119,7 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
      *
      * @return  DOCUMENT ME!
      */
-    private Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
+    protected Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
         reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
