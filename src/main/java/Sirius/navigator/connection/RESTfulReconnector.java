@@ -38,7 +38,7 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
+    protected static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(MethodHandles.lookup().lookupClass());
 
     //~ Instance fields --------------------------------------------------------
 

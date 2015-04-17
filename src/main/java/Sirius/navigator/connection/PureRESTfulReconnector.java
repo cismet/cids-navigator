@@ -12,7 +12,7 @@ import org.openide.util.Lookup;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
-import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
+import de.cismet.cids.server.ws.rest.RESTfulInterfaceConnector;
 
 import de.cismet.netutil.Proxy;
 
@@ -50,10 +50,13 @@ public class PureRESTfulReconnector<R extends CallServerService> extends RESTful
      */
     @Override
     protected R connectService() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("connection to cids pure REST service '" + callserverURL + "'");
+        }
+        
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 
-        // TODO: replace by RESTfulInterfaceConnector!
-        return (R)new RESTfulSerialInterfaceConnector(callserverURL, proxy, sslConfig);
+        return (R)new RESTfulInterfaceConnector(callserverURL, proxy, sslConfig);
     }
 }

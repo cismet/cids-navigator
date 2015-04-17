@@ -50,7 +50,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
      */
     @Override
     protected Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
-        reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
+        reconnector = new PureRESTfulReconnector(CallServerService.class, callserverURL, proxy);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
