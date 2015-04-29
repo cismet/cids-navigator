@@ -47,6 +47,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,6 +57,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -241,6 +243,8 @@ public final class MutablePopupMenu extends JPopupMenu {
             Boolean classNode = null;
 
             final Collection<MetaObject> ctxMetaObjects = new ArrayList<MetaObject>(selectedNodes.length);
+            final Collection<DefaultMetaTreeNode> ctxNodes = new ArrayList<DefaultMetaTreeNode>(Arrays.asList(
+                        selectedNodes));
             for (final DefaultMetaTreeNode tmp : selectedNodes) {
                 final Node node = tmp.getNode();
                 availability = availability | MethodManager.PURE_NODE;
@@ -352,17 +356,26 @@ public final class MutablePopupMenu extends JPopupMenu {
             MutablePopupMenu.this.pluginMenues.setAvailability(MethodManager.getManager().getMethodAvailability());
 
             // add CidsBeanActions dynamically (mscholl)
-            if (!ctxMetaObjects.isEmpty()) {
+            if (!ctxMetaObjects.isEmpty() || !ctxNodes.isEmpty()) {
                 final Collection<CidsBeanAction> additionalActions = new ArrayList<CidsBeanAction>(0);
                 final Runnable extensionRunner = new Runnable() {
 
                         @Override
                         public void run() {
-                            final Collection<? extends CidsBeanAction> extensions = CExtManager.getInstance()
-                                        .getExtensions(
-                                            CidsBeanAction.class,
-                                            new CExtContext(CExtContext.CTX_REFERENCE, ctxMetaObjects));
-                            additionalActions.addAll(extensions);
+                            if (!ctxMetaObjects.isEmpty()) {
+                                final Collection<? extends CidsBeanAction> extensions = CExtManager.getInstance()
+                                            .getExtensions(
+                                                CidsBeanAction.class,
+                                                new CExtContext(CExtContext.CTX_REFERENCE, ctxMetaObjects));
+                                additionalActions.addAll(extensions);
+                            }
+                            if (!ctxNodes.isEmpty()) {
+                                final Collection<? extends CidsBeanAction> extensionsForNodes = CExtManager.getInstance()
+                                            .getExtensions(
+                                                CidsBeanAction.class,
+                                                new CExtContext(CExtContext.CTX_REFERENCE, ctxNodes));
+                                additionalActions.addAll(extensionsForNodes);
+                            }
                         }
                     };
 
@@ -375,7 +388,7 @@ public final class MutablePopupMenu extends JPopupMenu {
                         lookupItems.add(separator);
                         MutablePopupMenu.this.add(separator);
 
-                        for (final CidsBeanAction action : additionalActions) {
+                        for (final Action action : additionalActions) {
                             final JMenuItem item = new JMenuItem(action);
                             lookupItems.add(item);
                             MutablePopupMenu.this.add(item);
