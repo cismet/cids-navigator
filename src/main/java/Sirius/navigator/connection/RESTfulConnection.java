@@ -78,7 +78,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
 
     private final transient boolean isLWMOEnabled;
 
-    private transient CallServerService connector;
+    protected transient CallServerService connector;
 
     //~ Constructors -----------------------------------------------------------
 
