@@ -10,10 +10,13 @@
 package Sirius.navigator.connection;
 
 import static Sirius.navigator.connection.RESTfulConnection.LOG;
+import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.util.image.ImageHashMap;
+import de.cismet.cids.client.tools.DevelopmentTools;
 import java.awt.GraphicsEnvironment;
 
 import de.cismet.cids.server.CallServerService;
@@ -29,6 +32,7 @@ import java.rmi.RemoteException;
 import java.util.Vector;
 import javax.swing.Icon;
 import javax.ws.rs.core.UriBuilder;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 /**
@@ -263,6 +267,26 @@ public class PureRESTfulConnection extends RESTfulConnection {
             return this.legacyConnector.hasConfigAttr(user, key);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not check config attr for user: " + user, e); // NOI18N
+        }
+    }
+    
+    
+    public static void main(String args[]) {
+        try {
+            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost("SWITCHON",
+                    "Administratoren", "admin", "cismet");
+            
+            final ConnectionProxy connectionProxy = SessionManager.getProxy();
+            final MetaClass[] metaClasses = connectionProxy.getClasses();
+            for(final MetaClass metaClass:metaClasses) {
+                System.out.println(metaClass.getKey());
+            }
+            
+            
+        } catch (Throwable ex) {
+            System.out.println(ex.getMessage());
+            LOG.fatal(ex.getMessage(), ex);
+            System.exit(1);
         }
     }
 }
