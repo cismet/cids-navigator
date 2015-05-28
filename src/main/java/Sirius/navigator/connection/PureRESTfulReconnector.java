@@ -53,7 +53,7 @@ public class PureRESTfulReconnector<R extends CallServerService> extends RESTful
         if (LOG.isDebugEnabled()) {
             LOG.debug("connection to cids pure REST service '" + callserverURL + "'");
         }
-        
+
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 

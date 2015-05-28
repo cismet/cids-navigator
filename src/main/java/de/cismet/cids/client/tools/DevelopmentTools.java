@@ -1,12 +1,10 @@
-/**
- * *************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- * 
-* ... and it just works.
- * 
-***************************************************
- */
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.cids.client.tools;
 
 import Sirius.navigator.connection.Connection;
@@ -68,21 +66,22 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 /**
  * DOCUMENT ME!
  *
- * @author thorsten
- * @version $Revision$, $Date$
+ * @author   thorsten
+ * @version  $Revision$, $Date$
  */
 public class DevelopmentTools {
 
     //~ Methods ----------------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void initSessionManagerFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -98,12 +97,12 @@ public class DevelopmentTools {
         final User u;
 
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
-        r = (Remote) Naming.lookup("rmi://localhost/callServer");
+        r = (Remote)Naming.lookup("rmi://localhost/callServer");
         System.out.println("server gefunden");
-        ss = (SearchService) r;
-        cat = (CatalogueService) r;
-        meta = (MetaService) r;
-        us = (UserService) r;
+        ss = (SearchService)r;
+        cat = (CatalogueService)r;
+        meta = (MetaService)r;
+        us = (UserService)r;
         u = us.getUser(domain, group, domain, user, pass);
         System.out.println("user angemeldet");
         ConnectionSession session = null;
@@ -117,16 +116,16 @@ public class DevelopmentTools {
         info.setUsergroupDomain(domain);
 
         final Connection connection = ConnectionFactory.getFactory()
-                .createConnection(
+                    .createConnection(
                         "Sirius.navigator.connection.RMIConnection",
                         info.getCallserverURL());
 
         session = ConnectionFactory.getFactory().createSession(connection,
                 info, true);
         proxy = ConnectionFactory.getFactory()
-                .createProxy(
-                        "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
-                        session);
+                    .createProxy(
+                            "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                            session);
         System.out.println("sessionmanager initialisieren");
         SessionManager.init(proxy);
 
@@ -136,12 +135,12 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void initSessionManagerFromRestfulConnectionOnLocalhost(final String domain,
             final String group,
@@ -166,25 +165,27 @@ public class DevelopmentTools {
         info.setUsergroupDomain(domain);
 
         final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
-                .createConnection(
+                    .createConnection(
                         "Sirius.navigator.connection.RESTfulConnection",
                         info.getCallserverURL(),
                         Proxy.fromPreferences());
         final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
         final ConnectionProxy conProxy = ConnectionFactory.getFactory()
-                .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
         SessionManager.init(conProxy);
 
         ClassCacheMultiple.setInstance(domain);
     }
 
     /**
-     * 
-     * @param domain
-     * @param group
-     * @param user
-     * @param pass
-     * @throws Exception 
+     * DOCUMENT ME!
+     *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void initSessionManagerFromPureRestfulConnectionOnLocalhost(final String domain,
             final String group,
@@ -209,13 +210,13 @@ public class DevelopmentTools {
         info.setUsergroupDomain(domain);
 
         final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
-                .createConnection(
+                    .createConnection(
                         "Sirius.navigator.connection.PureRESTfulConnection",
                         info.getCallserverURL(),
                         Proxy.fromPreferences());
         final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
         final ConnectionProxy conProxy = ConnectionFactory.getFactory()
-                .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
         SessionManager.init(conProxy);
 
         ClassCacheMultiple.setInstance(domain);
@@ -224,16 +225,16 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param objectId DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean createCidsBeanFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -249,7 +250,7 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject mo = SessionManager.getConnection()
-                .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -258,16 +259,16 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param objectId DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean createCidsBeanFromRestfulConnectionOnLocalhost(final String domain,
             final String group,
@@ -283,22 +284,25 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject mo = SessionManager.getConnection()
-                .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
     }
-    
+
     /**
-     * 
-     * @param domain
-     * @param group
-     * @param user
-     * @param pass
-     * @param table
-     * @param objectId
-     * @return
-     * @throws Exception 
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean createCidsBeanFromPureRestfulConnectionOnLocalhost(final String domain,
             final String group,
@@ -314,7 +318,7 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject mo = SessionManager.getConnection()
-                .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -323,15 +327,15 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   table   DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean[] createCidsBeansFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -344,16 +348,16 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param limit DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   table   DOCUMENT ME!
+     * @param   limit   DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean[] createCidsBeansFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -367,17 +371,17 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param condition DOCUMENT ME!
-     * @param limit DOCUMENT ME!
+     * @param   domain     DOCUMENT ME!
+     * @param   group      DOCUMENT ME!
+     * @param   user       DOCUMENT ME!
+     * @param   pass       DOCUMENT ME!
+     * @param   table      DOCUMENT ME!
+     * @param   condition  DOCUMENT ME!
+     * @param   limit      DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static CidsBean[] createCidsBeansFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -401,19 +405,19 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final String query = "SELECT "
-                + mc.getID()
-                + ", "
-                + mc.getPrimaryKey()
-                + " FROM "
-                + mc.getTableName()
-                + " "
-                + whereS
-                + " order by "
-                + mc.getPrimaryKey()
-                + " "
-                + limitS;
+                    + mc.getID()
+                    + ", "
+                    + mc.getPrimaryKey()
+                    + " FROM "
+                    + mc.getTableName()
+                    + " "
+                    + whereS
+                    + " order by "
+                    + mc.getPrimaryKey()
+                    + " "
+                    + limitS;
         final MetaObject[] metaObjects = SessionManager.getConnection()
-                .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
+                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
         for (int i = 0; i < metaObjects.length; i++) {
             final MetaObject metaObject = metaObjects[i];
@@ -425,15 +429,15 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param search DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   search  DOCUMENT ME!
      *
-     * @return DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static ArrayList<ArrayList> executeServerSearch(final String domain,
             final String group,
@@ -444,22 +448,22 @@ public class DevelopmentTools {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
         }
         final Collection res = SessionManager.getConnection()
-                .customServerSearch(SessionManager.getSession().getUser(), search);
+                    .customServerSearch(SessionManager.getSession().getUser(), search);
 
-        return (ArrayList<ArrayList>) res;
+        return (ArrayList<ArrayList>)res;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param path DOCUMENT ME!
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
+     * @param   path    DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   table   DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     @Deprecated
     public static void showReportForCidsBeans(final String path,
@@ -469,15 +473,15 @@ public class DevelopmentTools {
             final String pass,
             final String table) throws Exception {
         System.out.print("Lade JasperReport ...");
-        final JasperReport jasperReport = (JasperReport) JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
-                path));
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
+                    path));
         System.out.println(" geladen.\nErstelle Datenquelle ...");
         final JRRewindableDataSource dataSource = new CidsBeanDataSource(createCidsBeansFromRMIConnectionOnLocalhost(
-                domain,
-                group,
-                user,
-                pass,
-                table));
+                    domain,
+                    group,
+                    user,
+                    pass,
+                    table));
         boolean hasEntries = false;
         try {
             hasEntries = dataSource.next();
@@ -500,23 +504,23 @@ public class DevelopmentTools {
         aFrame.setSize(screenSize.width / 2, screenSize.height / 2);
         final java.awt.Insets insets = aFrame.getInsets();
         aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
-                aFrame.getHeight()
-                + insets.top
-                + insets.bottom
-                + 20);
+            aFrame.getHeight()
+                    + insets.top
+                    + insets.bottom
+                    + 20);
         aFrame.setLocation((screenSize.width - aFrame.getWidth()) / 2,
-                (screenSize.height - aFrame.getHeight())
-                / 2);
+            (screenSize.height - aFrame.getHeight())
+                    / 2);
         aFrame.setVisible(true);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param path DOCUMENT ME!
-     * @param c DOCUMENT ME!
+     * @param   path  DOCUMENT ME!
+     * @param   c     DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void showReportForBeans(final String path, final Collection c) throws Exception {
         showReportForBeans(path, c, Collections.EMPTY_MAP);
@@ -525,17 +529,17 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param path DOCUMENT ME!
-     * @param c DOCUMENT ME!
-     * @param parameters DOCUMENT ME!
+     * @param   path        DOCUMENT ME!
+     * @param   c           DOCUMENT ME!
+     * @param   parameters  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void showReportForBeans(final String path, final Collection c, final Map parameters)
             throws Exception {
         System.out.print("Lade JasperReport ...");
-        final JasperReport jasperReport = (JasperReport) JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
-                path));
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
+                    path));
         System.out.println(" geladen.\nErstelle Datenquelle ...");
         final JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(c);
 
@@ -562,30 +566,30 @@ public class DevelopmentTools {
         aFrame.setSize(700, 970);
         final java.awt.Insets insets = aFrame.getInsets();
         aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
-                aFrame.getHeight()
-                + insets.top
-                + insets.bottom
-                + 20);
+            aFrame.getHeight()
+                    + insets.top
+                    + insets.bottom
+                    + 20);
         aFrame.setLocation((screenSize.width - aFrame.getWidth()) / 2,
-                (screenSize.height - aFrame.getHeight())
-                / 2);
+            (screenSize.height - aFrame.getHeight())
+                    / 2);
         aFrame.setVisible(true);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param path DOCUMENT ME!
-     * @param cidsBeans DOCUMENT ME!
+     * @param   path       DOCUMENT ME!
+     * @param   cidsBeans  DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     @Deprecated
     public static void showReportForCidsBeans(final String path,
             final CidsBean[] cidsBeans) throws Exception {
         System.out.print("Lade JasperReport ...");
-        final JasperReport jasperReport = (JasperReport) JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
-                path));
+        final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
+                    path));
         System.out.println(" geladen.\nErstelle Datenquelle ...");
         final JRRewindableDataSource dataSource = new CidsBeanDataSource(cidsBeans);
         boolean hasEntries = false;
@@ -612,22 +616,22 @@ public class DevelopmentTools {
         aFrame.setSize(700, 970);
         final java.awt.Insets insets = aFrame.getInsets();
         aFrame.setSize(aFrame.getWidth() + insets.left + insets.right,
-                aFrame.getHeight()
-                + insets.top
-                + insets.bottom
-                + 20);
+            aFrame.getHeight()
+                    + insets.top
+                    + insets.bottom
+                    + 20);
         aFrame.setLocation((screenSize.width - aFrame.getWidth()) / 2,
-                (screenSize.height - aFrame.getHeight())
-                / 2);
+            (screenSize.height - aFrame.getHeight())
+                    / 2);
         aFrame.setVisible(true);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param c DOCUMENT ME!
-     * @param w DOCUMENT ME!
-     * @param h DOCUMENT ME!
+     * @param  c  DOCUMENT ME!
+     * @param  w  DOCUMENT ME!
+     * @param  h  DOCUMENT ME!
      */
     public static void showTestFrame(final JComponent c, final int w, final int h) {
         final JFrame jf = new JFrame("Test");
@@ -635,34 +639,34 @@ public class DevelopmentTools {
         jf.getContentPane().setLayout(new BorderLayout());
         jf.getContentPane().add(c, BorderLayout.CENTER);
         jf.setSize(
-                w,
-                h);
+            w,
+            h);
         jf.setVisible(
-                true);
+            true);
         final java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
 
         jf.setBounds(
-                (screenSize.width - w)
-                / 2,
-                (screenSize.height - h)
-                / 2,
-                w,
-                h);
+            (screenSize.width - w)
+                    / 2,
+            (screenSize.height - h)
+                    / 2,
+            w,
+            h);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param objectId DOCUMENT ME!
-     * @param w DOCUMENT ME!
-     * @param h DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     * @param   w         DOCUMENT ME!
+     * @param   h         DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void createEditorInFrameFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -686,17 +690,17 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param objectId DOCUMENT ME!
-     * @param title DOCUMENT ME!
-     * @param w DOCUMENT ME!
-     * @param h DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     * @param   title     DOCUMENT ME!
+     * @param   w         DOCUMENT ME!
+     * @param   h         DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void createRendererInFrameFromRMIConnectionOnLocalhost(final String domain,
             final String group,
@@ -721,12 +725,12 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param beans DOCUMENT ME!
-     * @param title DOCUMENT ME!
-     * @param w DOCUMENT ME!
-     * @param h DOCUMENT ME!
+     * @param   beans  DOCUMENT ME!
+     * @param   title  DOCUMENT ME!
+     * @param   w      DOCUMENT ME!
+     * @param   h      DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void createAggregationRendererInFrameFromRMIConnectionOnLocalhost(final Collection<CidsBean> beans,
             final String title,
@@ -750,16 +754,16 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param domain DOCUMENT ME!
-     * @param group DOCUMENT ME!
-     * @param user DOCUMENT ME!
-     * @param pass DOCUMENT ME!
-     * @param table DOCUMENT ME!
-     * @param objectId DOCUMENT ME!
-     * @param w DOCUMENT ME!
-     * @param h DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     * @param   w         DOCUMENT ME!
+     * @param   h         DOCUMENT ME!
      *
-     * @throws Exception DOCUMENT ME!
+     * @throws  Exception  DOCUMENT ME!
      */
     public static void createEditorInFrameFromRMIConnectionOnLocalhostInScrollPane(final String domain,
             final String group,
