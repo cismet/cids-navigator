@@ -12,9 +12,11 @@ import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
+import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassNode;
 import Sirius.server.middleware.types.MetaNode;
+import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
@@ -319,7 +321,43 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // for(final MetaClass metaClass:metaClasses) {
 // System.out.println(metaClass.getKey() + ":" + metaClass.getTableName());
 // }
-            // TEST & COMPARE NODES CLASS --------------------------------------------
+
+            DevelopmentTools.initSessionManagerFromRestfulConnectionOnLocalhost(
+                "SWITCHON",
+                "Administratoren",
+                "admin",
+                "cismet");
+
+            // SessionManager.getProxy().getSearchOptions();
+            // SessionManager.getProxy().getClassTreeNodes();
+            // MethodMap methods = SessionManager.getProxy().getMethods(SessionManager.getSession().getUser());
+            final MetaObject metaObjectBinary = SessionManager.getProxy().getMetaObject(76, 4, "SWITCHON");
+
+            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
+                "SWITCHON",
+                "Administratoren",
+                "admin",
+                "cismet");
+
+            final MetaObject metaObjectRest = SessionManager.getProxy().getMetaObject(76, 4, "SWITCHON");
+
+            System.exit(0);
+
+            // TEST & COMPARE NODES  --------------------------------------------
+
+            final String nodeQuery = "SELECT -1 AS id,\n"
+                        + "       taggroup.name,\n"
+                        + "       cs_class.id AS class_id,\n"
+                        + "       NULL AS object_id,\n"
+                        + "       'N' AS node_type,\n"
+                        + "       NULL AS url,\n"
+                        + "       csdc.tags(taggroup.id) AS dynamic_children,\n"
+                        + "       FALSE AS sql_sort\n"
+                        + "FROM taggroup,\n"
+                        + "     cs_class\n"
+                        + "WHERE cs_class.name = 'taggroup'\n"
+                        + "ORDER BY taggroup.name;";
+
             DevelopmentTools.initSessionManagerFromRestfulConnectionOnLocalhost(
                 "SWITCHON",
                 "Administratoren",
@@ -328,7 +366,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
             // final Node[] nodesBinary = SessionManager.getProxy().getRoots();
             final Node nodeBinary = SessionManager.getProxy().getNode(7, "SWITCHON");
             // final Node[] nodesBinary = new Node[]{nodeBinary};
-            final Node[] nodesBinary = SessionManager.getProxy().getChildren(nodeBinary);
+            final Node[] nodesBinary = SessionManager.getProxy()
+                        .getChildren(
+                            SessionManager.getProxy().getChildren(
+                                SessionManager.getProxy().getChildren(nodeBinary)[0])[0]);
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -337,7 +378,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "cismet");
             final Node nodeRest = SessionManager.getProxy().getNode(7, "SWITCHON");
             // final Node[] nodesRest = new Node[]{nodeRest};
-            final Node[] nodesRest = SessionManager.getProxy().getChildren(nodeRest);
+            final Node[] nodesRest = SessionManager.getProxy()
+                        .getChildren(
+                            SessionManager.getProxy().getChildren(
+                                SessionManager.getProxy().getChildren(nodeRest)[0])[0]);
 
             System.out.println("# rootNodes:\t'"
                         + nodesBinary.length + "' == '" + nodesRest.length + "'");
@@ -367,7 +411,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                             + nodesBinary[i].getDomain() + "' == '" + nodesRest[i].getDomain() + "'");
 
                 System.out.println("nodes[" + i + "].getDynamicChildrenStatement():\t'"
-                            + nodesBinary[i].getDynamicChildrenStatement() + "' == '"
+                            + nodesBinary[i].getDynamicChildrenStatement() + "' \n==\n '"
                             + nodesRest[i].getDynamicChildrenStatement() + "'");
 
                 System.out.println("nodes[" + i + "].getGroup():\t'"
@@ -407,7 +451,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 System.out.println("nodes[" + i + "].isValid():\t'"
                             + nodesBinary[i].isValid() + "' == '" + nodesRest[i].isValid() + "'");
 
-                System.out.println("nodes[" + i + "].isValid():\t'"
+                System.out.println("nodes[" + i + "].isSqlSort():\t'"
                             + nodesBinary[i].isSqlSort() + "' == '" + nodesRest[i].isSqlSort() + "'");
 
                 System.out.println("nodes[" + i + "].isMetaObjectNode:\t'"
