@@ -7,12 +7,10 @@
 ****************************************************/
 package Sirius.navigator.connection;
 
-import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
-import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassNode;
 import Sirius.server.middleware.types.MetaNode;
@@ -24,7 +22,6 @@ import Sirius.server.newuser.UserException;
 
 import Sirius.util.image.ImageHashMap;
 
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 import java.awt.GraphicsEnvironment;
@@ -41,6 +38,9 @@ import javax.swing.Icon;
 import javax.ws.rs.core.UriBuilder;
 
 import de.cismet.cids.client.tools.DevelopmentTools;
+
+import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.CidsBeanInfo;
 
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.ws.SSLConfig;
@@ -322,6 +322,30 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // System.out.println(metaClass.getKey() + ":" + metaClass.getTableName());
 // }
 
+            final String domain = "SWITCHON";
+            final int metaObjectId = 76;
+            final int metaClassId = 4;
+
+            // TEST insertMetaObject ...........................................
+// DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
+// "SWITCHON",
+// "Administratoren",
+// "admin",
+// "cismet");
+//
+// MetaClass metaClass = SessionManager.getProxy().getMetaClass(metaClassId, domain);
+// MetaObject newMetaObject = SessionManager.getProxy().getInstance(metaClass);
+// CidsBean newCidsBean = newMetaObject.getBean();
+// newCidsBean.setProperty("name", "NEW CIDS BEAN");
+// newCidsBean.setProperty("organisation", "NEW CIDS BEAN");
+// newCidsBean.setProperty("email", "NEW CIDS BEAN");
+// newCidsBean.setProperty("url", "NEW CIDS BEAN");
+// newCidsBean.setProperty("role", SessionManager.getProxy().getMetaObject(221, 6, domain).getBean());
+// newCidsBean.setProperty("description", "NEW CIDS BEAN");
+// newMetaObject = SessionManager.getProxy().insertMetaObject(newMetaObject, domain);
+// metaObjectId = newMetaObject.getId();
+            // TEST insertMetaObject ...........................................
+
             DevelopmentTools.initSessionManagerFromRestfulConnectionOnLocalhost(
                 "SWITCHON",
                 "Administratoren",
@@ -331,7 +355,11 @@ public class PureRESTfulConnection extends RESTfulConnection {
             // SessionManager.getProxy().getSearchOptions();
             // SessionManager.getProxy().getClassTreeNodes();
             // MethodMap methods = SessionManager.getProxy().getMethods(SessionManager.getSession().getUser());
-            final MetaObject metaObjectBinary = SessionManager.getProxy().getMetaObject(76, 4, "SWITCHON");
+            final MetaObject metaObjectBinary = SessionManager.getProxy()
+                        .getMetaObject(metaObjectId, metaClassId, domain);
+            final CidsBean cidsBeanBinary = metaObjectBinary.getBean();
+            final CidsBeanInfo cidsBeanInfoBinary = cidsBeanBinary.getCidsBeanInfo();
+            final String[] propertyNamesBinary = cidsBeanBinary.getPropertyNames();
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -339,7 +367,80 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "admin",
                 "cismet");
 
-            final MetaObject metaObjectRest = SessionManager.getProxy().getMetaObject(76, 4, "SWITCHON");
+            final MetaObject metaObjectRest = SessionManager.getProxy()
+                        .getMetaObject(metaObjectId, metaClassId, domain);
+            final CidsBean cidsBeanRest = metaObjectRest.getBean();
+            cidsBeanRest.setProperty("name", cidsBeanRest.getProperty("organisation"));
+
+            // TEST updateMetaObject ...........................................
+            // final int result = SessionManager.getProxy().updateMetaObject(metaObjectRest, "SWITCHON");
+            // System.out.println("update meta object: " + result);
+            // metaObjectRest = SessionManager.getProxy().getMetaObject(76, 4, "SWITCHON");
+            // cidsBeanRest = metaObjectRest.getBean();
+            // TEST updateMetaObject ...........................................
+
+            final CidsBeanInfo cidsBeanInfoRest = cidsBeanRest.getCidsBeanInfo();
+            final String[] propertyNamesRest = cidsBeanRest.getPropertyNames();
+
+            System.out.println("cidsBeanInfoBinary.equals(cidsBeanInfoRest): "
+                        + cidsBeanInfoBinary.equals(cidsBeanInfoRest));
+
+            System.out.println("cidsBeanInfo.hashCode():\t'"
+                        + cidsBeanInfoBinary.hashCode() + "' == '"
+                        + cidsBeanInfoRest.hashCode() + "'");
+
+            System.out.println("cidsBeanInfo.getClassKey():\t'"
+                        + cidsBeanInfoBinary.getClassKey() + "' == '"
+                        + cidsBeanInfoRest.getClassKey() + "'");
+
+            System.out.println("cidsBeanInfo.getDomainKey():\t'"
+                        + cidsBeanInfoBinary.getDomainKey() + "' == '"
+                        + cidsBeanInfoRest.getDomainKey() + "'");
+
+            System.out.println("cidsBeanInfo.getJsonObjectKey():\t'"
+                        + cidsBeanInfoBinary.getJsonObjectKey() + "' == '"
+                        + cidsBeanInfoRest.getJsonObjectKey() + "'");
+
+            System.out.println("cidsBeanInfo.getObjectKey():\t'"
+                        + cidsBeanInfoBinary.getObjectKey() + "' == '"
+                        + cidsBeanInfoRest.getObjectKey() + "'");
+
+            System.out.println("cidsBeanInfo.toString():\t'"
+                        + cidsBeanInfoBinary.toString() + "' == '"
+                        + cidsBeanInfoRest.toString() + "'");
+
+            System.out.println("cidsBeanBinary.equals(cidsBeanRest): "
+                        + cidsBeanBinary.equals(cidsBeanRest));
+
+            System.out.println("cidsBean.hashCode():\t'"
+                        + cidsBeanBinary.hashCode() + "' == '"
+                        + cidsBeanRest.hashCode() + "'");
+
+            System.out.println("cidsBean.getPrimaryKeyFieldname():\t'"
+                        + cidsBeanBinary.getPrimaryKeyFieldname() + "' == '"
+                        + cidsBeanRest.getPrimaryKeyFieldname() + "'");
+
+            System.out.println("cidsBean.getPrimaryKeyValue():\t'"
+                        + cidsBeanBinary.getPrimaryKeyValue() + "' == '"
+                        + cidsBeanRest.getPrimaryKeyValue() + "'");
+
+            System.out.println("cidsBean.properties\t'"
+                        + propertyNamesBinary.length + "' == '"
+                        + propertyNamesRest.length + "'");
+
+            if (propertyNamesBinary.length != propertyNamesRest.length) {
+                throw new Exception("propertyNamesBinary.length != propertyNamesRest.length");
+            }
+
+            for (int i = 0; i < propertyNamesBinary.length; i++) {
+                System.out.println("property[" + i + "]." + propertyNamesBinary[i] + "\t'"
+                            + cidsBeanBinary.getProperty(propertyNamesBinary[i]) + "' == '"
+                            + cidsBeanRest.getProperty(propertyNamesRest[i]) + "'");
+            }
+
+            // TEST deleteMetaObject after TEST insertMetaObject ................
+            // SessionManager.getProxy().deleteMetaObject(newMetaObject, domain);
+            // TEST deleteMetaObject after TEST insertMetaObject ................
 
             System.exit(0);
 
