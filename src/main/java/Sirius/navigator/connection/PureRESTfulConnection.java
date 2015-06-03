@@ -11,6 +11,7 @@ import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
+import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassNode;
 import Sirius.server.middleware.types.MetaNode;
@@ -31,6 +32,8 @@ import java.net.URI;
 import java.rmi.RemoteException;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -325,8 +328,115 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final String domain = "SWITCHON";
             final int metaObjectId = 76;
             final int metaClassId = 4;
+            final String[] representationFields = new String[] { "organisation", "email", "name", "role" };
+            final String representationPattern = "%0$2s";
 
-            // TEST insertMetaObject ...........................................
+            // TEST getAllLightweightMetaObjectsForClass
+
+            DevelopmentTools.initSessionManagerFromRestfulConnectionOnLocalhost(
+                "SWITCHON",
+                "Administratoren",
+                "admin",
+                "cismet");
+
+            final LightweightMetaObject[] lmoBinary = (LightweightMetaObject[])SessionManager.getProxy()
+                        .getAllLightweightMetaObjectsForClass(
+                                metaClassId,
+                                SessionManager.getSession().getUser(),
+                                representationFields,
+                                representationPattern);
+
+            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
+                "SWITCHON",
+                "Administratoren",
+                "admin",
+                "cismet");
+
+            final LightweightMetaObject[] lmoRest = (LightweightMetaObject[])SessionManager.getProxy()
+                        .getAllLightweightMetaObjectsForClass(
+                                metaClassId,
+                                SessionManager.getSession().getUser(),
+                                representationFields,
+                                representationPattern);
+
+            if (lmoBinary.length != lmoRest.length) {
+                throw new Exception("lmoBinary.length != lmoRest.length");
+            }
+
+            // legacy getLightweightMetaObjects returns  meta objects ordered descending
+            // by id!
+            final LinkedHashMap<Integer, LightweightMetaObject[]> orderedLmos =
+                new LinkedHashMap<Integer, LightweightMetaObject[]>();
+
+            for (int i = 0; i < lmoBinary.length; i++) {
+                LightweightMetaObject[] lightweightMetaObjects;
+                if (orderedLmos.containsKey(lmoBinary[i].getID())) {
+                    lightweightMetaObjects = orderedLmos.get(lmoBinary[i].getID());
+                    lightweightMetaObjects[0] = lmoBinary[i];
+                } else {
+                    lightweightMetaObjects = new LightweightMetaObject[2];
+                    lightweightMetaObjects[0] = lmoBinary[i];
+                    orderedLmos.put(lmoBinary[i].getID(), lightweightMetaObjects);
+                }
+
+                if (orderedLmos.containsKey(lmoRest[i].getID())) {
+                    lightweightMetaObjects = orderedLmos.get(lmoRest[i].getID());
+                    lightweightMetaObjects[1] = lmoRest[i];
+                } else {
+                    lightweightMetaObjects = new LightweightMetaObject[2];
+                    lightweightMetaObjects[1] = lmoRest[i];
+                    orderedLmos.put(lmoRest[i].getID(), lightweightMetaObjects);
+                }
+            }
+            final Iterator<LightweightMetaObject[]> lmoIterator = orderedLmos.values().iterator();
+            final int lmoArrayLength = (orderedLmos.size() > 5) ? 5 : orderedLmos.size();
+            int j = 0;
+            while (lmoIterator.hasNext() && (j < lmoArrayLength)) {
+                final LightweightMetaObject[] lightweightMetaObjects = lmoIterator.next();
+
+                System.out.println("LMO[" + j + "].toString()\t'"
+                            + lightweightMetaObjects[0].toString() + "' == '"
+                            + lightweightMetaObjects[1].toString() + "'");
+                System.out.println("LMO[" + j + "].hashCode()\t'"
+                            + lightweightMetaObjects[0].hashCode() + "' == '"
+                            + lightweightMetaObjects[1].hashCode() + "'");
+                System.out.println("LMO[" + j + "].getLWAttributes\t'"
+                            + lightweightMetaObjects[0].getKnownAttributeNames().size() + "' == '"
+                            + lightweightMetaObjects[1].getKnownAttributeNames().size() + "'");
+                System.out.println("LMO[" + j + "].getLWAttribute(\"email\")\t'"
+                            + lightweightMetaObjects[0].getLWAttribute("email") + "' == '"
+                            + lightweightMetaObjects[1].getLWAttribute("email") + "'");
+                System.out.println("LMO[" + j + "].getLWAttribute(\"organisation\")\t'"
+                            + lightweightMetaObjects[0].getLWAttribute("organisation") + "' == '"
+                            + lightweightMetaObjects[1].getLWAttribute("organisation") + "'");
+                System.out.println("LMO[" + j + "].getLWAttribute(\"role\")\t'"
+                            + lightweightMetaObjects[0].getLWAttribute("role") + "' == '"
+                            + lightweightMetaObjects[1].getLWAttribute("role") + "'");
+                System.out.println("LMO[" + j + "].getRealMetaObject().hashCode()\t'"
+                            + lightweightMetaObjects[0].getRealMetaObject().hashCode() + "' == '"
+                            + lightweightMetaObjects[1].getRealMetaObject().hashCode() + "'");
+                System.out.println("LMO[" + j + "].getRealMetaObject().getID()\t'"
+                            + lightweightMetaObjects[0].getRealMetaObject().getID() + "' == '"
+                            + lightweightMetaObjects[1].getRealMetaObject().getID() + "'");
+                System.out.println("LMO[" + j + "].getAttributeByFieldName(\"role\").getValue()\t'"
+                            + lightweightMetaObjects[0].getRealMetaObject().getAttributeByFieldName("role").getValue()
+                            + "' == '"
+                            + lightweightMetaObjects[1].getRealMetaObject().getAttributeByFieldName("role").getValue()
+                            + "'");
+
+                final CidsBean lmoBeanBinary = lightweightMetaObjects[0].getRealMetaObject().getBean();
+                final CidsBean lmoBeanRest = lightweightMetaObjects[1].getRealMetaObject().getBean();
+
+                System.out.println("LMOBean[" + j + "].getPropertyNames()()\t'"
+                            + lmoBeanBinary.getPropertyNames().length + "' == '"
+                            + lmoBeanRest.getPropertyNames().length + "'");
+
+                j++;
+            }
+
+            System.exit(0);
+
+// TEST insertMetaObject ...........................................
 // DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
 // "SWITCHON",
 // "Administratoren",
