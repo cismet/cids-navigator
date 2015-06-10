@@ -11,6 +11,7 @@ import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
+import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassNode;
@@ -46,6 +47,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanInfo;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
@@ -55,6 +58,8 @@ import de.cismet.netutil.Proxy;
 import de.cismet.reconnector.Reconnector;
 
 import static Sirius.navigator.connection.RESTfulConnection.LOG;
+import de.cismet.cids.custom.switchon.search.server.MetaObjectUniversalSearchStatement;
+import de.cismet.cids.server.api.types.legacy.ServerSearchFactory;
 
 /**
  * The PureRESTfulConnection allows the cids navigator to use the new cids Pure REST API while providing backwards
@@ -151,6 +156,98 @@ public class PureRESTfulConnection extends RESTfulConnection {
         }
 
         return true;
+    }
+
+    /**
+     * FIXME: CidsServerSearches that don't implement MetaObjectNodeServerSearch are delegated to the legacy REST
+     * Connection!
+     *
+     * @param   user          DOCUMENT ME!
+     * @param   serverSearch  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Override
+    public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
+            throws ConnectionException {
+        if (ServerSearchFactory.getFactory().getServerSearchClass(serverSearch.getClass().getSimpleName()) != null) {
+            return super.customServerSearch(user, serverSearch);
+        } else {
+            try {
+                LOG.warn("CidsServerSearch (" + serverSearch.getClass().getName()
+                            + ") is not supported by the cids pure REST API, delegating customServerSearch() to legacy REST Connection!");
+                return this.legacyConnector.customServerSearch(user, serverSearch);
+            } catch (final Exception e) {
+                final String message = "cannot perform custom server search: " + e.getMessage(); // NOI18N
+                LOG.error(message, e);
+                throw new ConnectionException(message, e);
+            }
+        }
+    }
+
+    /**
+     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service
+     *
+     * @param   classId               DOCUMENT ME!
+     * @param   user                  DOCUMENT ME!
+     * @param   query                 DOCUMENT ME!
+     * @param   representationFields  DOCUMENT ME!
+     * @param   formater              DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Override
+    public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
+            final User user,
+            final String query,
+            final String[] representationFields,
+            final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
+        try {
+            LOG.warn("delegating getLightweightMetaObjectsByQuery() to legacy REST Connection");
+            return this.legacyConnector.getLightweightMetaObjectsByQuery(classId, user, query, representationFields);
+        } catch (final Exception e) {
+            final String message = "cannot get Lightweight Meta Objects By query: " + e.getMessage(); // NOI18N
+            LOG.error(message, e);
+            throw new ConnectionException(message, e);
+        }
+    }
+
+    /**
+     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service
+     *
+     * @param   classId                DOCUMENT ME!
+     * @param   user                   DOCUMENT ME!
+     * @param   query                  DOCUMENT ME!
+     * @param   representationFields   DOCUMENT ME!
+     * @param   representationPattern  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Override
+    public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
+            final User user,
+            final String query,
+            final String[] representationFields,
+            final String representationPattern) throws ConnectionException {
+        try {
+            LOG.warn("delegating getLightweightMetaObjectsByQuery() to legacy REST Connection");
+            return this.legacyConnector.getLightweightMetaObjectsByQuery(
+                    classId,
+                    user,
+                    query,
+                    representationFields,
+                    representationPattern);
+        } catch (final Exception e) {
+            final String message = "cannot get Lightweight Meta Objects By query: " + e.getMessage(); // NOI18N
+            LOG.error(message, e);
+            throw new ConnectionException(message, e);
+        }
     }
 
     /**
@@ -311,7 +408,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
     /**
      * DOCUMENT ME!
      *
-     * @param  args  DOCUMENT ME!
+     * @param   args  DOCUMENT ME!
+     *
+     * @throws  UnsupportedOperationException  DOCUMENT ME!
      */
     public static void main(final String[] args) {
         try {
@@ -330,6 +429,104 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final int metaClassId = 4;
             final String[] representationFields = new String[] { "organisation", "email", "name", "role" };
             final String representationPattern = "%0$2s";
+
+            /**
+             * TEST SEARCH ----------------------------------------------------.
+             *
+             * @version  $Revision$, $Date$
+             */
+
+            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
+                "SWITCHON",
+                "Administratoren",
+                "admin",
+                "cismet");
+
+            final MetaObjectUniversalSearchStatement searchStatement = new MetaObjectUniversalSearchStatement();
+            searchStatement.setQuery("keyword:\"soil\" limit:\"5\"");
+
+            final Collection nodeCollection = SessionManager.getProxy().customServerSearch(searchStatement);
+            final Node[] nodesArray = (Node[])nodeCollection.toArray(new Node[nodeCollection.size()]);
+
+            for (int i = 0; i < nodesArray.length; i++) {
+                System.out.println("nodes[" + i + "].getName():\t'"
+                            + nodesArray[i].getName() + "'");
+
+                System.out.println("nodes[" + i + "].toString():\t'"
+                            + nodesArray[i].toString() + "'");
+
+                System.out.println("nodes[" + i + "].getArtificialId():\t'"
+                            + nodesArray[i].getArtificialId() + "'");
+
+                System.out.println("nodes[" + i + "].getDescription():\t'"
+                            + nodesArray[i].getDescription() + "'");
+
+                System.out.println("nodes[" + i + "].getDomain():\t'"
+                            + nodesArray[i].getDomain() + "'");
+
+                System.out.println("nodes[" + i + "].getDynamicChildrenStatement():\t'"
+                            + nodesArray[i].getDynamicChildrenStatement() + "'");
+
+                System.out.println("nodes[" + i + "].getGroup():\t'"
+                            + nodesArray[i].getGroup() + "'");
+
+                System.out.println("nodes[" + i + "].getIconString():\t'"
+                            + nodesArray[i].getIconString() + "'");
+
+                System.out.println("nodes[" + i + "].getClassId():\t'"
+                            + nodesArray[i].getClassId() + "'");
+
+                System.out.println("nodes[" + i + "].getIconFactory():\t'"
+                            + nodesArray[i].getIconFactory() + "'");
+
+                System.out.println("nodes[" + i + "].getClass().getName():\t'"
+                            + nodesArray[i].getClass().getName() + "'");
+
+                System.out.println("nodes[" + i + "].getId():\t'"
+                            + nodesArray[i].getId() + "'");
+
+                System.out.println("nodes[" + i + "].getPermissions():\t'"
+                            + nodesArray[i].getPermissions() + "'");
+
+                System.out.println("nodes[" + i + "].isDerivePermissionsFromClass():\t'"
+                            + nodesArray[i].isDerivePermissionsFromClass() + "'");
+
+                System.out.println("nodes[" + i + "].isDynamic():\t'"
+                            + nodesArray[i].isDynamic() + "'");
+
+                System.out.println("nodes[" + i + "].isLeaf():\t'"
+                            + nodesArray[i].isLeaf() + "'");
+
+                System.out.println("nodes[" + i + "].hashCode():\t'"
+                            + nodesArray[i].hashCode() + "'");
+
+                System.out.println("nodes[" + i + "].isValid():\t'"
+                            + nodesArray[i].isValid() + "'");
+
+                System.out.println("nodes[" + i + "].isSqlSort():\t'"
+                            + nodesArray[i].isSqlSort() + "'");
+
+                System.out.println("nodes[" + i + "].isMetaObjectNode:\t'"
+                            + MetaObjectNode.class.isAssignableFrom(nodesArray[i].getClass()));
+
+                if (MetaObjectNode.class.isAssignableFrom(nodesArray[i].getClass())) {
+                    final MetaObjectNode metaObjectNode = (MetaObjectNode)nodesArray[i];
+
+                    System.out.println("nodes[" + i + "].getObjectId():\t'"
+                                + metaObjectNode.getObjectId() + "'");
+
+                    System.out.println("nodes[" + i + "].hasMetaObject:\t'"
+                                + (metaObjectNode.getObject() != null) + "'");
+                }
+
+                System.out.println("nodes[" + i + "].isMetaClassNode:\t'"
+                            + MetaClassNode.class.isAssignableFrom(nodesArray[i].getClass()) + "'");
+
+                System.out.println("nodes[" + i + "].isMetaNode:\t'"
+                            + MetaNode.class.isAssignableFrom(nodesArray[i].getClass()) + "'");
+            }
+            
+            System.exit(0);
 
             // TEST getAllLightweightMetaObjectsForClass
 
