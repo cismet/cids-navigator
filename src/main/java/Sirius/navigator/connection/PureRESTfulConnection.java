@@ -48,7 +48,6 @@ import de.cismet.cids.dynamics.CidsBeanInfo;
 
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.search.CidsServerSearch;
-import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
@@ -58,8 +57,16 @@ import de.cismet.netutil.Proxy;
 import de.cismet.reconnector.Reconnector;
 
 import static Sirius.navigator.connection.RESTfulConnection.LOG;
-import de.cismet.cids.custom.switchon.search.server.MetaObjectUniversalSearchStatement;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import de.cismet.cids.base.types.Type;
+import de.cismet.cids.server.api.types.CidsClass;
+import de.cismet.cids.server.api.types.SearchParameter;
 import de.cismet.cids.server.api.types.legacy.ServerSearchFactory;
+import java.util.Date;
+import org.apache.commons.lang.ClassUtils;
 
 /**
  * The PureRESTfulConnection allows the cids navigator to use the new cids Pure REST API while providing backwards
@@ -424,6 +431,39 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // System.out.println(metaClass.getKey() + ":" + metaClass.getTableName());
 // }
 
+            //final Class listClass = ClassUtils.getClass("java.util.List<java.util.List>");
+            //System.out.println(listCla&ss);
+            //System.exit(0);
+            
+            final ObjectMapper MAPPER = new ObjectMapper(new JsonFactory());
+//          System.out.println(MAPPER.writeValueAsString("keyword:\"soil\" limit:\"5\""));
+//          //System.out.println(MAPPER.writer().writeValueAsString("keyword:\"soil\" limit:\"5\""));
+           
+           
+// MAPPER.writeValue(Writer,Object) with StringWriter and constructing String, but more efficient.
+            
+            
+//            System.out.println(MAPPER.writeValueAsString("true"));
+//            System.out.println(MAPPER.writeValueAsString(new Date()));
+//            System.out.println(MAPPER.writer().writeValueAsString(new Date()));
+//            Date date = (Date)MAPPER.convertValue(new Date(), Date.class);
+//            System.out.println(date);
+            
+//            SearchParameter searchParameter = new SearchParameter("type", Byte.parseByte("123", 8));
+//            System.out.println(MAPPER.writer().writeValueAsString(searchParameter));
+//            SearchParameter[] searchParameters 
+//                    = (SearchParameter[])MAPPER.convertValue(new SearchParameter[]{searchParameter,searchParameter}, SearchParameter[].class);
+//            System.out.println(MAPPER.writer().writeValueAsString(new SearchParameter[]{searchParameter}));
+//            System.out.println(searchParameters[1].getValue().getClass());
+//            System.out.println(searchParameters[1].getValue());
+//            
+//            JsonNode node = MAPPER.valueToTree(searchParameter);
+//            
+//            System.exit(0);
+            
+            
+            
+            
             final String domain = "SWITCHON";
             final int metaObjectId = 76;
             final int metaClassId = 4;
@@ -436,99 +476,108 @@ public class PureRESTfulConnection extends RESTfulConnection {
              * @version  $Revision$, $Date$
              */
 
-            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
-                "SWITCHON",
-                "Administratoren",
-                "admin",
-                "cismet");
-
-            final MetaObjectUniversalSearchStatement searchStatement = new MetaObjectUniversalSearchStatement();
-            searchStatement.setQuery("keyword:\"soil\" limit:\"5\"");
-
-            final Collection nodeCollection = SessionManager.getProxy().customServerSearch(searchStatement);
-            final Node[] nodesArray = (Node[])nodeCollection.toArray(new Node[nodeCollection.size()]);
-
-            for (int i = 0; i < nodesArray.length; i++) {
-                System.out.println("nodes[" + i + "].getName():\t'"
-                            + nodesArray[i].getName() + "'");
-
-                System.out.println("nodes[" + i + "].toString():\t'"
-                            + nodesArray[i].toString() + "'");
-
-                System.out.println("nodes[" + i + "].getArtificialId():\t'"
-                            + nodesArray[i].getArtificialId() + "'");
-
-                System.out.println("nodes[" + i + "].getDescription():\t'"
-                            + nodesArray[i].getDescription() + "'");
-
-                System.out.println("nodes[" + i + "].getDomain():\t'"
-                            + nodesArray[i].getDomain() + "'");
-
-                System.out.println("nodes[" + i + "].getDynamicChildrenStatement():\t'"
-                            + nodesArray[i].getDynamicChildrenStatement() + "'");
-
-                System.out.println("nodes[" + i + "].getGroup():\t'"
-                            + nodesArray[i].getGroup() + "'");
-
-                System.out.println("nodes[" + i + "].getIconString():\t'"
-                            + nodesArray[i].getIconString() + "'");
-
-                System.out.println("nodes[" + i + "].getClassId():\t'"
-                            + nodesArray[i].getClassId() + "'");
-
-                System.out.println("nodes[" + i + "].getIconFactory():\t'"
-                            + nodesArray[i].getIconFactory() + "'");
-
-                System.out.println("nodes[" + i + "].getClass().getName():\t'"
-                            + nodesArray[i].getClass().getName() + "'");
-
-                System.out.println("nodes[" + i + "].getId():\t'"
-                            + nodesArray[i].getId() + "'");
-
-                System.out.println("nodes[" + i + "].getPermissions():\t'"
-                            + nodesArray[i].getPermissions() + "'");
-
-                System.out.println("nodes[" + i + "].isDerivePermissionsFromClass():\t'"
-                            + nodesArray[i].isDerivePermissionsFromClass() + "'");
-
-                System.out.println("nodes[" + i + "].isDynamic():\t'"
-                            + nodesArray[i].isDynamic() + "'");
-
-                System.out.println("nodes[" + i + "].isLeaf():\t'"
-                            + nodesArray[i].isLeaf() + "'");
-
-                System.out.println("nodes[" + i + "].hashCode():\t'"
-                            + nodesArray[i].hashCode() + "'");
-
-                System.out.println("nodes[" + i + "].isValid():\t'"
-                            + nodesArray[i].isValid() + "'");
-
-                System.out.println("nodes[" + i + "].isSqlSort():\t'"
-                            + nodesArray[i].isSqlSort() + "'");
-
-                System.out.println("nodes[" + i + "].isMetaObjectNode:\t'"
-                            + MetaObjectNode.class.isAssignableFrom(nodesArray[i].getClass()));
-
-                if (MetaObjectNode.class.isAssignableFrom(nodesArray[i].getClass())) {
-                    final MetaObjectNode metaObjectNode = (MetaObjectNode)nodesArray[i];
-
-                    System.out.println("nodes[" + i + "].getObjectId():\t'"
-                                + metaObjectNode.getObjectId() + "'");
-
-                    System.out.println("nodes[" + i + "].hasMetaObject:\t'"
-                                + (metaObjectNode.getObject() != null) + "'");
-                }
-
-                System.out.println("nodes[" + i + "].isMetaClassNode:\t'"
-                            + MetaClassNode.class.isAssignableFrom(nodesArray[i].getClass()) + "'");
-
-                System.out.println("nodes[" + i + "].isMetaNode:\t'"
-                            + MetaNode.class.isAssignableFrom(nodesArray[i].getClass()) + "'");
-            }
+            // TEST Search -----------------------------------------------------
             
-            System.exit(0);
+//            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
+//                "SWITCHON",
+//                "Administratoren",
+//                "admin",
+//                "cismet");
+//
+//            final MetaObjectUniversalSearchStatement searchStatement = new MetaObjectUniversalSearchStatement();
+//            searchStatement.setQuery("keyword:\"soil\" limit:\"5\"");
+//
+//            SearchParameter searchParameter = new SearchParameter();
+//            searchParameter.setKey("query");
+//            searchParameter.setValue("keyword:\"soil\" limit:\"5\"");
+//            System.out.println(MAPPER.writeValueAsString(searchParameter));
+//            System.out.println(((SearchParameter)MAPPER.readValue(
+//                    MAPPER.writeValueAsString(searchParameter), SearchParameter.class)).getValue());
+//            
+//            final Collection nodeCollection = SessionManager.getProxy().customServerSearch(searchStatement);
+//            final Node[] nodesArray = (Node[])nodeCollection.toArray(new Node[nodeCollection.size()]);
+//
+//            for (int i = 0; i < nodesArray.length; i++) {
+//                System.out.println("nodes[" + i + "].getName():\t'"
+//                            + nodesArray[i].getName() + "'");
+//
+//                System.out.println("nodes[" + i + "].toString():\t'"
+//                            + nodesArray[i].toString() + "'");
+//
+//                System.out.println("nodes[" + i + "].getArtificialId():\t'"
+//                            + nodesArray[i].getArtificialId() + "'");
+//
+//                System.out.println("nodes[" + i + "].getDescription():\t'"
+//                            + nodesArray[i].getDescription() + "'");
+//
+//                System.out.println("nodes[" + i + "].getDomain():\t'"
+//                            + nodesArray[i].getDomain() + "'");
+//
+//                System.out.println("nodes[" + i + "].getDynamicChildrenStatement():\t'"
+//                            + nodesArray[i].getDynamicChildrenStatement() + "'");
+//
+//                System.out.println("nodes[" + i + "].getGroup():\t'"
+//                            + nodesArray[i].getGroup() + "'");
+//
+//                System.out.println("nodes[" + i + "].getIconString():\t'"
+//                            + nodesArray[i].getIconString() + "'");
+//
+//                System.out.println("nodes[" + i + "].getClassId():\t'"
+//                            + nodesArray[i].getClassId() + "'");
+//
+//                System.out.println("nodes[" + i + "].getIconFactory():\t'"
+//                            + nodesArray[i].getIconFactory() + "'");
+//
+//                System.out.println("nodes[" + i + "].getClass().getName():\t'"
+//                            + nodesArray[i].getClass().getName() + "'");
+//
+//                System.out.println("nodes[" + i + "].getId():\t'"
+//                            + nodesArray[i].getId() + "'");
+//
+//                System.out.println("nodes[" + i + "].getPermissions():\t'"
+//                            + nodesArray[i].getPermissions() + "'");
+//
+//                System.out.println("nodes[" + i + "].isDerivePermissionsFromClass():\t'"
+//                            + nodesArray[i].isDerivePermissionsFromClass() + "'");
+//
+//                System.out.println("nodes[" + i + "].isDynamic():\t'"
+//                            + nodesArray[i].isDynamic() + "'");
+//
+//                System.out.println("nodes[" + i + "].isLeaf():\t'"
+//                            + nodesArray[i].isLeaf() + "'");
+//
+//                System.out.println("nodes[" + i + "].hashCode():\t'"
+//                            + nodesArray[i].hashCode() + "'");
+//
+//                System.out.println("nodes[" + i + "].isValid():\t'"
+//                            + nodesArray[i].isValid() + "'");
+//
+//                System.out.println("nodes[" + i + "].isSqlSort():\t'"
+//                            + nodesArray[i].isSqlSort() + "'");
+//
+//                System.out.println("nodes[" + i + "].isMetaObjectNode:\t'"
+//                            + MetaObjectNode.class.isAssignableFrom(nodesArray[i].getClass()));
+//
+//                if (MetaObjectNode.class.isAssignableFrom(nodesArray[i].getClass())) {
+//                    final MetaObjectNode metaObjectNode = (MetaObjectNode)nodesArray[i];
+//
+//                    System.out.println("nodes[" + i + "].getObjectId():\t'"
+//                                + metaObjectNode.getObjectId() + "'");
+//
+//                    System.out.println("nodes[" + i + "].hasMetaObject:\t'"
+//                                + (metaObjectNode.getObject() != null) + "'");
+//                }
+//
+//                System.out.println("nodes[" + i + "].isMetaClassNode:\t'"
+//                            + MetaClassNode.class.isAssignableFrom(nodesArray[i].getClass()) + "'");
+//
+//                System.out.println("nodes[" + i + "].isMetaNode:\t'"
+//                            + MetaNode.class.isAssignableFrom(nodesArray[i].getClass()) + "'");
+//            }
+//            
+//            System.exit(0);
 
-            // TEST getAllLightweightMetaObjectsForClass
+            // TEST getAllLightweightMetaObjectsForClass .......................
 
             DevelopmentTools.initSessionManagerFromRestfulConnectionOnLocalhost(
                 "SWITCHON",
