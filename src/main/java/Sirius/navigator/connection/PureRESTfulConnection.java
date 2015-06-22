@@ -76,6 +76,13 @@ import de.cismet.netutil.Proxy;
 import de.cismet.reconnector.Reconnector;
 
 import static Sirius.navigator.connection.RESTfulConnection.LOG;
+import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
+import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.api.types.ActionTask;
+import de.cismet.commons.security.AccessHandler;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The PureRESTfulConnection allows the cids navigator to use the new cids Pure REST API while providing backwards
@@ -85,7 +92,7 @@ import static Sirius.navigator.connection.RESTfulConnection.LOG;
  * Implementation (PureRESTfulReconnector and RESTfulInterfaceConnector, respectively) that connects to the cids server
  * Pure REST API.</p>
  *
- * @author   Pascal Dihé <pascal.dihe@cismet.de>
+ * @author   Pascal DihÃ© <pascal.dihe@cismet.de>
  * @version  1.0 2015/04/17
  */
 public class PureRESTfulConnection extends RESTfulConnection {
@@ -172,35 +179,6 @@ public class PureRESTfulConnection extends RESTfulConnection {
         }
 
         return true;
-    }
-
-    /**
-     * FIXME: CidsServerSearches that don't implement MetaObjectNodeServerSearch are delegated to the legacy REST
-     * Connection!
-     *
-     * @param   user          DOCUMENT ME!
-     * @param   serverSearch  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    @Override
-    public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
-            throws ConnectionException {
-        if (ServerSearchFactory.getFactory().getServerSearchClass(serverSearch.getClass().getSimpleName()) != null) {
-            return super.customServerSearch(user, serverSearch);
-        } else {
-            try {
-                LOG.warn("CidsServerSearch (" + serverSearch.getClass().getName()
-                            + ") is not supported by the cids pure REST API, delegating customServerSearch() to legacy REST Connection!");
-                return this.legacyConnector.customServerSearch(user, serverSearch);
-            } catch (final Exception e) {
-                final String message = "cannot perform custom server search: " + e.getMessage(); // NOI18N
-                LOG.error(message, e);
-                throw new ConnectionException(message, e);
-            }
-        }
     }
 
     /**
@@ -409,11 +387,43 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final String[] representationFields = new String[] { "organisation", "email", "name", "role" };
             final String representationPattern = "%0$2s";
 
-            /**
-             * TEST SEARCH ----------------------------------------------------.
-             *
-             * @version  $Revision$, $Date$
-             */
+            
+            // Test Server Actions ---------------------------------------------
+            
+            DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
+                "SWITCHON",
+                "Administratoren",
+                "admin",
+                "cismet");
+            
+            //fails with: java.lang.ClassCastException: [B cannot be cast to java.lang.String
+            // Object taskResult = SessionManager.getProxy().executeTask("downloadFile", "SWITCHON", "C:\\pagefile.sys");
+            
+            final ActionTask actionTask = new ActionTask();
+            actionTask.setActionKey("httpTunnelAction");
+            final Map actionParameters = new HashMap<String, Object>();
+            actionParameters.put("URL", new URL("http://www.cismet.de"));
+            actionParameters.put("METHOD", AccessHandler.ACCESS_METHODS.GET_REQUEST);
+            actionTask.setParameters(actionParameters);
+            
+            ServerActionParameter actionParameterUrl 
+                    = new ServerActionParameter("URL", new URL("http://www.cismet.de"));
+            ServerActionParameter actionParameterMethod 
+                    = new ServerActionParameter("METHOD", AccessHandler.ACCESS_METHODS.GET_REQUEST);
+            ServerActionParameter actionParameterTest 
+                    = new ServerActionParameter(DefaultScheduledServerActionTestImpl.TESTPARAM, "TEST STRING!!!!!!!");
+           
+            
+            
+            // fails with: Caused by: java.lang.ClassCastException: java.lang.String cannot be cast to java.net.URL
+//            Object taskResult = SessionManager.getProxy().executeTask(
+//                    "httpTunnelAction", "SWITCHON", null, actionParameterUrl, actionParameterMethod);
+            
+            
+            Object taskResult = SessionManager.getProxy().executeTask(
+                    "testAction", "SWITCHON", null, actionParameterTest);
+            System.out.println(taskResult);
+            System.exit(0);
 
             // TEST Search -----------------------------------------------------
 
