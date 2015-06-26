@@ -14,6 +14,8 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import org.openide.util.Lookup;
 
+import java.lang.invoke.MethodHandles;
+
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
@@ -36,12 +38,13 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
+    protected static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(MethodHandles.lookup()
+                    .lookupClass());
 
     //~ Instance fields --------------------------------------------------------
 
-    private String callserverURL;
-    private Proxy proxy;
+    protected String callserverURL;
+    protected Proxy proxy;
     private RESTfulReconnectorErrorPanel errorPanel;
 
     //~ Constructors -----------------------------------------------------------
@@ -107,6 +110,10 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     @Override
     protected R connectService() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("connection to service '" + callserverURL + "'");
+        }
+
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 

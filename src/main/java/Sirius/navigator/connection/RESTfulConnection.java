@@ -37,6 +37,8 @@ import java.awt.GraphicsEnvironment;
 
 import java.io.File;
 
+import java.lang.invoke.MethodHandles;
+
 import java.rmi.RemoteException;
 
 import java.sql.SQLException;
@@ -63,19 +65,20 @@ import de.cismet.reconnector.Reconnector;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public final class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
+public class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final transient Logger LOG = Logger.getLogger(RESTfulConnection.class);
+    protected static final transient Logger LOG = Logger.getLogger(MethodHandles.lookup().lookupClass());
     private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo"; // NOI18N
 
     //~ Instance fields --------------------------------------------------------
 
-    private final transient boolean isLWMOEnabled;
+    protected Reconnector<CallServerService> reconnector;
 
-    private transient CallServerService connector;
-    private Reconnector<CallServerService> reconnector;
+    protected transient CallServerService connector;
+
+    private final transient boolean isLWMOEnabled;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -116,7 +119,7 @@ public final class RESTfulConnection implements Connection, Reconnectable<CallSe
      *
      * @return  DOCUMENT ME!
      */
-    private Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
+    protected Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
         reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;

@@ -370,7 +370,8 @@ public final class MutablePopupMenu extends JPopupMenu {
                                 additionalActions.addAll(extensions);
                             }
                             if (!ctxNodes.isEmpty()) {
-                                final Collection<? extends CidsBeanAction> extensionsForNodes = CExtManager.getInstance()
+                                final Collection<? extends CidsBeanAction> extensionsForNodes = CExtManager
+                                            .getInstance()
                                             .getExtensions(
                                                 CidsBeanAction.class,
                                                 new CExtContext(CExtContext.CTX_REFERENCE, ctxNodes));
