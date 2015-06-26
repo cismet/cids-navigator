@@ -71,7 +71,7 @@ import de.cismet.cids.server.api.types.SearchParameter;
 import de.cismet.cids.server.api.types.legacy.ServerSearchFactory;
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
 import de.cismet.cids.server.search.CidsServerSearch;
-import de.cismet.cids.server.search.LookupableServerSearch;
+import de.cismet.cids.server.search.RestApiCidsServerSearch;
 import de.cismet.cids.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
