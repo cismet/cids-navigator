@@ -39,13 +39,16 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 
 import java.net.URI;
+import java.net.URL;
 
 import java.rmi.RemoteException;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -60,6 +63,9 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.CidsBeanInfo;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
+import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.api.types.ActionTask;
 import de.cismet.cids.server.api.types.CidsClass;
 import de.cismet.cids.server.api.types.SearchParameter;
 import de.cismet.cids.server.api.types.legacy.ServerSearchFactory;
@@ -71,18 +77,13 @@ import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
+import de.cismet.commons.security.AccessHandler;
+
 import de.cismet.netutil.Proxy;
 
 import de.cismet.reconnector.Reconnector;
 
 import static Sirius.navigator.connection.RESTfulConnection.LOG;
-import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
-import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.api.types.ActionTask;
-import de.cismet.commons.security.AccessHandler;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The PureRESTfulConnection allows the cids navigator to use the new cids Pure REST API while providing backwards
@@ -387,41 +388,44 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final String[] representationFields = new String[] { "organisation", "email", "name", "role" };
             final String representationPattern = "%0$2s";
 
-            
             // Test Server Actions ---------------------------------------------
-            
+
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
                 "Administratoren",
                 "admin",
                 "cismet");
-            
-            //fails with: java.lang.ClassCastException: [B cannot be cast to java.lang.String
-            // Object taskResult = SessionManager.getProxy().executeTask("downloadFile", "SWITCHON", "C:\\pagefile.sys");
-            
+
+            // fails with: java.lang.ClassCastException: [B cannot be cast to java.lang.String Object taskResult =
+            // SessionManager.getProxy().executeTask("downloadFile", "SWITCHON", "C:\\pagefile.sys");
+
             final ActionTask actionTask = new ActionTask();
             actionTask.setActionKey("httpTunnelAction");
             final Map actionParameters = new HashMap<String, Object>();
             actionParameters.put("URL", new URL("http://www.cismet.de"));
             actionParameters.put("METHOD", AccessHandler.ACCESS_METHODS.GET_REQUEST);
             actionTask.setParameters(actionParameters);
-            
-            ServerActionParameter actionParameterUrl 
-                    = new ServerActionParameter("URL", new URL("http://www.cismet.de"));
-            ServerActionParameter actionParameterMethod 
-                    = new ServerActionParameter("METHOD", AccessHandler.ACCESS_METHODS.GET_REQUEST);
-            ServerActionParameter actionParameterTest 
-                    = new ServerActionParameter(DefaultScheduledServerActionTestImpl.TESTPARAM, "TEST STRING!!!!!!!");
-           
-            
-            
+
+            final ServerActionParameter actionParameterUrl = new ServerActionParameter(
+                    "URL",
+                    new URL("http://www.cismet.de"));
+            final ServerActionParameter actionParameterMethod = new ServerActionParameter(
+                    "METHOD",
+                    AccessHandler.ACCESS_METHODS.GET_REQUEST);
+            final ServerActionParameter actionParameterTest = new ServerActionParameter(
+                    DefaultScheduledServerActionTestImpl.TESTPARAM,
+                    "TEST STRING!!!!!!!");
+
             // fails with: Caused by: java.lang.ClassCastException: java.lang.String cannot be cast to java.net.URL
-//            Object taskResult = SessionManager.getProxy().executeTask(
-//                    "httpTunnelAction", "SWITCHON", null, actionParameterUrl, actionParameterMethod);
-            
-            
-            Object taskResult = SessionManager.getProxy().executeTask(
-                    "testAction", "SWITCHON", null, actionParameterTest);
+// Object taskResult = SessionManager.getProxy().executeTask(
+// "httpTunnelAction", "SWITCHON", null, actionParameterUrl, actionParameterMethod);
+
+            final Object taskResult = SessionManager.getProxy()
+                        .executeTask(
+                            "testAction",
+                            "SWITCHON",
+                            null,
+                            actionParameterTest);
             System.out.println(taskResult);
             System.exit(0);
 
@@ -660,7 +664,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 j++;
             }
 
-            //System.exit(0);
+            // System.exit(0);
 
 // TEST insertMetaObject ...........................................
 // DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
@@ -680,13 +684,13 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // newCidsBean.setProperty("description", "NEW CIDS BEAN");
 // newMetaObject = SessionManager.getProxy().insertMetaObject(newMetaObject, domain);
 // metaObjectId = newMetaObject.getId();
-            
+
 // TEST insertMetaObject ...........................................
-            
+
             // TEST getMetaObject
-            final String moQuery = "SELECT c.id as classId, t.ID as objectId \n" +
-            "FROM tag t, cs_class c, taggroup g\n" +
-            "WHERE t.taggroup = g.id AND g.name ilike '%protocol%' AND c.name = 'tag' LIMIT 1;";
+            final String moQuery = "SELECT c.id as classId, t.ID as objectId \n"
+                        + "FROM tag t, cs_class c, taggroup g\n"
+                        + "WHERE t.taggroup = g.id AND g.name ilike '%protocol%' AND c.name = 'tag' LIMIT 1;";
 
             DevelopmentTools.initSessionManagerFromRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -697,15 +701,17 @@ public class PureRESTfulConnection extends RESTfulConnection {
             // SessionManager.getProxy().getSearchOptions();
             // SessionManager.getProxy().getClassTreeNodes();
             // MethodMap methods = SessionManager.getProxy().getMethods(SessionManager.getSession().getUser());
-//            final MetaObject metaObjectBinary = SessionManager.getProxy()
-//                        .getMetaObject(metaObjectId, metaClassId, domain);
-            final MetaObject[] metaObjectsBinary = SessionManager.getProxy().getMetaObjectByQuery(
-                    SessionManager.getSession().getUser(), moQuery);
+// final MetaObject metaObjectBinary = SessionManager.getProxy()
+// .getMetaObject(metaObjectId, metaClassId, domain);
+            final MetaObject[] metaObjectsBinary = SessionManager.getProxy()
+                        .getMetaObjectByQuery(
+                            SessionManager.getSession().getUser(),
+                            moQuery);
             final MetaObject metaObjectBinary = metaObjectsBinary[0];
             final CidsBean cidsBeanBinary = metaObjectBinary.getBean();
             final CidsBeanInfo cidsBeanInfoBinary = cidsBeanBinary.getCidsBeanInfo();
             final String[] propertyNamesBinary = cidsBeanBinary.getPropertyNames();
-            
+
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
                 "Administratoren",
@@ -714,13 +720,15 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //
 //            final MetaObject metaObjectRest = SessionManager.getProxy()
 //                        .getMetaObject(metaObjectId, metaClassId, domain);
-            
-            final MetaObject[] metaObjectRests = SessionManager.getProxy().getMetaObjectByQuery(
-                    SessionManager.getSession().getUser(), moQuery);
+
+            final MetaObject[] metaObjectRests = SessionManager.getProxy()
+                        .getMetaObjectByQuery(
+                            SessionManager.getSession().getUser(),
+                            moQuery);
             final MetaObject metaObjectRest = metaObjectRests[0];
             final CidsBean cidsBeanRest = metaObjectRest.getBean();
             // TEST updateMetaObject ...........................................
-            //cidsBeanRest.setProperty("name", cidsBeanRest.getProperty("organisation"));
+            // cidsBeanRest.setProperty("name", cidsBeanRest.getProperty("organisation"));
             // final int result = SessionManager.getProxy().updateMetaObject(metaObjectRest, "SWITCHON");
             // System.out.println("update meta object: " + result);
             // metaObjectRest = SessionManager.getProxy().getMetaObject(76, 4, "SWITCHON");
@@ -789,7 +797,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
             // SessionManager.getProxy().deleteMetaObject(newMetaObject, domain);
             // TEST deleteMetaObject after TEST insertMetaObject ................
 
-            //System.exit(0);
+            // System.exit(0);
 
             // TEST & COMPARE NODES  --------------------------------------------
 
@@ -807,15 +815,16 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "admin",
                 "cismet");
             // final Node[] nodesBinary = SessionManager.getProxy().getRoots();
-//            final Node nodeBinary = SessionManager.getProxy().getNode(7, "SWITCHON");
+// final Node nodeBinary = SessionManager.getProxy().getNode(7, "SWITCHON");
             // final Node[] nodesBinary = new Node[]{nodeBinary};
-//            final Node[] nodesBinary = SessionManager.getProxy()
-//                        .getChildren(
-//                            SessionManager.getProxy().getChildren(
-//                                SessionManager.getProxy().getChildren(nodeBinary)[0])[0]);
-            
+// final Node[] nodesBinary = SessionManager.getProxy()
+// .getChildren(
+// SessionManager.getProxy().getChildren(
+// SessionManager.getProxy().getChildren(nodeBinary)[0])[0]);
+
             final Node[] nodesBinary = SessionManager.getConnection()
-                    .getCallServerService().getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
+                        .getCallServerService()
+                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -828,14 +837,13 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                        .getChildren(
 //                            SessionManager.getProxy().getChildren(
 //                                SessionManager.getProxy().getChildren(nodeRest)[0])[0]);
-            
-            
+
             final Node[] nodesRest = SessionManager.getConnection()
-                    .getCallServerService().getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
+                        .getCallServerService()
+                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
 
             final int nodesArrayLength = (nodesBinary.length > 3) ? 3 : nodesBinary.length;
-            
-            
+
             System.out.println("# nodes:\t'"
                         + nodesBinary.length + "' == '" + nodesRest.length + "'");
 
