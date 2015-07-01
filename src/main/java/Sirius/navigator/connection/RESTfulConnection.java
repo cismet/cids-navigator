@@ -69,7 +69,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final transient Logger LOG = Logger.getLogger(MethodHandles.lookup().lookupClass());
+    protected static final transient Logger LOG = Logger.getLogger(RESTfulConnection.class);
     private static final String DISABLE_MO_FILENAME = "cids_disable_lwmo"; // NOI18N
 
     //~ Instance fields --------------------------------------------------------
