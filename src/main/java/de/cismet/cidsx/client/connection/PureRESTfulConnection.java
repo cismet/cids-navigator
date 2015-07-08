@@ -5,8 +5,10 @@
 *              ... and it just works.
 *
 ****************************************************/
-package Sirius.navigator.connection;
+package de.cismet.cidsx.client.connection;
 
+import Sirius.navigator.connection.RESTfulConnection;
+import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
@@ -55,8 +57,6 @@ import javax.swing.Icon;
 
 import javax.ws.rs.core.UriBuilder;
 
-import de.cismet.cids.base.types.Type;
-
 import de.cismet.cids.client.tools.DevelopmentTools;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -65,25 +65,26 @@ import de.cismet.cids.dynamics.CidsBeanInfo;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.api.types.ActionTask;
-import de.cismet.cids.server.api.types.CidsClass;
-import de.cismet.cids.server.api.types.SearchParameter;
-import de.cismet.cids.server.api.types.legacy.ServerSearchFactory;
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
 import de.cismet.cids.server.search.CidsServerSearch;
-import de.cismet.cids.server.search.RestApiCidsServerSearch;
-import de.cismet.cids.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
+
+import de.cismet.cidsx.base.types.Type;
+
+import de.cismet.cidsx.server.api.types.ActionTask;
+import de.cismet.cidsx.server.api.types.CidsClass;
+import de.cismet.cidsx.server.api.types.SearchParameter;
+import de.cismet.cidsx.server.api.types.legacy.ServerSearchFactory;
+import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
+import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 
 import de.cismet.commons.security.AccessHandler;
 
 import de.cismet.netutil.Proxy;
 
 import de.cismet.reconnector.Reconnector;
-
-import static Sirius.navigator.connection.RESTfulConnection.LOG;
 
 /**
  * The PureRESTfulConnection allows the cids navigator to use the new cids Pure REST API while providing backwards
