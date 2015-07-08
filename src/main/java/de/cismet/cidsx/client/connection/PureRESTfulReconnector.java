@@ -5,14 +5,17 @@
 *              ... and it just works.
 *
 ****************************************************/
-package Sirius.navigator.connection;
+package de.cismet.cidsx.client.connection;
+
+import Sirius.navigator.connection.RESTfulReconnector;
 
 import org.openide.util.Lookup;
 
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
-import de.cismet.cids.server.ws.rest.RESTfulInterfaceConnector;
+
+import de.cismet.cidsx.client.connector.RESTfulInterfaceConnector;
 
 import de.cismet.netutil.Proxy;
 
