@@ -299,7 +299,7 @@ public class ReportSwingWorker extends SwingWorker<Boolean, Object> {
                 // print aus report und daten erzeugen
                 final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
                 // quer- bzw hochformat übernehmen
-                jasperPrint.setOrientation(jasperReport.getOrientation());
+                jasperPrint.setOrientation(jasperReport.getOrientationValue());
 
                 // zum pdfStream exportieren und der streamliste hinzufügen
                 final ByteArrayOutputStream outTmp = new ByteArrayOutputStream();
