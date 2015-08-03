@@ -13,7 +13,6 @@ import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
-import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassNode;
@@ -27,18 +26,13 @@ import Sirius.server.newuser.UserException;
 import Sirius.util.image.ImageHashMap;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.commons.lang.ClassUtils;
 
 import org.openide.util.Lookup;
 
 import java.awt.GraphicsEnvironment;
 
-import java.beans.BeanInfo;
-import java.beans.Introspector;
 
 import java.net.URI;
 import java.net.URL;
@@ -46,7 +40,6 @@ import java.net.URL;
 import java.rmi.RemoteException;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -65,20 +58,12 @@ import de.cismet.cids.dynamics.CidsBeanInfo;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.search.AbstractCidsServerSearch;
-import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
-import de.cismet.cidsx.base.types.Type;
 
 import de.cismet.cidsx.server.api.types.ActionTask;
-import de.cismet.cidsx.server.api.types.CidsClass;
-import de.cismet.cidsx.server.api.types.SearchParameter;
-import de.cismet.cidsx.server.api.types.legacy.ServerSearchFactory;
-import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
-import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 
 import de.cismet.commons.security.AccessHandler;
 

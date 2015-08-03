@@ -87,6 +87,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                 iconCache.put(classKey, nodeIcon);
             }
         } catch (Exception exp) {
+            LOG.warn("could not load object icon: " + exp.getMessage(), exp);
             this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");         // NOI18N
         }
     }
