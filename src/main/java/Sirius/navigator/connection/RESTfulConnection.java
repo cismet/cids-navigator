@@ -54,6 +54,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
+import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
 import de.cismet.netutil.Proxy;
 
@@ -1078,7 +1079,15 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
         try {
-            return connector.executeTask(user, taskname, taskdomain, body, params);
+            
+            // FIXME: workaround for legacy clients that do not support GenericResourceWithContentType
+            final Object taskResult = connector.executeTask(user, taskname, taskdomain, body, params);
+            if (taskResult != null && GenericResourceWithContentType.class.isAssignableFrom(taskResult.getClass())) {
+                    LOG.warn("REST Action  '" + taskname + "' completed, GenericResourceWithContentType with type '" + ((GenericResourceWithContentType)taskResult).getContentType() + "' generated.");
+                    return ((GenericResourceWithContentType)taskResult).getRes();
+                } else {
+                return taskResult;
+            }
         } catch (final RemoteException e) {
             throw new ConnectionException("could not executeTask: taskname: " + taskname + " || body: " + body
                         + " || taskdomain: " + taskdomain
