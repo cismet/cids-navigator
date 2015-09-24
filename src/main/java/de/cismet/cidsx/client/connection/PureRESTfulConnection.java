@@ -28,11 +28,9 @@ import Sirius.util.image.ImageHashMap;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import org.openide.util.Lookup;
 
 import java.awt.GraphicsEnvironment;
-
 
 import java.net.URI;
 import java.net.URL;
@@ -61,7 +59,6 @@ import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
-
 
 import de.cismet.cidsx.server.api.types.ActionTask;
 
