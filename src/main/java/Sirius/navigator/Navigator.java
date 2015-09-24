@@ -127,7 +127,6 @@ public class Navigator extends JFrame {
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
     private static volatile boolean startupFinished = false;
-    public static final String CLIENT_CERT_PASS_PREFS_KEY = "CLIENT_CERT_PASS";
 
     //~ Instance fields --------------------------------------------------------
 

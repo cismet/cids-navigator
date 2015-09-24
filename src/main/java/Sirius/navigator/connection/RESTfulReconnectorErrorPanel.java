@@ -57,6 +57,7 @@ import de.cismet.reconnector.DefaultReconnectorErrorPanel;
 import de.cismet.reconnector.ReconnectorErrorPanelWithApply;
 
 import static Sirius.navigator.connection.DefaultSSLConfigProvider.CLIENT_CERT_KEYSTORE_FILE_NAME;
+import static Sirius.navigator.connection.DefaultSSLConfigProvider.CLIENT_CERT_PASS_PREFS_KEY;
 import static Sirius.navigator.connection.DefaultSSLConfigProvider.FILE_SEP;
 import static Sirius.navigator.connection.DefaultSSLConfigProvider.SERVER_CERT_FILE_NAME;
 
@@ -74,11 +75,11 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
 
     //~ Instance fields --------------------------------------------------------
 
-    private JFileChooser fileChooser;
+    private final JFileChooser fileChooser;
     private final ProxyOptionsPanel panProxyOptions;
     private final RESTfulReconnector reconnector;
     private DefaultReconnectorErrorPanel errPan;
-    private Preferences navigatorPrefs;
+    private final Preferences cidsPrefs;
     private FileFilter keystoreFileFilter = new FileFilter() {
 
             @Override
@@ -147,8 +148,8 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         this.panProxyOptions = panProxyOptions;
         panProxyOptionsWrapper.add(panProxyOptions, BorderLayout.CENTER);
         panProxyOptionsWrapper.setVisible(false);
-        navigatorPrefs = Preferences.userNodeForPackage(Navigator.class);
-        txtClientCertPass.setText(navigatorPrefs.get(Navigator.CLIENT_CERT_PASS_PREFS_KEY, ""));
+        cidsPrefs = Preferences.userNodeForPackage(DefaultSSLConfigProvider.class);
+        txtClientCertPass.setText(cidsPrefs.get(CLIENT_CERT_PASS_PREFS_KEY, ""));
         txtClientCertPass.getDocument().addDocumentListener(new DocumentListener() {
 
                 @Override
@@ -180,7 +181,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
      * DOCUMENT ME!
      */
     private void updatePass() {
-        navigatorPrefs.put(Navigator.CLIENT_CERT_PASS_PREFS_KEY, new String(txtClientCertPass.getPassword()));
+        cidsPrefs.put(CLIENT_CERT_PASS_PREFS_KEY, new String(txtClientCertPass.getPassword()));
     }
 
     /**
@@ -467,7 +468,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbProxyActionPerformed
+    private void tbProxyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tbProxyActionPerformed
         panProxyOptionsWrapper.setVisible(tbProxy.isSelected());
 
         // hochpendeln bis JDialog
@@ -478,14 +479,14 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         if (parent != null) {
             ((JDialog)parent).pack();
         }
-    }//GEN-LAST:event_tbProxyActionPerformed
+    } //GEN-LAST:event_tbProxyActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tbCertsActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tbCertsActionPerformed
+    private void tbCertsActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tbCertsActionPerformed
         panCertOptionsWrapper.setVisible(tbCerts.isSelected());
         // hochpendeln bis JDialog
         Container parent = this;
@@ -495,44 +496,45 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         if (parent != null) {
             ((JDialog)parent).pack();
         }
-    }//GEN-LAST:event_tbCertsActionPerformed
+    } //GEN-LAST:event_tbCertsActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdGetServerCertActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdGetServerCertActionPerformed
+    private void cmdGetServerCertActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdGetServerCertActionPerformed
         fileChooser.setFileFilter(derFileFilter);
         final int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             final File fileToLoad = fileChooser.getSelectedFile();
             try {
-                Files.copy(fileToLoad, new File(Navigator.NAVIGATOR_HOME + FILE_SEP + SERVER_CERT_FILE_NAME));
+                Files.copy(fileToLoad, new File(DefaultSSLConfigProvider.CIDS_DIR + FILE_SEP + SERVER_CERT_FILE_NAME));
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
             checkGUIState();
         }
-    }//GEN-LAST:event_cmdGetServerCertActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdGetServerCertActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdGetClientCertActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdGetClientCertActionPerformed
+    private void cmdGetClientCertActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdGetClientCertActionPerformed
         fileChooser.setFileFilter(keystoreFileFilter);
         final int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             final File fileToLoad = fileChooser.getSelectedFile();
             try {
-                Files.copy(fileToLoad,
-                    new File(Navigator.NAVIGATOR_HOME + FILE_SEP + CLIENT_CERT_KEYSTORE_FILE_NAME));
+                Files.copy(
+                    fileToLoad,
+                    new File(DefaultSSLConfigProvider.CIDS_DIR + FILE_SEP + CLIENT_CERT_KEYSTORE_FILE_NAME));
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
             checkGUIState();
         }
-    }//GEN-LAST:event_cmdGetClientCertActionPerformed
+    }                                                                                    //GEN-LAST:event_cmdGetClientCertActionPerformed
 }

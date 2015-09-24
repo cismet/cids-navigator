@@ -7,8 +7,6 @@
 ****************************************************/
 package Sirius.navigator.connection;
 
-import Sirius.navigator.Navigator;
-
 import org.apache.log4j.Logger;
 
 import org.openide.util.lookup.ServiceProvider;
@@ -40,28 +38,55 @@ public final class DefaultSSLConfigProvider implements SSLConfigProvider {
     public static final String SERVER_CERT_FILE_NAME = "server.cert.der";
     public static final String CLIENT_CERT_KEYSTORE_FILE_NAME = "client.keystore";
     public static final String FILE_SEP = System.getProperty("file.separator");
-    public static final File LOCAL_SERVER_CERT_FILE = new File(Navigator.NAVIGATOR_HOME + FILE_SEP
+    private static final String EXTENSION = (((System.getProperty("directory.extension")) != null)
+            ? (System.getProperty("directory.extension")) : "");
+    public static final String CIDS_DIR = System.getProperty("user.home") + FILE_SEP + ".cids" + EXTENSION;
+    public static final File LOCAL_SERVER_CERT_FILE = new File(CIDS_DIR + FILE_SEP
                     + SERVER_CERT_FILE_NAME);
-    public static final File CLIENT_CERT_KEYSTORE_FILE = new File(Navigator.NAVIGATOR_HOME + FILE_SEP
+    public static final File CLIENT_CERT_KEYSTORE_FILE = new File(CIDS_DIR + FILE_SEP
                     + CLIENT_CERT_KEYSTORE_FILE_NAME);
+    public static final String CLIENT_CERT_PASS_PREFS_KEY = "CLIENT_CERT_PASS";
 
     private static final transient Logger LOG = Logger.getLogger(DefaultSSLConfigProvider.class);
 
     //~ Instance fields --------------------------------------------------------
 
-    Preferences navigatorPrefs;
+    Preferences cidsPrefs;
     char[] clientCertPWForKeystoreAndKey;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new DefaultSSLConfigProvider object.
+     */
+    public DefaultSSLConfigProvider() {
+        final File cismetDir = new File(CIDS_DIR);
+        if (!cismetDir.exists()) {
+            final boolean success = cismetDir.mkdir();
+            if (!success) {
+                LOG.error("Could not create " + CIDS_DIR);
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(CIDS_DIR + "created.");
+                }
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("CISMET_DIR=" + CIDS_DIR);
+            }
+        }
+    }
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public SSLConfig getSSLConfig() {
         SSLConfig sslConfig = null;
-        InputStream is = null;
-        BufferedInputStream bis = null;
+        final InputStream is;
+        final BufferedInputStream bis;
 
-        navigatorPrefs = Preferences.userNodeForPackage(Navigator.class);
-        clientCertPWForKeystoreAndKey = navigatorPrefs.get(Navigator.CLIENT_CERT_PASS_PREFS_KEY, "").toCharArray();
+        cidsPrefs = Preferences.userNodeForPackage(DefaultSSLConfigProvider.class);
+        clientCertPWForKeystoreAndKey = cidsPrefs.get(CLIENT_CERT_PASS_PREFS_KEY, "").toCharArray();
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("retrieving default SSL config"); // NOI18N
