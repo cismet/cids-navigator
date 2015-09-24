@@ -19,7 +19,9 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
 
+import org.openide.util.Lookup;
 import org.openide.util.WeakListeners;
 
 import java.awt.BorderLayout;
@@ -47,12 +49,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
@@ -67,6 +70,7 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 
+import de.cismet.cids.tools.metaobjectrenderer.CidsBeanAggregationHandler;
 import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
@@ -314,6 +318,32 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             }
             showObjects();
 
+            final Collection<? extends CidsBeanAggregationHandler> allSharedHandlers = Lookup.getDefault()
+                        .lookupAll(CidsBeanAggregationHandler.class);
+            final MultiMap sharedHM = new MultiMap();
+            for (final CidsBeanAggregationHandler sharedHandler : allSharedHandlers) {
+                sharedHM.put(sharedHandler.getSourceMetaClassTablename().toLowerCase(), sharedHandler);
+            }
+            for (final String tableName : (Set<String>)sharedHM.keySet()) {
+                Collections.sort((List<CidsBeanAggregationHandler>)sharedHM.get(tableName),
+                    new Comparator<CidsBeanAggregationHandler>() {
+
+                        @Override
+                        public int compare(final CidsBeanAggregationHandler o1,
+                                final CidsBeanAggregationHandler o2) {
+                            if ((o1 == null) && (o2 == null)) {
+                                return 0;
+                            } else if ((o1 != null) && (o2 == null)) {
+                                return 1;
+                            } else if ((o1 == null) && (o2 != null)) {
+                                return -1;
+                            } else {
+                                return Integer.compare(o1.getPriority(), o2.getPriority());
+                            }
+                        }
+                    });
+            }
+
             worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
                     final List<JComponent> all = new ArrayList<JComponent>();
@@ -330,56 +360,88 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                         && !((DefaultMetaTreeNode)object).isPureNode()
                                         && ((DefaultMetaTreeNode)object).isObjectNode()) {
                                 final ObjectTreeNode n = (ObjectTreeNode)object;
-                                objectsByClass.put(n.getMetaClass(), n);
+                                final MetaClass mc = n.getMetaClass();
+
+                                // look for sharedhandles
+                                final Collection<CidsBeanAggregationHandler> sharedHandlers = (Collection<CidsBeanAggregationHandler>)
+                                    sharedHM.get(mc.getTableName().toLowerCase());
+
+                                boolean consumed = false;
+                                if (sharedHandlers != null) {
+                                    for (final CidsBeanAggregationHandler sharedHandler : sharedHandlers) {
+                                        if (mc.getTableName().equalsIgnoreCase(
+                                                        sharedHandler.getSourceMetaClassTablename())) {
+                                            final Collection<CidsBean> aggrBeans = sharedHandler.getAggregatedBeans(
+                                                    n.getMetaObject().getBean());
+                                            for (final CidsBean aggrBean : aggrBeans) {
+                                                objectsByClass.put(sharedHandler.getTargetMetaClassTablename()
+                                                            .toLowerCase(),
+                                                    new ObjectTreeNode(new MetaObjectNode(aggrBean)));
+                                            }
+                                            if (sharedHandler.consume()) {
+                                                consumed = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (!consumed) {
+                                    objectsByClass.put(mc.getTableName().toLowerCase(), n);
+                                }
                             }
                         }
+
                         final Iterator it = objectsByClass.keySet().iterator();
                         multipleClasses = objectsByClass.keySet().size() > 1;
                         while (it.hasNext() && !isCancelled()) {
                             final Object key = it.next();
                             final List l = (List)objectsByClass.get(key);
 
-                            final List<MetaObject> v = new ArrayList<MetaObject>();
-                            for (final Object o : l) {
-                                v.add(((ObjectTreeNode)o).getMetaObject());
-                            }
-                            final MetaClass mc = ((MetaObject)v.toArray()[0]).getMetaClass();
+                            if (!l.isEmpty()) {
+                                final List<MetaObject> v = new ArrayList<MetaObject>();
+                                for (final Object o : l) {
+                                    v.add(((ObjectTreeNode)o).getMetaObject());
+                                }
+                                final MetaClass mc = ((MetaObject)v.toArray()[0]).getMetaClass();
 
-                            // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden
-                            // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
-                            JComponent aggrRendererTester = null;
+                                // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden
+                                // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
+                                JComponent aggrRendererTester = null;
 
-                            if (l.size() > 1) {
-                                aggrRendererTester = CidsObjectRendererFactory.getInstance()
-                                            .getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")"); // NOI18N
-                            }
-                            if (aggrRendererTester == null) {
-                                LOG.warn("AggregationRenderer was null. Will use SingleRenderer");            // NOI18N
-                                for (final Object object : l) {
-                                    final ObjectTreeNode otn = (ObjectTreeNode)object;
-                                    final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
-                                            CidsObjectRendererFactory.getInstance().getSingleRenderer(
-                                                otn.getMetaObject(),
-                                                otn.getMetaClass().getName()
-                                                        + ": "
-                                                        + otn));
-                                    final CidsBean bean = otn.getMetaObject().getBean();
-                                    final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
+                                if (l.size() > 1) {
+                                    aggrRendererTester = CidsObjectRendererFactory.getInstance()
+                                                .getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")"); // NOI18N
+                                }
+                                if (aggrRendererTester == null) {
+                                    LOG.warn("AggregationRenderer was null. Will use SingleRenderer");            // NOI18N
+                                    for (final Object object : l) {
+                                        final ObjectTreeNode otn = (ObjectTreeNode)object;
+                                        final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
+                                                CidsObjectRendererFactory.getInstance().getSingleRenderer(
+                                                    otn.getMetaObject(),
+                                                    otn.getMetaClass().getName()
+                                                            + ": "
+                                                            + otn));
+                                        final CidsBean bean = otn.getMetaObject().getBean();
+                                        final PropertyChangeListener propertyChangeListener =
+                                            new PropertyChangeListener() {
 
-                                            @Override
-                                            public void propertyChange(final PropertyChangeEvent evt) {
-                                                comp.repaint();
-                                            }
-                                        };
-                                    bean.addPropertyChangeListener(WeakListeners.propertyChange(
-                                            propertyChangeListener,
-                                            bean));
-                                    comp.setStrongListenerReference(propertyChangeListener);
+                                                @Override
+                                                public void propertyChange(final PropertyChangeEvent evt) {
+                                                    comp.repaint();
+                                                }
+                                            };
+                                        bean.addPropertyChangeListener(WeakListeners.propertyChange(
+                                                propertyChangeListener,
+                                                bean));
+                                        comp.setStrongListenerReference(propertyChangeListener);
+                                        publish(comp);
+                                    }
+                                } else {
+                                    final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
                                     publish(comp);
                                 }
-                            } else {
-                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
-                                publish(comp);
                             }
                         }
                         return null;
