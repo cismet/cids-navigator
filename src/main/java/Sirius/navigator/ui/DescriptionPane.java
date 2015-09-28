@@ -363,8 +363,9 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 final MetaClass mc = n.getMetaClass();
 
                                 // look for sharedhandles
-                                final Collection<CidsBeanAggregationHandler> sharedHandlers = (Collection<CidsBeanAggregationHandler>)
-                                    sharedHM.get(mc.getTableName().toLowerCase());
+                                final Collection<CidsBeanAggregationHandler> sharedHandlers =
+                                    (Collection<CidsBeanAggregationHandler>)sharedHM.get(mc.getTableName()
+                                                .toLowerCase());
 
                                 boolean consumed = false;
                                 if (sharedHandlers != null) {
