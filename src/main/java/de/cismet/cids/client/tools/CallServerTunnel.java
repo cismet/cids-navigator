@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.BasicScheme;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
+import org.apache.commons.io.IOUtils;
 
 import org.openide.util.Exceptions;
 
@@ -28,11 +29,13 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 
 import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import de.cismet.cids.server.actions.HttpTunnelAction;
@@ -45,10 +48,8 @@ import de.cismet.commons.security.exceptions.CannotReadFromURLException;
 import de.cismet.netutil.tunnel.TunnelTargetGroup;
 
 import de.cismet.security.GUICredentialsProvider;
+
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import java.io.StringReader;
-import java.util.LinkedHashMap;
-import org.apache.commons.io.IOUtils;
 
 /**
  * DOCUMENT ME!
@@ -282,19 +283,20 @@ public class CallServerTunnel implements Tunnel {
                 "admin",
                 "kif");
             final CallServerTunnel cst = new CallServerTunnel("kjdfhg");
-           
+
             System.out.println(cst.isResponsible(
                     ACCESS_METHODS.GET_REQUEST,
                     "http://chaos.wuppertal-intra.de/weird/path/to/nonsense"));
             System.out.println(cst.isResponsible(ACCESS_METHODS.GET_REQUEST, "http://www.google.de"));
             System.out.println(cst.isResponsible(ACCESS_METHODS.GET_REQUEST, "http://s10221./path/to/X"));
-        
-            InputStream is = cst.doRequest(new URL("http://cismet.de/"), 
-                    new StringReader(""), ACCESS_METHODS.GET_REQUEST, new LinkedHashMap());
-            if(is != null) {
+
+            final InputStream is = cst.doRequest(new URL("http://cismet.de/"),
+                    new StringReader(""),
+                    ACCESS_METHODS.GET_REQUEST,
+                    new LinkedHashMap());
+            if (is != null) {
                 System.out.println(IOUtils.toString(is));
             }
-            
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         } finally {

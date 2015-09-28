@@ -7,14 +7,10 @@
 ****************************************************/
 package Sirius.navigator.connection;
 
-import Sirius.navigator.exception.ConnectionException;
-
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
 import org.openide.util.Lookup;
-
-import java.lang.invoke.MethodHandles;
 
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.ws.SSLConfig;

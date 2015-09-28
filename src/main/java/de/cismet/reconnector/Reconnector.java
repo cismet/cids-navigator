@@ -29,6 +29,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 
+import de.cismet.cids.server.ws.rest.SSLInitializationException;
+
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
@@ -103,6 +105,7 @@ public abstract class Reconnector<S extends Object> {
      * @throws  Throwable  DOCUMENT ME!
      */
     protected abstract ReconnectorException getReconnectorException(final Throwable throwable) throws Throwable;
+
     /**
      * Abbrechen.
      */
@@ -110,6 +113,7 @@ public abstract class Reconnector<S extends Object> {
         reconnectorDialog.setVisible(false);
         isReconnecting = false;
     }
+
     /**
      * Verbindungsaufbau über Swingworker.
      */
@@ -126,6 +130,7 @@ public abstract class Reconnector<S extends Object> {
             connectorWorker.execute();
         }
     }
+
     /**
      * Verbindungsaufbau abbrechen.
      */
@@ -158,6 +163,7 @@ public abstract class Reconnector<S extends Object> {
     public void addListener(final ReconnectorListener listener) {
         listeners.add(listener);
     }
+
     /**
      * Service Proxy.
      *
@@ -217,6 +223,7 @@ public abstract class Reconnector<S extends Object> {
             reconnectorDialog = null;
         }
     }
+
     /**
      * public JPanel registerFrame(final JPanel panel) { final ReconnectorWrapperPanel reconnectorWrapperPanel = new
      * ReconnectorWrapperPanel(panel, createReconnectorPanel()); addListener(reconnectorWrapperPanel);
@@ -234,6 +241,7 @@ public abstract class Reconnector<S extends Object> {
             dispatcher.connectionFailed(new ReconnectorEvent(component));
         }
     }
+
     /**
      * mit GUI oder ohne?
      *
@@ -298,11 +306,20 @@ public abstract class Reconnector<S extends Object> {
                     serviceFailed(ex);
                 } catch (final InvocationTargetException ex) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Exception while invocation", ex); // NOI18N
+                        LOG.debug("Exception while invocation", ex);        // NOI18N
                     }
                     targetEx = ex.getTargetException();
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Wrapped Exception", targetEx);    // NOI18N
+                        LOG.debug("Wrapped Exception", targetEx);           // NOI18N
+                    }
+                    serviceFailed(getReconnectorException(targetEx));
+                } catch (final SSLInitializationException sslInitEx) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Exception while invocation", sslInitEx); // NOI18N
+                    }
+                    targetEx = sslInitEx.getCause();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Wrapped Exception", targetEx);           // NOI18N
                     }
                     serviceFailed(getReconnectorException(targetEx));
                 }
