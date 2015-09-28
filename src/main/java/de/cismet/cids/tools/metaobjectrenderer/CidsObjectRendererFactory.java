@@ -152,6 +152,58 @@ public class CidsObjectRendererFactory {
     /**
      * DOCUMENT ME!
      *
+     * @param   rendererClass  DOCUMENT ME!
+     * @param   moCollection   DOCUMENT ME!
+     * @param   title          DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  RuntimeException  DOCUMENT ME!
+     */
+    public JComponent getAggregationRenderer(final Class<?> rendererClass,
+            final Collection<MetaObject> moCollection,
+            final String title) {
+        final Collection<CidsBean> beans;
+        if (CidsBeanAggregationRenderer.class.isAssignableFrom(rendererClass)) {
+            beans = TypeSafeCollections.newArrayList(moCollection.size());
+            for (final MetaObject currentMO : moCollection) {
+                beans.add(currentMO.getBean());
+            }
+        } else {
+            beans = null;
+        }
+        try {
+            final Object rendererInstanceObject = rendererClass.newInstance();
+            if (beans != null) {
+                final CidsBeanAggregationRenderer rendererComp = (CidsBeanAggregationRenderer)rendererInstanceObject;
+                rendererComp.setTitle(title);
+                rendererComp.setCidsBeans(beans);
+                if (log.isDebugEnabled()) {
+                    log.debug("Will return " + rendererComp); // NOI18N
+                }
+                if ((cw != null) && !(rendererComp instanceof DoNotWrap)) {
+                    return (JComponent)cw.wrapComponent((JComponent)rendererComp);
+                } else {
+                    return (JComponent)rendererComp;
+                }
+            } else if (rendererInstanceObject instanceof MetaObjectRenderer) {
+                final MetaObjectRenderer mor = (MetaObjectRenderer)rendererInstanceObject;
+                final JComponent comp = mor.getAggregationRenderer(moCollection, title);
+                if ((cw != null) && !(comp instanceof DoNotWrap)) {
+                    return (JComponent)cw.wrapComponent(comp);
+                } else {
+                    return comp;
+                }
+            }
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
+        return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   moCollection  DOCUMENT ME!
      * @param   title         DOCUMENT ME!
      *
@@ -161,7 +213,6 @@ public class CidsObjectRendererFactory {
         if (moCollection.size() == 1) {
             return getSingleRenderer(moCollection.iterator().next(), title);
         } else {
-//            final boolean isEDT = EventQueue.isDispatchThread();
             final MetaObject mo = moCollection.iterator().next();
             final MetaClass mc = mo.getMetaClass();
             JComponent resultReferenceHolder = null;
@@ -170,56 +221,10 @@ public class CidsObjectRendererFactory {
                         mc,
                         ClassloadingHelper.CLASS_TYPE.AGGREGATION_RENDERER);
                 if (rendererClass != null) {
-                    final Collection<CidsBean> beans;
-                    if (CidsBeanAggregationRenderer.class.isAssignableFrom(rendererClass)) {
-                        beans = TypeSafeCollections.newArrayList(moCollection.size());
-                        for (final MetaObject currentMO : moCollection) {
-                            beans.add(currentMO.getBean());
-                        }
-                    } else {
-                        beans = null;
-                    }
-//                final Runnable aggregationRendererCreator = new Runnable() {
-//
-//                    @Override
-//                    public void run() {
-                    try {
-                        final Object rendererInstanceObject = rendererClass.newInstance();
-                        if (beans != null) {
-                            final CidsBeanAggregationRenderer rendererComp = (CidsBeanAggregationRenderer)
-                                rendererInstanceObject;
-                            rendererComp.setTitle(title);
-                            rendererComp.setCidsBeans(beans);
-                            if (log.isDebugEnabled()) {
-                                log.debug("Will return " + rendererComp); // NOI18N
-                            }
-                            if ((cw != null) && !(rendererComp instanceof DoNotWrap)) {
-                                resultReferenceHolder = (JComponent)cw.wrapComponent((JComponent)rendererComp);
-                            } else {
-                                resultReferenceHolder = (JComponent)rendererComp;
-                            }
-                        } else if (rendererInstanceObject instanceof MetaObjectRenderer) {
-                            final MetaObjectRenderer mor = (MetaObjectRenderer)rendererInstanceObject;
-                            final JComponent comp = mor.getAggregationRenderer(moCollection, title);
-                            if ((cw != null) && !(comp instanceof DoNotWrap)) {
-                                resultReferenceHolder = (JComponent)cw.wrapComponent(comp);
-                            } else {
-                                resultReferenceHolder = comp;
-                            }
-                        }
-                    } catch (Throwable t) {
-                        throw new RuntimeException(t);
-                    }
-//                    }
-//                };
-//                if (isEDT) {
-//                    aggregationRendererCreator.run();
-//                } else {
-//                    EventQueue.invokeAndWait(aggregationRendererCreator);
-//                }
+                    resultReferenceHolder = getAggregationRenderer(rendererClass, moCollection, title);
                 }
             } catch (Exception e) {
-                log.error("Error while creating the renderer.", e);       // NOI18N
+                log.error("Error while creating the renderer.", e); // NOI18N
             }
             return resultReferenceHolder;
         }
