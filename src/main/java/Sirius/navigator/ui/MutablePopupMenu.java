@@ -27,6 +27,7 @@ import Sirius.navigator.ui.embedded.EmbeddedComponent;
 import Sirius.navigator.ui.embedded.EmbeddedMenu;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
+import Sirius.navigator.ui.tree.WorkingSpaceTree;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaNode;
@@ -97,6 +98,8 @@ public final class MutablePopupMenu extends JPopupMenu {
 
     private final JMenuItem specialTreeItem;
     private final JMenuItem newObject;
+    private JMenuItem moveToWorkingSpace = null;
+    private JMenuItem exploreSubtreeMenu = null;
 
     private final PluginMenuesMap pluginMenues;
 
@@ -139,6 +142,11 @@ public final class MutablePopupMenu extends JPopupMenu {
                 specialTreeItem));
         this.add(specialTreeItem);
 
+        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+            moveToWorkingSpace = new MoveToWorkingSpaceTreeMethod();
+            this.add(moveToWorkingSpace);
+        }
+
         this.add(new JSeparator(JSeparator.HORIZONTAL));
 
         this.addPopupMenuListener(new DynamicPopupMenuListener());
@@ -148,7 +156,8 @@ public final class MutablePopupMenu extends JPopupMenu {
         this.add(new EditObjectMethod());
         this.add(new DeleteObjectMethod());
         this.add(newObject);
-        this.add(new ExploreSubTreeMethod());
+        exploreSubtreeMenu = new ExploreSubTreeMethod();
+        this.add(exploreSubtreeMenu);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -332,20 +341,36 @@ public final class MutablePopupMenu extends JPopupMenu {
                 }
             }
 
-            if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof SearchResultsTree) {
+            if (ComponentRegistry.getRegistry().getActiveCatalogue().getClass() == SearchResultsTree.class) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("showing default search tree menues");             // NOI18N
                 }
                 specialTreeItem.setText(org.openide.util.NbBundle.getMessage(
                         MutablePopupMenu.class,
                         "MutablePopupMenu.specialTreeItem.deleteEntries.text")); // NOI18N
-            } else if (ComponentRegistry.getRegistry().getActiveCatalogue() instanceof MetaCatalogueTree) {
+                if (moveToWorkingSpace != null) {
+                    moveToWorkingSpace.setVisible(true);
+                }
+                exploreSubtreeMenu.setVisible(false);
+            } else if (ComponentRegistry.getRegistry().getActiveCatalogue().getClass() == MetaCatalogueTree.class) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("showing default catalogue menues");               // NOI18N
                 }
                 specialTreeItem.setText(org.openide.util.NbBundle.getMessage(
                         MutablePopupMenu.class,
                         "MutablePopupMenu.specialTreeItem.adoptInTree.text"));   // NOI18N
+                if (moveToWorkingSpace != null) {
+                    moveToWorkingSpace.setVisible(true);
+                }
+                exploreSubtreeMenu.setVisible(true);
+            } else if (ComponentRegistry.getRegistry().getActiveCatalogue().getClass() == WorkingSpaceTree.class) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("showing default workingspace menues");            // NOI18N
+                }
+                if (moveToWorkingSpace != null) {
+                    moveToWorkingSpace.setVisible(false);
+                }
+                exploreSubtreeMenu.setVisible(false);
             }
 
             // enable/disable menues
@@ -648,7 +673,6 @@ public final class MutablePopupMenu extends JPopupMenu {
         //~ Constructors -------------------------------------------------------
 
         // TODO es wird noch deleteNode aufgerufen
-
         /**
          * Creates a new DeleteObjectMethod object.
          */
@@ -798,6 +822,54 @@ public final class MutablePopupMenu extends JPopupMenu {
                 } else {
                     EventQueue.invokeLater(r);
                 }
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class MoveToWorkingSpaceTreeMethod extends PluginMenuItem implements PluginMethod {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ExploreSubTreeMethod object.
+         */
+        public MoveToWorkingSpaceTreeMethod() {
+            super(MethodManager.NONE);
+
+            this.pluginMethod = this;
+
+            this.setText(org.openide.util.NbBundle.getMessage(
+                    MutablePopupMenu.class,
+                    "MutablePopupMenu.moveToWorkingSpace.text"));   // NOI18N
+            this.setIcon(resources.getIcon("clipboard--plus.png")); // NOI18N
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String getId() {
+            return this.getClass().getName();
+        }
+
+        @Override
+        public void invoke() throws Exception {
+            final DefaultMetaTreeNode[] selectedTreeNodes = ComponentRegistry.getRegistry()
+                        .getActiveCatalogue()
+                        .getSelectedNodesArray();
+
+            if ((selectedTreeNodes != null) && (selectedTreeNodes.length > 0)) {
+                final Node[] selectedNodes = new Node[selectedTreeNodes.length];
+
+                for (int i = 0; i < selectedTreeNodes.length; i++) {
+                    selectedNodes[i] = selectedTreeNodes[i].getNode();
+                }
+
+                ComponentRegistry.getRegistry().getWorkingSpaceTree().setResultNodes(selectedNodes, true, null);
             }
         }
     }

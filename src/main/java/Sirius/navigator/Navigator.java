@@ -21,7 +21,6 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.CidsSearchInitializer;
-import Sirius.navigator.search.dynamic.FormDataBean;
 import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.*;
@@ -35,6 +34,8 @@ import Sirius.navigator.ui.status.StatusChangeListener;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 import Sirius.navigator.ui.tree.SearchResultsTreePanel;
+import Sirius.navigator.ui.tree.WorkingSpace;
+import Sirius.navigator.ui.tree.WorkingSpaceTree;
 import Sirius.navigator.ui.widget.FloatingFrameConfigurator;
 
 import Sirius.server.middleware.types.*;
@@ -46,35 +47,20 @@ import Sirius.server.newuser.permission.*;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.HttpConnection;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.*;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import java.net.URL;
 
 import java.util.*;
 import java.util.prefs.*;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import javax.swing.*;
 
@@ -90,7 +76,6 @@ import de.cismet.netutil.Proxy;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
-import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
 
@@ -143,6 +128,8 @@ public class Navigator extends JFrame {
     private MutablePopupMenu popupMenu;
     private MetaCatalogueTree metaCatalogueTree;
     private SearchResultsTree searchResultsTree;
+    private WorkingSpace workingSpace;
+    private WorkingSpaceTree workingSpaceTree;
     private AttributeViewer attributeViewer;
     private AttributeEditor attributeEditor;
     private SearchDialog searchDialog;
@@ -560,6 +547,28 @@ public class Navigator extends JFrame {
             MutableConstraints.ANY_INDEX);
         container.add(searchResultsTreeConstraints);
 
+        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+            // WorkingSPace ---------------------------------------------------
+            progressObserver.setProgress(
+                235,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
+            workingSpaceTree = new WorkingSpaceTree();
+            workingSpace = new WorkingSpace(workingSpaceTree, propertyManager.isAdvancedLayout());
+            // dnd
+            new MetaTreeNodeDnDHandler(workingSpaceTree);
+
+            final MutableConstraints workingSpaceTreeConstraints = new MutableConstraints(
+                    propertyManager.isAdvancedLayout());
+            workingSpaceTreeConstraints.addAsComponent(
+                ComponentRegistry.WORKINGSPACE_TREE,
+                workingSpace,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.WorkingSpaceTreePanel.name"),    // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.WorkingSpaceTreePanel.tooltip"), // NOI18N
+                resourceManager.getIcon("clipboard-list.png"),                                                    // NOI18N
+                MutableConstraints.P1,
+                MutableConstraints.ANY_INDEX);
+            container.add(workingSpaceTreeConstraints);
+        }
         // AttributePanel ------------------------------------------------------
         progressObserver.setProgress(
             250,
@@ -727,6 +736,7 @@ public class Navigator extends JFrame {
             popupMenu,
             metaCatalogueTree,
             searchResultsTree,
+            workingSpaceTree,
             attributeViewer,
             attributeEditor,
             searchDialog,
@@ -788,6 +798,16 @@ public class Navigator extends JFrame {
         final DefaultPopupMenuListener cataloguePopupMenuListener = new DefaultPopupMenuListener(popupMenu);
         metaCatalogueTree.addMouseListener(cataloguePopupMenuListener);
         searchResultsTree.addMouseListener(cataloguePopupMenuListener);
+
+        if (PropertyManager.getManager().isWorkingSpaceEnabled() && (workingSpaceTree != null)) {
+            workingSpaceTree.addStatusChangeListener(statusChangeListener);
+            workingSpaceTree.addTreeSelectionListener(catalogueSelectionListener);
+            workingSpaceTree.addComponentListener(new CatalogueActivationListener(
+                    workingSpaceTree,
+                    attributeViewer,
+                    descriptionPane));
+            workingSpaceTree.addMouseListener(cataloguePopupMenuListener);
+        }
     }
 
     /**
@@ -1119,13 +1139,11 @@ public class Navigator extends JFrame {
                 PropertyConfigurator.configure(properties);
 
                 // log4j configuration .....................................
-
                 PropertyManager.getManager()
                         .configure(args[1], args[2], args[3], null, ((args.length > 5) ? args[5] : null));
             }
 
             // configuration ...................................................
-
             // look and feel ...................................................
             LAFManager.getManager().changeLookAndFeel(PropertyManager.getManager().getLookAndFeel());
 
