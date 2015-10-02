@@ -106,7 +106,7 @@ public final class PropertyManager {
     private final ProgressObserver sharedProgressObserver;
     private boolean editable;
     private boolean autoClose = false;
-    private boolean workingSpaceEnabled = true;
+    private boolean workingSpaceEnabled = false;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
 
     /**
@@ -248,6 +248,17 @@ public final class PropertyManager {
      */
     public void setWorkingSpaceEnabled(final boolean workingSpaceEnabled) {
         this.workingSpaceEnabled = workingSpaceEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  input  DOCUMENT ME!
+     */
+    public void setWorkingSpaceEnabled(final String input) {
+        if ((input != null) && input.trim().equalsIgnoreCase("true")) {
+            this.workingSpaceEnabled = true;
+        }
     }
 
     /**
@@ -1013,6 +1024,8 @@ public final class PropertyManager {
             this.setProxyDomain(value);
         } else if (property.equals("navigator.descriptionPane.htmlRenderer")) {
             this.setDescriptionPaneHtmlRenderer(value);
+        } else if (property.equals("navigator.workingspace.enabled")) {
+            this.setWorkingSpaceEnabled(value);
         }
     }
 
