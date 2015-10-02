@@ -16,6 +16,7 @@ import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.dialog.CoordinateChooser;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
+import Sirius.navigator.ui.tree.WorkingSpaceTree;
 
 import org.apache.log4j.Logger;
 
@@ -37,6 +38,7 @@ public class ComponentRegistry {
 
     public static final String CATALOGUE_TREE = MetaCatalogueTree.class.getName();
     public static final String SEARCHRESULTS_TREE = SearchResultsTree.class.getName();
+    public static final String WORKINGSPACE_TREE = WorkingSpaceTree.class.getName();
     public static final String ATTRIBUTE_VIEWER = AttributeViewer.class.getName();
     public static final String ATTRIBUTE_EDITOR = AttributeEditor.class.getName();
     public static final String DESCRIPTION_PANE = DescriptionPane.class.getName();
@@ -58,6 +60,8 @@ public class ComponentRegistry {
     private SearchDialog searchDialog = null;
     /** Holds value of property searchResultsTree. */
     private SearchResultsTree searchResultsTree = null;
+    private WorkingSpaceTree workingSpaceTree = null;
+
     /** Holds value of property queryResultProfileManager. */
     private Sirius.navigator.search.dynamic.profile.QueryResultProfileManager queryResultProfileManager = null;
     /** Holds value of property mutableContainer. */
@@ -90,6 +94,7 @@ public class ComponentRegistry {
      * @param   mutablePopupMenu   DOCUMENT ME!
      * @param   catalogueTree      DOCUMENT ME!
      * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
      * @param   searchDialog       DOCUMENT ME!
@@ -104,6 +109,7 @@ public class ComponentRegistry {
             final MutablePopupMenu mutablePopupMenu,
             final MetaCatalogueTree catalogueTree,
             final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
@@ -115,6 +121,7 @@ public class ComponentRegistry {
             mutablePopupMenu,
             catalogueTree,
             searchResultsTree,
+            workingSpaceTree,
             attributeViewer,
             attributeEditor,
             searchDialog,
@@ -132,6 +139,7 @@ public class ComponentRegistry {
      * @param   mutablePopupMenu   DOCUMENT ME!
      * @param   catalogueTree      DOCUMENT ME!
      * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
      * @param   searchDialog       DOCUMENT ME!
@@ -146,6 +154,7 @@ public class ComponentRegistry {
             final MutablePopupMenu mutablePopupMenu,
             final MetaCatalogueTree catalogueTree,
             final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
@@ -157,6 +166,7 @@ public class ComponentRegistry {
         this.mutablePopupMenu = mutablePopupMenu;
         this.catalogueTree = catalogueTree;
         this.searchResultsTree = searchResultsTree;
+        this.workingSpaceTree = workingSpaceTree;
         this.attributeViewer = attributeViewer;
         this.attributeEditor = attributeEditor;
         this.searchDialog = searchDialog;
@@ -192,6 +202,7 @@ public class ComponentRegistry {
      * @param   mutablePopupMenu   DOCUMENT ME!
      * @param   catalogueTree      DOCUMENT ME!
      * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
      * @param   searchDialog       DOCUMENT ME!
@@ -206,6 +217,7 @@ public class ComponentRegistry {
             final MutablePopupMenu mutablePopupMenu,
             final MetaCatalogueTree catalogueTree,
             final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
@@ -221,6 +233,7 @@ public class ComponentRegistry {
                         mutablePopupMenu,
                         catalogueTree,
                         searchResultsTree,
+                        workingSpaceTree,
                         attributeViewer,
                         attributeEditor,
                         searchDialog,
@@ -240,6 +253,7 @@ public class ComponentRegistry {
      * @param   mutablePopupMenu   DOCUMENT ME!
      * @param   catalogueTree      DOCUMENT ME!
      * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
      * @param   searchDialog       DOCUMENT ME!
@@ -254,6 +268,7 @@ public class ComponentRegistry {
             final MutablePopupMenu mutablePopupMenu,
             final MetaCatalogueTree catalogueTree,
             final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
             final SearchDialog searchDialog,
@@ -269,6 +284,7 @@ public class ComponentRegistry {
                         mutablePopupMenu,
                         catalogueTree,
                         searchResultsTree,
+                        workingSpaceTree,
                         attributeViewer,
                         attributeEditor,
                         searchDialog,
@@ -295,16 +311,48 @@ public class ComponentRegistry {
      * @return  DOCUMENT ME!
      */
     public MetaCatalogueTree getActiveCatalogue() {
-        if (catalogueTree.isShowing() && searchResultsTree.isShowing()) {
-            if (catalogueTree.getSelectedNodeCount() >= searchResultsTree.getSelectedNodeCount()) {
-                return catalogueTree;
-            } else {
-                return searchResultsTree;
+        int showingTeeCount = 0;
+        MetaCatalogueTree singleShowing = null;
+        int catSelCount = 0;
+        int searchSelCount = 0;
+        int workSelCount = 0;
+        if (catalogueTree != null) {
+            catSelCount = catalogueTree.getSelectedNodeCount();
+            if (catalogueTree.isShowing()) {
+                showingTeeCount++;
+                singleShowing = catalogueTree;
             }
-        } else if (catalogueTree.isShowing()) {
-            return catalogueTree;
+        }
+        if (searchResultsTree != null) {
+            searchSelCount = searchResultsTree.getSelectedNodeCount();
+            if (searchResultsTree.isShowing()) {
+                showingTeeCount++;
+                singleShowing = searchResultsTree;
+            }
+        }
+        if (workingSpaceTree != null) {
+            workSelCount = workingSpaceTree.getSelectedNodeCount();
+            if (workingSpaceTree.isShowing()) {
+                showingTeeCount++;
+                singleShowing = workingSpaceTree;
+            }
+        }
+
+        if (showingTeeCount > 1) {
+            if ((catSelCount >= searchSelCount) && (catSelCount >= workSelCount)) {
+                return catalogueTree;
+            } else if ((searchSelCount >= catSelCount) && (searchSelCount >= workSelCount)) {
+                return searchResultsTree;
+            } else if ((workSelCount >= catSelCount) && (workSelCount >= searchSelCount)) {
+                return workingSpaceTree;
+            } else {
+                // WHAT!?!
+                return catalogueTree;
+            }
+        } else if (showingTeeCount == 1) {
+            return singleShowing;
         } else {
-            return searchResultsTree;
+            return catalogueTree;
         }
     }
 
@@ -397,6 +445,15 @@ public class ComponentRegistry {
      */
     public SearchResultsTree getSearchResultsTree() {
         return this.searchResultsTree;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public WorkingSpaceTree getWorkingSpaceTree() {
+        return this.workingSpaceTree;
     }
 
     /**

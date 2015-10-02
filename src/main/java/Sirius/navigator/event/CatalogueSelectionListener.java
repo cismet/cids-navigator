@@ -75,21 +75,29 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
 
         final MetaCatalogueTree catalogue = ComponentRegistry.getRegistry().getCatalogueTree();
         final MetaCatalogueTree searchResults = ComponentRegistry.getRegistry().getSearchResultsTree();
+        final MetaCatalogueTree workingArea = ComponentRegistry.getRegistry().getWorkingSpaceTree();
 
         if (t == catalogue) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("searchresults tree changed");
             }
-            searchResults.removeTreeSelectionListener(this);
-            searchResults.clearSelection();
-            searchResults.addTreeSelectionListener(this);
-        } else {
+            tryToClearSelection(searchResults);
+            tryToClearSelection(workingArea);
+        } else if (t == searchResults) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("catalogue tree changed");
             }
+            tryToClearSelection(catalogue);
+            tryToClearSelection(workingArea);
             catalogue.removeTreeSelectionListener(this);
             catalogue.clearSelection();
             catalogue.addTreeSelectionListener(this);
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("working area tree changed");
+            }
+            tryToClearSelection(catalogue);
+            tryToClearSelection(searchResults);
         }
 
         final TreePath[] treePaths = t.getSelectionPaths();
@@ -102,6 +110,19 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
         }
         CatalogueSelectionListener.this.attributeViewer.setTreeNodes(objects);
         CatalogueSelectionListener.this.descriptionPane.setNodesDescriptions(objects);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  tree  DOCUMENT ME!
+     */
+    private void tryToClearSelection(final MetaCatalogueTree tree) {
+        if (tree != null) {
+            tree.removeTreeSelectionListener(this);
+            tree.clearSelection();
+            tree.addTreeSelectionListener(this);
+        }
     }
 
     /**

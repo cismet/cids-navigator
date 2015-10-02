@@ -106,6 +106,7 @@ public final class PropertyManager {
     private final ProgressObserver sharedProgressObserver;
     private boolean editable;
     private boolean autoClose = false;
+    private boolean workingSpaceEnabled = true;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
 
     /**
@@ -229,6 +230,24 @@ public final class PropertyManager {
     public void setSize(final String width, final String height) {
         this.setWidth(width);
         this.setHeight(height);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isWorkingSpaceEnabled() {
+        return workingSpaceEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  workingSpaceEnabled  DOCUMENT ME!
+     */
+    public void setWorkingSpaceEnabled(final boolean workingSpaceEnabled) {
+        this.workingSpaceEnabled = workingSpaceEnabled;
     }
 
     /**
