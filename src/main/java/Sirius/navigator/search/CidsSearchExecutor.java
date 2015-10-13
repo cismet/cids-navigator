@@ -134,7 +134,7 @@ public final class CidsSearchExecutor {
 
                         final Node[] ret = aln.toArray(new Node[0]);
                         if (!isCancelled()) {
-                            MethodManager.getManager().showSearchResults(ret, false, searchResultsListener);
+                            MethodManager.getManager().showSearchResults(search, ret, false, searchResultsListener);
                         }
                         return ret;
                     }
@@ -237,7 +237,7 @@ public final class CidsSearchExecutor {
                     if (!isCancelled()) {
                         if (!suppressEmptyResultMessage || (result.length > 0)) {
                             MethodManager.getManager()
-                                    .showSearchResults(result, false, searchResultsTreeListener, simpleSort);
+                                    .showSearchResults(search, result, false, searchResultsTreeListener, simpleSort);
                         }
                     }
 

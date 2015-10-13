@@ -12,6 +12,7 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.tree.postfilter.PostFilterGUI;
 
 import Sirius.server.search.store.QueryInfo;
 
@@ -33,7 +34,7 @@ import de.cismet.tools.gui.JPopupMenuButton;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class SearchResultsTreePanel extends JPanel {
+public class SearchResultsTreePanel extends JPanel implements ResultNodeListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -49,6 +50,11 @@ public class SearchResultsTreePanel extends JPanel {
     private JCheckBox showDirectlyInMap;
     private JCheckBox showDirectlyInRenderer;
     private JToggleButton tbnSort;
+    private JSplitPane splitPane;
+    private JPanel treePanel;
+    private JPanel postFilterPanel;
+    private JTabbedPane tabFilters = new JTabbedPane();
+    private JToggleButton tbnFilteredResults;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -62,7 +68,7 @@ public class SearchResultsTreePanel extends JPanel {
     }
 
     /**
-     * Creates a new instance of SearchResultsTreePanel.
+     * Creates a new SearchResultsTreePanel object.
      *
      * @param  searchResultsTree  DOCUMENT ME!
      * @param  advancedLayout     DOCUMENT ME!
@@ -76,7 +82,6 @@ public class SearchResultsTreePanel extends JPanel {
                 JToolBar.HORIZONTAL);
         this.toolBar.setRollover(advancedLayout);
         this.toolBar.setFloatable(advancedLayout);
-
         this.init();
     }
 
@@ -87,10 +92,20 @@ public class SearchResultsTreePanel extends JPanel {
      */
     private void init() {
         this.createDefaultButtons();
-        this.add(toolBar, BorderLayout.SOUTH);
-        this.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
+        if (searchResultsTree instanceof PostfilterEnabledSearchResultsTree) {
+            treePanel = new JPanel(new BorderLayout());
+            postFilterPanel = new JPanel(new BorderLayout());
+            splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treePanel, postFilterPanel);
+            treePanel.add(toolBar, BorderLayout.SOUTH);
+            treePanel.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
+            this.add(splitPane, BorderLayout.CENTER);
+            postFilterPanel.add(tabFilters);
+            searchResultsTree.addResultNodeListener(this);
+        } else {
+            this.add(toolBar, BorderLayout.SOUTH);
+            this.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
+        }
         this.setButtonsEnabled();
-
         final ButtonEnablingListener buttonEnablingListener = new ButtonEnablingListener();
         this.searchResultsTree.addTreeSelectionListener(buttonEnablingListener);
         this.searchResultsTree.addPropertyChangeListener("browse", buttonEnablingListener); // NOI18N
@@ -103,7 +118,8 @@ public class SearchResultsTreePanel extends JPanel {
     private void createDefaultButtons() {
         final ResourceManager resources = ResourceManager.getManager();
         final ActionListener toolBarListener = new ToolBarListener();
-
+        tbnFilteredResults = new JToggleButton(resources.getIcon("funnel.png"));
+        tbnFilteredResults.setEnabled(false);
         tbnSort = new JToggleButton(resources.getIcon("sort_ascending_16.png"));
         tbnSort.setToolTipText(org.openide.util.NbBundle.getMessage(
                 SearchResultsTreePanel.class,
@@ -211,6 +227,71 @@ public class SearchResultsTreePanel extends JPanel {
                 SearchResultsTreePanel.class,
                 "SearchResultsTreePanel.showDirectInRendererLabel.tooltipText")); // NOI18N
         toolBar.add(showDirectlyInRendererLabel);
+
+        if (isPostFiltersEnabled()) {
+            // Postfilterpecific Buttons
+
+//        tbnResetFilteredResults.setToolTipText(org.openide.util.NbBundle.getMessage(
+//                SearchResultsTreePanel.class,
+//                "SearchResultsTreePanel.tbnSort.tooltip"));
+            tbnFilteredResults.setMargin(new Insets(4, 4, 4, 4));
+            tbnFilteredResults.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        if (!tbnFilteredResults.isSelected()) {
+                            ((PostfilterEnabledSearchResultsTree)getSearchResultsTree()).clearFilter();
+                        }
+                    }
+                });
+            toolBar.add(Box.createHorizontalGlue());
+            toolBar.add(tbnFilteredResults);
+        }
+    }
+
+    @Override
+    public void resultNodesChanged() {
+        final Component tabFiltersVisComp = tabFilters.getSelectedComponent();
+        tbnFilteredResults.setSelected(false);
+        tbnFilteredResults.setEnabled(false);
+        tabFilters.setVisible(true);
+        for (final PostFilterGUI pfg
+                    : ((PostfilterEnabledSearchResultsTree)searchResultsTree).getAvailablePostFilterGUIs()) {
+            if (pfg.canHandle(searchResultsTree.resultNodes)) {
+                pfg.initializeFilter(searchResultsTree.resultNodes);
+                tabFilters.add(pfg.getTitle(), pfg.getGUI());
+                if (pfg.getIcon() != null) {
+                    tabFilters.setIconAt(tabFilters.indexOfComponent(pfg.getGUI()), pfg.getIcon());
+                }
+                pfg.addPostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
+            } else {
+                pfg.removePostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
+                tabFilters.remove(pfg.getGUI());
+            }
+        }
+        try {
+            if (tabFiltersVisComp != null) {
+                tabFilters.setSelectedComponent(tabFiltersVisComp);
+            }
+        } catch (Exception skip) {
+        }
+    }
+
+    @Override
+    public void resultNodesFiltered() {
+        tbnFilteredResults.setSelected(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+        tbnFilteredResults.setEnabled(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+
+        for (final Component c : tabFilters.getComponents()) {
+            if (c instanceof PostFilterGUI) {
+                ((PostFilterGUI)c).adjustFilter(searchResultsTree.resultNodes);
+            }
+        }
+    }
+
+    @Override
+    public void resultNodesCleared() {
+        tabFilters.setVisible(false);
     }
 
     /**
@@ -233,6 +314,15 @@ public class SearchResultsTreePanel extends JPanel {
 
         // saveAllButton.setEnabled(!searchResultsTree.isEmpty());
         saveAllButton.setEnabled(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isPostFiltersEnabled() {
+        return (searchResultsTree instanceof PostfilterEnabledSearchResultsTree);
     }
 
     /**

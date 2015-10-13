@@ -12,13 +12,13 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.DescriptionPane;
 
 import Sirius.server.middleware.types.*;
 
 import org.apache.log4j.Logger;
 
 import java.awt.EventQueue;
+import java.awt.Toolkit;
 
 import java.beans.PropertyChangeListener;
 
@@ -33,10 +33,10 @@ import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.cismet.cids.client.tools.DevelopmentTools;
-
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
+
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -58,8 +58,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
     //~ Instance fields --------------------------------------------------------
 
+    protected HashArrayList<Node> resultNodes = new HashArrayList<Node>();
+
+    protected boolean muteResultNodeListeners = false;
+
     private boolean empty = true;
-    private HashArrayList<Node> resultNodes = new HashArrayList<Node>();
     private final RootTreeNode rootNode;
     private Thread runningNameLoader = null;
     private SwingWorker<ArrayList<DefaultMetaTreeNode>, Void> refreshWorker;
@@ -67,6 +70,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private boolean ascending = true;
     private final WaitTreeNode waitTreeNode = new WaitTreeNode();
     private boolean syncWithRenderer;
+    private MetaObjectNodeServerSearch underlyingSearch;
+
+    private ArrayList<ResultNodeListener> resultNodeListeners = new ArrayList<ResultNodeListener>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -109,9 +115,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
         if ((nodes == null) || (nodes.length < 1)) {
             empty = true;
             resultNodes.clear();
+            fireResultNodesCleared();
         } else {
             empty = false;
             resultNodes = new HashArrayList<Node>(Arrays.asList(nodes));
+            fireResultNodesChanged();
         }
 
         if (resultNodes.size() > 0) {
@@ -124,6 +132,57 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public void syncWithMap() {
         syncWithMap(isSyncWithMap());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  rnl  DOCUMENT ME!
+     */
+    public void addResultNodeListener(final ResultNodeListener rnl) {
+        resultNodeListeners.add(rnl);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  rnl  DOCUMENT ME!
+     */
+    public void removeResultNodeListener(final ResultNodeListener rnl) {
+        resultNodeListeners.add(rnl);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void fireResultNodesChanged() {
+        if (!muteResultNodeListeners) {
+            for (final ResultNodeListener rnl : resultNodeListeners) {
+                rnl.resultNodesChanged();
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void fireResultNodesFiltered() {
+        if (!muteResultNodeListeners) {
+            for (final ResultNodeListener rnl : resultNodeListeners) {
+                rnl.resultNodesFiltered();
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void fireResultNodesCleared() {
+        if (!muteResultNodeListeners) {
+            for (final ResultNodeListener rnl : resultNodeListeners) {
+                rnl.resultNodesCleared();
+            }
+        }
     }
 
     /**
@@ -218,6 +277,24 @@ public class SearchResultsTree extends MetaCatalogueTree {
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObjectNodeServerSearch getUnderlyingSearch() {
+        return underlyingSearch;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  underlyingSearch  DOCUMENT ME!
+     */
+    public void setUnderlyingSearch(final MetaObjectNodeServerSearch underlyingSearch) {
+        this.underlyingSearch = underlyingSearch;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
@@ -267,7 +344,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
         empty = false;
         refreshTree(true, listener, simpleSort, sortActive);
-
+        fireResultNodesChanged();
         if (!getModel().getRoot().equals(rootNode)) {
             ((DefaultTreeModel)getModel()).setRoot(rootNode);
             ((DefaultTreeModel)getModel()).reload();
@@ -510,6 +587,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                     }
                 }
                 resultNodes.removeAll(selection);
+                fireResultNodesChanged();
 
 //                if (resultNodes.size() == 0) {
 //                    clear();
@@ -559,6 +637,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     public void clear() {
         log.info("[SearchResultsTree] removing all nodes"); // NOI18N
         resultNodes.clear();
+        fireResultNodesCleared();
         empty = true;
         rootNode.removeAllChildren();
         firePropertyChange("browse", 0, 1);                 // NOI18N
@@ -673,7 +752,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
         /**
          *
          * @param initialFill
-         * @param simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
+         * @param simpleSort if true, sorts the search results alphabetically.
+         * Usually set to false, as a more specific sorting order is wished.
          */
         public RefreshTreeWorker(final boolean initialFill, boolean simpleSort) {
             this(initialFill, simpleSort, true);
@@ -682,8 +762,10 @@ public class SearchResultsTree extends MetaCatalogueTree {
         /**
          *
          * @param initialFill
-         * @param simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific sorting order is wished.
-         * @param sortActive  if false, no sort will be done (the value of simpleSort will be ignored, if sortActive is false)
+         * @param simpleSort if true, sorts the search results alphabetically.
+         * Usually set to false, as a more specific sorting order is wished.
+         * @param sortActive if false, no sort will be done (the value of
+         * simpleSort will be ignored, if sortActive is false)
          */
         public RefreshTreeWorker(final boolean initialFill, boolean simpleSort, boolean sortActive) {
             this.initialFill = initialFill;
@@ -748,15 +830,13 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
                         SearchResultsTree.this.firePropertyChange("browse", 0, 1); // NOI18N
 
-
                         defaultTreeModel.nodeStructureChanged(rootNode);
-
 
                         if (initialFill) {
                             syncWithMap();
                             syncWithRenderer();
                             checkForDynamicNodes();
-                            if(simpleSort && sortActive){
+                            if (simpleSort && sortActive) {
                                 SearchResultsTree.this.sort(true);
                             }
                         }
@@ -767,8 +847,6 @@ public class SearchResultsTree extends MetaCatalogueTree {
             } catch (ExecutionException ex) {
                 log.error("Error occured while refreshing search results tree", ex);
             }
-
-
 
         }
     }

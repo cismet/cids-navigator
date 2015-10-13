@@ -93,9 +93,6 @@ public class WorkingSpace extends SearchResultsTreePanel implements DropTargetLi
                     final Collection c = (Collection)object;
                     final DefaultMetaTreeNode[] type = new DefaultMetaTreeNode[0];
                     final DefaultMetaTreeNode[] draggedTreeNodes = (DefaultMetaTreeNode[])c.toArray(type);
-                    System.out.println(draggedTreeNodes.length);
-//                    Object[] toArray =
-//
                     if ((draggedTreeNodes != null) && (draggedTreeNodes.length > 0)) {
                         final Node[] draggedNodes = new Node[draggedTreeNodes.length];
 

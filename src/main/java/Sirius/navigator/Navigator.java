@@ -32,6 +32,7 @@ import Sirius.navigator.ui.progress.ProgressObserver;
 import Sirius.navigator.ui.status.MutableStatusBar;
 import Sirius.navigator.ui.status.StatusChangeListener;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
+import Sirius.navigator.ui.tree.PostfilterEnabledSearchResultsTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 import Sirius.navigator.ui.tree.SearchResultsTreePanel;
 import Sirius.navigator.ui.tree.WorkingSpace;
@@ -530,7 +531,7 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             225,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
-        searchResultsTree = new SearchResultsTree();
+        searchResultsTree = new PostfilterEnabledSearchResultsTree();                                         // Changeme
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
         new MetaTreeNodeDnDHandler(searchResultsTree);
