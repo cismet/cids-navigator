@@ -14,6 +14,8 @@ import Sirius.navigator.ui.tree.postfilter.PostFilterListener;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.Node;
 
+import org.apache.log4j.Logger;
+
 import org.openide.util.Lookup;
 
 import java.beans.PropertyChangeListener;
@@ -33,6 +35,10 @@ import de.cismet.tools.collections.HashArrayList;
  * @version  $Revision$, $Date$
  */
 public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implements PostFilterListener {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final Logger LOG = Logger.getLogger(PostfilterEnabledSearchResultsTree.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -60,6 +66,8 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
                     return o1.getDisplayOrderKeyPrio().compareTo(o2.getDisplayOrderKeyPrio());
                 }
             });
+
+        LOG.info(availablePostFilterGUIs.size() + " post filter GUIs available");
     }
 
     /**
@@ -145,6 +153,11 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     public void internalSetResultNodes(final Node[] nodes) {
         super.muteResultNodeListeners = true;
         super.setResultNodes(nodes); // To change body of generated methods, choose Tools | Templates.
+        if (nodes.length == 0) {
+            // super.setResultNodes(nodes);  does not referesh the tree by default
+            // do it manually here:
+            refreshTree(true);
+        }
         super.muteResultNodeListeners = false;
     }
 
@@ -181,7 +194,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      * DOCUMENT ME!
      */
     void filter() {
-        Collection<Node> nodes = resultNodesOriginal;
+        Collection<Node> nodes = new ArrayList<Node>(resultNodesOriginal);
         filterArray.sort(new Comparator<PostFilter>() {
 
                 @Override
@@ -189,9 +202,15 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
                     return o1.getFilterChainOrderKeyPrio().compareTo(o2.getFilterChainOrderKeyPrio());
                 }
             });
-
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("applying " + filterArray.size() + " post filters to " + nodes.size() + " nodes");
+        }
         for (final PostFilter pf : filterArray) {
             nodes = pf.filter(nodes);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(nodes.size() + " nodes left after applying " + filterArray.size() + " filters to"
+                        + resultNodesOriginal.size() + " nodes");
         }
 
         internalSetResultNodes(nodes.toArray(new Node[0]));

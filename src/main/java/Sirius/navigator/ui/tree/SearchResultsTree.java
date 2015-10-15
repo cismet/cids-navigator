@@ -356,7 +356,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
      *
      * @param  initialFill  sort DOCUMENT ME!
      */
-    private void refreshTree(final boolean initialFill) {
+    protected void refreshTree(final boolean initialFill) {
         refreshTree(initialFill, null);
     }
 

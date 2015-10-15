@@ -9,12 +9,9 @@ package Sirius.navigator.ui.tree.postfilter;
 
 import Sirius.server.middleware.types.Node;
 
-import org.openide.util.lookup.ServiceProvider;
-
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -24,7 +21,7 @@ import javax.swing.event.ChangeListener;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = PostFilterGUI.class)
+//@ServiceProvider(service = PostFilterGUI.class)
 public class ExampleCommonPostFilterGUI extends AbstractPostFilterGUI {
 
     //~ Instance fields --------------------------------------------------------

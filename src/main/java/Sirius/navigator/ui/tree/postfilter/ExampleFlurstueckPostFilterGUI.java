@@ -26,7 +26,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = PostFilterGUI.class)
+//@ServiceProvider(service = PostFilterGUI.class)
 public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
 
     //~ Instance fields --------------------------------------------------------
@@ -107,9 +107,11 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
 
     @Override
     public boolean canHandle(final Collection<Node> nodes) {
-        for (final Node n : nodes) {
-            if (n.getClassId() == fstck.getId()) {
-                return true;
+        if (fstck != null) {
+            for (final Node n : nodes) {
+                if (n.getClassId() == fstck.getId()) {
+                    return true;
+                }
             }
         }
         return false;

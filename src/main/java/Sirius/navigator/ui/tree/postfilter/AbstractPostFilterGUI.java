@@ -32,7 +32,7 @@ public abstract class AbstractPostFilterGUI extends javax.swing.JPanel implement
 
     @Override
     public void addPostFilterListener(final PostFilterListener pfl) {
-        if(!pfListeners.contains(pfl)) {
+        if (!pfListeners.contains(pfl)) {
             pfListeners.add(pfl);
         }
     }

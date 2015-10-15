@@ -36,7 +36,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = PostFilterGUI.class)
+//@ServiceProvider(service = PostFilterGUI.class)
 public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
 
     //~ Instance fields --------------------------------------------------------
