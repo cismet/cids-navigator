@@ -114,6 +114,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected LinkStyleBreadCrumbGui breadCrumbGui;
     // will only be accessed in EDT !
     private transient boolean fullScreenRenderer;
+    private final MultiMap sharedHandlersHM = new MultiMap();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -187,6 +188,35 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             wrappedWaitingPanel = (JComponent)cw.wrapComponent(lblRendererCreationWaitingLabel);
         } else {
             wrappedWaitingPanel = null;
+        }
+
+        try {
+            final Collection<? extends CidsBeanAggregationHandler> allSharedHandlers = Lookup.getDefault()
+                        .lookupAll(CidsBeanAggregationHandler.class);
+            for (final CidsBeanAggregationHandler sharedHandler : allSharedHandlers) {
+                sharedHandlersHM.put(sharedHandler.getSourceMetaClassTablename().toLowerCase(), sharedHandler);
+            }
+            for (final String tableName : (Set<String>)sharedHandlersHM.keySet()) {
+                Collections.sort((List<CidsBeanAggregationHandler>)sharedHandlersHM.get(tableName),
+                    new Comparator<CidsBeanAggregationHandler>() {
+
+                        @Override
+                        public int compare(final CidsBeanAggregationHandler o1,
+                                final CidsBeanAggregationHandler o2) {
+                            if ((o1 != null) && (o2 == null)) {
+                                return 1;
+                            } else if ((o1 == null) && (o2 != null)) {
+                                return -1;
+                            } else if ((o1 != null) && (o2 != null)) {
+                                return Integer.compare(o1.getPriority(), o2.getPriority());
+                            } else { // (o1 == null) && (o2 == null)
+                                return 0;
+                            }
+                        }
+                    });
+            }
+        } catch (final Exception ex) {
+            LOG.warn("error while setting up sharedHandlers", ex);
         }
 
         startNoDescriptionRenderer();
@@ -318,32 +348,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             }
             showObjects();
 
-            final Collection<? extends CidsBeanAggregationHandler> allSharedHandlers = Lookup.getDefault()
-                        .lookupAll(CidsBeanAggregationHandler.class);
-            final MultiMap sharedHM = new MultiMap();
-            for (final CidsBeanAggregationHandler sharedHandler : allSharedHandlers) {
-                sharedHM.put(sharedHandler.getSourceMetaClassTablename().toLowerCase(), sharedHandler);
-            }
-            for (final String tableName : (Set<String>)sharedHM.keySet()) {
-                Collections.sort((List<CidsBeanAggregationHandler>)sharedHM.get(tableName),
-                    new Comparator<CidsBeanAggregationHandler>() {
-
-                        @Override
-                        public int compare(final CidsBeanAggregationHandler o1,
-                                final CidsBeanAggregationHandler o2) {
-                            if ((o1 == null) && (o2 == null)) {
-                                return 0;
-                            } else if ((o1 != null) && (o2 == null)) {
-                                return 1;
-                            } else if ((o1 == null) && (o2 != null)) {
-                                return -1;
-                            } else {
-                                return Integer.compare(o1.getPriority(), o2.getPriority());
-                            }
-                        }
-                    });
-            }
-
             worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
                     final List<JComponent> all = new ArrayList<JComponent>();
@@ -364,7 +368,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                                 // look for sharedhandles
                                 final Collection<CidsBeanAggregationHandler> sharedHandlers =
-                                    (Collection<CidsBeanAggregationHandler>)sharedHM.get(mc.getTableName()
+                                    (Collection<CidsBeanAggregationHandler>)sharedHandlersHM.get(mc.getTableName()
                                                 .toLowerCase());
 
                                 boolean consumed = false;
@@ -451,93 +455,92 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                     @Override
                     protected void done() {
                         all.clear();
-                        if (worker == this) {
-                            worker = null;
-                        }
                     }
 
                     @Override
                     protected void process(final List<SelfDisposingPanel> chunks) {
-                        int y = all.size();
+                        if (!isCancelled()) {
+                            int y = all.size();
 
-                        if (!initialized) {
-                            showsWaitScreen = false;
-                            removeAndDisposeAllRendererFromPanel();
-                            gridBagConstraints = new java.awt.GridBagConstraints();
-                            gridBagConstraints.gridx = 0;
-                            gridBagConstraints.gridy = 0;
-                            gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                            initialized = true;
-                        }
-
-                        if ((chunks.size() == 1) && (y == 0)) {
-                            final SelfDisposingPanel sdp = chunks.get(0);
-                            if (sdp instanceof RequestsFullSizeComponent) {
-                                if (LOG.isInfoEnabled()) {
-                                    LOG.info("Renderer is FullSize Component!"); // NOI18N
-                                }
-
-                                fullScreenRenderer = true;
-
-                                panObjects.remove(scpRenderer);
-                                panObjects.add(panRenderer, BorderLayout.CENTER);
-
-                                panRenderer.setLayout(new BorderLayout());
-                                panRenderer.add(sdp, BorderLayout.CENTER);
-                            } else {
-                                fullScreenRenderer = false;
-
-                                panObjects.remove(panRenderer);
-                                panObjects.add(scpRenderer, BorderLayout.CENTER);
-                                scpRenderer.setViewportView(panRenderer);
-
-                                panRenderer.setLayout(new GridBagLayout());
-                                panRenderer.add(sdp, gridBagConstraints);
-                            }
-                            sdp.startChecking();
-                            panRenderer.revalidate();
-                            revalidate();
-                            repaint();
-                        } else {
-                            if (fullScreenRenderer) {
-                                fullScreenRenderer = false;
-
-                                panObjects.remove(panRenderer);
-                                panObjects.add(scpRenderer, BorderLayout.CENTER);
-
-                                scpRenderer.setViewportView(panRenderer);
-
-                                panRenderer.setLayout(new GridBagLayout());
-
-                                // the first renderer was added with a BorderLayout constraint,
-                                // but now it needs GridBagConstraints
-                                if (panRenderer.getComponentCount() == 1) {
-                                    final Component firstRenderer = panRenderer.getComponent(0);
-                                    panRenderer.remove(firstRenderer);
-                                    panRenderer.add(firstRenderer, gridBagConstraints);
-                                }
-                            }
-
-                            for (final SelfDisposingPanel comp : chunks) {
-                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                            if (!initialized) {
+                                showsWaitScreen = false;
+                                removeAndDisposeAllRendererFromPanel();
+                                gridBagConstraints = new java.awt.GridBagConstraints();
                                 gridBagConstraints.gridx = 0;
-                                gridBagConstraints.gridy = y;
+                                gridBagConstraints.gridy = 0;
                                 gridBagConstraints.weightx = 1;
-                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
                                 gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                                panRenderer.add(comp, gridBagConstraints);
-
-                                comp.startChecking();
-
-                                panRenderer.revalidate();
-                                panRenderer.repaint();
-
-                                y++;
+                                initialized = true;
                             }
+
+                            if ((chunks.size() == 1) && (y == 0)) {
+                                final SelfDisposingPanel sdp = chunks.get(0);
+                                if (sdp instanceof RequestsFullSizeComponent) {
+                                    if (LOG.isInfoEnabled()) {
+                                        LOG.info("Renderer is FullSize Component!"); // NOI18N
+                                    }
+
+                                    fullScreenRenderer = true;
+
+                                    panObjects.remove(scpRenderer);
+                                    panObjects.add(panRenderer, BorderLayout.CENTER);
+
+                                    panRenderer.setLayout(new BorderLayout());
+                                    panRenderer.add(sdp, BorderLayout.CENTER);
+                                } else {
+                                    fullScreenRenderer = false;
+
+                                    panObjects.remove(panRenderer);
+                                    panObjects.add(scpRenderer, BorderLayout.CENTER);
+                                    scpRenderer.setViewportView(panRenderer);
+
+                                    panRenderer.setLayout(new GridBagLayout());
+                                    panRenderer.add(sdp, gridBagConstraints);
+                                }
+                                sdp.startChecking();
+                                panRenderer.revalidate();
+                                revalidate();
+                                repaint();
+                            } else {
+                                if (fullScreenRenderer) {
+                                    fullScreenRenderer = false;
+
+                                    panObjects.remove(panRenderer);
+                                    panObjects.add(scpRenderer, BorderLayout.CENTER);
+
+                                    scpRenderer.setViewportView(panRenderer);
+
+                                    panRenderer.setLayout(new GridBagLayout());
+
+                                    // the first renderer was added with a BorderLayout constraint,
+                                    // but now it needs GridBagConstraints
+                                    if (panRenderer.getComponentCount() == 1) {
+                                        final Component firstRenderer = panRenderer.getComponent(0);
+                                        panRenderer.remove(firstRenderer);
+                                        panRenderer.add(firstRenderer, gridBagConstraints);
+                                    }
+                                }
+
+                                for (final SelfDisposingPanel comp : chunks) {
+                                    final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                                    gridBagConstraints.gridx = 0;
+                                    gridBagConstraints.gridy = y;
+                                    gridBagConstraints.weightx = 1;
+                                    gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                    panRenderer.add(comp, gridBagConstraints);
+
+                                    comp.startChecking();
+
+                                    panRenderer.revalidate();
+                                    panRenderer.repaint();
+
+                                    y++;
+                                }
+                            }
+                            all.addAll(chunks);
                         }
-                        all.addAll(chunks);
                     }
                 };
             if ((worker != null) && (objects != null) && (objects.size() > 0)) {
