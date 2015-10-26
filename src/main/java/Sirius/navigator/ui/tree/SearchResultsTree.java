@@ -823,8 +823,10 @@ public class SearchResultsTree extends MetaCatalogueTree {
                             rootNode.add(dmtn);
 
                         }
-                        MetaTreeNodeRenderer renderer = new MetaTreeNodeRenderer();
-                        setRowHeight(getCellRenderer().getTreeCellRendererComponent(SearchResultsTree.this, rootNode.getFirstChild(), false, false, false, 0, false).getHeight());
+                        //MetaTreeNodeRenderer renderer = new MetaTreeNodeRenderer();
+                        if(!result.isEmpty()) {
+                            setRowHeight(getCellRenderer().getTreeCellRendererComponent(SearchResultsTree.this, rootNode.getFirstChild(), false, false, false, 0, false).getHeight());
+                        }
 
                         setLargeModel(result.size() > 15);
 

@@ -23,6 +23,9 @@ import java.awt.event.*;
 
 import java.beans.*;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import javax.swing.*;
 import javax.swing.event.*;
 
@@ -251,6 +254,7 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
 
     @Override
     public void resultNodesChanged() {
+        final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
         final Component tabFiltersVisComp = tabFilters.getSelectedComponent();
         tbnFilteredResults.setSelected(false);
         tbnFilteredResults.setEnabled(false);
@@ -261,8 +265,8 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
             LOG.debug("initializing " + availablePostFilterGUIs.size() + " PostFilterGUIs");
         }
         for (final PostFilterGUI pfg : availablePostFilterGUIs) {
-            if (pfg.canHandle(searchResultsTree.resultNodes)) {
-                pfg.initializeFilter(searchResultsTree.resultNodes);
+            if (pfg.canHandle(resultNodes)) {
+                pfg.initializeFilter(Collections.unmodifiableCollection(resultNodes));
                 tabFilters.add(pfg.getTitle(), pfg.getGUI());
                 if (pfg.getIcon() != null) {
                     tabFilters.setIconAt(tabFilters.indexOfComponent(pfg.getGUI()), pfg.getIcon());
@@ -290,12 +294,13 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
     public void resultNodesFiltered() {
         tbnFilteredResults.setSelected(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
         tbnFilteredResults.setEnabled(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+        final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
         if (LOG.isDebugEnabled()) {
             LOG.debug("adjusting " + tabFilters.getComponents() + " PostFilterGUIs");
         }
         for (final Component c : tabFilters.getComponents()) {
             if (c instanceof PostFilterGUI) {
-                ((PostFilterGUI)c).adjustFilter(searchResultsTree.resultNodes);
+                ((PostFilterGUI)c).adjustFilter(resultNodes);
             }
         }
     }
