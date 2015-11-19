@@ -69,6 +69,8 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.commons.gui.protocol.ProtocolPanel;
+
 import de.cismet.lookupoptions.gui.OptionsClient;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
@@ -133,6 +135,7 @@ public class Navigator extends JFrame {
     private WorkingSpaceTree workingSpaceTree;
     private AttributeViewer attributeViewer;
     private AttributeEditor attributeEditor;
+    private ProtocolPanel protocolPanel;
     private SearchDialog searchDialog;
     private Preferences preferences;
     /** Holds value of property disposed. */
@@ -713,6 +716,21 @@ public class Navigator extends JFrame {
             configurator,
             false);
         container.add(descriptionPaneConstraints);
+
+        if (StaticDebuggingTools.checkHomeForFile("cismetProtocolPanelEnabled")) {
+            protocolPanel = new ProtocolPanel();
+            final MutableConstraints protocolPanelConstraints = new MutableConstraints(
+                    propertyManager.isAdvancedLayout());
+            protocolPanelConstraints.addAsComponent(
+                ComponentRegistry.PROTOCOL_PANEL,
+                protocolPanel,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.name"),    // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.tooltip"), // NOI18N
+                resourceManager.getIcon("clipboard-list.gif"),
+                MutableConstraints.P1,
+                MutableConstraints.ANY_INDEX);
+            container.add(protocolPanelConstraints);
+        }
     }
 
     /**

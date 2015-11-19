@@ -26,6 +26,8 @@ import java.awt.Window;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import de.cismet.commons.gui.protocol.ProtocolPanel;
+
 /**
  * DOCUMENT ME!
  *
@@ -42,6 +44,7 @@ public class ComponentRegistry {
     public static final String ATTRIBUTE_VIEWER = AttributeViewer.class.getName();
     public static final String ATTRIBUTE_EDITOR = AttributeEditor.class.getName();
     public static final String DESCRIPTION_PANE = DescriptionPane.class.getName();
+    public static final String PROTOCOL_PANEL = ProtocolPanel.class.getName();
     private static ComponentRegistry registry = null;
     private static boolean registred;
     // private final Logger logger;
