@@ -52,6 +52,8 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -274,30 +276,35 @@ public class MethodManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  resultNodes  The results to display in the SearchResultsTree.
-     * @param  append       Whether to append the search results or not.
+     * @param  serverSearch  DOCUMENT ME!
+     * @param  resultNodes   The results to display in the SearchResultsTree.
+     * @param  append        Whether to append the search results or not.
      */
-    public void showSearchResults(final Node[] resultNodes,
+    public void showSearchResults(final MetaObjectNodeServerSearch serverSearch,
+            final Node[] resultNodes,
             final boolean append) {
-        showSearchResults(resultNodes, append, null);
+        showSearchResults(serverSearch, resultNodes, append, null);
     }
 
     /**
      * DOCUMENT ME!
      *
+     * @param  serverSearch               DOCUMENT ME!
      * @param  resultNodes                DOCUMENT ME!
      * @param  append                     DOCUMENT ME!
      * @param  searchResultsTreeListener  DOCUMENT ME!
      */
-    public void showSearchResults(final Node[] resultNodes,
+    public void showSearchResults(final MetaObjectNodeServerSearch serverSearch,
+            final Node[] resultNodes,
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener) {
-        showSearchResults(resultNodes, append, searchResultsTreeListener, false);
+        showSearchResults(serverSearch, resultNodes, append, searchResultsTreeListener, false);
     }
 
     /**
      * DOCUMENT ME!
      *
+     * @param  serverSearch               DOCUMENT ME!
      * @param  resultNodes                The results to display in the SearchResultsTree.
      * @param  append                     Whether to append the search results or not.
      * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
@@ -305,16 +312,18 @@ public class MethodManager {
      * @param  simpleSort                 if true, sorts the search results alphabetically. Usually set to false, as a
      *                                    more specific sorting order is wished.
      */
-    public void showSearchResults(final Node[] resultNodes,
+    public void showSearchResults(final MetaObjectNodeServerSearch serverSearch,
+            final Node[] resultNodes,
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean simpleSort) {
-        showSearchResults(resultNodes, append, searchResultsTreeListener, simpleSort, true);
+        showSearchResults(serverSearch, resultNodes, append, searchResultsTreeListener, simpleSort, true);
     }
 
     /**
      * DOCUMENT ME!
      *
+     * @param  serverSearch               DOCUMENT ME!
      * @param  resultNodes                The results to display in the SearchResultsTree.
      * @param  append                     Whether to append the search results or not.
      * @param  searchResultsTreeListener  A listener which will be informed about status changes of search thread.
@@ -324,7 +333,8 @@ public class MethodManager {
      * @param  sortActive                 if false, no sort will be done (the value of simpleSort will be ignored, if
      *                                    sortActive is false)
      */
-    public void showSearchResults(final Node[] resultNodes,
+    public void showSearchResults(final MetaObjectNodeServerSearch serverSearch,
+            final Node[] resultNodes,
             final boolean append,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean simpleSort,
@@ -342,6 +352,7 @@ public class MethodManager {
             ComponentRegistry.getRegistry()
                     .getSearchResultsTree()
                     .setResultNodes(resultNodes, append, searchResultsTreeListener, simpleSort, sortActive);
+            ComponentRegistry.getRegistry().getSearchResultsTree().setUnderlyingSearch(serverSearch);
             this.showSearchResults();
         }
     }

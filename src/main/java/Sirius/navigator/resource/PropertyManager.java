@@ -107,6 +107,7 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean workingSpaceEnabled = false;
+    private boolean postfilterEnabled = false;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
 
     /**
@@ -259,6 +260,33 @@ public final class PropertyManager {
         if ((input != null) && input.trim().equalsIgnoreCase("true")) {
             this.workingSpaceEnabled = true;
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isPostfilterEnabled() {
+        return postfilterEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  postfilterEnabled  DOCUMENT ME!
+     */
+    public void setPostfilterEnabled(final boolean postfilterEnabled) {
+        this.postfilterEnabled = postfilterEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  input  DOCUMENT ME!
+     */
+    public void setPostfilterEnabled(final String input) {
+        setPostfilterEnabled((input != null) && input.trim().equalsIgnoreCase("true"));
     }
 
     /**
@@ -1026,6 +1054,8 @@ public final class PropertyManager {
             this.setDescriptionPaneHtmlRenderer(value);
         } else if (property.equals("navigator.workingspace.enabled")) {
             this.setWorkingSpaceEnabled(value);
+        } else if (property.equals("navigator.postfilter.enabled")) {
+            this.setPostfilterEnabled(value);
         }
     }
 
@@ -1134,6 +1164,24 @@ public final class PropertyManager {
         } catch (Exception except) {
             logger.fatal(except, except);
         }
+
+//        try {
+//            final String parameter = this.properties.getProperty("plugins");
+//            setHttpInterfacePort(new Integer(properties.getProperty("httpInterfacePort", "9099")));
+//            setAutoClose(Boolean.valueOf(properties.getProperty("closeWithoutAsking", "false")));
+//
+//            if ((parameter != null) && (parameter.length() > 0)) {
+//                pluginList = new ArrayList();
+//                final StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
+//                while (tokenizer.hasMoreTokens()) {
+//                    final String plugin = tokenizer.nextToken().trim() + "/";
+//                    logger.info("adding plugin from config file: '" + plugin + "'");
+//                    pluginList.add(pluginPath + "/" + plugin);
+//                }
+//            }
+//        } catch (Exception except) {
+//            logger.fatal(except, except);
+//        }
 
         this.isPluginListAvailable();
     }
