@@ -196,7 +196,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      */
     void filter() {
         Collection<Node> nodes = new ArrayList<Node>(resultNodesOriginal);
-        filterArray.sort(new Comparator<PostFilter>() {
+        Collections.sort(filterArray, new Comparator<PostFilter>() {
 
                 @Override
                 public int compare(final PostFilter o1, final PostFilter o2) {
