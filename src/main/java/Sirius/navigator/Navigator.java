@@ -531,7 +531,11 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             225,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
-        searchResultsTree = new PostfilterEnabledSearchResultsTree();                                         // Changeme
+        if (PropertyManager.getManager().isPostfilterEnabled()) {
+            searchResultsTree = new PostfilterEnabledSearchResultsTree();
+        } else {
+            searchResultsTree = new SearchResultsTree();
+        }
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
         new MetaTreeNodeDnDHandler(searchResultsTree);
