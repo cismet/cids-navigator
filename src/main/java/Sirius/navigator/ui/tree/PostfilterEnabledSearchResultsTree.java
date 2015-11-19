@@ -22,6 +22,7 @@ import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
@@ -59,7 +60,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
         final Collection<? extends PostFilterGUI> lookupResult = Lookup.getDefault().lookupAll(PostFilterGUI.class);
         availablePostFilterGUIs = new ArrayList<PostFilterGUI>(lookupResult);
 
-        availablePostFilterGUIs.sort(new Comparator<PostFilterGUI>() {
+        Collections.sort(availablePostFilterGUIs, new Comparator<PostFilterGUI>() {
 
                 @Override
                 public int compare(final PostFilterGUI o1, final PostFilterGUI o2) {
