@@ -717,7 +717,7 @@ public class Navigator extends JFrame {
             false);
         container.add(descriptionPaneConstraints);
 
-        if (StaticDebuggingTools.checkHomeForFile("cismetProtocolPanelEnabled")) {
+        if (PropertyManager.getManager().isProtocolEnabled()) {
             protocolPanel = new ProtocolPanel();
             final MutableConstraints protocolPanelConstraints = new MutableConstraints(
                     propertyManager.isAdvancedLayout());
@@ -726,7 +726,7 @@ public class Navigator extends JFrame {
                 protocolPanel,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.name"),    // NOI18N
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.tooltip"), // NOI18N
-                resourceManager.getIcon("clipboard-list.gif"),
+                resourceManager.getIcon("protocolpane_icon.png"),
                 MutableConstraints.P1,
                 MutableConstraints.ANY_INDEX);
             container.add(protocolPanelConstraints);
