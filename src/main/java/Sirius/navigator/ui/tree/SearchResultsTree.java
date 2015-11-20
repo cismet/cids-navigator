@@ -8,10 +8,13 @@
 package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.PluginSupport;
+import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.option.CustomBeanPermissionProviderOptionsDialog;
 
 import Sirius.server.middleware.types.*;
 
@@ -33,10 +36,15 @@ import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import javax.swing.tree.DefaultTreeModel;
 
+import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+
+import de.cismet.cids.utils.ClassloadingHelper;
+
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -118,12 +126,81 @@ public class SearchResultsTree extends MetaCatalogueTree {
             fireResultNodesCleared();
         } else {
             empty = false;
-            resultNodes = new HashArrayList<Node>(Arrays.asList(nodes));
+            resultNodes = new HashArrayList<Node>(Arrays.asList(filterNodesWithoutPermission(nodes)));
             fireResultNodesChanged();
         }
 
         if (resultNodes.size() > 0) {
             refreshTree(true);
+        }
+    }
+
+    /**
+     * Removes all nodes, which references a cidsBean without read permissions. This is required to consider the
+     * CustomBeanPermissionProvider.
+     *
+     * @param   nodes  the nodes to check for read permissions
+     *
+     * @return  an array with all nodes with read permissions.
+     */
+    private Node[] filterNodesWithoutPermission(final Node[] nodes) {
+        final List<Node> nodeList = new ArrayList<Node>();
+
+        if (!PropertyManager.USE_CUSTOM_BEAN_PERMISSION_PROVIDER_FOR_SEARCH) {
+            return nodes;
+        }
+
+        for (final Node nodeToCheck : nodes) {
+            if (nodeToCheck instanceof MetaObjectNode) {
+                final MetaObjectNode mon = (MetaObjectNode)nodeToCheck;
+                final MetaClass mc = ClassCacheMultiple.getMetaClass(mon.getDomain(), mon.getClassId());
+
+                if (existsCustomBeanPermissonProviderForClass(mc)) {
+                    if (mon.getObject() == null) {
+                        try {
+                            final MetaObject MetaObject = SessionManager.getProxy()
+                                        .getMetaObject(mon.getObjectId(),
+                                            mon.getClassId(),
+                                            mon.getDomain());
+                            mon.setObject(MetaObject);
+                        } catch (ConnectionException e) {
+                            log.error("Cannot load meta object to check the read permissions", e);
+                            continue;
+                        }
+                    }
+
+                    if (!mon.getObject().getBean().hasObjectReadPermission(SessionManager.getSession().getUser())) {
+                        continue;
+                    }
+                }
+            }
+            nodeList.add(nodeToCheck);
+        }
+
+        return nodeList.toArray(new Node[nodeList.size()]);
+    }
+
+    /**
+     * Checks if a CustomBeanPermissionProvider for the given class exists.
+     *
+     * @param   mc  the class, it should be checked for
+     *
+     * @return  true, iff a CistomBeanPermissionProvider for the given class exists
+     */
+    private boolean existsCustomBeanPermissonProviderForClass(final MetaClass mc) {
+        try {
+            final Class cpp = ClassloadingHelper.getDynamicClass(mc,
+                    ClassloadingHelper.CLASS_TYPE.PERMISSION_PROVIDER);
+
+            if (log.isDebugEnabled()) {
+                log.debug("custom read permission provider retrieval result: " + cpp); // NOI18N
+            }
+
+            return cpp != null;
+        } catch (Exception ex) {
+            log.warn("error during creation of custom permission provider", ex); // NOI18N
+
+            return true;
         }
     }
 
@@ -336,10 +413,10 @@ public class SearchResultsTree extends MetaCatalogueTree {
             this.clear();
             return;
         } else if ((append == true) && (empty == false)) {
-            resultNodes.addAll(Arrays.asList(nodes));
+            resultNodes.addAll(Arrays.asList(filterNodesWithoutPermission(nodes)));
         } else {
             this.clear();
-            resultNodes = new HashArrayList<Node>(Arrays.asList(nodes));
+            resultNodes = new HashArrayList<Node>(Arrays.asList(filterNodesWithoutPermission(nodes)));
         }
 
         empty = false;
