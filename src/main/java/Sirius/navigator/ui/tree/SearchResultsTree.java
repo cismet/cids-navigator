@@ -14,7 +14,6 @@ import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.ComponentRegistry;
-import Sirius.navigator.ui.option.CustomBeanPermissionProviderOptionsDialog;
 
 import Sirius.server.middleware.types.*;
 
