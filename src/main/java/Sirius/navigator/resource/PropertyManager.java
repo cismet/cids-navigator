@@ -107,6 +107,7 @@ public final class PropertyManager {
     private boolean editable;
     private boolean autoClose = false;
     private boolean workingSpaceEnabled = false;
+    private boolean protocolEnabled = false;
     private boolean postfilterEnabled = false;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
 
@@ -259,6 +260,35 @@ public final class PropertyManager {
     public void setWorkingSpaceEnabled(final String input) {
         if ((input != null) && input.trim().equalsIgnoreCase("true")) {
             this.workingSpaceEnabled = true;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isProtocolEnabled() {
+        return protocolEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  protocolEnabled  DOCUMENT ME!
+     */
+    public void setProtocolEnabled(final boolean protocolEnabled) {
+        this.protocolEnabled = protocolEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  input  DOCUMENT ME!
+     */
+    public void setProtocolEnabled(final String input) {
+        if ((input != null) && input.trim().equalsIgnoreCase("true")) {
+            this.protocolEnabled = true;
         }
     }
 
@@ -1056,6 +1086,8 @@ public final class PropertyManager {
             this.setWorkingSpaceEnabled(value);
         } else if (property.equals("navigator.postfilter.enabled")) {
             this.setPostfilterEnabled(value);
+        } else if (property.equals("navigator.protocol.enabled")) {
+            this.setProtocolEnabled(value);
         }
     }
 

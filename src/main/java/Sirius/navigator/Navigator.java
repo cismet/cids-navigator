@@ -717,7 +717,7 @@ public class Navigator extends JFrame {
             false);
         container.add(descriptionPaneConstraints);
 
-        if (StaticDebuggingTools.checkHomeForFile("cismetProtocolPanelEnabled")) {
+        if (PropertyManager.getManager().isProtocolEnabled()) {
             protocolPanel = new ProtocolPanel();
             final MutableConstraints protocolPanelConstraints = new MutableConstraints(
                     propertyManager.isAdvancedLayout());
