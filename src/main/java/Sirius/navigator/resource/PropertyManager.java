@@ -61,7 +61,7 @@ public final class PropertyManager {
     public static final String FX_HTML_RENDERER = "fxWebView";
     public static final String CALPA_HTML_RENDERER = "calpa";
     public static final String FLYING_SAUCER_HTML_RENDERER = "flyingSaucer";
-    public static final boolean USE_CUSTOM_BEAN_PERMISSION_PROVIDER_FOR_SEARCH = false;
+    public static boolean USE_CUSTOM_BEAN_PERMISSION_PROVIDER_FOR_SEARCH = false;
 
     //~ Enums ------------------------------------------------------------------
 
