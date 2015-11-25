@@ -110,6 +110,7 @@ public final class PropertyManager {
     private boolean workingSpaceEnabled = false;
     private boolean protocolEnabled = false;
     private boolean postfilterEnabled = false;
+    private boolean fulltextSearchToolbarItemEnabled = false;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
 
     /**
@@ -318,6 +319,33 @@ public final class PropertyManager {
      */
     public void setPostfilterEnabled(final String input) {
         setPostfilterEnabled((input != null) && input.trim().equalsIgnoreCase("true"));
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isFulltextSearchToolbarItemEnabled() {
+        return fulltextSearchToolbarItemEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fulltextSearchToolbarItemEnabled  DOCUMENT ME!
+     */
+    public void setFulltextSearchToolbarItemEnabled(final boolean fulltextSearchToolbarItemEnabled) {
+        this.fulltextSearchToolbarItemEnabled = fulltextSearchToolbarItemEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  input  DOCUMENT ME!
+     */
+    public void setFulltextSearchToolbarItemEnabled(final String input) {
+        setFulltextSearchToolbarItemEnabled((input != null) && input.trim().equalsIgnoreCase("true"));
     }
 
     /**
@@ -1089,6 +1117,8 @@ public final class PropertyManager {
             this.setPostfilterEnabled(value);
         } else if (property.equals("navigator.protocol.enabled")) {
             this.setProtocolEnabled(value);
+        } else if (property.equals("navigator.fulltextSearchToolbarItem.enabled")) {
+            this.setFulltextSearchToolbarItemEnabled(value);
         }
     }
 
