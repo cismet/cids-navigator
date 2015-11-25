@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
@@ -250,5 +251,16 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
             result.add(mc.getTableName());
         }
         return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<Node> getOriginalResultNodes() {
+        final ArrayList<Node> originalResultNodes = new ArrayList<Node>(this.resultNodesOriginal.size());
+        originalResultNodes.addAll(this.resultNodesOriginal);
+        return originalResultNodes;
     }
 }
