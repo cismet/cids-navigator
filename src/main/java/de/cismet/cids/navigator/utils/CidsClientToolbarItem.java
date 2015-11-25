@@ -23,15 +23,13 @@
  */
 package de.cismet.cids.navigator.utils;
 
-import javax.swing.Action;
-
 /**
  * DOCUMENT ME!
  *
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public interface CidsClientToolbarItem extends Action {
+public interface CidsClientToolbarItem {
 
     //~ Methods ----------------------------------------------------------------
 

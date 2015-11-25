@@ -51,6 +51,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.*;
 
@@ -489,12 +490,17 @@ public class Navigator extends JFrame {
         Collections.sort(sorted, comp);
 
         for (final CidsClientToolbarItem ccti : sorted) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Adding CidsClientToolbarItem: " + ccti.getValue(Action.NAME) + " - class: '"
-                            + ccti.getClass().toString() + "'? " + ccti.isVisible());
-            }
             if (ccti.isVisible()) {
-                toolBar.getDefaultToolBar().add(ccti);
+                if (ccti instanceof Action) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding CidsClientToolbarItem: " + ((Action)ccti).getValue(Action.NAME)
+                                    + " - class: '"
+                                    + ccti.getClass().toString() + "'? " + ccti.isVisible());
+                    }
+                    toolBar.getDefaultToolBar().add((Action)ccti);
+                } else if (ccti instanceof Component) {
+                    toolBar.getDefaultToolBar().add((Component)ccti);
+                }
             }
         }
     }
