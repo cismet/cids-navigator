@@ -395,6 +395,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             worker.cancel(true);
             worker = null;
         }
+        clearBreadCrumb();
         showObjects();
         showWaitScreen();
         if ((otns != null) && (otns.length > 0)) {
@@ -685,7 +686,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param       to             DOCUMENT ME!
      * @param       optionalTitle  DOCUMENT ME!
      *
-     * @deprecated  use gotoMetaObjects(MetaObjectNode[], String) instead
+     * @deprecated  use gotoMetaObjects(MetaObjectNode[]) instead
      */
     @Deprecated
     public void gotoMetaObjects(final MetaObject[] to, final String optionalTitle) {
@@ -709,20 +710,98 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      *
-     * @param  mon            DOCUMENT ME!
-     * @param  optionalTitle  DOCUMENT ME!
+     * @param       mon            DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObjectNode(MetaObjectNode) instead
      */
+    @Deprecated
     public void gotoMetaObjectNode(final MetaObjectNode mon, final String optionalTitle) {
-        gotoObjectTreeNode(new ObjectTreeNode(mon), optionalTitle);
+        gotoMetaObjectNode(mon);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  otn            DOCUMENT ME!
-     * @param  optionalTitle  DOCUMENT ME!
+     * @param  mon  DOCUMENT ME!
      */
+    public void gotoMetaObjectNode(final MetaObjectNode mon) {
+        gotoMetaObjectNode(mon, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       mon              DOCUMENT ME!
+     * @param       optionalTitle    DOCUMENT ME!
+     * @param       clearBreadcrumb  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObjectNode(MetaObjectNode, boolean) instead
+     */
+    @Deprecated
+    public void gotoMetaObjectNode(final MetaObjectNode mon,
+            final String optionalTitle,
+            final boolean clearBreadcrumb) {
+        gotoMetaObjectNode(mon, clearBreadcrumb);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mon              DOCUMENT ME!
+     * @param  clearBreadcrumb  DOCUMENT ME!
+     */
+    public void gotoMetaObjectNode(final MetaObjectNode mon,
+            final boolean clearBreadcrumb) {
+        gotoObjectTreeNode(new ObjectTreeNode(mon), clearBreadcrumb);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       otn            DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoObjectTreeNode(ObjectTreeNode) instead
+     */
+    @Deprecated
     public void gotoObjectTreeNode(final ObjectTreeNode otn, final String optionalTitle) {
+        gotoObjectTreeNode(otn);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  otn  DOCUMENT ME!
+     */
+    public void gotoObjectTreeNode(final ObjectTreeNode otn) {
+        gotoObjectTreeNode(otn, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       otn              DOCUMENT ME!
+     * @param       optionalTitle    DOCUMENT ME!
+     * @param       clearBreadcrumb  DOCUMENT ME!
+     *
+     * @deprecated  use gotoObjectTreeNode(ObjectTreeNode, boolean) instead
+     */
+    @Deprecated
+    public void gotoObjectTreeNode(final ObjectTreeNode otn,
+            final String optionalTitle,
+            final boolean clearBreadcrumb) {
+        gotoObjectTreeNode(otn, clearBreadcrumb);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  otn              DOCUMENT ME!
+     * @param  clearBreadcrumb  DOCUMENT ME!
+     */
+    public void gotoObjectTreeNode(final ObjectTreeNode otn,
+            final boolean clearBreadcrumb) {
         if (currentRenderer() == null) {
             // there is no renderer displayed
             if ((worker != null) && !worker.isDone()) {
@@ -743,8 +822,20 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 @Override
                 protected void done() {
                     try {
-                        final MetaObject result = get();
-                        showMetaObjectSingleRenderer(result, optionalTitle);
+                        final MetaObject metaobject = get();
+                        final CidsMetaObjectBreadCrumb crumb = new CidsMetaObjectBreadCrumb(metaobject) {
+
+                                @Override
+                                public void crumbActionPerformed(final ActionEvent e) {
+                                    startSingleRendererWorker(otn);
+                                }
+                            };
+                        if (clearBreadcrumb) {
+                            breadCrumbModel.startWithNewCrumb(crumb);
+                        } else {
+                            breadCrumbModel.appendCrumb(crumb);
+                        }
+                        startSingleRendererWorker(otn);
                     } catch (final InterruptedException e) {
                         LOG.error("Background Thread was interrupted", e);                // NOI18N
                     } catch (final ExecutionException e) {
@@ -760,6 +851,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param  to             DOCUMENT ME!
      * @param  optionalTitle  DOCUMENT ME!
      */
+    @Deprecated
     protected void showMetaObjectSingleRenderer(final MetaObject to, final String optionalTitle) {
         final CidsMetaObjectBreadCrumb crumb = new CidsMetaObjectBreadCrumb(to) {
 
@@ -790,7 +882,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      * @param       to             DOCUMENT ME!
      * @param       optionalTitle  DOCUMENT ME!
      *
-     * @deprecated  use gotoMetaObjectNode(MetaObjectNode, String) instead
+     * @deprecated  use gotoMetaObjectNode(MetaObjectNode, false) instead
      */
     @Deprecated
     public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
@@ -991,15 +1083,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         final String descriptionURL = n.getDescription();
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
-            final MetaObject o = ((ObjectTreeNode)n).getMetaObject();
-            breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
-
-                    @Override
-                    public void crumbActionPerformed(final ActionEvent e) {
-                        startSingleRendererWorker(o, n.toString());
-                    }
-                });
-            startSingleRendererWorker(n);
+//            final MetaObject o = ().getMetaObject();
+            gotoObjectTreeNode((ObjectTreeNode)n, n.toString());
         } else if (n.isPureNode() && (n.getDescription() != null)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
