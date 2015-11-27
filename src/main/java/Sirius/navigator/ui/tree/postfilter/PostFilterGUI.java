@@ -101,4 +101,11 @@ public interface PostFilterGUI {
      * @return  DOCUMENT ME!
      */
     Icon getIcon();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    boolean isSelected();
 }

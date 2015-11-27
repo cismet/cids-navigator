@@ -10,8 +10,6 @@ package Sirius.navigator.ui.tree.postfilter;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.Node;
 
-import org.openide.util.lookup.ServiceProvider;
-
 import java.util.ArrayList;
 import java.util.Collection;
 

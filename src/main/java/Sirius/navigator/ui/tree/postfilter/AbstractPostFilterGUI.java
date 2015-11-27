@@ -9,6 +9,9 @@ package Sirius.navigator.ui.tree.postfilter;
 
 import Sirius.navigator.resource.ResourceManager;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.ArrayList;
 
 import javax.swing.Icon;
@@ -24,6 +27,9 @@ public abstract class AbstractPostFilterGUI extends javax.swing.JPanel implement
 
     //~ Instance fields --------------------------------------------------------
 
+    @Getter
+    @Setter
+    protected boolean selected = false;
     final ResourceManager resources = ResourceManager.getManager();
     final Icon defaultIcon = resources.getIcon("funnel.png");
     private final ArrayList<PostFilterListener> pfListeners = new ArrayList<PostFilterListener>();
