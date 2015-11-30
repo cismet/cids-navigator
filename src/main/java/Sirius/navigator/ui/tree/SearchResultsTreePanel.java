@@ -255,7 +255,7 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
     @Override
     public void resultNodesChanged() {
         final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
-        final Component tabFiltersVisComp = tabFilters.getSelectedComponent();
+        Component tabFiltersVisComp = tabFilters.getSelectedComponent();
         tbnFilteredResults.setSelected(false);
         tbnFilteredResults.setEnabled(false);
         tabFilters.setVisible(true);
@@ -267,9 +267,13 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
         for (final PostFilterGUI pfg : availablePostFilterGUIs) {
             if (pfg.canHandle(resultNodes)) {
                 pfg.initializeFilter(Collections.unmodifiableCollection(resultNodes));
-                tabFilters.add(pfg.getTitle(), pfg.getGUI());
+                final Component pfgGUI = pfg.getGUI();
+                tabFilters.add(pfg.getTitle(), pfgGUI);
                 if (pfg.getIcon() != null) {
                     tabFilters.setIconAt(tabFilters.indexOfComponent(pfg.getGUI()), pfg.getIcon());
+                }
+                if (pfg.isSelected()) {
+                    tabFiltersVisComp = pfgGUI;
                 }
                 pfg.addPostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
             } else {

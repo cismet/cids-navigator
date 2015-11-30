@@ -15,8 +15,6 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
-import org.openide.util.lookup.ServiceProvider;
-
 import java.awt.EventQueue;
 
 import java.util.ArrayList;
