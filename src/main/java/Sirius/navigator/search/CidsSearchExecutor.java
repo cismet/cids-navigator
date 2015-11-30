@@ -24,10 +24,11 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+import de.cismet.cids.server.search.SearchResultListener;
+import de.cismet.cids.server.search.SearchResultListenerProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -241,6 +242,16 @@ public final class CidsSearchExecutor {
                         }
                     }
 
+                    if (search instanceof SearchResultListenerProvider) {
+                        final SearchResultListenerProvider searchResultListenerProvider = (SearchResultListenerProvider)
+                            search;
+                        final SearchResultListener searchResultListener =
+                            searchResultListenerProvider.getSearchResultListener();
+                        if (searchResultListener != null) {
+                            searchResultListener.searchDone(new ArrayList(searchResult));
+                            searchResultListenerProvider.setSearchResultListener(null);
+                        }
+                    }
                     return result;
                 }
             };
