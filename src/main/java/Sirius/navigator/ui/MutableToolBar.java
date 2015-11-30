@@ -24,7 +24,9 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 
@@ -44,6 +46,8 @@ public class MutableToolBar extends JToolBar {
     //~ Instance fields --------------------------------------------------------
 
     private final JToolBar defaultToolBar;
+    private final JToolBar pluginToolBar;
+    private final JToolBar rightStickyToolBar;
     private final MoveableToolBarsMap moveableToolBars;
     private final PluginToolBarsMap pluginToolBars;
 
@@ -68,26 +72,47 @@ public class MutableToolBar extends JToolBar {
 
         this.advancedLayout = advancedLayout;
 
-        moveableToolBars = new MoveableToolBarsMap();
-        pluginToolBars = new PluginToolBarsMap();
-
         this.defaultToolBar = new JToolBar(
                 org.openide.util.NbBundle.getMessage(MutableToolBar.class, "MutableToolBar.defaultToolBar.name"), // NOI18N
                 HORIZONTAL);
+        this.pluginToolBar = new JToolBar(HORIZONTAL);
+        this.rightStickyToolBar = new JToolBar(HORIZONTAL);
+
+        this.moveableToolBars = new MoveableToolBarsMap(pluginToolBar);
+        this.pluginToolBars = new PluginToolBarsMap(pluginToolBar);
+
         this.defaultToolBar.setFloatable(false);
         this.defaultToolBar.setRollover(advancedLayout);
-        defaultToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
-        defaultToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
-        defaultToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+        this.defaultToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
+        this.defaultToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+
+        this.pluginToolBar.setFloatable(false);
+        this.pluginToolBar.setRollover(advancedLayout);
+        this.pluginToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
+        this.pluginToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+
+        this.rightStickyToolBar.setFloatable(false);
+        this.rightStickyToolBar.setRollover(advancedLayout);
+        this.rightStickyToolBar.putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
+        this.rightStickyToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
+
+        final JPanel filler = new JPanel();
+        filler.add(Box.createHorizontalGlue());
+        this.rightStickyToolBar.add(filler);
+
         this.createDefaultButtons();
+
         this.add(defaultToolBar);
+        this.add(pluginToolBar);
+        this.add(rightStickyToolBar);
+
         putClientProperty("JToolBar.isRollover", Boolean.TRUE); // NOI18N
-        putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
         this.setFloatable(false);
 
         if (advancedLayout) {
             this.setBorder(null);
+            pluginToolBar.setBorder(null);
         }
     }
 
@@ -254,6 +279,15 @@ public class MutableToolBar extends JToolBar {
         return defaultToolBar;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public JToolBar getRightStickyToolBar() {
+        return rightStickyToolBar;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -293,13 +327,19 @@ public class MutableToolBar extends JToolBar {
      */
     private class PluginToolBarsMap extends AbstractEmbeddedComponentsMap {
 
+        //~ Instance fields ----------------------------------------------------
+
+        protected final JToolBar toolbar;
+
         //~ Constructors -------------------------------------------------------
 
         /**
          * Creates a new PluginToolBarsMap object.
+         *
+         * @param  toolbar  DOCUMENT ME!
          */
-        private PluginToolBarsMap() {
-            Logger.getLogger(PluginToolBarsMap.class);
+        private PluginToolBarsMap(final JToolBar toolbar) {
+            this.toolbar = toolbar;
         }
 
         //~ Methods ------------------------------------------------------------
@@ -310,13 +350,13 @@ public class MutableToolBar extends JToolBar {
                 logger.debug("adding toolbar: '" + component + "'");             // NOI18N
             }
             if (component instanceof EmbeddedToolBar) {
-                MutableToolBar.this.add((EmbeddedToolBar)component);
+                toolbar.add((EmbeddedToolBar)component);
             } else {
-                this.logger.error("doAdd(): invalid object type '" + component.getClass().getName()
+                logger.error("doAdd(): invalid object type '" + component.getClass().getName()
                             + "', 'Sirius.navigator.EmbeddedToolBar' expected"); // NOI18N
             }
 
-            MutableToolBar.this.invalidate();
+            toolbar.invalidate();
             SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -332,13 +372,13 @@ public class MutableToolBar extends JToolBar {
         @Override
         protected void doRemove(final EmbeddedComponent component) {
             if (component instanceof EmbeddedToolBar) {
-                MutableToolBar.this.remove((EmbeddedToolBar)component);
+                toolbar.remove((EmbeddedToolBar)component);
             } else {
-                this.logger.error("doRemove(): invalid object type '" + component.getClass().getName()
+                logger.error("doRemove(): invalid object type '" + component.getClass().getName()
                             + "', 'Sirius.navigator.EmbeddedToolBar' expected"); // NOI18N
             }
 
-            MutableToolBar.this.invalidate();
+            toolbar.invalidate();
             SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -346,7 +386,7 @@ public class MutableToolBar extends JToolBar {
                         synchronized (getTreeLock()) {
                             validateTree();
                         }
-                        repaint();
+                        toolbar.repaint();
                     }
                 });
         }
@@ -363,9 +403,11 @@ public class MutableToolBar extends JToolBar {
 
         /**
          * Creates a new MoveableToolBarsMap object.
+         *
+         * @param  toolbar  DOCUMENT ME!
          */
-        private MoveableToolBarsMap() {
-            Logger.getLogger(MoveableToolBarsMap.class);
+        private MoveableToolBarsMap(final JToolBar toolbar) {
+            super(toolbar);
         }
 
         //~ Methods ------------------------------------------------------------
@@ -376,12 +418,12 @@ public class MutableToolBar extends JToolBar {
                 super.doSetVisible(component, visible);
 
                 if (visible) {
-                    this.doAdd(component);
+                    doAdd(component);
                 } else {
-                    this.doRemove(component);
+                    doRemove(component);
                 }
             } else {
-                this.logger.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
+                logger.warn("unexpected call to 'setVisible()': '" + visible + "'"); // NOI18N
             }
         }
     }

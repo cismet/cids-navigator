@@ -24,6 +24,7 @@ import Sirius.navigator.search.CidsSearchInitializer;
 import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.*;
+import Sirius.navigator.ui.RightStickyToolbarItem;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.dialog.LoginDialog;
@@ -448,11 +449,8 @@ public class Navigator extends JFrame {
         this.setContentPane(new JPanel(new BorderLayout(), true));
         this.setJMenuBar(menuBar);
 
-        final JPanel panel = new JPanel(new BorderLayout());
-        panel.add(toolBar, BorderLayout.NORTH);
-        panel.add(container.getContainer(), BorderLayout.CENTER);
-
-        this.getContentPane().add(panel, BorderLayout.CENTER);
+        this.getContentPane().add(toolBar, BorderLayout.NORTH);
+        this.getContentPane().add(container.getContainer(), BorderLayout.CENTER);
         this.getContentPane().add(statusBar, BorderLayout.SOUTH);
     }
     // #########################################################################
@@ -491,15 +489,21 @@ public class Navigator extends JFrame {
 
         for (final CidsClientToolbarItem ccti : sorted) {
             if (ccti.isVisible()) {
+                final JToolBar innerToolbar;
+                if (ccti instanceof RightStickyToolbarItem) {
+                    innerToolbar = toolBar.getRightStickyToolBar();
+                } else {
+                    innerToolbar = toolBar.getDefaultToolBar();
+                }
                 if (ccti instanceof Action) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("Adding CidsClientToolbarItem: " + ((Action)ccti).getValue(Action.NAME)
                                     + " - class: '"
                                     + ccti.getClass().toString() + "'? " + ccti.isVisible());
                     }
-                    toolBar.getDefaultToolBar().add((Action)ccti);
+                    innerToolbar.add((Action)ccti);
                 } else if (ccti instanceof Component) {
-                    toolBar.getDefaultToolBar().add((Component)ccti);
+                    innerToolbar.add((Component)ccti);
                 }
             }
         }
