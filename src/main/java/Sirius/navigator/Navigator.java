@@ -70,6 +70,7 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
@@ -260,6 +261,9 @@ public class Navigator extends JFrame {
             initSearch();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
+            if (PropertyManager.getManager().isProtocolEnabled()) {
+                configurationManager.addConfigurable(ProtocolHandler.getInstance());
+            }
             configurationManager.configure();
 
             SwingUtilities.invokeLater(new Runnable() {
