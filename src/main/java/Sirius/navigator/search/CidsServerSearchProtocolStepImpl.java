@@ -13,7 +13,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,11 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
             "CidsSearch protocol step");
 
     //~ Instance fields --------------------------------------------------------
+
+    @Getter
+    @Setter
+    @JsonIgnore
+    private transient CidsServerSearchProtocolStepReexecutor reexecutor;
 
     @Getter
     @JsonIgnore
@@ -93,6 +100,9 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
      */
     @Override
     public void reExecuteSearch() {
+        if (getReexecutor() != null) {
+            getReexecutor().reExecuteSearch();
+        }
     }
 
     /**
@@ -102,7 +112,11 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
      */
     @Override
     public boolean isReExecuteSearchEnabled() {
-        return false;
+        if (getReexecutor() != null) {
+            return getReexecutor().isReExecuteSearchEnabled();
+        } else {
+            return false;
+        }
     }
 
     @Override
