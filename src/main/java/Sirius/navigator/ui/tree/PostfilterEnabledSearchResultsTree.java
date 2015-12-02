@@ -105,7 +105,17 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
         // methods, choose Tools | Templates.
         resultNodesOriginal = new HashArrayList<Node>(super.resultNodes);
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nodes          DOCUMENT ME!
+     * @param  filteredNodes  DOCUMENT ME!
+     * @param  append         DOCUMENT ME!
+     * @param  listener       DOCUMENT ME!
+     * @param  simpleSort     DOCUMENT ME!
+     * @param  sortActive     DOCUMENT ME!
+     */
     public void setFilteredResultNodes(
             final Node[] nodes,
             final Node[] filteredNodes,
@@ -113,30 +123,39 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
             final PropertyChangeListener listener,
             final boolean simpleSort,
             final boolean sortActive) {
-        
-        LOG.debug("setting "  + nodes.length + " result nodes with " 
-                + filteredNodes.length + " pre-filtered nodes");
-        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("setting " + nodes.length + " result nodes with "
+                        + filteredNodes.length + " pre-filtered nodes");
+        }
+
         this.setResultNodes(nodes, append, listener, simpleSort, sortActive);
         this.internalSetResultNodes(filteredNodes, append, listener, simpleSort, sortActive);
-        super.fireResultNodesFiltered(); 
+        super.fireResultNodesFiltered();
     }
 
     @Override
     public void setResultNodes(final Node[] nodes) {
-        super.setResultNodes(nodes); 
+        super.setResultNodes(nodes);
         resultNodesOriginal = new HashArrayList<Node>(super.resultNodes);
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nodes          DOCUMENT ME!
+     * @param  filteredNodes  DOCUMENT ME!
+     */
     public void setFilteredResultNodes(
-            final Node[] nodes, 
+            final Node[] nodes,
             final Node[] filteredNodes) {
-        LOG.debug("setting "  + nodes.length + " result nodes with " 
-                + filteredNodes.length + " pre-filtered nodes");
-        
-        this.setResultNodes(nodes); 
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("setting " + nodes.length + " result nodes with "
+                        + filteredNodes.length + " pre-filtered nodes");
+        }
+
+        this.setResultNodes(nodes);
         this.internalSetResultNodes(filteredNodes);
-        super.fireResultNodesFiltered(); 
+        super.fireResultNodesFiltered();
     }
 
     @Override
@@ -148,7 +167,16 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
         super.setResultNodes(nodes, append, listener, simpleSort);
         // Tools | Templates.
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nodes          DOCUMENT ME!
+     * @param  filteredNodes  DOCUMENT ME!
+     * @param  append         DOCUMENT ME!
+     * @param  listener       DOCUMENT ME!
+     * @param  simpleSort     DOCUMENT ME!
+     */
     public void setFilteredResultNodes(
             final Node[] nodes,
             final Node[] filteredNodes,
@@ -157,27 +185,33 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
             final boolean simpleSort) {
         super.setResultNodes(nodes, append, listener, simpleSort);
         this.internalSetResultNodes(filteredNodes);
-        super.fireResultNodesFiltered(); 
+        super.fireResultNodesFiltered();
     }
-    
-    
 
     @Override
     public void setResultNodes(
-            final Node[] nodes, 
-            final boolean append, 
+            final Node[] nodes,
+            final boolean append,
             final PropertyChangeListener listener) {
         super.setResultNodes(nodes, append, listener);
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  nodes          DOCUMENT ME!
+     * @param  filteredNodes  DOCUMENT ME!
+     * @param  append         DOCUMENT ME!
+     * @param  listener       DOCUMENT ME!
+     */
     public void setFilteredResultNodes(
-            final Node[] nodes, 
+            final Node[] nodes,
             final Node[] filteredNodes,
-            final boolean append, 
+            final boolean append,
             final PropertyChangeListener listener) {
         super.setResultNodes(nodes, append, listener);
         this.internalSetResultNodes(filteredNodes);
-        super.fireResultNodesFiltered(); 
+        super.fireResultNodesFiltered();
     }
 
     /**
