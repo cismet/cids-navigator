@@ -97,6 +97,7 @@ public class MutableToolBar extends JToolBar {
         this.rightStickyToolBar.putClientProperty(Options.HEADER_STYLE_KEY, HeaderStyle.BOTH);
 
         final JPanel filler = new JPanel();
+        filler.setOpaque(false);
         filler.add(Box.createHorizontalGlue());
         this.rightStickyToolBar.add(filler);
 
