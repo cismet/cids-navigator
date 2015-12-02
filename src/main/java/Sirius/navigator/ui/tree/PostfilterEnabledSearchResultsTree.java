@@ -105,25 +105,79 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
         // methods, choose Tools | Templates.
         resultNodesOriginal = new HashArrayList<Node>(super.resultNodes);
     }
+    
+    public void setFilteredResultNodes(
+            final Node[] nodes,
+            final Node[] filteredNodes,
+            final boolean append,
+            final PropertyChangeListener listener,
+            final boolean simpleSort,
+            final boolean sortActive) {
+        
+        LOG.debug("setting "  + nodes.length + " result nodes with " 
+                + filteredNodes.length + " pre-filtered nodes");
+        
+        this.setResultNodes(nodes, append, listener, simpleSort, sortActive);
+        this.internalSetResultNodes(filteredNodes, append, listener, simpleSort, sortActive);
+        super.fireResultNodesFiltered(); 
+    }
 
     @Override
     public void setResultNodes(final Node[] nodes) {
-        super.setResultNodes(nodes); // To change body of generated methods, choose Tools | Templates.
+        super.setResultNodes(nodes); 
         resultNodesOriginal = new HashArrayList<Node>(super.resultNodes);
+    }
+    
+    public void setFilteredResultNodes(
+            final Node[] nodes, 
+            final Node[] filteredNodes) {
+        LOG.debug("setting "  + nodes.length + " result nodes with " 
+                + filteredNodes.length + " pre-filtered nodes");
+        
+        this.setResultNodes(nodes); 
+        this.internalSetResultNodes(filteredNodes);
+        super.fireResultNodesFiltered(); 
     }
 
     @Override
-    public void setResultNodes(final Node[] nodes,
+    public void setResultNodes(
+            final Node[] nodes,
             final boolean append,
             final PropertyChangeListener listener,
             final boolean simpleSort) {
-        super.setResultNodes(nodes, append, listener, simpleSort); // To change body of generated methods, choose
+        super.setResultNodes(nodes, append, listener, simpleSort);
         // Tools | Templates.
     }
+    
+    public void setFilteredResultNodes(
+            final Node[] nodes,
+            final Node[] filteredNodes,
+            final boolean append,
+            final PropertyChangeListener listener,
+            final boolean simpleSort) {
+        super.setResultNodes(nodes, append, listener, simpleSort);
+        this.internalSetResultNodes(filteredNodes);
+        super.fireResultNodesFiltered(); 
+    }
+    
+    
 
     @Override
-    public void setResultNodes(final Node[] nodes, final boolean append, final PropertyChangeListener listener) {
-        super.setResultNodes(nodes, append, listener); // To change body of generated methods, choose Tools | Templates.
+    public void setResultNodes(
+            final Node[] nodes, 
+            final boolean append, 
+            final PropertyChangeListener listener) {
+        super.setResultNodes(nodes, append, listener);
+    }
+    
+    public void setFilteredResultNodes(
+            final Node[] nodes, 
+            final Node[] filteredNodes,
+            final boolean append, 
+            final PropertyChangeListener listener) {
+        super.setResultNodes(nodes, append, listener);
+        this.internalSetResultNodes(filteredNodes);
+        super.fireResultNodesFiltered(); 
     }
 
     /**
@@ -211,7 +265,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
             nodes = pf.filter(nodes);
         }
         if (LOG.isDebugEnabled()) {
-            LOG.debug(nodes.size() + " nodes left after applying " + filterArray.size() + " filters to"
+            LOG.debug(nodes.size() + " nodes left after applying " + filterArray.size() + " filters to "
                         + resultNodesOriginal.size() + " nodes");
         }
 
