@@ -7,26 +7,25 @@
 ****************************************************/
 package Sirius.navigator.search;
 
-import Sirius.server.middleware.types.MetaObjectNode;
-
-import java.util.List;
-
-import de.cismet.commons.gui.protocol.ProtocolStep;
-
 /**
  * DOCUMENT ME!
  *
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public interface CidsServerSearchProtocolStep extends ProtocolStep, CidsServerSearchProtocolStepReexecutor {
+public interface CidsServerSearchProtocolStepReexecutor {
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    void reExecuteSearch();
 
     /**
      * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    List<MetaObjectNode> getSearchResultNodes();
+    boolean isReExecuteSearchEnabled();
 }
