@@ -30,13 +30,6 @@ public interface CidsServerSearchProtocolStep extends ProtocolStep {
      *
      * @return  DOCUMENT ME!
      */
-    CidsServerSearch getSearch();
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
     List<MetaObjectNode> getSearchResultNodes();
 
     /**

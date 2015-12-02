@@ -7,12 +7,17 @@
 ****************************************************/
 package Sirius.navigator.search;
 
+import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
 
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import java.awt.Dimension;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.swing.JLabel;
 
 import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
 
@@ -27,12 +32,12 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
 //    private static final Map<String, ImageIcon> ICON_MAP = new HashMap<String, ImageIcon>();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane2;
     private org.jdesktop.swingx.JXHyperlink jXHyperlink1;
+    private org.jdesktop.swingx.JXHyperlink jXHyperlink2;
     private Sirius.navigator.search.CidsServerSearchProtocolStepResultsTree protocolResultsTree1;
     // End of variables declaration//GEN-END:variables
 
@@ -54,9 +59,32 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
         super(cidsSearchProtocolStep);
         initComponents();
 
-        jButton1.setVisible(cidsSearchProtocolStep.isReExecuteSearchEnabled());
+        jXHyperlink2.setVisible(cidsSearchProtocolStep.isReExecuteSearchEnabled());
         protocolResultsTree1.setResultNodes(cidsSearchProtocolStep.getSearchResultNodes().toArray(
                 new MetaObjectNode[0]));
+
+        if (!protocolResultsTree1.getResultNodes().isEmpty()) {
+            final int maxSize = 10;
+
+            final JLabel dummy = (JLabel)protocolResultsTree1.getCellRenderer()
+                        .getTreeCellRendererComponent(
+                                protocolResultsTree1,
+                                new ObjectTreeNode((MetaObjectNode)protocolResultsTree1.getResultNodes().get(0)),
+                                false,
+                                false,
+                                false,
+                                0,
+                                false);
+            final int height;
+
+            if (protocolResultsTree1.getResultNodes().size() > maxSize) {
+                height = 4 + (dummy.getPreferredSize().height * maxSize);
+            } else {
+                height = 4 + (dummy.getPreferredSize().height * protocolResultsTree1.getResultNodes().size());
+            }
+
+            jScrollPane2.setPreferredSize(new Dimension((int)jScrollPane2.getPreferredSize().getWidth(), height));
+        }
 
         setSearchResultsPanelVisible(false);
     }
@@ -88,7 +116,6 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jButton1 = new javax.swing.JButton();
         jXHyperlink1 = new org.jdesktop.swingx.JXHyperlink();
         jPanel1 = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
@@ -99,26 +126,9 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
             e1.printStackTrace();
         }
         jButton2 = new javax.swing.JButton();
+        jXHyperlink2 = new org.jdesktop.swingx.JXHyperlink();
 
         setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jButton1,
-            org.openide.util.NbBundle.getMessage(
-                CidsServerSearchProtocolStepPanel.class,
-                "CidsServerSearchProtocolStepPanel.jButton1.text")); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
-        add(jButton1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
             jXHyperlink1,
@@ -187,16 +197,23 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
         add(jPanel2, gridBagConstraints);
-    } // </editor-fold>//GEN-END:initComponents
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        ((CidsServerSearchProtocolStep)getProtocolStep()).reExecuteSearch();
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+        org.openide.awt.Mnemonics.setLocalizedText(
+            jXHyperlink2,
+            org.openide.util.NbBundle.getMessage(
+                CidsServerSearchProtocolStepPanel.class,
+                "CidsServerSearchProtocolStepPanel.jXHyperlink2.text")); // NOI18N
+        jXHyperlink2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jXHyperlink2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_END;
+        add(jXHyperlink2, gridBagConstraints);
+    } // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -223,9 +240,12 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
         jPanel2.setVisible(visible);
 
         if ((getSearchResultNodesList() == null) || getSearchResultNodesList().isEmpty()) {
-            jXHyperlink1.setVisible(false);
+            jXHyperlink1.setEnabled(false);
+            jXHyperlink1.setText(org.openide.util.NbBundle.getMessage(
+                    CidsServerSearchProtocolStepPanel.class,
+                    "CidsServerSearchProtocolStepPanel.jXHyperlink1.text"));
         } else {
-            jXHyperlink1.setVisible(true);
+            jXHyperlink1.setEnabled(true);
             if (jPanel2.isVisible()) {
                 jXHyperlink1.setText(Integer.toString(getSearchResultNodesList().size()) + " Suchergebnisse verbergen");
             } else {
@@ -252,4 +272,13 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
     private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         loadSearchResultsIntoTree();
     }                                                                            //GEN-LAST:event_jButton2ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jXHyperlink2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink2ActionPerformed
+        ((CidsServerSearchProtocolStep)getProtocolStep()).reExecuteSearch();
+    }                                                                                //GEN-LAST:event_jXHyperlink2ActionPerformed
 }
