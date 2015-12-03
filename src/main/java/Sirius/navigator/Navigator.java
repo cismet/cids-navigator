@@ -82,6 +82,7 @@ import de.cismet.netutil.Proxy;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
+import de.cismet.tools.JnlpSystemPropertyHelper;
 import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
 
@@ -113,8 +114,7 @@ public class Navigator extends JFrame {
 
     private static final ResourceManager resourceManager = ResourceManager.getManager();
     public static final String NAVIGATOR_HOME_DIR = ".navigator"
-                + (((System.getProperty("directory.extension")) != null) ? (System.getProperty("directory.extension"))
-                                                                         : "");
+                + JnlpSystemPropertyHelper.getProperty("directory.extension", "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
     private static volatile boolean startupFinished = false;
