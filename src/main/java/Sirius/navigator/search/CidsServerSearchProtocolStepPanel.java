@@ -225,9 +225,9 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jXHyperlink1ActionPerformed
+    private void jXHyperlink1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink1ActionPerformed
         toggleSearchResultsPanelVisibility();
-    }//GEN-LAST:event_jXHyperlink1ActionPerformed
+    }                                                                                //GEN-LAST:event_jXHyperlink1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -314,16 +314,16 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jXHyperlink2ActionPerformed
+    private void jXHyperlink2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink2ActionPerformed
         ((CidsServerSearchProtocolStep)getProtocolStep()).reExecuteSearch();
-    }//GEN-LAST:event_jXHyperlink2ActionPerformed
+    }                                                                                //GEN-LAST:event_jXHyperlink2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jXHyperlink3ActionPerformed
+    private void jXHyperlink3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink3ActionPerformed
         loadSearchResultsIntoTree();
-    }//GEN-LAST:event_jXHyperlink3ActionPerformed
+    }                                                                                //GEN-LAST:event_jXHyperlink3ActionPerformed
 }
