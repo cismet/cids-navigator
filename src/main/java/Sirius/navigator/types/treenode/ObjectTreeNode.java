@@ -246,7 +246,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         }
 
         if (mo == null) {
-            synchronized (metaObjectFilled) {
+            synchronized (this) {
                 mo = mon.getObject();
                 if (mo == null) {
                     try {
@@ -317,5 +317,14 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     @Override
     public int getClassID() {
         return this.getMetaObjectNode().getClassId();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Boolean isMetaObjectFilled() {
+        return metaObjectFilled;
     }
 }

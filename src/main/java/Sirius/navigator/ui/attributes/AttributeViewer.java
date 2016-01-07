@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractButton;
+import javax.swing.SwingWorker;
 import javax.swing.event.*;
 
 /**
@@ -42,6 +43,8 @@ import javax.swing.event.*;
 public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar {
 
     //~ Instance fields --------------------------------------------------------
+
+    protected SwingWorker worker = null;
 
     private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
@@ -97,13 +100,53 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
      * @param  treeNode  DOCUMENT ME!
      */
     public void setTreeNode(final Object treeNode) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("setTreeNode");
+        }
         this.treeNode = treeNode;
         this.attributeTable.clear();
         this.attributeTree.setTreeNode(treeNode);
 
-        if ((treeNode != null) && (treeNode instanceof ObjectTreeNode) && PropertyManager.getManager().isEditable()) {
-            final MetaObject mo = ((ObjectTreeNode)treeNode).getMetaObject();
-            this.editButton.setEnabled(mo.getBean().hasObjectWritePermission(SessionManager.getSession().getUser()));
+        if ((worker != null) && !worker.isDone()) {
+            logger.warn("cancelling running getMetaObject worker thread");
+            worker.cancel(true);
+            worker = null;
+        }
+
+        if ((treeNode != null) && PropertyManager.getManager().isEditable()
+                    && (treeNode instanceof ObjectTreeNode)) {
+            final ObjectTreeNode objectTreeNode = (ObjectTreeNode)treeNode;
+            if (objectTreeNode.isMetaObjectFilled()) {
+                this.editButton.setEnabled(
+                    objectTreeNode.getMetaObject().getBean().hasObjectWritePermission(
+                        SessionManager.getSession().getUser()));
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("starting getMetaObject worker thread");
+                }
+                worker = new SwingWorker<MetaObject, Void>() {
+
+                        @Override
+                        protected MetaObject doInBackground() throws Exception {
+                            return objectTreeNode.getMetaObject();
+                        }
+
+                        @Override
+                        protected void done() {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("MetaObject loaded from server");
+                            }
+                            try {
+                                final MetaObject metaObject = this.get();
+                                editButton.setEnabled(metaObject.getBean().hasObjectWritePermission(
+                                        SessionManager.getSession().getUser()));
+                            } catch (Exception ex) {
+                                logger.error(ex.getMessage(), ex);
+                                editButton.setEnabled(false);
+                            }
+                        }
+                    };
+            }
         } else {
             this.editButton.setEnabled(false);
         }

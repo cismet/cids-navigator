@@ -79,13 +79,13 @@ public class CatalogueSelectionListener implements TreeSelectionListener {
 
         if (t == catalogue) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("searchresults tree changed");
+                LOG.debug("catalogue tree changed");
             }
             tryToClearSelection(searchResults);
             tryToClearSelection(workingArea);
         } else if (t == searchResults) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("catalogue tree changed");
+                LOG.debug("searchresults tree changed");
             }
             tryToClearSelection(catalogue);
             tryToClearSelection(workingArea);
