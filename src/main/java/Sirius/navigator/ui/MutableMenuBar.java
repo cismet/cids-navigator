@@ -11,6 +11,9 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
+import Sirius.navigator.plugin.PluginRegistry;
+import Sirius.navigator.plugin.interfaces.PluginMethod;
+import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.dynamic.SearchSearchTopicsDialogAction;
@@ -23,6 +26,8 @@ import Sirius.navigator.ui.embedded.EmbeddedContainersMap;
 import Sirius.navigator.ui.embedded.EmbeddedMenu;
 
 import org.apache.log4j.Logger;
+
+import org.openide.util.Exceptions;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -551,14 +556,33 @@ public class MutableMenuBar extends JMenuBar {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("reset layout"); // NOI18N
                 }
+
                 if (layoutManager != null) {
                     layoutManager.resetLayout();
                 } else {
                     // TODO Meldung Benutzer
                 }
+
+                final PluginSupport cismapPlugin = PluginRegistry.getRegistry().getPlugin("cismap");
+                if (cismapPlugin != null) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("reset layout of cismap plugin"); // NOI18N
+                    }
+                    final PluginMethod resetLayoutMethod = cismapPlugin.getMethod(
+                            "de.cismet.cismap.navigatorplugin.CismapPlugin$ResetLayoutMethod");
+                    if (resetLayoutMethod != null) {
+                        try {
+                            resetLayoutMethod.invoke();
+                        } catch (Exception ex) {
+                            LOG.error("ResetLayoutMethod of cismap plugin failed: " + ex.getMessage(), ex);
+                        }
+                    } else {
+                        LOG.warn("ResetLayoutMethod of cismap plugin not available");
+                    }
+                }
             } else if (e.getActionCommand().equals("navigator.open.layout")) { // NOI18N
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("open layout"); // NOI18N
+                    LOG.debug("open layout");                       // NOI18N
                 }
                 if (layoutManager != null) {
                     layoutManager.loadLayout((java.awt.Component)StaticSwingTools.getParentFrame(MutableMenuBar.this));
@@ -567,7 +591,7 @@ public class MutableMenuBar extends JMenuBar {
                 }
             } else if (e.getActionCommand().equals("navigator.save.current.layout")) { // NOI18N
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("save layout"); // NOI18N
+                    LOG.debug("save layout");                       // NOI18N
                 }
                 if (layoutManager != null) {
                     layoutManager.saveCurrentLayout((java.awt.Component)StaticSwingTools.getParentFrame(
