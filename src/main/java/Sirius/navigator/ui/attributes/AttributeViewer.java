@@ -27,8 +27,11 @@ import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.Exceptions;
+
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractButton;
 import javax.swing.SwingWorker;
@@ -103,15 +106,16 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
         if (logger.isDebugEnabled()) {
             logger.debug("setTreeNode");
         }
+        editButton.setEnabled(false);
+        if ((worker != null) && !worker.isDone() && !worker.isCancelled()) {
+            logger.warn("cancelling running getMetaObject worker thread");
+            worker.cancel(false);
+            worker = null;
+        }
+
         this.treeNode = treeNode;
         this.attributeTable.clear();
         this.attributeTree.setTreeNode(treeNode);
-
-        if ((worker != null) && !worker.isDone()) {
-            logger.warn("cancelling running getMetaObject worker thread");
-            worker.cancel(true);
-            worker = null;
-        }
 
         if ((treeNode != null) && PropertyManager.getManager().isEditable()
                     && (treeNode instanceof ObjectTreeNode)) {
@@ -138,14 +142,22 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                             }
                             try {
                                 final MetaObject metaObject = this.get();
-                                editButton.setEnabled(metaObject.getBean().hasObjectWritePermission(
-                                        SessionManager.getSession().getUser()));
-                            } catch (Exception ex) {
+
+                                if (!isCancelled()) {
+                                    editButton.setEnabled(metaObject.getBean().hasObjectWritePermission(
+                                            SessionManager.getSession().getUser()));
+                                } else {
+                                    logger.warn("getMetaObject worker thread is cancelled!");
+                                }
+                            } catch (InterruptedException ex) {
+                                logger.warn(ex.getMessage(), ex);
+                            } catch (ExecutionException ex) {
                                 logger.error(ex.getMessage(), ex);
                                 editButton.setEnabled(false);
                             }
                         }
                     };
+                worker.execute();
             }
         } else {
             this.editButton.setEnabled(false);
