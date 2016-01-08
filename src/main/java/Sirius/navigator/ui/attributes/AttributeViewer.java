@@ -31,6 +31,7 @@ import org.openide.util.Exceptions;
 
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractButton;
@@ -104,11 +105,11 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
      */
     public void setTreeNode(final Object treeNode) {
         if (logger.isDebugEnabled()) {
-            logger.debug("setTreeNode");
+            logger.debug("setTreeNode: " + treeNode.hashCode());
         }
         editButton.setEnabled(false);
         if ((worker != null) && !worker.isDone() && !worker.isCancelled()) {
-            logger.warn("cancelling running getMetaObject worker thread");
+            logger.warn("cancelling running getMetaObject worker thread of tree node " + treeNode.hashCode());
             worker.cancel(false);
             worker = null;
         }
@@ -126,7 +127,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                         SessionManager.getSession().getUser()));
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("starting getMetaObject worker thread");
+                    logger.debug("starting getMetaObject worker thread for tree node " + treeNode.hashCode());
                 }
                 worker = new SwingWorker<MetaObject, Void>() {
 
@@ -138,7 +139,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                         @Override
                         protected void done() {
                             if (logger.isDebugEnabled()) {
-                                logger.debug("MetaObject loaded from server");
+                                logger.debug("MetaObject loaded from server for tree node " + treeNode.hashCode());
                             }
                             try {
                                 final MetaObject metaObject = this.get();
@@ -147,13 +148,19 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                                     editButton.setEnabled(metaObject.getBean().hasObjectWritePermission(
                                             SessionManager.getSession().getUser()));
                                 } else {
-                                    logger.warn("getMetaObject worker thread is cancelled!");
+                                    logger.warn("getMetaObject worker cancelled for tree node " + treeNode.hashCode());
                                 }
                             } catch (InterruptedException ex) {
                                 logger.warn(ex.getMessage(), ex);
                             } catch (ExecutionException ex) {
                                 logger.error(ex.getMessage(), ex);
                                 editButton.setEnabled(false);
+                            } catch (CancellationException cex) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.warn("getMetaObject worker thread forcibly cancelled for tree node:"
+                                                + treeNode.hashCode() + ": " + cex.getMessage(),
+                                        cex);
+                                }
                             }
                         }
                     };
