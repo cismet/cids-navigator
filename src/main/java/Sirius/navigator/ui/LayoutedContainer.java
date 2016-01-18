@@ -45,6 +45,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import java.net.URL;
+
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -70,6 +72,11 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
     private static final Logger LOGGER = Logger.getLogger(LayoutedContainer.class);
     public static final String DEFAULT_LAYOUT = Navigator.NAVIGATOR_HOME + "navigator.layout"; // NOI18N
     public static final String DEFAULT_LOCAL_LAYOUT = "/defaultNavigator.layout";              // NOI18N
+    private static final String DEFAULT_LOCAL_LAYOUT_LANGUAGE = "/defaultNavigator_" + System.getProperty("user.language")
+                + ".layout";
+    private static final String DEFAULT_LOCAL_LAYOUT_LANGUAGE_COUNTRY = "/defaultNavigator_"
+                + System.getProperty("user.language") + "_" + System.getProperty("user.country")
+                + ".layout";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -860,13 +867,16 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         File layoutFile = null;
         boolean layoutExists;
         InputStream layoutFileInputStream = null;
-        if (isInit && file.equals(LayoutedContainer.DEFAULT_LOCAL_LAYOUT)
-                    && (this.getClass().getResource(LayoutedContainer.DEFAULT_LOCAL_LAYOUT) != null)) {
+        final String defaultLayout = this.getInternationalizedDefaultLayout();
+        if (isInit
+                    && (file.equals(LayoutedContainer.DEFAULT_LOCAL_LAYOUT)
+                        || file.equals(defaultLayout))
+                    && (defaultLayout != null)) {
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("loading default layout from local layout file '" + DEFAULT_LOCAL_LAYOUT + "'");
+                LOGGER.debug("loading default layout from local layout file '" + defaultLayout + "'");
             }
 
-            layoutFileInputStream = this.getClass().getResourceAsStream(LayoutedContainer.DEFAULT_LOCAL_LAYOUT);
+            layoutFileInputStream = this.getClass().getResourceAsStream(defaultLayout);
             layoutExists = true;
         } else {
             layoutFile = new File(file);
@@ -919,9 +929,9 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
         } else {
             if (isInit) {
                 LOGGER.warn("layout file ' " + file + "' does not exist, generating default layout (init)"); // NOI18N
-                if (isInit && (this.getClass().getResource(LayoutedContainer.DEFAULT_LOCAL_LAYOUT) != null)) {
+                if (isInit && (defaultLayout != null)) {
                     // reset to saved local layout file in custom res.jar
-                    this.loadLayout(LayoutedContainer.DEFAULT_LOCAL_LAYOUT, isInit, parent);
+                    this.loadLayout(defaultLayout, isInit, parent);
                 } else {
                     // generate global default layout
                     SwingUtilities.invokeLater(new Runnable() {
@@ -949,6 +959,43 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected String getInternationalizedDefaultLayout() {
+        URL defaultLayoutUrl = this.getClass().getResource(LayoutedContainer.DEFAULT_LOCAL_LAYOUT_LANGUAGE_COUNTRY);
+        if (defaultLayoutUrl == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("default layout file '" + DEFAULT_LOCAL_LAYOUT_LANGUAGE_COUNTRY
+                            + "' not found, trying to find '" + DEFAULT_LOCAL_LAYOUT_LANGUAGE + "'");
+            }
+        } else {
+            return DEFAULT_LOCAL_LAYOUT_LANGUAGE_COUNTRY;
+        }
+
+        defaultLayoutUrl = this.getClass().getResource(LayoutedContainer.DEFAULT_LOCAL_LAYOUT_LANGUAGE);
+        if (defaultLayoutUrl == null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("default layout file '" + DEFAULT_LOCAL_LAYOUT_LANGUAGE
+                            + "' not found, trying to find '" + DEFAULT_LOCAL_LAYOUT + "'");
+            }
+        } else {
+            return DEFAULT_LOCAL_LAYOUT_LANGUAGE;
+        }
+
+        defaultLayoutUrl = this.getClass().getResource(LayoutedContainer.DEFAULT_LOCAL_LAYOUT);
+        if (defaultLayoutUrl == null) {
+            LOGGER.warn("default layout file '" + DEFAULT_LOCAL_LAYOUT
+                        + "' not found, giving up!");
+        } else {
+            return DEFAULT_LOCAL_LAYOUT;
+        }
+
+        return null;
     }
 
     @Override
