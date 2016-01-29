@@ -71,60 +71,33 @@ public class BlurredMapObjectRenderer extends CustomMetaObjectRenderer implement
 
     //~ Instance fields --------------------------------------------------------
 
-    @InjectedResource
-    public int offset;
-    @InjectedResource
-    public int offsetRight;
-    @InjectedResource
-    public int offsetTop;
-    @InjectedResource
-    public int offsetBetween;
-    @InjectedResource
-    public int arcSize;
-    @InjectedResource
-    public int shadowLength;
-    @InjectedResource
-    public int blurFactor;
-    @InjectedResource
-    public float borderWidth;
-    @InjectedResource
-    public float shadowIntensity;
-    @InjectedResource
-    public float titlePanelOpacity;
-    @InjectedResource
-    public float titleLinesOpacity;
-    @InjectedResource
-    public float interPanelOpacity;
-    @InjectedResource
-    public float interLinesOpacity;
-    @InjectedResource
-    public float blurredMapOpacity;
-    @InjectedResource
-    public float cutOutMapOpacity;
-    @InjectedResource
-    public float glossyOpacity;
-    @InjectedResource
-    public Color shadowColor;
-    @InjectedResource
-    public Color colorBorder;
-    @InjectedResource
-    public Color colorMapBorder;
-    @InjectedResource
-    public Color colorTitle;
-    @InjectedResource
-    public Color colorInter;
-    @InjectedResource
-    public Color colorDarkLine;
-    @InjectedResource
-    public Color colorBrightLine;
-    @InjectedResource
-    public Color colorGlossy;
-    @InjectedResource
-    public Color gradientColorTop;
-    @InjectedResource
-    public Color gradientColorBottom;
-    @InjectedResource
-    public boolean usePainterCoolPanel;
+    @InjectedResource public int offset;
+    @InjectedResource public int offsetRight;
+    @InjectedResource public int offsetTop;
+    @InjectedResource public int offsetBetween;
+    @InjectedResource public int arcSize;
+    @InjectedResource public int shadowLength;
+    @InjectedResource public int blurFactor;
+    @InjectedResource public float borderWidth;
+    @InjectedResource public float shadowIntensity;
+    @InjectedResource public float titlePanelOpacity;
+    @InjectedResource public float titleLinesOpacity;
+    @InjectedResource public float interPanelOpacity;
+    @InjectedResource public float interLinesOpacity;
+    @InjectedResource public float blurredMapOpacity;
+    @InjectedResource public float cutOutMapOpacity;
+    @InjectedResource public float glossyOpacity;
+    @InjectedResource public Color shadowColor;
+    @InjectedResource public Color colorBorder;
+    @InjectedResource public Color colorMapBorder;
+    @InjectedResource public Color colorTitle;
+    @InjectedResource public Color colorInter;
+    @InjectedResource public Color colorDarkLine;
+    @InjectedResource public Color colorBrightLine;
+    @InjectedResource public Color colorGlossy;
+    @InjectedResource public Color gradientColorTop;
+    @InjectedResource public Color gradientColorBottom;
+    @InjectedResource public boolean usePainterCoolPanel;
 
     // Lumbermill Logger initialisieren
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());

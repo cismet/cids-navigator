@@ -118,15 +118,13 @@ public final class PropertyManager {
      *
      * @deprecated  use {@link descriptionPaneHtmlRenderer} instead
      */
-    @Deprecated
-    private boolean useFlyingSaucer = false;
+    @Deprecated private boolean useFlyingSaucer = false;
     /**
      * DOCUMENT ME!
      *
      * @deprecated  use {@link descriptionPaneHtmlRenderer} instead
      */
-    @Deprecated
-    private boolean useWebView = false;
+    @Deprecated private boolean useWebView = false;
     private String descriptionPaneHtmlRenderer = null;
     private boolean enableSearchDialog = false;
     private boolean usePainterCoolPanel = true;

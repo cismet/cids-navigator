@@ -413,7 +413,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
                                                     java.awt.Cursor.WAIT_CURSOR));
-                                    final MetaObject MetaObject = SessionManager.getProxy().getInstance(metaClass);
+                                    final MetaObject metaObject = SessionManager.getProxy().getInstance(metaClass);
                                     ComponentRegistry.getRegistry()
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
@@ -422,7 +422,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                     final MetaObjectNode MetaObjectNode = new MetaObjectNode(
                                             -1,
                                             SessionManager.getSession().getUser().getDomain(),
-                                            MetaObject,
+                                            metaObject,
                                             TreeNodeEditor.this.nameField.getText(),
                                             null,
                                             true,
