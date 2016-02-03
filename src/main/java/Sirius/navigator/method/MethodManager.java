@@ -11,7 +11,6 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.exception.SqlConnectionException;
-import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.tools.CloneHelper;
 import Sirius.navigator.types.iterator.TreeNodeIterator;
 import Sirius.navigator.types.iterator.TreeNodeRestriction;
@@ -197,7 +196,6 @@ public class MethodManager {
      * DOCUMENT ME!
      */
     public void showQueryResultProfileManager() {
-        StaticSwingTools.showDialog(ComponentRegistry.getRegistry().getQueryResultProfileManager());
     }
 
     /**
@@ -212,10 +210,6 @@ public class MethodManager {
      */
     public void showSearchDialog() // throws Exception
     {
-        final ComponentRegistry cr = ComponentRegistry.getRegistry();
-        final SearchDialog dialog = cr.getSearchDialog();
-        dialog.pack();
-        StaticSwingTools.showDialog(dialog);
     }
 
     /**
@@ -223,8 +217,6 @@ public class MethodManager {
      */
     public void showQueryProfilesManager() // throws Exception
     {
-        ComponentRegistry.getRegistry().getSearchDialog().pack();
-        ComponentRegistry.getRegistry().getSearchDialog().showQueryProfilesManager();
     }
 
     /**

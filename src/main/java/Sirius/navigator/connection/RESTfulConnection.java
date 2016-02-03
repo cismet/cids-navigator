@@ -23,7 +23,6 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
 import Sirius.server.search.store.Info;
@@ -36,8 +35,6 @@ import org.apache.log4j.Logger;
 import java.awt.GraphicsEnvironment;
 
 import java.io.File;
-
-import java.lang.invoke.MethodHandles;
 
 import java.rmi.RemoteException;
 
@@ -396,31 +393,6 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
-    public MetaObject[] getMetaObject(final User usr, final Query query) throws ConnectionException {
-        try {
-            return connector.getMetaObject(usr, query);
-        } catch (final Exception e) {
-            final String message = "could not get metaobject for user, query: " + usr + " :: " + query; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public MetaObject[] getMetaObject(final User usr, final Query query, final String domain)
-            throws ConnectionException {
-        try {
-            return connector.getMetaObject(usr, query);
-        } catch (final Exception e) {
-            final String message = "could not get metaobject for user, query, domain: " + usr + " :: " + query // NOI18N
-                        + " :: "                                                                               // NOI18N
-                        + domain;
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
     public MetaObject getMetaObject(final User user, final int objectID, final int classID, final String domain)
             throws ConnectionException {
         try {
@@ -477,32 +449,6 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         + domain
                         + " :: "                                                                // NOI18N
                         + metaObject;
-            LOG.error(message, e);
-            /*
-             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
-             * visualised with a custom error dialog by the MethodManager
-             */
-            final Throwable initialCause = getTopInitialCause(e);
-            if (initialCause instanceof SQLException) {
-                throw new SqlConnectionException(initialCause.getMessage(),
-                    initialCause);
-            } else {
-                throw new ConnectionException(message, e);
-            }
-        }
-    }
-
-    @Override
-    public int insertMetaObject(final User user, final Query query, final String domain) throws ConnectionException {
-        try {
-            return connector.insertMetaObject(user, query, domain);
-        } catch (final Exception e) {
-            final String message = "could not insert metaobject for user, query, domain: " // NOI18N
-                        + user
-                        + "@"                                                              // NOI18N
-                        + domain
-                        + " :: "                                                           // NOI18N
-                        + query;
             LOG.error(message, e);
             /*
              *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
@@ -578,260 +524,6 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             return connector.getInstance(user, c);
         } catch (final Exception e) {
             final String message = "could not get instance for user, metaclass: " + user + " :: " + c; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public HashMap getSearchOptions(final User user) throws ConnectionException {
-        try {
-            return connector.getSearchOptions(user);
-        } catch (final Exception e) {
-            final String message = "could not get search options for user: " + user; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public HashMap getSearchOptions(final User user, final String domain) throws ConnectionException {
-        try {
-            return connector.getSearchOptions(user, domain);
-        } catch (final Exception e) {
-            final String message = "could not get search options for user, domain: " + user + "@" + domain; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public SearchResult search(final User user, final String[] classIds, final SearchOption[] searchOptions)
-            throws ConnectionException {
-        try {
-            return connector.search(user, classIds, searchOptions);
-        } catch (final Exception e) {
-            final String message = "could not perform search for user, classids, searchoptions: " + user; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public int addQuery(final User user,
-            final String name,
-            final String description,
-            final String statement,
-            final int resultType,
-            final char isUpdate,
-            final char isRoot,
-            final char isUnion,
-            final char isBatch) throws ConnectionException {
-        try {
-            return connector.addQuery(
-                    user,
-                    name,
-                    description,
-                    statement,
-                    resultType,
-                    isUpdate,
-                    isBatch,
-                    isRoot,
-                    isUnion);
-        } catch (final Exception e) {
-            final String message =
-                "could not add query for user, name, desc, stmt, type, update, batch, root, union: " // NOI18N
-                        + user
-                        + " :: "                                                                     // NOI18N
-                        + name
-                        + " :: "                                                                     // NOI18N
-                        + description
-                        + " :: "                                                                     // NOI18N
-                        + statement
-                        + " :: "                                                                     // NOI18N
-                        + resultType
-                        + " :: "                                                                     // NOI18N
-                        + isUpdate
-                        + " :: "                                                                     // NOI18N
-                        + isBatch
-                        + " :: "                                                                     // NOI18N
-                        + isRoot
-                        + " :: "                                                                     // NOI18N
-                        + isUnion;
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public int addQuery(final User user, final String name, final String description, final String statement)
-            throws ConnectionException {
-        try {
-            return connector.addQuery(
-                    user,
-                    name,
-                    description,
-                    statement);
-        } catch (final Exception e) {
-            final String message = "could not add query for user, name, desc, stmt: " // NOI18N
-                        + user
-                        + " :: "                                                      // NOI18N
-                        + name
-                        + " :: "                                                      // NOI18N
-                        + description
-                        + " :: "                                                      // NOI18N
-                        + statement;
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public boolean addQueryParameter(final User user,
-            final int queryId,
-            final int typeId,
-            final String paramkey,
-            final String description,
-            final char isQueryResult,
-            final int queryPosition) throws ConnectionException {
-        try {
-            return connector.addQueryParameter(
-                    user,
-                    queryId,
-                    typeId,
-                    paramkey,
-                    description,
-                    isQueryResult,
-                    queryPosition);
-        } catch (final Exception e) {
-            final String message =
-                "could not add query param for user, queryid, typeid, paramkey, desc, result, pos: " // NOI18N
-                        + user
-                        + " :: "                                                                     // NOI18N
-                        + queryId
-                        + " :: "                                                                     // NOI18N
-                        + typeId
-                        + " :: "                                                                     // NOI18N
-                        + paramkey
-                        + " :: "                                                                     // NOI18N
-                        + description
-                        + " :: "                                                                     // NOI18N
-                        + isQueryResult
-                        + " :: "                                                                     // NOI18N
-                        + queryPosition;
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public boolean addQueryParameter(final User user,
-            final int queryId,
-            final String paramkey,
-            final String description) throws ConnectionException {
-        try {
-            return connector.addQueryParameter(user, queryId, paramkey, description);
-        } catch (final Exception e) {
-            final String message = "could not add query param for user, queryid, paramkey, desc: " // NOI18N
-                        + user
-                        + " :: "                                                                   // NOI18N
-                        + queryId
-                        + " :: "                                                                   // NOI18N
-                        + paramkey
-                        + " :: "                                                                   // NOI18N
-                        + description;
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public boolean deleteQueryData(final int queryDataId, final String domain) throws ConnectionException {
-        try {
-            return connector.delete(queryDataId, domain);
-        } catch (final Exception e) {
-            final String message = "could not delete querydata for id, domain: " // NOI18N
-                        + queryDataId
-                        + " :: "
-                        + domain;                                                // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public boolean storeQueryData(final User user, final QueryData data) throws ConnectionException {
-        try {
-            return connector.storeQuery(user, data);
-        } catch (final Exception e) {
-            final String message = "could not store query data for user, data: " // NOI18N
-                        + user
-                        + " :: "
-                        + data;                                                  // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public QueryData getQueryData(final int id, final String domain) throws ConnectionException {
-        try {
-            return connector.getQuery(id, domain);
-        } catch (final Exception e) {
-            final String message = "could not get query data for id, domain: " // NOI18N
-                        + id
-                        + " :: "
-                        + domain;                                              // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public Info[] getUserGroupQueryInfos(final UserGroup userGroup) throws ConnectionException {
-        try {
-            return connector.getQueryInfos(userGroup);
-        } catch (final Exception e) {
-            final String message = "could not get query infos for usergroup: " // NOI18N
-                        + userGroup;                                           // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public Info[] getUserQueryInfos(final User user) throws ConnectionException {
-        try {
-            return connector.getQueryInfos(user);
-        } catch (final Exception e) {
-            final String message = "could not get query infos for user: " // NOI18N
-                        + user;                                           // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public MethodMap getMethods(final User user) throws ConnectionException {
-        try {
-            return connector.getMethods(user);
-        } catch (final Exception e) {
-            final String message = "could not get methods for user: " // NOI18N
-                        + user;
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public MethodMap getMethods(final User user, final String domain) throws ConnectionException {
-        try {
-            return connector.getMethods(user, domain);
-        } catch (final Exception e) {
-            final String message = "could not get methods for user, domain: " // NOI18N
-                        + user
-                        + "@"                                                 // NOI18N
-                        + domain;
             LOG.error(message, e);
             throw new ConnectionException(message, e);
         }

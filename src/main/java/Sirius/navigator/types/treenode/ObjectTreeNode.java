@@ -14,6 +14,7 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 import org.apache.log4j.Logger;
@@ -40,9 +41,8 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     //~ Instance fields --------------------------------------------------------
 
     protected Geometry cashedGeometry;
-    protected String lightweightJson; 
-    
-    
+    protected String lightweightJson;
+
     /**
      * DOCUMENT ME!
      *
@@ -333,17 +333,21 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         return metaObjectFilled;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public Geometry getCashedGeometry() {
         return cashedGeometry;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     public String getLightweightJson() {
         return lightweightJson;
     }
-    
-    
-    
 }
-
-
-
