@@ -10,11 +10,8 @@ package Sirius.navigator.ui.tree;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.*;
-import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.tree.postfilter.PostFilterGUI;
-
-import Sirius.server.search.store.QueryInfo;
 
 import org.apache.log4j.Logger;
 
@@ -49,7 +46,6 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
     private final JToolBar toolBar;
     private JButton removeButton;
     private JButton clearButton;
-    private JPopupMenuButton saveAllButton;
     private JCheckBox showDirectlyInMap;
     private JCheckBox showDirectlyInRenderer;
     private JToggleButton tbnSort;
@@ -150,19 +146,6 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
         clearButton.setMargin(new Insets(4, 4, 4, 4));
         clearButton.addActionListener(toolBarListener);
         toolBar.add(clearButton);
-
-        // saveAllButton = new JButton(resources.getIcon("saveall24.gif"));
-        saveAllButton = new JPopupMenuButton();
-        saveAllButton.setPopupMenu(new HistoryPopupMenu());
-        saveAllButton.setIcon(resources.getIcon("saveall24.gif")); // NOI18N
-        saveAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(
-                SearchResultsTreePanel.class,
-                "SearchResultsTreePanel.saveAllButton.tooltip"));  // NOI18N
-        saveAllButton.setActionCommand("saveall");                 // NOI18N
-        saveAllButton.setMargin(new Insets(4, 4, 4, 4));
-        saveAllButton.addActionListener(toolBarListener);
-        doNotShowThisButtonAsItsFunctionalityIsBroken(saveAllButton);
-        toolBar.add(saveAllButton);
 
         showDirectlyInMap = new JCheckBox();
         showDirectlyInMap.addActionListener(new ActionListener() {
@@ -333,7 +316,7 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
         clearButton.setEnabled(!searchResultsTree.isEmpty());
 
         // saveAllButton.setEnabled(!searchResultsTree.isEmpty());
-        saveAllButton.setEnabled(true);
+        // saveAllButton.setEnabled(true);
     }
 
     /**
@@ -469,94 +452,6 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
         @Override
         public void valueChanged(final TreeSelectionEvent e) {
             SearchResultsTreePanel.this.setButtonsEnabled();
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private class HistoryPopupMenu extends JPopupMenu implements PopupMenuListener, ActionListener {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private QueryResultProfileManager queryResultProfileManager = null;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new HistoryPopupMenu object.
-         */
-        public HistoryPopupMenu() {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("HistoryPopupMenu(): creating new instance"); // NOI18N
-            }
-            this.addPopupMenuListener(this);
-
-            // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme")); // NOI18N
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void popupMenuCanceled(final PopupMenuEvent e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("popupMenuCanceled()"); // NOI18N
-            }
-
-            // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme")); // NOI18N
-        }
-
-        @Override
-        public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("popupMenuWillBecomeInvisible()"); // NOI18N
-            }
-
-            // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme")); // NOI18N
-        }
-
-        @Override
-        public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("popupMenuWillBecomeVisible(): showing popup meu"); // NOI18N
-            }
-
-            if (this.queryResultProfileManager == null) {
-                this.queryResultProfileManager = ComponentRegistry.getRegistry().getQueryResultProfileManager();
-            }
-
-            if ((this.queryResultProfileManager.getUserInfos() == null)
-                        || (this.queryResultProfileManager.getUserInfos().length == 0)) {
-                this.queryResultProfileManager.updateQueryResultProfileManager();
-            }
-
-            this.removeAll();
-
-            final QueryInfo[] userInfo = this.queryResultProfileManager.getUserInfos();
-            if ((userInfo != null) && (userInfo.length > 0)) {
-                for (int i = 0; i < userInfo.length; i++) {
-                    final JMenuItem menuItem = new JMenuItem(userInfo[i].getName());
-                    menuItem.setActionCommand(userInfo[i].getFileName());
-                    menuItem.addActionListener(this);
-
-                    this.add(menuItem);
-                }
-            } else if (LOG.isDebugEnabled()) {
-                LOG.warn("HistoryPopupMenu: no query result profiles found"); // NOI18N
-            }
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("HistoryPopupMenu: loading query result profile '" + e.getActionCommand() + "'"); // NOI18N
-            }
-            this.queryResultProfileManager.loadSearchResults(e.getActionCommand());
         }
     }
 }

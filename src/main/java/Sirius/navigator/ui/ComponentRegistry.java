@@ -9,8 +9,6 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.Navigator;
 import Sirius.navigator.plugin.ui.manager.PluginManager;
-import Sirius.navigator.search.dynamic.SearchDialog;
-import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.dialog.CoordinateChooser;
@@ -60,13 +58,10 @@ public class ComponentRegistry {
     /** Holds value of property mainFrame. */
     private JFrame mainFrame = null;
     /** Holds value of property searchDialog. */
-    private SearchDialog searchDialog = null;
     /** Holds value of property searchResultsTree. */
     private SearchResultsTree searchResultsTree = null;
     private WorkingSpaceTree workingSpaceTree = null;
 
-    /** Holds value of property queryResultProfileManager. */
-    private Sirius.navigator.search.dynamic.profile.QueryResultProfileManager queryResultProfileManager = null;
     /** Holds value of property mutableContainer. */
     private GUIContainer guiContainer = null;
     /** Holds value of property catalogueTree. */
@@ -100,7 +95,6 @@ public class ComponentRegistry {
      * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
-     * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -115,7 +109,6 @@ public class ComponentRegistry {
             final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
-            final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
         this((JFrame)navigator,
             guiContainer,
@@ -127,7 +120,6 @@ public class ComponentRegistry {
             workingSpaceTree,
             attributeViewer,
             attributeEditor,
-            searchDialog,
             descriptionPane);
         this.navigator = navigator;
     }
@@ -145,7 +137,6 @@ public class ComponentRegistry {
      * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
-     * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -160,7 +151,6 @@ public class ComponentRegistry {
             final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
-            final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
         this.mainFrame = mainFrame;
         this.guiContainer = guiContainer;
@@ -172,7 +162,6 @@ public class ComponentRegistry {
         this.workingSpaceTree = workingSpaceTree;
         this.attributeViewer = attributeViewer;
         this.attributeEditor = attributeEditor;
-        this.searchDialog = searchDialog;
         this.descriptionPane = descriptionPane;
     }
 
@@ -208,7 +197,6 @@ public class ComponentRegistry {
      * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
-     * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -223,7 +211,6 @@ public class ComponentRegistry {
             final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
-            final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
         synchronized (blocker) {
             if (!isRegistred()) {
@@ -239,7 +226,6 @@ public class ComponentRegistry {
                         workingSpaceTree,
                         attributeViewer,
                         attributeEditor,
-                        searchDialog,
                         descriptionPane);
                 registry.registred = true;
             }
@@ -259,7 +245,6 @@ public class ComponentRegistry {
      * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
-     * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -274,7 +259,6 @@ public class ComponentRegistry {
             final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
-            final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
         synchronized (blocker) {
             if (!isRegistred()) {
@@ -290,7 +274,6 @@ public class ComponentRegistry {
                         workingSpaceTree,
                         attributeViewer,
                         attributeEditor,
-                        searchDialog,
                         descriptionPane);
                 registry.registred = true;
             }
@@ -426,15 +409,6 @@ public class ComponentRegistry {
     }
 
     /**
-     * Getter for property searchDialog.
-     *
-     * @return  Value of property searchDialog.
-     */
-    public SearchDialog getSearchDialog() {
-        return this.searchDialog;
-    }
-
-    /**
      * Getter for property searchProgressDialog.
      *
      * @return  Value of property searchProgressDialog.
@@ -457,22 +431,6 @@ public class ComponentRegistry {
      */
     public WorkingSpaceTree getWorkingSpaceTree() {
         return this.workingSpaceTree;
-    }
-
-    /**
-     * Getter for property queryResultProfileManager.
-     *
-     * @return  Value of property queryResultProfileManager.
-     */
-    public Sirius.navigator.search.dynamic.profile.QueryResultProfileManager getQueryResultProfileManager() {
-        if (this.queryResultProfileManager == null) {
-            queryResultProfileManager = new Sirius.navigator.search.dynamic.profile.QueryResultProfileManager(this
-                            .getMainWindow(),
-                    this.searchResultsTree,
-                    QueryResultProfileManager.QUERY_RESULT_PROFILE);
-        }
-
-        return this.queryResultProfileManager;
     }
 
     /**
