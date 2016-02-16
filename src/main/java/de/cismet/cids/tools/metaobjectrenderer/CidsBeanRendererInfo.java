@@ -29,8 +29,7 @@ public interface CidsBeanRendererInfo {
 
     //~ Instance fields --------------------------------------------------------
 
-    @Deprecated
-    String WIDTH_RATIO = "WIDTH_RATIO"; // NOI18N
+    @Deprecated String WIDTH_RATIO = "WIDTH_RATIO"; // NOI18N
 
     //~ Methods ----------------------------------------------------------------
 

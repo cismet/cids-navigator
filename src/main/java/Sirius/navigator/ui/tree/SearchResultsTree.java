@@ -608,12 +608,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
         tmpNodeVector.addAll(Arrays.asList(resultNodes));
 
         for (int i = 0; i < tmpNodeVector.size(); i++) {
-            for (int j = 0; j < selectedNodes.length;) {
+            for (int j = 0; j < selectedNodes.length; j++) {
                 if ((i < tmpNodeVector.size()) && selectedNodes[j].equalsNode((Node)tmpNodeVector.get(i))) {
                     tmpNodeVector.remove(i);
                     deleted = true;
-                } else {
-                    ++j;
+                    j--;
                 }
             }
         }

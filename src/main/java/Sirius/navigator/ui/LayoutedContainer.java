@@ -72,7 +72,8 @@ public class LayoutedContainer implements GUIContainer, LayoutManager {
     private static final Logger LOGGER = Logger.getLogger(LayoutedContainer.class);
     public static final String DEFAULT_LAYOUT = Navigator.NAVIGATOR_HOME + "navigator.layout"; // NOI18N
     public static final String DEFAULT_LOCAL_LAYOUT = "/defaultNavigator.layout";              // NOI18N
-    private static final String DEFAULT_LOCAL_LAYOUT_LANGUAGE = "/defaultNavigator_" + System.getProperty("user.language")
+    private static final String DEFAULT_LOCAL_LAYOUT_LANGUAGE = "/defaultNavigator_"
+                + System.getProperty("user.language")
                 + ".layout";
     private static final String DEFAULT_LOCAL_LAYOUT_LANGUAGE_COUNTRY = "/defaultNavigator_"
                 + System.getProperty("user.language") + "_" + System.getProperty("user.country")

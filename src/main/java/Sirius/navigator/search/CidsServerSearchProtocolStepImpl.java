@@ -42,18 +42,11 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
 
     //~ Instance fields --------------------------------------------------------
 
-    @Getter
-    @Setter
-    @JsonIgnore
-    private transient CidsServerSearchProtocolStepReexecutor reexecutor;
+    @Getter @Setter @JsonIgnore private transient CidsServerSearchProtocolStepReexecutor reexecutor;
 
-    @Getter
-    @JsonIgnore
-    private final transient CidsServerSearch search;
+    @Getter @JsonIgnore private final transient CidsServerSearch search;
 
-    @Getter
-    @JsonIgnore
-    private final transient List<MetaObjectNode> searchResultNodes;
+    @Getter @JsonIgnore private final transient List<MetaObjectNode> searchResultNodes;
 
     @Getter
     @JsonProperty(required = true)
