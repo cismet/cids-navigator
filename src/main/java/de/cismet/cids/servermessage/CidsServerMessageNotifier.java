@@ -171,13 +171,13 @@ public class CidsServerMessageNotifier {
         public void run() {
             int newLastMesageId = lastMessageId;
             try {
-                final ServerActionParameter<Integer> lastMessageIdParam = new ServerActionParameter<Integer>(
-                        CheckCidsServerMessageAction.ParameterType.LAST_MESSAGE_ID.toString(),
-                        lastMessageId);
                 if (SessionManager.getSession().getConnection().hasConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 "csa://"
                                 + CheckCidsServerMessageAction.TASK_NAME)) {
+                    final ServerActionParameter<Integer> lastMessageIdParam = new ServerActionParameter<Integer>(
+                            CheckCidsServerMessageAction.ParameterType.LAST_MESSAGE_ID.toString(),
+                            lastMessageId);
                     final Object ret = SessionManager.getSession()
                                 .getConnection()
                                 .executeTask(
