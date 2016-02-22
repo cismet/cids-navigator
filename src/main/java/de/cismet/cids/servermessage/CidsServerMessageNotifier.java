@@ -8,7 +8,6 @@
 package de.cismet.cids.servermessage;
 
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -175,48 +174,48 @@ public class CidsServerMessageNotifier {
                 final ServerActionParameter<Integer> lastMessageIdParam = new ServerActionParameter<Integer>(
                         CheckCidsServerMessageAction.ParameterType.LAST_MESSAGE_ID.toString(),
                         lastMessageId);
-                final Object ret = SessionManager.getSession()
-                            .getConnection()
-                            .executeTask(
+                if (SessionManager.getSession().getConnection().hasConfigAttr(
                                 SessionManager.getSession().getUser(),
-                                CheckCidsServerMessageAction.TASK_NAME,
-                                SessionManager.getSession().getUser().getDomain(),
-                                null,
-                                lastMessageIdParam);
-//                final Object ret = SessionManager.getSession()
-//                            .getConnection()
-//                            .receiveLastMessages(SessionManager.getSession().getUser(),
-//                                SessionManager.getSession().getUser().getDomain(),
-//                                lastMessageId);
+                                "csa://"
+                                + CheckCidsServerMessageAction.TASK_NAME)) {
+                    final Object ret = SessionManager.getSession()
+                                .getConnection()
+                                .executeTask(
+                                    SessionManager.getSession().getUser(),
+                                    CheckCidsServerMessageAction.TASK_NAME,
+                                    SessionManager.getSession().getUser().getDomain(),
+                                    null,
+                                    lastMessageIdParam);
 
-                if (ret instanceof List) {
-                    final List<CidsServerMessage> cidsServerMessages = (List<CidsServerMessage>)ret;
+                    if (ret instanceof List) {
+                        final List<CidsServerMessage> cidsServerMessages = (List<CidsServerMessage>)ret;
 
-                    Collections.sort(cidsServerMessages, new Comparator<CidsServerMessage>() {
+                        Collections.sort(cidsServerMessages, new Comparator<CidsServerMessage>() {
 
-                            @Override
-                            public int compare(final CidsServerMessage o1, final CidsServerMessage o2) {
-                                final Integer id1 = (o1 == null) ? null : o1.getId();
-                                final Integer id2 = (o2 == null) ? null : o2.getId();
+                                @Override
+                                public int compare(final CidsServerMessage o1, final CidsServerMessage o2) {
+                                    final Integer id1 = (o1 == null) ? null : o1.getId();
+                                    final Integer id2 = (o2 == null) ? null : o2.getId();
 
-                                if ((id1 == null) && (id2 == null)) {
-                                    return 0;
-                                } else if (id2 == null) {
-                                    return 1;
-                                } else if (id1 == null) {
-                                    return -1;
-                                } else {
-                                    return Integer.compare(id1, id2);
+                                    if ((id1 == null) && (id2 == null)) {
+                                        return 0;
+                                    } else if (id2 == null) {
+                                        return 1;
+                                    } else if (id1 == null) {
+                                        return -1;
+                                    } else {
+                                        return Integer.compare(id1, id2);
+                                    }
                                 }
-                            }
-                        });
+                            });
 
-                    for (final CidsServerMessage cidsServerMessage : cidsServerMessages) {
-                        final int messageId = cidsServerMessage.getId();
-                        if (messageId > newLastMesageId) {
-                            newLastMesageId = messageId;
+                        for (final CidsServerMessage cidsServerMessage : cidsServerMessages) {
+                            final int messageId = cidsServerMessage.getId();
+                            if (messageId > newLastMesageId) {
+                                newLastMesageId = messageId;
+                            }
+                            publish(cidsServerMessage, cidsServerMessage.getCategory());
                         }
-                        publish(cidsServerMessage, cidsServerMessage.getCategory());
                     }
                 }
             } catch (final Exception ex) {

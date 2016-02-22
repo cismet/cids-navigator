@@ -206,28 +206,6 @@ public class Navigator extends JFrame {
 
     /**
      * DOCUMENT ME!
-     */
-    private void initServerMessageNotifier() {
-        CidsServerMessageNotifier.getInstance().subscribe(MotdDialog.getInstance(), "FooCat");
-        CidsServerMessageNotifier.getInstance().subscribe(new CidsServerMessageNotifierListener() {
-
-                @Override
-                public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
-                    if ((event != null) && (event.getMessage() != null)) {
-                        logger.fatal(
-                            event.getMessage().getId()
-                                    + " ("
-                                    + event.getMessage().getCategory()
-                                    + "): "
-                                    + event.getMessage().getMessage());
-                    }
-                }
-            }, null);
-        CidsServerMessageNotifier.getInstance().start();
-    }
-
-    /**
-     * DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
@@ -288,7 +266,6 @@ public class Navigator extends JFrame {
             initEvents();
             initWindow();
             initSearch();
-            initServerMessageNotifier();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
             if (PropertyManager.getManager().isProtocolEnabled()) {
