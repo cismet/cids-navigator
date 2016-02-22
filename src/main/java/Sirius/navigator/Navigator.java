@@ -71,6 +71,12 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.cids.server.messages.CidsServerMessageManagerImpl;
+
+import de.cismet.cids.servermessage.CidsServerMessageNotifier;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
+
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
 
