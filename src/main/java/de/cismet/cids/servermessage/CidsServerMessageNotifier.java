@@ -39,7 +39,7 @@ public class CidsServerMessageNotifier {
 
     private static CidsServerMessageNotifier INSTANCE = null;
 
-    private static final int SCHEDULE_INTERVAL = 5000;
+    public static final long DEFAULT_SCHEDULE_INTERVAL = 10000;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -47,6 +47,7 @@ public class CidsServerMessageNotifier {
     private final int lastMessageId = -1;
     private boolean running;
     private final Map<String, Collection> subscribers = new HashMap<String, Collection>();
+    private long scheduleIntervall = DEFAULT_SCHEDULE_INTERVAL;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -75,9 +76,27 @@ public class CidsServerMessageNotifier {
     public void start() {
         synchronized (timer) {
             if (!running) {
-                startTimer(lastMessageId, SCHEDULE_INTERVAL);
+                startTimer(lastMessageId);
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  scheduleIntervall  DOCUMENT ME!
+     */
+    public void setScheduleIntervall(final long scheduleIntervall) {
+        this.scheduleIntervall = scheduleIntervall;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public long getScheduleIntervall() {
+        return scheduleIntervall;
     }
 
     /**
@@ -129,12 +148,11 @@ public class CidsServerMessageNotifier {
      * DOCUMENT ME!
      *
      * @param  lastMessageId  DOCUMENT ME!
-     * @param  scheduleMs     DOCUMENT ME!
      */
-    private void startTimer(final int lastMessageId, final int scheduleMs) {
+    private void startTimer(final int lastMessageId) {
         running = true;
         synchronized (timer) {
-            timer.schedule(new RetrieveTimerTask(lastMessageId, scheduleMs), scheduleMs);
+            timer.schedule(new RetrieveTimerTask(lastMessageId), getScheduleIntervall());
         }
     }
 
@@ -150,7 +168,6 @@ public class CidsServerMessageNotifier {
         //~ Instance fields ----------------------------------------------------
 
         private final int lastMessageId;
-        private final int intervall;
 
         //~ Constructors -------------------------------------------------------
 
@@ -158,11 +175,9 @@ public class CidsServerMessageNotifier {
          * Creates a new RetrieveTimerTask object.
          *
          * @param  lastMessageId  DOCUMENT ME!
-         * @param  intervall      DOCUMENT ME!
          */
-        public RetrieveTimerTask(final int lastMessageId, final int intervall) {
+        public RetrieveTimerTask(final int lastMessageId) {
             this.lastMessageId = lastMessageId;
-            this.intervall = intervall;
         }
 
         //~ Methods ------------------------------------------------------------
@@ -222,7 +237,7 @@ public class CidsServerMessageNotifier {
                 LOG.fatal(ex, ex);
             } finally {
                 synchronized (timer) {
-                    startTimer(newLastMesageId, intervall);
+                    startTimer(newLastMesageId);
                 }
             }
         }
