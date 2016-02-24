@@ -8,6 +8,9 @@
 package de.cismet.cids.servermessage;
 
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.exception.ConnectionException;
+
+import org.openide.util.Exceptions;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +26,8 @@ import java.util.TimerTask;
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.messages.CidsServerMessage;
+
+import de.cismet.tools.StaticDebuggingTools;
 
 /**
  * DOCUMENT ME!
@@ -70,14 +75,27 @@ public class CidsServerMessageNotifier {
         }
         return INSTANCE;
     }
+
     /**
      * DOCUMENT ME!
      */
     public void start() {
-        synchronized (timer) {
-            if (!running) {
-                startTimer(lastMessageId);
+        try {
+            if (StaticDebuggingTools.checkHomeForFile("cidsServerMessagesEnabled")
+                        && SessionManager.getSession().getConnection().hasConfigAttr(
+                            SessionManager.getSession().getUser(),
+                            "csa://"
+                            + CheckCidsServerMessageAction.TASK_NAME)) {
+                synchronized (timer) {
+                    if (!running) {
+                        startTimer(lastMessageId);
+                    }
+                }
             }
+        } catch (ConnectionException ex) {
+            LOG.info("error checking csa://"
+                        + CheckCidsServerMessageAction.TASK_NAME + ". no cids server messages",
+                ex);
         }
     }
 
@@ -140,7 +158,11 @@ public class CidsServerMessageNotifier {
         }
 
         for (final CidsServerMessageNotifierListener listener : listeners) {
-            listener.messageRetrieved(new CidsServerMessageNotifierListenerEvent(this, message));
+            try {
+                listener.messageRetrieved(new CidsServerMessageNotifierListenerEvent(this, message));
+            } catch (final Exception ex) {
+                LOG.warn("error while invoking listener.messageRetrieved(...)", ex);
+            }
         }
     }
 
@@ -185,6 +207,7 @@ public class CidsServerMessageNotifier {
         @Override
         public void run() {
             int newLastMesageId = lastMessageId;
+            boolean errorWhileCheck = false;
             try {
                 if (SessionManager.getSession().getConnection().hasConfigAttr(
                                 SessionManager.getSession().getUser(),
@@ -234,10 +257,13 @@ public class CidsServerMessageNotifier {
                     }
                 }
             } catch (final Exception ex) {
-                LOG.fatal(ex, ex);
+                LOG.error("error while checking message. abort retrieving new messages.", ex);
+                errorWhileCheck = true;
             } finally {
-                synchronized (timer) {
-                    startTimer(newLastMesageId);
+                if (!errorWhileCheck) {
+                    synchronized (timer) {
+                        startTimer(newLastMesageId);
+                    }
                 }
             }
         }
