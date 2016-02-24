@@ -7,11 +7,17 @@
 ****************************************************/
 package Sirius.navigator.ui.option;
 
+import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.exception.ConnectionException;
+
 import org.apache.log4j.Logger;
 
 import org.jdom.Element;
 
+import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
+
+import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 
@@ -211,5 +217,22 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
         conf.addContent(intervallElement);
 
         return conf;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        try {
+            return SessionManager.getSession()
+                        .getConnection()
+                        .hasConfigAttr(
+                            SessionManager.getSession().getUser(),
+                            "csa://"
+                            + CheckCidsServerMessageAction.TASK_NAME);
+        } catch (final Exception ex) {
+            LOG.warn("could not check csa://" + CheckCidsServerMessageAction.TASK_NAME
+                        + ". CidsServerMessageOptionsPanel is now disabled",
+                ex);
+            return false;
+        }
     }
 }
