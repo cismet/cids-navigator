@@ -28,8 +28,6 @@
  */
 package Sirius.navigator;
 
-import Sirius.navigator.resource.PropertyManager;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -39,18 +37,12 @@ import java.awt.EventQueue;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.ProxySelector;
-import java.net.URI;
-import java.net.URL;
-
-import java.util.Iterator;
-import java.util.List;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
+import javax.swing.JTextArea;
 
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
@@ -71,41 +63,41 @@ public class ConnectionTester extends javax.swing.JFrame {
 
     private static final transient Logger LOG = Logger.getLogger(ConnectionTester.class);
 
+    //~ Instance fields --------------------------------------------------------
+
+    private final String connectionUrl;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnClear;
     private javax.swing.JButton btnStore;
     private javax.swing.JButton btnTest;
     private javax.swing.JEditorPane jEditorPane1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JPasswordField pwdPassword;
+    private de.cismet.lookupoptions.options.ProxyOptionsPanel proxyOptionsPanel1;
     private javax.swing.JTextArea txaLog;
     private javax.swing.JTextArea txaOut;
-    private javax.swing.JTextField txtDomain;
-    private javax.swing.JTextField txtProxy;
-    private javax.swing.JTextField txtRegex;
-    private javax.swing.JTextField txtUsername;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates new form ConnectionTester.
+     *
+     * @param  connectionUrl  DOCUMENT ME!
      */
-    public ConnectionTester() {
+    public ConnectionTester(final String connectionUrl) {
+        this.connectionUrl = connectionUrl;
+
         initComponents();
         initLog();
-        init();
+
+        setTitle(getTitle() + ": " + connectionUrl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -114,8 +106,7 @@ public class ConnectionTester extends javax.swing.JFrame {
      * DOCUMENT ME!
      */
     private void initLog() {
-        TextAreaAppender.setTextArea(txaLog, txtRegex);
-
+        TextAreaAppender.setTextArea(txaLog, new JTextArea());
         final Properties logProperties = new Properties();
         logProperties.put("log4j.rootLogger", "DEBUG, CONSOLE, TEXTAREA");
         logProperties.put("log4j.appender.CONSOLE", "org.apache.log4j.ConsoleAppender");      // A standard console
@@ -133,87 +124,36 @@ public class ConnectionTester extends javax.swing.JFrame {
     }
 
     /**
-     * DOCUMENT ME!
-     */
-    private void init() {
-        final String proxyURL = PropertyManager.getManager().getProxyURL();
-        if ((proxyURL == null) || proxyURL.isEmpty()) {
-            try {
-                System.setProperty("java.net.useSystemProxies", "true");
-                final List l = ProxySelector.getDefault().select(new URI("http://www.cismet.de/"));
-
-                for (final Iterator iter = l.iterator(); iter.hasNext();) {
-                    final java.net.Proxy proxy = (java.net.Proxy)iter.next();
-                    final InetSocketAddress addr = (InetSocketAddress)proxy.address();
-
-                    if (addr != null) {
-                        txtProxy.setText("http://" + addr.getHostName() + ":" + addr.getPort());
-                    }
-                }
-            } catch (final Exception e) {
-                // skip
-            }
-        } else {
-            txtProxy.setText(proxyURL);
-        }
-        final String username = PropertyManager.getManager().getProxyUsername();
-        if ((username == null) || username.isEmpty()) {
-            txtUsername.setText(System.getenv("USERNAME"));
-        } else {
-            txtUsername.setText(username);
-        }
-        final String domain = PropertyManager.getManager().getProxyDomain();
-        if ((domain == null) || domain.isEmpty()) {
-            txtDomain.setText(System.getenv("USERDOMAIN"));
-        } else {
-            txtDomain.setText(domain);
-        }
-    }
-
-    /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
         jScrollPane2 = new javax.swing.JScrollPane();
         jEditorPane1 = new javax.swing.JEditorPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
-        jLabel1 = new javax.swing.JLabel();
-        txtProxy = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        txtUsername = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        pwdPassword = new javax.swing.JPasswordField();
-        jLabel4 = new javax.swing.JLabel();
-        txtDomain = new javax.swing.JTextField();
         btnTest = new javax.swing.JButton();
-        btnStore = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         txaOut = new javax.swing.JTextArea();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane4 = new javax.swing.JScrollPane();
         txaLog = new javax.swing.JTextArea();
-        jLabel5 = new javax.swing.JLabel();
-        txtRegex = new javax.swing.JTextField();
-        btnClear = new javax.swing.JButton();
+        btnStore = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        proxyOptionsPanel1 = new de.cismet.lookupoptions.options.ProxyOptionsPanel();
 
         jScrollPane2.setViewportView(jEditorPane1);
 
         jScrollPane3.setViewportView(jTextPane1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        jLabel1.setText("Proxy:"); // NOI18N
-
-        jLabel2.setText("Username:"); // NOI18N
-
-        jLabel3.setText("Password:"); // NOI18N
-
-        jLabel4.setText("Domain:"); // NOI18N
+        setTitle(org.openide.util.NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.title")); // NOI18N
+        getContentPane().setLayout(new java.awt.GridBagLayout());
 
         btnTest.setText("Test"); // NOI18N
         btnTest.addActionListener(new java.awt.event.ActionListener() {
@@ -223,15 +163,12 @@ public class ConnectionTester extends javax.swing.JFrame {
                     btnTestActionPerformed(evt);
                 }
             });
-
-        btnStore.setText("Store"); // NOI18N
-        btnStore.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnStoreActionPerformed(evt);
-                }
-            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(btnTest, gridBagConstraints);
 
         txaOut.setColumns(20);
         txaOut.setRows(5);
@@ -239,119 +176,68 @@ public class ConnectionTester extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Out", jScrollPane1);
 
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
         txaLog.setColumns(20);
         txaLog.setRows(5);
         txaLog.setAutoscrolls(false);
         jScrollPane4.setViewportView(txaLog);
 
-        jLabel5.setText("Regex:"); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 744;
+        gridBagConstraints.ipady = 345;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        jPanel1.add(jScrollPane4, gridBagConstraints);
 
-        btnClear.setText("Clear"); // NOI18N
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
+        btnStore.setText("save"); // NOI18N
+        btnStore.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
                 public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnClearActionPerformed(evt);
+                    btnStoreActionPerformed(evt);
                 }
             });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel1.add(btnStore, gridBagConstraints);
 
-        final org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                jPanel1Layout.createSequentialGroup().addContainerGap().add(jLabel5).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    txtRegex,
-                    org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                    221,
-                    org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED,
-                    370,
-                    Short.MAX_VALUE).add(btnClear)).add(
-                jScrollPane4,
-                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                739,
-                Short.MAX_VALUE));
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                jPanel1Layout.createSequentialGroup().add(
-                    jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(
-                        txtRegex,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(jLabel5).add(btnClear)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    jScrollPane4,
-                    org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                    351,
-                    Short.MAX_VALUE)));
+        final org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 0, Short.MAX_VALUE));
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 0, Short.MAX_VALUE));
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel1.add(jPanel3, gridBagConstraints);
 
         jTabbedPane1.addTab("Log", jPanel1);
 
-        final org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                layout.createSequentialGroup().addContainerGap().add(
-                    layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                        jTabbedPane1,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        760,
-                        Short.MAX_VALUE).add(
-                        layout.createSequentialGroup().add(
-                            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(jLabel2).add(
-                                jLabel1)).addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED).add(
-                            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                                txtProxy,
-                                org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                684,
-                                Short.MAX_VALUE).add(
-                                layout.createSequentialGroup().add(
-                                    txtUsername,
-                                    org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                                    193,
-                                    org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(18, 18, 18).add(jLabel3).add(
-                                    18,
-                                    18,
-                                    18).add(
-                                    pwdPassword,
-                                    org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                                    205,
-                                    Short.MAX_VALUE).add(18, 18, 18).add(
-                                    layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false).add(
-                                        layout.createSequentialGroup().add(18, 18, 18).add(btnTest).addPreferredGap(
-                                            org.jdesktop.layout.LayoutStyle.UNRELATED).add(btnStore)).add(
-                                        layout.createSequentialGroup().add(jLabel4).addPreferredGap(
-                                            org.jdesktop.layout.LayoutStyle.RELATED).add(txtDomain)))))))
-                            .addContainerGap()));
-        layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(
-                layout.createSequentialGroup().addContainerGap().add(
-                    layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(jLabel1).add(
-                        txtProxy,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(
-                    org.jdesktop.layout.LayoutStyle.UNRELATED).add(
-                    layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(jLabel2).add(
-                        txtUsername,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(
-                        pwdPassword,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(
-                        txtDomain,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE,
-                        org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                        org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(jLabel4).add(jLabel3)).add(26, 26, 26).add(
-                    layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(btnStore).add(btnTest))
-                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED).add(
-                    jTabbedPane1,
-                    org.jdesktop.layout.GroupLayout.DEFAULT_SIZE,
-                    436,
-                    Short.MAX_VALUE).addContainerGap()));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(jTabbedPane1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        getContentPane().add(proxyOptionsPanel1, gridBagConstraints);
 
         pack();
     } // </editor-fold>//GEN-END:initComponents
@@ -359,92 +245,81 @@ public class ConnectionTester extends javax.swing.JFrame {
     /**
      * DOCUMENT ME!
      *
-     * @param   evt  DOCUMENT ME!
-     *
-     * @throws  IllegalStateException  DOCUMENT ME!
+     * @param  evt  DOCUMENT ME!
      */
     private void btnTestActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnTestActionPerformed
     {                                                                         //GEN-HEADEREND:event_btnTestActionPerformed
-        txaOut.setText("");
-        final Proxy proxy;
-        if ((txtProxy.getText() == null) || txtProxy.getText().trim().isEmpty()) {
-            proxy = null;
-        } else {
-            proxy = new Proxy();
-            try {
-                final URL url = new URL(txtProxy.getText());
-                proxy.setHost(url.getHost());
-                proxy.setPort(url.getPort());
-            } catch (final MalformedURLException ex) {
-                throw new IllegalStateException("illegal proxy url", ex);
-            }
-            proxy.setUsername(txtUsername.getText());
-            proxy.setPassword(String.valueOf(pwdPassword.getPassword()));
-            proxy.setDomain(txtDomain.getText());
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("system properties: " + System.getProperties());
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("system env: " + System.getenv());
-        }
+        try {
+            txaOut.setText("");
 
-        final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
-                "https://fis-wasser-mv.de/callserver/binary",
-                proxy,
-                Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig());
+            proxyOptionsPanel1.applyChanges();
 
-        final Thread establisher = new Thread(new Runnable() {
+            final Proxy proxy = proxyOptionsPanel1.getProxy();
 
-                    @Override
-                    public void run() {
-                        try {
-                            final String ret = connector.getUser(
-                                        "WRRL_DB_MV",
-                                        "Administratoren",
-                                        "WRRL_DB_MV",
-                                        "admin",
-                                        "cismet")
-                                        .toString() + "\n\nSUCCESS";
-                            EventQueue.invokeLater(new Runnable() {
+            txaOut.setText("Connection test running...\n\n");
 
-                                    @Override
-                                    public void run() {
-                                        txaOut.setText(ret);
-                                    }
-                                });
-                        } catch (final Exception e) {
-                            EventQueue.invokeLater(new Runnable() {
+            final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
+                    connectionUrl,
+                    proxy,
+                    Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig());
 
-                                    @Override
-                                    public void run() {
-                                        txaOut.append(e.getMessage() + "\n");
-                                        txaOut.append("STACKTRACE: \n");
-                                        for (final StackTraceElement ste : e.getStackTrace()) {
-                                            txaOut.append(ste.toString() + "\n");
+            final Thread establisher = new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                final String ret = connector.getDomains().length + " domain(s) retrieved\n\nSUCCESS";
+                                EventQueue.invokeLater(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            txaOut.append(ret);
                                         }
-
-                                        Throwable cause = e.getCause();
-                                        while (cause != null) {
-                                            txaOut.append("\n\n");
-                                            txaOut.append("CAUSE: ");
-                                            txaOut.append(cause.getMessage());
-                                            txaOut.append("\n");
-                                            txaOut.append("STACKTRACE: \n");
-                                            for (final StackTraceElement ste : cause.getStackTrace()) {
-                                                txaOut.append(ste.toString() + "\n");
-                                            }
-
-                                            cause = cause.getCause();
-                                        }
-                                        txaOut.append("\nFAILURE");
-                                    }
-                                });
+                                    });
+                            } catch (final Exception ex) {
+                                appendException(ex);
+                            }
                         }
-                    }
-                });
-        establisher.start();
+                    });
+            establisher.start();
+        } catch (final Exception ex) {
+            appendException(ex);
+        }
     } //GEN-LAST:event_btnTestActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  ex  DOCUMENT ME!
+     */
+    private void appendException(final Exception ex) {
+        EventQueue.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    txaOut.append(ex.getMessage() + "\n");
+                    txaOut.append("STACKTRACE: \n");
+                    for (final StackTraceElement ste : ex.getStackTrace()) {
+                        txaOut.append(ste.toString() + "\n");
+                    }
+
+                    Throwable cause = ex.getCause();
+                    while (cause != null) {
+                        txaOut.append("\n\n");
+                        txaOut.append("CAUSE: ");
+                        txaOut.append(cause.getMessage());
+                        txaOut.append("\n");
+                        txaOut.append("STACKTRACE: \n");
+                        for (final StackTraceElement ste : cause.getStackTrace()) {
+                            txaOut.append(ste.toString() + "\n");
+                        }
+
+                        cause = cause.getCause();
+                    }
+                    txaOut.append("\nFAILURE");
+                }
+            });
+    }
 
     /**
      * DOCUMENT ME!
@@ -453,33 +328,25 @@ public class ConnectionTester extends javax.swing.JFrame {
      */
     private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnStoreActionPerformed
     {                                                                          //GEN-HEADEREND:event_btnStoreActionPerformed
-        final PropertyManager manager = PropertyManager.getManager();
-        manager.setProxyURL(txtProxy.getText());
-        manager.setProxyUsername(txtUsername.getText());
-        manager.setProxyPassword(String.valueOf(pwdPassword.getPassword()));
-        manager.setProxyDomain(txtDomain.getText());
         BufferedOutputStream bos = null;
         try {
             final JFileChooser chooser = new JFileChooser();
             final int answer = chooser.showSaveDialog(this);
             if (answer == JFileChooser.APPROVE_OPTION) {
                 bos = new BufferedOutputStream(new FileOutputStream(chooser.getSelectedFile()));
-                manager.save(bos);
+                bos.write(txaLog.getText().getBytes());
             }
         } catch (final Exception e) {
-            LOG.error("cannot save config", e);
+            LOG.error("cannot save log", e);
+            if (bos != null) {
+                try {
+                    bos.close();
+                } catch (final IOException ex) {
+                    LOG.error("cannot close stream", ex);
+                }
+            }
         }
     }                                                                          //GEN-LAST:event_btnStoreActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void btnClearActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnClearActionPerformed
-    {                                                                          //GEN-HEADEREND:event_btnClearActionPerformed
-        txaLog.setText("");
-    }                                                                          //GEN-LAST:event_btnClearActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -489,15 +356,15 @@ public class ConnectionTester extends javax.swing.JFrame {
      * @throws  Exception  DOCUMENT ME!
      */
     public static void main(final String[] args) throws Exception {
-        if (args.length > 4) {
-            PropertyManager.getManager()
-                    .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
+        if ((args.length <= 0) || !(args[0] instanceof String)) {
+            System.out.println("missing connectionUrl argument");
+            System.exit(1);
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    new ConnectionTester().setVisible(true);
+                    new ConnectionTester((String)args[0]).setVisible(true);
                 }
             });
     }
