@@ -21,7 +21,6 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.CidsSearchInitializer;
-import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.RightStickyToolbarItem;
@@ -145,7 +144,6 @@ public class Navigator extends JFrame {
     private AttributeViewer attributeViewer;
     private AttributeEditor attributeEditor;
     private ProtocolPanel protocolPanel;
-    private SearchDialog searchDialog;
     private Preferences preferences;
     /** Holds value of property disposed. */
     private boolean disposed = false;    // InfoNode
@@ -763,11 +761,6 @@ public class Navigator extends JFrame {
             350,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_350")); // NOI18N
 
-        searchDialog = new SearchDialog(
-                this,
-                SessionManager.getProxy().getSearchOptions(),
-                SessionManager.getProxy().getClassTreeNodes());
-
         progressObserver.setProgress(
             550,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_550")); // NOI18N
@@ -782,7 +775,6 @@ public class Navigator extends JFrame {
             workingSpaceTree,
             attributeViewer,
             attributeEditor,
-            searchDialog,
             descriptionPane);
     }
 
@@ -821,7 +813,6 @@ public class Navigator extends JFrame {
 
         metaCatalogueTree.addStatusChangeListener(statusChangeListener);
         descriptionPane.addStatusChangeListener(statusChangeListener);
-        searchDialog.addStatusChangeListener(statusChangeListener);
 
         final CatalogueSelectionListener catalogueSelectionListener = new CatalogueSelectionListener(
                 attributeViewer,
