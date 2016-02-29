@@ -7,31 +7,7 @@
 ****************************************************/
 package Sirius.navigator.connection.proxy;
 
-/*******************************************************************************
-
-        Copyright (c)   :       EIG (Environmental Informatics Group)
-                                http://www.enviromatics.net
-                                Prof. Dr. Reiner Guettler
-                                Prof. Dr. Ralf Denzer
-
-                                HTW
-                                University of Applied Sciences
-                                Goebenstr. 40
-                                66117 Saarbruecken, Germany
-
-        Programmers     :       Pascal <pascal@enviromatics.net>
-
-        Project         :       Sirius
-        Version         :       1.0
-        Purpose         :
-        Created         :       12/20/2002
-        History         :
-
-*******************************************************************************/
-
-import Sirius.navigator.connection.*;
-
-import Sirius.server.middleware.types.*;
+import Sirius.navigator.connection.Connection;
 
 /**
  * An interfaces, that defines methods, that should be implemented by the <code>ConnectionProxyHandler.</code>

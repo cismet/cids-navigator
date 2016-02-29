@@ -598,6 +598,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
         if (log.isInfoEnabled()) {
             log.info("[SearchResultsTree] removing '" + selectedNodes + "' nodes"); // NOI18N
         }
+        //J-
         boolean deleted = false;
 
         if ((selectedNodes == null) || (selectedNodes.length < 1)) {
@@ -616,6 +617,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
                 }
             }
         }
+        //J+
 
         if (deleted) {
             this.setResultNodes((Node[])tmpNodeVector.toArray(new Node[tmpNodeVector.size()]), false, null);

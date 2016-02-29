@@ -15,6 +15,8 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -37,6 +39,9 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     private static final HashMap<String, ImageIcon> iconCache = new HashMap<String, ImageIcon>();
 
     //~ Instance fields --------------------------------------------------------
+
+    protected Geometry cashedGeometry;
+    protected String lightweightJson;
 
     /**
      * DOCUMENT ME!
@@ -68,10 +73,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     /**
      * Creates a new ObjectTreeNode object.
      *
-     * @param  MetaObjectNode  DOCUMENT ME!
+     * @param  metaObjectNode  DOCUMENT ME!
      */
-    public ObjectTreeNode(final MetaObjectNode MetaObjectNode) {
-        super(MetaObjectNode);
+    public ObjectTreeNode(final MetaObjectNode metaObjectNode) {
+        super(metaObjectNode);
 
         try {
             final MetaClass myMetaClass = this.getMetaClass();
@@ -326,5 +331,23 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      */
     public Boolean isMetaObjectFilled() {
         return metaObjectFilled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Geometry getCashedGeometry() {
+        return cashedGeometry;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getLightweightJson() {
+        return lightweightJson;
     }
 }

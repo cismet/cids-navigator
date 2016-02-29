@@ -9,10 +9,8 @@ package de.cismet.cids.navigator.remote;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.plugin.PluginRegistry;
-import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
-import Sirius.navigator.types.treenode.TreeNodeLoader;
 import Sirius.navigator.ui.ComponentRegistry;
 
 import Sirius.server.middleware.types.MetaClass;
@@ -25,8 +23,6 @@ import org.openide.util.lookup.ServiceProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.ImageIcon;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,8 +33,6 @@ import javax.ws.rs.core.Response;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
-
-import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
@@ -116,7 +110,8 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
                         .append(oids)
                         .append(");"); // NOI18N
 
-            final MetaObject[] metaObjects = SessionManager.getProxy().getMetaObjectByQuery(query.toString(), 0);
+            final MetaObject[] metaObjects = SessionManager.getProxy()
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(), query.toString(), domain);
 
             if ((metaObjects != null) && (metaObjects.length == 0)) {
                 LOG.info("The query " + query.toString() + "returned with no results");

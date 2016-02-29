@@ -67,7 +67,9 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
                     result.getDomain(),
                     result.getObjectId(),
                     result.getClassId(),
-                    result.getName()));
+                    result.getName(),
+                    null,
+                    null)); // TODO: Check4CashedGeomAndLightweightJson
         }
         this.searchResults = searchResults;
 
