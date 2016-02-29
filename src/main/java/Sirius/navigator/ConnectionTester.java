@@ -98,7 +98,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         initLog();
 
         setTitle(getTitle() + ": " + connectionUrl);
-        
+
         proxyOptionsPanel1.update();
     }
 
@@ -249,8 +249,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnTestActionPerformed
-    {//GEN-HEADEREND:event_btnTestActionPerformed
+    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnTestActionPerformed
+    {                                                                         //GEN-HEADEREND:event_btnTestActionPerformed
         try {
             txaOut.setText("");
 
@@ -287,7 +287,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         } catch (final Exception ex) {
             appendException(ex);
         }
-    }//GEN-LAST:event_btnTestActionPerformed
+    } //GEN-LAST:event_btnTestActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -328,8 +328,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnStoreActionPerformed
-    {//GEN-HEADEREND:event_btnStoreActionPerformed
+    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnStoreActionPerformed
+    {                                                                          //GEN-HEADEREND:event_btnStoreActionPerformed
         BufferedOutputStream bos = null;
         try {
             final JFileChooser chooser = new JFileChooser();
@@ -348,7 +348,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 }
             }
         }
-    }//GEN-LAST:event_btnStoreActionPerformed
+    }                                                                          //GEN-LAST:event_btnStoreActionPerformed
 
     /**
      * DOCUMENT ME!
