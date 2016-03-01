@@ -11,9 +11,15 @@
  */
 package de.cismet.cids.navigatorstartuphooks;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.log4j.Logger;
 
 import org.openide.util.lookup.ServiceProvider;
+
+import java.io.IOException;
+
+import de.cismet.cids.client.tools.RemoteLog4JConfig;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
@@ -52,11 +58,33 @@ public class CidsServerMessageStartUpHook implements StartupHook {
                                         + " ("
                                         + event.getMessage().getCategory()
                                         + "): "
-                                        + event.getMessage().getMessage());
+                                        + event.getMessage().getContent());
                         }
                     }
                 }
             }, null);
+
+        CidsServerMessageNotifier.getInstance()
+                .subscribe(new CidsServerMessageNotifierListener() {
+
+                        @Override
+                        public void messageRetrieved(final CidsServerMessageNotifierListenerEvent event) {
+                            try {
+                                final RemoteLog4JConfig remoteConfig =
+                                    new ObjectMapper().readValue(
+                                        (String)event.getMessage().getContent(),
+                                        RemoteLog4JConfig.class);
+
+                                Log4JQuickConfig.configure4LumbermillOn(
+                                    remoteConfig.getRemoteHost(),
+                                    remoteConfig.getRemotePort(),
+                                    remoteConfig.getLogLevel());
+                            } catch (IOException ex) {
+                                LOG.warn(ex, ex);
+                            }
+                        }
+                    }, "log4j_remote_config");
+
         CidsServerMessageNotifier.getInstance().start();
     }
 }
