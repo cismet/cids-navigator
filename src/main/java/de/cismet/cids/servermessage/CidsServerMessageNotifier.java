@@ -88,7 +88,7 @@ public class CidsServerMessageNotifier {
                             + CheckCidsServerMessageAction.TASK_NAME)) {
                 synchronized (timer) {
                     if (!running) {
-                        startTimer(lastMessageId);
+                        startTimer(lastMessageId, true);
                     }
                 }
             }
@@ -158,11 +158,18 @@ public class CidsServerMessageNotifier {
         }
 
         for (final CidsServerMessageNotifierListener listener : listeners) {
-            try {
-                listener.messageRetrieved(new CidsServerMessageNotifierListenerEvent(this, message));
-            } catch (final Exception ex) {
-                LOG.warn("error while invoking listener.messageRetrieved(...)", ex);
-            }
+            new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            listener.messageRetrieved(
+                                new CidsServerMessageNotifierListenerEvent(CidsServerMessageNotifier.this, message));
+                        } catch (final Exception ex) {
+                            LOG.warn("error while invoking listener.messageRetrieved(...)", ex);
+                        }
+                    }
+                }).start();
         }
     }
 
@@ -170,11 +177,12 @@ public class CidsServerMessageNotifier {
      * DOCUMENT ME!
      *
      * @param  lastMessageId  DOCUMENT ME!
+     * @param  firstStart     DOCUMENT ME!
      */
-    private void startTimer(final int lastMessageId) {
+    private void startTimer(final int lastMessageId, final boolean firstStart) {
         running = true;
         synchronized (timer) {
-            timer.schedule(new RetrieveTimerTask(lastMessageId), getScheduleIntervall());
+            timer.schedule(new RetrieveTimerTask(lastMessageId), firstStart ? 1000 : getScheduleIntervall());
         }
     }
 
@@ -262,7 +270,7 @@ public class CidsServerMessageNotifier {
             } finally {
                 if (!errorWhileCheck) {
                     synchronized (timer) {
-                        startTimer(newLastMesageId);
+                        startTimer(newLastMesageId, false);
                     }
                 }
             }

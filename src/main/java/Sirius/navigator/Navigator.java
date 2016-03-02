@@ -151,6 +151,7 @@ public class Navigator extends JFrame {
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
     private NavigatorSplashScreen splashScreen;
+    private String title;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -853,11 +854,35 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             950,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950")); // NOI18N
-        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));              // NOI18N
+        this.title = org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title");                // NOI18N
+        this.setTitle(title);
         this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new Navigator.ClosingListener());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  totd  DOCUMENT ME!
+     */
+    public void setTotd(final String totd) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            if ((totd == null) || totd.trim().isEmpty()) {
+                setTitle(title);
+            } else {
+                setTitle(title + " - " + totd);
+            }
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        setTotd(totd);
+                    }
+                });
+        }
     }
 
     /**
