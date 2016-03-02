@@ -47,6 +47,15 @@ public class CidsServerMessageStartUpHook implements StartupHook {
     @Override
     public void applicationStarted() {
         // logger
+        initLogAllMessages();
+        initRemoteLog4JConfigChanger();
+        startNotifier();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initLogAllMessages() {
         CidsServerMessageNotifier.getInstance().subscribe(new CidsServerMessageNotifierListener() {
 
                 @Override
@@ -63,7 +72,12 @@ public class CidsServerMessageStartUpHook implements StartupHook {
                     }
                 }
             }, null);
+    }
 
+    /**
+     * DOCUMENT ME!
+     */
+    private void initRemoteLog4JConfigChanger() {
         CidsServerMessageNotifier.getInstance()
                 .subscribe(new CidsServerMessageNotifierListener() {
 
@@ -79,12 +93,17 @@ public class CidsServerMessageStartUpHook implements StartupHook {
                                     remoteConfig.getRemoteHost(),
                                     remoteConfig.getRemotePort(),
                                     remoteConfig.getLogLevel());
-                            } catch (IOException ex) {
+                            } catch (final IOException ex) {
                                 LOG.warn(ex, ex);
                             }
                         }
                     }, "log4j_remote_config");
+    }
 
+    /**
+     * DOCUMENT ME!
+     */
+    private void startNotifier() {
         CidsServerMessageNotifier.getInstance().start();
     }
 }
