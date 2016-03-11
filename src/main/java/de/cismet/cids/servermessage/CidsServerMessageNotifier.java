@@ -81,8 +81,7 @@ public class CidsServerMessageNotifier {
      */
     public void start() {
         try {
-            if (StaticDebuggingTools.checkHomeForFile("cidsServerMessagesEnabled")
-                        && SessionManager.getSession().getConnection().hasConfigAttr(
+            if (SessionManager.getSession().getConnection().hasConfigAttr(
                             SessionManager.getSession().getUser(),
                             "csa://"
                             + CheckCidsServerMessageAction.TASK_NAME)) {
