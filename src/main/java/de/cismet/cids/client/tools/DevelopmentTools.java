@@ -157,7 +157,7 @@ public class DevelopmentTools {
 
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
         final ConnectionInfo info = new ConnectionInfo();
-        info.setCallserverURL("http://localhost:9986/callserver/binary");
+        info.setCallserverURL("http://localhost:9917/callserver/binary");
         info.setUsername(user);
         info.setUsergroup(group);
         info.setPassword(pass);
