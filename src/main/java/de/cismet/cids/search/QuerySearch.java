@@ -127,7 +127,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private QuerySearchMethod[] additionalMethods;
     private String currentlyExpandedAttribute;
     private String searchButtonName = org.openide.util.NbBundle.getMessage(
-            SearchControlPanel.class,
+            QuerySearch.class,
             "SearchControlPanel.btnSearchCancel.text");
     private MetaClass metaClass;
 
@@ -391,6 +391,16 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Enables line wrap in the query text area.
+     *
+     * @param  enabled  true or false, if the line wrap should be enabled or disabled
+     */
+    public void enableLineWrap(final boolean enabled) {
+        taQuery.setLineWrap(enabled);
+        taQuery.setWrapStyleWord(enabled);
+    }
 
     @Override
     public void actionPerformed(final ActionEvent e) {
@@ -828,7 +838,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
                         this,
                         eLProperty,
-                        jAttributesLi);
+                        jAttributesLi,
+                        "");
         jListBinding.setDetailBinding(org.jdesktop.beansbinding.ELProperty.create("${name}"));
         jListBinding.setSourceNullValue(null);
         jListBinding.setSourceUnreadableValue(null);
@@ -1095,8 +1106,15 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         } else if (jLayerCB.getSelectedItem() instanceof AbstractFeatureService) {
             final AbstractFeatureService afs = (AbstractFeatureService)jLayerCB.getSelectedItem();
             final Map<String, FeatureServiceAttribute> newAttribMap = afs.getFeatureServiceAttributes();
-            final List<FeatureServiceAttribute> newAttributes = new ArrayList<FeatureServiceAttribute>(
-                    newAttribMap.values());
+            final List<FeatureServiceAttribute> newAttributes = new ArrayList<FeatureServiceAttribute>();
+
+            for (final String attr : (List<String>)afs.getOrderedFeatureServiceAttributes()) {
+                final FeatureServiceAttribute fsa = newAttribMap.get(attr);
+
+                if (attr != null) {
+                    newAttributes.add(fsa);
+                }
+            }
 
             if (afs.getCalculatedAttributes() != null) {
                 for (final String attrName : afs.getCalculatedAttributes()) {
@@ -1251,7 +1269,16 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      */
     private void performSearch() {
         final QuerySearchMethod method = getSelectedMethod();
-        method.actionPerformed(jLayerCB.getSelectedItem(), taQuery.getText());
+        final Object layer = jLayerCB.getSelectedItem();
+        String query = taQuery.getText();
+
+        if (layer instanceof AbstractFeatureService) {
+            if (((AbstractFeatureService)layer).decorateLater()) {
+                query = ((AbstractFeatureService)layer).decorateQuery(query);
+            }
+        }
+
+        method.actionPerformed(jLayerCB.getSelectedItem(), query);
     }
 
     /**
@@ -1427,7 +1454,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     if (layer instanceof AbstractFeatureService) {
                         if (source == jAttributesLi) {
                             final String v = ((FeatureServiceAttribute)selectedObject).getName();
-                            value = ((AbstractFeatureService)layer).decoratePropertyName(v);
+                            if (((AbstractFeatureService)layer).decorateLater()) {
+                                value = v;
+                            } else {
+                                value = ((AbstractFeatureService)layer).decoratePropertyName(v);
+                            }
                         } else {
                             value = ((AbstractFeatureService)layer).decoratePropertyValue(
                                     currentlyExpandedAttribute,
