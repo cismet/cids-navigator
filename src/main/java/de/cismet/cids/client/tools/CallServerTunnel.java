@@ -61,9 +61,6 @@ public class CallServerTunnel implements Tunnel {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final int BIG_SIZE_LOG_THRESHOLD = 104857600; // 100MB
-    private static final int MB = 1048576;                       // 100MB
-
     private static final String tunnelActionName = "httpTunnelAction";
     private static ObjectMapper mapper = new ObjectMapper();
     private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
@@ -215,12 +212,6 @@ public class CallServerTunnel implements Tunnel {
                         creds);
             }
             result = (byte[])res;
-            if (((result != null) && (result.length > CallServerTunnel.BIG_SIZE_LOG_THRESHOLD))) {
-                final double size = ((double)result.length) / ((double)MB);
-                final String message = "BIG REQUEST: " + (Math.round(size * 100) / 100.0) + " MB from " + user + "\n"
-                            + url.toString() + parameter.toString();
-                LOG.info(message);
-            }
         } catch (final Exception ex) {
         }
 
