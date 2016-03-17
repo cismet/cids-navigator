@@ -392,6 +392,16 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
     //~ Methods ----------------------------------------------------------------
 
+    /**
+     * Enables line wrap in the query text area.
+     *
+     * @param  enabled  true or false, if the line wrap should be enabled or disabled
+     */
+    public void enableLineWrap(final boolean enabled) {
+        taQuery.setLineWrap(enabled);
+        taQuery.setWrapStyleWord(enabled);
+    }
+
     @Override
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(panPagination)) {
