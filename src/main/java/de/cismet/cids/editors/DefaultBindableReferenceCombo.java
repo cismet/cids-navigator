@@ -433,7 +433,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
             MetaObject[] metaObjects;
             try {
-                metaObjects = MetaObjectCache.getInstance().getMetaObjectsByQuery(query, forceReload);
+                metaObjects = MetaObjectCache.getInstance().getMetaObjectsByQuery(query, mc.getDomain(), forceReload);
             } catch (final CacheException ex) {
                 LOG.warn("cache could not come up with appropriate objects", ex); // NOI18N
                 metaObjects = new MetaObject[0];

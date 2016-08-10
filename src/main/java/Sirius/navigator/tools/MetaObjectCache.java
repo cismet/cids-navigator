@@ -179,8 +179,30 @@ public class MetaObjectCache {
      *
      * @see     #getMetaObjectsByQuery(java.lang.String, boolean)
      */
+    @Deprecated
     public MetaObject[] getMetaObjectsByQuery(final String query) throws CacheException {
-        return getMetaObjectsByQuery(query, false);
+        return getMetaObjectsByQuery(query, null, false);
+    }
+
+    /**
+     * Get {@link MetaObject}s by query using the very same query string as one would request them from the server. This
+     * operation simply calls {@link #getMetaObjectsByQuery(java.lang.String, boolean)} with the given query and <code>
+     * false</code> for force reload. It throws an exception to indicate any errors so that it can maintain compliance
+     * with a call to {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)} with regards to its return
+     * value.
+     *
+     * @param   query   the query to get the <code>MetaObject</code>s for
+     * @param   domain  the domai to get the <code>MetaObject</code>s from
+     *
+     * @return  an array of <code>MetaObject</code>s as they would have been returned from
+     *          ConnectionProxy#getMetaObjectByQuery(java.lang.String, int) if used directly
+     *
+     * @throws  CacheException  if any error occurs, e.g. the server is not reachable if the cache is empty
+     *
+     * @see     #getMetaObjectsByQuery(java.lang.String, boolean)
+     */
+    public MetaObject[] getMetaObjectsByQuery(final String query, final String domain) throws CacheException {
+        return getMetaObjectsByQuery(query, domain, false);
     }
 
     /**
@@ -201,13 +223,38 @@ public class MetaObjectCache {
      *
      * @see     ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)
      */
+    @Deprecated
     public MetaObject[] getMetaObjectsByQuery(final String query, final boolean forceReload) throws CacheException {
+        return getMetaObjectsByQuery(query, null, forceReload);
+    }
+
+    /**
+     * Get {@link MetaObject}s by query using the very same query string as one would request them from the server. This
+     * operation supports forcing of a reload so that callers are assured to receive a current result as it would have
+     * been returned from {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)}. It throws an exception to
+     * indicate any errors so that it can maintain compliance with a call to
+     * {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)} with regards to its return value.
+     *
+     * @param   query        the query to get the <code>MetaObject</code>s for
+     * @param   domain       the domain to get the <code>MetaObject</code>s from
+     * @param   forceReload  force a reload of the <code>MetaObject</code>s if they have already been cached
+     *
+     * @return  an array of <code>MetaObject</code>s as they would have been returned from
+     *          {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)} if used directly
+     *
+     * @throws  CacheException  if any error occurs, e.g. the server is not reachable if the cache is empty or was
+     *                          forced to reload
+     *
+     * @see     ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)
+     */
+    public MetaObject[] getMetaObjectsByQuery(final String query, final String domain, final boolean forceReload)
+            throws CacheException {
         if (query == null) {
             return null;
         }
 
         final String iQuery = query.intern();
-        final Integer qHash = iQuery.hashCode();
+        final Integer qHash = (iQuery + (domain != null ? "@" + domain : "")).hashCode();
         MetaObject[] cachedObjects = null;
         Lock lock = null;
         try {
@@ -244,7 +291,12 @@ public class MetaObjectCache {
                                         + "]");         // NOI18N
                         }
 
-                        cachedObjects = SessionManager.getProxy().getMetaObjectByQuery(iQuery, 0);
+                        if (domain != null) {
+                            cachedObjects = SessionManager.getProxy()
+                                        .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, domain);
+                        } else {
+                            cachedObjects = SessionManager.getProxy().getMetaObjectByQuery(iQuery, 0);
+                        }
                         cache.put(qHash, new SoftReference<MetaObject[]>(cachedObjects));
                     } catch (final ConnectionException ex) {
                         final String message = "cannot fetch meta objects for query: " + iQuery; // NOI18N
