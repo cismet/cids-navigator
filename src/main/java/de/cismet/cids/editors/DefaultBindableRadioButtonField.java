@@ -175,7 +175,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                         final String query = "select " + mc.getID() + ", " + mc.getPrimaryKey() + " from "
                                     + mc.getTableName();
 
-                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query);
+                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query, mc.getDomain());
                     } else {
                         LOG.error("Meta class is null.", new Throwable());
                     }

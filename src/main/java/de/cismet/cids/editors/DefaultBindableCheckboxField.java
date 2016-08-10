@@ -198,7 +198,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                                     + " from "
                                     + foreignClass.getTableName();
 
-                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query);
+                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query, mc.getDomain());
                     } else {
                         LOG.error("The meta class was not set.", new Throwable());
                     }
