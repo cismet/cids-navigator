@@ -254,7 +254,7 @@ public class MetaObjectCache {
         }
 
         final String iQuery = query.intern();
-        final Integer qHash = (iQuery + (domain != null ? "@" + domain : "")).hashCode();
+        final Integer qHash = (iQuery + ((domain != null) ? ("@" + domain) : "")).hashCode();
         MetaObject[] cachedObjects = null;
         Lock lock = null;
         try {
