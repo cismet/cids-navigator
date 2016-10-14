@@ -659,7 +659,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      */
-    protected void showWaitScreen() {
+    public void showWaitScreen() {
         if (!showsWaitScreen) {
             showsWaitScreen = true;
             final Runnable run = new Runnable() {
