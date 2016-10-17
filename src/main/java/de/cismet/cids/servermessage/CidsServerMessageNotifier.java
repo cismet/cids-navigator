@@ -10,7 +10,8 @@ package de.cismet.cids.servermessage;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
-import org.openide.util.Exceptions;
+import org.jdom.Attribute;
+import org.jdom.Element;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +28,8 @@ import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.messages.CidsServerMessage;
 
-import de.cismet.tools.StaticDebuggingTools;
+import de.cismet.tools.configuration.Configurable;
+import de.cismet.tools.configuration.NoWriteError;
 
 /**
  * DOCUMENT ME!
@@ -35,24 +37,31 @@ import de.cismet.tools.StaticDebuggingTools;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CidsServerMessageNotifier {
+public class CidsServerMessageNotifier implements Configurable {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             CidsServerMessageNotifier.class);
 
+    private static final String CONFIGURATION = "CidsServerMessages";
+    private static final String CONF_ELEM_INTERVALL = "intervall";
+    private static final String CONF_ELEM_LAST_MESSAGE_IDS = "last_message_ids";
+    private static final String CONF_ELEM_LAST_MESSAGE_ID = "last_message_id";
+    private static final String CONF_ATTR_LAST_MESSAGE_ID_CATEGORY = "category";
+
     private static CidsServerMessageNotifier INSTANCE = null;
 
-    public static final long DEFAULT_SCHEDULE_INTERVAL = 10000;
+    public static final int DEFAULT_SCHEDULE_INTERVAL = 10000;
 
     //~ Instance fields --------------------------------------------------------
 
+    private final Map<String, Integer> lastMessageIds = new HashMap<String, Integer>();
+
     private final Timer timer = new Timer();
-    private final int lastMessageId = -1;
     private boolean running;
     private final Map<String, Collection> subscribers = new HashMap<String, Collection>();
-    private long scheduleIntervall = DEFAULT_SCHEDULE_INTERVAL;
+    private int scheduleIntervall = DEFAULT_SCHEDULE_INTERVAL;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -87,7 +96,7 @@ public class CidsServerMessageNotifier {
                             + CheckCidsServerMessageAction.TASK_NAME)) {
                 synchronized (timer) {
                     if (!running) {
-                        startTimer(lastMessageId, true);
+                        startTimer(true);
                     }
                 }
             }
@@ -103,7 +112,7 @@ public class CidsServerMessageNotifier {
      *
      * @param  scheduleIntervall  DOCUMENT ME!
      */
-    public void setScheduleIntervall(final long scheduleIntervall) {
+    public void setScheduleIntervall(final int scheduleIntervall) {
         this.scheduleIntervall = scheduleIntervall;
     }
 
@@ -112,7 +121,7 @@ public class CidsServerMessageNotifier {
      *
      * @return  DOCUMENT ME!
      */
-    public long getScheduleIntervall() {
+    public int getScheduleIntervall() {
         return scheduleIntervall;
     }
 
@@ -175,14 +184,66 @@ public class CidsServerMessageNotifier {
     /**
      * DOCUMENT ME!
      *
-     * @param  lastMessageId  DOCUMENT ME!
-     * @param  firstStart     DOCUMENT ME!
+     * @param  firstStart  DOCUMENT ME!
      */
-    private void startTimer(final int lastMessageId, final boolean firstStart) {
+    private void startTimer(final boolean firstStart) {
         running = true;
         synchronized (timer) {
-            timer.schedule(new RetrieveTimerTask(lastMessageId), firstStart ? 1000 : getScheduleIntervall());
+            timer.schedule(new RetrieveTimerTask(), firstStart ? 1000 : getScheduleIntervall());
         }
+    }
+
+    @Override
+    public void configure(final Element parent) {
+        try {
+            String elementIntervall = "";
+            if (parent != null) {
+                final Element conf = parent.getChild(CONFIGURATION);
+                if (conf != null) {
+                    elementIntervall = conf.getChildText(CONF_ELEM_INTERVALL);
+
+                    lastMessageIds.clear();
+                    for (final Object child : conf.getChild(CONF_ELEM_LAST_MESSAGE_IDS).getChildren()) {
+                        final Element lastMessageIdElement = (Element)child;
+                        final String category = lastMessageIdElement.getAttributeValue(
+                                CONF_ATTR_LAST_MESSAGE_ID_CATEGORY);
+                        final Integer lastMessageId = Integer.valueOf(lastMessageIdElement.getText());
+                        lastMessageIds.put(category, lastMessageId);
+                    }
+                }
+            }
+            setScheduleIntervall(Integer.valueOf(elementIntervall));
+        } catch (final Exception ex) {
+            LOG.warn("Fehler beim Konfigurieren des CidsServerMessagesNotifier", ex);
+        }
+    }
+
+    @Override
+    public Element getConfiguration() throws NoWriteError {
+        final Element conf = new Element(CONFIGURATION);
+
+        final Element intervallElement = new Element(CONF_ELEM_INTERVALL);
+        intervallElement.addContent(Long.toString(getScheduleIntervall()));
+        conf.addContent(intervallElement);
+
+        final Element lastMessageIdsElement = new Element(CONF_ELEM_LAST_MESSAGE_IDS);
+        for (final String category : lastMessageIds.keySet()) {
+            final Integer lastMessageId = lastMessageIds.get(category);
+            if (lastMessageId != null) {
+                final Element lastMessageIdElement = new Element(CONF_ELEM_LAST_MESSAGE_ID);
+                lastMessageIdElement.setAttribute(new Attribute(CONF_ATTR_LAST_MESSAGE_ID_CATEGORY, category));
+                lastMessageIdElement.setText(Integer.toString(lastMessageId));
+                lastMessageIdsElement.addContent(lastMessageIdElement);
+            }
+        }
+        conf.addContent(lastMessageIdsElement);
+
+        return conf;
+    }
+
+    @Override
+    public void masterConfigure(final Element parent) {
+        configure(parent);
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -194,35 +255,30 @@ public class CidsServerMessageNotifier {
      */
     class RetrieveTimerTask extends TimerTask {
 
-        //~ Instance fields ----------------------------------------------------
-
-        private final int lastMessageId;
-
         //~ Constructors -------------------------------------------------------
 
         /**
          * Creates a new RetrieveTimerTask object.
-         *
-         * @param  lastMessageId  DOCUMENT ME!
          */
-        public RetrieveTimerTask(final int lastMessageId) {
-            this.lastMessageId = lastMessageId;
+        public RetrieveTimerTask() {
         }
 
         //~ Methods ------------------------------------------------------------
 
         @Override
         public void run() {
-            int newLastMesageId = lastMessageId;
             boolean errorWhileCheck = false;
             try {
                 if (SessionManager.getSession().getConnection().hasConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 "csa://"
                                 + CheckCidsServerMessageAction.TASK_NAME)) {
-                    final ServerActionParameter<Integer> lastMessageIdParam = new ServerActionParameter<Integer>(
-                            CheckCidsServerMessageAction.ParameterType.LAST_MESSAGE_ID.toString(),
-                            lastMessageId);
+                    final ServerActionParameter<Map> lastMessageIdParam = new ServerActionParameter<Map>(
+                            CheckCidsServerMessageAction.Parameter.LAST_MESSAGE_IDS.toString(),
+                            lastMessageIds);
+                    final ServerActionParameter<Integer> intervallParam = new ServerActionParameter<Integer>(
+                            CheckCidsServerMessageAction.Parameter.INTERVALL.toString(),
+                            scheduleIntervall);
                     final Object ret = SessionManager.getSession()
                                 .getConnection()
                                 .executeTask(
@@ -230,7 +286,8 @@ public class CidsServerMessageNotifier {
                                     CheckCidsServerMessageAction.TASK_NAME,
                                     SessionManager.getSession().getUser().getDomain(),
                                     null,
-                                    lastMessageIdParam);
+                                    lastMessageIdParam,
+                                    intervallParam);
 
                     if (ret instanceof List) {
                         final List<CidsServerMessage> cidsServerMessages = (List<CidsServerMessage>)ret;
@@ -256,8 +313,10 @@ public class CidsServerMessageNotifier {
 
                         for (final CidsServerMessage cidsServerMessage : cidsServerMessages) {
                             final int messageId = cidsServerMessage.getId();
-                            if (messageId > newLastMesageId) {
-                                newLastMesageId = messageId;
+                            final String category = cidsServerMessage.getCategory();
+                            final Integer lastMessageId = lastMessageIds.get(category);
+                            if ((lastMessageId == null) || (messageId > lastMessageId)) {
+                                lastMessageIds.put(category, messageId);
                             }
                             publish(cidsServerMessage, cidsServerMessage.getCategory());
                         }
@@ -269,7 +328,7 @@ public class CidsServerMessageNotifier {
             } finally {
                 if (!errorWhileCheck) {
                     synchronized (timer) {
-                        startTimer(newLastMesageId, false);
+                        startTimer(false);
                     }
                 }
             }

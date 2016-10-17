@@ -8,13 +8,11 @@
 package Sirius.navigator.ui.option;
 
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
 
 import org.apache.log4j.Logger;
 
 import org.jdom.Element;
 
-import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
@@ -39,12 +37,10 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(CidsServerMessagesOptionsPanel.class);
-    private static final String CONFIGURATION = "CidsServerMessages";
-    private static final String INTERVALL = "intervall";
 
     //~ Instance fields --------------------------------------------------------
 
-    private long intervallInMs = CidsServerMessageNotifier.DEFAULT_SCHEDULE_INTERVAL;
+    private int intervallInMs = CidsServerMessageNotifier.DEFAULT_SCHEDULE_INTERVAL;
     private boolean stillConfigured = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -154,13 +150,13 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
 
     @Override
     public void applyChanges() {
-        intervallInMs = ((Number)jSpinner1.getValue()).longValue() * 1000;
+        intervallInMs = ((Number)jSpinner1.getValue()).intValue() * 1000;
         CidsServerMessageNotifier.getInstance().setScheduleIntervall(intervallInMs);
     }
 
     @Override
     public boolean isChanged() {
-        return (((Number)jSpinner1.getValue()).longValue() * 1000) != intervallInMs;
+        return (((Number)jSpinner1.getValue()).intValue() * 1000) != intervallInMs;
     }
 
     /**
@@ -185,19 +181,7 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
     @Override
     public void configure(final Element parent) {
         if (!stillConfigured) {
-            try {
-                String elementIntervall = "";
-                if (parent != null) {
-                    final Element conf = parent.getChild(CONFIGURATION);
-                    if (conf != null) {
-                        elementIntervall = conf.getChildText(INTERVALL);
-                    }
-                }
-                intervallInMs = new Long(elementIntervall);
-            } catch (final Exception ex) {
-                LOG.warn("Fehler beim Konfigurieren des CidsServerMessagesOptionsPanel", ex);
-            }
-
+            CidsServerMessageNotifier.getInstance().configure(parent);
             updateGui();
 
             stillConfigured = true;
@@ -208,15 +192,7 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
 
     @Override
     public Element getConfiguration() throws NoWriteError {
-        final Element conf = new Element(CONFIGURATION);
-
-        final Element intervallElement = new Element(INTERVALL);
-
-        intervallElement.addContent(Long.toString(intervallInMs));
-
-        conf.addContent(intervallElement);
-
-        return conf;
+        return CidsServerMessageNotifier.getInstance().getConfiguration();
     }
 
     @Override
