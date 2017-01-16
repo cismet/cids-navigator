@@ -108,4 +108,11 @@
             <jalopy.skip>true</jalopy.skip>
         </properties>
     </action>
+    <action>
+        <actionName>CUSTOM-deploy</actionName>
+        <displayName>deploy</displayName>
+        <goals>
+            <goal>deploy</goal>
+        </goals>
+    </action>
 </actions>
