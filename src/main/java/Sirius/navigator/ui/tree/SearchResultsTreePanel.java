@@ -8,11 +8,10 @@
 package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.method.*;
+import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.*;
-import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.ComponentRegistry;
-
-import Sirius.server.search.store.QueryInfo;
+import Sirius.navigator.ui.tree.postfilter.PostFilterGUI;
 
 import org.apache.log4j.Logger;
 
@@ -20,6 +19,9 @@ import java.awt.*;
 import java.awt.event.*;
 
 import java.beans.*;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.swing.*;
 import javax.swing.event.*;
@@ -32,7 +34,7 @@ import de.cismet.tools.gui.JPopupMenuButton;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class SearchResultsTreePanel extends JPanel {
+public class SearchResultsTreePanel extends JPanel implements ResultNodeListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -44,9 +46,14 @@ public class SearchResultsTreePanel extends JPanel {
     private final JToolBar toolBar;
     private JButton removeButton;
     private JButton clearButton;
-    private JPopupMenuButton saveAllButton;
     private JCheckBox showDirectlyInMap;
+    private JCheckBox showDirectlyInRenderer;
     private JToggleButton tbnSort;
+    private JSplitPane splitPane;
+    private JPanel treePanel;
+    private JPanel postFilterPanel;
+    private JTabbedPane tabFilters = new JTabbedPane();
+    private JToggleButton tbnFilteredResults;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -60,7 +67,7 @@ public class SearchResultsTreePanel extends JPanel {
     }
 
     /**
-     * Creates a new instance of SearchResultsTreePanel.
+     * Creates a new SearchResultsTreePanel object.
      *
      * @param  searchResultsTree  DOCUMENT ME!
      * @param  advancedLayout     DOCUMENT ME!
@@ -74,7 +81,6 @@ public class SearchResultsTreePanel extends JPanel {
                 JToolBar.HORIZONTAL);
         this.toolBar.setRollover(advancedLayout);
         this.toolBar.setFloatable(advancedLayout);
-
         this.init();
     }
 
@@ -85,10 +91,20 @@ public class SearchResultsTreePanel extends JPanel {
      */
     private void init() {
         this.createDefaultButtons();
-        this.add(toolBar, BorderLayout.SOUTH);
-        this.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
+        if (searchResultsTree instanceof PostfilterEnabledSearchResultsTree) {
+            treePanel = new JPanel(new BorderLayout());
+            postFilterPanel = new JPanel(new BorderLayout());
+            splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, treePanel, postFilterPanel);
+            treePanel.add(toolBar, BorderLayout.SOUTH);
+            treePanel.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
+            this.add(splitPane, BorderLayout.CENTER);
+            postFilterPanel.add(tabFilters);
+            searchResultsTree.addResultNodeListener(this);
+        } else {
+            this.add(toolBar, BorderLayout.SOUTH);
+            this.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
+        }
         this.setButtonsEnabled();
-
         final ButtonEnablingListener buttonEnablingListener = new ButtonEnablingListener();
         this.searchResultsTree.addTreeSelectionListener(buttonEnablingListener);
         this.searchResultsTree.addPropertyChangeListener("browse", buttonEnablingListener); // NOI18N
@@ -101,7 +117,8 @@ public class SearchResultsTreePanel extends JPanel {
     private void createDefaultButtons() {
         final ResourceManager resources = ResourceManager.getManager();
         final ActionListener toolBarListener = new ToolBarListener();
-
+        tbnFilteredResults = new JToggleButton(resources.getIcon("funnel.png"));
+        tbnFilteredResults.setEnabled(false);
         tbnSort = new JToggleButton(resources.getIcon("sort_ascending_16.png"));
         tbnSort.setToolTipText(org.openide.util.NbBundle.getMessage(
                 SearchResultsTreePanel.class,
@@ -129,19 +146,6 @@ public class SearchResultsTreePanel extends JPanel {
         clearButton.setMargin(new Insets(4, 4, 4, 4));
         clearButton.addActionListener(toolBarListener);
         toolBar.add(clearButton);
-        toolBar.addSeparator();
-
-        // saveAllButton = new JButton(resources.getIcon("saveall24.gif"));
-        saveAllButton = new JPopupMenuButton();
-        saveAllButton.setPopupMenu(new HistoryPopupMenu());
-        saveAllButton.setIcon(resources.getIcon("saveall24.gif")); // NOI18N
-        saveAllButton.setToolTipText(org.openide.util.NbBundle.getMessage(
-                SearchResultsTreePanel.class,
-                "SearchResultsTreePanel.saveAllButton.tooltip"));  // NOI18N
-        saveAllButton.setActionCommand("saveall");                 // NOI18N
-        saveAllButton.setMargin(new Insets(4, 4, 4, 4));
-        saveAllButton.addActionListener(toolBarListener);
-        toolBar.add(saveAllButton);
 
         showDirectlyInMap = new JCheckBox();
         showDirectlyInMap.addActionListener(new ActionListener() {
@@ -160,6 +164,14 @@ public class SearchResultsTreePanel extends JPanel {
                 public void mouseClicked(final MouseEvent e) {
                     if (e.getClickCount() > 1) {
                         searchResultsTree.syncWithMap(true);
+                        if (searchResultsTree.isSyncWithRenderer()) {
+                            // Because in this case the map is not brought to front by default
+                            PluginRegistry.getRegistry()
+                                    .getPluginDescriptor("cismap")
+                                    .getUIDescriptor("cismap")
+                                    .getView()
+                                    .makeVisible();
+                        }
                     }
                 }
             });
@@ -168,6 +180,131 @@ public class SearchResultsTreePanel extends JPanel {
                 SearchResultsTreePanel.class,
                 "SearchResultsTreePanel.showDirectInMapLabel.tooltipText")); // NOI18N
         toolBar.add(showDirectlyInMapLabel);
+
+        showDirectlyInRenderer = new JCheckBox();
+        showDirectlyInRenderer.addActionListener(new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    searchResultsTree.setSyncWithRenderer(showDirectlyInRenderer.isSelected());
+                }
+            });
+        showDirectlyInRenderer.setSelected(false);
+        toolBar.add(showDirectlyInRenderer);
+        final JLabel showDirectlyInRendererLabel = new JLabel(new javax.swing.ImageIcon(
+                    getClass().getResource("/Sirius/navigator/resource/imgx/descriptionpane_icon.gif"))); // NOI18N
+        showDirectlyInRendererLabel.addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseClicked(final MouseEvent e) {
+                    if (e.getClickCount() > 1) {
+                        searchResultsTree.syncWithRenderer(true);
+                        if (searchResultsTree.isSyncWithMap()) {
+                            // Because in this case the renderer is not brought to front by default
+                            ComponentRegistry.getRegistry()
+                                    .getGUIContainer()
+                                    .select(ComponentRegistry.DESCRIPTION_PANE);
+                        }
+                    }
+                }
+            });
+
+        showDirectlyInRendererLabel.setToolTipText(org.openide.util.NbBundle.getMessage(
+                SearchResultsTreePanel.class,
+                "SearchResultsTreePanel.showDirectInRendererLabel.tooltipText")); // NOI18N
+        toolBar.add(showDirectlyInRendererLabel);
+
+        if (isPostFiltersEnabled()) {
+            // Postfilterpecific Buttons
+
+//        tbnResetFilteredResults.setToolTipText(org.openide.util.NbBundle.getMessage(
+//                SearchResultsTreePanel.class,
+//                "SearchResultsTreePanel.tbnSort.tooltip"));
+            tbnFilteredResults.setMargin(new Insets(4, 4, 4, 4));
+            tbnFilteredResults.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        if (!tbnFilteredResults.isSelected()) {
+                            ((PostfilterEnabledSearchResultsTree)getSearchResultsTree()).clearFilter();
+                        }
+                    }
+                });
+            toolBar.add(Box.createHorizontalGlue());
+            toolBar.add(tbnFilteredResults);
+        }
+    }
+
+    @Override
+    public void resultNodesChanged() {
+        final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
+        Component tabFiltersVisComp = tabFilters.getSelectedComponent();
+        tbnFilteredResults.setSelected(false);
+        tbnFilteredResults.setEnabled(false);
+        tabFilters.setVisible(true);
+        final java.util.List<PostFilterGUI> availablePostFilterGUIs =
+            ((PostfilterEnabledSearchResultsTree)searchResultsTree).getAvailablePostFilterGUIs();
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("initializing " + availablePostFilterGUIs.size() + " PostFilterGUIs");
+        }
+        for (final PostFilterGUI pfg : availablePostFilterGUIs) {
+            if (pfg.canHandle(resultNodes)) {
+                pfg.initializeFilter(Collections.unmodifiableCollection(resultNodes));
+                final Component pfgGUI = pfg.getGUI();
+                tabFilters.add(pfg.getTitle(), pfgGUI);
+                if (pfg.getIcon() != null) {
+                    tabFilters.setIconAt(tabFilters.indexOfComponent(pfg.getGUI()), pfg.getIcon());
+                }
+                if (pfg.isSelected()) {
+                    tabFiltersVisComp = pfgGUI;
+                }
+                pfg.addPostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
+            } else {
+                pfg.removePostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
+                tabFilters.remove(pfg.getGUI());
+            }
+        }
+        try {
+            if (tabFiltersVisComp != null) {
+                tabFilters.setSelectedComponent(tabFiltersVisComp);
+            }
+        } catch (Exception skip) {
+            LOG.error(skip.getMessage(), skip);
+        }
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(tabFilters.getComponents().length + " post filter GUIs of "
+                        + availablePostFilterGUIs.size() + " post filters enabled and initialized");
+        }
+    }
+
+    @Override
+    public void resultNodesFiltered() {
+        tbnFilteredResults.setSelected(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+        tbnFilteredResults.setEnabled(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+        final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("adjusting " + tabFilters.getComponents() + " PostFilterGUIs");
+        }
+        for (final Component c : tabFilters.getComponents()) {
+            if (c instanceof PostFilterGUI) {
+                ((PostFilterGUI)c).adjustFilter(resultNodes);
+            }
+        }
+    }
+
+    @Override
+    public void resultNodesCleared() {
+        tabFilters.setVisible(false);
+    }
+
+    /**
+     * The functionality of the buttons hidden with this method is broken. Therefore that functionality needs to be
+     * fixed before the items can become visible again.
+     *
+     * @param  button  menuItem
+     */
+    private void doNotShowThisButtonAsItsFunctionalityIsBroken(final JButton button) {
+        button.setVisible(false);
     }
 
     /**
@@ -179,7 +316,16 @@ public class SearchResultsTreePanel extends JPanel {
         clearButton.setEnabled(!searchResultsTree.isEmpty());
 
         // saveAllButton.setEnabled(!searchResultsTree.isEmpty());
-        saveAllButton.setEnabled(true);
+        // saveAllButton.setEnabled(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isPostFiltersEnabled() {
+        return (searchResultsTree instanceof PostfilterEnabledSearchResultsTree);
     }
 
     /**
@@ -306,94 +452,6 @@ public class SearchResultsTreePanel extends JPanel {
         @Override
         public void valueChanged(final TreeSelectionEvent e) {
             SearchResultsTreePanel.this.setButtonsEnabled();
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    private class HistoryPopupMenu extends JPopupMenu implements PopupMenuListener, ActionListener {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private QueryResultProfileManager queryResultProfileManager = null;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new HistoryPopupMenu object.
-         */
-        public HistoryPopupMenu() {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("HistoryPopupMenu(): creating new instance"); // NOI18N
-            }
-            this.addPopupMenuListener(this);
-
-            // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme")); // NOI18N
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void popupMenuCanceled(final PopupMenuEvent e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("popupMenuCanceled()"); // NOI18N
-            }
-
-            // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme")); // NOI18N
-        }
-
-        @Override
-        public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("popupMenuWillBecomeInvisible()"); // NOI18N
-            }
-
-            // ugly workaround
-            this.add(new JMenuItem("shouldnotseeme")); // NOI18N
-        }
-
-        @Override
-        public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("popupMenuWillBecomeVisible(): showing popup meu"); // NOI18N
-            }
-
-            if (this.queryResultProfileManager == null) {
-                this.queryResultProfileManager = ComponentRegistry.getRegistry().getQueryResultProfileManager();
-            }
-
-            if ((this.queryResultProfileManager.getUserInfos() == null)
-                        || (this.queryResultProfileManager.getUserInfos().length == 0)) {
-                this.queryResultProfileManager.updateQueryResultProfileManager();
-            }
-
-            this.removeAll();
-
-            final QueryInfo[] userInfo = this.queryResultProfileManager.getUserInfos();
-            if ((userInfo != null) && (userInfo.length > 0)) {
-                for (int i = 0; i < userInfo.length; i++) {
-                    final JMenuItem menuItem = new JMenuItem(userInfo[i].getName());
-                    menuItem.setActionCommand(userInfo[i].getFileName());
-                    menuItem.addActionListener(this);
-
-                    this.add(menuItem);
-                }
-            } else if (LOG.isDebugEnabled()) {
-                LOG.warn("HistoryPopupMenu: no query result profiles found"); // NOI18N
-            }
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("HistoryPopupMenu: loading query result profile '" + e.getActionCommand() + "'"); // NOI18N
-            }
-            this.queryResultProfileManager.loadSearchResults(e.getActionCommand());
         }
     }
 }

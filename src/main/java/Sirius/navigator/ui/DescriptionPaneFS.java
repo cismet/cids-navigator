@@ -11,8 +11,9 @@ import Sirius.navigator.ui.status.Status;
 
 import org.xhtmlrenderer.extend.NamespaceHandler;
 import org.xhtmlrenderer.simple.extend.XhtmlNamespaceHandler;
+import org.xhtmlrenderer.swing.BasicPanel;
+import org.xhtmlrenderer.swing.LinkListener;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -70,8 +71,16 @@ public class DescriptionPaneFS extends DescriptionPane {
      */
     private void initComponents() {
         fSScrollPane1 = new org.xhtmlrenderer.simple.FSScrollPane();
-        xHTMLPanel1 = new org.xhtmlrenderer.simple.XHTMLPanel();
+        xHTMLPanel1 = new FSXHtmlPanel();
         popupMenu = new JPopupMenu();
+        final LinkListener ll = new LinkListener() {
+
+                @Override
+                public void linkClicked(final BasicPanel panel, final String uri) {
+                    pageURI = panel.getURL().toString();
+                }
+            };
+        ((BasicPanel)xHTMLPanel1).addMouseTrackingListener(ll);
 
         fSScrollPane1.setViewportView(xHTMLPanel1);
         mnuItem_openInExternalBrowser = new JMenuItem(org.openide.util.NbBundle.getMessage(
@@ -101,31 +110,6 @@ public class DescriptionPaneFS extends DescriptionPane {
     }
 
     /**
-     * Show the blank page.
-     */
-    @Override
-    public void clear() {
-        final Runnable clearRunnable = new Runnable() {
-
-                @Override
-                public void run() {
-                    setPageFromContent(
-                        blankPage,
-                        getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml")
-                                    .toString());
-                    removeAndDisposeAllRendererFromPanel();
-                    repaint();
-                }
-            };
-
-        if (!EventQueue.isDispatchThread()) {
-            EventQueue.invokeLater(clearRunnable);
-        } else {
-            clearRunnable.run();
-        }
-    }
-
-    /**
      * Loads the given URI and renders the referenced XHTML document. Shows an error page if loading causes an error.
      *
      * @param  page  An URI to an XHTML document.
@@ -141,9 +125,7 @@ public class DescriptionPaneFS extends DescriptionPane {
 
         try {
             if ((page == null) || (page.trim().length() <= 0)) {
-                setPageFromContent(
-                    blankPage,
-                    getClass().getClassLoader().getResource("Sirius/navigator/resource/doc/blank.xhtml").toString());
+                startNoDescriptionRenderer();
             } else {
                 pageURI = page;
                 xHTMLPanel1.setDocument(page);

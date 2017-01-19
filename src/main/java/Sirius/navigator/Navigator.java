@@ -21,10 +21,9 @@ import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.CidsSearchInitializer;
-import Sirius.navigator.search.dynamic.FormDataBean;
-import Sirius.navigator.search.dynamic.SearchDialog;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.*;
+import Sirius.navigator.ui.RightStickyToolbarItem;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
 import Sirius.navigator.ui.dialog.LoginDialog;
@@ -33,44 +32,37 @@ import Sirius.navigator.ui.progress.ProgressObserver;
 import Sirius.navigator.ui.status.MutableStatusBar;
 import Sirius.navigator.ui.status.StatusChangeListener;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
+import Sirius.navigator.ui.tree.PostfilterEnabledSearchResultsTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 import Sirius.navigator.ui.tree.SearchResultsTreePanel;
+import Sirius.navigator.ui.tree.WorkingSpace;
+import Sirius.navigator.ui.tree.WorkingSpaceTree;
 import Sirius.navigator.ui.widget.FloatingFrameConfigurator;
 
 import Sirius.server.middleware.types.*;
+import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.HttpConnection;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Point;
 import java.awt.event.*;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 
 import java.net.URL;
 
 import java.util.*;
 import java.util.prefs.*;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import javax.swing.*;
 
@@ -78,24 +70,42 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.cids.server.messages.CidsServerMessageManagerImpl;
+
+import de.cismet.cids.servermessage.CidsServerMessageNotifier;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
+import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
+
+import de.cismet.commons.gui.protocol.ProtocolHandler;
+import de.cismet.commons.gui.protocol.ProtocolPanel;
+
 import de.cismet.lookupoptions.gui.OptionsClient;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
 import de.cismet.netutil.Proxy;
 
-import de.cismet.tools.CismetThreadPool;
+import de.cismet.remote.RESTRemoteControlStarter;
+
+import de.cismet.tools.JnlpSystemPropertyHelper;
+import de.cismet.tools.JnlpTools;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.configuration.ConfigurationManager;
 import de.cismet.tools.configuration.ShutdownHook;
 import de.cismet.tools.configuration.StartupHook;
+import de.cismet.tools.configuration.TakeoffHook;
 
 import de.cismet.tools.gui.CheckThreadViolationRepaintManager;
 import de.cismet.tools.gui.DefaultPopupMenuListener;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+
+import static Sirius.navigator.Navigator.NAVIGATOR_HOME;
+import static Sirius.navigator.Navigator.NAVIGATOR_HOME_DIR;
+
+import static java.awt.Frame.MAXIMIZED_BOTH;
 
 /**
  * DOCUMENT ME!
@@ -109,11 +119,9 @@ public class Navigator extends JFrame {
 
     private static final ResourceManager resourceManager = ResourceManager.getManager();
     public static final String NAVIGATOR_HOME_DIR = ".navigator"
-                + (((System.getProperty("directory.extension")) != null) ? (System.getProperty("directory.extension"))
-                                                                         : "");
+                + JnlpSystemPropertyHelper.getProperty("directory.extension", "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
-
     private static volatile boolean startupFinished = false;
 
     //~ Instance fields --------------------------------------------------------
@@ -131,9 +139,11 @@ public class Navigator extends JFrame {
     private MutablePopupMenu popupMenu;
     private MetaCatalogueTree metaCatalogueTree;
     private SearchResultsTree searchResultsTree;
+    private WorkingSpace workingSpace;
+    private WorkingSpaceTree workingSpaceTree;
     private AttributeViewer attributeViewer;
     private AttributeEditor attributeEditor;
-    private SearchDialog searchDialog;
+    private ProtocolPanel protocolPanel;
     private Preferences preferences;
     /** Holds value of property disposed. */
     private boolean disposed = false;    // InfoNode
@@ -141,6 +151,7 @@ public class Navigator extends JFrame {
     private SearchResultsTreePanel searchResultsTreePanel;
     private DescriptionPane descriptionPane;
     private NavigatorSplashScreen splashScreen;
+    private String title;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -184,7 +195,7 @@ public class Navigator extends JFrame {
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
         this.exceptionManager = ExceptionManager.getManager();
-
+        StaticSwingTools.tweakUI();
         this.init();
 
         startupFinished = true;
@@ -207,6 +218,8 @@ public class Navigator extends JFrame {
         if (StaticDebuggingTools.checkHomeForFile("cismetCheckForEDThreadVialoation")) {                  // NOI18N
             RepaintManager.setCurrentManager(new CheckThreadViolationRepaintManager());
         }
+
+        initTakeoffHooks();
 
         final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
         proxyOptions.setProxy(Proxy.fromPreferences());
@@ -254,6 +267,9 @@ public class Navigator extends JFrame {
             initSearch();
 
             configurationManager.addConfigurable(OptionsClient.getInstance());
+            if (PropertyManager.getManager().isProtocolEnabled()) {
+                configurationManager.addConfigurable(ProtocolHandler.getInstance());
+            }
             configurationManager.configure();
 
             SwingUtilities.invokeLater(new Runnable() {
@@ -442,11 +458,8 @@ public class Navigator extends JFrame {
         this.setContentPane(new JPanel(new BorderLayout(), true));
         this.setJMenuBar(menuBar);
 
-        final JPanel panel = new JPanel(new BorderLayout());
-        panel.add(toolBar, BorderLayout.NORTH);
-        panel.add(container.getContainer(), BorderLayout.CENTER);
-
-        this.getContentPane().add(panel, BorderLayout.CENTER);
+        this.getContentPane().add(toolBar, BorderLayout.NORTH);
+        this.getContentPane().add(container.getContainer(), BorderLayout.CENTER);
         this.getContentPane().add(statusBar, BorderLayout.SOUTH);
     }
     // #########################################################################
@@ -484,12 +497,23 @@ public class Navigator extends JFrame {
         Collections.sort(sorted, comp);
 
         for (final CidsClientToolbarItem ccti : sorted) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Adding CidsClientToolbarItem: " + ccti.getValue(Action.NAME) + " - class: '"
-                            + ccti.getClass().toString() + "'? " + ccti.isVisible());
-            }
             if (ccti.isVisible()) {
-                toolBar.getDefaultToolBar().add(ccti);
+                final JToolBar innerToolbar;
+                if (ccti instanceof RightStickyToolbarItem) {
+                    innerToolbar = toolBar.getRightStickyToolBar();
+                } else {
+                    innerToolbar = toolBar.getDefaultToolBar();
+                }
+                if (ccti instanceof Action) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Adding CidsClientToolbarItem: " + ((Action)ccti).getValue(Action.NAME)
+                                    + " - class: '"
+                                    + ccti.getClass().toString() + "'? " + ccti.isVisible());
+                    }
+                    innerToolbar.add((Action)ccti);
+                } else if (ccti instanceof Component) {
+                    innerToolbar.add((Component)ccti);
+                }
             }
         }
     }
@@ -529,7 +553,11 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             225,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
-        searchResultsTree = new SearchResultsTree();
+        if (PropertyManager.getManager().isPostfilterEnabled()) {
+            searchResultsTree = new PostfilterEnabledSearchResultsTree();
+        } else {
+            searchResultsTree = new SearchResultsTree();
+        }
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
         new MetaTreeNodeDnDHandler(searchResultsTree);
@@ -546,6 +574,28 @@ public class Navigator extends JFrame {
             MutableConstraints.ANY_INDEX);
         container.add(searchResultsTreeConstraints);
 
+        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+            // WorkingSPace ---------------------------------------------------
+            progressObserver.setProgress(
+                235,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
+            workingSpaceTree = new WorkingSpaceTree();
+            workingSpace = new WorkingSpace(workingSpaceTree, propertyManager.isAdvancedLayout());
+            // dnd
+            new MetaTreeNodeDnDHandler(workingSpaceTree);
+
+            final MutableConstraints workingSpaceTreeConstraints = new MutableConstraints(
+                    propertyManager.isAdvancedLayout());
+            workingSpaceTreeConstraints.addAsComponent(
+                ComponentRegistry.WORKINGSPACE_TREE,
+                workingSpace,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.WorkingSpaceTreePanel.name"),    // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.WorkingSpaceTreePanel.tooltip"), // NOI18N
+                resourceManager.getIcon("clipboard-list.png"),                                                    // NOI18N
+                MutableConstraints.P1,
+                MutableConstraints.ANY_INDEX);
+            container.add(workingSpaceTreeConstraints);
+        }
         // AttributePanel ------------------------------------------------------
         progressObserver.setProgress(
             250,
@@ -643,8 +693,23 @@ public class Navigator extends JFrame {
             325,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_325")); // NOI18N
 
-        if (PropertyManager.getManager().isUseFlyingSaucer()) {
+        if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
             descriptionPane = new DescriptionPaneFS();
+        } else if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FX_HTML_RENDERER)) {
+            try {
+                descriptionPane = new DescriptionPaneFX();
+//            } catch (NoClassDefFoundError e) {
+            } catch (Error e) {
+                logger.error("Error during initialisation of Java FX Description Pane. Using Calpa as fallback.", e);
+                descriptionPane = new DescriptionPaneCalpa();
+            } catch (Exception e) {
+                logger.error(
+                    "Exception during initialisation of Java FX Description Pane. Using Calpa as fallback.",
+                    e);
+                descriptionPane = new DescriptionPaneCalpa();
+            }
         } else {
             descriptionPane = new DescriptionPaneCalpa();
         }
@@ -670,6 +735,21 @@ public class Navigator extends JFrame {
             configurator,
             false);
         container.add(descriptionPaneConstraints);
+
+        if (PropertyManager.getManager().isProtocolEnabled()) {
+            protocolPanel = new ProtocolPanel();
+            final MutableConstraints protocolPanelConstraints = new MutableConstraints(
+                    propertyManager.isAdvancedLayout());
+            protocolPanelConstraints.addAsComponent(
+                ComponentRegistry.PROTOCOL_PANEL,
+                protocolPanel,
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.name"),    // NOI18N
+                org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.tooltip"), // NOI18N
+                resourceManager.getIcon("protocolpane_icon.png"),
+                MutableConstraints.P1,
+                MutableConstraints.ANY_INDEX);
+            container.add(protocolPanelConstraints);
+        }
     }
 
     /**
@@ -682,11 +762,6 @@ public class Navigator extends JFrame {
             350,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_350")); // NOI18N
 
-        searchDialog = new SearchDialog(
-                this,
-                SessionManager.getProxy().getSearchOptions(),
-                SessionManager.getProxy().getClassTreeNodes());
-
         progressObserver.setProgress(
             550,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_550")); // NOI18N
@@ -698,9 +773,9 @@ public class Navigator extends JFrame {
             popupMenu,
             metaCatalogueTree,
             searchResultsTree,
+            workingSpaceTree,
             attributeViewer,
             attributeEditor,
-            searchDialog,
             descriptionPane);
     }
 
@@ -739,7 +814,6 @@ public class Navigator extends JFrame {
 
         metaCatalogueTree.addStatusChangeListener(statusChangeListener);
         descriptionPane.addStatusChangeListener(statusChangeListener);
-        searchDialog.addStatusChangeListener(statusChangeListener);
 
         final CatalogueSelectionListener catalogueSelectionListener = new CatalogueSelectionListener(
                 attributeViewer,
@@ -759,6 +833,16 @@ public class Navigator extends JFrame {
         final DefaultPopupMenuListener cataloguePopupMenuListener = new DefaultPopupMenuListener(popupMenu);
         metaCatalogueTree.addMouseListener(cataloguePopupMenuListener);
         searchResultsTree.addMouseListener(cataloguePopupMenuListener);
+
+        if (PropertyManager.getManager().isWorkingSpaceEnabled() && (workingSpaceTree != null)) {
+            workingSpaceTree.addStatusChangeListener(statusChangeListener);
+            workingSpaceTree.addTreeSelectionListener(catalogueSelectionListener);
+            workingSpaceTree.addComponentListener(new CatalogueActivationListener(
+                    workingSpaceTree,
+                    attributeViewer,
+                    descriptionPane));
+            workingSpaceTree.addMouseListener(cataloguePopupMenuListener);
+        }
     }
 
     /**
@@ -770,11 +854,35 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             950,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950")); // NOI18N
-        this.setTitle(org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title"));              // NOI18N
+        this.title = org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title");                // NOI18N
+        this.setTitle(title);
         this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        this.addWindowListener(new ClosingListener());
+        this.addWindowListener(new Navigator.ClosingListener());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  totd  DOCUMENT ME!
+     */
+    public void setTotd(final String totd) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            if ((totd == null) || totd.trim().isEmpty()) {
+                setTitle(title);
+            } else {
+                setTitle(title + " - " + totd);
+            }
+        } else {
+            SwingUtilities.invokeLater(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        setTotd(totd);
+                    }
+                });
+        }
     }
 
     /**
@@ -808,14 +916,50 @@ public class Navigator extends JFrame {
     /**
      * DOCUMENT ME!
      *
+     * @throws  InterruptedException  DOCUMENT ME!
+     */
+    private void initTakeoffHooks() throws InterruptedException {
+        final Collection<? extends TakeoffHook> hooks = Lookup.getDefault().lookupAll(TakeoffHook.class);
+
+        for (final TakeoffHook hook : hooks) {
+            hook.applicationTakeoff();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   classes     DOCUMENT ME!
      * @param   permission  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private boolean hasPermission(final MetaClass[] classes,
-            final Sirius.server.newuser.permission.Permission permission) {
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
+    private boolean hasPermission(final MetaClass[] classes, final Permission permission) {
+        final User user = SessionManager.getSession().getUser();
+        final UserGroup userGroup = user.getUserGroup();
+        if (userGroup != null) {
+            return hasPermission(classes, permission, userGroup);
+        } else {
+            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                if (hasPermission(classes, permission, potentialUserGroup)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classes     DOCUMENT ME!
+     * @param   permission  DOCUMENT ME!
+     * @param   userGroup   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean hasPermission(final MetaClass[] classes, final Permission permission, final UserGroup userGroup) {
+        final String key = userGroup.getKey().toString();
 
         for (int i = 0; i < classes.length; i++) {
             try {
@@ -840,6 +984,11 @@ public class Navigator extends JFrame {
         return false;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  visible  DOCUMENT ME!
+     */
     @Override
     public void setVisible(final boolean visible) {
         if (logger.isInfoEnabled()) {
@@ -868,7 +1017,12 @@ public class Navigator extends JFrame {
      * @param  visible  DOCUMENT ME!
      */
     private void doSetVisible(final boolean visible) {
-        super.setLocationRelativeTo(this.loginDialog);
+        final Point location = this.getLocation();
+        // issue #8 we assume a position of 0,0 to be the default position. thus we center the navigator window then.
+        if ((location.x == 0) && (location.y == 0)) {
+            this.setLocationRelativeTo(this.loginDialog);
+        }
+
         super.setVisible(visible);
 
         if (visible) {
@@ -890,6 +1044,9 @@ public class Navigator extends JFrame {
     }
     // .........................................................................
 
+    /**
+     * DOCUMENT ME!
+     */
     @Override
     public void dispose() {
         if (logger.isInfoEnabled()) {
@@ -952,9 +1109,17 @@ public class Navigator extends JFrame {
         final int windowWidth = this.preferences.getInt("windowWidth", PropertyManager.getManager().getWidth());    // NOI18N
         final int windowX = this.preferences.getInt("windowX", 0);                                                  // NOI18N
         final int windowY = this.preferences.getInt("windowY", 0);                                                  // NOI18N
-        final boolean windowMaximised = this.preferences.getBoolean(
-                "windowMaximised",
-                propertyManager.isMaximizeWindow());                                                                // NOI18N
+
+        final boolean windowMaximised;
+        // issue #8: osx does to correctly determine the maximised state of a window, thus we ignore that on osx
+        final String osName = System.getProperty("os.name"); // NOI18N
+        if (osName.startsWith("Mac")) {
+            windowMaximised = false;
+        } else {
+            windowMaximised = this.preferences.getBoolean(
+                    "windowMaximised",                       // NOI18N
+                    propertyManager.isMaximizeWindow());
+        }
 
         if (logger.isInfoEnabled()) {
             logger.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
@@ -975,21 +1140,14 @@ public class Navigator extends JFrame {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        Runtime.getRuntime().addShutdownHook(new NavigatorShutdown());
-        Thread.setDefaultUncaughtExceptionHandler(new DefaultNavigatorExceptionHandler());
+        Runtime.getRuntime().addShutdownHook(new Navigator.NavigatorShutdown());
+        Thread.setDefaultUncaughtExceptionHandler(DefaultNavigatorExceptionHandler.getInstance());
 
-        // For some unknown reason, the content of the user.language and the user.country properties
-        // must explicitly set as default locale. This is requiered for the cids-navigator project, but
-        // not for the other internationalized projects
+        // There is no way to adjust the Locale using the Jnlp file.
         try {
-            final String lang = System.getProperty("user.language");   // NOI18N
-            final String country = System.getProperty("user.country"); // NOI18N
+            JnlpTools.adjustDefaultLocale();
 
-            if ((lang != null) && (country != null)) {
-                Locale.setDefault(new Locale(lang, country));
-            } else if (lang != null) {
-                Locale.setDefault(new Locale(lang));
-            }
+            System.out.println("Using default Locale: " + Locale.getDefault());
         } catch (final SecurityException e) {
             System.err.println("You have insufficient rights to set the default locale."); // NOI18N
         }
@@ -1012,10 +1170,6 @@ public class Navigator extends JFrame {
                 System.out.println("navigator.cfg    = " + args[1]);                           // NOI18N
                 System.out.println("basedir          = " + args[2]);                           // NOI18N
                 System.out.println("plugindir        = " + args[3]);                           // NOI18N
-                System.out.println("searchdir        = " + args[4]);                           // NOI18N
-                if (args.length > 5) {
-                    System.out.println("profilesdir      = " + args[5]);                       // NOI18N
-                }
                 System.out.println("-------------------------------------------------------"); // NOI18N
 
                 // log4j configuration .....................................
@@ -1044,13 +1198,11 @@ public class Navigator extends JFrame {
                 PropertyConfigurator.configure(properties);
 
                 // log4j configuration .....................................
-
                 PropertyManager.getManager()
-                        .configure(args[1], args[2], args[3], args[4], ((args.length > 5) ? args[5] : null));
+                        .configure(args[1], args[2], args[3], null, ((args.length > 5) ? args[5] : null));
             }
 
             // configuration ...................................................
-
             // look and feel ...................................................
             LAFManager.getManager().changeLookAndFeel(PropertyManager.getManager().getLookAndFeel());
 
@@ -1105,114 +1257,11 @@ public class Navigator extends JFrame {
      * DOCUMENT ME!
      */
     private void initHttpServer() {
-        final Thread t = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            final Server server = new Server();
-                            final Connector connector = new SelectChannelConnector();
-                            connector.setPort(propertyManager.getHttpInterfacePort());
-                            server.setConnectors(new Connector[] { connector });
-
-                            final Handler param = new AbstractHandler() {
-
-                                    @Override
-                                    public void handle(final String target,
-                                            final HttpServletRequest request,
-                                            final HttpServletResponse response,
-                                            final int dispatch) throws IOException, ServletException {
-                                        final Request base_request = (request instanceof Request)
-                                            ? (Request)request : HttpConnection.getCurrentConnection().getRequest();
-                                        base_request.setHandled(true);
-                                        response.setContentType("text/html");                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 // NOI18N
-                                        response.setStatus(HttpServletResponse.SC_OK);
-                                        response.getWriter()
-                                                .println(
-                                                    "<html><head><title>HTTP interface</title></head><body><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"80%\"><tr><td width=\"30%\" align=\"center\" valign=\"middle\"><img border=\"0\" src=\"http://www.cismet.de/images/cismetLogo250M.png\" ><br></td><td width=\"%\">&nbsp;</td><td width=\"50%\" align=\"left\" valign=\"middle\"><font face=\"Arial\" size=\"3\" color=\"#1c449c\">... and <b><font face=\"Arial\" size=\"3\" color=\"#1c449c\">http://</font></b> just works</font><br><br><br></td></tr></table></body></html>"); // NOI18N
-                                    }
-                                };
-
-                            final Handler hello = new AbstractHandler() {
-
-                                    @Override
-                                    public void handle(final String target,
-                                            final HttpServletRequest request,
-                                            final HttpServletResponse response,
-                                            final int dispatch) throws IOException, ServletException {
-                                        try {
-                                            if (request.getLocalAddr().equals(request.getRemoteAddr())) {
-                                                if (logger.isInfoEnabled()) {
-                                                    logger.info("HttpInterface asked");                                                 // NOI18N
-                                                }
-                                                if (target.equalsIgnoreCase("/executeSearch")) {                                        // NOI18N
-                                                    final String query = request.getParameter("query");                                 // NOI18N
-                                                    final String domain = request.getParameter("domain");                               // NOI18N
-                                                    final String classId = request.getParameter("classId");                             // NOI18N
-                                                    final HashMap dataBeans = ComponentRegistry.getRegistry()
-                                                                .getSearchDialog()
-                                                                .getSearchFormManager()
-                                                                .getFormDataBeans();
-                                                    final Object object = dataBeans.get(query + "@" + domain);                          // NOI18N
-                                                    final HashMap<String, String> params =
-                                                        new HashMap<String, String>();
-                                                    final Set keys = request.getParameterMap().keySet();
-                                                    final Iterator it = keys.iterator();
-                                                    while (it.hasNext()) {
-                                                        final String key = it.next().toString();
-                                                        if (!(key.equalsIgnoreCase("query")
-                                                                        || key.equalsIgnoreCase("domain")
-                                                                        || key.equalsIgnoreCase("classId"))) {                          // NOI18N
-                                                            params.put(key, request.getParameter(key));
-                                                        }
-                                                    }
-                                                    if (object != null) {
-                                                        final FormDataBean parambean = (FormDataBean)object;
-                                                        for (final String key : params.keySet()) {
-                                                            parambean.setBeanParameter(key, params.get(key));
-                                                        }
-                                                        final List v = new ArrayList();
-                                                        final String cid = classId + "@" + domain;                                      // NOI18N
-                                                        v.add(cid);
-                                                        final LinkedList searchFormData = new LinkedList();
-                                                        searchFormData.add(parambean);
-                                                        ComponentRegistry.getRegistry()
-                                                                .getSearchDialog()
-                                                                .search(v, searchFormData, Navigator.this, false);
-                                                    }
-                                                }
-                                                if (target.equalsIgnoreCase("/showAkuk")) {                                             // NOI18N
-                                                    final String domain = request.getParameter("domain");                               // NOI18N
-                                                    final String classId = request.getParameter("classId");                             // NOI18N
-                                                    final String objectIds = request.getParameter("objectIds");                         // NOI18N
-                                                } else {
-                                                    logger.warn("Unknown Target: " + target);                                           // NOI18N
-                                                }
-                                            } else {
-                                                logger.warn(
-                                                    "Sombody tries to access the HTTP Interface from a different Terminal. Rejected."); // NOI18N
-                                            }
-                                        } catch (Throwable t) {
-                                            logger.error("Error while handling HttpRequests", t);                                       // NOI18N
-                                        }
-                                    }
-                                };
-
-                            final HandlerCollection handlers = new HandlerCollection();
-                            handlers.setHandlers(new Handler[] { param, hello });
-                            server.setHandler(handlers);
-
-                            server.start();
-                            server.join();
-                        } catch (Throwable t) {
-                            logger.error(
-                                "Error in  Navigator HttpInterface on port "
-                                        + propertyManager.getHttpInterfacePort(),
-                                t); // NOI18N
-                        }
-                    }
-                });
-        CismetThreadPool.execute(t);
+        try {
+            RESTRemoteControlStarter.initRestRemoteControlMethods(propertyManager.getHttpInterfacePort());
+        } catch (Throwable e) {
+            logger.error("Error during initializion of remote control server", e);
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -1226,10 +1275,22 @@ public class Navigator extends JFrame {
 
         //~ Static fields/initializers -----------------------------------------
 
-        private static final transient Logger LOG = Logger.getLogger(NavigatorShutdown.class);
+        private static final transient Logger LOG = Logger.getLogger(Navigator.NavigatorShutdown.class);
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new NavigatorShutdown object.
+         */
+        public NavigatorShutdown() {
+            super("NavigatorShutdown");
+        }
 
         //~ Methods ------------------------------------------------------------
 
+        /**
+         * DOCUMENT ME!
+         */
         @Override
         public void run() {
             if (startupFinished) {

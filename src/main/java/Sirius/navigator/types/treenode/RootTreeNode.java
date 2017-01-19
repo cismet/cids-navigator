@@ -289,6 +289,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
                                 @Override
                                 protected Void doInBackground() throws Exception {
+                                    Thread.currentThread().setName("RootTreeNode addChildren()");
                                     otn.getMetaObject(true);
 
                                     return null;

@@ -9,14 +9,12 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.Navigator;
 import Sirius.navigator.plugin.ui.manager.PluginManager;
-import Sirius.navigator.search.dynamic.SearchDialog;
-import Sirius.navigator.search.dynamic.profile.QueryResultProfileManager;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
-import Sirius.navigator.ui.dialog.AboutDialog;
 import Sirius.navigator.ui.dialog.CoordinateChooser;
 import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
+import Sirius.navigator.ui.tree.WorkingSpaceTree;
 
 import org.apache.log4j.Logger;
 
@@ -25,6 +23,8 @@ import java.awt.Window;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+
+import de.cismet.commons.gui.protocol.ProtocolPanel;
 
 /**
  * DOCUMENT ME!
@@ -38,9 +38,11 @@ public class ComponentRegistry {
 
     public static final String CATALOGUE_TREE = MetaCatalogueTree.class.getName();
     public static final String SEARCHRESULTS_TREE = SearchResultsTree.class.getName();
+    public static final String WORKINGSPACE_TREE = WorkingSpaceTree.class.getName();
     public static final String ATTRIBUTE_VIEWER = AttributeViewer.class.getName();
     public static final String ATTRIBUTE_EDITOR = AttributeEditor.class.getName();
     public static final String DESCRIPTION_PANE = DescriptionPane.class.getName();
+    public static final String PROTOCOL_PANEL = ProtocolPanel.class.getName();
     private static ComponentRegistry registry = null;
     private static boolean registred;
     // private final Logger logger;
@@ -53,12 +55,13 @@ public class ComponentRegistry {
     private CoordinateChooser coordinateChooser = null;
     /** Holds value of property navigator. */
     private Navigator navigator = null;
+    /** Holds value of property mainFrame. */
+    private JFrame mainFrame = null;
     /** Holds value of property searchDialog. */
-    private SearchDialog searchDialog = null;
     /** Holds value of property searchResultsTree. */
     private SearchResultsTree searchResultsTree = null;
-    /** Holds value of property queryResultProfileManager. */
-    private Sirius.navigator.search.dynamic.profile.QueryResultProfileManager queryResultProfileManager = null;
+    private WorkingSpaceTree workingSpaceTree = null;
+
     /** Holds value of property mutableContainer. */
     private GUIContainer guiContainer = null;
     /** Holds value of property catalogueTree. */
@@ -72,8 +75,6 @@ public class ComponentRegistry {
     private MutablePopupMenu mutablePopupMenu = null;
     /** Holds value of property pluginManager. */
     private PluginManager pluginManager = null;
-    /** Holds value of property aboutDialog. */
-    private AboutDialog aboutDialog;
     private DescriptionPane descriptionPane = null;
     /** Holds value of property attributeEditor. */
     private AttributeEditor attributeEditor;
@@ -91,9 +92,9 @@ public class ComponentRegistry {
      * @param   mutablePopupMenu   DOCUMENT ME!
      * @param   catalogueTree      DOCUMENT ME!
      * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
-     * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -105,20 +106,62 @@ public class ComponentRegistry {
             final MutablePopupMenu mutablePopupMenu,
             final MetaCatalogueTree catalogueTree,
             final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
-            final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
+        this((JFrame)navigator,
+            guiContainer,
+            mutableMenuBar,
+            mutableToolBar,
+            mutablePopupMenu,
+            catalogueTree,
+            searchResultsTree,
+            workingSpaceTree,
+            attributeViewer,
+            attributeEditor,
+            descriptionPane);
         this.navigator = navigator;
+    }
+
+    /**
+     * Creates a new ComponentRegistry object.
+     *
+     * @param   mainFrame          DOCUMENT ME!
+     * @param   guiContainer       DOCUMENT ME!
+     * @param   mutableMenuBar     DOCUMENT ME!
+     * @param   mutableToolBar     DOCUMENT ME!
+     * @param   mutablePopupMenu   DOCUMENT ME!
+     * @param   catalogueTree      DOCUMENT ME!
+     * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
+     * @param   attributeViewer    DOCUMENT ME!
+     * @param   attributeEditor    DOCUMENT ME!
+     * @param   descriptionPane    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private ComponentRegistry(final JFrame mainFrame,
+            final GUIContainer guiContainer,
+            final MutableMenuBar mutableMenuBar,
+            final MutableToolBar mutableToolBar,
+            final MutablePopupMenu mutablePopupMenu,
+            final MetaCatalogueTree catalogueTree,
+            final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
+            final AttributeViewer attributeViewer,
+            final AttributeEditor attributeEditor,
+            final DescriptionPane descriptionPane) throws Exception {
+        this.mainFrame = mainFrame;
         this.guiContainer = guiContainer;
         this.mutableMenuBar = mutableMenuBar;
         this.mutableToolBar = mutableToolBar;
         this.mutablePopupMenu = mutablePopupMenu;
         this.catalogueTree = catalogueTree;
         this.searchResultsTree = searchResultsTree;
+        this.workingSpaceTree = workingSpaceTree;
         this.attributeViewer = attributeViewer;
         this.attributeEditor = attributeEditor;
-        this.searchDialog = searchDialog;
         this.descriptionPane = descriptionPane;
     }
 
@@ -151,9 +194,9 @@ public class ComponentRegistry {
      * @param   mutablePopupMenu   DOCUMENT ME!
      * @param   catalogueTree      DOCUMENT ME!
      * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
      * @param   attributeViewer    DOCUMENT ME!
      * @param   attributeEditor    DOCUMENT ME!
-     * @param   searchDialog       DOCUMENT ME!
      * @param   descriptionPane    DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
@@ -165,9 +208,9 @@ public class ComponentRegistry {
             final MutablePopupMenu mutablePopupMenu,
             final MetaCatalogueTree catalogueTree,
             final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
             final AttributeViewer attributeViewer,
             final AttributeEditor attributeEditor,
-            final SearchDialog searchDialog,
             final DescriptionPane descriptionPane) throws Exception {
         synchronized (blocker) {
             if (!isRegistred()) {
@@ -180,9 +223,57 @@ public class ComponentRegistry {
                         mutablePopupMenu,
                         catalogueTree,
                         searchResultsTree,
+                        workingSpaceTree,
                         attributeViewer,
                         attributeEditor,
-                        searchDialog,
+                        descriptionPane);
+                registry.registred = true;
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mainFrame          DOCUMENT ME!
+     * @param   mutableContainer   DOCUMENT ME!
+     * @param   mutableMenuBar     DOCUMENT ME!
+     * @param   mutableToolBar     DOCUMENT ME!
+     * @param   mutablePopupMenu   DOCUMENT ME!
+     * @param   catalogueTree      DOCUMENT ME!
+     * @param   searchResultsTree  DOCUMENT ME!
+     * @param   workingSpaceTree   DOCUMENT ME!
+     * @param   attributeViewer    DOCUMENT ME!
+     * @param   attributeEditor    DOCUMENT ME!
+     * @param   descriptionPane    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static final void registerComponents(final JFrame mainFrame,
+            final GUIContainer mutableContainer,
+            final MutableMenuBar mutableMenuBar,
+            final MutableToolBar mutableToolBar,
+            final MutablePopupMenu mutablePopupMenu,
+            final MetaCatalogueTree catalogueTree,
+            final SearchResultsTree searchResultsTree,
+            final WorkingSpaceTree workingSpaceTree,
+            final AttributeViewer attributeViewer,
+            final AttributeEditor attributeEditor,
+            final DescriptionPane descriptionPane) throws Exception {
+        synchronized (blocker) {
+            if (!isRegistred()) {
+                // Logger.getLogger(ComponentRegistry.class).debug("creating singelton ComponentRegistry instance");
+                registry = new ComponentRegistry(
+                        mainFrame,
+                        mutableContainer,
+                        mutableMenuBar,
+                        mutableToolBar,
+                        mutablePopupMenu,
+                        catalogueTree,
+                        searchResultsTree,
+                        workingSpaceTree,
+                        attributeViewer,
+                        attributeEditor,
                         descriptionPane);
                 registry.registred = true;
             }
@@ -206,16 +297,48 @@ public class ComponentRegistry {
      * @return  DOCUMENT ME!
      */
     public MetaCatalogueTree getActiveCatalogue() {
-        if (catalogueTree.isShowing() && searchResultsTree.isShowing()) {
-            if (catalogueTree.getSelectedNodeCount() >= searchResultsTree.getSelectedNodeCount()) {
-                return catalogueTree;
-            } else {
-                return searchResultsTree;
+        int showingTeeCount = 0;
+        MetaCatalogueTree singleShowing = null;
+        int catSelCount = 0;
+        int searchSelCount = 0;
+        int workSelCount = 0;
+        if (catalogueTree != null) {
+            catSelCount = catalogueTree.getSelectedNodeCount();
+            if (catalogueTree.isShowing()) {
+                showingTeeCount++;
+                singleShowing = catalogueTree;
             }
-        } else if (catalogueTree.isShowing()) {
-            return catalogueTree;
+        }
+        if (searchResultsTree != null) {
+            searchSelCount = searchResultsTree.getSelectedNodeCount();
+            if (searchResultsTree.isShowing()) {
+                showingTeeCount++;
+                singleShowing = searchResultsTree;
+            }
+        }
+        if (workingSpaceTree != null) {
+            workSelCount = workingSpaceTree.getSelectedNodeCount();
+            if (workingSpaceTree.isShowing()) {
+                showingTeeCount++;
+                singleShowing = workingSpaceTree;
+            }
+        }
+
+        if (showingTeeCount > 1) {
+            if ((catSelCount >= searchSelCount) && (catSelCount >= workSelCount)) {
+                return catalogueTree;
+            } else if ((searchSelCount >= catSelCount) && (searchSelCount >= workSelCount)) {
+                return searchResultsTree;
+            } else if ((workSelCount >= catSelCount) && (workSelCount >= searchSelCount)) {
+                return workingSpaceTree;
+            } else {
+                // WHAT!?!
+                return catalogueTree;
+            }
+        } else if (showingTeeCount == 1) {
+            return singleShowing;
         } else {
-            return searchResultsTree;
+            return catalogueTree;
         }
     }
 
@@ -234,7 +357,7 @@ public class ComponentRegistry {
      * @return  DOCUMENT ME!
      */
     public JFrame getMainWindow() {
-        return navigator;
+        return mainFrame;
     }
 
     /**
@@ -286,15 +409,6 @@ public class ComponentRegistry {
     }
 
     /**
-     * Getter for property searchDialog.
-     *
-     * @return  Value of property searchDialog.
-     */
-    public SearchDialog getSearchDialog() {
-        return this.searchDialog;
-    }
-
-    /**
      * Getter for property searchProgressDialog.
      *
      * @return  Value of property searchProgressDialog.
@@ -311,19 +425,12 @@ public class ComponentRegistry {
     }
 
     /**
-     * Getter for property queryResultProfileManager.
+     * DOCUMENT ME!
      *
-     * @return  Value of property queryResultProfileManager.
+     * @return  DOCUMENT ME!
      */
-    public Sirius.navigator.search.dynamic.profile.QueryResultProfileManager getQueryResultProfileManager() {
-        if (this.queryResultProfileManager == null) {
-            queryResultProfileManager = new Sirius.navigator.search.dynamic.profile.QueryResultProfileManager(this
-                            .getMainWindow(),
-                    this.searchResultsTree,
-                    QueryResultProfileManager.QUERY_RESULT_PROFILE);
-        }
-
-        return this.queryResultProfileManager;
+    public WorkingSpaceTree getWorkingSpaceTree() {
+        return this.workingSpaceTree;
     }
 
     /**
@@ -405,19 +512,6 @@ public class ComponentRegistry {
         }
 
         return this.optionsDialog;
-    }
-
-    /**
-     * Getter for property aboutDialog.
-     *
-     * @return  Value of property aboutDialog.
-     */
-    public AboutDialog getAboutDialog() {
-        if (this.aboutDialog == null) {
-            this.aboutDialog = new AboutDialog(this.getMainWindow());
-        }
-
-        return this.aboutDialog;
     }
 
     /**

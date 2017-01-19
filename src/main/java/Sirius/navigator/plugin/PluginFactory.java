@@ -13,10 +13,11 @@ import Sirius.navigator.plugin.ui.*;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.embedded.*;
 
+import Sirius.server.newuser.User;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.commons.digester.*;
-import org.apache.commons.logging.Log;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -50,7 +51,6 @@ public final class PluginFactory {
     //~ Instance fields --------------------------------------------------------
 
     private final Logger logger;
-    private final Log log;
 
     private final PreloadPluginRuleSet preloadRuleSet;
     private final LoadPluginRuleSet loadRuleSet;
@@ -67,7 +67,6 @@ public final class PluginFactory {
         // log = new Log4jFactory().getInstance("navigator.plugin.factory.digester");
         final Logger digesterLogger = Logger.getLogger(PluginFactory.LoadPluginRuleSet.class);
         digesterLogger.setLevel(Level.WARN);
-        log = new org.apache.commons.logging.impl.Log4JLogger(digesterLogger);
 
         preloadRuleSet = new PreloadPluginRuleSet();
         loadRuleSet = new LoadPluginRuleSet();
@@ -107,7 +106,6 @@ public final class PluginFactory {
             // "'"); digester.setSchema(this.getSchemaLocation()); digester.setValidating(validating);
         }
 
-        digester.setLogger(log);
         digester.push(descriptor);
         digester.addRuleSet(preloadRuleSet);
 
@@ -135,7 +133,7 @@ public final class PluginFactory {
         final InputStream inputStream = this.getXMLDescriptorInputStream(descriptor.getPluginPath());
         final Digester digester = new Digester();
 
-        digester.setLogger(log);
+//        digester.setLogger(log);
         digester.push(new PluginFactory.FactoryCore(descriptor));
         digester.addRuleSet(loadRuleSet);
 
@@ -1035,9 +1033,25 @@ public final class PluginFactory {
                     method = SessionManager.getProxy().getMethod(methodKey);
 
                     if (method != null) {
-                        if (method.getPermissions().hasPermission(
-                                        SessionManager.getSession().getUser().getUserGroup().getKey(),
-                                        PermissionHolder.READPERMISSION)) {
+                        final User user = SessionManager.getSession().getUser();
+                        final UserGroup userGroup = user.getUserGroup();
+                        final boolean hasPermission;
+                        if (userGroup != null) {
+                            hasPermission = method.getPermissions()
+                                        .hasPermission(userGroup.getKey(), PermissionHolder.READPERMISSION);
+                        } else {
+                            boolean tmpPerm = false;
+                            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                                if (method.getPermissions().hasPermission(
+                                                potentialUserGroup.getKey(),
+                                                PermissionHolder.READPERMISSION)) {
+                                    tmpPerm = true;
+                                    break;
+                                }
+                            }
+                            hasPermission = tmpPerm;
+                        }
+                        if (hasPermission) {
                             final PluginMenuItem menuItem = new PluginMenuItem(methodDescriptor.getMethod(), method);
 
                             this.setItemProperties(menuItem, actionDescriptor);
@@ -1108,9 +1122,25 @@ public final class PluginFactory {
                 try {
                     method = SessionManager.getProxy().getMethod(methodKey);
                     if (method != null) {
-                        if (method.getPermissions().hasPermission(
-                                        SessionManager.getSession().getUser().getUserGroup().getKey(),
-                                        PermissionHolder.READPERMISSION)) {
+                        final User user = SessionManager.getSession().getUser();
+                        final UserGroup userGroup = user.getUserGroup();
+                        final boolean hasPermission;
+                        if (userGroup != null) {
+                            hasPermission = method.getPermissions()
+                                        .hasPermission(userGroup.getKey(), PermissionHolder.READPERMISSION);
+                        } else {
+                            boolean tmpPerm = false;
+                            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                                if (method.getPermissions().hasPermission(
+                                                potentialUserGroup.getKey(),
+                                                PermissionHolder.READPERMISSION)) {
+                                    tmpPerm = true;
+                                    break;
+                                }
+                            }
+                            hasPermission = tmpPerm;
+                        }
+                        if (hasPermission) {
                             final PluginMenuItem menuItem = new PluginMenuItem(methodDescriptor.getMethod(), method);
 
                             this.setItemProperties(menuItem, actionDescriptor);

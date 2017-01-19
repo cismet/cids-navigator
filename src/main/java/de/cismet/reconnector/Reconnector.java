@@ -9,6 +9,8 @@ package de.cismet.reconnector;
 
 import Sirius.navigator.ui.ComponentRegistry;
 
+import org.openide.util.NbBundle;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -26,6 +28,8 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
+
+import de.cismet.cids.server.ws.rest.SSLInitializationException;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
@@ -101,13 +105,15 @@ public abstract class Reconnector<S extends Object> {
      * @throws  Throwable  DOCUMENT ME!
      */
     protected abstract ReconnectorException getReconnectorException(final Throwable throwable) throws Throwable;
+
     /**
      * Abbrechen.
      */
-    public void doAbbort() {
+    public void doAbort() {
         reconnectorDialog.setVisible(false);
         isReconnecting = false;
     }
+
     /**
      * Verbindungsaufbau über Swingworker.
      */
@@ -124,6 +130,7 @@ public abstract class Reconnector<S extends Object> {
             connectorWorker.execute();
         }
     }
+
     /**
      * Verbindungsaufbau abbrechen.
      */
@@ -132,13 +139,20 @@ public abstract class Reconnector<S extends Object> {
             connectorWorker.cancel(true);
             connectorWorker = null;
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Verbindungsvorgang abgebrochen");
+                LOG.debug("Verbindungsvorgang abgebrochen"); // NOI18N
             }
         } else {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("nichts zum Abbrechen");
+                LOG.debug("nichts zum Abbrechen");           // NOI18N
             }
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void doIgnore() {
+        reconnectorDialog.dispose();
     }
 
     /**
@@ -149,6 +163,7 @@ public abstract class Reconnector<S extends Object> {
     public void addListener(final ReconnectorListener listener) {
         listeners.add(listener);
     }
+
     /**
      * Service Proxy.
      *
@@ -182,7 +197,10 @@ public abstract class Reconnector<S extends Object> {
                 dialogOwner = null;
             }
 
-            reconnectorDialog = new JDialog(dialogOwner, "Verbindungsfehler", true);
+            final String title = NbBundle.getMessage(
+                    Reconnector.class,
+                    "Reconnector.useDialog().reconnectorDialog.title");
+            reconnectorDialog = new JDialog(dialogOwner, title, true);
             reconnectorDialog.setResizable(true);
             reconnectorDialog.setMinimumSize(new Dimension(400, 150));
             reconnectorDialog.setContentPane(createReconnectorPanel());
@@ -190,7 +208,7 @@ public abstract class Reconnector<S extends Object> {
 
                     @Override
                     public void windowClosing(final WindowEvent we) {
-                        doAbbort();
+                        doAbort();
                     }
                 });
             reconnectorDialog.setAlwaysOnTop(true);
@@ -205,6 +223,7 @@ public abstract class Reconnector<S extends Object> {
             reconnectorDialog = null;
         }
     }
+
     /**
      * public JPanel registerFrame(final JPanel panel) { final ReconnectorWrapperPanel reconnectorWrapperPanel = new
      * ReconnectorWrapperPanel(panel, createReconnectorPanel()); addListener(reconnectorWrapperPanel);
@@ -222,6 +241,7 @@ public abstract class Reconnector<S extends Object> {
             dispatcher.connectionFailed(new ReconnectorEvent(component));
         }
     }
+
     /**
      * mit GUI oder ohne?
      *
@@ -286,11 +306,20 @@ public abstract class Reconnector<S extends Object> {
                     serviceFailed(ex);
                 } catch (final InvocationTargetException ex) {
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Exception while invocation", ex);
+                        LOG.debug("Exception while invocation", ex);        // NOI18N
                     }
                     targetEx = ex.getTargetException();
                     if (LOG.isDebugEnabled()) {
-                        LOG.debug("Wrapped Exception", targetEx);
+                        LOG.debug("Wrapped Exception", targetEx);           // NOI18N
+                    }
+                    serviceFailed(getReconnectorException(targetEx));
+                } catch (final SSLInitializationException sslInitEx) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Exception while invocation", sslInitEx); // NOI18N
+                    }
+                    targetEx = sslInitEx.getCause();
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Wrapped Exception", targetEx);           // NOI18N
                     }
                     serviceFailed(getReconnectorException(targetEx));
                 }

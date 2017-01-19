@@ -14,12 +14,12 @@ import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.CidsServerSearch;
-import Sirius.server.search.Query;
-import Sirius.server.search.SearchResult;
 
 import java.util.Collection;
 import java.util.HashMap;
+
+import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.CidsServerSearch;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -222,18 +222,6 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject getMetaObject(String objectId) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   query  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    MetaObject[] getMetaObject(Query query) throws ConnectionException;
-
     /**
      * DOCUMENT ME!
      *
@@ -245,7 +233,6 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject[] getMetaObjectByQuery(String query, int sig) throws ConnectionException;
-
     /**
      * DOCUMENT ME!
      *
@@ -257,18 +244,6 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject insertMetaObject(MetaObject MetaObject, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   query   DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    int insertMetaObject(Query query, String domain) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -308,110 +283,6 @@ public interface ProxyInterface {
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    HashMap getSearchOptions() throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   classIds       DOCUMENT ME!
-     * @param   searchOptions  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    SearchResult search(Collection classIds, Collection searchOptions) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   searchOptions  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    SearchResult search(Collection searchOptions) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   name         DOCUMENT ME!
-     * @param   description  DOCUMENT ME!
-     * @param   statement    DOCUMENT ME!
-     * @param   resultType   DOCUMENT ME!
-     * @param   isUpdate     DOCUMENT ME!
-     * @param   isRoot       DOCUMENT ME!
-     * @param   isUnion      DOCUMENT ME!
-     * @param   isBatch      DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    int addQuery(String name,
-            String description,
-            String statement,
-            int resultType,
-            char isUpdate,
-            char isRoot,
-            char isUnion,
-            char isBatch) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   name         DOCUMENT ME!
-     * @param   description  DOCUMENT ME!
-     * @param   statement    DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    int addQuery(String name, String description, String statement) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   queryId        DOCUMENT ME!
-     * @param   typeId         DOCUMENT ME!
-     * @param   paramkey       DOCUMENT ME!
-     * @param   description    DOCUMENT ME!
-     * @param   isQueryResult  DOCUMENT ME!
-     * @param   queryPosition  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    boolean addQueryParameter(int queryId,
-            int typeId,
-            String paramkey,
-            String description,
-            char isQueryResult,
-            int queryPosition) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   queryId      DOCUMENT ME!
-     * @param   paramkey     DOCUMENT ME!
-     * @param   description  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    boolean addQueryParameter(int queryId, String paramkey, String description) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param   serverSearch  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
@@ -419,4 +290,19 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     Collection customServerSearch(CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   body        DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(String taskname, String taskdomain, Object body, ServerActionParameter... params)
+            throws ConnectionException;
 }

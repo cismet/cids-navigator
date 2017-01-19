@@ -47,7 +47,7 @@ public class SearchProgressDialog extends javax.swing.JDialog {
     private final ResourceManager resources;
     private final DefaultStatusChangeSupport statusChangeSupport;
     private final MutableImageLabel animationLabel;
-    private SearchThread searchThread;
+//    private SearchThread searchThread;
     /** Holds value of property canceld. */
     private boolean canceld;
     /** Holds value of property resultNodes. */
@@ -130,54 +130,53 @@ public class SearchProgressDialog extends javax.swing.JDialog {
     /**
      * .........................................................................
      *
-     * @param  classNodeKeys  DOCUMENT ME!
-     * @param  searchOptions  DOCUMENT ME!
+     * @return  DOCUMENT ME!
      */
-    public void show(final Collection classNodeKeys, final Collection searchOptions) {
-        if ((this.searchThread != null) && this.searchThread.isAlive()) {
-            logger.warn("search thread is still running"); // NOI18N
-
-            try {
-                // TODO display warning message
-                this.searchThread.join();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("searchThread.join() successfull"); // NOI18N
-                }
-            } catch (InterruptedException iexp) {
-                if (logger.isDebugEnabled()) {
-                    logger.warn(iexp.getMessage(), iexp);
-                }
-            }
-        }
-
-        this.statusChangeSupport.fireStatusChange(
-            org.openide.util.NbBundle.getMessage(
-                SearchProgressDialog.class,
-                "SearchProgressDialog.show(Collection,Collection).status.running"), // NOI18N
-            Status.MESSAGE_POSITION_2,
-            Status.ICON_IGNORE,
-            Status.ICON_BLINKING);
-
-        this.animationLabel.switchOn(
-            true);
-        // this.setResultNodes(null);
-
-        this.setSearchResult(
-            null);
-
-        this.setCanceld(
-            false);
-
-        searchThread = new SearchThread(classNodeKeys, searchOptions);
-//        searchThread.start();
-        CismetThreadPool.execute(searchThread);
-
-        if (logger.isDebugEnabled()) {
-            logger.debug("waiting for search thread to finish"); // NOI18N
-        }                                                        // this.pack();
-
-        StaticSwingTools.showDialog(this);
-    }
+// public void show(final Collection classNodeKeys, final Collection searchOptions) {
+// if ((this.searchThread != null) && this.searchThread.isAlive()) {
+// logger.warn("search thread is still running"); // NOI18N
+//
+// try {
+// // TODO display warning message
+// this.searchThread.join();
+// if (logger.isDebugEnabled()) {
+// logger.debug("searchThread.join() successfull"); // NOI18N
+// }
+// } catch (InterruptedException iexp) {
+// if (logger.isDebugEnabled()) {
+// logger.warn(iexp.getMessage(), iexp);
+// }
+// }
+// }
+//
+// this.statusChangeSupport.fireStatusChange(
+// org.openide.util.NbBundle.getMessage(
+// SearchProgressDialog.class,
+// "SearchProgressDialog.show(Collection,Collection).status.running"), // NOI18N
+// Status.MESSAGE_POSITION_2,
+// Status.ICON_IGNORE,
+// Status.ICON_BLINKING);
+//
+// this.animationLabel.switchOn(
+// true);
+// // this.setResultNodes(null);
+//
+// this.setSearchResult(
+// null);
+//
+// this.setCanceld(
+// false);
+//
+// searchThread = new SearchThread(classNodeKeys, searchOptions);
+////        searchThread.start();
+//        CismetThreadPool.execute(searchThread);
+//
+//        if (logger.isDebugEnabled()) {
+//            logger.debug("waiting for search thread to finish"); // NOI18N
+//        }                                                        // this.pack();
+//
+//        StaticSwingTools.showDialog(this);
+//    }
 
     // .........................................................................
     /**
@@ -345,126 +344,126 @@ public class SearchProgressDialog extends javax.swing.JDialog {
      *
      * @version  $Revision$, $Date$
      */
-    private final class SearchThread extends Thread {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private final Logger logger;
-        private final Collection classNodeKeys;
-        private final Collection searchOptions;
-        // private Node[] resultNodes = null;
-        private SearchResult searchResult = null;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new SearchThread object.
-         *
-         * @param  classNodeKeys  DOCUMENT ME!
-         * @param  searchOptions  DOCUMENT ME!
-         */
-        private SearchThread(final Collection classNodeKeys, final Collection searchOptions) {
-            super("SearchThread"); // NOI18N
-
-            this.logger = Logger.getLogger(this.getClass());
-
-            this.classNodeKeys = classNodeKeys;
-            this.searchOptions = searchOptions;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public void run() {
-            logger.info("starting new search with ");                            // NOI18N
-            if (logger.isDebugEnabled()) {
-                logger.debug("# classNodeKeys: " + classNodeKeys.size() + ", #  searchOptions: "
-                            + searchOptions.size());                             // NOI18N
-            }
-            if (!SearchProgressDialog.this.isCanceld()) {
-                try {
-                    if ((this.classNodeKeys != null) && (this.classNodeKeys.size() > 0)) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("performing search with class ids");    // NOI18N
-                        }
-                        this.searchResult = SessionManager.getProxy().search(this.classNodeKeys, this.searchOptions);
-                    } else {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("performing search without class ids"); // NOI18N
-                        }
-                        this.searchResult = SessionManager.getProxy().search(this.searchOptions);
-                    }
-
-                    if (!SearchProgressDialog.this.isCanceld()) {
-                        SearchProgressDialog.this.setSearchResult(this.searchResult);
-
-                        if (this.searchResult.isNode() && (this.searchResult.getNodes() != null)
-                                    && (this.searchResult.getNodes().length > 0)) {
-                            if (logger.isInfoEnabled()) {
-                                logger.info(this.searchResult.getNodes().length + " nodes found");      // NOI18N
-                            }
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
-                                this.searchResult.getNodes().length
-                                        + org.openide.util.NbBundle.getMessage(
-                                            SearchProgressDialog.class,
-                                            "SearchProgressDialog.SearchThread.run().status.results"),  // NOI18N
-                                Status.MESSAGE_POSITION_2,
-                                Status.ICON_ACTIVATED,
-                                Status.ICON_DEACTIVATED);
-                        } else if (this.searchResult.isObject()) {
-                            logger.info(this.searchResult.getObjects().length + " meta objects found"); // NOI18N
-                        } else if (this.searchResult.isSearchParameter()) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("searchParameter found");                                  // NOI18N
-                            }
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
-                                "",
-                                Status.MESSAGE_POSITION_2,
-                                Status.ICON_ACTIVATED,
-                                Status.ICON_DEACTIVATED);                                               // NOI18N
-                        } else if (logger.isDebugEnabled()) {
-                            logger.warn("no search results found: " + this.searchResult.getResult() + "("
-                                        + this.searchResult.getResult().getClass() + ")");              // NOI18N
-                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
-                                org.openide.util.NbBundle.getMessage(
-                                    SearchProgressDialog.class,
-                                    "SearchProgressDialog.SearchThread.run().status.noresults"),        // NOI18N
-                                Status.MESSAGE_POSITION_2,
-                                Status.ICON_ACTIVATED,
-                                Status.ICON_DEACTIVATED);
-                        }
-
-                        SearchProgressDialog.this.dispose();
-                    }
-                } catch (Throwable t) {
-                    logger.error("could not perform search", t); // NOI18N
-                    SearchProgressDialog.this.setSearchResult(null);
-                    SearchProgressDialog.this.animationLabel.switchOff(true);
-
-                    if (!SearchProgressDialog.this.isCanceld()) {
-                        SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
-                            org.openide.util.NbBundle.getMessage(
-                                SearchProgressDialog.class,
-                                "SearchProgressDialog.SearchThread.run().status.error"), // NOI18N
-                            Status.MESSAGE_POSITION_2,
-                            Status.ICON_DEACTIVATED,
-                            Status.ICON_ACTIVATED);
-                        ExceptionManager.getManager()
-                                .showExceptionDialog(
-                                    ExceptionManager.ERROR,
-                                    org.openide.util.NbBundle.getMessage(
-                                        SearchProgressDialog.class,
-                                        "SearchProgressDialog.SearchThread.run().name"), // NOI18N
-                                    org.openide.util.NbBundle.getMessage(
-                                        SearchProgressDialog.class,
-                                        "SearchProgressDialog.SearchThread.run().message"), // NOI18N
-                                    t);
-                        SearchProgressDialog.this.dispose();
-                    }
-                }
-            }
-        }
-    }
+//    private final class SearchThread extends Thread {
+//
+//        //~ Instance fields ----------------------------------------------------
+//
+//        private final Logger logger;
+//        private final Collection classNodeKeys;
+//        private final Collection searchOptions;
+//        // private Node[] resultNodes = null;
+//        private SearchResult searchResult = null;
+//
+//        //~ Constructors -------------------------------------------------------
+//
+//        /**
+//         * Creates a new SearchThread object.
+//         *
+//         * @param  classNodeKeys  DOCUMENT ME!
+//         * @param  searchOptions  DOCUMENT ME!
+//         */
+//        private SearchThread(final Collection classNodeKeys, final Collection searchOptions) {
+//            super("SearchThread"); // NOI18N
+//
+//            this.logger = Logger.getLogger(this.getClass());
+//
+//            this.classNodeKeys = classNodeKeys;
+//            this.searchOptions = searchOptions;
+//        }
+//
+//        //~ Methods ------------------------------------------------------------
+//
+//        @Override
+//        public void run() {
+//            logger.info("starting new search with ");                            // NOI18N
+//            if (logger.isDebugEnabled()) {
+//                logger.debug("# classNodeKeys: " + classNodeKeys.size() + ", #  searchOptions: "
+//                            + searchOptions.size());                             // NOI18N
+//            }
+//            if (!SearchProgressDialog.this.isCanceld()) {
+//                try {
+//                    if ((this.classNodeKeys != null) && (this.classNodeKeys.size() > 0)) {
+//                        if (logger.isDebugEnabled()) {
+//                            logger.debug("performing search with class ids");    // NOI18N
+//                        }
+//                        this.searchResult = SessionManager.getProxy().search(this.classNodeKeys, this.searchOptions);
+//                    } else {
+//                        if (logger.isDebugEnabled()) {
+//                            logger.debug("performing search without class ids"); // NOI18N
+//                        }
+//                        this.searchResult = SessionManager.getProxy().search(this.searchOptions);
+//                    }
+//
+//                    if (!SearchProgressDialog.this.isCanceld()) {
+//                        SearchProgressDialog.this.setSearchResult(this.searchResult);
+//
+//                        if (this.searchResult.isNode() && (this.searchResult.getNodes() != null)
+//                                    && (this.searchResult.getNodes().length > 0)) {
+//                            if (logger.isInfoEnabled()) {
+//                                logger.info(this.searchResult.getNodes().length + " nodes found");      // NOI18N
+//                            }
+//                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+//                                this.searchResult.getNodes().length
+//                                        + org.openide.util.NbBundle.getMessage(
+//                                            SearchProgressDialog.class,
+//                                            "SearchProgressDialog.SearchThread.run().status.results"),  // NOI18N
+//                                Status.MESSAGE_POSITION_2,
+//                                Status.ICON_ACTIVATED,
+//                                Status.ICON_DEACTIVATED);
+//                        } else if (this.searchResult.isObject()) {
+//                            logger.info(this.searchResult.getObjects().length + " meta objects found"); // NOI18N
+//                        } else if (this.searchResult.isSearchParameter()) {
+//                            if (logger.isDebugEnabled()) {
+//                                logger.debug("searchParameter found");                                  // NOI18N
+//                            }
+//                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+//                                "",
+//                                Status.MESSAGE_POSITION_2,
+//                                Status.ICON_ACTIVATED,
+//                                Status.ICON_DEACTIVATED);                                               // NOI18N
+//                        } else if (logger.isDebugEnabled()) {
+//                            logger.warn("no search results found: " + this.searchResult.getResult() + "("
+//                                        + this.searchResult.getResult().getClass() + ")");              // NOI18N
+//                            SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+//                                org.openide.util.NbBundle.getMessage(
+//                                    SearchProgressDialog.class,
+//                                    "SearchProgressDialog.SearchThread.run().status.noresults"),        // NOI18N
+//                                Status.MESSAGE_POSITION_2,
+//                                Status.ICON_ACTIVATED,
+//                                Status.ICON_DEACTIVATED);
+//                        }
+//
+//                        SearchProgressDialog.this.dispose();
+//                    }
+//                } catch (Throwable t) {
+//                    logger.error("could not perform search", t); // NOI18N
+//                    SearchProgressDialog.this.setSearchResult(null);
+//                    SearchProgressDialog.this.animationLabel.switchOff(true);
+//
+//                    if (!SearchProgressDialog.this.isCanceld()) {
+//                        SearchProgressDialog.this.statusChangeSupport.fireStatusChange(
+//                            org.openide.util.NbBundle.getMessage(
+//                                SearchProgressDialog.class,
+//                                "SearchProgressDialog.SearchThread.run().status.error"), // NOI18N
+//                            Status.MESSAGE_POSITION_2,
+//                            Status.ICON_DEACTIVATED,
+//                            Status.ICON_ACTIVATED);
+//                        ExceptionManager.getManager()
+//                                .showExceptionDialog(
+//                                    ExceptionManager.ERROR,
+//                                    org.openide.util.NbBundle.getMessage(
+//                                        SearchProgressDialog.class,
+//                                        "SearchProgressDialog.SearchThread.run().name"), // NOI18N
+//                                    org.openide.util.NbBundle.getMessage(
+//                                        SearchProgressDialog.class,
+//                                        "SearchProgressDialog.SearchThread.run().message"), // NOI18N
+//                                    t);
+//                        SearchProgressDialog.this.dispose();
+//                    }
+//                }
+//            }
+//        }
+//    }
     /**
      * @param args the command line arguments
      */

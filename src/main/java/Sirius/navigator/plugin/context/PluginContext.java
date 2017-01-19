@@ -8,7 +8,6 @@
 package Sirius.navigator.plugin.context;
 
 import Sirius.navigator.exception.*;
-import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.*;
 import Sirius.navigator.plugin.interfaces.*;
 import Sirius.navigator.plugin.listener.*;
@@ -21,9 +20,9 @@ import Sirius.navigator.tools.*;
 import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.ui.*;
 
-import Sirius.server.middleware.types.*;
-
 import org.apache.log4j.Logger;
+
+import org.openide.util.Exceptions;
 
 import java.applet.*;
 
@@ -61,7 +60,6 @@ public class PluginContext {
 
     // private final String pluginId;
     // private final String pluginBasePath;
-
     /** Holds value of property environment. */
     private PluginContext.Environment environment;
 
@@ -136,6 +134,7 @@ public class PluginContext {
     public PluginContext.Environment getEnvironment() {
         return this.environment;
     }
+
     /**
      * Hell.
      *
@@ -355,15 +354,6 @@ public class PluginContext {
         }
 
         /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public AppletContext getAppletContext() {
-            return PropertyManager.getManager().getAppletContext();
-        }
-
-        /**
          * Translates a meta attribute name into a meta attribute id.
          *
          * <p>XML descriptor</p>
@@ -377,7 +367,6 @@ public class PluginContext {
          * be not found, no mappings loaded");     return null; }  Object object = mappingTable.get(attributeName);
          * if(object != null) {     return (String[])object; } else {     PluginContext.logger.warn("attribute '" +
          * attributeName + "' not found");     return null; }}*/
-
         public Collection getAttributeMappings(final String attributeName) {
             if (this.mappingTable == null) {
                 PluginContext.logger.warn("attribute '" + attributeName
@@ -458,33 +447,6 @@ public class PluginContext {
         }
 
         /**
-         * Returns the locale of the operating system or the locale of the web browser.
-         *
-         * @return  the system locale object
-         */
-        public Locale getDefaultLocale() {
-            if (this.isApplet()) {
-                final Enumeration enu = this.getAppletContext().getApplets();
-                if (enu.hasMoreElements()) {
-                    return ((Applet)enu.nextElement()).getLocale();
-                }
-            }
-
-            return Locale.getDefault();
-        }
-
-        /**
-         * Returns the current locale of the navigator.
-         *
-         * <p>This method can return a different locae than <code>getSystemLocale()</code></p>
-         *
-         * @return  the navigator locale object
-         */
-        public Locale getNavigatorLocale() {
-            return resources.getLocale();
-        }
-
-        /**
          * DOCUMENT ME!
          *
          * @return  DOCUMENT ME!
@@ -548,7 +510,11 @@ public class PluginContext {
          * @param  url  DOCUMENT ME!
          */
         public void showDocumentInDefaultBrowser(final URL url) {
-            PropertyManager.getManager().getAppletContext().showDocument(url, "_blank"); // NOI18N
+            try {
+                de.cismet.tools.BrowserLauncher.openURL(url.toString());
+            } catch (Exception ex) {
+                logger.error("Cannot open the url:" + url, ex);
+            }
         }
 
         /**
@@ -628,11 +594,11 @@ public class PluginContext {
             }
 
             try {
-                if (getEnvironment().isApplet())                                                 // oder webstart, dann
-                                                                                                 // ist applet auch true
+                if (getEnvironment().isApplet()) // oder webstart, dann
+                // ist applet auch true
                 {
                     if (PluginContext.logger.isDebugEnabled()) {
-                        logger.debug("ich denk ich bin ein applet: path:" + path);               // NOI18N
+                        logger.debug("ich denk ich bin ein applet: path:" + path); // NOI18N
                     }
                     final URL url = new URL(path);
                     final URLConnection connection = url.openConnection();
@@ -864,7 +830,6 @@ public class PluginContext {
     }
 
     // #########################################################################
-
     /**
      * Dynmaic Search.
      *
@@ -876,12 +841,10 @@ public class PluginContext {
 
         // FIXME include this in plugin descriptor
         // private final Properties searchProperties;
-
         // private final FormDataBean textSearchData;
         // private final FormDataBean boundingBoxSearchData;
-
         private boolean appendSearchResults = false;
-        private final HashMap dataBeans;
+//        private final HashMap dataBeans;
 
         //~ Constructors -------------------------------------------------------
 
@@ -893,11 +856,10 @@ public class PluginContext {
                 logger.debug("initializing search form data beans"); // NOI18N
             }
 
-            this.dataBeans = ComponentRegistry.getRegistry().getSearchDialog().getSearchFormManager()
-                        .getFormDataBeans();
+//            this.dataBeans = ComponentRegistry.getRegistry().getSearchDialog().getSearchFormManager()
+//                    .getFormDataBeans();
 
             // logger.debug("loading plugin search properties file 'search.properties'");
-
             // FIXME include this in plugin descriptor
             /*this.searchProperties = new Properties();
              * try { this.searchProperties.load(this.getClass().getResourceAsStream("search.properties")); }
@@ -945,7 +907,6 @@ public class PluginContext {
          * ((LsClassSelection)classSelectionMap.get(domain)).addClassID(classId);             }     }     }
          * catch(Exception exp)     {         logger.error("could not create ls class selection from string '" + theme +
          * "': " + exp.getMessage());     } }  return new Vector(classSelectionMap.values());}*/
-
         /**
          * DOCUMENT ME!
          *
@@ -976,7 +937,6 @@ public class PluginContext {
          * else { logger.error("could not perform bounding box search: insufficient parameters"); throw new
          * Exception("could not perform bounding box search: insufficient parameters");}*/
         // }
-
         /**
          * DOCUMENT ME!
          *
@@ -1000,50 +960,43 @@ public class PluginContext {
          * else {     logger.error("could not perform attribute search: insufficient parameters");     throw new
          * Exception("could not perform attribute search: insufficient parameters"); }*/
         // }
-
         public HashMap getDataBeans() {
-            return this.dataBeans;
+            return null; // this.dataBeans;
         }
 
         /**
          * DOCUMENT ME!
          *
-         * @param  classNodeKeys   DOCUMENT ME!
-         * @param  searchFormData  DOCUMENT ME!
+         * @param   classNodeKeys   DOCUMENT ME!
+         * @param   searchFormData  DOCUMENT ME!
+         *
+         * @throws  UnsupportedOperationException  DOCUMENT ME!
          */
         public void performSearch(final Collection classNodeKeys, final Collection searchFormData) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("performing search with " + classNodeKeys.size() + " classNodeKeys and "
-                            + searchFormData.size() + " searchFormData"); // NOI18N
-            }
-
-            ComponentRegistry.getRegistry().getSearchDialog().search(classNodeKeys, searchFormData);
+            throw new UnsupportedOperationException("Never again");
         }
 
         /**
          * DOCUMENT ME!
          *
-         * @param  classNodeKeys  DOCUMENT ME!
-         * @param  formData       DOCUMENT ME!
+         * @param   classNodeKeys  DOCUMENT ME!
+         * @param   formData       DOCUMENT ME!
+         *
+         * @throws  UnsupportedOperationException  DOCUMENT ME!
          */
         public void performSearch(final Collection classNodeKeys, final FormDataBean formData) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("performing search with " + classNodeKeys.size()
-                            + " classNodeKeys and one searchFormData"); // NOI18N
-            }
-
-            final LinkedList searchFormData = new LinkedList();
-            searchFormData.add(formData);
-            ComponentRegistry.getRegistry().getSearchDialog().search(classNodeKeys, searchFormData);
+            throw new UnsupportedOperationException("Never again");
         }
 
         /**
          * DOCUMENT ME!
          *
-         * @param  classNodeKeys        DOCUMENT ME!
-         * @param  searchFormData       DOCUMENT ME!
-         * @param  owner                DOCUMENT ME!
-         * @param  appendSearchResults  DOCUMENT ME!
+         * @param   classNodeKeys        DOCUMENT ME!
+         * @param   searchFormData       DOCUMENT ME!
+         * @param   owner                DOCUMENT ME!
+         * @param   appendSearchResults  DOCUMENT ME!
+         *
+         * @throws  UnsupportedOperationException  DOCUMENT ME!
          */
         public void performSearch(final Collection classNodeKeys,
                 final Collection searchFormData,
@@ -1054,61 +1007,50 @@ public class PluginContext {
                             + searchFormData.size() + " searchFormData"); // NOI18N
             }
 
-            ComponentRegistry.getRegistry()
-                    .getSearchDialog()
-                    .search(classNodeKeys, searchFormData, owner, appendSearchResults);
+            throw new UnsupportedOperationException("Never again");
         }
 
         /**
          * DOCUMENT ME!
          *
-         * @param  classNodeKeys        DOCUMENT ME!
-         * @param  formData             DOCUMENT ME!
-         * @param  owner                DOCUMENT ME!
-         * @param  appendSearchResults  DOCUMENT ME!
+         * @param   classNodeKeys        DOCUMENT ME!
+         * @param   formData             DOCUMENT ME!
+         * @param   owner                DOCUMENT ME!
+         * @param   appendSearchResults  DOCUMENT ME!
+         *
+         * @throws  UnsupportedOperationException  DOCUMENT ME!
          */
         public void performSearch(final Collection classNodeKeys,
                 final FormDataBean formData,
                 final Component owner,
                 final boolean appendSearchResults) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("performing search with " + classNodeKeys.size()
-                            + " classNodeKeys and one searchFormData"); // NOI18N
-            }
-
-            final LinkedList searchFormData = new LinkedList();
-            searchFormData.add(formData);
-            ComponentRegistry.getRegistry()
-                    .getSearchDialog()
-                    .search(classNodeKeys, searchFormData, owner, appendSearchResults);
+            throw new UnsupportedOperationException("Never again");
         }
 
         /**
          * DOCUMENT ME!
          *
-         * @param  formDataBean         DOCUMENT ME!
-         * @param  owner                DOCUMENT ME!
-         * @param  appendSearchResults  DOCUMENT ME!
+         * @param   formDataBean         DOCUMENT ME!
+         * @param   owner                DOCUMENT ME!
+         * @param   appendSearchResults  DOCUMENT ME!
+         *
+         * @throws  UnsupportedOperationException  DOCUMENT ME!
          */
         public void performSearch(final FormDataBean formDataBean,
                 final Component owner,
                 final boolean appendSearchResults) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("performing search with one searchFormData (" + formDataBean.getFormId() + ")"); // NOI18N
-            }
-            ComponentRegistry.getRegistry().getSearchDialog().search(formDataBean, owner, appendSearchResults);
+            throw new UnsupportedOperationException("Never again");
         }
 
         /**
          * DOCUMENT ME!
          *
-         * @param  formDataBean  DOCUMENT ME!
+         * @param   formDataBean  DOCUMENT ME!
+         *
+         * @throws  UnsupportedOperationException  DOCUMENT ME!
          */
         public void performSearch(final FormDataBean formDataBean) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("performing search with one searchFormData (" + formDataBean.getFormId() + ")"); // NOI18N
-            }
-            ComponentRegistry.getRegistry().getSearchDialog().search(formDataBean);
+            throw new UnsupportedOperationException("Never again");
         }
 
         /*
@@ -1118,12 +1060,10 @@ public class PluginContext {
          * in search results tree"); MethodManager.getManager().showSearchResults(searchProgressDialog.getResultNodes(),
          * true); } else
          * if(logger.isDebugEnabled()) {     logger.debug("search canceld, don't do anything"); }}*/
-
         // .....................................................................
     }
 
     // -------------------------------------------------------------------------
-
     /**
      * Internationalization Support.
      *

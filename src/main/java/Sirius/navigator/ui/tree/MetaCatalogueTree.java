@@ -49,9 +49,9 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import javax.swing.AbstractAction;
@@ -74,6 +74,8 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
+
+import de.cismet.commons.concurrency.CismetExecutors;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -137,7 +139,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 TreeModelListener.class,
                 refreshCache,
                 defaultTreeModel));
-        this.treePool = Executors.newFixedThreadPool(
+        this.treePool = CismetExecutors.newFixedThreadPool(
                 maxThreadCount,
                 NavigatorConcurrency.createThreadFactory("meta-tree")); // NOI18N
 
@@ -303,53 +305,39 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     }
 
     /**
-     * DOCUMENT ME!
+     * Refreshes every node on a tree path. The refresh of each node happens in an individual RefreshWorker. Those
+     * workers are wrapped in Futures, which are put in a set. That set will be returned. If nothing will be refreshed
+     * or if something went wrong, an empty set will be returned.
      *
-     * @param   treePath  DOCUMENT ME!
+     * @param   treePath  the treePath to refresh
      *
-     * @return  DOCUMENT ME!
+     * @return  a set with Futures in which the refresh of each node happens
      */
-    public Future refreshTreePath(final TreePath treePath) {
+    public Set<Future> refreshTreePath(final TreePath treePath) {
         final Set<Future> futures = new HashSet<Future>();
         final Object[] nodes = treePath.getPath();
-        final Object rootNode = this.getModel().getRoot();
-        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
 
-        if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
+        if ((nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("exploring subtree: " + nodes.length);                                                        // NOI18N
+                LOG.debug("exploring subtree: " + nodes.length); // NOI18N
             }
-            final List<?> nodeList = Arrays.asList(nodes);
-            for (final Object o : nodeList) {
-                if (!(o instanceof DefaultMetaTreeNode)) {
-                    nodeList.remove(o);
-                    LOG.warn("Node " + o                                                                                // NOI18N
+
+            // ignore root node, therefor start index is 1
+            for (int i = 1; i < nodes.length; ++i) {
+                if (nodes[i] instanceof DefaultMetaTreeNode) {
+                    final DefaultMetaTreeNode node = (DefaultMetaTreeNode)nodes[i];
+                    futures.add(treePool.submit(new RefreshWorker(node)));
+                } else {
+                    LOG.warn("Node " + nodes[i] // NOI18N
                                 + " is not instance of DefaultMetaTreeNode and has been removed from the Collection."); // NOI18N
                 }
             }
-            final Iterator<DefaultMetaTreeNode> childrenIterator = (Iterator<DefaultMetaTreeNode>)nodeList.iterator();
-
-            // Root Node entfernen
-            childrenIterator.next();
-
-            while (childrenIterator.hasNext()) {
-                final DefaultMetaTreeNode node = childrenIterator.next();
-//                if ((node == null) || !node.isExplored()) {
-//                    // we won't do anything, the node is not in cache or has not been explored yet, so an update would
-//                    // be pointless
-//                } else {
-//                    if (LOG.isDebugEnabled()) {
-//                        LOG.debug("refresh node: " + node);
-//                    }
-                futures.add(treePool.submit(new RefreshWorker(node)));
-//                }
-            }
-            return null;
+            return futures;
         } else {
             LOG.warn("could not explore subtree"); // NOI18N
         }
 
-        return null;
+        return futures;
     }
 
     /**
@@ -569,13 +557,17 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
         @Override
         public void run() {
             synchronized (node) {
+                if (node.getParent() == null) {
+                    return;
+                }
                 final Node thisNode = node.getNode();
 
                 assert thisNode != null : "DefaultMetaTreeNode without backing node: " + node; // NOI18N
 
-                if (thisNode.isSqlSort() && thisNode.isDynamic()) {
+                if (thisNode.isSqlSort() && (thisNode.getDynamicChildrenStatement() != null)) {
                     if (LOG.isInfoEnabled()) {
-                        LOG.info("these children are sorted via SQL, thus soft refresh is not possible: " + thisNode); // NOI18N
+                        LOG.info("these children are sorted via SQL, thus soft refresh is not possible: "
+                                    + thisNode); // NOI18N
                     }
 
                     node.refreshChildren();
@@ -638,18 +630,20 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                     @Override
                     public void run() {
-                        final int index = node.removeNode(toRemove);
+                        if (node.getParent() != null) {
+                            final int index = node.removeNode(toRemove);
 
-                        if (index == -1) {
-                            throw new IllegalStateException(
-                                "trying to remove a node that is not present: [node=" // NOI18N
-                                        + node
-                                        + "|removalCandidate="                        // NOI18N
-                                        + toRemove
-                                        + "]");                                       // NOI18N
+                            if (index == -1) {
+                                throw new IllegalStateException(
+                                    "trying to remove a node that is not present: [node=" // NOI18N
+                                            + node
+                                            + "|removalCandidate="                        // NOI18N
+                                            + toRemove
+                                            + "]");                                       // NOI18N
+                            }
+                            defaultTreeModel.nodesWereRemoved(node, new int[] { index }, new Object[] { toRemove });
+                            defaultTreeModel.nodeStructureChanged(node);
                         }
-                        defaultTreeModel.nodesWereRemoved(node, new int[] { index }, new Object[] { toRemove });
-                        defaultTreeModel.nodeStructureChanged(node);
                     }
                 });
         }
@@ -709,7 +703,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * Knoten der bereits expandiert wurde (d.h. dessen Children bereits vom Server geladen wurden) muss die Funktion
      * <b>explore()</b> nicht mehr ausgefuehrt werden.
      *
-     * <p> <b>Wenn der DefaultMetaTree Multithreading benutzen soll, wird an den expandierten Knoten eine <b>
+     * <p><b>Wenn der DefaultMetaTree Multithreading benutzen soll, wird an den expandierten Knoten eine <b>
      * DefaultMetaTreeNode</b> vom Typ <b>WaitNode</b> aengehaengt. Anschliessend wird <b>nodeStructureChanged(node)</b>
      * aufgerufen, um diesen Knoten anzuzeigen.<br>
      * Die <b>WaitNode</b> wird zwar sofort innerhalb der <b>explore</b> Funktion der selektierten <b>
@@ -842,6 +836,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
          * @param  defaultTreeModel  DOCUMENT ME!
          */
         public TreeExploreThread(final DefaultMetaTreeNode selectedNode, final DefaultTreeModel defaultTreeModel) {
+            super("TreeExploreThread");
             if (LOG.isDebugEnabled()) {
                 LOG.debug("<THREAD>: TreeExploreThread"); // NOI18N
             }
@@ -926,6 +921,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
          */
         public SubTreeExploreThread(final DefaultMetaTreeNode rootNode,
                 final Iterator<DefaultMetaTreeNode> childrenNodes) {
+            super("SubTreeExploreThread");
             this.node = rootNode;
             this.childrenNodes = childrenNodes;
         }

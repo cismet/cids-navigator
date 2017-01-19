@@ -15,7 +15,6 @@ import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
 
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.CidsServerSearch;
 
 import java.awt.EventQueue;
 
@@ -26,6 +25,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.swing.SwingWorker;
+
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+import de.cismet.cids.server.search.SearchResultListener;
+import de.cismet.cids.server.search.SearchResultListenerProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -54,7 +57,19 @@ public final class CidsSearchExecutor {
      *
      * @param  search  DOCUMENT ME!
      */
-    public static void searchAndDisplayResultsWithDialog(final CidsServerSearch search) {
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search) {
+        searchAndDisplayResultsWithDialog(search, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  search      DOCUMENT ME!
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     */
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final boolean simpleSort) {
         if (searchControlDialog == null) {
             searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
             searchControlDialog.pack();
@@ -66,7 +81,7 @@ public final class CidsSearchExecutor {
 
                 @Override
                 public void run() {
-                    searchControlDialog.startSearch();
+                    searchControlDialog.startSearch(simpleSort);
                 }
             });
         StaticSwingTools.showDialog(searchControlDialog);
@@ -81,7 +96,7 @@ public final class CidsSearchExecutor {
      *
      * @return  DOCUMENT ME!
      */
-    public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final CidsServerSearch search,
+    public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener listener,
             final PropertyChangeListener searchResultsListener) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
@@ -90,6 +105,7 @@ public final class CidsSearchExecutor {
 
                 @Override
                 protected Node[] doInBackground() throws Exception {
+                    Thread.currentThread().setName("CidsSearchExecutor searchAndDisplayResultsWithDialog()");
                     EventQueue.invokeLater(new Runnable() {
 
                             @Override
@@ -119,7 +135,7 @@ public final class CidsSearchExecutor {
 
                         final Node[] ret = aln.toArray(new Node[0]);
                         if (!isCancelled()) {
-                            MethodManager.getManager().showSearchResults(ret, false, searchResultsListener);
+                            MethodManager.getManager().showSearchResults(search, ret, false, searchResultsListener);
                         }
                         return ret;
                     }
@@ -152,6 +168,28 @@ public final class CidsSearchExecutor {
     /**
      * DOCUMENT ME!
      *
+     * @param   search                      DOCUMENT ME!
+     * @param   searchListener              DOCUMENT ME!
+     * @param   searchResultsTreeListener   DOCUMENT ME!
+     * @param   suppressEmptyResultMessage  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
+            final PropertyChangeListener searchListener,
+            final PropertyChangeListener searchResultsTreeListener,
+            final boolean suppressEmptyResultMessage) {
+        return searchAndDisplayResults(
+                search,
+                searchListener,
+                searchResultsTreeListener,
+                suppressEmptyResultMessage,
+                false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   search                      The search to perform.
      * @param   searchListener              A listener which will be informed about status changes of search thread.
      *                                      Usually a SearchControlPanel.
@@ -162,17 +200,22 @@ public final class CidsSearchExecutor {
      *                                      Since this message is generated in the called method to display the search
      *                                      results in the SearchResultsTree this flag decides about calling thismethod
      *                                      or not.
+     * @param   simpleSort                  if true, sorts the search results alphabetically. Usually set to false, as a
+     *                                      more specific sorting order is wished.
      *
      * @return  DOCUMENT ME!
      */
-    public static SwingWorker<Node[], Void> searchAndDisplayResults(final CidsServerSearch search,
+    public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
-            final boolean suppressEmptyResultMessage) {
+            final boolean suppressEmptyResultMessage,
+            final boolean simpleSort) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 @Override
                 protected Node[] doInBackground() throws Exception {
+                    Thread.currentThread().setName("CidsSearchExecutor searchAndDisplayResults()");
+
                     Node[] result = null;
                     final Collection searchResult = SessionManager.getProxy()
                                 .customServerSearch(SessionManager.getSession().getUser(), search);
@@ -194,10 +237,21 @@ public final class CidsSearchExecutor {
                     result = nodes.toArray(new Node[0]);
                     if (!isCancelled()) {
                         if (!suppressEmptyResultMessage || (result.length > 0)) {
-                            MethodManager.getManager().showSearchResults(result, false, searchResultsTreeListener);
+                            MethodManager.getManager()
+                                    .showSearchResults(search, result, false, searchResultsTreeListener, simpleSort);
                         }
                     }
 
+                    if (search instanceof SearchResultListenerProvider) {
+                        final SearchResultListenerProvider searchResultListenerProvider = (SearchResultListenerProvider)
+                            search;
+                        final SearchResultListener searchResultListener =
+                            searchResultListenerProvider.getSearchResultListener();
+                        if (searchResultListener != null) {
+                            searchResultListener.searchDone(new ArrayList(searchResult));
+                            searchResultListenerProvider.setSearchResultListener(null);
+                        }
+                    }
                     return result;
                 }
             };

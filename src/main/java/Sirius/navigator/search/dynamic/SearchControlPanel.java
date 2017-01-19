@@ -16,7 +16,6 @@ import Sirius.navigator.search.CidsSearchExecutor;
 import Sirius.navigator.ui.ComponentRegistry;
 
 import Sirius.server.middleware.types.Node;
-import Sirius.server.search.CidsServerSearch;
 
 import org.apache.log4j.Logger;
 
@@ -31,11 +30,14 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 
 import java.util.Collection;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
+
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 /**
  * DOCUMENT ME!
@@ -53,9 +55,12 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
 
     private SearchControlListener listener;
     private SwingWorker<Node[], Void> searchThread;
+    private SwingWorker<Boolean, Void> searchPreparationThread;
     private boolean searching = false;
     private ImageIcon iconSearch;
     private ImageIcon iconCancel;
+
+    private boolean simpleSort;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -126,7 +131,6 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
         btnSearchCancel.setToolTipText(org.openide.util.NbBundle.getMessage(
                 SearchControlPanel.class,
                 "SearchControlPanel.btnSearchCancel.toolTipText")); // NOI18N
-        btnSearchCancel.setFocusPainted(false);
         btnSearchCancel.setMaximumSize(new java.awt.Dimension(
                 100,
                 (new Double(getMaximumSize().getHeight()).intValue())));
@@ -165,29 +169,84 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
             if (searchThread != null) {
                 searchThread.cancel(true);
             }
+
+            if (searchPreparationThread != null) {
+                searchPreparationThread.cancel(true);
+            }
+
             ComponentRegistry.getRegistry().getSearchResultsTree().cancelNodeLoading();
         } else {
             if (listener == null) {
                 LOG.error("Search should be started, but listener is null.");
                 return;
             }
-
-            final CidsServerSearch search = listener.assembleSearch();
+            final MetaObjectNodeServerSearch search = listener.assembleSearch();
             if (search == null) {
                 LOG.warn("The listener didn't provide a search.");
                 return;
             }
 
-            searchThread = CidsSearchExecutor.searchAndDisplayResults(
-                    search,
-                    this,
-                    this,
-                    listener.suppressEmptyResultMessage());
             searching = true;
             setControlsAccordingToState();
             listener.searchStarted();
+
+            searchPreparationThread = new SwingWorker<Boolean, Void>() {
+
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        return SearchControlPanel.this.checkIfSearchShouldBeStarted(this, search);
+                    }
+
+                    @Override
+                    protected void done() {
+                        boolean startSearch = false;
+                        try {
+                            startSearch = get();
+                        } catch (InterruptedException ex) {
+                            LOG.error("Could not start search.", ex);
+                        } catch (ExecutionException ex) {
+                            LOG.error("Could not start search.", ex);
+                        } catch (CancellationException ex) {
+                            LOG.info("Search cancelled.", ex);
+                        }
+
+                        if (startSearch) {
+                            ComponentRegistry.getRegistry()
+                                    .getSearchResultsTree()
+                                    .addPropertyChangeListener("browse", SearchControlPanel.this);
+                            searchThread = CidsSearchExecutor.searchAndDisplayResults(
+                                    search,
+                                    SearchControlPanel.this,
+                                    SearchControlPanel.this,
+                                    listener.suppressEmptyResultMessage(),
+                                    simpleSort);
+                        } else {
+                            searching = false;
+                            setControlsAccordingToState();
+                            listener.searchCanceled();
+                        }
+                    }
+                };
+            searchPreparationThread.execute();
         }
     } //GEN-LAST:event_btnSearchCancelActionPerformed
+
+    /**
+     * This method is called before the search is actually started and gives a possibility to abort the search. In the
+     * default implementation it always returns true, but subclasses can override this method.
+     *
+     * <p>Note: the method is called in the doInBackground() of a SwingWorker and therefor not in the EDT</p>
+     *
+     * @param   calledBySwingWorker  the SwingWorker instance by which this method was called, to check e.g. if the
+     *                               SwingWorker was canceled
+     * @param   search               the search, which will be started or aborted later on
+     *
+     * @return  true: the search will be started. False: the search will be aborted
+     */
+    public boolean checkIfSearchShouldBeStarted(final SwingWorker calledBySwingWorker,
+            final MetaObjectNodeServerSearch search) {
+        return true;
+    }
 
     /**
      * DOCUMENT ME!
@@ -259,11 +318,12 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                             org.openide.util.NbBundle.getMessage(
                                 SearchControlPanel.class,
                                 "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.message"),
-                            ex.getLocalizedMessage(),
+                            null,
                             "ERROR",
-                            ex,
+                            ex.getCause(),
                             Level.WARNING,
                             null);
+
                     JXErrorPane.showDialog(getRootPane(), errorInfo);
                 }
 
@@ -296,10 +356,22 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      * DOCUMENT ME!
      */
     public void startSearch() {
+        startSearch(false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     */
+    public void startSearch(final boolean simpleSort) {
         if (LOG.isInfoEnabled()) {
             LOG.info("Start search programmatically.");
         }
+        this.simpleSort = simpleSort;
         btnSearchCancel.doClick();
+        this.simpleSort = false;
     }
 
     @Override

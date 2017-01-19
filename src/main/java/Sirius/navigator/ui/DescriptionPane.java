@@ -11,6 +11,7 @@ import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
+import Sirius.navigator.ui.attributes.renderer.NoDescriptionRenderer;
 import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
 import Sirius.navigator.ui.status.Status;
 import Sirius.navigator.ui.status.StatusChangeListener;
@@ -18,7 +19,9 @@ import Sirius.navigator.ui.status.StatusChangeSupport;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
+import Sirius.server.middleware.types.MetaObjectNode;
 
+import org.openide.util.Lookup;
 import org.openide.util.WeakListeners;
 
 import java.awt.BorderLayout;
@@ -47,8 +50,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
@@ -63,6 +70,7 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 
+import de.cismet.cids.tools.metaobjectrenderer.CidsBeanAggregationHandler;
 import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
@@ -100,13 +108,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     protected SwingWorker worker = null;
     protected GridBagConstraints gridBagConstraints;
     protected String welcomePage;
-    protected String blankPage;
     protected String errorPage;
     protected boolean showsWaitScreen = false;
     protected DefaultBreadCrumbModel breadCrumbModel = new DefaultBreadCrumbModel();
     protected LinkStyleBreadCrumbGui breadCrumbGui;
     // will only be accessed in EDT !
     private transient boolean fullScreenRenderer;
+    private final MultiMap sharedHandlersHM = new MultiMap();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -129,40 +137,25 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         this.fullScreenRenderer = false;
         BufferedReader reader = null;
         try {
-            StringBuffer buffer = new StringBuffer();
-            String string = null;
+            final StringBuffer welcomeBuffer = new StringBuffer();
+            String welcomeString = null;
             reader = new BufferedReader(new InputStreamReader(
                         RESOURCE.getNavigatorResourceAsStream("doc/welcome.html"))); // NOI18N
 
-            while ((string = reader.readLine()) != null) {
-                buffer.append(string);
+            while ((welcomeString = reader.readLine()) != null) {
+                welcomeBuffer.append(welcomeString);
             }
+            this.welcomePage = welcomeBuffer.toString();
 
-            this.welcomePage = buffer.toString();
-
-            buffer = new StringBuffer();
-            string = null;
-            reader = new BufferedReader(new InputStreamReader(
-                        RESOURCE.getNavigatorResourceAsStream("doc/blank.xhtml"), // NOI18N
-                        "UTF-8")); // NOI18N
-
-            while ((string = reader.readLine()) != null) {
-                buffer.append(string);
-            }
-
-            this.blankPage = buffer.toString();
-
-            buffer = new StringBuffer();
-            string = null;
+            final StringBuffer errorBuffer = new StringBuffer();
+            String errorString = null;
             reader = new BufferedReader(new InputStreamReader(
                         RESOURCE.getNavigatorResourceAsStream("doc/error.xhtml"), // NOI18N
                         "UTF-8")); // NOI18N
-
-            while ((string = reader.readLine()) != null) {
-                buffer.append(string);
+            while ((errorString = reader.readLine()) != null) {
+                errorBuffer.append(errorString);
             }
-
-            this.errorPage = buffer.toString();
+            this.errorPage = errorBuffer.toString();
         } catch (final IOException ioexp) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Couldn't read default pages.", ioexp); // NOI18N
@@ -172,7 +165,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 try {
                     reader.close();
                 } catch (IOException ex) {
-                    LOG.warn("Can't close reader.", ex);          // NOI18N
+                    LOG.warn("Can't close reader.", ex); // NOI18N
                 }
             }
         }
@@ -196,6 +189,37 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         } else {
             wrappedWaitingPanel = null;
         }
+
+        try {
+            final Collection<? extends CidsBeanAggregationHandler> allSharedHandlers = Lookup.getDefault()
+                        .lookupAll(CidsBeanAggregationHandler.class);
+            for (final CidsBeanAggregationHandler sharedHandler : allSharedHandlers) {
+                sharedHandlersHM.put(sharedHandler.getSourceMetaClassTablename().toLowerCase(), sharedHandler);
+            }
+            for (final String tableName : (Set<String>)sharedHandlersHM.keySet()) {
+                Collections.sort((List<CidsBeanAggregationHandler>)sharedHandlersHM.get(tableName),
+                    new Comparator<CidsBeanAggregationHandler>() {
+
+                        @Override
+                        public int compare(final CidsBeanAggregationHandler o1,
+                                final CidsBeanAggregationHandler o2) {
+                            if ((o1 != null) && (o2 == null)) {
+                                return 1;
+                            } else if ((o1 == null) && (o2 != null)) {
+                                return -1;
+                            } else if ((o1 != null) && (o2 != null)) {
+                                return Integer.compare(o1.getPriority(), o2.getPriority());
+                            } else { // (o1 == null) && (o2 == null)
+                                return 0;
+                            }
+                        }
+                    });
+            }
+        } catch (final Exception ex) {
+            LOG.warn("error while setting up sharedHandlers", ex);
+        }
+
+        startNoDescriptionRenderer();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -261,7 +285,21 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      */
-    public abstract void clear();
+    public void clear() {
+        final Runnable clearRunnable = new Runnable() {
+
+                @Override
+                public void run() {
+                    removeAndDisposeAllRendererFromPanel();
+                }
+            };
+
+        if (!EventQueue.isDispatchThread()) {
+            EventQueue.invokeLater(clearRunnable);
+        } else {
+            clearRunnable.run();
+        }
+    }
 
     @Override
     public void addStatusChangeListener(final StatusChangeListener listener) {
@@ -304,169 +342,261 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         if (objects.size() == 1) {
             setNodeDescription(objects.get(0));
         } else {
-            if (worker != null) {
-                worker.cancel(true);
-                worker = null;
-            }
-            showObjects();
-            clear();
-
-            worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
-
-                    final List<JComponent> all = new ArrayList<JComponent>();
-                    boolean multipleClasses = false;
-                    boolean initialized = false;
+            new SwingWorker<List<ObjectTreeNode>, Void>() {
 
                     @Override
-                    protected SelfDisposingPanel doInBackground() throws Exception {
-                        final MultiMap objectsByClass = new MultiMap();
+                    protected List<ObjectTreeNode> doInBackground() throws Exception {
+                        final List<ObjectTreeNode> otns = new ArrayList<ObjectTreeNode>();
                         for (final Object object : objects) {
-                            if ((object != null) && !((DefaultMetaTreeNode)object).isWaitNode()
-                                        && !((DefaultMetaTreeNode)object).isRootNode()
-                                        && !((DefaultMetaTreeNode)object).isPureNode()
-                                        && ((DefaultMetaTreeNode)object).isObjectNode()) {
-                                final ObjectTreeNode n = (ObjectTreeNode)object;
-                                objectsByClass.put(n.getMetaClass(), n);
-                            }
-                        }
-                        final Iterator it = objectsByClass.keySet().iterator();
-                        multipleClasses = objectsByClass.keySet().size() > 1;
-                        while (it.hasNext() && !isCancelled()) {
-                            final Object key = it.next();
-                            final List l = (List)objectsByClass.get(key);
-
-                            final List<MetaObject> v = new ArrayList<MetaObject>();
-                            for (final Object o : l) {
-                                v.add(((ObjectTreeNode)o).getMetaObject());
-                            }
-                            final MetaClass mc = ((MetaObject)v.toArray()[0]).getMetaClass();
-
-                            // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt werden
-                            // fall getAggregationrenderer null lifert (keiner da, oder Fehler)
-                            JComponent aggrRendererTester = null;
-
-                            if (l.size() > 1) {
-                                aggrRendererTester = CidsObjectRendererFactory.getInstance()
-                                            .getAggregationRenderer(v, mc.getName() + " (" + v.size() + ")"); // NOI18N
-                            }
-                            if (aggrRendererTester == null) {
-                                LOG.warn("AggregationRenderer was null. Will use SingleRenderer");            // NOI18N
-                                for (final Object object : l) {
-                                    final ObjectTreeNode otn = (ObjectTreeNode)object;
-                                    final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
-                                            CidsObjectRendererFactory.getInstance().getSingleRenderer(
-                                                otn.getMetaObject(),
-                                                otn.getMetaClass().getName()
-                                                        + ": "
-                                                        + otn));
-                                    final CidsBean bean = otn.getMetaObject().getBean();
-                                    final PropertyChangeListener propertyChangeListener = new PropertyChangeListener() {
-
-                                            @Override
-                                            public void propertyChange(final PropertyChangeEvent evt) {
-                                                comp.repaint();
-                                            }
-                                        };
-                                    bean.addPropertyChangeListener(WeakListeners.propertyChange(
-                                            propertyChangeListener,
-                                            bean));
-                                    comp.setStrongListenerReference(propertyChangeListener);
-                                    publish(comp);
+                            if (object instanceof DefaultMetaTreeNode) {
+                                final DefaultMetaTreeNode node = (DefaultMetaTreeNode)object;
+                                if (!node.isWaitNode() && !node.isRootNode() && !node.isPureNode()
+                                            && node.isObjectNode()) {
+                                    otns.add((ObjectTreeNode)node);
                                 }
-                            } else {
-                                final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(aggrRendererTester);
-                                publish(comp);
                             }
                         }
-                        return null;
+                        return otns;
                     }
 
                     @Override
                     protected void done() {
-                        all.clear();
-                        if (worker == this) {
-                            worker = null;
+                        try {
+                            final List<ObjectTreeNode> otns = get();
+                            gotoObjectTreeNodes(otns.toArray(new ObjectTreeNode[0]));
+                        } catch (final Exception ex) {
+                            LOG.error("error while preparing MetaObjectNodes", ex);
                         }
                     }
+                }.execute();
+        }
+    }
 
-                    @Override
-                    protected void process(final List<SelfDisposingPanel> chunks) {
-                        int y = all.size();
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mons  DOCUMENT ME!
+     */
+    public void gotoMetaObjectNodes(final MetaObjectNode[] mons) {
+        final Collection<ObjectTreeNode> otns = new ArrayList<ObjectTreeNode>();
+        for (final MetaObjectNode mon : mons) {
+            otns.add(new ObjectTreeNode(mon));
+        }
+        gotoObjectTreeNodes(otns.toArray(new ObjectTreeNode[0]));
+    }
 
-                        if (!initialized) {
-                            showsWaitScreen = false;
-                            removeAndDisposeAllRendererFromPanel();
-                            gridBagConstraints = new java.awt.GridBagConstraints();
-                            gridBagConstraints.gridx = 0;
-                            gridBagConstraints.gridy = 0;
-                            gridBagConstraints.weightx = 1;
-                            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-                            gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                            initialized = true;
-                        }
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  otns  DOCUMENT ME!
+     */
+    public void gotoObjectTreeNodes(final ObjectTreeNode[] otns) {
+        if (otns.length == 1) {
+            gotoObjectTreeNode(otns[0]);
+        } else {
+            if (worker != null) {
+                worker.cancel(true);
+                worker = null;
+            }
+            clearBreadCrumb();
+            showObjects();
+            showWaitScreen();
+            if ((otns != null) && (otns.length > 0)) {
+                worker = new SwingWorker<SelfDisposingPanel, SelfDisposingPanel>() {
 
-                        if ((chunks.size() == 1) && (y == 0)) {
-                            final SelfDisposingPanel sdp = chunks.get(0);
-                            if (sdp instanceof RequestsFullSizeComponent) {
-                                if (LOG.isInfoEnabled()) {
-                                    LOG.info("Renderer is FullSize Component!"); // NOI18N
+                        final List<JComponent> all = new ArrayList<JComponent>();
+                        boolean multipleClasses = false;
+                        boolean initialized = false;
+
+                        @Override
+                        protected SelfDisposingPanel doInBackground() throws Exception {
+                            Thread.currentThread().setName("DescriptionPane setNodesDescriptions()");
+                            final MultiMap objectsByClass = new MultiMap();
+                            for (final ObjectTreeNode otn : otns) {
+                                final MetaObject metaObject = otn.getMetaObject();
+                                final MetaClass mc = otn.getMetaClass();
+
+                                // look for sharedhandles
+                                final Collection<CidsBeanAggregationHandler> sharedHandlers =
+                                    (Collection<CidsBeanAggregationHandler>)sharedHandlersHM.get(mc.getTableName()
+                                                .toLowerCase());
+
+                                boolean consumed = false;
+                                if (sharedHandlers != null) {
+                                    for (final CidsBeanAggregationHandler sharedHandler : sharedHandlers) {
+                                        if (mc.getTableName().equalsIgnoreCase(
+                                                        sharedHandler.getSourceMetaClassTablename())) {
+                                            final Collection<CidsBean> aggrBeans = sharedHandler.getAggregatedBeans(
+                                                    metaObject.getBean());
+                                            for (final CidsBean aggrBean : aggrBeans) {
+                                                objectsByClass.put(sharedHandler.getTargetMetaClassTablename()
+                                                            .toLowerCase(),
+                                                    aggrBean.getMetaObject());
+                                            }
+                                            if (sharedHandler.consume()) {
+                                                consumed = true;
+                                                break;
+                                            }
+                                        }
+                                    }
                                 }
 
-                                fullScreenRenderer = true;
-
-                                panObjects.remove(scpRenderer);
-                                panObjects.add(panRenderer, BorderLayout.CENTER);
-
-                                panRenderer.setLayout(new BorderLayout());
-                                panRenderer.add(sdp, BorderLayout.CENTER);
-                            } else {
-                                fullScreenRenderer = false;
-
-                                panObjects.remove(panRenderer);
-                                panObjects.add(scpRenderer, BorderLayout.CENTER);
-                                scpRenderer.setViewportView(panRenderer);
-
-                                panRenderer.setLayout(new GridBagLayout());
-                                panRenderer.add(sdp, gridBagConstraints);
-                            }
-                            sdp.startChecking();
-                            panRenderer.revalidate();
-                            revalidate();
-                            repaint();
-                        } else {
-                            if (fullScreenRenderer) {
-                                fullScreenRenderer = false;
-
-                                panObjects.remove(panRenderer);
-                                panObjects.add(scpRenderer, BorderLayout.CENTER);
-
-                                scpRenderer.setViewportView(panRenderer);
-
-                                panRenderer.setLayout(new GridBagLayout());
+                                if (!consumed) {
+                                    objectsByClass.put(mc.getTableName().toLowerCase(), metaObject);
+                                }
                             }
 
-                            for (final SelfDisposingPanel comp : chunks) {
-                                final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
-                                gridBagConstraints.gridx = 0;
-                                gridBagConstraints.gridy = y;
-                                gridBagConstraints.weightx = 1;
-                                gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
-                                gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-                                panRenderer.add(comp, gridBagConstraints);
+                            final Iterator it = objectsByClass.keySet().iterator();
+                            multipleClasses = objectsByClass.keySet().size() > 1;
+                            while (it.hasNext() && !isCancelled()) {
+                                final Object key = it.next();
+                                final List<MetaObject> mos = (List)objectsByClass.get(key);
 
-                                comp.startChecking();
+                                if (!mos.isEmpty()) {
+                                    final MetaClass mc = mos.toArray(new MetaObject[0])[0].getMetaClass();
 
-                                panRenderer.revalidate();
-                                panRenderer.repaint();
+                                    // Hier wird schon der Aggregationsrenderer gebaut, weil Einzelrenderer angezeigt
+                                    // werden fall getAggregationrenderer null lifert (keiner da, oder Fehler)
+                                    JComponent aggrRendererTester = null;
 
-                                y++;
+                                    if (mos.size() > 1) {
+                                        aggrRendererTester = CidsObjectRendererFactory.getInstance()
+                                                    .getAggregationRenderer(
+                                                            mos,
+                                                            mc.getName()
+                                                            + " ("
+                                                            + mos.size()
+                                                            + ")");                                        // NOI18N
+                                    }
+                                    if (aggrRendererTester == null) {
+                                        LOG.warn("AggregationRenderer was null. Will use SingleRenderer"); // NOI18N
+                                        for (final MetaObject mo : mos) {
+                                            final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
+                                                    CidsObjectRendererFactory.getInstance().getSingleRenderer(
+                                                        mo,
+                                                        mo.getMetaClass().getName()
+                                                                + ": "
+                                                                + mo));
+                                            final CidsBean bean = mo.getBean();
+                                            final PropertyChangeListener propertyChangeListener =
+                                                new PropertyChangeListener() {
+
+                                                    @Override
+                                                    public void propertyChange(final PropertyChangeEvent evt) {
+                                                        comp.repaint();
+                                                    }
+                                                };
+                                            bean.addPropertyChangeListener(WeakListeners.propertyChange(
+                                                    propertyChangeListener,
+                                                    bean));
+                                            comp.setStrongListenerReference(propertyChangeListener);
+                                            publish(comp);
+                                        }
+                                    } else {
+                                        final SelfDisposingPanel comp = encapsulateInSelfDisposingPanel(
+                                                aggrRendererTester);
+                                        publish(comp);
+                                    }
+                                }
+                            }
+                            return null;
+                        }
+
+                        @Override
+                        protected void done() {
+                            all.clear();
+                        }
+
+                        @Override
+                        protected void process(final List<SelfDisposingPanel> chunks) {
+                            if (!isCancelled()) {
+                                int y = all.size();
+
+                                if (!initialized) {
+                                    showsWaitScreen = false;
+                                    removeAndDisposeAllRendererFromPanel();
+                                    gridBagConstraints = new java.awt.GridBagConstraints();
+                                    gridBagConstraints.gridx = 0;
+                                    gridBagConstraints.gridy = 0;
+                                    gridBagConstraints.weightx = 1;
+                                    gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+                                    gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                    initialized = true;
+                                }
+
+                                if ((chunks.size() == 1) && (y == 0)) {
+                                    final SelfDisposingPanel sdp = chunks.get(0);
+                                    if (sdp instanceof RequestsFullSizeComponent) {
+                                        if (LOG.isInfoEnabled()) {
+                                            LOG.info("Renderer is FullSize Component!"); // NOI18N
+                                        }
+
+                                        fullScreenRenderer = true;
+
+                                        panObjects.remove(scpRenderer);
+                                        panObjects.add(panRenderer, BorderLayout.CENTER);
+
+                                        panRenderer.setLayout(new BorderLayout());
+                                        panRenderer.add(sdp, BorderLayout.CENTER);
+                                    } else {
+                                        fullScreenRenderer = false;
+
+                                        panObjects.remove(panRenderer);
+                                        panObjects.add(scpRenderer, BorderLayout.CENTER);
+                                        scpRenderer.setViewportView(panRenderer);
+
+                                        panRenderer.setLayout(new GridBagLayout());
+                                        panRenderer.add(sdp, gridBagConstraints);
+                                    }
+                                    sdp.startChecking();
+                                    panRenderer.revalidate();
+                                    revalidate();
+                                    repaint();
+                                } else {
+                                    if (fullScreenRenderer) {
+                                        fullScreenRenderer = false;
+
+                                        panObjects.remove(panRenderer);
+                                        panObjects.add(scpRenderer, BorderLayout.CENTER);
+
+                                        scpRenderer.setViewportView(panRenderer);
+
+                                        panRenderer.setLayout(new GridBagLayout());
+
+                                        // the first renderer was added with a BorderLayout constraint,
+                                        // but now it needs GridBagConstraints
+                                        if (panRenderer.getComponentCount() == 1) {
+                                            final Component firstRenderer = panRenderer.getComponent(0);
+                                            panRenderer.remove(firstRenderer);
+                                            panRenderer.add(firstRenderer, gridBagConstraints);
+                                        }
+                                    }
+
+                                    for (final SelfDisposingPanel comp : chunks) {
+                                        final GridBagConstraints gridBagConstraints = new java.awt.GridBagConstraints();
+                                        gridBagConstraints.gridx = 0;
+                                        gridBagConstraints.gridy = y;
+                                        gridBagConstraints.weightx = 1;
+                                        gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
+                                        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+                                        panRenderer.add(comp, gridBagConstraints);
+
+                                        comp.startChecking();
+
+                                        panRenderer.revalidate();
+                                        panRenderer.repaint();
+
+                                        y++;
+                                    }
+                                }
+                                all.addAll(chunks);
                             }
                         }
-                        all.addAll(chunks);
-                    }
-                };
-            if (worker != null) {
+                    };
                 CismetThreadPool.execute(worker);
+            } else {
+                clear();
+                startNoDescriptionRenderer();
             }
         }
     }
@@ -529,7 +659,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      */
-    protected void showWaitScreen() {
+    public void showWaitScreen() {
         if (!showsWaitScreen) {
             showsWaitScreen = true;
             final Runnable run = new Runnable() {
@@ -563,10 +693,176 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      *
+     * @param       to             DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObjects(MetaObjectNode[]) instead
+     */
+    @Deprecated
+    public void gotoMetaObjects(final MetaObject[] to, final String optionalTitle) {
+        if (currentRenderer() == null) {
+            // there is no renderer displayed
+            if ((worker != null) && !worker.isDone()) {
+                worker.cancel(true);
+                worker = null;
+            } else {
+                showObjects();
+                showWaitScreen();
+            }
+        }
+        final List<MetaObjectNode> mons = new ArrayList<MetaObjectNode>();
+        for (final MetaObject metaObject : to) {
+            mons.add(new MetaObjectNode(metaObject.getBean()));
+        }
+        gotoMetaObjectNodes(mons.toArray(new MetaObjectNode[0]));
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       mon            DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObjectNode(MetaObjectNode) instead
+     */
+    @Deprecated
+    public void gotoMetaObjectNode(final MetaObjectNode mon, final String optionalTitle) {
+        gotoMetaObjectNode(mon);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mon  DOCUMENT ME!
+     */
+    public void gotoMetaObjectNode(final MetaObjectNode mon) {
+        gotoMetaObjectNode(mon, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       mon              DOCUMENT ME!
+     * @param       optionalTitle    DOCUMENT ME!
+     * @param       clearBreadcrumb  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObjectNode(MetaObjectNode, boolean) instead
+     */
+    @Deprecated
+    public void gotoMetaObjectNode(final MetaObjectNode mon,
+            final String optionalTitle,
+            final boolean clearBreadcrumb) {
+        gotoMetaObjectNode(mon, clearBreadcrumb);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  mon              DOCUMENT ME!
+     * @param  clearBreadcrumb  DOCUMENT ME!
+     */
+    public void gotoMetaObjectNode(final MetaObjectNode mon,
+            final boolean clearBreadcrumb) {
+        gotoObjectTreeNode(new ObjectTreeNode(mon), clearBreadcrumb);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       otn            DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoObjectTreeNode(ObjectTreeNode) instead
+     */
+    @Deprecated
+    public void gotoObjectTreeNode(final ObjectTreeNode otn, final String optionalTitle) {
+        gotoObjectTreeNode(otn);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  otn  DOCUMENT ME!
+     */
+    public void gotoObjectTreeNode(final ObjectTreeNode otn) {
+        gotoObjectTreeNode(otn, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       otn              DOCUMENT ME!
+     * @param       optionalTitle    DOCUMENT ME!
+     * @param       clearBreadcrumb  DOCUMENT ME!
+     *
+     * @deprecated  use gotoObjectTreeNode(ObjectTreeNode, boolean) instead
+     */
+    @Deprecated
+    public void gotoObjectTreeNode(final ObjectTreeNode otn,
+            final String optionalTitle,
+            final boolean clearBreadcrumb) {
+        gotoObjectTreeNode(otn, clearBreadcrumb);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  otn              DOCUMENT ME!
+     * @param  clearBreadcrumb  DOCUMENT ME!
+     */
+    public void gotoObjectTreeNode(final ObjectTreeNode otn,
+            final boolean clearBreadcrumb) {
+        if (currentRenderer() == null) {
+            // there is no renderer displayed
+            if ((worker != null) && !worker.isDone()) {
+                worker.cancel(true);
+                worker = null;
+            } else {
+                showObjects();
+                showWaitScreen();
+            }
+        }
+        new SwingWorker<MetaObject, Void>() {
+
+                @Override
+                protected MetaObject doInBackground() throws Exception {
+                    return otn.getMetaObject();
+                }
+
+                @Override
+                protected void done() {
+                    try {
+                        final MetaObject metaobject = get();
+                        final CidsMetaObjectBreadCrumb crumb = new CidsMetaObjectBreadCrumb(metaobject) {
+
+                                @Override
+                                public void crumbActionPerformed(final ActionEvent e) {
+                                    startSingleRendererWorker(otn);
+                                }
+                            };
+                        if (clearBreadcrumb) {
+                            breadCrumbModel.startWithNewCrumb(crumb);
+                        } else {
+                            breadCrumbModel.appendCrumb(crumb);
+                        }
+                        startSingleRendererWorker(otn);
+                    } catch (final InterruptedException e) {
+                        LOG.error("Background Thread was interrupted", e);                // NOI18N
+                    } catch (final ExecutionException e) {
+                        LOG.error("Background Thread execution encountered an error", e); // NOI18N
+                    }
+                }
+            }.execute();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  to             DOCUMENT ME!
      * @param  optionalTitle  DOCUMENT ME!
      */
-    public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
+    @Deprecated
+    protected void showMetaObjectSingleRenderer(final MetaObject to, final String optionalTitle) {
         final CidsMetaObjectBreadCrumb crumb = new CidsMetaObjectBreadCrumb(to) {
 
                 @Override
@@ -593,10 +889,26 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     /**
      * DOCUMENT ME!
      *
-     * @param  mc             DOCUMENT ME!
-     * @param  toObjectId     DOCUMENT ME!
-     * @param  optionalTitle  DOCUMENT ME!
+     * @param       to             DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObjectNode(MetaObjectNode, false) instead
      */
+    @Deprecated
+    public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
+        showMetaObjectSingleRenderer(to, optionalTitle);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       mc             DOCUMENT ME!
+     * @param       toObjectId     DOCUMENT ME!
+     * @param       optionalTitle  DOCUMENT ME!
+     *
+     * @deprecated  use gotoMetaObject(MetaObjectNode, String) instead
+     */
+    @Deprecated
     public void gotoMetaObject(final MetaClass mc, final int toObjectId, final String optionalTitle) {
         showWaitScreen();
         new SwingWorker<MetaObject, Void>() {
@@ -610,7 +922,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 protected void done() {
                     try {
                         final MetaObject result = get();
-                        gotoMetaObject(result, optionalTitle);
+                        showMetaObjectSingleRenderer(result, optionalTitle);
                     } catch (final InterruptedException e) {
                         LOG.error("Background Thread was interrupted", e);                // NOI18N
                     } catch (final ExecutionException e) {
@@ -643,6 +955,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
     /**
      * DOCUMENT ME!
+     */
+    protected void startNoDescriptionRenderer() {
+        startSingleRendererWorker(null, null, null);
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  o      DOCUMENT ME!
      * @param  node   DOCUMENT ME!
@@ -653,16 +972,23 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected SelfDisposingPanel doInBackground() throws Exception {
-                    final JComponent jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
-                    if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
-                        ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
-                    } else if ((jComp instanceof WrappedComponent)
-                                && (((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore)
-                                && (node != null)) {
-                        final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
-                        ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
+                    Thread.currentThread().setName("CidsSearchExecutor startSingleRendererWorker()");
+                    final JComponent jComp;
+                    final boolean isNoDescriptionRenderer = (o == null) && (node == null);
+                    if (isNoDescriptionRenderer) {
+                        jComp = NoDescriptionRenderer.getInstance();
+                    } else {
+                        jComp = CidsObjectRendererFactory.getInstance().getSingleRenderer(o, title);
+
+                        if ((jComp instanceof MetaTreeNodeStore) && (node != null)) {
+                            ((MetaTreeNodeStore)jComp).setMetaTreeNode(node);
+                        } else if ((jComp instanceof WrappedComponent)
+                                    && (((WrappedComponent)jComp).getOriginalComponent() instanceof MetaTreeNodeStore)
+                                    && (node != null)) {
+                            final JComponent originalComponent = ((WrappedComponent)jComp).getOriginalComponent();
+                            ((MetaTreeNodeStore)originalComponent).setMetaTreeNode(node);
+                        }
                     }
-                    final CidsBean bean = o.getBean();
                     final PropertyChangeListener localListener = new PropertyChangeListener() {
 
                             @Override
@@ -671,13 +997,17 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                             }
                         };
 
-                    // set the renderer for the current breadcrumb
-                    final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
-                    if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
-                        ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                    if (!isNoDescriptionRenderer) {
+                        // set the renderer for the current breadcrumb
+                        final BreadCrumb lastCrumb = breadCrumbModel.getLastCrumb();
+                        if (lastCrumb instanceof CidsMetaObjectBreadCrumb) {
+                            ((CidsMetaObjectBreadCrumb)lastCrumb).setRenderer(jComp);
+                        }
+
+                        final CidsBean bean = o.getBean();
+                        bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     }
 
-                    bean.addPropertyChangeListener(WeakListeners.propertyChange(localListener, bean));
                     final SelfDisposingPanel sdp = encapsulateInSelfDisposingPanel(jComp);
                     sdp.setStrongListenerReference(localListener);
                     return sdp;
@@ -763,27 +1093,18 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         final String descriptionURL = n.getDescription();
         // besorge MO zum parametrisieren der URL
         if (n.isObjectNode()) {
-            final MetaObject o = ((ObjectTreeNode)n).getMetaObject();
-            breadCrumbModel.startWithNewCrumb(new CidsMetaObjectBreadCrumb(o) {
-
-                    @Override
-                    public void crumbActionPerformed(final ActionEvent e) {
-                        startSingleRendererWorker(o, n.toString());
-                    }
-                });
-            startSingleRendererWorker(n);
-        } else {
-            if (n.isPureNode()) {
-                showHTML();
+//            final MetaObject o = ().getMetaObject();
+            gotoObjectTreeNode((ObjectTreeNode)n, n.toString());
+        } else if (n.isPureNode() && (n.getDescription() != null)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
             }
-            showsWaitScreen = false;
+            setPageFromURI(descriptionURL);
+            showHTML();
+        } else {
+            startNoDescriptionRenderer();
         }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("loading description from url '" + descriptionURL + "'"); // NOI18N
-        }
-
-        this.setPageFromURI(descriptionURL);
+        showsWaitScreen = false;
     }
 
     /**

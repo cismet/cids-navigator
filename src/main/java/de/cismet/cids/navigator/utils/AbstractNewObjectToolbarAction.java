@@ -41,7 +41,7 @@ import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.tools.gui.Static2DTools;
+import de.cismet.tools.Static2DTools;
 
 /**
  * DOCUMENT ME!

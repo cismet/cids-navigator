@@ -10,7 +10,6 @@ package Sirius.navigator.connection;
 import Sirius.navigator.exception.ConnectionException;
 
 import Sirius.server.localserver.method.MethodMap;
-import Sirius.server.middleware.interfaces.proxy.MetaService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.Link;
@@ -20,10 +19,6 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.CidsServerSearch;
-import Sirius.server.search.Query;
-import Sirius.server.search.SearchOption;
-import Sirius.server.search.SearchResult;
 import Sirius.server.search.store.Info;
 import Sirius.server.search.store.QueryData;
 
@@ -34,6 +29,10 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
+
+import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.netutil.Proxy;
 
@@ -104,21 +103,27 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
+    @Deprecated
     ImageHashMap getDefaultIcons() throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
-     * @param   name  DOCUMENT ME!
+     * @param       name  DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
+    @Deprecated
     Icon getDefaultIcon(String name) throws ConnectionException;
     /**
      * User --------------------------------------------------------------------
@@ -274,12 +279,15 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param   user  DOCUMENT ME!
+     * @param       user  DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getClassTreeNodes(User user) throws ConnectionException;
     /**
      * Classes & Objects -------------------------------------------------------
@@ -309,31 +317,6 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param   usr    DOCUMENT ME!
-     * @param   query  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    MetaObject[] getMetaObject(User usr, Query query) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   usr     DOCUMENT ME!
-     * @param   query   DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    MetaObject[] getMetaObject(User usr, Query query, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param   user      DOCUMENT ME!
      * @param   objectID  DOCUMENT ME!
      * @param   classID   DOCUMENT ME!
@@ -348,26 +331,32 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param   user   DOCUMENT ME!
-     * @param   query  DOCUMENT ME!
+     * @param       user   DOCUMENT ME!
+     * @param       query  DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @Deprecated  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getMetaObjectByQuery(User user, String query) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
-     * @param   user    DOCUMENT ME!
-     * @param   query   DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
+     * @param       user    DOCUMENT ME!
+     * @param       query   DOCUMENT ME!
+     * @param       domain  DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @Deprecated  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getMetaObjectByQuery(User user, String query, String domain) throws ConnectionException;
 
     /**
@@ -382,19 +371,6 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject insertMetaObject(User user, MetaObject MetaObject, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user    DOCUMENT ME!
-     * @param   query   DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    int insertMetaObject(User user, Query query, String domain) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -434,200 +410,7 @@ public interface Connection {
      */
     MetaObject getInstance(User user, MetaClass c) throws ConnectionException;
     /**
-     * Dynmaic Search ----------------------------------------------------------
-     *
-     * @param   user  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    HashMap getSearchOptions(User user) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user    DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    HashMap getSearchOptions(User user, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user           DOCUMENT ME!
-     * @param   classIds       DOCUMENT ME!
-     * @param   searchOptions  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    SearchResult search(User user, String[] classIds, SearchOption[] searchOptions) throws ConnectionException;
-
-    /**
-     * add single query root and leaf returns a query_id.
-     *
-     * @param   user         DOCUMENT ME!
-     * @param   name         DOCUMENT ME!
-     * @param   description  DOCUMENT ME!
-     * @param   statement    DOCUMENT ME!
-     * @param   resultType   DOCUMENT ME!
-     * @param   isUpdate     DOCUMENT ME!
-     * @param   isRoot       DOCUMENT ME!
-     * @param   isUnion      DOCUMENT ME!
-     * @param   isBatch      DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    int addQuery(User user,
-            String name,
-            String description,
-            String statement,
-            int resultType,
-            char isUpdate,
-            char isRoot,
-            char isUnion,
-            char isBatch) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user         DOCUMENT ME!
-     * @param   name         DOCUMENT ME!
-     * @param   description  DOCUMENT ME!
-     * @param   statement    DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    int addQuery(User user, String name, String description, String statement) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user           DOCUMENT ME!
-     * @param   queryId        DOCUMENT ME!
-     * @param   typeId         DOCUMENT ME!
-     * @param   paramkey       DOCUMENT ME!
-     * @param   description    DOCUMENT ME!
-     * @param   isQueryResult  DOCUMENT ME!
-     * @param   queryPosition  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    boolean addQueryParameter(User user,
-            int queryId,
-            int typeId,
-            String paramkey,
-            String description,
-            char isQueryResult,
-            int queryPosition) throws ConnectionException;
-
-    /**
-     * position set in order of the addition.
-     *
-     * @param   user         DOCUMENT ME!
-     * @param   queryId      DOCUMENT ME!
-     * @param   paramkey     DOCUMENT ME!
-     * @param   description  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    boolean addQueryParameter(User user, int queryId, String paramkey, String description) throws ConnectionException;
-    /**
-     * QueryData ---------------------------------------------------------------
-     *
-     * @param   queryDataId  DOCUMENT ME!
-     * @param   domain       DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    boolean deleteQueryData(int queryDataId, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user  DOCUMENT ME!
-     * @param   data  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    boolean storeQueryData(User user, QueryData data) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   id      DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    QueryData getQueryData(int id, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   userGroup  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    Info[] getUserGroupQueryInfos(UserGroup userGroup) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    Info[] getUserQueryInfos(User user) throws ConnectionException;
-    /**
-     * Methods -----------------------------------------------------------------
-     *
-     * @param   user  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    MethodMap getMethods(User user) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   user    DOCUMENT ME!
-     * @param   domain  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    MethodMap getMethods(User user, String domain) throws ConnectionException;
-
-    /**
-     * DOCUMENT ME!
+     * /** DOCUMENT ME!
      *
      * @param   classId                DOCUMENT ME!
      * @param   user                   DOCUMENT ME!
@@ -663,16 +446,19 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param   classId                DOCUMENT ME!
-     * @param   user                   DOCUMENT ME!
-     * @param   query                  DOCUMENT ME!
-     * @param   representationFields   DOCUMENT ME!
-     * @param   representationPattern  DOCUMENT ME!
+     * @param       classId                DOCUMENT ME!
+     * @param       user                   DOCUMENT ME!
+     * @param       query                  DOCUMENT ME!
+     * @param       representationFields   DOCUMENT ME!
+     * @param       representationPattern  DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @Deprecated  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getLightweightMetaObjectsByQuery(int classId,
             User user,
             String query,
@@ -682,16 +468,19 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param   classId               DOCUMENT ME!
-     * @param   user                  DOCUMENT ME!
-     * @param   query                 DOCUMENT ME!
-     * @param   representationFields  DOCUMENT ME!
-     * @param   formater              DOCUMENT ME!
+     * @param       classId               DOCUMENT ME!
+     * @param       user                  DOCUMENT ME!
+     * @param       query                 DOCUMENT ME!
+     * @param       representationFields  DOCUMENT ME!
+     * @param       formater              DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return      DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @deprecated  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getLightweightMetaObjectsByQuery(int classId,
             User user,
             String query,
@@ -709,9 +498,23 @@ public interface Connection {
     boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
 
     /**
-     * @see  Sirius.server.middleware.interfaces.proxy.MetaService#getHistory(int, int, java.lang.String,
-     *       Sirius.server.newuser.User, int)
+     * DOCUMENT ME!
+     *
+     * @param       classId   DOCUMENT ME!
+     * @param       objectId  DOCUMENT ME!
+     * @param       domain    DOCUMENT ME!
+     * @param       user      DOCUMENT ME!
+     * @param       elements  DOCUMENT ME!
+     *
+     * @return      DOCUMENT ME!
+     *
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @see         Sirius.server.middleware.interfaces.proxy.MetaService#getHistory(int, int, java.lang.String,
+     *              Sirius.server.newuser.User, int)
+     * @deprecated  DOCUMENT ME!
      */
+    @Deprecated
     HistoryObject[] getHistory(final int classId,
             final int objectId,
             final String domain,
@@ -729,4 +532,27 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user        DOCUMENT ME!
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   body        json DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(User user, String taskname, String taskdomain, Object body, ServerActionParameter... params)
+            throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    CallServerService getCallServerService();
 }

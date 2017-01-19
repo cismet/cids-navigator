@@ -27,10 +27,15 @@ import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.Exceptions;
+
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractButton;
+import javax.swing.SwingWorker;
 import javax.swing.event.*;
 
 /**
@@ -42,6 +47,8 @@ import javax.swing.event.*;
 public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar {
 
     //~ Instance fields --------------------------------------------------------
+
+    protected SwingWorker worker = null;
 
     private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
@@ -97,13 +104,68 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
      * @param  treeNode  DOCUMENT ME!
      */
     public void setTreeNode(final Object treeNode) {
+        if (logger.isDebugEnabled()) {
+            logger.debug("setTreeNode: " + treeNode.hashCode());
+        }
+        editButton.setEnabled(false);
+        if ((worker != null) && !worker.isDone() && !worker.isCancelled()) {
+            logger.warn("cancelling running getMetaObject worker thread of tree node " + treeNode.hashCode());
+            worker.cancel(false);
+            worker = null;
+        }
+
         this.treeNode = treeNode;
         this.attributeTable.clear();
         this.attributeTree.setTreeNode(treeNode);
 
-        if ((treeNode != null) && (treeNode instanceof ObjectTreeNode) && PropertyManager.getManager().isEditable()) {
-            final MetaObject mo = ((ObjectTreeNode)treeNode).getMetaObject();
-            this.editButton.setEnabled(mo.getBean().hasObjectWritePermission(SessionManager.getSession().getUser()));
+        if ((treeNode != null) && PropertyManager.getManager().isEditable()
+                    && (treeNode instanceof ObjectTreeNode)) {
+            final ObjectTreeNode objectTreeNode = (ObjectTreeNode)treeNode;
+            if (objectTreeNode.isMetaObjectFilled()) {
+                this.editButton.setEnabled(
+                    objectTreeNode.getMetaObject().getBean().hasObjectWritePermission(
+                        SessionManager.getSession().getUser()));
+            } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("starting getMetaObject worker thread for tree node " + treeNode.hashCode());
+                }
+                worker = new SwingWorker<MetaObject, Void>() {
+
+                        @Override
+                        protected MetaObject doInBackground() throws Exception {
+                            return objectTreeNode.getMetaObject();
+                        }
+
+                        @Override
+                        protected void done() {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("MetaObject loaded from server for tree node " + treeNode.hashCode());
+                            }
+                            try {
+                                final MetaObject metaObject = this.get();
+
+                                if (!isCancelled()) {
+                                    editButton.setEnabled(metaObject.getBean().hasObjectWritePermission(
+                                            SessionManager.getSession().getUser()));
+                                } else {
+                                    logger.warn("getMetaObject worker cancelled for tree node " + treeNode.hashCode());
+                                }
+                            } catch (InterruptedException ex) {
+                                logger.warn(ex.getMessage(), ex);
+                            } catch (ExecutionException ex) {
+                                logger.error(ex.getMessage(), ex);
+                                editButton.setEnabled(false);
+                            } catch (CancellationException cex) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.warn("getMetaObject worker thread forcibly cancelled for tree node:"
+                                                + treeNode.hashCode() + ": " + cex.getMessage(),
+                                        cex);
+                                }
+                            }
+                        }
+                    };
+                worker.execute();
+            }
         } else {
             this.editButton.setEnabled(false);
         }

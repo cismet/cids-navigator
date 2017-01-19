@@ -15,6 +15,8 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -37,6 +39,9 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     private static final HashMap<String, ImageIcon> iconCache = new HashMap<String, ImageIcon>();
 
     //~ Instance fields --------------------------------------------------------
+
+    protected Geometry cashedGeometry;
+    protected String lightweightJson;
 
     /**
      * DOCUMENT ME!
@@ -68,10 +73,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     /**
      * Creates a new ObjectTreeNode object.
      *
-     * @param  MetaObjectNode  DOCUMENT ME!
+     * @param  metaObjectNode  DOCUMENT ME!
      */
-    public ObjectTreeNode(final MetaObjectNode MetaObjectNode) {
-        super(MetaObjectNode);
+    public ObjectTreeNode(final MetaObjectNode metaObjectNode) {
+        super(metaObjectNode);
 
         try {
             final MetaClass myMetaClass = this.getMetaClass();
@@ -87,6 +92,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                 iconCache.put(classKey, nodeIcon);
             }
         } catch (Exception exp) {
+            LOG.warn("could not load object icon: " + exp.getMessage(), exp);
             this.nodeIcon = resource.getIcon("ObjectNodeIcon.gif");         // NOI18N
         }
     }
@@ -159,7 +165,13 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
             } else {
                 // Implicitly stores toString in getNode().setName(...) for future use.
                 // See implementation of getMetaObject().
-                toString = getMetaObject().toString();
+                final MetaObject m = getMetaObject();
+
+                if (m != null) {
+                    toString = m.toString();
+                } else {
+                    toString = "null";
+                }
             }
         }
         return toString;
@@ -239,7 +251,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
         }
 
         if (mo == null) {
-            synchronized (metaObjectFilled) {
+            synchronized (this) {
                 mo = mon.getObject();
                 if (mo == null) {
                     try {
@@ -257,7 +269,13 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                         }
                         mo = metaObject;
                     } catch (final Throwable t) {
-                        LOG.error("could not retrieve meta object of node '" + userObject + "'", t);
+                        String nodeName = String.valueOf(userObject);
+
+                        if (mon != null) {
+                            nodeName += " (class: " + mon.getClassId() + ", object: " + mon.getObjectId() + ")";
+                        }
+
+                        LOG.error("could not retrieve meta object of node '" + nodeName + "'", t);
                     }
                 }
             }
@@ -304,5 +322,32 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     @Override
     public int getClassID() {
         return this.getMetaObjectNode().getClassId();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Boolean isMetaObjectFilled() {
+        return metaObjectFilled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Geometry getCashedGeometry() {
+        return cashedGeometry;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getLightweightJson() {
+        return lightweightJson;
     }
 }

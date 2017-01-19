@@ -292,7 +292,6 @@ public class NavigatorSplashScreen extends JFrame {
 
             if (observer.isInterrupted() || observer.isFinished()) {
                 timer.stop();
-                timer = null;
                 dispose();
             }
         }
@@ -320,7 +319,7 @@ public class NavigatorSplashScreen extends JFrame {
 
         @Override
         protected void doInvoke() {
-            final Thread t = new Thread() {
+            final Thread t = new Thread("NavigatorSplashScreen doInvoke()") {
 
                     @Override
                     public void run() {
@@ -393,11 +392,20 @@ public class NavigatorSplashScreen extends JFrame {
 
             repaint();
 
-            if (progressObserver.isFinished()) {
-                timer.stop();
-                timer = null;
-                repaint();
-            }
+            // the following rows should not be executed in the edt, because they can cause a deadlock, if they are
+            // executed in the edt at the same time, the property change method of the outer class is executed (invoked
+            // by the setProgress() method of the ProgressObserver) and the progressObserver object is finished. Reason:
+            // a worker thread has the monitor of the progressObserver and is waiting for the edt (invokeAndWait()) and
+            // the edt is waiting for the monitor of the progressObserver (isFinished())
+            new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        if (progressObserver.isFinished()) {
+                            timer.stop();
+                        }
+                    }
+                }).start();
             /*}
              * catch (Throwable t) { t.printStackTrace(); //progressBar.setValue(navigatorLoader.max);
              * statusLabel.setText(navigatorLoader.errorMessage); restartButton.setEnabled(true);

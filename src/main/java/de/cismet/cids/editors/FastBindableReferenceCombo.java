@@ -14,6 +14,7 @@ package de.cismet.cids.editors;
 import Sirius.navigator.connection.SessionManager;
 
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
+import Sirius.server.middleware.types.LightweightMetaObject;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
@@ -26,6 +27,7 @@ import java.awt.Component;
 import java.io.Serializable;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.Vector;
 
@@ -40,6 +42,9 @@ import javax.swing.ListCellRenderer;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
+import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
+import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch;
 
 /**
  * DOCUMENT ME!
@@ -60,14 +65,15 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
             }
         };
 
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             FastBindableReferenceCombo.class);
 
     //~ Instance fields --------------------------------------------------------
 
     private final AbstractAttributeRepresentationFormater representationFormater;
     private final String representation;
-    private final String query;
+    @Deprecated private final String query;
+    private final LightweightMetaObjectsSearch lwmoSearch;
     private boolean nullable = true;
     private boolean sorted = false;
     private String[] representationFields;
@@ -91,7 +97,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
      * @param  representationFields  DOCUMENT ME!
      */
     public FastBindableReferenceCombo(final String representation, final String[] representationFields) {
-        this("", representation, representationFields); // NOI18N
+        this((LightweightMetaObjectsSearch)null, representation, representationFields); // NOI18N
     }
 
     /**
@@ -101,6 +107,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
      * @param  representation        DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
      */
+    @Deprecated
     public FastBindableReferenceCombo(final String query,
             final String representation,
             final String[] representationFields) {
@@ -110,14 +117,41 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     /**
      * Creates a new FastBindableReferenceCombo object.
      *
+     * @param  lwmoSearch            DOCUMENT ME!
+     * @param  representation        DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     */
+    public FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
+            final String representation,
+            final String[] representationFields) {
+        this(lwmoSearch, representation, null, representationFields);
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
      * @param  query                 DOCUMENT ME!
      * @param  formater              DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
      */
+    @Deprecated
     public FastBindableReferenceCombo(final String query,
             final AbstractAttributeRepresentationFormater formater,
             final String[] representationFields) {
         this(query, null, formater, representationFields);
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  lwmoSearch            DOCUMENT ME!
+     * @param  formater              DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     */
+    public FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
+            final AbstractAttributeRepresentationFormater formater,
+            final String[] representationFields) {
+        this(lwmoSearch, null, formater, representationFields);
     }
 
     /**
@@ -128,11 +162,46 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
      * @param  formater              DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
      */
+    @Deprecated
     private FastBindableReferenceCombo(final String query,
             final String representation,
             final AbstractAttributeRepresentationFormater formater,
             final String[] representationFields) {
+        this(null, query, representation, formater, representationFields);
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  lwmoSearch            DOCUMENT ME!
+     * @param  representation        DOCUMENT ME!
+     * @param  formater              DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     */
+    private FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
+            final String representation,
+            final AbstractAttributeRepresentationFormater formater,
+            final String[] representationFields) {
+        this(lwmoSearch, null, representation, formater, representationFields);
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  lwmoSearch            DOCUMENT ME!
+     * @param  query                 DOCUMENT ME!
+     * @param  representation        DOCUMENT ME!
+     * @param  formater              DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     */
+    @Deprecated
+    private FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
+            final String query,
+            final String representation,
+            final AbstractAttributeRepresentationFormater formater,
+            final String[] representationFields) {
         final String[] s = new String[] { null };
+        this.lwmoSearch = lwmoSearch;
         this.query = query;
         this.metaClass = null;
         this.representation = representation;
@@ -173,7 +242,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
             setModel(mod);
             setSelectedItem(cidsBean);
         } catch (Exception ex) {
-            log.error(ex, ex);
+            LOG.error(ex, ex);
         }
     }
 
@@ -249,7 +318,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
                     cidsBean = ((MetaObject)anObject).getBean();
                 } catch (Exception ex) {
                     cidsBean = null;
-                    log.error(ex, ex);
+                    LOG.error(ex, ex);
                 }
             }
         } else {
@@ -337,26 +406,35 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     public final MetaObject[] receiveLightweightMetaObjects() throws Exception {
         final MetaClass mc = metaClass;
         if (mc == null) {
-            log.error("MetaClass is null!", new Exception()); // NOI18N
+            LOG.error("MetaClass is null!", new Exception()); // NOI18N
             return new MetaObject[0];
         }
         MetaObject[] lwmos;
+
+        final LightweightMetaObjectsSearch search;
+
         if ((query != null) && (query.trim().length() > 1)) {
-            if (representationFormater != null) {
-                lwmos = SessionManager.getProxy()
-                            .getLightweightMetaObjectsByQuery(mc.getID(),
-                                    SessionManager.getSession().getUser(),
-                                    query,
-                                    getRepresentationFields(),
-                                    representationFormater);
-            } else {
-                lwmos = SessionManager.getProxy()
-                            .getLightweightMetaObjectsByQuery(mc.getID(),
-                                    SessionManager.getSession().getUser(),
-                                    query,
-                                    getRepresentationFields(),
-                                    getRepresentation());
+            search = new LightweightMetaObjectsByQuerySearch();
+            ((LightweightMetaObjectsByQuerySearch)search).setDomain(mc.getDomain());
+            ((LightweightMetaObjectsByQuerySearch)search).setClassId(mc.getID());
+            ((LightweightMetaObjectsByQuerySearch)search).setQuery(query);
+        } else {
+            search = this.lwmoSearch;
+        }
+
+        if (search != null) {
+            search.setRepresentationFields(getRepresentationFields());
+            if (representationFormater == null) {
+                search.setRepresentationPattern(getRepresentation());
             }
+            final Collection<LightweightMetaObject> results = SessionManager.getProxy()
+                        .customServerSearch(SessionManager.getSession().getUser(), search);
+            if (representationFormater != null) {
+                for (final LightweightMetaObject result : results) {
+                    result.setFormater(representationFormater);
+                }
+            }
+            lwmos = results.toArray(new MetaObject[0]);
         } else {
             if (representationFormater != null) {
                 lwmos = SessionManager.getProxy()
@@ -422,6 +500,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
      *
      * @return  the query
      */
+    @Deprecated
     public String getQuery() {
         return query;
     }
@@ -483,7 +562,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
         if ((tabname != null) && (tabname.length() > 0)) {
             this.metaClass = ClassCacheMultiple.getMetaClass(domain, tabname);
             if (metaClass == null) {
-                log.error("Could not find MetaClass for Table " + tabname + " in domain " + domain); // NOI18N
+                LOG.error("Could not find MetaClass for Table " + tabname + " in domain " + domain); // NOI18N
             }
             init();
         }

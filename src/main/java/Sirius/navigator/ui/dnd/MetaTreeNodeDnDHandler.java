@@ -14,11 +14,12 @@ package Sirius.navigator.ui.dnd;
 
 import Sirius.navigator.connection.*;
 import Sirius.navigator.method.*;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.tree.*;
 
+import Sirius.server.newuser.User;
+import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
@@ -31,9 +32,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.*;
 import java.awt.image.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
 /**
@@ -66,7 +71,10 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     private Vector<MutableTreeNode> draggedNodes = new Vector<MutableTreeNode>();
 //    private TreePath[] cachedTreePaths; //DND Fehlverhalten Workaround
 
-    private TreePath[] cachedTreePaths; // DND Fehlverhalten Workaround
+    private TreePath[] cachedTreePaths;     // DND Fehlverhalten Workaround
+    private TreePath[] lastCachedTreePaths; // DND Fehlverhalten Workaround
+    private boolean autoSelection = false;
+    private boolean valueChanged = false;
     private int insertAreaHeight = 8;
     private Rectangle lastRowBounds;
     private Object lastNode = null;
@@ -90,24 +98,45 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
 
         this.metaTree = metaTree;
         this.dragSource = DragSource.getDefaultDragSource();
-        metaTree.addMouseListener(new MouseAdapter() {                                  // DND Fehlverhalten Workaround
+        metaTree.addMouseListener(new MouseAdapter() {
+
                 @Override
-                public void mouseReleased(final MouseEvent e) {                         // DND Fehlverhalten Workaround
-                    cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths(); // DND Fehlverhalten Workaround
+                public void mousePressed(final MouseEvent e) {
+                    if (!valueChanged) {
+                        lastCachedTreePaths = cachedTreePaths;
+                    }
+                    valueChanged = false;
+                }
+            });
+        metaTree.getSelectionModel().addTreeSelectionListener(new TreeSelectionListener() {
+
+                // DND Fehlverhalten Workaround
+                @Override
+                public void valueChanged(final TreeSelectionEvent e) {
+                    if (autoSelection) {
+                        return;
+                    }
+                    final java.util.List<TreePath> path = new ArrayList<TreePath>();
+                    ;
+                    valueChanged = true;
+
+                    if (cachedTreePaths != null) {
+                        path.addAll(Arrays.asList(cachedTreePaths));
+                    }
+
+                    for (final TreePath tmpPath : e.getPaths()) {
+                        if (e.isAddedPath(tmpPath)) {
+                            path.add(tmpPath);
+                        } else {
+                            path.remove(tmpPath);
+                        }
+                    }
+                    lastCachedTreePaths = cachedTreePaths;
+                    cachedTreePaths = path.toArray(new TreePath[path.size()]);
                 }
             });
 
-//        metaTree.addMouseListener(new MouseAdapter() {                                       //DND Fehlverhalten Workaround
-//                public void mouseReleased(MouseEvent e) {                           //DND Fehlverhalten Workaround
-//                    cachedTreePaths= metaTree.getSelectionPaths();       //DND Fehlverhalten Workaround
-//                }
-//            });
         final int sourceActions = DnDConstants.ACTION_COPY_OR_MOVE;
-//        if(this.metaTree instanceof SearchResultsTree) {
-//            sourceActions = DnDConstants.ACTION_COPY;// & InputEvent.BUTTON3_MASK;
-//        } else {
-//            sourceActions = DnDConstants.ACTION_COPY_OR_MOVE + DnDConstants.ACTION_LINK;// & InputEvent.BUTTON3_MASK;
-//        }
 
         _colorCueLine = new Color(SystemColor.controlShadow.getRed(),
                 SystemColor.controlShadow.getGreen(),
@@ -118,26 +147,12 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                 this.metaTree,
                 sourceActions,
                 this);
-//        if(!(this.metaTree instanceof SearchResultsTree)) {
-//            DropTarget dropTarget = new DropTarget(this.metaTree, this);
-//        }
     }
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void dragGestureRecognized(final DragGestureEvent dge) {
-//        metaTree.setSelectionPaths(cachedTreePaths); //DND Fehlverhalten Workaround
-//        TreePath selPath = metaTree.getPathForLocation((int)dge.getDragOrigin().getX(),(int)dge.getDragOrigin().getY());//DND Fehlverhalten Workaround
-//
-//        if ((dge.getTriggerEvent().getModifiers()& (dge.getTriggerEvent().CTRL_MASK | dge.getTriggerEvent().SHIFT_MASK) ) !=0) {//DND Fehlverhalten Workaround
-//            metaTree.setSelectionPaths(cachedTreePaths); //DND Fehlverhalten Workaround /
-//            metaTree.addSelectionPath(selPath);          //DND Fehlverhalten Workaround
-//            cachedTreePaths= metaTree.getSelectionPaths();//DND Fehlverhalten Workaround
-//        } else {
-//            metaTree.setSelectionPath(selPath);//DND Fehlverhalten Workaround
-//        }
-
         if (logger.isDebugEnabled()) {
             logger.debug("dragGestureRecognized()"); // NOI18N
         }
@@ -146,14 +161,22 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         final TreePath selPath = metaTree.getPathForLocation((int)dge.getDragOrigin().getX(),
                 (int)dge.getDragOrigin().getY());                        // DND Fehlverhalten Workaround
 
+        autoSelection = true;
         if ((dge.getTriggerEvent().getModifiers()
-                        & (dge.getTriggerEvent().CTRL_MASK | dge.getTriggerEvent().SHIFT_MASK)) != 0) { // DND Fehlverhalten Workaround
-            metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths);                            // DND Fehlverhalten Workaround /
-            metaTree.getSelectionModel().addSelectionPath(selPath);                                     // DND Fehlverhalten Workaround
-            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();                         // DND Fehlverhalten Workaround
+                        & (dge.getTriggerEvent().CTRL_MASK)) != 0) {                 // DND Fehlverhalten Workaround
+            metaTree.getSelectionModel().setSelectionPaths(cachedTreePaths);         // DND Fehlverhalten Workaround /
+            metaTree.getSelectionModel().addSelectionPath(selPath);                  // DND Fehlverhalten Workaround
+            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();      // DND Fehlverhalten Workaround
+        } else if ((dge.getTriggerEvent().getModifiers() & dge.getTriggerEvent().SHIFT_MASK) != 0) {
+            metaTree.getSelectionModel().addSelectionPaths(cachedTreePaths);         // DND Fehlverhalten Workaround
+            cachedTreePaths = metaTree.getSelectionModel().getSelectionPaths();      // DND Fehlverhalten Workaround
         } else {
-            metaTree.getSelectionModel().setSelectionPath(selPath);                                     // DND Fehlverhalten Workaround
+            if (contains(lastCachedTreePaths, selPath)) {
+                metaTree.getSelectionModel().setSelectionPaths(lastCachedTreePaths); // DND Fehlverhalten Workaround
+                cachedTreePaths = lastCachedTreePaths;
+            }
         }
+        autoSelection = false;
 
         if (this.metaTree.getSelectedNode() != null) {
             // draggedNode=metaTree.getSelectedNode();
@@ -180,6 +203,50 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   list  DOCUMENT ME!
+     * @param   path  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean contains(final TreePath[] list, final TreePath path) {
+        if (list == null) {
+            return false;
+        }
+        for (final TreePath tmpPath : list) {
+            if (tmpPath.equals(path)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node       DOCUMENT ME!
+     * @param   userGroup  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isNodeEditable(final DefaultMetaTreeNode node, final UserGroup userGroup) {
+        final String key = userGroup.getKey().toString();
+
+        // Permission p = SessionManager.getSession().getWritePermission();
+
+        try {
+            return node.isEditable(key, PermissionHolder.WRITEPERMISSION);
+        } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(" Node not editable");
+            }
+        } // NOI18N
+        return false;
+    }
+
     @Override
     public void drop(final DropTargetDropEvent dtde) {
         if (logger.isDebugEnabled()) {
@@ -187,27 +254,28 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         }
         metaTree.repaint();
 
+        final User user = SessionManager.getSession().getUser();
+        final UserGroup userGroup = user.getUserGroup();
+
         boolean nodeEditable = false;
-
-        final String key = SessionManager.getSession().getUser().getUserGroup().getKey().toString();
-
-        // Permission p = SessionManager.getSession().getWritePermission();
-
-        try {
-            nodeEditable = this.metaTree.getSelectedNode().isEditable(key, PermissionHolder.WRITEPERMISSION);
-        } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(" Node not editable");
+        if (userGroup != null) {
+            nodeEditable = isNodeEditable(metaTree.getSelectedNode(), userGroup);
+        } else {
+            for (final UserGroup potentialUserGroup : user.getPotentialUserGroups()) {
+                if (isNodeEditable(metaTree.getSelectedNode(), potentialUserGroup)) {
+                    nodeEditable = true;
+                    break;
+                }
             }
-        } // NOI18N
+        }
 
-        if (this.metaTree.isEditable() && nodeEditable) {
+        if (metaTree.isEditable() && nodeEditable) {
             final Transferable transferable = dtde.getTransferable();
 
             try {
                 if (transferable.isDataFlavorSupported(MetaTreeNodeTransferable.dataFlavors[0])) {
                     final Point location = dtde.getLocation();
-                    final TreePath destinationPath = this.metaTree.getClosestPathForLocation(location.x, location.y);
+                    final TreePath destinationPath = metaTree.getClosestPathForLocation(location.x, location.y);
                     final DefaultMetaTreeNode sourceNode = (DefaultMetaTreeNode)transferable.getTransferData(
                             MetaTreeNodeTransferable.dataFlavors[0]);
                     final TreePath sourcePath = new TreePath(sourceNode.getPath());
@@ -225,7 +293,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                                 destinationNode.getNode(),
                                                 PermissionHolder.WRITEPERMISSION)) {
                                     dtde.dropComplete(MethodManager.getManager().copyNode(
-                                            this.metaTree,
+                                            metaTree,
                                             destinationNode,
                                             sourceNode));
                                 }
@@ -240,7 +308,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                                     sourceNode.getNode(),
                                                     PermissionHolder.WRITEPERMISSION)) {
                                         dtde.dropComplete(MethodManager.getManager().moveNode(
-                                                this.metaTree,
+                                                metaTree,
                                                 destinationNode,
                                                 sourceNode));
                                     }
@@ -257,7 +325,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                                     sourceNode.getNode(),
                                                     PermissionHolder.WRITEPERMISSION)) {
                                         dtde.dropComplete(MethodManager.getManager().linkNode(
-                                                this.metaTree,
+                                                metaTree,
                                                 destinationNode,
                                                 sourceNode));
                                     }
@@ -268,7 +336,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                             default: {
                                 logger.error("unsupported dnd operation: " + dtde.getDropAction());         // NOI18N
                                 JOptionPane.showMessageDialog(
-                                    this.metaTree,
+                                    metaTree,
                                     org.openide.util.NbBundle.getMessage(
                                         MetaTreeNodeDnDHandler.class,
                                         "MetaTreeNodeDnDHandler.drop().unsupportedOperationError.message"), // NOI18N
@@ -291,7 +359,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                     t);                                                                                     // NOI18N
 
                 JOptionPane.showMessageDialog(
-                    this.metaTree,
+                    metaTree,
                     org.openide.util.NbBundle.getMessage(
                         MetaTreeNodeDnDHandler.class,
                         "MetaTreeNodeDnDHandler.drop().unsupportedObjectError.message"), // NOI18N
@@ -304,7 +372,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
         } else {
             logger.error("catalog is not editable");                                   // NOI18N
             JOptionPane.showMessageDialog(
-                this.metaTree,
+                metaTree,
                 org.openide.util.NbBundle.getMessage(
                     MetaTreeNodeDnDHandler.class,
                     "MetaTreeNodeDnDHandler.drop().notEditableError.message"),         // NOI18N

@@ -41,7 +41,6 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(PasswordOptionsDialog.class);
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
     private javax.swing.Box.Filler filler1;
@@ -66,11 +65,16 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
                 PasswordOptionsDialog.class,
                 "PasswordOptionsDialog.title"), // NOI18N,
             SecurityOptionsCategory.class);
+        try {
+            initComponents();
 
-        initComponents();
-
-        this.txtUser.setText(SessionManager.getSession().getUser().getName());
-        this.clearPwdFields();
+            this.txtUser.setText(SessionManager.getSession().getUser().getName());
+            this.clearPwdFields();
+        } catch (Exception e) {
+            LOG.error("Erro during Creation of Password Dialog", e);
+            btnChangePassword.setEnabled(false);
+            ;
+        }
     }
 
     //~ Methods ----------------------------------------------------------------

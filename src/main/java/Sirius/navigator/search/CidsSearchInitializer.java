@@ -34,6 +34,7 @@ import javax.swing.JSeparator;
 import de.cismet.cids.tools.search.clientstuff.CidsDialogSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
+import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
 
 import de.cismet.tools.StaticDebuggingTools;
 
@@ -126,6 +127,23 @@ public class CidsSearchInitializer {
                         MutableConstraints.P1,
                         MutableConstraints.ANY_INDEX);
                     guiContainer.add(mutableConstraints);
+
+                    if (windowSearch instanceof CidsWindowSearchWithMenuEntry) {
+                        final JMenu menu = menuBar.getSearchMenu();
+                        menu.add(new JSeparator());
+                        final JMenuItem item = new JMenuItem(windowSearch.getName());
+                        menu.add(item);
+                        item.setIcon(windowSearch.getIcon());
+                        item.addActionListener(new ActionListener() {
+
+                                @Override
+                                public void actionPerformed(final ActionEvent e) {
+                                    ComponentRegistry.getRegistry()
+                                            .getGUIContainer()
+                                            .select(windowSearch.getClass().getName());
+                                }
+                            });
+                    }
                 } else {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Could not initialize window search '" + windowSearch.getName()

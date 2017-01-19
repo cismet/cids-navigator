@@ -175,6 +175,40 @@ public class ConnectionSession {
     /**
      * DOCUMENT ME!
      *
+     * @param   userDomain  DOCUMENT ME!
+     * @param   username    DOCUMENT ME!
+     * @param   password    DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public void login(final String userDomain,
+            final String username,
+            final String password) throws ConnectionException, UserException {
+        if (loggedin && (user != null)
+                    && connectionInfo.getUserDomain().equals(userDomain)
+                    && connectionInfo.getUsername().equals(username) && connectionInfo.getPassword().equals(password)) {
+            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
+        } else {
+            if (loggedin && (user != null)) {
+                if (logger.isInfoEnabled()) {
+                    logger.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
+                }
+            }
+
+            connectionInfo.setUsername(username);
+            connectionInfo.setPassword(password);
+            connectionInfo.setUsergroup(null);
+            connectionInfo.setUserDomain(userDomain);
+            connectionInfo.setUsergroupDomain(null);
+
+            loggedin = login();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!

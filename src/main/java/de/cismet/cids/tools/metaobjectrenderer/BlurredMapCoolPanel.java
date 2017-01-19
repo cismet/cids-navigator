@@ -387,7 +387,7 @@ public class BlurredMapCoolPanel extends PainterCoolPanel implements ComponentLi
                                     }
                                 });
                         }
-                    });
+                    }, "BlurredMapCoolPanel createBackground()");
             CismetThreadPool.execute(t);
         }
     }

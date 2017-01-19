@@ -38,7 +38,7 @@ import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.retrieval.RetrievalEvent;
 import de.cismet.cismap.commons.retrieval.RetrievalListener;
 
-import de.cismet.tools.gui.Static2DTools;
+import de.cismet.tools.Static2DTools;
 
 /**
  * DOCUMENT ME!

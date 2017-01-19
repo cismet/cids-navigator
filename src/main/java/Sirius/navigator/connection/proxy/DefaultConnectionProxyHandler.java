@@ -16,8 +16,6 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
-import Sirius.server.search.CidsServerSearch;
-import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
 
@@ -34,6 +32,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.CidsServerSearch;
+
 /**
  * Default implementation of the connection proxy interface.
  *
@@ -44,7 +45,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final ProxyInterface proxyHandler;
+    protected ProxyInterface proxyHandler;
     protected ImageHashMap iconCache = null;
     protected ClassAndMethodCache classAndMethodCache = null;
     protected HashMap objectCache = new HashMap();
@@ -144,17 +145,10 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             methodHash = new HashMap(25, 0.5f);
             lsNames = new ArrayList((localServerNames.length + 1));
             // metaServiceRef = metaService;
-            try {
-                final MethodMap methodMap = connection.getMethods(user);
-                if (methodMap != null) {
-                    this.putMethods(methodMap);
-                }
-            } catch (final Exception e) {
-                log.fatal("Ausnahme im ClassAndMethodCache beim Aufruf von remoteNodeRef.getMethods(...): ", e); // NOI18N
-            }
+
             for (int i = 0; i < localServerNames.length; i++) {
                 try {
-                    final MetaClass[] tmpClasses = connection.getClasses(user, localServerNames[i]);             // .getClasses(user, localServerNames[i]);
+                    final MetaClass[] tmpClasses = connection.getClasses(user, localServerNames[i]); // .getClasses(user, localServerNames[i]);
 
                     if (tmpClasses != null) {
                         putClasses(tmpClasses, localServerNames[i]);
@@ -197,7 +191,6 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             if (!lsNames.contains(localServerName)) {
                 final MetaClass[] tmpClasses = connection.getClasses(user, localServerName);
                 this.putClasses(tmpClasses, localServerName);
-                this.putMethods(connection.getMethods(user, localServerName));
                 if (log.isDebugEnabled()) {
                     log.debug("<CC> Classes von neuem LocalServer " + localServerName + " gecacht");
                 }
@@ -208,7 +201,6 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             if (!classHash.containsKey(key)) {
                 final MetaClass tmpClass = connection.getMetaClass(user, classID, localServerName);
                 this.putClass(tmpClass, localServerName);
-                this.putMethods(connection.getMethods(user, localServerName));
                 return tmpClass;
             } else {
                 return (MetaClass)classHash.get(key);
@@ -320,7 +312,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
      *
      * @version  $Revision$, $Date$
      */
-    class DefaultConnectionProxy implements ProxyInterface {
+    protected class DefaultConnectionProxy implements ProxyInterface {
 
         //~ Methods ------------------------------------------------------------
 
@@ -350,7 +342,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         public Node[] getChildren(final Node node) throws ConnectionException {
             final Node[] c = connection.getChildren(node, session.getUser());
 
-            if (node.isDynamic() && node.isSqlSort()) {
+            if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
                 return c;
             }
 
@@ -385,89 +377,6 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         @Override
         public Node[] getClassTreeNodes() throws ConnectionException {
             return connection.getClassTreeNodes(session.getUser());
-        }
-
-        @Override
-        public HashMap getSearchOptions() throws ConnectionException {
-            if (log.isDebugEnabled()) {
-                final HashMap searchOptions = connection.getSearchOptions(session.getUser());
-                log.info(searchOptions.size() + " search options loaded"); // NOI18N
-
-                return searchOptions;
-            } else {
-                return connection.getSearchOptions(session.getUser());
-            }
-        }
-
-        @Override
-        public SearchResult search(final Collection classIds, final Collection searchOptions)
-                throws ConnectionException {
-            if (log.isDebugEnabled()) {
-                log.debug(classIds);
-            }
-            for (final Object so : searchOptions) {
-                final SearchOption sopt = (SearchOption)so;
-                if (log.isDebugEnabled()) {
-                    log.debug(sopt);
-                }
-            }
-
-            return connection.search(session.getUser(),
-                    (String[])classIds.toArray(new String[classIds.size()]),
-                    (SearchOption[])searchOptions.toArray(new SearchOption[searchOptions.size()]));
-        }
-
-        @Override
-        public SearchResult search(final Collection searchOptions) throws ConnectionException {
-            return this.search(new LinkedList(), searchOptions);
-        }
-
-        @Override
-        public int addQuery(final String name, final String description, final String statement)
-                throws ConnectionException {
-            return connection.addQuery(session.getUser(), name, description, statement);
-        }
-
-        @Override
-        public int addQuery(final String name,
-                final String description,
-                final String statement,
-                final int resultType,
-                final char isUpdate,
-                final char isRoot,
-                final char isUnion,
-                final char isBatch) throws ConnectionException {
-            return connection.addQuery(session.getUser(),
-                    name,
-                    description,
-                    statement,
-                    resultType,
-                    isUpdate,
-                    isRoot,
-                    isUnion,
-                    isBatch);
-        }
-
-        @Override
-        public boolean addQueryParameter(final int queryId, final String paramkey, final String description)
-                throws ConnectionException {
-            return connection.addQueryParameter(session.getUser(), queryId, paramkey, description);
-        }
-
-        @Override
-        public boolean addQueryParameter(final int queryId,
-                final int typeId,
-                final String paramkey,
-                final String description,
-                final char isQueryResult,
-                final int queryPosition) throws ConnectionException {
-            return connection.addQueryParameter(session.getUser(),
-                    queryId,
-                    typeId,
-                    paramkey,
-                    description,
-                    isQueryResult,
-                    queryPosition);
         }
 
         @Override
@@ -602,19 +511,6 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
-        public MetaObject[] getMetaObject(final Query query) throws ConnectionException {
-            final MetaObject[] obs = connection.getMetaObject(session.getUser(), query);
-
-            for (int i = 0; i < obs.length; i++) {
-                if (obs[i] != null) {
-                    obs[i].setAllClasses(classAndMethodCache.getClassHash());
-                }
-            }
-
-            return obs;
-        }
-
-        @Override
         public MetaObject[] getMetaObjectByQuery(final String query, final int sig) throws ConnectionException {
             if (classAndMethodCache == null) {
                 initClassAndMethodCache();
@@ -648,11 +544,6 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
-        public int insertMetaObject(final Query query, final String domain) throws ConnectionException {
-            return connection.insertMetaObject(session.getUser(), query, domain);
-        }
-
-        @Override
         public int updateMetaObject(final MetaObject MetaObject, final String domain) throws ConnectionException {
             return connection.updateMetaObject(session.getUser(), MetaObject, domain);
         }
@@ -675,6 +566,15 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         @Override
         public Collection customServerSearch(final CidsServerSearch serverSearch) throws ConnectionException {
             return connection.customServerSearch(session.getUser(), serverSearch);
+        }
+
+        @Override
+        public Object executeTask(
+                final String taskname,
+                final String taskdomain,
+                final Object body,
+                final ServerActionParameter... params) throws ConnectionException {
+            return connection.executeTask(session.getUser(), taskname, taskdomain, body, params);
         }
     }
 }

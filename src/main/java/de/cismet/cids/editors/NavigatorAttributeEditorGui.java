@@ -29,6 +29,7 @@ import Sirius.server.newuser.User;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
 import java.awt.BorderLayout;
@@ -130,7 +131,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
-                                        || !(backupObject.propertyEquals(editorObject))))
+                                        || editorObject.isChanged()))
                                 || (backupObject == null)) {
                         if (editorObject.getBean().hasObjectWritePermission(SessionManager.getSession().getUser())) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
@@ -179,7 +180,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 public void actionPerformed(final ActionEvent e) {
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
-                                        || !(backupObject.propertyEquals(editorObject))))
+                                        || editorObject.isChanged()))
                                 || (backupObject == null)) {
                         final int answer = JOptionPane.showConfirmDialog(
                                 NavigatorAttributeEditorGui.this,
@@ -195,6 +196,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                             clear();
                         }
                     } else {
+                        if (currentBeanStore instanceof EditorSaveListener) {
+                            ((EditorSaveListener)currentBeanStore).editorClosed(
+                                new EditorClosedEvent(
+                                    EditorSaveListener.EditorSaveStatus.CANCELED));
+                        }
                         clear();
                     }
                 }
@@ -364,8 +370,28 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     /**
      * DOCUMENT ME!
      */
-    private void saveIt() {
+    public void cancelEditing() {
+        if (currentBeanStore instanceof EditorSaveListener) {
+            ((EditorSaveListener)currentBeanStore).editorClosed(
+                new EditorClosedEvent(
+                    EditorSaveListener.EditorSaveStatus.CANCELED));
+        }
+        clear();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void saveIt() {
         saveIt(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  savedBean  DOCUMENT ME!
+     */
+    protected void executeAfterSuccessfullSave(final CidsBean savedBean) {
     }
 
     /**
@@ -373,7 +399,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      *
      * @param  closeEditor  DOCUMENT ME!
      */
-    private void saveIt(final boolean closeEditor) {
+    public void saveIt(final boolean closeEditor) {
         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
         final MetaObject mo = otn.getMetaObject();
         final CidsBean oldBean = mo.getBean();
@@ -446,6 +472,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             }
             refreshTree();
             refreshSearchTree();
+            executeAfterSuccessfullSave(savedInstance);
         } catch (Exception ex) {
             if (editorSaveListener != null) {
                 editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
@@ -491,8 +518,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
     @Override
     public void setTreeNode(final Object node) {
-        if ((treeNode != null) && (editorObject != null) && (backupObject != null)) {
-            if (editorObject.getBean().hasArtificialChangeFlag() || !editorObject.propertyEquals(backupObject)) {
+        if ((treeNode != null) && (editorObject != null)) {
+            if (editorObject.getBean().hasArtificialChangeFlag() || editorObject.isChanged()) {
                 final int answer = JOptionPane.showConfirmDialog(
                         NavigatorAttributeEditorGui.this,
                         org.openide.util.NbBundle.getMessage(
@@ -531,6 +558,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
 
                     @Override
                     protected JComponent doInBackground() throws Exception {
+                        Thread.currentThread().setName("NavigatorAttributeEditorGui setTreeNode()");
                         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
                         editorObject = otn.getMetaObject();
                         backupObject = null;
@@ -598,10 +626,13 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                                             .getInitializer(editorObject.getMetaClass());
                                 copyButton.setEnabled(true);
                                 if (currentInitializer != null) {
-                                    // enable editor attribute paste only for NEW MOs
+                                    // enable editor attribute paste only for NEW MOs and initializers which implement
+                                    // the BeanInitializerForcePaste interface
                                     final boolean isNewBean = currentBeanStore.getCidsBean().getMetaObject().getStatus()
                                                 == MetaObject.NEW;
-                                    pasteButton.setEnabled(isNewBean);
+                                    pasteButton.setEnabled(
+                                        isNewBean
+                                                || (currentInitializer instanceof BeanInitializerForcePaste));
                                 }
                             }
                             final CidsBean bean = editorObject.getBean();
@@ -708,6 +739,15 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     @Override
     public boolean isChanged() {
         return true;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObject getEditorObject() {
+        return editorObject;
     }
 
     /**
@@ -907,8 +947,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 EditorBeanInitializerStore.getInstance()
                         .registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
             }
-            // enable editor attribute paste only for new MOs
-            pasteButton.setEnabled((currentInitializer != null) && isNewBean);
+            // enable editor attribute paste only for new MOs and initializers which implement the
+            // BeanInitializerForcePaste interface
+            pasteButton.setEnabled((currentInitializer != null)
+                        && (isNewBean || (currentInitializer instanceof BeanInitializerForcePaste)));
         }
     } //GEN-LAST:event_copyButtonActionPerformed
 
@@ -920,11 +962,23 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
     private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pasteButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
-            try {
-                EditorBeanInitializerStore.getInstance().initialize(bean);
-            } catch (Exception ex) {
-                log.error(ex, ex);
+
+            final int res = JOptionPane.showConfirmDialog(StaticSwingTools.getFirstParentFrame(this),
+                    NbBundle.getMessage(
+                        NavigatorAttributeEditorGui.class,
+                        "NavigatorAttributeEditorGui.pasteButtonActionPerformed.message"),
+                    NbBundle.getMessage(
+                        NavigatorAttributeEditorGui.class,
+                        "NavigatorAttributeEditorGui.pasteButtonActionPerformed.title"),
+                    JOptionPane.OK_CANCEL_OPTION);
+
+            if (res == JOptionPane.OK_OPTION) {
+                try {
+                    EditorBeanInitializerStore.getInstance().initialize(bean);
+                } catch (Exception ex) {
+                    log.error(ex, ex);
+                }
             }
         }
-    }                                                                               //GEN-LAST:event_pasteButtonActionPerformed
+    } //GEN-LAST:event_pasteButtonActionPerformed
 }

@@ -139,7 +139,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
         final Node node = this.getNode();
 
         final Node[] c = SessionManager.getProxy().getChildren(node, SessionManager.getSession().getUser());
-        if (node.isDynamic() && node.isSqlSort()) {
+        if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
             return c;
         }
 
@@ -197,7 +197,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
 
         assert newNode != null : "received DefaultMetaTreeNode without backing Node: " + toAdd; // NOI18N
 
-        for (int i = 0; i < children.size(); ++i) {
+        for (int i = 0; (children != null) && (i < children.size()); ++i) {
             final TreeNode tn = getChildAt(i);
             if (tn instanceof DefaultMetaTreeNode) {
                 final DefaultMetaTreeNode dmtn = (DefaultMetaTreeNode)tn;

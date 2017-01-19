@@ -34,12 +34,12 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
+    protected static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(RESTfulReconnector.class);
 
     //~ Instance fields --------------------------------------------------------
 
-    private String callserverURL;
-    private Proxy proxy;
+    protected String callserverURL;
+    protected Proxy proxy;
     private RESTfulReconnectorErrorPanel errorPanel;
 
     //~ Constructors -----------------------------------------------------------
@@ -83,6 +83,8 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
                 final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
                 error = (status == 503) || (status == 407);
             }
+        } else if (exception instanceof IllegalArgumentException) {
+            error = true;
         } else if (exception instanceof ClientHandlerException) {
             error = true;
         }
@@ -103,6 +105,10 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     @Override
     protected R connectService() {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("connection to service '" + callserverURL + "'");
+        }
+
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 

@@ -12,14 +12,13 @@
  */
 package Sirius.navigator.search.dynamic;
 
-import Sirius.server.search.CidsServerSearch;
-
-import org.apache.log4j.Logger;
-
 import org.openide.util.Exceptions;
 
 import java.awt.Color;
 import java.awt.EventQueue;
+
+import de.cismet.cids.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
@@ -31,13 +30,9 @@ import de.cismet.tools.gui.StaticSwingTools;
  */
 public class SearchControlDialog extends javax.swing.JDialog implements SearchControlListener {
 
-    //~ Static fields/initializers ---------------------------------------------
-
-    private static Logger LOG = Logger.getLogger(SearchControlDialog.class);
-
     //~ Instance fields --------------------------------------------------------
 
-    private CidsServerSearch search;
+    private MetaObjectNodeServerSearch search;
 
     private SearchControlPanel pnlSearchCancel;
     private Color foregroundColor;
@@ -70,7 +65,9 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
      * @param  modal   DOCUMENT ME!
      * @param  search  DOCUMENT ME!
      */
-    public SearchControlDialog(final java.awt.Frame parent, final boolean modal, final CidsServerSearch search) {
+    public SearchControlDialog(final java.awt.Frame parent,
+            final boolean modal,
+            final MetaObjectNodeServerSearch search) {
         super(parent, modal);
 
         initComponents();
@@ -189,7 +186,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
      *
      * @param  search  DOCUMENT ME!
      */
-    public void setSearch(final CidsServerSearch search) {
+    public void setSearch(final MetaObjectNodeServerSearch search) {
         this.search = search;
 
         if (isCloseButtonShown) {
@@ -214,15 +211,26 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     public CidsServerSearch getSearch() {
         return search;
     }
+
     /**
      * DOCUMENT ME!
      */
     public void startSearch() {
-        pnlSearchCancel.startSearch();
+        startSearch(false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
+     *                     sorting order is wished.
+     */
+    public void startSearch(final boolean simpleSort) {
+        pnlSearchCancel.startSearch(simpleSort);
     }
 
     @Override
-    public CidsServerSearch assembleSearch() {
+    public MetaObjectNodeServerSearch assembleSearch() {
         return search;
     }
 

@@ -7,13 +7,6 @@
 ****************************************************/
 package de.cismet.cids.client.tools;
 
-/***************************************************
- *
- * cismet GmbH, Saarbruecken, Germany
- *
- *              ... and it just works.
- *
- ****************************************************/
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionInfo;
@@ -45,7 +38,9 @@ import java.rmi.Remote;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -58,9 +53,13 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.search.CidsServerSearch;
+
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
 import de.cismet.cids.utils.jasperreports.CidsBeanDataSource;
+
+import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -136,6 +135,96 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass) throws Exception {
+        System.out.println("start");
+        // lookup des callservers
+        final Remote r;
+        final SearchService ss;
+        final CatalogueService cat;
+        final MetaService meta;
+        final UserService us;
+        final User u;
+
+        Log4JQuickConfig.configure4LumbermillOnLocalhost();
+        final ConnectionInfo info = new ConnectionInfo();
+        info.setCallserverURL("http://localhost:9917/callserver/binary");
+        info.setUsername(user);
+        info.setUsergroup(group);
+        info.setPassword(pass);
+        info.setUserDomain(domain);
+        info.setUsergroupDomain(domain);
+
+        final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
+                    .createConnection(
+                        "Sirius.navigator.connection.RESTfulConnection",
+                        info.getCallserverURL(),
+                        Proxy.fromPreferences());
+        final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
+        final ConnectionProxy conProxy = ConnectionFactory.getFactory()
+                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+        SessionManager.init(conProxy);
+
+        ClassCacheMultiple.setInstance(domain);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromPureRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass) throws Exception {
+        System.out.println("start");
+        // lookup des callservers
+        final Remote r;
+        final SearchService ss;
+        final CatalogueService cat;
+        final MetaService meta;
+        final UserService us;
+        final User u;
+
+        Log4JQuickConfig.configure4LumbermillOnLocalhost();
+        final ConnectionInfo info = new ConnectionInfo();
+        info.setCallserverURL("http://localhost:8890/");
+        info.setUsername(user);
+        info.setUsergroup(group);
+        info.setPassword(pass);
+        info.setUserDomain(domain);
+        info.setUsergroupDomain(domain);
+
+        final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
+                    .createConnection(
+                        "Sirius.navigator.connection.PureRESTfulConnection",
+                        info.getCallserverURL(),
+                        Proxy.fromPreferences());
+        final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
+        final ConnectionProxy conProxy = ConnectionFactory.getFactory()
+                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+        SessionManager.init(conProxy);
+
+        ClassCacheMultiple.setInstance(domain);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   domain    DOCUMENT ME!
      * @param   group     DOCUMENT ME!
      * @param   user      DOCUMENT ME!
@@ -155,6 +244,74 @@ public class DevelopmentTools {
             final int objectId) throws Exception {
         if (!SessionManager.isInitialized()) {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
+        }
+        System.out.println("MO abfragen");
+
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+
+        final MetaObject mo = SessionManager.getConnection()
+                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+        final CidsBean cidsBean = mo.getBean();
+        System.out.println("cidsBean erzeugt");
+        return cidsBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createCidsBeanFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId) throws Exception {
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromRestfulConnectionOnLocalhost(domain, group, user, pass);
+        }
+        System.out.println("MO abfragen");
+
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+
+        final MetaObject mo = SessionManager.getConnection()
+                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+        final CidsBean cidsBean = mo.getBean();
+        System.out.println("cidsBean erzeugt");
+        return cidsBean;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createCidsBeanFromPureRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId) throws Exception {
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromPureRestfulConnectionOnLocalhost(domain, group, user, pass);
         }
         System.out.println("MO abfragen");
 
@@ -247,7 +404,6 @@ public class DevelopmentTools {
         }
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
-        System.out.println("bauen ...");
         final String query = "SELECT "
                     + mc.getID()
                     + ", "
@@ -260,7 +416,6 @@ public class DevelopmentTools {
                     + mc.getPrimaryKey()
                     + " "
                     + limitS;
-        System.out.println("Query: " + query);
         final MetaObject[] metaObjects = SessionManager.getConnection()
                     .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
@@ -268,8 +423,34 @@ public class DevelopmentTools {
             final MetaObject metaObject = metaObjects[i];
             cidsBeans[i] = metaObject.getBean();
         }
-        System.out.println("CidsBeans erzeugt.");
         return cidsBeans;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain  DOCUMENT ME!
+     * @param   group   DOCUMENT ME!
+     * @param   user    DOCUMENT ME!
+     * @param   pass    DOCUMENT ME!
+     * @param   search  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static ArrayList<ArrayList> executeServerSearch(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final CidsServerSearch search) throws Exception {
+        if (!SessionManager.isInitialized()) {
+            initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
+        }
+        final Collection res = SessionManager.getConnection()
+                    .customServerSearch(SessionManager.getSession().getUser(), search);
+
+        return (ArrayList<ArrayList>)res;
     }
 
     /**
@@ -342,6 +523,20 @@ public class DevelopmentTools {
      * @throws  Exception  DOCUMENT ME!
      */
     public static void showReportForBeans(final String path, final Collection c) throws Exception {
+        showReportForBeans(path, c, Collections.EMPTY_MAP);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   path        DOCUMENT ME!
+     * @param   c           DOCUMENT ME!
+     * @param   parameters  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void showReportForBeans(final String path, final Collection c, final Map parameters)
+            throws Exception {
         System.out.print("Lade JasperReport ...");
         final JasperReport jasperReport = (JasperReport)JRLoader.loadObject(DevelopmentTools.class.getResourceAsStream(
                     path));
@@ -360,7 +555,7 @@ public class DevelopmentTools {
         }
         System.out.print("Fülle Report ...");
         // print aus report und daten erzeugen
-        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, new HashMap(), dataSource);
+        final JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 //        JasperExportManager.exportReportToPdfFile(jasperPrint, "/Users/thorsten/xxx.pdf");
 
         System.out.print(" gefüllt.\nZeige Report an ...");

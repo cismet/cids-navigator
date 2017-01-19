@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.reconnector;
 
+import org.openide.util.NbBundle;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 
@@ -24,16 +26,19 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ReconnectorPanel.class);
 
-    private static final String CONNECTION_CANCELED = java.util.ResourceBundle.getBundle("de/cismet/reconnector/Bundle")
-                .getString("connection_canceled");
+    private static final String CONNECTION_CANCELED = NbBundle.getMessage(
+            ReconnectorPanel.class,
+            "connection_canceled");
 
     //~ Instance fields --------------------------------------------------------
 
     private final Reconnector reconnector;
+    private Component errorComponent;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnExit;
+    private javax.swing.JButton btnIgnore;
     private javax.swing.JButton btnRetry;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labTryingToConnect;
@@ -112,6 +117,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panError = new javax.swing.JPanel();
         jPanel1 = new javax.swing.JPanel();
         btnExit = new javax.swing.JButton();
+        btnIgnore = new javax.swing.JButton();
         btnRetry = new javax.swing.JButton();
 
         panProgress.setMinimumSize(new java.awt.Dimension(200, 88));
@@ -127,8 +133,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         panProgress.add(pb, gridBagConstraints);
 
-        final java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("de/cismet/reconnector/Bundle"); // NOI18N
-        btnCancel.setText(bundle.getString("cancel"));                                                              // NOI18N
+        btnCancel.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "cancel")); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -143,7 +148,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         panProgress.add(btnCancel, gridBagConstraints);
 
-        labTryingToConnect.setText(bundle.getString("trying_to_connect")); // NOI18N
+        labTryingToConnect.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "trying_to_connect")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -157,7 +162,7 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panError.setLayout(new java.awt.BorderLayout());
         panRetry.add(panError, java.awt.BorderLayout.CENTER);
 
-        btnExit.setText("Beenden");
+        btnExit.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "stop")); // NOI18N
         btnExit.setPreferredSize(new java.awt.Dimension(125, 29));
         btnExit.addActionListener(new java.awt.event.ActionListener() {
 
@@ -168,7 +173,18 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
             });
         jPanel1.add(btnExit);
 
-        btnRetry.setText(bundle.getString("retry")); // NOI18N
+        btnIgnore.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "ignore")); // NOI18N
+        btnIgnore.setPreferredSize(new java.awt.Dimension(125, 29));
+        btnIgnore.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnIgnoreActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnIgnore);
+
+        btnRetry.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "retry")); // NOI18N
         btnRetry.setPreferredSize(new java.awt.Dimension(125, 29));
         btnRetry.addActionListener(new java.awt.event.ActionListener() {
 
@@ -199,6 +215,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
      * @param  evt  DOCUMENT ME!
      */
     private void btnRetryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnRetryActionPerformed
+        if (errorComponent instanceof ReconnectorErrorPanelWithApply) {
+            ((ReconnectorErrorPanelWithApply)errorComponent).apply();
+        }
         reconnector.doReconnect();
     }                                                                            //GEN-LAST:event_btnRetryActionPerformed
 
@@ -211,6 +230,15 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         System.exit(1);
     }                                                                           //GEN-LAST:event_btnExitActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnIgnoreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnIgnoreActionPerformed
+        reconnector.doAbort();
+    }                                                                             //GEN-LAST:event_btnIgnoreActionPerformed
+
     @Override
     public void connecting() {
         showConnecting();
@@ -218,15 +246,18 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
 
     @Override
     public void connectionFailed(final ReconnectorEvent event) {
-        showError(event.getComponent());
+        errorComponent = event.getComponent();
+        showError(errorComponent);
     }
 
     @Override
     public void connectionCanceled() {
+        errorComponent = null;
         showError(new JLabel(CONNECTION_CANCELED));
     }
 
     @Override
     public void connectionCompleted() {
+        errorComponent = null;
     }
 }

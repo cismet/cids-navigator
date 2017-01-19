@@ -8,16 +8,12 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.exception.SqlConnectionException;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.method.MethodMap;
-import Sirius.server.middleware.interfaces.proxy.CatalogueService;
-import Sirius.server.middleware.interfaces.proxy.MetaService;
-import Sirius.server.middleware.interfaces.proxy.QueryStore;
-import Sirius.server.middleware.interfaces.proxy.SearchService;
-import Sirius.server.middleware.interfaces.proxy.SystemService;
-import Sirius.server.middleware.interfaces.proxy.UserService;
+import Sirius.server.middleware.interfaces.proxy.*;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.LightweightMetaObject;
@@ -28,8 +24,6 @@ import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.CidsServerSearch;
-import Sirius.server.search.Query;
 import Sirius.server.search.SearchOption;
 import Sirius.server.search.SearchResult;
 import Sirius.server.search.store.Info;
@@ -39,9 +33,13 @@ import Sirius.util.image.ImageHashMap;
 
 import org.apache.log4j.Logger;
 
+import java.awt.GraphicsEnvironment;
+
 import java.io.File;
 
 import java.rmi.RemoteException;
+
+import java.sql.SQLException;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,6 +50,8 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.netutil.Proxy;
 
@@ -110,7 +110,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
      */
     private Reconnector<CallServerService> createReconnector(final String callserverURL) {
         reconnector = new RmiReconnector<CallServerService>(CallServerService.class, callserverURL);
-        reconnector.useDialog(true, null);
+        reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
 
@@ -456,31 +456,6 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public MetaObject[] getMetaObject(final User user, final Query query) throws ConnectionException {
-        try {
-            return ((MetaService)callserver).getMetaObject(user, query);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not retrieve MetaObject", re);
-            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public MetaObject[] getMetaObject(final User usr, final Query query, final String domain)
-            throws ConnectionException {
-        try {
-            return ((MetaService)callserver).getMetaObject(usr, query, domain);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not retrieve MetaObject", re);
-            throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    @Override
     public MetaObject getMetaObject(final User user, final int objectID, final int classID, final String domain)
             throws ConnectionException {
         try {
@@ -497,30 +472,22 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public int insertMetaObject(final User user, final Sirius.server.search.Query query, final String domain)
-            throws ConnectionException {
-        try {
-            return ((MetaService)callserver).insertMetaObject(user, query, domain);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not insert / update MetaObject '" + query + "'", re);
-            throw new ConnectionException("[[ServerError] could not insert / update MetaObject '" + query + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    @Override
     public MetaObject insertMetaObject(final User user, final MetaObject MetaObject, final String domain)
             throws ConnectionException {
         try {
             return ((MetaService)callserver).insertMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not insert MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] could not insert MetaObject '" + MetaObject + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] could not insert MetaObject '" + MetaObject + "': "
+                            + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -531,10 +498,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return ((MetaService)callserver).updateMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not update MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] could not update MetaObject '" + MetaObject + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] could not update MetaObject '" + MetaObject + "': "
+                            + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -545,10 +518,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             return ((MetaService)callserver).deleteMetaObject(user, MetaObject, domain);
         } catch (RemoteException re) {
             LOG.error("[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "'", re);
-            throw new ConnectionException("[[ServerError] deleteMetaObject(): could not delete MetaObject '"
-                        + MetaObject + "': " + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
+            /*
+             *if the top level cause was an SQL Exception, we throw an instance of SqlConnectionException which are
+             * visualised with a custom error dialog by the MethodManager
+             */
+            final Throwable initialCause = getTopInitialCause(re);
+            if (initialCause instanceof SQLException) {
+                throw new SqlConnectionException(initialCause.getMessage(),
+                    initialCause);
+            } else {
+                throw new ConnectionException("[[ServerError] deleteMetaObject(): could not delete MetaObject '"
+                            + MetaObject + "': " + re.getMessage(),
+                    ConnectionException.ERROR,
+                    re.getCause());
+            }
         }
     }
 
@@ -565,213 +548,6 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         } catch (RemoteException re) {
             LOG.error("[ServerError] getInstance(): could not get instance of class '" + c + "'", re);
             throw new ConnectionException("[[ServerError] getInstance(): could not get instance of class '" + c + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    // Dynmaic Search ----------------------------------------------------------
-    @Override
-    public HashMap getSearchOptions(final User user) throws ConnectionException {
-        try {
-            return ((Sirius.server.middleware.interfaces.proxy.SearchService)callserver).getSearchOptions(user);
-        } catch (RemoteException re) {
-            LOG.fatal("[SearchService] getSearchOptions() failed ...", re);
-            throw new ConnectionException("[SearchService] getSearchOptions() failed: " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public HashMap getSearchOptions(final User user, final String domain) throws ConnectionException {
-        try {
-            return ((Sirius.server.middleware.interfaces.proxy.SearchService)callserver).getSearchOptions(user, domain);
-        } catch (RemoteException re) {
-            LOG.fatal("[SearchService] getSearchOptions() failed ...", re);
-            throw new ConnectionException("[SearchService] getSearchOptions() failed: " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public SearchResult search(final User user, final String[] classIds, final SearchOption[] searchOptions)
-            throws ConnectionException {
-        try {
-            return ((Sirius.server.middleware.interfaces.proxy.SearchService)callserver).search(
-                    user,
-                    classIds,
-                    searchOptions);
-        } catch (RemoteException re) {
-            LOG.fatal("[SearchService] search failed ...", re);
-            throw new ConnectionException("[SearchService] search failed: " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    // QueryData ---------------------------------------------------------------
-    @Override
-    public Info[] getUserQueryInfos(final User user) throws ConnectionException {
-        try {
-            return ((QueryStore)callserver).getQueryInfos(user);
-        } catch (RemoteException re) {
-            LOG.fatal("[ServerError] getUserGroupQueryInfos(UserGroup userGroup)", re);
-            throw new ConnectionException("[ServerError] getUserGroupQueryInfos(UserGroup userGroup): "
-                        + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public Info[] getUserGroupQueryInfos(final UserGroup userGroup) throws ConnectionException {
-        try {
-            return ((QueryStore)callserver).getQueryInfos(userGroup);
-        } catch (RemoteException re) {
-            LOG.fatal("[QueryStore] getUserGroupQueryInfos(UserGroup userGroup)", re);
-            throw new ConnectionException("[QueryStore] getUserGroupQueryInfos(UserGroup userGroup): "
-                        + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public QueryData getQueryData(final int id, final String domain) throws ConnectionException {
-        try {
-            return ((QueryStore)callserver).getQuery(id, domain);
-        } catch (RemoteException re) {
-            LOG.fatal("[QueryStore] getQuery(QueryInfo queryInfo)", re);
-            throw new ConnectionException("[QueryStore] getQuery(QueryInfo queryInfo): " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public boolean storeQueryData(final User user, final QueryData data) throws ConnectionException {
-        try {
-            return ((QueryStore)callserver).storeQuery(user, data);
-        } catch (RemoteException re) {
-            LOG.fatal("[ueryStore] storeUserQuery(User user, Query query)", re);
-            throw new ConnectionException("[ueryStore] storeUserQuery(User user, Query query): " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public boolean deleteQueryData(final int queryDataId, final String domain) throws ConnectionException {
-        try {
-            return ((QueryStore)callserver).delete(queryDataId, domain);
-        } catch (RemoteException re) {
-            LOG.fatal("[QueryStore] deleteQuery(QueryInfo queryInfo)", re);
-            throw new ConnectionException("[QueryStore] deleteQuery(QueryInfo queryInfo): " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    // Methods -----------------------------------------------------------------
-    @Override
-    public MethodMap getMethods(final User user) throws ConnectionException {
-        try {
-            return ((MetaService)callserver).getMethods(user);
-        } catch (RemoteException re) {
-            LOG.fatal("[ServerError] could not retrieve methods", re);
-            throw new ConnectionException("[ServerError] could not retrieve methods: " + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public MethodMap getMethods(final User user, final String domain) throws ConnectionException {
-        try {
-            return ((MetaService)callserver).getMethods(user, domain);
-        } catch (RemoteException re) {
-            LOG.fatal("[ServerError] could not retrieve methods from domain " + domain + "", re);
-            throw new ConnectionException("[ServerError] could not retrieve methods from domain " + domain + ": "
-                        + re.getMessage(),
-                ConnectionException.FATAL,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public int addQuery(final User user, final String name, final String description, final String statement)
-            throws ConnectionException {
-        try {
-            return ((SearchService)callserver).addQuery(user, name, description, statement);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not add query '" + name + "'", re);
-            throw new ConnectionException("[ServerError] could not add query '" + name + "': " + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public int addQuery(final User user,
-            final String name,
-            final String description,
-            final String statement,
-            final int resultType,
-            final char isUpdate,
-            final char isRoot,
-            final char isUnion,
-            final char isBatch) throws ConnectionException {
-        try {
-            return ((SearchService)callserver).addQuery(
-                    user,
-                    name,
-                    description,
-                    statement,
-                    resultType,
-                    isUpdate,
-                    isRoot,
-                    isUnion,
-                    isBatch);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not add query '" + name + "'", re);
-            throw new ConnectionException("[ServerError] could not add query '" + name + "': " + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public boolean addQueryParameter(final User user,
-            final int queryId,
-            final String paramkey,
-            final String description) throws ConnectionException {
-        try {
-            return ((SearchService)callserver).addQueryParameter(user, queryId, paramkey, description);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not add query parameter '" + queryId + "'", re);
-            throw new ConnectionException("[ServerError] could not add query parameter '" + queryId + "': "
-                        + re.getMessage(),
-                ConnectionException.ERROR,
-                re.getCause());
-        }
-    }
-
-    @Override
-    public boolean addQueryParameter(final User user,
-            final int queryId,
-            final int typeId,
-            final String paramkey,
-            final String description,
-            final char isQueryResult,
-            final int queryPosition) throws ConnectionException {
-        try {
-            return ((SearchService)callserver).addQueryParameter(user, queryId, paramkey, description);
-        } catch (RemoteException re) {
-            LOG.error("[ServerError] could not add query parameter '" + queryId + "'", re);
-            throw new ConnectionException("[ServerError] could not add query parameter '" + queryId + "': "
                         + re.getMessage(),
                 ConnectionException.ERROR,
                 re.getCause());
@@ -883,6 +659,21 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   e  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Throwable getTopInitialCause(final Exception e) {
+        Throwable initialCause = e.getCause();
+        while (initialCause.getCause() != null) {
+            initialCause = initialCause.getCause();
+        }
+        return initialCause;
+    }
+
+    /**
      * !For debugging purpose only. Do not use!
      *
      * @param   classId  DOCUMENT ME!
@@ -983,5 +774,25 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                         + " || domain: " + domain + " || user: " + user + " || elements: " + elements, // NOI18N
                 e);
         }
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final Object body,
+            final ServerActionParameter... params) throws ConnectionException {
+        try {
+            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, body, params);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could executeTask: taskname: " + taskname + " || taskdomain: " + taskdomain
+                        + " || user: " + user,
+                e);
+        }
+    }
+
+    @Override
+    public CallServerService getCallServerService() {
+        return (CallServerService)callserver;
     }
 }
