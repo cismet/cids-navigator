@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<plugin xmlns="http://www.enviromatics.net/sirius/navigator/plugins" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://www.enviromatics.net/sirius/navigator/plugins
+        ../plugin.xsd" 
+        id="webcall">
+
+    <metainfo 
+        name="WebCall" 
+        version="0.1 alpha"
+        copyright="Copyright (c) 2005"
+        company="CISMET GmbH" 
+        homepage="http://www.cismet.de" 
+        author="Sascha Schlobinski" 
+        contact="pascal.dihe@cismet.de">
+        <description>
+            Aufruf parametrisierter URLs
+        </description>
+    </metainfo>
+    
+    <properties>
+        <capabilities>
+            <progressobservable>false</progressobservable>
+            <propertyobservable>false</propertyobservable> 
+            <internationalized>false</internationalized> 
+            <unloadable>false</unloadable>
+            <deactivateable>true</deactivateable> 
+        </capabilities>
+    </properties>
+    
+    <deployment>
+        <pluginclass>cismet.cids.navigator.plugins.webcall.WebCall</pluginclass>
+        <libraries>
+        </libraries>
+        
+        <mappings>
+            <attribute>
+                <name>classKey</name>
+                <id>2@WUNDA_LAGER</id>
+            </attribute>
+            <attribute>
+                <name>classKey</name>
+                <id>3@WUNDA_BLAU</id>
+            </attribute>
+	            
+            <attribute>
+                <name>urlName</name>
+                <id>DESCRIPTION</id>
+            </attribute>
+        </mappings>
+        
+    </deployment>
+    
+    <methods>
+        
+        <method>
+            <id>cismet.cids.navigator.plugins.webcall.WebCall$WebCallMethod</id>
+            <name>Browseraufruf</name>
+            <description>Ruft URLs im Standardbrowser auf</description>
+            <multithreaded>false</multithreaded>
+            <availability>0</availability>
+        </method>
+    </methods>
+    
+    <ui>
+        <actions>             
+            <popupmenu>
+                <properties>
+                    <name>WebCall</name>
+                    <mnemonic>W</mnemonic>
+                    <icon>images/cross.gif</icon>   
+                </properties>
+                    
+                <items>   
+                    <item>
+                        <name>Browsesraufruf</name>
+                        <mnemonic>E</mnemonic>
+                        <icon>images/greenball.gif</icon>
+                        <method>cismet.cids.navigator.plugins.webcall.WebCall$WebCallMethod</method>
+                        <accelerator>alt E</accelerator>
+                    </item>
+                </items>
+            </popupmenu>
+        </actions>
+    </ui>
+</plugin>

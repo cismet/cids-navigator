@@ -367,10 +367,100 @@
         <!-- END: Provided dependencies -->
         
         <!-- BEGIN: TEST dependencies -->
+        <!-- BEGIN: External Test Packages -->
+        <dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>cismet-commons</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>cismet-gui-commons</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.cismet.commons</groupId>
+            <artifactId>cismap-commons</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>de.cismet.cids</groupId>
+            <artifactId>cids-server</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <!-- END: External Test Packages -->
+        
+        <!-- BEGIN: Navigator Plugins for Testing -->
+        
+        
+        <!-- END: Navigator Plugins for Testing -->
+        
+        <!--
+            ATTENTION: we need to include also all test dependencies required by downstream 
+            test-jars!
+            
+            See https://maven.apache.org/plugins/maven-jar-plugin/examples/create-test-jar.html
+        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>xmlunit</groupId>
+            <artifactId>xmlunit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tngtech.java</groupId>
+            <artifactId>junit-dataprovider</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.jaxrs</groupId>
+            <artifactId>jackson-jaxrs-xml-provider</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
     
@@ -387,26 +477,68 @@
                             </manifest>
                         </archive>
                     </configuration>
-                </plugin>        
+                </plugin>   
+                <!--
+                    Unpack resources of test dependencies to be able to run also tests
+                    that cannot be run from a jar file, e.g. because resources are 
+                    loaded as java.io.File.
+                -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>resource-dependencies</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>unpack-dependencies</goal>
+                            </goals>
+                            <configuration>
+                                <includeGroupIds>de.cismet</includeGroupIds>
+                                <includeArtifactIds>cismet-commons,cismet-gui-commons,cismap-commons,cids-server</includeArtifactIds>
+                                <outputDirectory>${project.build.testOutputDirectory}/</outputDirectory>
+                                <encoding>${project.build.sourceEncoding}</encoding>
+                                <classifier>tests</classifier>
+                                <type>test-jar</type>
+                                <includeScope>test</includeScope>
+                                <failOnMissingClassifierArtifact>true</failOnMissingClassifierArtifact>
+                                <excludes>**/log4j.properties,**/*.class</excludes>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>     
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <dependenciesToScan>
                             <dependency>de.cismet.commons:cismet-commons</dependency>
+                            <dependency>de.cismet.commons:cismet-gui-commons</dependency>
+                            <dependency>de.cismet.commons:cismap-commons</dependency>
+                            <dependency>de.cismet.cids:cids-server</dependency>
                         </dependenciesToScan>
-                        <!-- 
-                           all those tests have to be excluded because they require a connection to a postgres db or the
-                           remote test helper service, respectively. as this service is only internally available we have
-                           to think of another method to test these things
+                        <!--
+                            These tests from cismap- and cismet-commons do not work from inside a JAR file!
+                            Therefore, the required resources to run the external tests have been 
+                            copied to the cids-navigator test/resources directory!
                         -->
                         <excludes>
-                            <!--
-                                These tests from cismet-commons do not work from inside a JAR file!
-                            -->
                             <exclude>**/ClassPathInfoTest.java</exclude>
+                            <exclude>**/ClassloadingHelperTest</exclude>
+                            <!--
+                                Unfortunately, the Mockito Stuff does not work from inside a jar!
+                            -->
+                            <exclude>**/CidsBeanTest</exclude>
+                            <exclude>**/CidsBeanSerialisationTest</exclude>
+                            <!--
+                                No need to exclude these resources, because maven-dependency-plugin:unpack-dependencies
+                                extracted the required respource files to the target/test-classes directory!
+                            -->
+                            <!--
                             <exclude>**/MultiPagePictureReaderTest.java</exclude>
                             <exclude>**/ExifReaderTest.java</exclude>
+                            <exclude>**/ImageFileRetrievalTest.java</exclude>
+                            -->
                         </excludes>
                     </configuration>
                 </plugin>
@@ -420,7 +552,7 @@
             Profile for executing cids-navigator with cismap plugin
         -->
         <profile>
-            <id>nb-exec</id>
+            <id>navigator-with-plugin</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
