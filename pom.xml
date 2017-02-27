@@ -125,7 +125,7 @@
                 <dependency>
                     <groupId>de.cismet.cismap</groupId>
                     <artifactId>cismap-plugin</artifactId>
-                    <version>4.0</version>
+                    <version>4.1</version>
                     <scope>runtime</scope>
                 </dependency>
             </dependencies>
