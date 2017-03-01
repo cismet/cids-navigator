@@ -152,7 +152,7 @@
         <properties>
             <exec.workingdir>${de.cismet.cids.navigator.workingDir}</exec.workingdir>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>-Xms256m -Xmx1024m -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
+            <exec.args>-Duser.country=DE -Duser.language=de -Ddirectory.extension=.netbeans -Xms256m -Xmx1g -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
         <activatedProfiles>
@@ -173,7 +173,7 @@
         <properties>
             <exec.workingdir>${de.cismet.cids.navigator.workingDir}</exec.workingdir>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms256m -Xmx1024m -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Duser.country=DE -Duser.language=de -Ddirectory.extension=.netbeans -Xms256m -Xmx1g -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
             <exec.executable>java</exec.executable>
             <jpda.listen>true</jpda.listen>
         </properties>
@@ -195,7 +195,7 @@
         <properties>
             <exec.workingdir>${de.cismet.cids.navigator.workingDir}</exec.workingdir>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.args>${profiler.args} -Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Xms256m -Xmx1024m -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
+            <exec.args>${profiler.args} -Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Duser.country=DE -Duser.language=de -Ddirectory.extension=.netbeans -Xms256m -Xmx1g -classpath ${de.cismet.cids.classpath} Sirius.navigator.Navigator ${de.cismet.cids.navigator.workingDir}/config/log4j.debug.properties ${de.cismet.cids.navigator.workingDir}/config/navigator.cfg ${de.cismet.cids.navigator.workingDir} ${de.cismet.cids.navigator.workingDir}/plugins ${de.cismet.cids.navigator.workingDir}/search ${de.cismet.cids.navigator.workingDir}/profiles</exec.args>
             <exec.executable>${profiler.java}</exec.executable>
         </properties>
         <activatedProfiles>
