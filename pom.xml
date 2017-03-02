@@ -2,6 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- 
+        FIXME: Replace deprecated cids-parent by cismet-parent
+    -->
     <parent>
         <groupId>de.cismet.cids</groupId>
         <artifactId>cids-parent</artifactId>
@@ -539,6 +542,13 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        
+        <!-- 
+            DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER DANGER
+            the artifact has to be renamed du to compatibility reasons to the cidsDistribution 
+            
+            See https://cismet.slack.com/files/jruiz/F3ZC7HX7V/Snapshot_als_finalName_in_pom_xml
+        -->
         <finalName>cidsNavigator</finalName>        
     </build>
 
