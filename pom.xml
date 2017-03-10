@@ -23,7 +23,6 @@
     <name>${names.cids-navigator}</name>
     <description>!!! description pending !!!</description>
 
-
     <scm>
         <connection>https://github.com/cismet/cids-navigator.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-navigator.git</developerConnection>
@@ -222,11 +221,14 @@
         <dependency>
             <groupId>net.sf.jasperreports</groupId>
             <artifactId>jasperreports</artifactId>
+            <type>jar</type>
+
         </dependency>
-        
         <dependency>
             <groupId>com.lowagie</groupId>
             <artifactId>itext</artifactId>
+            <type>jar</type>
+
         </dependency>
         <dependency>
             <groupId>com.vividsolutions</groupId>
@@ -255,6 +257,8 @@
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
+            <type>jar</type>
+
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -280,41 +284,45 @@
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
+            <type>jar</type>
+
         </dependency>
-        <!-- END: managed dependencies -->
-        
         <dependency>
             <groupId>net.infonode.docking</groupId>
             <artifactId>docking</artifactId>
-            <version>1.5.0</version>
-        </dependency>
-        <dependency>
-            <groupId>calpa.html</groupId>
-            <artifactId>calpahtml</artifactId>
-            <version>2_04</version>
+            <scope>compile</scope>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.jgoodies</groupId>
             <artifactId>looks</artifactId>
-            <version>2.2.2</version>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.fuse</groupId>
-            <artifactId>fuse-core</artifactId>
-            <version>0.4</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
             <scope>compile</scope>
             <type>jar</type>
         </dependency>
+        <!-- END: managed dependencies -->
+        
+        <dependency>
+            <groupId>calpa.html</groupId>
+            <artifactId>calpahtml</artifactId>
+            <version>2_04</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.java.dev.fuse</groupId>
+            <artifactId>fuse-core</artifactId>
+            <version>0.4</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>   
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -593,6 +601,3 @@
         </profile>
     </profiles>
 </project>
-
-
-
