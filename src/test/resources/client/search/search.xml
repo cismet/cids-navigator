@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>  <search xmlns="http://www.enviromatics.net/sirius/navigator/search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.enviromatics.net/sirius/navigator/search file:///D:%5Cwork%5Cweb%5CSirius%5CNavigator%5Csearch%5Csearch.xsd"> 
+    <libraries>  </libraries> 
+    <categories> 
+        <!-- Datum ===================================================== -->   
+        <!-- Umgebungsssuche =========================================== --> 
+        <category> 
+            <name>Geographie</name> 
+            <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> 
+            <resourceBundle>de.cismet.cids.navigator.search.forms.geography.geography</resourceBundle> 
+            <forms>  
+                <!-- Koordinaten aus Katalog ........................... --> 
+                <form> 
+                    <name>KatalogKoordinaten</name> 
+                    <formClass>de.cismet.cids.navigator.search.forms.geography.CatalogCoordinatesSearchForm</formClass> 
+                    <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> 
+                    <formId>katalog.koordinaten</formId> 
+                    <queryId>GEOSEARCH@WUNDA_BLAU</queryId>  
+                    <resourceBundle>de.cismet.cids.navigator.search.forms.geography.geography</resourceBundle> 
+                    <properties> 
+                        <property> 
+                            <name>maxAmbiance</name> 
+                            <value>100</value> 
+                        </property> 
+                        <property> 
+                            <name>coordinateAttribute</name> 
+                            <value>Georeferenz;GEOMETRIE;KOORDINATE;Geometrie;geom</value> 
+                        </property> 
+                    </properties> 
+                    <mappings> <!-- OGC Feature String --> 
+                        <queryParameter> 
+                            <queryName>polygon</queryName> 
+                            <formName>featureString</formName> 
+                        </queryParameter>  
+                        <!-- wird nicht als query parameter verwendet, nur zum speichern (profil) --> 
+                        <queryParameter> 
+                            <queryName>coordinateString</queryName> 
+                            <formName>coordinateString</formName> 
+                        </queryParameter> 
+                    </mappings> 
+                </form> 
+            </forms> 
+        </category> 
+        <!-- Volltextsuche ============================================= --> 
+        <category> 
+            <name>Volltextsuche</name> 
+            <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> 
+            <resourceBundle>de.cismet.cids.navigator.search.forms.TextSearchForm</resourceBundle> 
+            <forms> 
+                <!-- Volltextsuche Formular ........................... --> 
+                <form> 
+                    <name>Volltextsuche</name> 
+                    <formClass>de.cismet.cids.navigator.search.forms.TextSearchForm</formClass> 
+                    <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> 
+                    <formId>volltextsuche</formId> 
+                    <queryId>TEXTSEARCH@WUNDA_BLAU</queryId> 
+                    <resourceBundle>de.cismet.cids.navigator.search.forms.TextSearchForm</resourceBundle> 
+                    <properties> 
+                        <property> 
+                            <name>minTextLength</name> 
+                            <value>3</value> 
+                        </property> 
+                        <property> 
+                            <name>caseSensitiv</name> 
+                            <value>true</value> 
+                        </property> 
+                    </properties> 
+                    <mappings> 
+                        <queryParameter> 
+                            <queryName>text</queryName> 
+                            <formName>searchText</formName> 
+                        </queryParameter> <!-- not used --> 
+                        <queryParameter> 
+                            <queryName>case</queryName> 
+                            <formName>caseSensitiv</formName> 
+                        </queryParameter> 
+                    </mappings> 
+                </form> 
+            </forms> 
+        </category>   
+        <!-- JIXFe Suche (Test Form -> visible = false) ======================== -->       
+        <!-- Standard Form (Test) ========================================== --> 
+        <!--<category> <name>Standard Kategorie</name> <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> <forms> <form> <name>Standard Formular</name> <formClass>Sirius.navigator.search.dynamic.DefaultSearchForm</formClass> <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> <formId>standard</formId> <queryId>standard.query@WUNDA_BLAU</queryId> <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> <mappings> <queryParameter> <queryName>wa</queryName> <formName>Wert A</formName> </queryParameter> <queryParameter> <queryName>wb</queryName> <formName>Wert B</formName> </queryParameter> <queryParameter> <queryName>wc</queryName> <formName>Wert C</formName> </queryParameter> <queryParameter> <queryName>wd</queryName> <formName>Wert D</formName> </queryParameter> </mappings> </form> </forms> </category>-->  <!-- Verdis KZ Suche ========================================== --> 
+        <category> 
+            <name>Verdis</name> 
+            <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> 
+            <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> 
+            <forms> 
+                <form> 
+                    <name>Kassenzeichen Suche</name> 
+                    <formClass>Sirius.navigator.search.dynamic.DefaultSearchForm</formClass> 
+                    <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> 
+                    <formId>Kassenzeichen</formId> 
+                    <queryId>kassenzeichenSuche@VERDIS</queryId> 
+                    <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> 
+                    <mappings> 
+                        <queryParameter> 
+                            <queryName>kassenzeichen</queryName> 
+                            <formName>Kassenzeichen</formName> 
+                        </queryParameter>  
+                    </mappings> 
+                </form> 
+                <!-- Verdis FEB Suche ========================================== --> 
+                <form> 
+                    <name>FEB Suche</name> 
+                    <formClass>Sirius.navigator.search.dynamic.DefaultSearchForm</formClass> 
+                    <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> 
+                    <formId>FEB</formId> 
+                    <queryId>feb@VERDIS</queryId> 
+                    <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> 
+                    <mappings> 
+                        <queryParameter> 
+                            <queryName>feb_id</queryName> 
+                            <formName>FEB ID</formName> 
+                        </queryParameter>  
+                    </mappings> 
+                </form>  
+            </forms> 
+        </category> 
+        <!--category>  <name>Lagerbuch</name> <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> <visible>true</visible> <forms> <form> <name>Verwaltende Dienststelle</name> <formClass>Sirius.navigator.search.dynamic.DefaultSearchForm</formClass> <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> <formId>verw_dienst</formId> <queryId>rsb_suche@WUNDA_LAGER</queryId> <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> <mappings> <queryParameter> <queryName>verw_dienststelle</queryName> <formName>Verwaltende Dienststelle</formName> </queryParameter> </mappings> </form> </forms> </category--> <!--category>  <name>AKUK</name> <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> <visible>true</visible> <forms> <form> <name>Allgemeine Abfrage</name> <formClass>Sirius.navigator.search.dynamic.DefaultSearchForm</formClass> <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> <formId>akuk_sql</formId> <queryId>kaufvertraege@WUNDA_BLAU</queryId> <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> <mappings> <queryParameter> <queryName>akuk_statement</queryName> <formName>Allgemeine Abfrage </formName> </queryParameter> </mappings> </form> </forms> </category-->  
+        <category>  
+            <name>AKUK</name> 
+            <categoryClass>Sirius.navigator.search.dynamic.DefaultSearchFormContainer</categoryClass> 
+            <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> 
+            <visible>true</visible> 
+            <forms> 
+                <form> 
+                    <name>Allgemeine Abfrage</name> 
+                    <formClass>de.wuppertal.r102.akuk.navigator.search.forms.StandardSearchForm</formClass> 
+                    <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> 
+                    <formId>akuk_sql</formId> 
+                    <queryId>kaufvertraege@WUNDA_BLAU</queryId> 
+                    <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> 
+                    <mappings> 
+                        <queryParameter> 
+                            <queryName>akuk_statement</queryName> 
+                            <formName>Allgemeine Abfrage </formName> 
+                        </queryParameter> 
+                    </mappings> 
+                </form> 
+                <form> 
+                    <name>nach Id's</name> 
+                    <formClass>Sirius.navigator.search.dynamic.DefaultSearchForm</formClass> 
+                    <formDataClass>Sirius.navigator.search.dynamic.DefaultFormDataBean</formDataClass> 
+                    <formId>akuk_ids</formId> 
+                    <queryId>kaufvertraege_by_ids@WUNDA_BLAU</queryId> 
+                    <resourceBundle>Sirius.navigator.search.dynamic.default</resourceBundle> 
+                    <mappings> 
+                        <queryParameter> 
+                            <queryName>akuk_ids</queryName> 
+                            <formName>ids</formName> 
+                        </queryParameter> 
+                    </mappings> 
+                </form> 
+            </forms> 
+        </category> 
+    </categories> 
+</search>

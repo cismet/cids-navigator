@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<plugin xmlns="http://www.enviromatics.net/sirius/navigator/plugins" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://www.enviromatics.net/sirius/navigator/plugins
+        ../plugin.xsd" 
+        id="verdis">
+
+    <metainfo 
+        name="VERDIS" 
+        version="0.8"
+        copyright="GPL"
+        company="cismet GmbH" 
+        homepage="http://www.cismet.de" 
+        author="Thorsten Hell" 
+        contact="thorsten.hell@cismet.de">
+        <description>lall
+        </description>
+    </metainfo>
+    
+    <properties>
+        <capabilities>
+            <progressobservable>true</progressobservable>
+            <propertyobservable>false</propertyobservable> 
+            <internationalized>false</internationalized> 
+            <unloadable>true</unloadable>
+            <deactivateable>true</deactivateable> 
+        </capabilities>
+    </properties>
+    
+    <deployment>
+        <pluginclass>de.cismet.verdis.gui.Main</pluginclass>
+        <libraries>
+        </libraries>
+        <rights>
+            <users>
+            </users>
+            <usergroups>
+            </usergroups>
+        </rights>
+
+
+        <params>
+        </params>
+        
+        <mappings>
+            <attribute>
+                <name>className</name>
+                <id>KASSENZEICHEN</id>
+            </attribute>
+            <attribute>
+                <name>attributeName</name>
+                <id>ID</id>
+            </attribute>
+        </mappings>
+    </deployment>
+    
+    <methods>
+    </methods>
+     
+    <ui>
+        <widgets>
+            <widget>
+                <component>
+                    <id>verdis</id>
+                    <name>Verdis</name>
+                    <tooltip></tooltip>
+                    <icon>images/verdis.png</icon>
+                    <position>P3</position>
+                    <preferredindex>2</preferredindex>
+                    <componentevents>false</componentevents>
+                </component>
+                <container>
+                    <floatingframe>
+                        <menubaravailable>true</menubaravailable>
+                        <swapmenubar>true</swapmenubar>
+                        <disablemenubar>false</disablemenubar>
+                        <toolbaravailable>true</toolbaravailable>
+                        <swaptoolbar>true</swaptoolbar>
+                        <disabletoolbar>true</disabletoolbar>
+                        <floatingevents>false</floatingevents>
+                    </floatingframe>
+                </container>
+            </widget>
+        </widgets>
+        
+        <actions>
+        </actions>
+    </ui>
+</plugin>

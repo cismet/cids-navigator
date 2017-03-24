@@ -1,0 +1,581 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document        : plugin.xsd
+    Created on      : 14. Februar 2003, 12:56
+    Author          : Pascal Dihé <pascal.dihe@enviromatics.net>
+    Description:
+        Purpose of XML Schema document follows.
+-->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://www.enviromatics.net/sirius/navigator/plugins"
+  xmlns:eig="http://www.enviromatics.net/sirius/navigator/plugins"
+  elementFormDefault="qualified">
+            
+    <xsd:element name="plugin">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="metainfo" type="eig:metainfoType" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="properties" type="eig:propertiesType" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="deployment" type="eig:deploymentType" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="methods" type="eig:methodsType" minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="ui" type="eig:uiType" minOccurs="0" maxOccurs="1"/>
+            </xsd:sequence>
+             <!-- unique id, plugin developers can obtain an id from eig -->
+            <xsd:attribute name="id" type="xsd:string" use="required"/>
+            <!-- short plugin name, same name as plugin directory, -jar file and -descriptor-->
+            <!--<xsd:attribute name="name" type="xsd:string" use="required"/> -->
+            <!-- plugin version -->
+            <!-- <xsd:attribute name="version" type="xsd:string" use="required"/>-->
+            <!-- determines if the plugin supports internationalization (i18n) -->
+            <!-- <xsd:attribute name="i18n" type="xsd:boolean" use="required"/>-->
+            <!--<xsd:attribute name="user" type="xsd:string" use="optional"/>
+            <xsd:attribute name="usergroup" type="xsd:string" use="optional"/>-->
+        </xsd:complexType>
+    </xsd:element>
+    
+    <!-- PlugIn Metainfo, used to describe the plugin, this information is displayed in the plugin info table-->  
+    <xsd:complexType name="metainfoType">
+        <xsd:sequence>	
+            <!-- (detailed) description of plugin -->
+            <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+        <!-- Full name of PlugIn Name -->
+        <xsd:attribute name="name" type="xsd:string" use="required"/>	
+        <!-- plugin version -->
+        <xsd:attribute name="version" type="xsd:string" use="required"/>
+        <!-- copyright, required-->
+        <xsd:attribute name="copyright" type="xsd:string" use="required"/>		
+        <!-- company, required-->
+        <xsd:attribute name="company" type="xsd:string" use="required"/>
+        <!-- homepage -->
+        <xsd:attribute name="homepage" type="xsd:anyURI" use="optional"/>
+        <!-- authors(s), required-->
+        <xsd:attribute name="author" type="xsd:string" use="optional"/>
+        <!-- contact email address -->
+        <xsd:attribute name="contact" type="xsd:string" use="optional"/>
+    </xsd:complexType>
+		    
+   <xsd:complexType name="deploymentType">
+        <xsd:sequence>
+            <!-- fully qualified class name of the class that implements the plugin interface(s) -->
+            <xsd:element name="pluginclass" type="xsd:string" minOccurs="1" maxOccurs="1"/> 
+            <!-- libraries (jar files) -->
+            <xsd:element name="libraries" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="jar" minOccurs="1" maxOccurs="unbounded">
+                            <xsd:simpleType>
+                                <xsd:restriction base="xsd:string">
+                                    <xsd:pattern value=".*\.jar"/>
+                                </xsd:restriction>
+                            </xsd:simpleType>
+                        </xsd:element> 
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!-- user/group restrictions -->
+            <xsd:element name="rights" minOccurs="0" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="users" minOccurs="0" maxOccurs="1">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element> 
+                        <xsd:element name="usergroups" minOccurs="0" maxOccurs="1">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!-- initialization parameters -->
+            <xsd:element name="params" minOccurs="0" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="param" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element> 
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <!-- attribute name to attribute id mapping -->
+            <xsd:element name="mappings" minOccurs="0" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                         <xsd:element name="attribute" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>  
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>  
+               
+            <!--<xsd:element name="events" minOccurs="0" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                         <xsd:element name="selection" minOccurs="1" maxOccurs="1">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                     <xsd:element name="nodes" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                                     <xsd:element name="attributes" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>  -->      
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <!-- plugin properties -->
+    <xsd:complexType name="propertiesType">
+        <xsd:sequence>  
+            <xsd:element name="capabilities" minOccurs="1" maxOccurs="1"> 
+                <xsd:complexType>
+                    <xsd:sequence>
+                         <xsd:element name="progressobservable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                         <xsd:element name="propertyobservable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                         <xsd:element name="internationalized" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                         <xsd:element name="unloadable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                         <xsd:element name="deactivateable" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="internationalization" type="eig:internationalizationType" minOccurs="0" maxOccurs="1"/> 
+        </xsd:sequence>
+    </xsd:complexType> 
+             
+    <xsd:complexType name="methodsType">
+        <xsd:sequence>
+             <xsd:element name="method" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="description" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="multithreaded" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                        <xsd:element name="availability" type="xsd:long" minOccurs="1" maxOccurs="1"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>  
+        </xsd:sequence>
+    </xsd:complexType>
+ 
+    <xsd:complexType name ="uiType">
+        <xsd:sequence>
+            <xsd:element name="widgets" minOccurs="0" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="widget" minOccurs="1" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="component" minOccurs="1" maxOccurs="1">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <!-- unique id -->
+                                                <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                                <!-- name (title) of the ui component, i18n key -->
+                                                <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                                <!-- ui tooltip -->
+                                                <xsd:element name="tooltip" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                                                <!-- indicates that the plugin ui component should recieve component events (shown(), ...) -->
+                                                <xsd:element name="icon" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                                                <!-- position of the plugin ui inside the navigator layout container -->
+                                                <xsd:element name="position" minOccurs="1" maxOccurs="1" default="P3">
+                                                    <xsd:simpleType>
+                                                        <xsd:restriction base="xsd:string">
+                                                            <xsd:enumeration value="P1"/>
+                                                            <xsd:enumeration value="P2"/>
+                                                            <xsd:enumeration value="P3"/>
+                                                        </xsd:restriction>
+                                                    </xsd:simpleType>
+                                                </xsd:element>
+                                                <!-- preferred ui index in the tabbed pane -->
+                                                <xsd:element name="preferredindex" type="xsd:nonNegativeInteger" minOccurs="0" maxOccurs="1"/>
+                                                <!-- indicates that the plugin ui component should recieve component events (shown(), ...) -->
+                                                <xsd:element name="componentevents" type="xsd:boolean" minOccurs="1" maxOccurs="1"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                    <!-- type of the underlying layout container -->
+                                    <xsd:element name="container" minOccurs="1" maxOccurs="1">
+                                        <xsd:complexType>
+                                            <xsd:choice>
+                                                <xsd:element name="panel" type="eig:panelType" minOccurs="1" maxOccurs="1"/>
+                                                <xsd:element name="scrollpane" minOccurs="1" maxOccurs="1"/>
+                                                <xsd:element name="floatingframe" type="eig:floatingframeType" minOccurs="1" maxOccurs="1"/>
+                                                <xsd:element name="none" minOccurs="1" maxOccurs="1"/>
+                                            </xsd:choice>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            
+            <xsd:element name="actions" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="toolbar" minOccurs="0" maxOccurs="1">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="properties" type="eig:toolbarPropertiesType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="buttons" minOccurs="1" maxOccurs="1">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="button" type="eig:buttonActionType" minOccurs="1" maxOccurs="unbounded"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="menu" minOccurs="0" maxOccurs="1">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="properties" type="eig:menuPropertiesType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="items" minOccurs="1" maxOccurs="1">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="item" type="eig:menuActionType" minOccurs="1" maxOccurs="unbounded"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                        <xsd:element name="popupmenu" minOccurs="0" maxOccurs="1">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="properties" type="eig:menuPropertiesType" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="items" minOccurs="1" maxOccurs="1">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="item" type="eig:popupMenuActionType" minOccurs="1" maxOccurs="unbounded"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>        
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <!-- container types ................................................... -->
+    <!-- panel container type -->
+
+    <xsd:complexType name="panelType">
+        <xsd:sequence>
+            <xsd:element name="layout" minOccurs="0" maxOccurs="1" default="FILL">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="CENTER"/>
+                        <xsd:enumeration value="FLOW"/>
+                        <xsd:enumeration value="FILL"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+             </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <!-- floatingframe container type -->
+    <xsd:complexType  name="floatingframeType">
+        <xsd:sequence>
+            <!-- Determines if the embedded plugin ui component has a menubar -->
+            <xsd:element name="menubaravailable" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+            <!-- Determines if the embedded plugin ui component's menubar shoulb be swappable-->
+            <xsd:element name="swapmenubar" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+            <!-- disable the menubar if the embeded floating component is hidden-->
+            <xsd:element name="disablemenubar" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+             <!-- Determines if the embedded plugin ui component has a toolbar -->
+            <xsd:element name="toolbaravailable" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+            <!-- Determines if the embedded plugin ui component's toolbar shoulb be swappable-->
+            <xsd:element name="swaptoolbar" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+            <!-- disable the toolbar if the embeded floating component is hidden-->
+            <xsd:element name="disabletoolbar" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+            <!-- recieve floating events -->
+            <xsd:element name="floatingevents" type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <!--  Properties types -->
+    
+   
+    <xsd:complexType name="toolbarPropertiesType">
+        <xsd:sequence>
+            <!-- action name, e.g. button title -->
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <!-- toolbar floatable -->
+            <xsd:element name="floatable" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType> 
+                                                    
+    <xsd:complexType name="menuPropertiesType">
+        <xsd:sequence>
+            <!-- action name, e.g. button title -->
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <!-- mnemonix -->
+            <xsd:element name="mnemonic" type="eig:mnemonicType" minOccurs="0" maxOccurs="1"/>
+            <!-- action iconid -->
+            <xsd:element name="icon" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType> 
+    
+    <!-- action type ....................................................... -->
+
+    <xsd:complexType name="buttonActionType">
+        <xsd:sequence>
+            <!-- action name, e.g. button title -->
+            <xsd:element name="name" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <!-- mnemonix -->
+            <xsd:element name="mnemonic" type="eig:mnemonicType" minOccurs="0" maxOccurs="1"/>
+            <!-- action tooltip -->
+            <xsd:element name="tooltip" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <!-- action iconid -->
+            <xsd:element name="icon" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <!-- action method is -->
+            <xsd:element name="method" type="xsd:string" minOccurs="1" maxOccurs="1"/> 
+        </xsd:sequence>
+    </xsd:complexType> 
+    
+    <xsd:complexType name="menuActionType">
+        <xsd:complexContent>
+            <xsd:extension base="eig:buttonActionType">
+                 <xsd:sequence> 
+                    <!-- keyboard accelerator -->
+                    <xsd:element name="accelerator" type="eig:acceleratorType" minOccurs="0" maxOccurs="1"/>
+                    <!-- place a separator below this item -->
+                    <xsd:element name="separator" type="xsd:boolean" minOccurs="0" maxOccurs="1"/>
+                 </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="popupMenuActionType">
+        <xsd:complexContent>
+            <xsd:extension base="eig:menuActionType">
+                 <xsd:sequence> 
+                    <!-- restrict the availability of the method -->
+                    <xsd:element name="availability" type="xsd:byte" minOccurs="0" maxOccurs="1"/>
+                 </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    
+    <!-- keyboard accelerator -->
+    
+    <xsd:simpleType name="mnemonicType">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value='1'/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="acceleratorType">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="((shift )|(alt )|(ctrl )){1,2}."/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <!-- language type -->
+    <xsd:complexType name="internationalizationType">
+        <xsd:sequence> 
+            <xsd:element name="defaultlocale" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="locales" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="locale" minOccurs="1" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                    <!--  a lowercase two-letter ISO-639 code -->
+                                    <xsd:element name="language" minOccurs="1" maxOccurs="1" default="de">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:string">
+                                                <xsd:pattern value='[a-z]{2}'/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:element>
+                                    <!-- uppercase two-letter ISO-3166 code -->
+                                    <xsd:element name="country" minOccurs="1" maxOccurs="1" default="DE">
+                                        <xsd:simpleType>
+                                            <xsd:restriction base="xsd:string">
+                                                <xsd:pattern value='[A-Z]{2}'/>
+                                            </xsd:restriction>
+                                        </xsd:simpleType>
+                                    </xsd:element>
+                                    <xsd:element name="resourcefile" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <!-- deprecated, ignore ................................................ --> 
+    <!-- an internationalizeable (i18n) string -->    
+    <!-- 
+    <xsd:complexType name="i18nstring">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="i18nkey" type="xsd:boolean" default="false"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType> 
+    -->
+    
+    
+    <!-- plugin interfaces -->
+    <!--
+    <xsd:element name="interface">
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="Sirius.Navigator.pluginsupport.interfaces.FloatingUISupport"/>
+            </xsd:restriction>
+        </xsd:simpleType>
+    </xsd:element>
+    -->
+    
+    <!-- 
+    <xsd:element name="uidefinitions">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="param" minOccurs="1" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                            <xsd:element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element> 
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    -->
+    
+    <!-- 
+    <xsd:simpleType name="key">
+        <xsd:restriction base="xsd:string">
+            <xsd:length value="1"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    -->
+    
+    
+    <!-- scrollpane container type -->
+    <!--
+    <xsd:complexType name="scrollpaneType">
+        <xsd:sequence>-->
+            <!--  Enables/disables scrolling in response to movement of the mouse wheel. --> <!--
+            <xsd:element name="mousewheel" type="xsd:boolean" minOccurs="0" maxOccurs="1" default="false"/>-->
+            <!-- Determines when the vertical scrollbar appears in the scrollpane --><!--
+            <xsd:element name="vsbpolicy" minOccurs="0" maxOccurs="1" default="VERTICAL_SCROLLBAR_AS_NEEDED">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="VERTICAL_SCROLLBAR_AS_NEEDED"/>
+                        <xsd:enumeration value="VERTICAL_SCROLLBAR_NEVER"/>
+                        <xsd:enumeration value="VERTICAL_SCROLLBAR_ALWAYS"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+             </xsd:element>-->
+             <!-- Determines when the horizontal scrollbar appears in the scrollpane --><!--
+             <xsd:element name="hsbpolicy" minOccurs="0" maxOccurs="1" default="HORIZONTAL_SCROLLBAR_AS_NEEDED">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="HORIZONTAL_SCROLLBAR_AS_NEEDED"/>
+                        <xsd:enumeration value="HORIZONTAL_SCROLLBAR_NEVER"/>
+                        <xsd:enumeration value="HORIZONTAL_SCROLLBAR_ALWAYS"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+             </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    -->
+    
+    <!--
+        <xsd:complexType name="menuitem">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="methodid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="iconid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            
+        </xsd:sequence>
+    </xsd:complexType> 
+    
+    
+    
+    <xsd:complexType name="button">
+        <xsd:sequence>
+            <xsd:element name="tooltip" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="methodid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="iconid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+        </xsd:sequence>
+    </xsd:complexType> 
+    
+    <xsd:complexType name="popupmenuitem">
+        <xsd:complexContent>
+            <xsd:extension base="eig:menuitem" >
+                <xsd:sequence>
+                    
+                </xsd:sequence>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType> 
+    -->
+    
+    <!--
+    <xsd:element name="menubar" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="iconid" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                                    <xsd:element name="accelerator" type="eig:acceleratorType" minOccurs="0" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>
+
+                        <xsd:element name="toolbar" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+
+                                    <xsd:element name="methodid" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+
+                                    <xsd:element name="buttons" type="xsd:byte" minOccurs="0" maxOccurs="1"/>
+
+                                    <xsd:element name="mapping" minOccurs="0" maxOccurs="unbounded">
+                                        <xsd:complexType>
+                                            <xsd:sequence>
+                                                <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                                <xsd:element name="id" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                            </xsd:sequence>
+                                        </xsd:complexType>
+                                    </xsd:element>  
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>       
+    --> 
+
+</xsd:schema>

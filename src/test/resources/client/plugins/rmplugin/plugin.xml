@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<plugin xmlns="http://www.enviromatics.net/sirius/navigator/plugins" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://www.enviromatics.net/sirius/navigator/plugins
+        ../plugin.xsd" 
+        id="rmplugin">
+    <!-- usergroup="usergroup@DOMAIN" -->
+
+    <metainfo 
+        name="rmplugin" 
+        version="0.8"
+        copyright="GPL"
+        company="cismet GmbH" 
+        homepage="http://www.cismet.de" 
+        author="Sebastian Puhl" 
+        contact="sebastian.puhl@cismet.de">
+        <description>Plugin Für Remote Nachrichten Funktionaliät
+        </description>
+    </metainfo>
+    
+    <properties>
+        <capabilities>
+            <progressobservable>true</progressobservable>
+            <propertyobservable>false</propertyobservable> 
+            <internationalized>false</internationalized> 
+            <unloadable>false</unloadable>
+            <deactivateable>true</deactivateable> 
+        </capabilities>		
+    </properties>
+    
+    <deployment>
+        <pluginclass>de.cismet.rmplugin.RMPlugin</pluginclass>
+        <libraries>
+        </libraries>
+        
+        <params>
+            <param>
+                <name>DefaultPort</name>
+                <value>1099</value>
+            </param>
+            <param>
+                <name>AltPort</name>
+                <value>9001</value>
+            </param>
+            <param>
+                <name>RMRegistryServer</name>
+                <value>rmi://localhost:1099/RMRegistryServer</value>
+            </param>			
+        </params>
+        
+        <mappings>        
+        </mappings>
+    </deployment>
+    
+    <methods>	
+    </methods>
+     
+    <ui>
+        <actions>
+        </actions>
+    </ui>
+</plugin>
