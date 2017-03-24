@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : search.xsd
+    Created on : 12. November 2003, 10:15
+    Author     : pascal
+    Description:
+        Purpose of XML Schema document follows.
+-->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.enviromatics.net/sirius/navigator/search"
+            xmlns:eig="http://www.enviromatics.net/sirius/navigator/search"
+            elementFormDefault="qualified">
+  
+    <xsd:element name="search">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="libraries" type="eig:librariesType" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="categories" minOccurs="1" maxOccurs="1">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="category" type="eig:categoryType" minOccurs="1" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:complexType name="librariesType">
+        <xsd:sequence>
+            <xsd:element name="jar" minOccurs="1" maxOccurs="unbounded">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value=".*\.jar"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element> 
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="categoryType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="categoryClass" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="resourceBundle" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="forms" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="form" type="eig:formType" minOccurs="1" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>    
+        </xsd:sequence>
+    </xsd:complexType>
+    
+    <xsd:complexType name="formType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="formClass" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="formDataClass" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="formId" type="xsd:string" minOccurs="1" maxOccurs="1"/>  
+            <xsd:element name="queryId" type="xsd:string" minOccurs="1" maxOccurs="1"/>  
+            <xsd:element name="resourceBundle" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <!-- initilization properties -->
+            <xsd:element name="properties" minOccurs="0" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="property" minOccurs="1" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="name" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="value" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>  
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>   
+            <!-- attribute name to attribute id mapping -->
+            <xsd:element name="mappings" minOccurs="1" maxOccurs="1">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="queryParameter" minOccurs="1" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:sequence>
+                                    <xsd:element name="queryName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                    <xsd:element name="formName" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                                </xsd:sequence>
+                            </xsd:complexType>
+                        </xsd:element>  
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>   
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

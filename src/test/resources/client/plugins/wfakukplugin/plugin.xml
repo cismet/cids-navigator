@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<plugin xmlns="http://www.enviromatics.net/sirius/navigator/plugins" 
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="http://www.enviromatics.net/sirius/navigator/plugins
+        ../plugin.xsd" 
+        id="wfakukplugin">
+
+    <metainfo 
+        name="wfakukplugin" 
+        version="0.8"
+        copyright="GPL"
+        company="cismet GmbH" 
+        homepage="http://www.cismet.de" 
+        author="Thorsten hell" 
+        contact="thorsten.hell@cismet.de">
+        <description>Plugin zum ansteuern von WF-Akuk</description>
+    </metainfo>
+    
+    <properties>
+        <capabilities>
+            <progressobservable>true</progressobservable>
+            <propertyobservable>false</propertyobservable> 
+            <internationalized>false</internationalized> 
+            <unloadable>false</unloadable>
+            <deactivateable>true</deactivateable> 
+        </capabilities>		
+    </properties>
+    
+    <deployment>
+        <pluginclass>de.cismet.cids.navigator.plugins.WFAkukPlugin</pluginclass>
+        
+        <libraries>
+        </libraries>
+        <rights>
+            <users>
+            </users>
+            <usergroups>
+            </usergroups>
+        </rights>
+        
+        <params>
+            <param>
+                <name>exchangeDirectory</name>
+                <value>.akukexchange</value>
+            </param>
+            <param>
+                <name>exchangeFile</name>
+                <value>CismetSelektion.txt</value>
+            </param>
+            <param>
+                <name>exchangeTriggerExe</name>
+                <!--value>WFAKuKCismetConnector.exe</value-->
+                <value>.akukexchange\WFAKuKCismetConnector.exe</value>
+            </param>
+            <param>
+                <name>akukClassKey</name>
+                <value>25@WUNDA_BLAU</value>
+            </param>
+        </params>
+        
+        <mappings>        
+        </mappings>
+    </deployment>
+    
+    <methods>	
+        <method>
+            <id>de.cismet.cids.navigator.plugins.WFAkukPlugin$ShowInAkuk</id>
+            <name>Objekte in WF-Akuk anzeigen</name>
+            <description>Die ausgewaehlten Objekte werden in der Anwendung WF-Akuk angezeigt.</description>
+            <multithreaded>false</multithreaded>
+        </method>
+    </methods>
+     
+    <ui>
+        <actions>
+            <toolbar>
+                <properties>
+                    <name>WF-Akuk</name>
+                    <floatable>true</floatable>
+                </properties>
+                <buttons>
+                    <button>
+                        <tooltip>in WF-Akuk anzeigen</tooltip>
+                        <icon>images/akuk.png</icon>
+                        <method>de.cismet.cids.navigator.plugins.WFAkukPlugin$ShowInAkuk</method>
+                    </button>
+                </buttons>
+            </toolbar>
+        </actions>
+    </ui>
+</plugin>
