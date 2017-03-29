@@ -69,6 +69,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.Disposable;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 
 import de.cismet.cids.editors.converters.BooleanToStringConverter;
@@ -550,6 +551,10 @@ public class CidsObjectEditorFactory {
                                 final String newKey = mai.getFieldName().toLowerCase() + "." + key; // NOI18N
                                 cidsEditor.addControlInformation(newKey, ed.getAllControls().get(key));
                             }
+                        }
+
+                        if (cmpEditor instanceof Disposable) {
+                            cidsEditor.addDisposableChild((Disposable)cmpEditor);
                         }
 
                         gbc = getCommonConstraints();

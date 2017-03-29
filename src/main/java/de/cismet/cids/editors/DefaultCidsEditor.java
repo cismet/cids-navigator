@@ -15,11 +15,14 @@ import org.jdesktop.beansbinding.BindingGroup;
 
 import java.awt.LayoutManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JPanel;
 
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.Disposable;
 
 import de.cismet.cids.tools.metaobjectrenderer.Titled;
 
@@ -37,6 +40,7 @@ public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,
     private CidsBean cidsBean = null;
     private BindingGroup bindingGroup = new BindingGroup();
     private String customTitle = null;
+    private List<Disposable> disposableChildren = new ArrayList<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -135,8 +139,21 @@ public class DefaultCidsEditor extends JPanel implements AutoBindableCidsEditor,
         customTitle = title;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  disposableChild  DOCUMENT ME!
+     */
+    public void addDisposableChild(final Disposable disposableChild) {
+        disposableChildren.add(disposableChild);
+    }
+
     @Override
     public void dispose() {
+        for (final Disposable disposableChild : disposableChildren) {
+            disposableChild.dispose();
+        }
+        disposableChildren.clear();
         bindingGroup.unbind();
     }
 }
