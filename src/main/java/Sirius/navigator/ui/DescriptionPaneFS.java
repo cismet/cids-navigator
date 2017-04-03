@@ -54,7 +54,8 @@ public class DescriptionPaneFS extends DescriptionPane {
     public DescriptionPaneFS() {
         super();
 
-        System.setProperty("xr.load.xml-reader", "org.ccil.cowan.tagsoup.Parser");
+        System.setProperty("xr.load.xml-reader", org.ccil.cowan.tagsoup.Parser.class.getCanonicalName());
+        // System.setProperty("xr.util-logging.loggingEnabled", "true");
         System.setProperty("xr.load.string-interning", "true");
         System.setProperty("xr.use.listeners", "true");
 
