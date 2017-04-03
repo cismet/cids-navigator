@@ -12,6 +12,8 @@
  */
 package Sirius.navigator.ui;
 
+import org.apache.log4j.BasicConfigurator;
+
 import java.awt.BorderLayout;
 import java.awt.event.KeyEvent;
 
@@ -29,7 +31,7 @@ public class DescriptionPaneTest extends javax.swing.JFrame {
 
     //~ Instance fields --------------------------------------------------------
 
-    private DescriptionPaneFS pnlDescription;
+    private DescriptionPane pnlDescription;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGo;
     private javax.swing.JButton btnOpenFile;
@@ -61,6 +63,7 @@ public class DescriptionPaneTest extends javax.swing.JFrame {
         }
 
         pnlDescription.setPageFromURI(url);
+        pnlDescription.showHTML();
     }
 
     /**
@@ -163,6 +166,8 @@ public class DescriptionPaneTest extends javax.swing.JFrame {
      * @param  args  the command line arguments
      */
     public static void main(final String[] args) {
+        BasicConfigurator.configure();
+
         java.awt.EventQueue.invokeLater(new Runnable() {
 
                 @Override
