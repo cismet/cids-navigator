@@ -1,0 +1,182 @@
+{
+    "mainMenu":
+            [
+                {
+                    "name": "&Navigator",
+                    "items":
+                            [
+                                {"actionKey": "navigator.save.current.layout"},
+                                {"actionKey": "navigator.open.layout"},
+                                {"actionKey": "navigator.reset.layout"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "tree.refresh"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "navigator.exit"}
+                            ]
+                },
+                {
+                    "name": "&Suche",
+                    "items":
+                            [
+                                {"actionKey": "SearchSearchTopicsDialog"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "query.search"}
+                            ]
+                },
+                {
+                    "name": "&Datei",
+                    "items":
+                            [
+                                {"actionKey": "cismap.load.config"},
+                                {"actionKey": "cismap.save.config"},
+                                {"actionKey": "cismap.load.server.config"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "cismap.load.shape"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "ExportMapToFileAction"},
+                                {"actionKey": "ExportMapToClipboardAction"},
+                                {"actionKey": "ExportGeoPointToClipboardAction"}
+                            ]
+                },
+                {
+                    "name": "&Bearbeiten",
+                    "items":
+                            [
+                                {"actionKey": "RefreshAction"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "cismap.zoom.selection"},
+                                {"actionKey": "cismap.zoom.all"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "cismap.remove.selection"},
+                                {"actionKey": "cismap.remove.all"}
+                            ]
+                },
+                {
+                    "name": "&Chronik",
+                    "items":
+                            [
+                                {"actionKey": "JHistoryBackAction"},
+                                {"actionKey": "HomeAction"},
+                                {"actionKey": "JHistoryForwardAction"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "mapHistory"}
+                            ]
+                },
+                {
+                    "name": "GeoSuche",
+                    "actionKey": "MetaSearchMenu"
+                },
+                {
+                    "name": "&Extras",
+                    "items":
+                            [
+                                {"actionKey": "extras.options"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "BufferSelectedGeometryAction"},
+                                {"actionKey": "AngleMeasurementAction"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "GotoPointAction"},
+                                {"actionKey": "MenuSeparator"},
+                                {"actionKey": "ChangeScaleAction"},
+                                {"actionKey": "ScaleMenu"}
+                            ]
+                },
+                {
+                    "name": "S&uche und Finde",
+                    "items":
+                            [
+                                {"actionKey": "MapWindowActstrasse_hausnummerWindowActionion"},
+                                {"actionKey": "gemarkung_flur_flurstueckWindowAction"},
+                                {"actionKey": "bplan_sucheWindowAction"},
+                                {"actionKey": "poi_themaWindowAction"},
+                                {"actionKey": "poi_sucheWindowAction"}
+                            ]
+                },
+                {
+                    "name": "&Fenster",
+                    "items":
+                            [
+                                {"actionKey": "MapWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.capabilitywidget.CapabilityWidgetWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.featurecontrolwidget.FeatureControlWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.featureinfowidget.FeatureInfoWidgetWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.infowidgets.LayerInfoWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.infowidgets.LegendWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.infowidgets.ServerInfoWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.layerwidget.LayerWidgetWindowAction"},
+                                {"actionKey": "de.cismet.cismap.commons.gui.overviewwidget.OverviewComponentWindowAction"},
+                                {"actionKey": "Sirius.navigator.ui.DescriptionPaneWindowAction"},
+                                {"actionKey": "Sirius.navigator.ui.attributes.AttributeViewerWindowAction"},
+                                {"actionKey": "Sirius.navigator.ui.tree.MetaCatalogueTreeWindowAction"},
+                                {"actionKey": "Sirius.navigator.ui.tree.SearchResultsTreeWindowAction"},
+                                {"actionKey": "Sirius.navigator.ui.attributes.editor.AttributeEditorWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.AlkisWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.BaulastWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.BillingWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.LandParcelWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.MauernWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.MeasurementPointWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.Sb_StadtbildWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.custom.wunda_blau.search.VermessungRissWindowSearchWindowAction"},
+                                {"actionKey": "de.cismet.cids.search.QuerySearchWindowAction"}
+                            ]
+                },
+                {
+                    "name": "&Hilfe",
+                    "items":
+                            [
+                                {"actionKey": "OnlineHelpAction"},
+                                {"actionKey": "NewsAction"}
+                            ]
+                }
+            ],
+    "toolbars": 
+            [
+                {
+                    "id": "mainToolBar",
+                    "items":
+                    [
+                        {"actionKey": "SearchSearchTopicsDialog"},
+                        {"actionKey": "download.manager"},
+                        {"actionKey": "TestSetMotdAction"},
+                        {"actionKey": "BerechtigungspruefungToolbarWidget"},
+                        {"actionKey": "JHistoryBackButton"},
+                        {"actionKey": "HomeAction"},
+                        {"actionKey": "JHistoryForwardButton"},
+                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "RefreshAction"},
+                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "PrintAction"},
+                        {"actionKey": "AlkisToobarPlugin"},
+                        {"actionKey": "PointNumberReservationToolbar"},
+                        {"actionKey": "DigitalDataExportToolbar"},
+                        {"actionKey": "MapExportPanel"},
+                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "SingleSelectionAction", "radio": "MapMode"},
+                        {"actionKey": "ZoomAction", "radio": "MapMode"},
+                        {"actionKey": "PanAction", "radio": "MapMode"},
+                        {"actionKey": "FeatureInfoAction", "radio": "MapMode"},
+                        {"actionKey": "MetaSearchToolbarComponent", "radio": "MapMode"},
+                        {"actionKey": "NewPolygonAction", "radio": "MapMode"},
+                        {"actionKey": "NewLineStringAction", "radio": "MapMode"},
+                        {"actionKey": "NewPointAction", "radio": "MapMode"},
+                        {"actionKey": "MoveAction", "radio": "MapMode"},
+                        {"actionKey": "RemoveAction", "radio": "MapMode"},
+                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "NodeMoveAction", "radio": "NodeMode"},
+                        {"actionKey": "NodeAddAction", "radio": "NodeMode"},
+                        {"actionKey": "NodeRemoveAction", "radio": "NodeMode"},
+                        {"actionKey": "NodeRotateAction", "radio": "NodeMode"},
+                        {"actionKey": "NodeReflectAction", "radio": "NodeMode"},
+                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "SnapAction", "toggle": "true"},
+                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "UndoAction"},
+                        {"actionKey": "RedoAction"},
+                        {"actionKey": "VirtualCityMapToolbar"},
+                        {"actionKey": "SimpleMemoryMonitoringToolbarWidget"}
+                    ]
+                }
+            ]
+}
+

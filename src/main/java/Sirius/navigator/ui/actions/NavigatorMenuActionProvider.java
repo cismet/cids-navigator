@@ -8,7 +8,7 @@
 package Sirius.navigator.ui.actions;
 
 import Sirius.navigator.Navigator;
-import Sirius.navigator.NavigatorNeu;
+import Sirius.navigator.NavigatorX;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
@@ -134,7 +134,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
             if (layoutManager != null) {
                 layoutManager.saveCurrentLayout(ComponentRegistry.getRegistry().getMainWindow());
             } else {
-                saveCurrentLayout((NavigatorNeu)ComponentRegistry.getRegistry().getMainWindow());
+                saveCurrentLayout((NavigatorX)ComponentRegistry.getRegistry().getMainWindow());
             }
         }
 
@@ -143,7 +143,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
          *
          * @param  parent  DOCUMENT ME!
          */
-        public void saveCurrentLayout(final NavigatorNeu parent) {
+        public void saveCurrentLayout(final NavigatorX parent) {
             final JFileChooser fc = new JFileChooser(Navigator.NAVIGATOR_HOME);
             fc.setFileFilter(new FileFilter() {
 
@@ -224,7 +224,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
             if (layoutManager != null) {
                 layoutManager.loadLayout(ComponentRegistry.getRegistry().getMainWindow());
             } else {
-                loadLayout((NavigatorNeu)ComponentRegistry.getRegistry().getMainWindow());
+                loadLayout((NavigatorX)ComponentRegistry.getRegistry().getMainWindow());
             }
         }
 
@@ -233,7 +233,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
          *
          * @param  parent  DOCUMENT ME!
          */
-        public void loadLayout(final NavigatorNeu parent) {
+        public void loadLayout(final NavigatorX parent) {
             final JFileChooser fc = new JFileChooser(Navigator.NAVIGATOR_HOME);
             fc.setFileHidingEnabled(false);
             fc.setFileFilter(new FileFilter() {
@@ -318,7 +318,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
             if (layoutManager != null) {
                 layoutManager.resetLayout();
             } else {
-                ((NavigatorNeu)ComponentRegistry.getRegistry().getMainWindow()).loadLayout(
+                ((NavigatorX)ComponentRegistry.getRegistry().getMainWindow()).loadLayout(
                     LayoutedContainer.DEFAULT_LOCAL_LAYOUT,
                     true);
             }
