@@ -141,7 +141,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
 
             if ((search == null) || search) {
                 ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(newNodes, false, null);
-                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.SEARCHRESULTS_TREE);
+                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.SEARCHRESULTS_TREE);
             }
 
             if ((map != null) && map) {
@@ -154,7 +154,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             }
             if ((renderer != null) && renderer) {
                 ComponentRegistry.getRegistry().getDescriptionPane().setNodesDescriptions(defaultMetaTreeNodes);
-                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.DESCRIPTION_PANE);
+                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.DESCRIPTION_PANE);
             }
         } catch (Exception e) {
             LOG.error("Problem during remote-showing an object", e);

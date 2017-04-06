@@ -12,6 +12,7 @@ import Sirius.navigator.ui.ComponentRegistry;
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
 import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
+import de.cismet.tools.gui.menu.CidsUiAction;
 
 /**
  * DOCUMENT ME!
@@ -20,7 +21,8 @@ import de.cismet.tools.gui.downloadmanager.DownloadManagerAction;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsClientToolbarItem.class)
-public class NavigatorDownloadManagerAction extends DownloadManagerAction implements CidsClientToolbarItem {
+public class NavigatorDownloadManagerAction extends DownloadManagerAction implements CidsClientToolbarItem,
+    CidsUiAction {
 
     //~ Constructors -----------------------------------------------------------
 
@@ -29,6 +31,7 @@ public class NavigatorDownloadManagerAction extends DownloadManagerAction implem
      */
     public NavigatorDownloadManagerAction() {
         super(ComponentRegistry.getRegistry().getMainWindow());
+        putValue(CidsUiAction.CIDS_ACTION_KEY, "download.manager");
     }
 
     //~ Methods ----------------------------------------------------------------

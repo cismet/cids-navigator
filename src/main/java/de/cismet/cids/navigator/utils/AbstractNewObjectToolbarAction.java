@@ -44,6 +44,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
 
+import de.cismet.tools.gui.menu.CidsUiAction;
+
 /**
  * DOCUMENT ME!
  *
@@ -51,7 +53,8 @@ import de.cismet.connectioncontext.ConnectionContextStore;
  * @version  $Revision$, $Date$
  */
 public abstract class AbstractNewObjectToolbarAction extends AbstractAction implements CidsClientToolbarItem,
-    ConnectionContextStore {
+    ConnectionContextStore,
+    CidsUiAction {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -88,6 +91,18 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
                         + getDomain(),
                 e);
         }
+        putValue(CidsUiAction.CIDS_ACTION_KEY, getActionName());
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private String getActionName() {
+        return this.getClass().getName().substring(this.getClass().getName().lastIndexOf(".") + 1);
     }
 
     @Override
