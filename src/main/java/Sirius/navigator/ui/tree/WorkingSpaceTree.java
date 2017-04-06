@@ -8,6 +8,11 @@
 package Sirius.navigator.ui.tree;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import Sirius.navigator.resource.PropertyManager;
+
+import javax.swing.JComponent;
+
+import de.cismet.tools.gui.GUIWindow;
 
 /**
  * DOCUMENT ME!
@@ -15,7 +20,8 @@ import de.cismet.connectioncontext.ConnectionContext;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class WorkingSpaceTree extends SearchResultsTree {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow {
 
     //~ Constructors -----------------------------------------------------------
 
@@ -43,5 +49,16 @@ public class WorkingSpaceTree extends SearchResultsTree {
             final int maxThreadCount,
             final ConnectionContext connectionContext) throws Exception {
         super(useThread, maxThreadCount, connectionContext);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public String getPermissionString() {
+        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+            return GUIWindow.NO_PERMISSION;
+        } else {
+            return "WorkingSpaceTreeEnabled";
+        }
     }
 }

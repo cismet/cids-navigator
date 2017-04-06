@@ -23,6 +23,7 @@ package Sirius.navigator.ui.status;
  */
 import Sirius.navigator.DefaultNavigatorExceptionHandler;
 import Sirius.navigator.resource.*;
+import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.widget.MutableImageLabel;
 
 import org.apache.log4j.Logger;
@@ -32,6 +33,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
+import de.cismet.tools.gui.NavigatorStatusBarComponent;
 import de.cismet.tools.gui.downloadmanager.DownloadManagerStatusPanel;
 import de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPanel;
 
@@ -40,7 +42,8 @@ import de.cismet.tools.gui.exceptionnotification.ExceptionNotificationStatusPane
  *
  * @version  $Revision$, $Date$
  */
-public class MutableStatusBar extends JPanel {
+@org.openide.util.lookup.ServiceProvider(service = NavigatorStatusBarComponent.class)
+public class MutableStatusBar extends JPanel implements NavigatorStatusBarComponent {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -263,5 +266,42 @@ public class MutableStatusBar extends JPanel {
      */
     public boolean isRedStatusIconBlinking() {
         return redStatusIcon.isBlinking();
+    }
+
+    @Override
+    public Component getComponent() {
+        return this;
+    }
+
+    @Override
+    public double getWeight() {
+        return 0.8;
+    }
+
+    @Override
+    public Side getSide() {
+        return Side.LEFT;
+    }
+
+    @Override
+    public boolean isVisibleInStatusBar() {
+        return true;
+    }
+
+    @Override
+    public void initialize() {
+        final StatusChangeListener statusChangeListener = new StatusChangeListener(this);
+
+        if (ComponentRegistry.getRegistry().getActiveCatalogue() != null) {
+            ComponentRegistry.getRegistry().getActiveCatalogue().addStatusChangeListener(statusChangeListener);
+        }
+
+        if (ComponentRegistry.getRegistry().getDescriptionPane() != null) {
+            ComponentRegistry.getRegistry().getDescriptionPane().addStatusChangeListener(statusChangeListener);
+        }
+
+        if (ComponentRegistry.getRegistry().getWorkingSpaceTree() != null) {
+            ComponentRegistry.getRegistry().getWorkingSpaceTree().addStatusChangeListener(statusChangeListener);
+        }
     }
 }
