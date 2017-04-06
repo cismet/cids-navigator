@@ -633,7 +633,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 org.openide.util.NbBundle.getMessage(
                     Navigator.class,
                     "Navigator.initWidgets().configurator.name.attributeViewer")); // NOI18N
-        configurator.setTitleBarEnabled(false);
+// configurator.setTitleBarEnabled(false);
 
         final MutableConstraints attributePanelConstraints = new MutableConstraints(propertyManager.isAdvancedLayout());
         attributePanelConstraints.addAsFloatingFrame(
@@ -685,25 +685,6 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             // SHIFT + F2 / F3
             final InputMap inputMap = attributeEditor.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
             final ActionMap actionMap = attributeEditor.getActionMap();
-
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F2, KeyEvent.SHIFT_DOWN_MASK, true), MutableConstraints.P2);
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_F3, KeyEvent.SHIFT_DOWN_MASK, true), MutableConstraints.P3);
-
-            actionMap.put(MutableConstraints.P2, new AbstractAction() {
-
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        attributeEditorConstraints.setPosition(MutableConstraints.P2);
-                    }
-                });
-
-            actionMap.put(MutableConstraints.P3, new AbstractAction() {
-
-                    @Override
-                    public void actionPerformed(final ActionEvent e) {
-                        attributeEditorConstraints.setPosition(MutableConstraints.P3);
-                    }
-                });
 
             if (logger.isInfoEnabled()) {
                 logger.info("attribute editor enabled");  // NOI18N
