@@ -55,6 +55,7 @@ import java.util.concurrent.Future;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.Icon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JTree;
@@ -81,12 +82,15 @@ import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
+import de.cismet.tools.gui.GUIWindow;
+
 /**
  * DefaultMetaTree ist ein Navigationsbaum.
  *
  * @version  $Revision$, $Date$
  */
-public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll, ConnectionContextProvider {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll, ConnectionContextProvider, GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -94,19 +98,27 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final DefaultStatusChangeSupport statusChangeSupport;
-    protected final DefaultTreeModel defaultTreeModel;
-    protected final boolean useThread;
+    protected DefaultStatusChangeSupport statusChangeSupport;
+    protected DefaultTreeModel defaultTreeModel;
+    protected boolean useThread;
 
     private BufferedImage dragImage = null;
     // HELL
     private int margin = 12;
 
-    private final transient MetaTreeRefreshCache refreshCache;
-    private final transient ExecutorService treePool;
+    private transient MetaTreeRefreshCache refreshCache;
+    private transient ExecutorService treePool;
     private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
+
+    /**
+     * This default constructor will be used by the lookup. If the object was created with this constructor, the method
+     * <code>init(RootTreeNode, boolean, boolean, int)</code> should be invoked, to initialise this component
+     */
+    public MetaCatalogueTree() {
+        connectionContext = ConnectionContext.createDeprecated();
+    }
 
     /**
      * Creates a new MetaCatalogueTree object.
@@ -165,6 +177,23 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
         this.useThread = useThread;
+        init(rootTreeNode, editable, useThread, maxThreadCount);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Should be invoked, if the default constructor was used.
+     *
+     * @param  rootTreeNode    DOCUMENT ME!
+     * @param  editable        DOCUMENT ME!
+     * @param  useThread       DOCUMENT ME!
+     * @param  maxThreadCount  DOCUMENT ME!
+     */
+    public void init(final RootTreeNode rootTreeNode,
+            final boolean editable,
+            final boolean useThread,
+            final int maxThreadCount) {
         this.setModel(new DefaultTreeModel(rootTreeNode, true));
         this.setEditable(editable);
 
@@ -242,8 +271,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 }
             });
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * Expandiert alle geladenen Knoten.
@@ -570,6 +597,25 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     @Override
     public ConnectionContext getConnectionContext() {
         return connectionContext;
+    }
+    
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        return GUIWindow.NO_PERMISSION;
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
     }
 
     //~ Inner Classes ----------------------------------------------------------
