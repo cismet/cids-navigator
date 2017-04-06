@@ -26,6 +26,7 @@ import java.util.Collections;
 import javax.swing.*;
 import javax.swing.event.*;
 
+import de.cismet.tools.gui.GUIWindow;
 import de.cismet.tools.gui.JPopupMenuButton;
 
 /**
@@ -34,7 +35,8 @@ import de.cismet.tools.gui.JPopupMenuButton;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class SearchResultsTreePanel extends JPanel implements ResultNodeListener {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class SearchResultsTreePanel extends JPanel implements ResultNodeListener, GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -42,8 +44,8 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
 
     //~ Instance fields --------------------------------------------------------
 
-    private final SearchResultsTree searchResultsTree;
-    private final JToolBar toolBar;
+    private SearchResultsTree searchResultsTree;
+    private JToolBar toolBar;
     private JButton removeButton;
     private JButton clearButton;
     private JCheckBox showDirectlyInMap;
@@ -56,6 +58,14 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
     private JToggleButton tbnFilteredResults;
 
     //~ Constructors -----------------------------------------------------------
+
+    /**
+     * This default constructor will be used by the lookup. If the object was created with this constructor, the method
+     * <code>init(SearchResultsTree, boolean)</code> should be invoked, to initialise this component
+     */
+    public SearchResultsTreePanel() {
+        super(new BorderLayout());
+    }
 
     /**
      * Creates a new SearchResultsTreePanel object.
@@ -74,6 +84,18 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
      */
     public SearchResultsTreePanel(final SearchResultsTree searchResultsTree, final boolean advancedLayout) {
         super(new BorderLayout());
+        init(searchResultsTree, advancedLayout);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Should be invoked, if the default constructor was used.
+     *
+     * @param  searchResultsTree  DOCUMENT ME!
+     * @param  advancedLayout     DOCUMENT ME!
+     */
+    public void init(final SearchResultsTree searchResultsTree, final boolean advancedLayout) {
         this.searchResultsTree = searchResultsTree;
         this.toolBar = new JToolBar(org.openide.util.NbBundle.getMessage(
                     SearchResultsTreePanel.class,
@@ -83,8 +105,6 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
         this.toolBar.setFloatable(advancedLayout);
         this.init();
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -201,9 +221,7 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
                         searchResultsTree.syncWithRenderer(true);
                         if (searchResultsTree.isSyncWithMap()) {
                             // Because in this case the renderer is not brought to front by default
-                            ComponentRegistry.getRegistry()
-                                    .getGUIContainer()
-                                    .select(ComponentRegistry.DESCRIPTION_PANE);
+                            ComponentRegistry.getRegistry().showComponent(ComponentRegistry.DESCRIPTION_PANE);
                         }
                     }
                 }
@@ -344,6 +362,26 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
      */
     public SearchResultsTree getSearchResultsTree() {
         return this.searchResultsTree;
+    }
+
+    @Override
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        return GUIWindow.NO_PERMISSION;
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
     }
 
     //~ Inner Classes ----------------------------------------------------------

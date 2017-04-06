@@ -347,7 +347,7 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
                 log.debug("syncWithRenderer"); // NOI18N
             }
             if (!isSyncWithMap()) {
-                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.DESCRIPTION_PANE);
+                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.DESCRIPTION_PANE);
             }
             setSelectionInterval(0, getRowCount());
         }
