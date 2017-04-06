@@ -15,6 +15,7 @@ import Sirius.navigator.actiontag.ActionTagProtected;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.search.dynamic.SearchControlPanel;
+import Sirius.navigator.ui.ComponentRegistry;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
@@ -91,6 +92,7 @@ import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.gui.PaginationPanel;
+import de.cismet.tools.gui.menu.CidsUiAction;
 
 /**
  * DOCUMENT ME!
@@ -102,7 +104,8 @@ import de.cismet.tools.gui.PaginationPanel;
 public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry,
     ActionTagProtected,
     ActionListener,
-    ConnectionContextStore {
+    ConnectionContextStore,
+    CidsUiAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -135,6 +138,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             QuerySearch.class,
             "SearchControlPanel.btnSearchCancel.text");
     private MetaClass metaClass;
+    private Map<String, Object> actionValueMap = new HashMap<String, Object>();
 
     private final boolean paginationEnabled;
     private final transient AbstractFeatureService[] choosenLayers;
@@ -402,6 +406,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         }
 
         jLayerCBActionPerformed(null);
+
+        putValue(NAME, getName());
+        putValue(SMALL_ICON, getIcon());
     }
 
     /**
@@ -418,6 +425,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     public void actionPerformed(final ActionEvent e) {
         if (e.getSource().equals(panPagination)) {
             performSearch();
+        } else {
+            ComponentRegistry.getRegistry().showComponent(this.getClass().getName());
         }
     }
 
@@ -1095,7 +1104,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
         setMetaClass(null);
         if (jLayerCB.getSelectedItem() instanceof MetaClass) {
             setMetaClass((MetaClass)jLayerCB.getSelectedItem());
@@ -1172,14 +1181,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         firePropertyChange(PROP_VALUES, old, values);
 
         fillButtonPanel();
-    } //GEN-LAST:event_jLayerCBActionPerformed
+    }//GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -1284,19 +1293,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
                 currentlyExpandedAttribute));
-    } //GEN-LAST:event_jGetValuesBnActionPerformed
+    }//GEN-LAST:event_jGetValuesBnActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
         if (panPagination.getParent() != null) {
             panPagination.reset();
         }
         performSearch();
-    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
+    }//GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1320,17 +1329,17 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
-    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
+    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
+    }//GEN-LAST:event_jMethodCBItemStateChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
+    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jLayerCBItemStateChanged
         taQuery.setText("");
-    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
+    }//GEN-LAST:event_jLayerCBItemStateChanged
 
     /**
      * DOCUMENT ME!
@@ -1449,6 +1458,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     @Override
     public ConnectionContext getConnectionContext() {
         return connectionContext;
+    }
+
+    public Object getValue(final String key) {
+        if (key.equals(CidsUiAction.CIDS_ACTION_KEY)) {
+            return "query.search";
+        } else {
+            return actionValueMap.get(key);
+        }
+    }
+
+    @Override
+    public void putValue(final String key, final Object value) {
+        actionValueMap.put(key, value);
     }
 
     //~ Inner Classes ----------------------------------------------------------

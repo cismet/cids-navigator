@@ -13,6 +13,7 @@
 package de.cismet.cids.editors;
 
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -45,6 +46,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -58,6 +60,7 @@ import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.gui.ComponentWrapper;
+import de.cismet.tools.gui.GUIWindow;
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.WrappedComponent;
 
@@ -67,7 +70,8 @@ import de.cismet.tools.gui.WrappedComponent;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class NavigatorAttributeEditorGui extends AttributeEditor {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -983,4 +987,28 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             }
         }
     } //GEN-LAST:event_pasteButtonActionPerformed
+
+    @Override
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        if (PropertyManager.getManager().isEditable()) {
+            return GUIWindow.NO_PERMISSION;
+        } else {
+            return "AttributeViewerGuiEnabled";
+        }
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
+    }
 }
