@@ -26,6 +26,7 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.tools.gui.menu.CidsUiAction;
 
 /**
  * DOCUMENT ME!
@@ -34,7 +35,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsClientToolbarItem.class)
-public class SearchSearchTopicsDialogAction extends AbstractAction implements CidsClientToolbarItem {
+public class SearchSearchTopicsDialogAction extends AbstractAction implements CidsClientToolbarItem, CidsUiAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -69,11 +70,13 @@ public class SearchSearchTopicsDialogAction extends AbstractAction implements Ci
 
         if (icon != null) {
             putValue(SMALL_ICON, new javax.swing.ImageIcon(icon));
+            putValue(LARGE_ICON_KEY, new javax.swing.ImageIcon(icon));
         }
 
         putValue(Action.NAME, name);
         putValue(Action.SHORT_DESCRIPTION, tooltiptext);
         putValue(Action.ACTION_COMMAND_KEY, command);
+        putValue(CidsUiAction.CIDS_ACTION_KEY, "SearchSearchTopicsDialog");
     }
 
     //~ Methods ----------------------------------------------------------------
