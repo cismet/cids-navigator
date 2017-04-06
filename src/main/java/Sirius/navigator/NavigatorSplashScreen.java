@@ -203,19 +203,19 @@ public class NavigatorSplashScreen extends JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void exitForm(final java.awt.event.WindowEvent evt) //GEN-FIRST:event_exitForm
+    private void exitForm(final java.awt.event.WindowEvent evt)//GEN-FIRST:event_exitForm
     {
         System.exit(0);
-    }                                                           //GEN-LAST:event_exitForm
+    }//GEN-LAST:event_exitForm
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         System.exit(0);
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * Sets the ProxyOption panel by adding it at the CENTER position of the panConnection.
@@ -327,7 +327,7 @@ public class NavigatorSplashScreen extends JFrame {
                             if (logger.isInfoEnabled()) {
                                 logger.info("creating navigator instance");    // NOI18N
                             }
-                            final Navigator navigator = new Navigator(
+                            final NavigatorX navigator = new NavigatorX(
                                     NavigatorLoader.this.progressObserver,
                                     NavigatorSplashScreen.this);
                             if (logger.isInfoEnabled()) {

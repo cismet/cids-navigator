@@ -93,7 +93,7 @@ public class NavigatorStatusBar extends javax.swing.JPanel {
                     1,
                     0,
                     GridBagConstraints.WEST,
-                    GridBagConstraints.NONE,
+                    GridBagConstraints.HORIZONTAL,
                     new Insets(0, 0, 0, 0),
                     0,
                     0);
@@ -109,7 +109,7 @@ public class NavigatorStatusBar extends javax.swing.JPanel {
                     1,
                     0,
                     GridBagConstraints.EAST,
-                    GridBagConstraints.NONE,
+                    GridBagConstraints.HORIZONTAL,
                     new Insets(0, 0, 0, 0),
                     0,
                     0);
