@@ -23,10 +23,13 @@ import Sirius.navigator.event.CatalogueSelectionListener;
 import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
-import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
+import Sirius.navigator.plugin.listener.MetaNodeSelectionListener;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
+import Sirius.navigator.types.iterator.AttributeRestriction;
+import Sirius.navigator.types.iterator.ComplexAttributeRestriction;
+import Sirius.navigator.types.iterator.SingleAttributeIterator;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -40,6 +43,7 @@ import Sirius.navigator.ui.LAFManager;
 import Sirius.navigator.ui.LayoutedContainer;
 import Sirius.navigator.ui.MutablePopupMenu;
 import Sirius.navigator.ui.NavigatorStatusBar;
+import Sirius.navigator.ui.ShowObjectsInGuiMethod;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.dialog.LoginDialog;
 import Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler;
@@ -151,6 +155,7 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
+import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
@@ -160,19 +165,30 @@ import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.drophandler.MappingComponentDropHandler;
 import de.cismet.cismap.commons.drophandler.MappingComponentDropHandlerRegistry;
 import de.cismet.cismap.commons.features.Feature;
+import de.cismet.cismap.commons.features.FeatureCollectionAdapter;
+import de.cismet.cismap.commons.features.FeatureCollectionEvent;
+import de.cismet.cismap.commons.features.FeatureCollectionListener;
+import de.cismet.cismap.commons.features.FeatureGroup;
+import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.gui.MappingComponent;
+import de.cismet.cismap.commons.gui.attributetable.AttributeTable;
+import de.cismet.cismap.commons.gui.attributetable.AttributeTableFactory;
+import de.cismet.cismap.commons.gui.attributetable.AttributeTableListener;
 import de.cismet.cismap.commons.gui.capabilitywidget.CapabilityWidget;
 import de.cismet.cismap.commons.gui.featurecontrolwidget.FeatureControl;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.layerwidget.LayerWidget;
 import de.cismet.cismap.commons.gui.layerwidget.LayerWidgetProvider;
+import de.cismet.cismap.commons.gui.layerwidget.ThemeLayerWidget;
 import de.cismet.cismap.commons.gui.options.CapabilityWidgetOptionsPanel;
 import de.cismet.cismap.commons.gui.overviewwidget.OverviewComponent;
+import de.cismet.cismap.commons.gui.piccolo.eventlistener.SelectionListener;
 import de.cismet.cismap.commons.gui.shapeexport.ShapeExport;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.MapDnDListener;
 import de.cismet.cismap.commons.interaction.events.MapDnDEvent;
 import de.cismet.cismap.commons.util.DnDUtils;
+import de.cismet.cismap.commons.util.SelectionManager;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
 import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
 
@@ -206,11 +222,16 @@ import de.cismet.tools.gui.DefaultPopupMenuListener;
 import de.cismet.tools.gui.EventDispatchThreadHangMonitor;
 import de.cismet.tools.gui.GUIWindow;
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.tools.gui.WaitingDialogThread;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.tools.gui.menu.CidsUiAction;
 import de.cismet.tools.gui.menu.ConfiguredToolBar;
 
 import static java.awt.Frame.MAXIMIZED_BOTH;
+import java.util.StringTokenizer;
+import net.infonode.docking.DockingWindowAdapter;
+import net.infonode.docking.OperationAbortedException;
+import net.infonode.docking.TabWindow;
 
 /**
  * DOCUMENT ME!
@@ -228,7 +249,7 @@ public class NavigatorX extends javax.swing.JFrame {
                 + JnlpSystemPropertyHelper.getProperty("directory.extension", "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
-    public static final String DEFAULT_LAYOUT = NAVIGATOR_HOME + "navigator.layout"; // NOI18N
+    public static final String DEFAULT_LAYOUT = NAVIGATOR_HOME + "navigatorx.layout"; // NOI18N
     private static volatile boolean startupFinished = false;
 
     //~ Instance fields --------------------------------------------------------
@@ -253,6 +274,7 @@ public class NavigatorX extends javax.swing.JFrame {
     private Properties titleNames = new Properties();
     private int currentId = 0;
     private MappingComponent mapC = null;
+    private FeatureControl featureControl = null;
     private WFSFormFactory wfsFormFactory;
     private String home = System.getProperty("user.home");    // NOI18N
     private String fs = System.getProperty("file.separator"); // NOI18N
@@ -262,6 +284,8 @@ public class NavigatorX extends javax.swing.JFrame {
     private final Map<Feature, DefaultMetaTreeNode> featuresInMapReverse = new HashMap<Feature, DefaultMetaTreeNode>();
     private List<ConfiguredToolBar> toolbars;
     private Map<String, Action> windowActions = new HashMap<String, Action>();
+    private ShowObjectsInGuiMethod showObjectMethod = null;
+    private HashMap<String, View> attributeTableMap = new HashMap<String, View>();
     private int progress = 200;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -391,6 +415,13 @@ public class NavigatorX extends javax.swing.JFrame {
             initWindow();
             initSearch();
 
+            final Collection<? extends ShowObjectsInGuiMethod> showObjectMethods = Lookup.getDefault()
+                        .lookupAll(ShowObjectsInGuiMethod.class);
+
+            if ((showObjectMethods != null) && (showObjectMethods.size() > 0)) {
+                showObjectMethod = showObjectMethods.iterator().next();
+                showObjectMethod.init();
+            }
             configurationManager.addConfigurable(OptionsClient.getInstance());
             if (PropertyManager.getManager().isProtocolEnabled()) {
                 configurationManager.addConfigurable(ProtocolHandler.getInstance());
@@ -441,6 +472,12 @@ public class NavigatorX extends javax.swing.JFrame {
             };
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(configLoggerKeyStroke, "CONFIGLOGGING"); // NOI18N
         getRootPane().getActionMap().put("CONFIGLOGGING", configAction);                                          // NOI18N
+        initAttributeTable();
+        final SelectionListener sl = (SelectionListener)mapC.getInputEventListener().get(MappingComponent.SELECT);
+
+        if (sl != null) {
+            sl.setFeaturesFromServicesSelectable(true);
+        }
     }
 
     /**
@@ -484,6 +521,210 @@ public class NavigatorX extends javax.swing.JFrame {
         this.getContentPane().add(rootWindow, BorderLayout.CENTER);
 //        jPanel1.add(rootWindow, BorderLayout.CENTER);
         rootWindow.getRootWindowProperties().getDockingWindowProperties().setTitleProvider(new CustomTitleProvider());
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initAttributeTable() {
+        AttributeTableFactory.getInstance().setMappingComponent(mapC);
+        AttributeTableFactory.getInstance().setAttributeTableListener(new AttributeTableListener() {
+
+                @Override
+                public void showAttributeTable(final AttributeTable table,
+                        final String id,
+                        final String name,
+                        final String tooltip) {
+                    View view = attributeTableMap.get(id);
+
+                    table.setExportEnabled(true);
+
+                    if (view != null) {
+                        view.restore();
+                        view.requestFocusInWindow();
+                        final Object parentWindow = view.getWindowParent();
+
+                        if (parentWindow instanceof TabWindow) {
+                            final TabWindow tab = (TabWindow)parentWindow;
+                            final int tabIndex = tab.getChildWindowIndex(view);
+
+                            if (tabIndex != -1) {
+                                tab.setSelectedTab(tabIndex);
+                            }
+                        }
+                    } else {
+                        view = new View(name, null, table);
+                        addAttributeTableWindowListener(view, table);
+                        viewMap.addView(id, view);
+                        attributeTableMap.put(id, view);
+                        final TabWindow tw = (TabWindow)viewMap.getView("Map").getWindowParent();
+                        tw.addTab(view, tw.getChildWindowCount());
+                        view.restore();
+                        SelectionManager.getInstance().addConsideredAttributeTable(table);
+                    }
+                }
+
+                @Override
+                public void changeName(final String id, final String name) {
+                    final View view = attributeTableMap.get(id);
+
+                    if (view != null) {
+                        view.getViewProperties().setTitle(name);
+                    }
+                }
+
+                @Override
+                public void processingModeChanged(final AbstractFeatureService service, final boolean active) {
+                    SelectionManager.getInstance().switchProcessingMode(service);
+                }
+
+                @Override
+                public void closeAttributeTable(final AbstractFeatureService service) {
+                    final View attributeTableView = attributeTableMap.remove(AttributeTableFactory.createId(service));
+
+                    if (attributeTableView != null) {
+                        attributeTableView.close();
+                    }
+                }
+
+                @Override
+                public AttributeTable getAttributeTable(final String id) {
+                    final View view = attributeTableMap.get(id);
+
+                    if (view != null) {
+                        final Component c = view.getComponent();
+
+                        if (c instanceof AttributeTable) {
+                            return (AttributeTable)c;
+                        }
+                    }
+
+                    return null;
+                }
+
+                @Override
+                public void switchProcessingMode(final AbstractFeatureService service, final String id) {
+                    if (!NavigatorX.this.switchProcessingMode(service, false)) {
+//                        setTabWindow();
+                        final int index = -1;
+
+//                        if ((tabWindow != null) && (tabWindow.getSelectedWindow() != null)) {
+//                            index = tabWindow.getChildWindowIndex(tabWindow.getSelectedWindow());
+//                        }
+
+                        AttributeTableFactory.getInstance().showAttributeTable(service);
+
+//                        if ((index != -1) && (index < tabWindow.getChildWindowCount())) {
+//                            tabWindow.setSelectedTab(index);
+//                        }
+
+                        final WaitingDialogThread<Void> wdt = new WaitingDialogThread<Void>(
+                                NavigatorX.this,
+                                true,
+                                "Starte Edit mode",
+//                                NbBundle.getMessage(
+//                                    CismapPlugin.class,
+//                                    "WatergisApp.EditModeMenuItem.actionPerformed().wait"),
+                                null,
+                                200) {
+
+                                @Override
+                                protected Void doInBackground() throws Exception {
+                                    final View view = attributeTableMap.get(id);
+
+                                    if (view != null) {
+                                        final Component c = view.getComponent();
+
+                                        if (c instanceof AttributeTable) {
+                                            final AttributeTable attrTable = (AttributeTable)c;
+
+                                            while (attrTable.isLoading()) {
+                                                Thread.sleep(100);
+                                            }
+                                        }
+                                    }
+
+                                    return null;
+                                }
+
+                                @Override
+                                protected void done() {
+                                    NavigatorX.this.switchProcessingMode(service, false);
+                                }
+                            };
+
+                        wdt.start();
+                    }
+                }
+            });
+    }
+
+    /**
+     * Adds the window listener to the given view.
+     *
+     * @param  view   the view to add the listener
+     * @param  table  the AttributeTable that is used inside the view
+     */
+    private void addAttributeTableWindowListener(final View view, final AttributeTable table) {
+        view.addListener(new DockingWindowAdapter() {
+
+                @Override
+                public void windowClosing(final DockingWindow window) throws OperationAbortedException {
+                    final boolean disposeCompleted = table.dispose();
+
+                    if (!disposeCompleted) {
+                        throw new OperationAbortedException();
+                    }
+                }
+
+                @Override
+                public void windowClosed(final DockingWindow window) {
+                    disposeTable();
+                }
+
+                private void disposeTable() {
+                    view.removeListener(this);
+                    if (view.getParent() != null) {
+                        view.getParent().remove(view);
+                    }
+                    viewMap.removeView("Attributtabelle " + table.getFeatureService().getName());
+                    attributeTableMap.remove(AttributeTableFactory.createId(table.getFeatureService()));
+
+                    SelectionManager.getInstance().removeConsideredAttributeTable(table);
+
+                    // The view is not removed from the root window and this will cause that the layout cannot be saved
+                    // when the application will be closed. So rootWindow.removeView(view) must be invoked. But without
+                    // the invocation of view.close(), the invocation of rootWindow.removeView(view) will do nothing To
+                    // avoid an infinite loop, view.removeListener(this) must be invoked before view.close();
+                    view.close();
+                    rootWindow.removeView(view);
+                }
+            });
+    }
+
+    /**
+     * switches the processing mode of the given service.
+     *
+     * @param   service    DOCUMENT ME!
+     * @param   forceSave  if true, the changed data will be saved without confirmation
+     *
+     * @return  true, if the processing mode was switched
+     */
+    public boolean switchProcessingMode(final AbstractFeatureService service, final boolean forceSave) {
+        final View view = attributeTableMap.get(AttributeTableFactory.createId(service));
+
+        if (view != null) {
+            final Component c = view.getComponent();
+
+            if (c instanceof AttributeTable) {
+                final AttributeTable attrTable = (AttributeTable)c;
+
+                attrTable.changeProcessingMode(forceSave);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -676,6 +917,7 @@ public class NavigatorX extends javax.swing.JFrame {
                     wfsFormFactory = WFSFormFactory.getInstance(mapC);
                     CismapBroker.getInstance().addCrsChangeListener(mapC);
                     CismapBroker.getInstance().setMappingComponent(mapC);
+                    SelectionManager.getInstance().init();
                 } else if (window.getGuiComponent() instanceof LayerWidget) {
                     view = new View(window.getViewTitle(),
                             window.getViewIcon(),
@@ -701,10 +943,10 @@ public class NavigatorX extends javax.swing.JFrame {
                             window.getGuiComponent());
                     viewId = getUniqueId(window.getClass().getName());
                     viewMap.addView(viewId, view);
-                    final FeatureControl fc = (FeatureControl)window.getGuiComponent();
-                    fc.init(mapC);
-                    mapC.getFeatureCollection().addFeatureCollectionListener(fc);
-                    CismapBroker.getInstance().addMapBoundsListener(fc);
+                    featureControl = (FeatureControl)window.getGuiComponent();
+                    featureControl.init(mapC);
+                    mapC.getFeatureCollection().addFeatureCollectionListener(featureControl);
+                    CismapBroker.getInstance().addMapBoundsListener(featureControl);
                 } else if (window.getGuiComponent() instanceof OverviewComponent) {
                     view = new View(window.getViewTitle(),
                             window.getViewIcon(),
@@ -712,7 +954,17 @@ public class NavigatorX extends javax.swing.JFrame {
                     viewId = getUniqueId(window.getClass().getName());
                     viewMap.addView(viewId, view);
                     final OverviewComponent oMap = (OverviewComponent)window.getGuiComponent();
+                    cismapConfigurationManager.addConfigurable(oMap);
                     oMap.setMasterMap(mapC);
+                    oMap.getOverviewMap().unlock();
+                } else if (window.getGuiComponent() instanceof ThemeLayerWidget) {
+                    view = new View(window.getViewTitle(),
+                            window.getViewIcon(),
+                            window.getGuiComponent());
+                    viewId = getUniqueId(window.getClass().getName());
+                    viewMap.addView(viewId, view);
+                    final ThemeLayerWidget layerWidget = (ThemeLayerWidget)window.getGuiComponent();
+                    layerWidget.setMappingModel((ActiveLayerModel)mapC.getMappingModel());
                 } else {
                     viewId = getUniqueId(window.getClass().getName());
                     view = new View(window.getViewTitle(),
@@ -845,9 +1097,7 @@ public class NavigatorX extends javax.swing.JFrame {
      */
     private void addWfsForms() {
         final Set<String> keySet = wfsFormFactory.getForms().keySet();
-//        final JMenu wfsFormsMenu = new JMenu(org.openide.util.NbBundle.getMessage(
-//                    CismapPlugin.class,
-//                    "CismapPlugin.CismapPlugin(PluginContext).wfsFormMenu.title")); // NOI18N
+
         cismapConfigurationManager.configure(wfsFormFactory);
 
         for (final String key : keySet) {
@@ -875,21 +1125,6 @@ public class NavigatorX extends javax.swing.JFrame {
     /**
      * DOCUMENT ME!
      *
-     * @param  v  DOCUMENT ME!
-     */
-    private void showOrHideView(final View v) {
-        ///irgendwas besser als Closable ??
-        // Problem wenn floating --> close -> open  (muss zweimal open)
-        if (v.isClosable()) {
-            v.close();
-        } else {
-            v.restore();
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  id  DOCUMENT ME!
      */
     public void select(final String id) {
@@ -899,8 +1134,21 @@ public class NavigatorX extends javax.swing.JFrame {
             if (!v.isClosable()) {
                 v.restore();
             }
-
             v.restoreFocus();
+        }
+    }
+    
+    
+    public void showOrHide(final String id) {
+        final View v = viewMap.getView(id);
+
+        if (v != null) {
+            if (v.isClosable()) {
+                v.close();
+            } else {
+                v.restore();
+            }
+//            v.restoreFocus();
         }
     }
 
@@ -1219,7 +1467,6 @@ public class NavigatorX extends javax.swing.JFrame {
         String cismapconfig = null;
         String fallBackConfig = null;
         String dirExtension = "";
-//        PluginContext context;
         try {
             final String ext = JnlpSystemPropertyHelper.getProperty("directory.extension"); // NOI18N
 
@@ -1237,7 +1484,7 @@ public class NavigatorX extends javax.swing.JFrame {
             final User user = SessionManager.getSession().getUser();
             final UserGroup userGroup = user.getUserGroup();
 
-            final String prefix = "cismapconfig:"; // NOI18N
+            final String prefix = "cismapconfig:";    // NOI18N
             final String username = user.getName();
             Collection<UserGroup> groups;
             if (userGroup != null) {
@@ -1247,47 +1494,6 @@ public class NavigatorX extends javax.swing.JFrame {
             } else {
                 groups = user.getPotentialUserGroups();
             }
-
-            // First try: cismapconfig:username@usergroup@domainserver
-// if (cismapconfig == null) {
-// for (final UserGroup group : groups) {
-// cismapconfig = context.getEnvironment()
-// .getParameter(prefix + username + "@" + group.getName() + "@" // NOI18N
-// + group.getDomain());
-// if (cismapconfig != null) {
-// break;
-// }
-// }
-// }
-
-            // Second try: cismapconfig:*@usergroup@domainserver
-// if (cismapconfig == null) {
-// for (final UserGroup group : groups) {
-// cismapconfig = context.getEnvironment()
-// .getParameter(prefix + "*" + "@" + group.getName() + "@" // NOI18N
-// + group.getDomain());
-// if (cismapconfig != null) {
-// break;
-// }
-// }
-// }
-
-            // Third try: cismapconfig:*@*@domainserver//NOI18N
-// if (cismapconfig == null) {
-// for (final UserGroup group : groups) {
-// cismapconfig = context.getEnvironment()
-// .getParameter(prefix + "*" + "@" + "*" + "@" + group.getDomain()); // NOI18N
-// if (cismapconfig != null) {
-// break;
-// }
-// }
-// }
-            // Default from pluginXML
-// if (cismapconfig == null) {
-// cismapconfig = context.getEnvironment().getParameter(prefix + "default"); // NOI18N
-// }
-//
-// fallBackConfig = context.getEnvironment().getParameter(prefix + "default"); // NOI18N
         } catch (final Exception e) {
             LOG.info("cismap started standalone", e); // NOI18N
         }
@@ -1304,7 +1510,6 @@ public class NavigatorX extends javax.swing.JFrame {
         cismapConfigurationManager.setFallBackFileName(fallBackConfig);
 
         cismapConfigurationManager.setFileName("configurationPlugin.xml"); // NOI18N
-// cismapConfigurationManager.addConfigurable(metaSearchComponentFactory);
 
         cismapConfigurationManager.setClassPathFolder("/");             // NOI18N
         cismapConfigurationManager.setFolder(".cismap" + dirExtension); // NOI18N
@@ -1523,6 +1728,20 @@ public class NavigatorX extends javax.swing.JFrame {
     /**
      * DOCUMENT ME!
      *
+     * @param  nodes     DOCUMENT ME!
+     * @param  editable  DOCUMENT ME!
+     */
+    public void showObjectInGui(final Collection<DefaultMetaTreeNode> nodes, final boolean editable) {
+        try {
+            showObjectMethod.invoke(nodes, editable);
+        } catch (Exception e) {
+            LOG.error("Cannot show object in gui", e);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  file    DOCUMENT ME!
      * @param  isInit  DOCUMENT ME!
      */
@@ -1702,13 +1921,11 @@ public class NavigatorX extends javax.swing.JFrame {
             LOG.info("dispose() called"); // NOI18N
             LOG.info("saving Layout");    // NOI18N
         }
-        saveLayout(LayoutedContainer.DEFAULT_LAYOUT, this);
+        saveLayout(DEFAULT_LAYOUT, this);
         saveWindowState();
 
         configurationManager.writeConfiguration();
         cismapConfigurationManager.writeConfiguration();
-
-        PluginRegistry.destroy();
 
         SessionManager.getConnection().disconnect();
         SessionManager.destroy();
@@ -1875,113 +2092,6 @@ public class NavigatorX extends javax.swing.JFrame {
         return cismapDirectory;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  e  DOCUMENT ME!
-     */
-// @Override
-    public void masterConfigure(final Element e) {
-//        final Element prefs = e.getChild("cismapPluginUIPreferences"); // NOI18N
-//        cismapPluginUIPreferences = prefs;
-//        activateLineRef();
-//
-//        try {
-//            final Element httpInterfacePortElement = prefs.getChild("httpInterfacePort"); // NOI18N
-//
-//            try {
-//                httpInterfacePort = new Integer(httpInterfacePortElement.getText());
-//            } catch (Throwable t) {
-//                LOG.warn("httpInterface was not configured. Set default value: " + httpInterfacePort, t); // NOI18N
-//            }
-//        } catch (Throwable t) {
-//            LOG.error("Error while loading the help urls (" + prefs.getChildren() + "), disabling menu items", t); // NOI18N
-//        }
-//
-//        try {
-//            final List<JMenuItem> serverProfileItems = new ArrayList<JMenuItem>();
-//
-//            final Element serverprofiles = e.getChild("serverProfiles");                   // NOI18N
-//            final Iterator<Element> it = serverprofiles.getChildren("profile").iterator(); // NOI18N
-//
-//            while (it.hasNext()) {
-//                final Element next = it.next();
-//                final String id = next.getAttributeValue("id");                                 // NOI18N
-//                final String sorter = next.getAttributeValue("sorter");                         // NOI18N
-//                final String name = next.getAttributeValue("name");                             // NOI18N
-//                final String path = next.getAttributeValue("path");                             // NOI18N
-//                final String icon = next.getAttributeValue("icon");                             // NOI18N
-//                final String descr = next.getAttributeValue("descr");                           // NOI18N
-//                final String descrWidth = next.getAttributeValue("descrwidth");                 // NOI18N
-//                final String complexDescriptionText = next.getTextTrim();
-//                final String complexDescriptionSwitch = next.getAttributeValue("complexdescr"); // NOI18N
-//
-//                final JMenuItem serverProfileMenuItem = new JMenuItem();
-//                serverProfileMenuItem.setText(name);
-//                serverProfileMenuItem.addActionListener(new ActionListener() {
-//
-//                        @Override
-//                        public void actionPerformed(final ActionEvent e) {
-//                            try {
-//                                ((ActiveLayerModel)mapC.getMappingModel()).removeAllLayers();
-//                                configurationManager.configureFromClasspath(path, null);
-//                                setButtonSelectionAccordingToMappingComponent();
-//                            } catch (Throwable ex) {
-//                                log.fatal("No ServerProfile", ex); // NOI18N
-//                            }
-//                        }
-//                    });
-//                serverProfileMenuItem.setName("ServerProfile:" + sorter + ":" + name); // NOI18N
-//
-//                if ((complexDescriptionSwitch != null) && complexDescriptionSwitch.equalsIgnoreCase("true") // NOI18N
-//                            && (complexDescriptionText != null)) {
-//                    serverProfileMenuItem.setToolTipText(complexDescriptionText);
-//                } else if (descrWidth != null) {
-//                    serverProfileMenuItem.setToolTipText("<html><table width=\"" + descrWidth               // NOI18N
-//                                + "\" border=\"0\"><tr><td>" + descr + "</p></td></tr></table></html>");    // NOI18N
-//                } else {
-//                    serverProfileMenuItem.setToolTipText(descr);
-//                }
-//
-//                try {
-//                    serverProfileMenuItem.setIcon(new javax.swing.ImageIcon(getClass().getResource(icon)));
-//                } catch (Exception iconE) {
-//                    log.warn("Could not create Icon for ServerProfile.", iconE); // NOI18N
-//                }
-//
-//                serverProfileItems.add(serverProfileMenuItem);
-//            }
-//
-//            Collections.sort(serverProfileItems, new Comparator<JMenuItem>() {
-//
-//                    @Override
-//                    public int compare(final JMenuItem o1, final JMenuItem o2) {
-//                        if ((o1.getName() != null) && (o2.getName() != null)) {
-//                            return o1.getName().compareTo(o2.getName());
-//                        } else {
-//                            return 0;
-//                        }
-//                    }
-//                });
-//
-//            menFile.removeAll();
-//
-//            for (final Component c : before) {
-//                menFile.add(c);
-//            }
-//
-//            for (final JMenuItem jmi : serverProfileItems) {
-//                menFile.add(jmi);
-//            }
-//
-//            for (final Component c : after) {
-//                menFile.add(c);
-//            }
-//        } catch (Exception x) {
-//            log.info("No server profile available, or error while cerating analysis.", x); // NOI18N
-//        }
-    }
-
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -2128,10 +2238,44 @@ public class NavigatorX extends javax.swing.JFrame {
          */
         private String getTitleByKey(final String key) {
             if (titleNames != null) {
-                return titleNames.getProperty(key, key);
+                List<String> allTokenFromKey = toList(key);
+                String propertyKey = null;
+                int hitsForPopertyKes = 0;
+                
+                for (String titleName : titleNames.stringPropertyNames()) {
+                    List<String> allTokenFromPossibleTitle = toList(titleName);
+                    int hits = 0;
+                    
+                    for (String token : allTokenFromKey) {
+                        if (allTokenFromPossibleTitle.contains(token)) {
+                            ++hits;
+                        }
+                    }
+                    if (hits == allTokenFromPossibleTitle.size() && hits > hitsForPopertyKes) {
+                        hitsForPopertyKes = hits;
+                        propertyKey = titleName;
+                    }
+                }
+                
+                if (propertyKey != null) {
+                    return titleNames.getProperty(propertyKey, key);
+                } else {
+                    return key;
+                }
             } else {
                 return key;
             }
+        }
+        
+        private List<String> toList(String title) {
+            StringTokenizer tokenizer = new StringTokenizer(title, "_");
+            List<String> allToken = new ArrayList<String>();
+            
+            while (tokenizer.hasMoreTokens()) {
+                allToken.add(tokenizer.nextToken());
+            }
+            
+            return allToken;
         }
     }
 
@@ -2176,7 +2320,7 @@ public class NavigatorX extends javax.swing.JFrame {
 
                         if (object instanceof Collection) {
                             final Collection c = (Collection)object;
-                            invoke(c, false);
+                            showObjectMethod.invoke(c, false);
                         }
                     } catch (Throwable t) {
                         LOG.fatal("Error on drop", t); // NOI18N
@@ -2223,128 +2367,6 @@ public class NavigatorX extends javax.swing.JFrame {
                             "CismapPlugin.dropOnMap(MapDnDEvent).JOptionPane.message")); // NOI18N
                     LOG.error("Unable to process the datatype." + dtde.getTransferable().getTransferDataFlavors()[0]); // NOI18N
                 }
-            }
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param   nodes     DOCUMENT ME!
-         * @param   editable  DOCUMENT ME!
-         *
-         * @throws  Exception  DOCUMENT ME!
-         */
-        public synchronized void invoke(final Collection<DefaultMetaTreeNode> nodes, final boolean editable)
-                throws Exception {
-            LOG.info("invoke shows objects in the map"); // NOI18N
-
-            final Runnable showWaitRunnable = new Runnable() {
-
-                    @Override
-                    public void run() {
-//                        StaticSwingTools.showDialog(showObjectsWaitDialog);
-
-                        final SwingWorker<List<Feature>, Void> addToMapWorker = new SwingWorker<List<Feature>, Void>() {
-
-                                private Map<DefaultMetaTreeNode, Feature> tmpFeaturesInMap = null;
-                                private Map<Feature, DefaultMetaTreeNode> tmpFeaturesInMapReverse = null;
-
-                                @Override
-                                protected List<Feature> doInBackground() throws Exception {
-                                    Thread.currentThread().setName("ShowObjectsMethod addToMapWorker");
-                                    final Iterator<DefaultMetaTreeNode> mapIter = featuresInMap.keySet().iterator();
-
-                                    while (mapIter.hasNext()) {
-                                        final DefaultMetaTreeNode node = mapIter.next();
-                                        final Feature f = featuresInMap.get(node);
-
-                                        if (!mapC.getFeatureCollection().isHoldFeature(f)) {
-                                            mapIter.remove();
-                                            featuresInMapReverse.remove(f);
-                                        }
-                                    }
-
-                                    final List<Feature> features = new ArrayList<Feature>();
-
-                                    for (final DefaultMetaTreeNode node : nodes) {
-                                        final MetaObjectNode mon = ((ObjectTreeNode)node).getMetaObjectNode();
-                                        // TODO: Check4CashedGeomAndLightweightJson
-                                        MetaObject mo = mon.getObject();
-
-                                        if (mo == null) {
-                                            mo = ((ObjectTreeNode)node).getMetaObject();
-                                        }
-
-                                        final CExtContext context = new CExtContext(
-                                                CExtContext.CTX_REFERENCE,
-                                                mo.getBean());
-                                        // there always is a default final MapVisualisationProvider mvp =
-                                        // CExtManager.getInstance() .getExtension(MapVisualisationProvider.class,
-                                        // context);
-                                        //
-                                        // final Feature feature = mvp.getFeature(mo.getBean()); if (feature == null) {
-                                        // // no map visualisation available, ignore continue; }
-                                        //
-                                        // feature.setEditable(editable);
-                                        //
-                                        // final List<Feature> allFeaturesToAdd; if (feature instanceof FeatureGroup) {
-                                        // final FeatureGroup fg = (FeatureGroup)feature; allFeaturesToAdd = new
-                                        // ArrayList<Feature>(FeatureGroups.expandAll(fg)); } else { allFeaturesToAdd
-                                        // = Arrays.asList(feature); }
-                                        //
-                                        // if (LOG.isDebugEnabled()) { LOG.debug("allFeaturesToAdd:" +
-                                        // allFeaturesToAdd); // NOI18N }
-                                        //
-                                        // if (!(featuresInMap.containsValue(feature))) {
-                                        // features.addAll(allFeaturesToAdd);
-                                        //
-                                        // node -> masterfeature featuresInMap.put(node, feature);
-                                        //
-                                        // for (final Feature f : allFeaturesToAdd) { // master and all subfeatures ->
-                                        // node featuresInMapReverse.put(f, node); } if (LOG.isDebugEnabled()) {
-                                        // LOG.debug("featuresInMap.put(node,cidsFeature):" + node + "," // NOI18Ns +
-                                        // feature); } }
-                                    }
-                                    tmpFeaturesInMap = new HashMap<DefaultMetaTreeNode, Feature>(featuresInMap);
-                                    tmpFeaturesInMapReverse = new HashMap<Feature, DefaultMetaTreeNode>(
-                                            featuresInMapReverse);
-
-                                    return features;
-                                }
-
-                                @Override
-                                protected void done() {
-                                    try {
-//                                        showObjectsWaitDialog.setVisible(false);
-                                        final List<Feature> features = get();
-
-                                        mapC.getFeatureLayer().setVisible(true);
-                                        mapC.getFeatureCollection().substituteFeatures(features);
-                                        featuresInMap.clear();
-                                        featuresInMap.putAll(tmpFeaturesInMap);
-                                        featuresInMapReverse.clear();
-                                        featuresInMapReverse.putAll(tmpFeaturesInMapReverse);
-
-                                        if (!mapC.isFixedMapExtent()) {
-                                            mapC.zoomToFeatureCollection(mapC.isFixedMapScale());
-                                        }
-                                    } catch (final InterruptedException e) {
-                                        if (LOG.isDebugEnabled()) {
-                                            LOG.debug(e, e);
-                                        }
-                                    } catch (final Exception e) {
-                                        LOG.error("Error while displaying objects:", e); // NOI18N
-                                    }
-                                }
-                            };
-                        CismetThreadPool.execute(addToMapWorker);
-                    }
-                };
-
-            if (EventQueue.isDispatchThread()) {
-                showWaitRunnable.run();
-            } else {
-                EventQueue.invokeLater(showWaitRunnable);
             }
         }
 

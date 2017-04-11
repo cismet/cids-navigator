@@ -18,6 +18,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.swing.JPanel;
+
 import de.cismet.tools.gui.NavigatorStatusBarComponent;
 import de.cismet.tools.gui.menu.CidsUiAction;
 
@@ -90,7 +92,7 @@ public class NavigatorStatusBar extends javax.swing.JPanel {
                     0,
                     1,
                     1,
-                    1,
+                    0,
                     0,
                     GridBagConstraints.WEST,
                     GridBagConstraints.HORIZONTAL,
@@ -100,13 +102,28 @@ public class NavigatorStatusBar extends javax.swing.JPanel {
             this.add(bar.getComponent(), gbc);
         }
 
+        // add filer
+        final GridBagConstraints gbcFiller = new GridBagConstraints(
+                index++,
+                0,
+                1,
+                1,
+                1,
+                0,
+                GridBagConstraints.WEST,
+                GridBagConstraints.HORIZONTAL,
+                new Insets(0, 0, 0, 0),
+                0,
+                0);
+        this.add(new JPanel(), gbcFiller);
+
         for (final NavigatorStatusBarComponent bar : rightBars) {
             final GridBagConstraints gbc = new GridBagConstraints(
                     index++,
                     0,
                     1,
                     1,
-                    1,
+                    0,
                     0,
                     GridBagConstraints.EAST,
                     GridBagConstraints.HORIZONTAL,

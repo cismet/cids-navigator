@@ -129,9 +129,9 @@ public class MutableStatusBar extends JPanel implements NavigatorStatusBarCompon
         constraints.gridheight = 1;
         this.add(status_1, constraints);
 
-        constraints.weightx = 0.0;
-        constraints.gridx++;
-        this.add(status_2, constraints);
+//        constraints.weightx = 0.0;
+//        constraints.gridx++;
+//        this.add(status_2, constraints);
 
         constraints.gridx = 2;
         this.add(status_3, constraints);

@@ -186,11 +186,12 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
                         searchResultsTree.syncWithMap(true);
                         if (searchResultsTree.isSyncWithRenderer()) {
                             // Because in this case the map is not brought to front by default
-                            PluginRegistry.getRegistry()
-                                    .getPluginDescriptor("cismap")
-                                    .getUIDescriptor("cismap")
-                                    .getView()
-                                    .makeVisible();
+                            ComponentRegistry.getRegistry().showComponent("map");
+//                            PluginRegistry.getRegistry()
+//                                    .getPluginDescriptor("cismap")
+//                                    .getUIDescriptor("cismap")
+//                                    .getView()
+//                                    .makeVisible();
                         }
                     }
                 }
