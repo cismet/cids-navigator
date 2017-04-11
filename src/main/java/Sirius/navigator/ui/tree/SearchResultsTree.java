@@ -300,17 +300,17 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
     public void syncWithMap(final boolean sync) {
         if (sync) {
             if (log.isDebugEnabled()) {
-                log.debug("syncWithMap");                                                   // NOI18N
+                log.debug("syncWithMap"); // NOI18N
             }
             if (!isSyncWithRenderer()) {
-                PluginRegistry.getRegistry()
-                        .getPluginDescriptor("cismap")
-                        .getUIDescriptor("cismap")
-                        .getView()
-                        .makeVisible();
+                ComponentRegistry.getRegistry().showComponent("map");
+//                PluginRegistry.getRegistry()
+//                        .getPluginDescriptor("cismap")
+//                        .getUIDescriptor("cismap")
+//                        .getView()
+//                        .makeVisible();
             }
             try {
-                final PluginSupport map = PluginRegistry.getRegistry().getPlugin("cismap"); // NOI18N
                 final List<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
                 final DefaultTreeModel dtm = (DefaultTreeModel)getModel();
 

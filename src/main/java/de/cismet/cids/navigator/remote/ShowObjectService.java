@@ -145,11 +145,12 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             }
 
             if ((map != null) && map) {
-                PluginRegistry.getRegistry()
-                        .getPluginDescriptor("cismap")
-                        .getUIDescriptor("cismap")
-                        .getView()
-                        .makeVisible();
+                ComponentRegistry.getRegistry().showComponent("map");
+//                PluginRegistry.getRegistry()
+//                        .getPluginDescriptor("cismap")
+//                        .getUIDescriptor("cismap")
+//                        .getView()
+//                        .makeVisible();
                 MetaTreeNodeVisualization.getInstance().addVisualization(defaultMetaTreeNodes);
             }
             if ((renderer != null) && renderer) {

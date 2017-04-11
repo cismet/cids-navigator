@@ -67,6 +67,14 @@
                     "actionKey": "MetaSearchMenu"
                 },
                 {
+                    "name": "GIS",
+                    "items":
+                            [
+                                {"actionKey": "OpenFeatureInfo", "radio": "MapMode"},
+                                {"actionKey": "OpenThemeWidgetAction"}
+                            ]
+                },
+                {
                     "name": "&Extras",
                     "items":
                             [
@@ -105,11 +113,13 @@
                                 {"actionKey": "de.cismet.cismap.commons.gui.infowidgets.ServerInfoWindowAction"},
                                 {"actionKey": "de.cismet.cismap.commons.gui.layerwidget.LayerWidgetWindowAction"},
                                 {"actionKey": "de.cismet.cismap.commons.gui.overviewwidget.OverviewComponentWindowAction"},
+                                {"actionKey": "MenuSeparator"},
                                 {"actionKey": "Sirius.navigator.ui.DescriptionPaneWindowAction"},
                                 {"actionKey": "Sirius.navigator.ui.attributes.AttributeViewerWindowAction"},
                                 {"actionKey": "Sirius.navigator.ui.tree.MetaCatalogueTreeWindowAction"},
                                 {"actionKey": "Sirius.navigator.ui.tree.SearchResultsTreeWindowAction"},
                                 {"actionKey": "Sirius.navigator.ui.attributes.editor.AttributeEditorWindowAction"},
+                                {"actionKey": "MenuSeparator"},
                                 {"actionKey": "de.cismet.cids.custom.wunda_blau.search.AlkisWindowSearchWindowAction"},
                                 {"actionKey": "de.cismet.cids.custom.wunda_blau.search.BaulastWindowSearchWindowAction"},
                                 {"actionKey": "de.cismet.cids.custom.wunda_blau.search.BillingWindowSearchWindowAction"},
@@ -118,6 +128,7 @@
                                 {"actionKey": "de.cismet.cids.custom.wunda_blau.search.MeasurementPointWindowSearchWindowAction"},
                                 {"actionKey": "de.cismet.cids.custom.wunda_blau.search.Sb_StadtbildWindowSearchWindowAction"},
                                 {"actionKey": "de.cismet.cids.custom.wunda_blau.search.VermessungRissWindowSearchWindowAction"},
+                                {"actionKey": "MenuSeparator"},
                                 {"actionKey": "de.cismet.cids.search.QuerySearchWindowAction"}
                             ]
                 },
