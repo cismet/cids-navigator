@@ -22,15 +22,10 @@ import org.openide.util.NbBundle;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ContainerAdapter;
-import java.awt.event.ContainerEvent;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
@@ -53,8 +48,6 @@ import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JSeparator;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
@@ -107,6 +100,21 @@ public class ActionConfiguration {
      * @param  additionalActions  DOCUMENT ME!
      */
     public ActionConfiguration(final String configurationFile, final Map<String, Action> additionalActions) {
+        lookup();
+        menu = readConfiguration(configurationFile);
+
+        if (additionalActions != null) {
+            toolbarItemActionMap.putAll(additionalActions);
+        }
+    }
+
+    /**
+     * Creates a new ActionConfiguration object.
+     *
+     * @param  configurationFile  the configuration as input stream
+     * @param  additionalActions  DOCUMENT ME!
+     */
+    public ActionConfiguration(final InputStream configurationFile, final Map<String, Action> additionalActions) {
         lookup();
         menu = readConfiguration(configurationFile);
 
@@ -644,6 +652,36 @@ public class ActionConfiguration {
         try {
             reader = new BufferedReader(new InputStreamReader(
                         this.getClass().getResourceAsStream(configurationFile)));
+            return mapper.readValue(reader, Menu.class);
+        } catch (IOException ex) {
+            LOG.error("Error while parsing the menu configuration", ex);
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ex) {
+                    LOG.warn("Cannot close the menu configuration file", ex);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Read the json input stream with the menu configuration.
+     *
+     * @param   configurationStream  a json input stream with the menu configuration
+     *
+     * @return  a menu object representation of the given configuration file
+     */
+    private Menu readConfiguration(final InputStream configurationStream) {
+        final ObjectMapper mapper = new ObjectMapper();
+
+        BufferedReader reader = null;
+
+        try {
+            reader = new BufferedReader(new InputStreamReader(configurationStream));
             return mapper.readValue(reader, Menu.class);
         } catch (IOException ex) {
             LOG.error("Error while parsing the menu configuration", ex);

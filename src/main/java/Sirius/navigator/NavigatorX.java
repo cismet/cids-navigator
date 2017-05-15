@@ -24,14 +24,9 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
-import Sirius.navigator.plugin.listener.MetaNodeSelectionListener;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.resource.ResourceManager;
-import Sirius.navigator.types.iterator.AttributeRestriction;
-import Sirius.navigator.types.iterator.ComplexAttributeRestriction;
-import Sirius.navigator.types.iterator.SingleAttributeIterator;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
-import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.types.treenode.RootTreeNode;
 import Sirius.navigator.ui.ActionConfiguration;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -58,8 +53,6 @@ import Sirius.navigator.ui.widget.FloatingFrame;
 import Sirius.navigator.ui.widget.FloatingFrameConfigurator;
 
 import Sirius.server.middleware.types.MetaClass;
-import Sirius.server.middleware.types.MetaObject;
-import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
 import Sirius.server.newuser.UserGroup;
@@ -67,7 +60,10 @@ import Sirius.server.newuser.permission.Permission;
 import Sirius.server.newuser.permission.PermissionHolder;
 
 import net.infonode.docking.DockingWindow;
+import net.infonode.docking.DockingWindowAdapter;
+import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
+import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
 import net.infonode.docking.theme.DockingWindowsTheme;
 import net.infonode.docking.theme.ShapedGradientDockingTheme;
@@ -83,8 +79,6 @@ import org.apache.commons.collections.MultiHashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import org.jdom.Element;
-
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.HttpConnection;
@@ -94,19 +88,19 @@ import org.mortbay.jetty.handler.AbstractHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 
-import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -125,14 +119,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.prefs.Preferences;
 
@@ -145,7 +138,6 @@ import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -155,7 +147,6 @@ import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.ToolTipManager;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
@@ -165,10 +156,6 @@ import de.cismet.cismap.commons.BoundingBox;
 import de.cismet.cismap.commons.drophandler.MappingComponentDropHandler;
 import de.cismet.cismap.commons.drophandler.MappingComponentDropHandlerRegistry;
 import de.cismet.cismap.commons.features.Feature;
-import de.cismet.cismap.commons.features.FeatureCollectionAdapter;
-import de.cismet.cismap.commons.features.FeatureCollectionEvent;
-import de.cismet.cismap.commons.features.FeatureCollectionListener;
-import de.cismet.cismap.commons.features.FeatureGroup;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.attributetable.AttributeTable;
@@ -195,7 +182,7 @@ import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
 
-import de.cismet.ext.CExtContext;
+import de.cismet.layout.WrapLayout;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
@@ -205,7 +192,6 @@ import de.cismet.netutil.Proxy;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
-import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.JnlpSystemPropertyHelper;
 import de.cismet.tools.JnlpTools;
 import de.cismet.tools.Static2DTools;
@@ -228,10 +214,6 @@ import de.cismet.tools.gui.menu.CidsUiAction;
 import de.cismet.tools.gui.menu.ConfiguredToolBar;
 
 import static java.awt.Frame.MAXIMIZED_BOTH;
-import java.util.StringTokenizer;
-import net.infonode.docking.DockingWindowAdapter;
-import net.infonode.docking.OperationAbortedException;
-import net.infonode.docking.TabWindow;
 
 /**
  * DOCUMENT ME!
@@ -333,7 +315,11 @@ public class NavigatorX extends javax.swing.JFrame {
         this.propertyManager = PropertyManager.getManager();
 
         try {
-            titleNames.load(getClass().getResourceAsStream("/Sirius/navigator/titleNames.properties"));
+            final String titleNamesFile = System.getProperty(
+                    "jnlp.titleName",
+                    "/Sirius/navigator/titleNames.properties");
+            // todo: load user defined name titles from the configuration attribute
+            titleNames.load(getClass().getResourceAsStream(titleNamesFile));
         } catch (Exception e) {
             LOG.warn("Cannot load titles property file", e);
         }
@@ -343,6 +329,7 @@ public class NavigatorX extends javax.swing.JFrame {
         this.exceptionManager = ExceptionManager.getManager();
         StaticSwingTools.tweakUI();
         this.init();
+        CismapBroker.getInstance().setUseInternalDb(true);
         mapC.setReadOnly(false);
         mapC.unlock();
         CismapBroker.getInstance().addMapDnDListener(new CustomMapDnDListener());
@@ -748,13 +735,15 @@ public class NavigatorX extends javax.swing.JFrame {
         } catch (InterruptedException ex) {
             // nothing to do
         }
-        final ActionConfiguration config = new ActionConfiguration("/Sirius/navigator/MenuConfig.json", windowActions);
+        final String configFile = System.getProperty("jnlp.menuConfigFile", "/Sirius/navigator/MenuConfig.json");
+        // todo: load user defined menu configuration from the configuration attribute
+        final ActionConfiguration config = new ActionConfiguration(configFile, windowActions);
 
         config.configureMainMenu(menuBar);
         toolbars = config.getToolbars();
 
         if ((toolbars != null) && !toolbars.isEmpty()) {
-            toolbarPanel.setLayout(new GridLayout(toolbars.size(), 1));
+            toolbarPanel.setLayout(new WrapLayout(FlowLayout.LEFT, 1, 0));
 
             for (final ConfiguredToolBar toolbar : toolbars) {
                 toolbarPanel.add(toolbar.getToolbar());
@@ -1137,8 +1126,12 @@ public class NavigatorX extends javax.swing.JFrame {
             v.restoreFocus();
         }
     }
-    
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  id  DOCUMENT ME!
+     */
     public void showOrHide(final String id) {
         final View v = viewMap.getView(id);
 
@@ -1830,7 +1823,10 @@ public class NavigatorX extends javax.swing.JFrame {
         InputStream layoutInput = null;
 
         try {
-            layoutInput = NavigatorX.class.getResourceAsStream("/Sirius/navigator/defaultLayout.layout");
+            final String layoutFile = System.getProperty(
+                    "jnlp.defaultLayout",
+                    "/Sirius/navigator/defaultLayout.layout");
+            layoutInput = NavigatorX.class.getResourceAsStream(layoutFile);
             in = new ObjectInputStream(layoutInput);
             rootWindow.read(in);
             in.close();
@@ -2238,25 +2234,25 @@ public class NavigatorX extends javax.swing.JFrame {
          */
         private String getTitleByKey(final String key) {
             if (titleNames != null) {
-                List<String> allTokenFromKey = toList(key);
+                final List<String> allTokenFromKey = toList(key);
                 String propertyKey = null;
                 int hitsForPopertyKes = 0;
-                
-                for (String titleName : titleNames.stringPropertyNames()) {
-                    List<String> allTokenFromPossibleTitle = toList(titleName);
+
+                for (final String titleName : titleNames.stringPropertyNames()) {
+                    final List<String> allTokenFromPossibleTitle = toList(titleName);
                     int hits = 0;
-                    
-                    for (String token : allTokenFromKey) {
+
+                    for (final String token : allTokenFromKey) {
                         if (allTokenFromPossibleTitle.contains(token)) {
                             ++hits;
                         }
                     }
-                    if (hits == allTokenFromPossibleTitle.size() && hits > hitsForPopertyKes) {
+                    if ((hits == allTokenFromPossibleTitle.size()) && (hits > hitsForPopertyKes)) {
                         hitsForPopertyKes = hits;
                         propertyKey = titleName;
                     }
                 }
-                
+
                 if (propertyKey != null) {
                     return titleNames.getProperty(propertyKey, key);
                 } else {
@@ -2266,15 +2262,22 @@ public class NavigatorX extends javax.swing.JFrame {
                 return key;
             }
         }
-        
-        private List<String> toList(String title) {
-            StringTokenizer tokenizer = new StringTokenizer(title, "_");
-            List<String> allToken = new ArrayList<String>();
-            
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   title  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        private List<String> toList(final String title) {
+            final StringTokenizer tokenizer = new StringTokenizer(title, "_");
+            final List<String> allToken = new ArrayList<String>();
+
             while (tokenizer.hasMoreTokens()) {
                 allToken.add(tokenizer.nextToken());
             }
-            
+
             return allToken;
         }
     }
