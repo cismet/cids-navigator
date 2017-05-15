@@ -280,7 +280,7 @@ public class MutableStatusBar extends JPanel implements NavigatorStatusBarCompon
 
     @Override
     public Side getSide() {
-        return Side.LEFT;
+        return Side.RIGHT;
     }
 
     @Override
