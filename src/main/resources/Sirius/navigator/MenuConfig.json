@@ -153,16 +153,31 @@
                         {"actionKey": "BerechtigungspruefungToolbarWidget"},
                         {"actionKey": "JHistoryBackButton"},
                         {"actionKey": "HomeAction"},
-                        {"actionKey": "JHistoryForwardButton"},
-                        {"actionKey": "ToolbarSeparator"},
-                        {"actionKey": "RefreshAction"},
-                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "JHistoryForwardButton"}
+                    ]
+                },
+                {
+                    "id": "refreshToolBar",
+                    "items":
+                    [
+                        {"actionKey": "RefreshAction"}
+                    ]
+                },
+                {
+                    "id": "exportToolBar",
+                    "items":
+                    [
                         {"actionKey": "PrintAction"},
                         {"actionKey": "AlkisToobarPlugin"},
                         {"actionKey": "PointNumberReservationToolbar"},
                         {"actionKey": "DigitalDataExportToolbar"},
-                        {"actionKey": "MapExportPanel"},
-                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "MapExportPanel"}
+                    ]
+                },
+                {
+                    "id": "modeToolBar",
+                    "items":
+                    [
                         {"actionKey": "SingleSelectionAction", "radio": "MapMode"},
                         {"actionKey": "ZoomAction", "radio": "MapMode"},
                         {"actionKey": "PanAction", "radio": "MapMode"},
@@ -172,14 +187,24 @@
                         {"actionKey": "NewLineStringAction", "radio": "MapMode"},
                         {"actionKey": "NewPointAction", "radio": "MapMode"},
                         {"actionKey": "MoveAction", "radio": "MapMode"},
-                        {"actionKey": "RemoveAction", "radio": "MapMode"},
-                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "RemoveAction", "radio": "MapMode"}
+                    ]
+                },
+                {
+                    "id": "nodeToolBar",
+                    "items":
+                    [
                         {"actionKey": "NodeMoveAction", "radio": "NodeMode"},
                         {"actionKey": "NodeAddAction", "radio": "NodeMode"},
                         {"actionKey": "NodeRemoveAction", "radio": "NodeMode"},
                         {"actionKey": "NodeRotateAction", "radio": "NodeMode"},
-                        {"actionKey": "NodeReflectAction", "radio": "NodeMode"},
-                        {"actionKey": "ToolbarSeparator"},
+                        {"actionKey": "NodeReflectAction", "radio": "NodeMode"}
+                    ]
+                },
+                {
+                    "id": "miscToolBar",
+                    "items":
+                    [
                         {"actionKey": "SnapAction", "toggle": "true"},
                         {"actionKey": "ToolbarSeparator"},
                         {"actionKey": "UndoAction"},
