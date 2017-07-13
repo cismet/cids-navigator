@@ -103,11 +103,14 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
      *
      * @param   callserverURL       DOCUMENT ME!
      * @param   proxy               DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    protected Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
-        reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy);
+    protected Reconnector<CallServerService> createReconnector(final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled) {
+        reconnector = new RESTfulReconnector(CallServerService.class, callserverURL, proxy, compressionEnabled);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
@@ -130,7 +133,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
             throws ConnectionException {
-        connector = createReconnector(callserverURL, proxy).getProxy();
+        connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         try {
             connector.getDomains();

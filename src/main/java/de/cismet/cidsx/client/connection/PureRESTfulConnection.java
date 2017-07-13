@@ -108,7 +108,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    private CallServerService createLegacyConnector(final String restServerURL, final Proxy proxy) throws ConnectionException {
+    private CallServerService createLegacyConnector(final String restServerURL,
+            final Proxy proxy,
+            final boolean compressionEnabled) throws ConnectionException {
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 
@@ -121,7 +123,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
             }
             final URI callServerURI = uriBuilder.port(9986).replacePath("callserver/binary").build();
             LOG.warn("creating additional legacy connection to service '" + callServerURI + "'");
-            return new RESTfulSerialInterfaceConnector(callServerURI.toString(), proxy, sslConfig);
+            return new RESTfulSerialInterfaceConnector(callServerURI.toString(), proxy, sslConfig, compressionEnabled);
         } catch (Exception ex) {
             final String message = "could n ot build legacy callServerURL from restServerURL '" + restServerURL + "': "
                         + ex.getMessage();
@@ -136,12 +138,14 @@ public class PureRESTfulConnection extends RESTfulConnection {
      *
      * @param   callserverURL       DOCUMENT ME!
      * @param   proxy               DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
      *
      * @return  PureRESTfulReconnector
      */
     @Override
     protected Reconnector<CallServerService> createReconnector(final String callserverURL,
-            final Proxy proxy) {
+            final Proxy proxy,
+            final boolean compressionEnabled) {
         reconnector = new PureRESTfulReconnector(CallServerService.class, callserverURL, proxy);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
@@ -155,10 +159,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
     @Override
     public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
             throws ConnectionException {
-        this.connector = createReconnector(callserverURL, proxy).getProxy();
+        this.connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         // FIXME: remove when all methods implemented in pure RESTful Service
-        this.legacyConnector = createLegacyConnector(callserverURL, proxy);
+        this.legacyConnector = createLegacyConnector(callserverURL, proxy, compressionEnabled);
 
         try {
             this.getDomains();
