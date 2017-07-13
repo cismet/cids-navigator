@@ -100,15 +100,15 @@ public class PureRESTfulConnection extends RESTfulConnection {
     /**
      * DOCUMENT ME!
      *
-     * @param   restServerURL  DOCUMENT ME!
-     * @param   proxy          DOCUMENT ME!
+     * @param   restServerURL       DOCUMENT ME!
+     * @param   proxy               DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    private CallServerService createLegacyConnector(final String restServerURL, final Proxy proxy)
-            throws ConnectionException {
+    private CallServerService createLegacyConnector(final String restServerURL, final Proxy proxy) throws ConnectionException {
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 
@@ -134,13 +134,14 @@ public class PureRESTfulConnection extends RESTfulConnection {
      * Overridden to return a PureRESTfulReconnector that internally uses a RESTfulInterfaceConnector to interact with
      * the cids server Pure REST API.
      *
-     * @param   callserverURL  DOCUMENT ME!
-     * @param   proxy          DOCUMENT ME!
+     * @param   callserverURL       DOCUMENT ME!
+     * @param   proxy               DOCUMENT ME!
      *
      * @return  PureRESTfulReconnector
      */
     @Override
-    protected Reconnector<CallServerService> createReconnector(final String callserverURL, final Proxy proxy) {
+    protected Reconnector<CallServerService> createReconnector(final String callserverURL,
+            final Proxy proxy) {
         reconnector = new PureRESTfulReconnector(CallServerService.class, callserverURL, proxy);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
@@ -148,6 +149,12 @@ public class PureRESTfulConnection extends RESTfulConnection {
 
     @Override
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
+        return connect(callserverURL, proxy, false);
+    }
+
+    @Override
+    public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
+            throws ConnectionException {
         this.connector = createReconnector(callserverURL, proxy).getProxy();
 
         // FIXME: remove when all methods implemented in pure RESTful Service

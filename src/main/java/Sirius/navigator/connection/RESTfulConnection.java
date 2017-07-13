@@ -11,7 +11,6 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.SqlConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
-import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
@@ -22,11 +21,6 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
-import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.SearchOption;
-import Sirius.server.search.SearchResult;
-import Sirius.server.search.store.Info;
-import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -41,7 +35,6 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -105,16 +98,11 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         return reconnector;
     }
 
-    @Override
-    public boolean connect(final String callserverURL) throws ConnectionException {
-        return connect(callserverURL, null);
-    }
-
     /**
      * DOCUMENT ME!
      *
-     * @param   callserverURL  DOCUMENT ME!
-     * @param   proxy          DOCUMENT ME!
+     * @param   callserverURL       DOCUMENT ME!
+     * @param   proxy               DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -125,7 +113,23 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    public boolean connect(final String callserverURL) throws ConnectionException {
+        return connect(callserverURL, false);
+    }
+
+    @Override
+    public boolean connect(final String callserverURL, final boolean compressionEnabled) throws ConnectionException {
+        return connect(callserverURL, null, compressionEnabled);
+    }
+
+    @Override
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
+        return connect(callserverURL, proxy, false);
+    }
+
+    @Override
+    public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
+            throws ConnectionException {
         connector = createReconnector(callserverURL, proxy).getProxy();
 
         try {
