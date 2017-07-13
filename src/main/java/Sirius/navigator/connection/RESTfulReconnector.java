@@ -27,9 +27,10 @@ import de.cismet.reconnector.ReconnectorException;
 /**
  * DOCUMENT ME!
  *
+ * @param    <R>
+ *
  * @author   jruiz
  * @version  $Revision$, $Date$
- * @param <R>
  */
 public class RESTfulReconnector<R extends CallServerService> extends Reconnector<R> {
 
