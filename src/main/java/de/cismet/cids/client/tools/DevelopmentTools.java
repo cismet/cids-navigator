@@ -146,6 +146,25 @@ public class DevelopmentTools {
             final String group,
             final String user,
             final String pass) throws Exception {
+        initSessionManagerFromRestfulConnectionOnLocalhost(domain, group, user, pass, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   user                DOCUMENT ME!
+     * @param   pass                DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final boolean compressionEnabled) throws Exception {
         System.out.println("start");
         // lookup des callservers
         final Remote r;
@@ -157,7 +176,7 @@ public class DevelopmentTools {
 
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
         final ConnectionInfo info = new ConnectionInfo();
-        info.setCallserverURL("http://localhost:9917/callserver/binary");
+        info.setCallserverURL("http://localhost:9986/callserver/binary");
         info.setUsername(user);
         info.setUsergroup(group);
         info.setPassword(pass);
@@ -168,7 +187,8 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.RESTfulConnection",
                         info.getCallserverURL(),
-                        Proxy.fromPreferences());
+                        Proxy.fromPreferences(),
+                        compressionEnabled);
         final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
         final ConnectionProxy conProxy = ConnectionFactory.getFactory()
                     .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
