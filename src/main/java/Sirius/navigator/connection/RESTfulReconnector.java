@@ -27,6 +27,8 @@ import de.cismet.reconnector.ReconnectorException;
 /**
  * DOCUMENT ME!
  *
+ * @param    <R>
+ *
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
@@ -40,7 +42,8 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     protected String callserverURL;
     protected Proxy proxy;
-    private RESTfulReconnectorErrorPanel errorPanel;
+    private final RESTfulReconnectorErrorPanel errorPanel;
+    private final boolean compressionEnabled;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -52,6 +55,21 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
      * @param  proxy          DOCUMENT ME!
      */
     public RESTfulReconnector(final Class serviceClass, final String callserverURL, final Proxy proxy) {
+        this(serviceClass, callserverURL, proxy, false);
+    }
+
+    /**
+     * Creates a new RESTfulReconnector object.
+     *
+     * @param  serviceClass        DOCUMENT ME!
+     * @param  callserverURL       DOCUMENT ME!
+     * @param  proxy               DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
+     */
+    public RESTfulReconnector(final Class serviceClass,
+            final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled) {
         super(serviceClass);
 
         this.callserverURL = callserverURL;
@@ -59,6 +77,7 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         final ProxyOptionsPanel pop = new ProxyOptionsPanel();
         pop.setProxy(proxy);
         this.errorPanel = new RESTfulReconnectorErrorPanel(pop, this);
+        this.compressionEnabled = compressionEnabled;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -112,6 +131,6 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 
-        return (R)new RESTfulSerialInterfaceConnector(callserverURL, proxy, sslConfig);
+        return (R)new RESTfulSerialInterfaceConnector(callserverURL, proxy, sslConfig, compressionEnabled);
     }
 }

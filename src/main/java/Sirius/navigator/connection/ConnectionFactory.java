@@ -55,7 +55,7 @@ public class ConnectionFactory {
     }
 
     /**
-     * Creates and initializes a new shared connection instance.
+     * DOCUMENT ME!
      *
      * @param   connectionClassName  DOCUMENT ME!
      * @param   callserverURL        DOCUMENT ME!
@@ -66,8 +66,25 @@ public class ConnectionFactory {
      */
     public Connection createConnection(final String connectionClassName, final String callserverURL)
             throws ConnectionException {
+        return createConnection(connectionClassName, callserverURL, true);
+    }
+
+    /**
+     * Creates and initializes a new shared connection instance.
+     *
+     * @param   connectionClassName  DOCUMENT ME!
+     * @param   callserverURL        DOCUMENT ME!
+     * @param   compressionEnabled   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public Connection createConnection(final String connectionClassName,
+            final String callserverURL,
+            final boolean compressionEnabled) throws ConnectionException {
         final Connection connection = createConnection(connectionClassName);
-        connection.connect(callserverURL);
+        connection.connect(callserverURL, compressionEnabled);
 
         return connection;
     }
@@ -85,8 +102,27 @@ public class ConnectionFactory {
      */
     public Connection createConnection(final String connectionClassName, final String callserverURL, final Proxy proxy)
             throws ConnectionException {
+        return createConnection(connectionClassName, callserverURL, proxy, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionClassName  DOCUMENT ME!
+     * @param   callserverURL        DOCUMENT ME!
+     * @param   proxy                DOCUMENT ME!
+     * @param   compressionEnabled   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public Connection createConnection(final String connectionClassName,
+            final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled) throws ConnectionException {
         final Connection connection = createConnection(connectionClassName);
-        connection.connect(callserverURL, proxy);
+        connection.connect(callserverURL, proxy, compressionEnabled);
 
         return connection;
     }
