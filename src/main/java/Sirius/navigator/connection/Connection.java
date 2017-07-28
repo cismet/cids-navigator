@@ -9,7 +9,6 @@ package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
 
-import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.Link;
@@ -18,14 +17,10 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
-import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.store.Info;
-import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -62,6 +57,18 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
+     * @param   callserverURL       DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean connect(String callserverURL, final boolean compressionEnabled) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   callserverURL  DOCUMENT ME!
      * @param   proxy          DOCUMENT ME!
      *
@@ -70,6 +77,19 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     boolean connect(String callserverURL, Proxy proxy) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverURL       DOCUMENT ME!
+     * @param   proxy               DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean connect(String callserverURL, Proxy proxy, final boolean compressionEnabled) throws ConnectionException;
 
     /**
      * DOCUMENT ME!

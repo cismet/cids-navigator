@@ -128,6 +128,7 @@ public final class PropertyManager {
     private String descriptionPaneHtmlRenderer = null;
     private boolean enableSearchDialog = false;
     private boolean usePainterCoolPanel = true;
+    private boolean compressionEnabled = false;
     private transient String proxyURL;
     private transient String proxyUsername;
     private transient String proxyPassword;
@@ -1059,6 +1060,8 @@ public final class PropertyManager {
             this.setAutoLogin(value);
         } else if (property.equalsIgnoreCase("connectionClass")) {                             // NOI18N
             this.setConnectionClass(value);
+        } else if (property.equals("compressionEnabled")) {
+            this.setCompressionEnabled(value);
         } else if (property.equalsIgnoreCase("connectionProxyClass")) {                        // NOI18N
             this.setConnectionProxyClass(value);
         } else if (property.equalsIgnoreCase("maxConnections")) {                              // NOI18N
@@ -1614,6 +1617,33 @@ public final class PropertyManager {
      */
     public String getDescriptionPaneHtmlRenderer() {
         return this.descriptionPaneHtmlRenderer;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isCompressionEnabled() {
+        return compressionEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  compressionEnabled  DOCUMENT ME!
+     */
+    public void setCompressionEnabled(final boolean compressionEnabled) {
+        this.compressionEnabled = compressionEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  input  DOCUMENT ME!
+     */
+    public void setCompressionEnabled(final String input) {
+        setCompressionEnabled((input != null) && input.trim().equalsIgnoreCase("true"));
     }
 
     //~ Inner Classes ----------------------------------------------------------
