@@ -116,6 +116,11 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
 
     @Override
     public boolean connect(final String callserverURL) throws ConnectionException {
+        return connect(callserverURL, false);
+    }
+
+    @Override
+    public boolean connect(final String callserverURL, final boolean compressionEnabled) throws ConnectionException {
         this.callserverURL = null;
         this.connected = false;
 
@@ -144,6 +149,12 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
 
     @Override
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
+        return connect(callserverURL, proxy, false);
+    }
+
+    @Override
+    public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
+            throws ConnectionException {
         if (proxy != null) {
             LOG.warn("RMI over proxy not supported yet"); // NOI18N
         }
