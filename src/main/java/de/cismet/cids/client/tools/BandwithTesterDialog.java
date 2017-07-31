@@ -42,6 +42,8 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
 
+import de.cismet.netutil.Proxy;
+
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -465,7 +467,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
 
             try {
                 final Connection connection = ConnectionFactory.getFactory()
-                            .createConnection(CONNECTION_CLASS, callServerURL);
+                            .createConnection(CONNECTION_CLASS, callServerURL, Proxy.fromPreferences());
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
