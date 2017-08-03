@@ -293,7 +293,7 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
 //                        final String domain = args[1];
                         final String callServerURL = "rmi://localhost/callServer";
                         final String domain = "WUNDA_BLAU";
-                        dialog.login(callServerURL, domain);
+                        dialog.login(callServerURL, domain, false);
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                                 @Override
@@ -323,11 +323,12 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
     /**
      * DOCUMENT ME!
      *
-     * @param  callServerURL  DOCUMENT ME!
-     * @param  domain         DOCUMENT ME!
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
      */
-    private void login(final String callServerURL, final String domain) {
-        final CidsAuthentification cidsAuth = new CidsAuthentification(callServerURL, domain);
+    private void login(final String callServerURL, final String domain, final boolean compressionEnabled) {
+        final CidsAuthentification cidsAuth = new CidsAuthentification(callServerURL, domain, compressionEnabled);
         final JXLoginPane login = new JXLoginPane(cidsAuth);
         final JXLoginPane.JXLoginDialog loginDialog = new JXLoginPane.JXLoginDialog((Frame)null, login);
 

@@ -41,6 +41,7 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
+import de.cismet.netutil.Proxy;
 
 import de.cismet.netutil.Proxy;
 
@@ -75,6 +76,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(BandwithTesterDialog.class);
+    private static boolean compressionEnabled = false;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -219,16 +221,16 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnStartDownloadActionPerformed
+    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartDownloadActionPerformed
         downloadStarted();
 
         new SwingWorker<byte[], Object>() {
@@ -267,7 +269,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_btnStartDownloadActionPerformed
+    }//GEN-LAST:event_btnStartDownloadActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -322,6 +324,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
         final String callServerURL = args[0];
         final String domain = args[1];
         final Integer fileSize = Integer.valueOf(args[2]);
+        compressionEnabled = (args.length > 3) && "compressionEnabled".equals(args[3]);
 
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -467,7 +470,11 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
 
             try {
                 final Connection connection = ConnectionFactory.getFactory()
-                            .createConnection(CONNECTION_CLASS, callServerURL, Proxy.fromPreferences());
+                            .createConnection(
+                                CONNECTION_CLASS,
+                                callServerURL,
+                                Proxy.fromPreferences(),
+                                compressionEnabled);
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
