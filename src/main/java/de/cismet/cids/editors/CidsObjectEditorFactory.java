@@ -1042,7 +1042,8 @@ public class CidsObjectEditorFactory {
                         final Connection connection = ConnectionFactory.getFactory()
                                     .createConnection(
                                         "Sirius.navigator.connection.RMIConnection",
-                                        connectionInfo.getCallserverURL()); // NOI18N
+                                        connectionInfo.getCallserverURL(),
+                                        false); // NOI18N
 
                         // connection.g
 

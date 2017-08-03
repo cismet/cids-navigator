@@ -325,9 +325,8 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog {
                                 true);
                         final String callServerURL = args[0];
                         final String domain = args[1];
-//                        final String callServerURL = "rmi://localhost/callServer";
-//                        final String domain = "WUNDA_BLAU";
-                        dialog.login(callServerURL, domain);
+                        final boolean compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);
+                        dialog.login(callServerURL, domain, compressionEnabled);
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                                 @Override
@@ -384,11 +383,12 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog {
     /**
      * DOCUMENT ME!
      *
-     * @param  callServerURL  DOCUMENT ME!
-     * @param  domain         DOCUMENT ME!
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
      */
-    private void login(final String callServerURL, final String domain) {
-        final CidsAuthentification cidsAuth = new CidsAuthentification(callServerURL, domain);
+    private void login(final String callServerURL, final String domain, final boolean compressionEnabled) {
+        final CidsAuthentification cidsAuth = new CidsAuthentification(callServerURL, domain, compressionEnabled);
         final JXLoginPane login = new JXLoginPane(cidsAuth);
 
         final JXLoginPane.JXLoginDialog loginDialog = new JXLoginPane.JXLoginDialog((Frame)null, login);

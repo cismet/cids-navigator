@@ -118,7 +118,8 @@ public class DevelopmentTools {
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(
                         "Sirius.navigator.connection.RMIConnection",
-                        info.getCallserverURL());
+                        info.getCallserverURL(),
+                        false);
 
         session = ConnectionFactory.getFactory().createSession(connection,
                 info, true);
@@ -142,6 +143,7 @@ public class DevelopmentTools {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static void initSessionManagerFromRestfulConnectionOnLocalhost(final String domain,
             final String group,
             final String user,
@@ -207,10 +209,30 @@ public class DevelopmentTools {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static void initSessionManagerFromPureRestfulConnectionOnLocalhost(final String domain,
             final String group,
             final String user,
             final String pass) throws Exception {
+        initSessionManagerFromPureRestfulConnectionOnLocalhost(domain, group, user, pass, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   user                DOCUMENT ME!
+     * @param   pass                DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromPureRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final boolean compressionEnabled) throws Exception {
         System.out.println("start");
         // lookup des callservers
         final Remote r;
@@ -233,7 +255,8 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.PureRESTfulConnection",
                         info.getCallserverURL(),
-                        Proxy.fromPreferences());
+                        Proxy.fromPreferences(),
+                        compressionEnabled);
         final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
         final ConnectionProxy conProxy = ConnectionFactory.getFactory()
                     .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
@@ -290,14 +313,40 @@ public class DevelopmentTools {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static CidsBean createCidsBeanFromRestfulConnectionOnLocalhost(final String domain,
             final String group,
             final String user,
             final String pass,
             final String table,
             final int objectId) throws Exception {
+        return createCidsBeanFromRestfulConnectionOnLocalhost(domain, group, user, pass, table, objectId, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   user                DOCUMENT ME!
+     * @param   pass                DOCUMENT ME!
+     * @param   table               DOCUMENT ME!
+     * @param   objectId            DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createCidsBeanFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId,
+            final boolean compressionEnabled) throws Exception {
         if (!SessionManager.isInitialized()) {
-            initSessionManagerFromRestfulConnectionOnLocalhost(domain, group, user, pass);
+            initSessionManagerFromRestfulConnectionOnLocalhost(domain, group, user, pass, compressionEnabled);
         }
         System.out.println("MO abfragen");
 
