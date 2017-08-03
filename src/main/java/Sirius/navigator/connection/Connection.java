@@ -52,6 +52,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     boolean connect(String callserverURL) throws ConnectionException;
 
     /**
@@ -76,6 +77,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     boolean connect(String callserverURL, Proxy proxy) throws ConnectionException;
 
     /**

@@ -41,32 +41,40 @@ public class CidsAuthentification extends LoginService {
     private final String connectionClass;
     private final String callServerURL;
     private final String domain;
+    private final boolean compressionEnabled;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CidsAuthentification object.
      *
-     * @param  callServerURL  DOCUMENT ME!
-     * @param  domain         DOCUMENT ME!
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
      */
-    public CidsAuthentification(final String callServerURL, final String domain) {
+    public CidsAuthentification(final String callServerURL, final String domain, final boolean compressionEnabled) {
         this.connectionClass = CONNECTION_CLASS;
         this.callServerURL = callServerURL;
         this.domain = domain;
+        this.compressionEnabled = compressionEnabled;
     }
 
     /**
      * Creates a new CidsAuthentification object.
      *
-     * @param  connectionClass  DOCUMENT ME!
-     * @param  callServerURL    DOCUMENT ME!
-     * @param  domain           DOCUMENT ME!
+     * @param  connectionClass     DOCUMENT ME!
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
      */
-    public CidsAuthentification(final String connectionClass, final String callServerURL, final String domain) {
+    public CidsAuthentification(final String connectionClass,
+            final String callServerURL,
+            final String domain,
+            final boolean compressionEnabled) {
         this.connectionClass = connectionClass;
         this.callServerURL = callServerURL;
         this.domain = domain;
+        this.compressionEnabled = compressionEnabled;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -91,7 +99,7 @@ public class CidsAuthentification extends LoginService {
 
         try {
             final Connection connection = ConnectionFactory.getFactory()
-                        .createConnection(connectionClass, callServerURL);
+                        .createConnection(connectionClass, callServerURL, compressionEnabled);
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
             connectionInfo.setPassword(new String(password));

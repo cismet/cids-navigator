@@ -64,9 +64,10 @@ public class ConnectionFactory {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     public Connection createConnection(final String connectionClassName, final String callserverURL)
             throws ConnectionException {
-        return createConnection(connectionClassName, callserverURL, true);
+        return createConnection(connectionClassName, callserverURL, false);
     }
 
     /**
@@ -100,6 +101,7 @@ public class ConnectionFactory {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     public Connection createConnection(final String connectionClassName, final String callserverURL, final Proxy proxy)
             throws ConnectionException {
         return createConnection(connectionClassName, callserverURL, proxy, false);
@@ -303,11 +305,37 @@ public class ConnectionFactory {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     public ConnectionProxy createProxy(final String connectionClassName,
             final String connectionProxyHandlerClassName,
             final ConnectionInfo connectionInfo,
             final boolean autoLogin) throws ConnectionException, UserException {
-        final Connection connection = createConnection(connectionClassName, connectionInfo.getCallserverURL());
+        return createProxy(connectionClassName, connectionProxyHandlerClassName, connectionInfo, autoLogin, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionClassName              DOCUMENT ME!
+     * @param   connectionProxyHandlerClassName  DOCUMENT ME!
+     * @param   connectionInfo                   DOCUMENT ME!
+     * @param   autoLogin                        DOCUMENT ME!
+     * @param   compressionEnabled               DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    public ConnectionProxy createProxy(final String connectionClassName,
+            final String connectionProxyHandlerClassName,
+            final ConnectionInfo connectionInfo,
+            final boolean autoLogin,
+            final boolean compressionEnabled) throws ConnectionException, UserException {
+        final Connection connection = createConnection(
+                connectionClassName,
+                connectionInfo.getCallserverURL(),
+                compressionEnabled);
         final ConnectionSession connectionSession = createSession(connection, connectionInfo, autoLogin);
 
         return createProxy(connectionProxyHandlerClassName, connectionSession);
@@ -325,9 +353,10 @@ public class ConnectionFactory {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     public ConnectionProxy createProxy(final String connectionClassName,
             final String connectionProxyHandlerClassName,
             final ConnectionInfo connectionInfo) throws ConnectionException, UserException {
-        return createProxy(connectionClassName, connectionProxyHandlerClassName, connectionInfo, true);
+        return createProxy(connectionClassName, connectionProxyHandlerClassName, connectionInfo, true, false);
     }
 }
