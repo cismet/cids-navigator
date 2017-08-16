@@ -76,17 +76,17 @@ public class ObjectAttributeNode extends AttributeNode {
      * @param  ignoreArrayHelperObjects   DOCUMENT ME!
      * @param  ignoreInvisibleAttributes  DOCUMENT ME!
      * @param  attributeId                DOCUMENT ME!
-     * @param  MetaObject                 DOCUMENT ME!
+     * @param  metaObject                 DOCUMENT ME!
      */
     public ObjectAttributeNode(final String name,
             final boolean ignoreSubstitute,
             final boolean ignoreArrayHelperObjects,
             final boolean ignoreInvisibleAttributes,
             final Object attributeId,
-            final MetaObject MetaObject) {
+            final MetaObject metaObject) {
         super(name, ignoreSubstitute, ignoreArrayHelperObjects, ignoreInvisibleAttributes, attributeId);
 
-        this.MetaObject = MetaObject;
+        this.MetaObject = metaObject;
         this.attributeIterator = new SingleAttributeIterator(this.objectAttributeRestriction, false);
 
         MetaClass tempClass = null;
@@ -94,9 +94,9 @@ public class ObjectAttributeNode extends AttributeNode {
 
         // load class icon ...
         try {
-            tempClass = SessionManager.getProxy().getMetaClass(MetaObject.getClassID(), MetaObject.getDomain());
+            tempClass = SessionManager.getProxy().getMetaClass(metaObject.getClassID(), metaObject.getDomain());
         } catch (Exception exp) {
-            logger.error("could not load class for Object :" + MetaObject, exp); // NOI18N
+            logger.error("could not load class for Object :" + metaObject, exp); // NOI18N
         }
 
         // logger.fatal(name + " isArrayHelperObject: " + tempClass.isArrayElementLink());
@@ -107,21 +107,26 @@ public class ObjectAttributeNode extends AttributeNode {
         }
 
         // ignore array attribute nodes
-        if ((tempClass != null) && this.ignoreArrayHelperObjects && tempClass.isArrayElementLink()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("addArrayAttributeNodes(): ignoring array helper objects '" + MetaObject.getName() + "'"); // NOI18N
-            }
-            final SingleAttributeIterator arrayAttributeIterator = new SingleAttributeIterator(
-                    this.objectAttributeRestriction,
-                    false);
-            arrayAttributeIterator.init(MetaObject.getAttributes().values());
-            attributeValues = new LinkedList();
+        final LinkedHashMap attributes = metaObject.getAttributes();
+        if (attributes != null) {
+            if ((tempClass != null) && this.ignoreArrayHelperObjects && tempClass.isArrayElementLink()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("addArrayAttributeNodes(): ignoring array helper objects '" + metaObject.getName()
+                                + "'"); // NOI18N
+                }
+                final SingleAttributeIterator arrayAttributeIterator = new SingleAttributeIterator(
+                        this.objectAttributeRestriction,
+                        false);
+                arrayAttributeIterator.init(attributes.values());
+                attributeValues = new LinkedList();
 
-            while (arrayAttributeIterator.hasNext()) {
-                attributeValues.addAll(((MetaObject)arrayAttributeIterator.next().getValue()).getAttributes().values());
+                while (arrayAttributeIterator.hasNext()) {
+                    attributeValues.addAll(((MetaObject)arrayAttributeIterator.next().getValue()).getAttributes()
+                                .values());
+                }
+            } else {
+                attributeValues = attributes.values();
             }
-        } else {
-            attributeValues = MetaObject.getAttributes().values();
         }
 
         // load attributes ...
