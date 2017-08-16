@@ -41,7 +41,6 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
-import de.cismet.netutil.Proxy;
 
 import de.cismet.netutil.Proxy;
 
@@ -221,16 +220,16 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartDownloadActionPerformed
+    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnStartDownloadActionPerformed
         downloadStarted();
 
         new SwingWorker<byte[], Object>() {
@@ -269,7 +268,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_btnStartDownloadActionPerformed
+    } //GEN-LAST:event_btnStartDownloadActionPerformed
 
     /**
      * DOCUMENT ME!
