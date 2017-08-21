@@ -162,7 +162,35 @@ public class DevelopmentTools {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static void initSessionManagerFromRestfulConnectionOnLocalhost(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final boolean compressionEnabled) throws Exception {
+        initSessionManagerFromRestfulConnection(
+            "http://localhost:9986/callserver/binary",
+            domain,
+            group,
+            user,
+            pass,
+            compressionEnabled);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverUrl       DOCUMENT ME!
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   user                DOCUMENT ME!
+     * @param   pass                DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromRestfulConnection(final String callserverUrl,
+            final String domain,
             final String group,
             final String user,
             final String pass,
@@ -178,7 +206,7 @@ public class DevelopmentTools {
 
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
         final ConnectionInfo info = new ConnectionInfo();
-        info.setCallserverURL("http://localhost:9986/callserver/binary");
+        info.setCallserverURL(callserverUrl);
         info.setUsername(user);
         info.setUsergroup(group);
         info.setPassword(pass);
