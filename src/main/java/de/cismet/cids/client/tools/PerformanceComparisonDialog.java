@@ -187,7 +187,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         jProgressBar1.setIndeterminate(true);
         jButton1.setEnabled(false);
@@ -272,7 +272,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
                     jButton1.setEnabled(true);
                 }
             }.execute();
-    } //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -416,17 +416,17 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
     /**
      * DOCUMENT ME!
      *
-     * @param  args2  DOCUMENT ME!
+     * @param  args  DOCUMENT ME!
      */
-    public static void main(final String[] args2) {
+    public static void main(final String[] args) {
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
 
-        final String[] args = new String[] {
-                "local;http://localhost:9986/callserver/binary;admin@Administratoren@WRRL_DB_MV;true;132@257@WRRL_DB_MV;132@257@WRRL_DB_MV",
+//        final String[] args = new String[] {
 //                "local;http://localhost:9986/callserver/binary;admin@Administratoren@WRRL_DB_MV;true;132@257@WRRL_DB_MV;132@257@WRRL_DB_MV",
+////                "local;http://localhost:9986/callserver/binary;admin@Administratoren@WRRL_DB_MV;true;132@257@WRRL_DB_MV;132@257@WRRL_DB_MV",
 //                "leela;https://wrrldbmv-callserver.cismet.de/callserver/binary;admin@Administratoren@WRRL_DB_MV;true;132@257@WRRL_DB_MV;132@257@WRRL_DB_MV",
-//                "fiswrrl;https://fis-wasser-mv.de/callserver/binary;admin@Administratoren@WRRL_DB_MV;false;132@257@WRRL_DB_MV;132@257@WRRL_DB_MV"
-            };
+////                "fiswrrl;https://fis-wasser-mv.de/callserver/binary;admin@Administratoren@WRRL_DB_MV;false;132@257@WRRL_DB_MV;132@257@WRRL_DB_MV"
+//            };
 
         final List<TestInfo> testInfos = new ArrayList<>(args.length);
         for (final String arg : args) {
