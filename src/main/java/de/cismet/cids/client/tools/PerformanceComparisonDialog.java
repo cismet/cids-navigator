@@ -187,7 +187,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
 
         jProgressBar1.setIndeterminate(true);
         jButton1.setEnabled(false);
@@ -272,7 +272,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
                     jButton1.setEnabled(true);
                 }
             }.execute();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    } //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
