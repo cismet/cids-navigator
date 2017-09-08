@@ -66,6 +66,7 @@ public class ConnectionTester extends javax.swing.JFrame {
     //~ Instance fields --------------------------------------------------------
 
     private final String connectionUrl;
+    private final boolean compressionEnabled;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnStore;
@@ -89,10 +90,12 @@ public class ConnectionTester extends javax.swing.JFrame {
     /**
      * Creates new form ConnectionTester.
      *
-     * @param  connectionUrl  DOCUMENT ME!
+     * @param  connectionUrl       DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
      */
-    public ConnectionTester(final String connectionUrl) {
+    public ConnectionTester(final String connectionUrl, final boolean compressionEnabled) {
         this.connectionUrl = connectionUrl;
+        this.compressionEnabled = compressionEnabled;
 
         initComponents();
         initLog();
@@ -263,7 +266,8 @@ public class ConnectionTester extends javax.swing.JFrame {
             final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
                     connectionUrl,
                     proxy,
-                    Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig());
+                    Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig(),
+                    compressionEnabled);
 
             final Thread establisher = new Thread(new Runnable() {
 
@@ -362,11 +366,22 @@ public class ConnectionTester extends javax.swing.JFrame {
             System.out.println("missing connectionUrl argument");
             System.exit(1);
         }
+        final String arg0 = (String)args[0];
+        boolean arg1 = false;
+        if (args.length > 1) {
+            try {
+                arg1 = Boolean.parseBoolean(args[1]);
+            } catch (final Exception ex) {
+                LOG.warn("error while parsing compressionEnabled argument", ex);
+            }
+        }
+        final String callserverUrl = arg0;
+        final boolean compressionEnabled = arg1;
         java.awt.EventQueue.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    new ConnectionTester((String)args[0]).setVisible(true);
+                    new ConnectionTester(callserverUrl, compressionEnabled).setVisible(true);
                 }
             });
     }
