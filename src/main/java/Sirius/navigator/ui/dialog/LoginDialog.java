@@ -12,6 +12,7 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.resource.PropertyManager;
 
+import Sirius.server.newuser.LoginRestrictionUserException;
 import Sirius.server.newuser.UserException;
 
 import org.apache.log4j.Logger;
@@ -326,54 +327,54 @@ public class LoginDialog extends JDialog {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tf_nameActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tf_nameActionPerformed
+    private void tf_nameActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_nameActionPerformed
         refreshLogin(evt);
-    }                                                                           //GEN-LAST:event_tf_nameActionPerformed
+    }//GEN-LAST:event_tf_nameActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pf_passActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pf_passActionPerformed
+    private void pf_passActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pf_passActionPerformed
         refreshLogin(evt);
-    }                                                                           //GEN-LAST:event_pf_passActionPerformed
+    }//GEN-LAST:event_pf_passActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btn_okActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btn_okActionPerformed
+    private void btn_okActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_okActionPerformed
         refreshLogin(evt);
-    }                                                                          //GEN-LAST:event_btn_okActionPerformed
+    }//GEN-LAST:event_btn_okActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btn_cancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btn_cancelActionPerformed
+    private void btn_cancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
         refreshLogin(evt);
-    }                                                                              //GEN-LAST:event_btn_cancelActionPerformed
+    }//GEN-LAST:event_btn_cancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tf_nameFocusLost(final java.awt.event.FocusEvent evt) { //GEN-FIRST:event_tf_nameFocusLost
+    private void tf_nameFocusLost(final java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_nameFocusLost
         refreshFocus(evt);
-    }                                                                    //GEN-LAST:event_tf_nameFocusLost
+    }//GEN-LAST:event_tf_nameFocusLost
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cb_srvItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_cb_srvItemStateChanged
+    private void cb_srvItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cb_srvItemStateChanged
         domainRefresh(evt);
-    }                                                                         //GEN-LAST:event_cb_srvItemStateChanged
+    }//GEN-LAST:event_cb_srvItemStateChanged
 
     /**
      * DOCUMENT ME!
@@ -615,7 +616,18 @@ public class LoginDialog extends JDialog {
 
                         dispose();
                     } catch (UserException u) {
-                        if (u.wrongUserName()) {
+                        if (u instanceof LoginRestrictionUserException) {
+                            JOptionPane.showMessageDialog(
+                                LoginDialog.this,
+                                org.openide.util.NbBundle.getMessage(
+                                    LoginDialog.class,
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginRestrictedOptionPane.message"), // NOI18N
+                                org.openide.util.NbBundle.getMessage(
+                                    LoginDialog.class,
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginRestrictedOptionPane.title"), // NOI18N
+                                JOptionPane.ERROR_MESSAGE);
+                            pf_pass.setText("");
+                        } else if (u.wrongUserName()) {
                             JOptionPane.showMessageDialog(
                                 LoginDialog.this,
                                 org.openide.util.NbBundle.getMessage(
