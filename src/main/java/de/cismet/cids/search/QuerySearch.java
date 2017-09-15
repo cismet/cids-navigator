@@ -80,6 +80,7 @@ import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.features.FeatureServiceFeature;
 import de.cismet.cismap.commons.featureservice.AbstractFeatureService;
 import de.cismet.cismap.commons.featureservice.FeatureServiceAttribute;
+import de.cismet.cismap.commons.gui.attributetable.AttributeTableRuleSet;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
 import de.cismet.cismap.commons.interaction.CismapBroker;
@@ -1117,9 +1118,13 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             }
 
             if (afs.getCalculatedAttributes() != null) {
+                final AttributeTableRuleSet ruleSet = (AttributeTableRuleSet)afs.getLayerProperties()
+                            .getAttributeTableRuleSet();
+
                 for (final String attrName : afs.getCalculatedAttributes()) {
                     for (int i = 0; i < newAttributes.size(); ++i) {
-                        if (newAttributes.get(i).getName().equals(attrName)) {
+                        if (newAttributes.get(i).getName().equals(attrName)
+                                    && ((ruleSet == null) || (ruleSet.getAdditionalFieldFormula(attrName) == null))) {
                             newAttributes.remove(i);
                             break;
                         }
