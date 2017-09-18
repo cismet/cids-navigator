@@ -12,6 +12,7 @@ import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.resource.PropertyManager;
 
+import Sirius.server.newuser.LoginRestrictionUserException;
 import Sirius.server.newuser.UserException;
 
 import org.apache.log4j.Logger;
@@ -615,7 +616,18 @@ public class LoginDialog extends JDialog {
 
                         dispose();
                     } catch (UserException u) {
-                        if (u.wrongUserName()) {
+                        if (u instanceof LoginRestrictionUserException) {
+                            JOptionPane.showMessageDialog(
+                                LoginDialog.this,
+                                org.openide.util.NbBundle.getMessage(
+                                    LoginDialog.class,
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginRestrictedOptionPane.message"), // NOI18N
+                                org.openide.util.NbBundle.getMessage(
+                                    LoginDialog.class,
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginRestrictedOptionPane.title"), // NOI18N
+                                JOptionPane.ERROR_MESSAGE);
+                            pf_pass.setText("");
+                        } else if (u.wrongUserName()) {
                             JOptionPane.showMessageDialog(
                                 LoginDialog.this,
                                 org.openide.util.NbBundle.getMessage(
@@ -623,9 +635,9 @@ public class LoginDialog extends JDialog {
                                     "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsernameOptionPane.message"), // NOI18N
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsernameOptionPane.title"), // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsernameOptionPane.title"),   // NOI18N
                                 JOptionPane.ERROR_MESSAGE);
-                            tf_name.setText("");                                                                             // NOI18N
+                            tf_name.setText("");                                                                               // NOI18N
                         } else if (u.wrongPassword()) {
                             JOptionPane.showMessageDialog(
                                 LoginDialog.this,
@@ -634,9 +646,9 @@ public class LoginDialog extends JDialog {
                                     "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongPasswordOptionPane.message"), // NOI18N
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongPasswordOptionPane.title"), // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongPasswordOptionPane.title"),   // NOI18N
                                 JOptionPane.ERROR_MESSAGE);
-                            pf_pass.setText("");                                                                             // NOI18N
+                            pf_pass.setText("");                                                                               // NOI18N
                         } else if (u.wrongUserGroup()) {
                             JOptionPane.showMessageDialog(
                                 LoginDialog.this,
@@ -645,7 +657,7 @@ public class LoginDialog extends JDialog {
                                     "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsergroupOptionPane.message"), // NOI18N
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsergroupOptionPane.title"), // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongUsergroupOptionPane.title"),  // NOI18N
                                 JOptionPane.ERROR_MESSAGE);
                             cb_userGroup.setSelectedIndex(0);
                         } else if (u.wrongLocalServer()) {
@@ -653,10 +665,10 @@ public class LoginDialog extends JDialog {
                                 LoginDialog.this,
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongDomainOptionPane.message"), // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongDomainOptionPane.message"),   // NOI18N
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongDomainOptionPane.title"),   // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).wrongDomainOptionPane.title"),     // NOI18N
                                 JOptionPane.ERROR_MESSAGE);
                             cb_srv.setSelectedIndex(0);
                         } else {
@@ -664,17 +676,17 @@ public class LoginDialog extends JDialog {
                                 LoginDialog.this,
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginFailedOptionPane.message"), // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginFailedOptionPane.message"),   // NOI18N
                                 org.openide.util.NbBundle.getMessage(
                                     LoginDialog.class,
-                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginFailedOptionPane.title"),   // NOI18N
+                                    "LoginDialog.LoginListener.actionPerformed(ActionEvent).loginFailedOptionPane.title"),     // NOI18N
                                 JOptionPane.ERROR_MESSAGE);
                         }
                     }
                 }
-            } else if (e.getActionCommand().equals("cancel")) {                                                              // NOI18N
+            } else if (e.getActionCommand().equals("cancel")) {                                                                // NOI18N
                 if (ExceptionManager.getManager().showExitDialog(LoginDialog.this)) {
-                    LOG.info("close program");                                                                               // NOI18N
+                    LOG.info("close program");                                                                                 // NOI18N
                     System.exit(0);
                 }
             }
