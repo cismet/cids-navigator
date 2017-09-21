@@ -20,7 +20,7 @@
         <names.cids-navigator>cids Navigator</names.cids-navigator>
     </properties>
     
-    <name>${names.cids-navigator}</name>
+    <name>${names.cids-navigator} [${project.version}]</name>
     <description>!!! description pending !!!</description>
 
     <scm>
