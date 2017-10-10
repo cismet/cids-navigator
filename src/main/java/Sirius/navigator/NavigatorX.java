@@ -1550,7 +1550,8 @@ public class NavigatorX extends javax.swing.JFrame {
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
-                        proxyConfig);
+                        proxyConfig,
+                        propertyManager.isCompressionEnabled());
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
