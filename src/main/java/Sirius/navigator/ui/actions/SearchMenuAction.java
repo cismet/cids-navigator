@@ -61,17 +61,17 @@ public class SearchMenuAction extends AbstractAction implements CidsUiAction {
         putValue(
             NAME,
             org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
+                SearchMenuAction.class,
                 "SearchMenuAction.initAction.search.title"));
         putValue(
             MNEMONIC_KEY,
             org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
+                SearchMenuAction.class,
                 "SearchMenuAction.initAction.search.mnemonic"));
         putValue(
             SHORT_DESCRIPTION,
             org.openide.util.NbBundle.getMessage(
-                MutableMenuBar.class,
+                SearchMenuAction.class,
                 "SearchMenuAction.initAction.search.tooltip"));
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke("alt S"));
         putValue(ACTION_COMMAND_KEY, "search.search");
