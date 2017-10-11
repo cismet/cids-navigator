@@ -42,6 +42,7 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
@@ -400,10 +401,20 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    @Deprecated
     public MetaObject getMetaObject(final User user, final int objectID, final int classID, final String domain)
             throws ConnectionException {
+        return getMetaObject(user, objectID, classID, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject getMetaObject(final User user,
+            final int objectID,
+            final int classID,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getMetaObject(user, objectID, classID, domain);
+            return connector.getMetaObject(user, objectID, classID, domain, context);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, objectid, classid, domain: " // NOI18N
                         + user
@@ -419,9 +430,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    @Deprecated
     public MetaObject[] getMetaObjectByQuery(final User user, final String query) throws ConnectionException {
+        return getMetaObjectByQuery(user, query, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getMetaObjectByQuery(final User user, final String query, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getMetaObject(user, query);
+            return connector.getMetaObject(user, query, context);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, query: " + user + " :: " + query; // NOI18N
             LOG.error(message, e);
@@ -432,8 +450,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public MetaObject[] getMetaObjectByQuery(final User user, final String query, final String domain)
             throws ConnectionException {
+        return getMetaObjectByQuery(user, query, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getMetaObjectByQuery(final User user,
+            final String query,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getMetaObject(user, query, domain);
+            return connector.getMetaObject(user, query, domain, context);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, query, domain: " + user + " :: " // NOI18N
                         + query
@@ -773,14 +799,25 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    @Deprecated
     public Object executeTask(final User user,
             final String taskname,
             final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
+        return executeTask(user, taskname, taskdomain, ConnectionContext.createDeprecated(), body, params);
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final ConnectionContext context,
+            final Object body,
+            final ServerActionParameter... params) throws ConnectionException {
         try {
             // FIXME: workaround for legacy clients that do not support GenericResourceWithContentType
-            final Object taskResult = connector.executeTask(user, taskname, taskdomain, body, params);
+            final Object taskResult = connector.executeTask(user, taskname, taskdomain, context, body, params);
             if ((taskResult != null) && GenericResourceWithContentType.class.isAssignableFrom(taskResult.getClass())) {
                 LOG.warn("REST Action  '" + taskname + "' completed, GenericResourceWithContentType with type '"
                             + ((GenericResourceWithContentType)taskResult).getContentType() + "' generated.");

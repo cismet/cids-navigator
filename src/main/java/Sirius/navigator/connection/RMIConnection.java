@@ -12,7 +12,6 @@ import Sirius.navigator.exception.SqlConnectionException;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
-import Sirius.server.localserver.method.MethodMap;
 import Sirius.server.middleware.interfaces.proxy.*;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
@@ -23,11 +22,6 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
-import Sirius.server.newuser.UserGroup;
-import Sirius.server.search.SearchOption;
-import Sirius.server.search.SearchResult;
-import Sirius.server.search.store.Info;
-import Sirius.server.search.store.QueryData;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -42,7 +36,6 @@ import java.rmi.RemoteException;
 import java.sql.SQLException;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.Icon;
@@ -50,6 +43,7 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
@@ -442,9 +436,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
+    @Deprecated
     public MetaObject[] getMetaObjectByQuery(final User user, final String query) throws ConnectionException {
+        return getMetaObjectByQuery(user, query, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getMetaObjectByQuery(final User user, final String query, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((MetaService)callserver).getMetaObject(user, query);
+            return ((MetaService)callserver).getMetaObject(user, query, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve MetaObject", re);
             throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),
@@ -454,10 +455,19 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
+    @Deprecated
     public MetaObject[] getMetaObjectByQuery(final User user, final String query, final String domain)
             throws ConnectionException {
+        return getMetaObjectByQuery(user, query, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getMetaObjectByQuery(final User user,
+            final String query,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).getMetaObject(user, query, domain);
+            return ((MetaService)callserver).getMetaObject(user, query, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve MetaObject", re);
             throw new ConnectionException("[ServerError] could not retrieve MetaObject: " + re.getMessage(),
@@ -467,10 +477,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
+    @Deprecated
     public MetaObject getMetaObject(final User user, final int objectID, final int classID, final String domain)
             throws ConnectionException {
+        return getMetaObject(user, objectID, classID, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject getMetaObject(final User user,
+            final int objectID,
+            final int classID,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).getMetaObject(user, objectID, classID, domain);
+            return ((MetaService)callserver).getMetaObject(user, objectID, classID, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve MetaObject '" + objectID + '@' + classID + '@' + domain
                         + '\'',
@@ -788,13 +808,24 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
+    @Deprecated
     public Object executeTask(final User user,
             final String taskname,
             final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
+        return executeTask(user, taskname, taskdomain, ConnectionContext.createDeprecated(), body, params);
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final ConnectionContext context,
+            final Object body,
+            final ServerActionParameter... params) throws ConnectionException {
         try {
-            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, body, params);
+            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, context, body, params);
         } catch (final RemoteException e) {
             throw new ConnectionException("could executeTask: taskname: " + taskname + " || taskdomain: " + taskdomain
                         + " || user: " + user,

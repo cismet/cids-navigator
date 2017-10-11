@@ -16,8 +16,6 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
-import Sirius.server.search.SearchOption;
-import Sirius.server.search.SearchResult;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -28,10 +26,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
@@ -465,8 +463,17 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
+        @Deprecated
         public MetaObject getMetaObject(final int objectID, final int classID, final String domain)
                 throws ConnectionException {
+            return getMetaObject(objectID, classID, domain, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject getMetaObject(final int objectID,
+                final int classID,
+                final String domain,
+                final ConnectionContext context) throws ConnectionException {
             if (classAndMethodCache == null) {
                 initClassAndMethodCache();
             }
@@ -475,7 +482,11 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 log.debug("getMetaObject(): objectID=" + objectID + ", classID=" + classID + ", domain=" + domain); // NOI18N
             }
 
-            final MetaObject metaObject = connection.getMetaObject(session.getUser(), objectID, classID, domain);
+            final MetaObject metaObject = connection.getMetaObject(session.getUser(),
+                    objectID,
+                    classID,
+                    domain,
+                    context);
             if (metaObject != null) {
                 if (log.isDebugEnabled()) {
                     log.debug(" MetaObject: " + metaObject + " MetaObject.getName(): " + metaObject.getName()
@@ -491,14 +502,21 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
+        @Deprecated
         public MetaObject getMetaObject(final String objectId) throws ConnectionException {
+            return getMetaObject(objectId, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject getMetaObject(final String objectId, final ConnectionContext context)
+                throws ConnectionException {
             try {
                 final StringTokenizer tokenizer = new StringTokenizer(objectId, "@"); // NOI18N
                 final int objectID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 final int classID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 final String domain = tokenizer.nextToken();
 
-                return this.getMetaObject(objectID, classID, domain);
+                return this.getMetaObject(objectID, classID, domain, context);
             } catch (final ConnectionException cexp) {
                 throw cexp;
             } catch (final Exception t) {
@@ -511,7 +529,14 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
+        @Deprecated
         public MetaObject[] getMetaObjectByQuery(final String query, final int sig) throws ConnectionException {
+            return getMetaObjectByQuery(query, sig, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject[] getMetaObjectByQuery(final String query, final int sig, final ConnectionContext context)
+                throws ConnectionException {
             if (classAndMethodCache == null) {
                 initClassAndMethodCache();
             }
@@ -521,7 +546,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             }
 
             try {
-                final MetaObject[] obs = connection.getMetaObjectByQuery(session.getUser(), query);
+                final MetaObject[] obs = connection.getMetaObjectByQuery(session.getUser(), query, context);
 
                 for (int i = 0; i < obs.length; i++) {
                     if (obs[i] != null) {
@@ -569,12 +594,23 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
+        @Deprecated
         public Object executeTask(
                 final String taskname,
                 final String taskdomain,
                 final Object body,
                 final ServerActionParameter... params) throws ConnectionException {
-            return connection.executeTask(session.getUser(), taskname, taskdomain, body, params);
+            return executeTask(taskname, taskdomain, ConnectionContext.createDeprecated(), body, params);
+        }
+
+        @Override
+        public Object executeTask(
+                final String taskname,
+                final String taskdomain,
+                final ConnectionContext context,
+                final Object body,
+                final ServerActionParameter... params) throws ConnectionException {
+            return connection.executeTask(session.getUser(), taskname, taskdomain, context, body, params);
         }
     }
 }

@@ -16,8 +16,8 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 
 import java.util.Collection;
-import java.util.HashMap;
 
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
@@ -210,7 +210,23 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject getMetaObject(int objectID, int classID, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   objectID  DOCUMENT ME!
+     * @param   classID   DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   context   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject getMetaObject(int objectID, int classID, String domain, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -222,6 +238,19 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject getMetaObject(String objectId) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   objectId  DOCUMENT ME!
+     * @param   context   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject getMetaObject(String objectId, ConnectionContext context) throws ConnectionException;
+
     /**
      * DOCUMENT ME!
      *
@@ -233,6 +262,20 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     MetaObject[] getMetaObjectByQuery(String query, int sig) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   query    DOCUMENT ME!
+     * @param   sig      DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject[] getMetaObjectByQuery(String query, int sig, ConnectionContext context) throws ConnectionException;
+
     /**
      * DOCUMENT ME!
      *
@@ -303,6 +346,26 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Object executeTask(String taskname, String taskdomain, Object body, ServerActionParameter... params)
             throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     * @param   body        DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(String taskname,
+            String taskdomain,
+            ConnectionContext context,
+            Object body,
+            ServerActionParameter... params) throws ConnectionException;
 }

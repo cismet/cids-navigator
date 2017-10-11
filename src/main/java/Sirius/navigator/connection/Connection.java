@@ -26,6 +26,7 @@ import java.util.Vector;
 import javax.swing.Icon;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
@@ -348,19 +349,33 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject getMetaObject(User user, int objectID, int classID, String domain) throws ConnectionException;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user      DOCUMENT ME!
+     * @param   objectID  DOCUMENT ME!
+     * @param   classID   DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   context   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject getMetaObject(User user, int objectID, int classID, String domain, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
-     * @param       user   DOCUMENT ME!
-     * @param       query  DOCUMENT ME!
+     * @param   user   DOCUMENT ME!
+     * @param   query  DOCUMENT ME!
      *
-     * @return      DOCUMENT ME!
+     * @return  DOCUMENT ME!
      *
-     * @throws      ConnectionException  DOCUMENT ME!
-     *
-     * @Deprecated  DOCUMENT ME!
+     * @throws  ConnectionException  DOCUMENT ME!
      */
     @Deprecated
     MetaObject[] getMetaObjectByQuery(User user, String query) throws ConnectionException;
@@ -368,9 +383,9 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
-     * @param       user    DOCUMENT ME!
-     * @param       query   DOCUMENT ME!
-     * @param       domain  DOCUMENT ME!
+     * @param       user     DOCUMENT ME!
+     * @param       query    DOCUMENT ME!
+     * @param       context  DOCUMENT ME!
      *
      * @return      DOCUMENT ME!
      *
@@ -379,7 +394,38 @@ public interface Connection {
      * @Deprecated  DOCUMENT ME!
      */
     @Deprecated
+    MetaObject[] getMetaObjectByQuery(User user, String query, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user    DOCUMENT ME!
+     * @param   query   DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
     MetaObject[] getMetaObjectByQuery(User user, String query, String domain) throws ConnectionException;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       user     DOCUMENT ME!
+     * @param       query    DOCUMENT ME!
+     * @param       domain   DOCUMENT ME!
+     * @param       context  DOCUMENT ME!
+     *
+     * @return      DOCUMENT ME!
+     *
+     * @throws      ConnectionException  DOCUMENT ME!
+     *
+     * @Deprecated  DOCUMENT ME!
+     */
+    @Deprecated
+    MetaObject[] getMetaObjectByQuery(User user, String query, String domain, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -568,8 +614,30 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Object executeTask(User user, String taskname, String taskdomain, Object body, ServerActionParameter... params)
             throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user        DOCUMENT ME!
+     * @param   taskname    DOCUMENT ME!
+     * @param   taskdomain  DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     * @param   body        DOCUMENT ME!
+     * @param   params      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(User user,
+            String taskname,
+            String taskdomain,
+            final ConnectionContext context,
+            Object body,
+            ServerActionParameter... params) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
