@@ -26,8 +26,8 @@ import java.util.Vector;
 import javax.swing.Icon;
 
 import de.cismet.cids.server.CallServerService;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.netutil.Proxy;
@@ -114,14 +114,27 @@ public interface Connection {
      * @return  DOCUMENT ME!
      */
     boolean isConnected();
+
     /**
-     * Default -----------------------------------------------------------------
+     * DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     String[] getDomains() throws ConnectionException;
+
+    /**
+     * Default -----------------------------------------------------------------
+     *
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    String[] getDomains(ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -148,8 +161,9 @@ public interface Connection {
      */
     @Deprecated
     Icon getDefaultIcon(String name) throws ConnectionException;
+
     /**
-     * User --------------------------------------------------------------------
+     * DOCUMENT ME!
      *
      * @param   userGroupLsName  DOCUMENT ME!
      * @param   userGroupName    DOCUMENT ME!
@@ -162,8 +176,31 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     User getUser(String userGroupLsName, String userGroupName, String userLsName, String userName, String password)
             throws ConnectionException, UserException;
+
+    /**
+     * User --------------------------------------------------------------------
+     *
+     * @param   userGroupLsName  DOCUMENT ME!
+     * @param   userGroupName    DOCUMENT ME!
+     * @param   userLsName       DOCUMENT ME!
+     * @param   userName         DOCUMENT ME!
+     * @param   password         DOCUMENT ME!
+     * @param   context          DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    User getUser(String userGroupLsName,
+            String userGroupName,
+            String userLsName,
+            String userName,
+            String password,
+            ConnectionContext context) throws ConnectionException, UserException;
 
     /**
      * DOCUMENT ME!
@@ -172,7 +209,19 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Vector getUserGroupNames() throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Vector getUserGroupNames(ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -185,7 +234,23 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     Vector getUserGroupNames(String username, String domain) throws ConnectionException, UserException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   username  DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   context   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    Vector getUserGroupNames(String username, String domain, ConnectionContext context) throws ConnectionException,
+        UserException;
 
     /**
      * DOCUMENT ME!
@@ -199,9 +264,27 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     boolean changePassword(User user, String oldPassword, String newPassword) throws ConnectionException, UserException;
+
     /**
-     * Node --------------------------------------------------------------------
+     * DOCUMENT ME!
+     *
+     * @param   user         DOCUMENT ME!
+     * @param   oldPassword  DOCUMENT ME!
+     * @param   newPassword  DOCUMENT ME!
+     * @param   context      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    boolean changePassword(User user, String oldPassword, String newPassword, ConnectionContext context)
+            throws ConnectionException, UserException;
+
+    /**
+     * DOCUMENT ME!
      *
      * @param   user  DOCUMENT ME!
      *
@@ -209,7 +292,20 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getRoots(User user) throws ConnectionException;
+
+    /**
+     * Node --------------------------------------------------------------------
+     *
+     * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getRoots(User user, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -221,7 +317,21 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getRoots(User user, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user     DOCUMENT ME!
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getRoots(User user, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -233,7 +343,21 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getChildren(Node node, User user) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node     DOCUMENT ME!
+     * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getChildren(Node node, User user, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -246,7 +370,22 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node getNode(User user, int nodeID, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user     DOCUMENT ME!
+     * @param   nodeID   DOCUMENT ME!
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node getNode(User user, int nodeID, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -259,7 +398,22 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node addNode(Node node, Link parent, User user) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node     DOCUMENT ME!
+     * @param   parent   DOCUMENT ME!
+     * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node addNode(Node node, Link parent, User user, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -271,11 +425,25 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     boolean deleteNode(Node node, User user) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
+     * @param   node     DOCUMENT ME!
+     * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean deleteNode(Node node, User user, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   from  DOCUMENT ME!
      * @param   to    DOCUMENT ME!
      * @param   user  DOCUMENT ME!
@@ -284,11 +452,26 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     boolean addLink(Node from, Node to, User user) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
+     * @param   from     DOCUMENT ME!
+     * @param   to       DOCUMENT ME!
+     * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean addLink(Node from, Node to, User user, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   from  DOCUMENT ME!
      * @param   to    DOCUMENT ME!
      * @param   user  DOCUMENT ME!
@@ -297,12 +480,40 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     boolean deleteLink(Node from, Node to, User user) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
-     * @param       user  DOCUMENT ME!
+     * @param   from     DOCUMENT ME!
+     * @param   to       DOCUMENT ME!
+     * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean deleteLink(Node from, Node to, User user, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    Node[] getClassTreeNodes(User user) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param       user     DOCUMENT ME!
+     * @param       context  DOCUMENT ME!
      *
      * @return      DOCUMENT ME!
      *
@@ -311,9 +522,10 @@ public interface Connection {
      * @deprecated  DOCUMENT ME!
      */
     @Deprecated
-    Node[] getClassTreeNodes(User user) throws ConnectionException;
+    Node[] getClassTreeNodes(User user, ConnectionContext context) throws ConnectionException;
+
     /**
-     * Classes & Objects -------------------------------------------------------
+     * DOCUMENT ME!
      *
      * @param   user     DOCUMENT ME!
      * @param   classID  DOCUMENT ME!
@@ -323,7 +535,22 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaClass getMetaClass(User user, int classID, String domain) throws ConnectionException;
+
+    /**
+     * Classes & Objects -------------------------------------------------------
+     *
+     * @param   user     DOCUMENT ME!
+     * @param   classID  DOCUMENT ME!
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaClass getMetaClass(User user, int classID, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -335,7 +562,21 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaClass[] getClasses(User user, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user     DOCUMENT ME!
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaClass[] getClasses(User user, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -438,6 +679,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject insertMetaObject(User user, MetaObject MetaObject, String domain) throws ConnectionException;
 
     /**
@@ -446,12 +688,14 @@ public interface Connection {
      * @param   user        DOCUMENT ME!
      * @param   MetaObject  DOCUMENT ME!
      * @param   domain      DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    int updateMetaObject(User user, MetaObject MetaObject, String domain) throws ConnectionException;
+    MetaObject insertMetaObject(User user, MetaObject MetaObject, String domain, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -464,7 +708,52 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
+    int updateMetaObject(User user, MetaObject MetaObject, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user        DOCUMENT ME!
+     * @param   MetaObject  DOCUMENT ME!
+     * @param   domain      DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    int updateMetaObject(User user, MetaObject MetaObject, String domain, ConnectionContext context)
+            throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user        DOCUMENT ME!
+     * @param   MetaObject  DOCUMENT ME!
+     * @param   domain      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
     int deleteMetaObject(User user, MetaObject MetaObject, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user        DOCUMENT ME!
+     * @param   MetaObject  DOCUMENT ME!
+     * @param   domain      DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    int deleteMetaObject(User user, MetaObject MetaObject, String domain, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -476,9 +765,24 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject getInstance(User user, MetaClass c) throws ConnectionException;
+
     /**
-     * /** DOCUMENT ME!
+     * DOCUMENT ME!
+     *
+     * @param   user     DOCUMENT ME!
+     * @param   c        DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject getInstance(User user, MetaClass c, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
      *
      * @param   classId                DOCUMENT ME!
      * @param   user                   DOCUMENT ME!
@@ -489,10 +793,29 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getAllLightweightMetaObjectsForClass(int classId,
             User user,
             String[] representationFields,
             String representationPattern) throws ConnectionException;
+    /**
+     * /** DOCUMENT ME!
+     *
+     * @param   classId                DOCUMENT ME!
+     * @param   user                   DOCUMENT ME!
+     * @param   representationFields   DOCUMENT ME!
+     * @param   representationPattern  DOCUMENT ME!
+     * @param   context                DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject[] getAllLightweightMetaObjectsForClass(int classId,
+            User user,
+            String[] representationFields,
+            String representationPattern,
+            ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -506,10 +829,50 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getAllLightweightMetaObjectsForClass(int classId,
             User user,
             String[] representationFields,
             AbstractAttributeRepresentationFormater formater) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classId               DOCUMENT ME!
+     * @param   user                  DOCUMENT ME!
+     * @param   representationFields  DOCUMENT ME!
+     * @param   formater              DOCUMENT ME!
+     * @param   context               DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject[] getAllLightweightMetaObjectsForClass(int classId,
+            User user,
+            String[] representationFields,
+            AbstractAttributeRepresentationFormater formater,
+            ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classId                DOCUMENT ME!
+     * @param   user                   DOCUMENT ME!
+     * @param   query                  DOCUMENT ME!
+     * @param   representationFields   DOCUMENT ME!
+     * @param   representationPattern  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    MetaObject[] getLightweightMetaObjectsByQuery(int classId,
+            User user,
+            String query,
+            String[] representationFields,
+            String representationPattern) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -519,6 +882,7 @@ public interface Connection {
      * @param       query                  DOCUMENT ME!
      * @param       representationFields   DOCUMENT ME!
      * @param       representationPattern  DOCUMENT ME!
+     * @param       context                DOCUMENT ME!
      *
      * @return      DOCUMENT ME!
      *
@@ -531,7 +895,28 @@ public interface Connection {
             User user,
             String query,
             String[] representationFields,
-            String representationPattern) throws ConnectionException;
+            String representationPattern,
+            ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classId               DOCUMENT ME!
+     * @param   user                  DOCUMENT ME!
+     * @param   query                 DOCUMENT ME!
+     * @param   representationFields  DOCUMENT ME!
+     * @param   formater              DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    MetaObject[] getLightweightMetaObjectsByQuery(int classId,
+            User user,
+            String query,
+            String[] representationFields,
+            AbstractAttributeRepresentationFormater formater) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -541,6 +926,7 @@ public interface Connection {
      * @param       query                 DOCUMENT ME!
      * @param       representationFields  DOCUMENT ME!
      * @param       formater              DOCUMENT ME!
+     * @param       context               DOCUMENT ME!
      *
      * @return      DOCUMENT ME!
      *
@@ -553,17 +939,65 @@ public interface Connection {
             User user,
             String query,
             String[] representationFields,
-            AbstractAttributeRepresentationFormater formater) throws ConnectionException;
+            AbstractAttributeRepresentationFormater formater,
+            ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user  DOCUMENT ME!
+     * @param   key   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    String getConfigAttr(final User user, final String key) throws ConnectionException;
 
     /**
      * @see  Sirius.server.middleware.interfaces.proxy.UserService#getConfigAttr(Sirius.server.newuser.User, java.lang.String)
      */
-    String getConfigAttr(final User user, final String key) throws ConnectionException;
+    String getConfigAttr(final User user, final String key, final ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user  DOCUMENT ME!
+     * @param   key   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
 
     /**
      * @see  Sirius.server.middleware.interfaces.proxy.UserService#hasConfigAttr(Sirius.server.newuser.User, java.lang.String)
      */
-    boolean hasConfigAttr(final User user, final String key) throws ConnectionException;
+    boolean hasConfigAttr(final User user, final String key, final ConnectionContext context)
+            throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classId   DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
+     * @param   domain    DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   elements  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    HistoryObject[] getHistory(final int classId,
+            final int objectId,
+            final String domain,
+            final User user,
+            final int elements) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -573,6 +1007,7 @@ public interface Connection {
      * @param       domain    DOCUMENT ME!
      * @param       user      DOCUMENT ME!
      * @param       elements  DOCUMENT ME!
+     * @param       context   DOCUMENT ME!
      *
      * @return      DOCUMENT ME!
      *
@@ -587,7 +1022,8 @@ public interface Connection {
             final int objectId,
             final String domain,
             final User user,
-            final int elements) throws ConnectionException;
+            final int elements,
+            final ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -599,7 +1035,22 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Collection customServerSearch(User user, CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user          DOCUMENT ME!
+     * @param   serverSearch  DOCUMENT ME!
+     * @param   context       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Collection customServerSearch(User user, CidsServerSearch serverSearch, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!

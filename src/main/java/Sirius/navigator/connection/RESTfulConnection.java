@@ -42,8 +42,9 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
@@ -58,7 +59,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
+public class RESTfulConnection implements Connection, Reconnectable<CallServerService>, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -137,7 +138,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         try {
-            connector.getDomains();
+            connector.getDomains(getConnectionContext());
         } catch (final Exception e) {
             final String message = "no connection to restful interface"; // NOI18N
             LOG.error(message, e);
@@ -166,10 +167,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         return connector != null;
     }
 
+    @Deprecated
     @Override
     public String[] getDomains() throws ConnectionException {
+        return getDomains(ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public String[] getDomains(final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getDomains();
+            return connector.getDomains(context);
         } catch (final Exception e) {
             final String message = "cannot get domains"; // NOI18N
             LOG.error(message, e);
@@ -199,14 +206,31 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public User getUser(final String userGroupLsName,
             final String userGroupName,
             final String userLsName,
             final String userName,
             final String password) throws ConnectionException, UserException {
+        return getUser(
+                userGroupLsName,
+                userGroupName,
+                userLsName,
+                userName,
+                password,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public User getUser(final String userGroupLsName,
+            final String userGroupName,
+            final String userLsName,
+            final String userName,
+            final String password,
+            final ConnectionContext context) throws ConnectionException, UserException {
         try {
-            return connector.getUser(userGroupLsName, userGroupName, userLsName, userName, password);
+            return connector.getUser(userGroupLsName, userGroupName, userLsName, userName, password, context);
         } catch (final UserException e) {
             final String message = "cannot get user: " // NOI18N
                         + userGroupLsName
@@ -234,10 +258,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Vector getUserGroupNames() throws ConnectionException {
+        return getUserGroupNames(ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Vector getUserGroupNames(final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getUserGroupNames();
+            return connector.getUserGroupNames(context);
         } catch (final Exception e) {
             final String message = "could not get usergroup names"; // NOI18N
             LOG.error(message, e);
@@ -245,11 +275,18 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Vector getUserGroupNames(final String username, final String domain) throws ConnectionException,
         UserException {
+        return getUserGroupNames(username, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Vector getUserGroupNames(final String username, final String domain, final ConnectionContext context)
+            throws ConnectionException, UserException {
         try {
-            return connector.getUserGroupNames(username, domain);
+            return connector.getUserGroupNames(username, domain, context);
         } catch (final Exception e) {
             final String message = "could not get usergroup names by username,domain: " + username + "@" + domain; // NOI18N
             LOG.error(message, e);
@@ -257,11 +294,20 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public boolean changePassword(final User user, final String oldPassword, final String newPassword)
             throws ConnectionException, UserException {
+        return changePassword(user, oldPassword, newPassword, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean changePassword(final User user,
+            final String oldPassword,
+            final String newPassword,
+            final ConnectionContext context) throws ConnectionException, UserException {
         try {
-            return connector.changePassword(user, oldPassword, newPassword);
+            return connector.changePassword(user, oldPassword, newPassword, context);
         } catch (final Exception e) {
             final String message = "could not change password: " + user + " :: " + oldPassword + " :: " + newPassword; // NOI18N
             LOG.error(message, e);
@@ -269,10 +315,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getRoots(final User user) throws ConnectionException {
+        return getRoots(user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getRoots(final User user, final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getRoots(user);
+            return connector.getRoots(user, context);
         } catch (final Exception e) {
             final String message = "could not get roots for user: " + user; // NOI18N
             LOG.error(message, e);
@@ -280,10 +332,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getRoots(final User user, final String domain) throws ConnectionException {
+        return getRoots(user, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getRoots(final User user, final String domain, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getRoots(user, domain);
+            return connector.getRoots(user, domain, context);
         } catch (final Exception e) {
             final String message = "could not get roots for user: " + user + "@" + domain; // NOI18N
             LOG.error(message, e);
@@ -291,10 +350,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getChildren(final Node node, final User user) throws ConnectionException {
+        return getChildren(node, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getChildren(final Node node, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getChildren(node, user);
+            return connector.getChildren(node, user, context);
         } catch (final Exception e) {
             final String message = "could not get children for node and user: " + node + " :: " + user; // NOI18N
             LOG.error(message, e);
@@ -302,10 +368,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Node getNode(final User user, final int nodeID, final String domain) throws ConnectionException {
+        return getNode(user, nodeID, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node getNode(final User user, final int nodeID, final String domain, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getMetaObjectNode(user, nodeID, domain);
+            return connector.getMetaObjectNode(user, nodeID, domain, context);
         } catch (final Exception e) {
             final String message = "could not get node for user, nodeID, domain: " // NOI18N
                         + user
@@ -318,10 +391,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Node addNode(final Node node, final Link parent, final User user) throws ConnectionException {
+        return addNode(node, parent, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node addNode(final Node node, final Link parent, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.addNode(node, parent, user);
+            return connector.addNode(node, parent, user, context);
         } catch (final Exception e) {
             final String message = "could not add node with parent and user: " + node + " :: " + parent + " :: " + user; // NOI18N
             LOG.error(message, e);
@@ -329,10 +409,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public boolean deleteNode(final Node node, final User user) throws ConnectionException {
+        return deleteNode(node, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean deleteNode(final Node node, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.deleteNode(node, user);
+            return connector.deleteNode(node, user, context);
         } catch (final Exception e) {
             final String message = "could not delete node for user: " + node + " :: " + user; // NOI18N
             LOG.error(message, e);
@@ -340,10 +427,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public boolean addLink(final Node from, final Node to, final User user) throws ConnectionException {
+        return addLink(from, to, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean addLink(final Node from, final Node to, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.addLink(from, to, user);
+            return connector.addLink(from, to, user, context);
         } catch (final Exception e) {
             final String message = "could not add link, node from, to, user: " + from + " :: " + to + ":: " + user; // NOI18N
             LOG.error(message, e);
@@ -351,10 +445,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public boolean deleteLink(final Node from, final Node to, final User user) throws ConnectionException {
+        return deleteLink(from, to, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean deleteLink(final Node from, final Node to, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.deleteLink(from, to, user);
+            return connector.deleteLink(from, to, user, context);
         } catch (final Exception e) {
             final String message = "could not delete link, node from, to, user: " + from + " :: " + to + ":: " + user; // NOI18N
             LOG.error(message, e);
@@ -362,10 +463,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getClassTreeNodes(final User user) throws ConnectionException {
+        return getClassTreeNodes(user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getClassTreeNodes(final User user, final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getClassTreeNodes(user);
+            return connector.getClassTreeNodes(user, context);
         } catch (final Exception e) {
             final String message = "could not get classtree nodes for user: " + user; // NOI18N
             LOG.error(message, e);
@@ -373,10 +480,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaClass getMetaClass(final User user, final int classID, final String domain) throws ConnectionException {
+        return getMetaClass(user, classID, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaClass getMetaClass(final User user,
+            final int classID,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getClass(user, classID, domain);
+            return connector.getClass(user, classID, domain, context);
         } catch (final Exception e) {
             final String message = "could not get metaclass for user, domain, classid " // NOI18N
                         + user
@@ -389,10 +505,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaClass[] getClasses(final User user, final String domain) throws ConnectionException {
+        return getClasses(user, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaClass[] getClasses(final User user, final String domain, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getClasses(user, domain);
+            return connector.getClasses(user, domain, context);
         } catch (final Exception e) {
             final String message = "could not get classes for user, doamin: " + user + "@" + domain; // NOI18N
             LOG.error(message, e);
@@ -447,6 +570,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getMetaObjectByQuery(final User user, final String query, final String domain)
             throws ConnectionException {
@@ -470,11 +594,20 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject insertMetaObject(final User user, final MetaObject metaObject, final String domain)
             throws ConnectionException {
+        return insertMetaObject(user, metaObject, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject insertMetaObject(final User user,
+            final MetaObject metaObject,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.insertMetaObject(user, metaObject, domain);
+            return connector.insertMetaObject(user, metaObject, domain, context);
         } catch (final Exception e) {
             final String message = "could not insert metaobject for user, metaobject, domain: " // NOI18N
                         + user
@@ -497,11 +630,20 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public int updateMetaObject(final User user, final MetaObject metaObject, final String domain)
             throws ConnectionException {
+        return updateMetaObject(user, metaObject, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public int updateMetaObject(final User user,
+            final MetaObject metaObject,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.updateMetaObject(user, metaObject, domain);
+            return connector.updateMetaObject(user, metaObject, domain, context);
         } catch (final Exception e) {
             final String message = "could not update metaobject for user, metaobject, domain: " // NOI18N
                         + user
@@ -524,11 +666,20 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public int deleteMetaObject(final User user, final MetaObject metaObject, final String domain)
             throws ConnectionException {
+        return deleteMetaObject(user, metaObject, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public int deleteMetaObject(final User user,
+            final MetaObject metaObject,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.deleteMetaObject(user, metaObject, domain);
+            return connector.deleteMetaObject(user, metaObject, domain, context);
         } catch (final Exception e) {
             final String message = "could not delete metaobject for user, metaobject, domain: " // NOI18N
                         + user
@@ -551,10 +702,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject getInstance(final User user, final MetaClass c) throws ConnectionException {
+        return getInstance(user, c, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject getInstance(final User user, final MetaClass c, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getInstance(user, c);
+            return connector.getInstance(user, c, context);
         } catch (final Exception e) {
             final String message = "could not get instance for user, metaclass: " + user + " :: " + c; // NOI18N
             LOG.error(message, e);
@@ -562,18 +720,34 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
             final User user,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
+        return getAllLightweightMetaObjectsForClass(
+                classId,
+                user,
+                representationFields,
+                representationPattern,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
+            final User user,
+            final String[] representationFields,
+            final String representationPattern,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmos = connector.getAllLightweightMetaObjectsForClass(
                         classId,
                         user,
                         representationFields,
-                        representationPattern);
+                        representationPattern,
+                        context);
                 return initLWMOs(lwmos, null);
             } else {
                 return getLWMOFallback(classId, user);
@@ -592,17 +766,33 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
             final User user,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
+        return getAllLightweightMetaObjectsForClass(
+                classId,
+                user,
+                representationFields,
+                formater,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
+            final User user,
+            final String[] representationFields,
+            final AbstractAttributeRepresentationFormater formater,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmo = connector.getAllLightweightMetaObjectsForClass(
                         classId,
                         user,
-                        representationFields);
+                        representationFields,
+                        context);
                 return initLWMOs(lwmo, formater);
             } else {
                 return getLWMOFallback(classId, user);
@@ -619,12 +809,29 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
             final User user,
             final String query,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
+        return getLightweightMetaObjectsByQuery(
+                classId,
+                user,
+                query,
+                representationFields,
+                representationPattern,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
+            final User user,
+            final String query,
+            final String[] representationFields,
+            final String representationPattern,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmo = connector.getLightweightMetaObjectsByQuery(
@@ -632,7 +839,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         user,
                         query,
                         representationFields,
-                        representationPattern);
+                        representationPattern,
+                        context);
                 return initLWMOs(lwmo, null);
             } else {
                 return getLWMOFallback(classId, user);
@@ -651,19 +859,37 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
             final User user,
             final String query,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
+        return getLightweightMetaObjectsByQuery(
+                classId,
+                user,
+                query,
+                representationFields,
+                formater,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
+            final User user,
+            final String query,
+            final String[] representationFields,
+            final AbstractAttributeRepresentationFormater formater,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmo = connector.getLightweightMetaObjectsByQuery(
                         classId,
                         user,
                         query,
-                        representationFields);
+                        representationFields,
+                        context);
                 return initLWMOs(lwmo, formater);
             } else {
                 return getLWMOFallback(classId, user);
@@ -680,11 +906,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         }
     }
 
+    @Deprecated
     @Override
     public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
             throws ConnectionException {
+        return customServerSearch(user, serverSearch, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Collection customServerSearch(final User user,
+            final CidsServerSearch serverSearch,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.customServerSearch(user, serverSearch);
+            return connector.customServerSearch(user, serverSearch, context);
         } catch (final Exception e) {
             final String message = "error during custom search";
             throw new ConnectionException(message, e);
@@ -764,22 +998,46 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         return getMetaObjectByQuery(user, query);
     }
 
+    @Deprecated
     @Override
     public String getConfigAttr(final User user, final String key) throws ConnectionException {
+        return getConfigAttr(user, key, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public String getConfigAttr(final User user, final String key, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.getConfigAttr(user, key);
+            return connector.getConfigAttr(user, key, context);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not get config attr for user: " + user, e); // NOI18N
         }
     }
 
+    @Deprecated
     @Override
     public boolean hasConfigAttr(final User user, final String key) throws ConnectionException {
+        return hasConfigAttr(user, key, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean hasConfigAttr(final User user, final String key, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return connector.hasConfigAttr(user, key);
+            return connector.hasConfigAttr(user, key, context);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not check config attr for user: " + user, e); // NOI18N
         }
+    }
+
+    @Deprecated
+    @Override
+    public HistoryObject[] getHistory(final int classId,
+            final int objectId,
+            final String domain,
+            final User user,
+            final int elements) throws ConnectionException {
+        return getHistory(classId, objectId, domain, user, elements, ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -787,9 +1045,10 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final int objectId,
             final String domain,
             final User user,
-            final int elements) throws ConnectionException {
+            final int elements,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return connector.getHistory(classId, objectId, domain, user, elements);
+            return connector.getHistory(classId, objectId, domain, user, elements, context);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not get history: classId: " + classId + " || objectId: " // NOI18N
                         + objectId
@@ -836,5 +1095,10 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public CallServerService getCallServerService() {
         return (CallServerService)connector;
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContext.create(RESTfulConnection.class.getSimpleName());
     }
 }

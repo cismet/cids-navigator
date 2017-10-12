@@ -28,6 +28,8 @@
  */
 package Sirius.navigator;
 
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
@@ -57,7 +59,7 @@ import de.cismet.tools.gui.TextAreaAppender;
  * @author   mscholl
  * @version  $Revision$, $Date$
  */
-public class ConnectionTester extends javax.swing.JFrame {
+public class ConnectionTester extends javax.swing.JFrame implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -252,8 +254,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnTestActionPerformed
-    {                                                                         //GEN-HEADEREND:event_btnTestActionPerformed
+    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnTestActionPerformed
+    {//GEN-HEADEREND:event_btnTestActionPerformed
         try {
             txaOut.setText("");
 
@@ -274,7 +276,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                         @Override
                         public void run() {
                             try {
-                                final String ret = connector.getDomains().length + " domain(s) retrieved\n\nSUCCESS";
+                                final String ret = connector.getDomains(getConnectionContext()).length + " domain(s) retrieved\n\nSUCCESS";
                                 EventQueue.invokeLater(new Runnable() {
 
                                         @Override
@@ -291,7 +293,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         } catch (final Exception ex) {
             appendException(ex);
         }
-    } //GEN-LAST:event_btnTestActionPerformed
+    }//GEN-LAST:event_btnTestActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -332,8 +334,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnStoreActionPerformed
-    {                                                                          //GEN-HEADEREND:event_btnStoreActionPerformed
+    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnStoreActionPerformed
+    {//GEN-HEADEREND:event_btnStoreActionPerformed
         BufferedOutputStream bos = null;
         try {
             final JFileChooser chooser = new JFileChooser();
@@ -352,7 +354,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 }
             }
         }
-    }                                                                          //GEN-LAST:event_btnStoreActionPerformed
+    }//GEN-LAST:event_btnStoreActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -384,5 +386,10 @@ public class ConnectionTester extends javax.swing.JFrame {
                     new ConnectionTester(callserverUrl, compressionEnabled).setVisible(true);
                 }
             });
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContext.create(ConnectionTester.class.getSimpleName());
     }
 }

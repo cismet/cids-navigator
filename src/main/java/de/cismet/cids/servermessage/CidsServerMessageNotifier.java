@@ -26,6 +26,7 @@ import java.util.TimerTask;
 
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.messages.CidsServerMessage;
 
 import de.cismet.tools.configuration.Configurable;
@@ -281,11 +282,11 @@ public class CidsServerMessageNotifier implements Configurable {
                             scheduleIntervall);
                     final Object ret = SessionManager.getSession()
                                 .getConnection()
-                                .executeTask(
-                                    SessionManager.getSession().getUser(),
+                                .executeTask(SessionManager.getSession().getUser(),
                                     CheckCidsServerMessageAction.TASK_NAME,
                                     SessionManager.getSession().getUser().getDomain(),
-                                    null,
+                                    ConnectionContext.create(CidsServerMessage.class.getSimpleName()),
+                                    (Object)null,
                                     lastMessageIdParam,
                                     intervallParam);
 

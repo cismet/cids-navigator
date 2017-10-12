@@ -40,6 +40,7 @@ import java.util.Map;
 
 import de.cismet.cids.server.actions.HttpTunnelAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 
 import de.cismet.commons.security.AccessHandler;
 import de.cismet.commons.security.Tunnel;
@@ -174,6 +175,7 @@ public class CallServerTunnel implements Tunnel {
                             .executeTask(
                                     tunnelActionName,
                                     callserverName,
+                                    ConnectionContext.create(CallServerTunnel.class.getSimpleName()),
                                     nullBody,
                                     urlSAP,
                                     parameterSAP,
@@ -404,6 +406,7 @@ public class CallServerTunnel implements Tunnel {
                     .executeTask(
                         taskname,
                         taskdomain,
+                        ConnectionContext.create(CallServerTunnel.class.getSimpleName()),
                         body,
                         urlSAP,
                         parameterSAP,

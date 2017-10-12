@@ -17,8 +17,8 @@ import Sirius.server.middleware.types.Node;
 
 import java.util.Collection;
 
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 /**

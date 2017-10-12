@@ -56,6 +56,8 @@ import de.cismet.cids.dynamics.CidsBeanInfo;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
@@ -79,7 +81,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   Pascal DihÃ© <pascal.dihe@cismet.de>
  * @version  1.0 2015/04/17
  */
-public class PureRESTfulConnection extends RESTfulConnection {
+public class PureRESTfulConnection extends RESTfulConnection implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -187,7 +189,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
     public String[] getDomains() throws ConnectionException {
         try {
             LOG.warn("delegating getDomains() to legacy REST Connection");
-            return this.legacyConnector.getDomains();
+            return this.legacyConnector.getDomains(getConnectionContext());
         } catch (final Exception e) {
             final String message = "cannot get domains: " + e.getMessage(); // NOI18N
             LOG.error(message, e);
@@ -418,7 +420,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                         .executeTask(
                             "testAction",
                             "SWITCHON",
-                            null,
+                            ConnectionContext.create(PureRESTfulConnection.class.getSimpleName()),
+                            (Object)null,
                             actionParameterTest);
             System.out.println(taskResult);
             System.exit(0);
@@ -818,7 +821,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
 
             final Node[] nodesBinary = SessionManager.getConnection()
                         .getCallServerService()
-                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
+                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery, new PureRESTfulConnection().getConnectionContext());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -834,7 +837,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
 
             final Node[] nodesRest = SessionManager.getConnection()
                         .getCallServerService()
-                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
+                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery, new PureRESTfulConnection().getConnectionContext());
 
             final int nodesArrayLength = (nodesBinary.length > 3) ? 3 : nodesBinary.length;
 
@@ -949,7 +952,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "cismet");
             final MetaClass tagClassBinary = SessionManager.getConnection()
                         .getCallServerService()
-                        .getClassByTableName(SessionManager.getSession().getUser(), "tag", "SWITCHON");
+                        .getClassByTableName(SessionManager.getSession().getUser(), "tag", "SWITCHON", new PureRESTfulConnection().getConnectionContext());
 //            final MetaClass tagClassBinary = SessionManager.getConnection().getCallServerService()
 //                     .getClass(SessionManager.getSession().getUser(), 6, "SWITCHON");
 //            System.out.println(".getKey(): " + tagClassBinary.getKey());
@@ -961,7 +964,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "cismet");
             final MetaClass tagClassRest = SessionManager.getConnection()
                         .getCallServerService()
-                        .getClassByTableName(SessionManager.getSession().getUser(), "TAG", "SWITCHON");
+                        .getClassByTableName(SessionManager.getSession().getUser(), "TAG", "SWITCHON", new PureRESTfulConnection().getConnectionContext());
 
             System.out.println("tagClassBinary.equals(tagClassRest): "
                         + tagClassBinary.equals(tagClassRest));
@@ -1207,5 +1210,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
             LOG.fatal(ex.getMessage(), ex);
             System.exit(1);
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContext.create(PureRESTfulConnection.class.getSimpleName());
     }
 }

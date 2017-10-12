@@ -43,8 +43,8 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.netutil.Proxy;
@@ -181,10 +181,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     // Default -----------------------------------------------------------------
+
+    @Deprecated
     @Override
     public String[] getDomains() throws ConnectionException {
+        return getDomains(ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public String[] getDomains(final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).getDomains();
+            return ((MetaService)callserver).getDomains(context);
         } catch (RemoteException re) {
             LOG.fatal("[ServerError] could not retrieve the local server names", re);
             throw new ConnectionException("[ServerError] could not retrieve the local server names: " + re.getMessage(),
@@ -217,19 +224,38 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     // User ---------------------------------------------------------
+
+    @Deprecated
     @Override
     public User getUser(final String usergroupLocalserver,
             final String usergroup,
             final String userLocalserver,
             final String username,
             final String password) throws ConnectionException, UserException {
+        return getUser(
+                usergroupLocalserver,
+                usergroup,
+                userLocalserver,
+                username,
+                password,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public User getUser(final String usergroupLocalserver,
+            final String usergroup,
+            final String userLocalserver,
+            final String username,
+            final String password,
+            final ConnectionContext context) throws ConnectionException, UserException {
         try {
             return ((UserService)callserver).getUser(
                     usergroupLocalserver,
                     usergroup,
                     userLocalserver,
                     username,
-                    password);
+                    password,
+                    context);
         } catch (UserException ue) {
             LOG.warn("can't login: wrong user informations", ue);
             throw ue;
@@ -241,10 +267,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Vector getUserGroupNames() throws ConnectionException {
+        return getUserGroupNames(ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Vector getUserGroupNames(final ConnectionContext context) throws ConnectionException {
         try {
-            return ((UserService)callserver).getUserGroupNames();
+            return ((UserService)callserver).getUserGroupNames(context);
         } catch (RemoteException re) {
             LOG.fatal("[ServerError] could not retrieve the usergroup names", re);
             throw new ConnectionException("[ServerError] could not retrieve the usergroup names: " + re.getMessage(),
@@ -253,11 +285,18 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Vector getUserGroupNames(final String username, final String domain) throws ConnectionException,
         UserException {
+        return getUserGroupNames(username, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Vector getUserGroupNames(final String username, final String domain, final ConnectionContext context)
+            throws ConnectionException, UserException {
         try {
-            return ((UserService)callserver).getUserGroupNames(username, domain);
+            return ((UserService)callserver).getUserGroupNames(username, domain, context);
         } catch (RemoteException re) {
             if (re.getMessage().indexOf("UserGroupException") != -1) {
                 LOG.warn("[ServerError] could not retrieve the usergroup names for user '" + username + "'", re);
@@ -274,14 +313,23 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public boolean changePassword(final User user, final String oldPassword, final String newPassword)
             throws ConnectionException, UserException {
+        return changePassword(user, oldPassword, newPassword, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean changePassword(final User user,
+            final String oldPassword,
+            final String newPassword,
+            final ConnectionContext context) throws ConnectionException, UserException {
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("changing user password");
             }
-            return ((UserService)callserver).changePassword(user, oldPassword, newPassword);
+            return ((UserService)callserver).changePassword(user, oldPassword, newPassword, context);
         } catch (UserException ue) {
             LOG.warn("could not change password");
             throw ue;
@@ -294,10 +342,18 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     // Node ---------------------------------------------------------
+
+    @Deprecated
     @Override
     public Node[] getRoots(final User user, final String domain) throws ConnectionException {
+        return getRoots(user, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getRoots(final User user, final String domain, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).getRoots(user, domain);
+            return ((CatalogueService)callserver).getRoots(user, domain, context);
         } catch (RemoteException re) {
             LOG.fatal("[ServerError] could not retrieve the top nodes of domain '" + domain + "'", re);
             throw new ConnectionException("[ServerError] could not  retrieve the top nodes of domain '" + domain + "': "
@@ -307,10 +363,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getRoots(final User user) throws ConnectionException {
+        return getRoots(user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getRoots(final User user, final ConnectionContext context) throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).getRoots(user);
+            return ((CatalogueService)callserver).getRoots(user, context);
         } catch (RemoteException re) {
             LOG.fatal("[CatalogueService] could not retrieve the top nodes", re);
             throw new ConnectionException("[CatalogueService] could not retrieve the top nodes: " + re.getMessage(),
@@ -319,10 +381,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getChildren(final Node node, final User user) throws ConnectionException {
+        return getChildren(node, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getChildren(final Node node, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).getChildren(node, user);
+            return ((CatalogueService)callserver).getChildren(node, user, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve children of node '" + node, re);
             throw new ConnectionException("[ServerError] could not retrieve children of node '" + node
@@ -332,10 +401,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Node getNode(final User user, final int nodeID, final String domain) throws ConnectionException {
+        return getNode(user, nodeID, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node getNode(final User user, final int nodeID, final String domain, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((MetaService)callserver).getMetaObjectNode(user, nodeID, domain);
+            return ((MetaService)callserver).getMetaObjectNode(user, nodeID, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve node '" + nodeID + "' of domain '" + domain + "'", re);
             throw new ConnectionException("[ServerError] could not retrieve node '" + nodeID + "' of domain '" + domain
@@ -345,10 +421,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Node addNode(final Node node, final Link parent, final User user) throws ConnectionException {
+        return addNode(node, parent, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node addNode(final Node node, final Link parent, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).addNode(node, parent, user);
+            return ((CatalogueService)callserver).addNode(node, parent, user, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] addNode() could not add node '" + node + "'", re);
             throw new ConnectionException("[ServerError] addNode() could not add node '" + node + "': "
@@ -358,10 +441,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public boolean deleteNode(final Node node, final User user) throws ConnectionException {
+        return deleteNode(node, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean deleteNode(final Node node, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).deleteNode(node, user);
+            return ((CatalogueService)callserver).deleteNode(node, user, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] deleteNode() could not delete node '" + node + "'", re);
             throw new ConnectionException("[ServerError] deleteNode() could not delete node '" + node + "': "
@@ -371,10 +461,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public boolean addLink(final Node from, final Node to, final User user) throws ConnectionException {
+        return addLink(from, to, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean addLink(final Node from, final Node to, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).addLink(from, to, user);
+            return ((CatalogueService)callserver).addLink(from, to, user, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] addLink() could not add Link", re);
             throw new ConnectionException("[ServerError] addLink() could not add Link: " + re.getMessage(),
@@ -383,10 +480,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public boolean deleteLink(final Node from, final Node to, final User user) throws ConnectionException {
+        return deleteLink(from, to, user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean deleteLink(final Node from, final Node to, final User user, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((CatalogueService)callserver).deleteLink(from, to, user);
+            return ((CatalogueService)callserver).deleteLink(from, to, user, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] deleteLink() could not delete Link", re);
             throw new ConnectionException("[ServerError] deleteLink() could not delete Link: " + re.getMessage(),
@@ -395,10 +499,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Node[] getClassTreeNodes(final User user) throws ConnectionException {
+        return getClassTreeNodes(user, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Node[] getClassTreeNodes(final User user, final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).getClassTreeNodes(user);
+            return ((MetaService)callserver).getClassTreeNodes(user, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve the class tree nodes", re);
             throw new ConnectionException("[ServerError] could not retrieve the class tree nodes: " + re.getMessage(),
@@ -408,10 +518,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     // Classes and Objects -----------------------------------------------------
+
+    @Deprecated
     @Override
     public MetaClass getMetaClass(final User user, final int classID, final String domain) throws ConnectionException {
+        return getMetaClass(user, classID, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaClass getMetaClass(final User user,
+            final int classID,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).getClass(user, classID, domain);
+            return ((MetaService)callserver).getClass(user, classID, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve meta class '" + classID + "' from domain '" + domain + "'",
                 re);
@@ -422,10 +542,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public MetaClass[] getClasses(final User user, final String domain) throws ConnectionException {
+        return getClasses(user, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaClass[] getClasses(final User user, final String domain, final ConnectionContext context)
+            throws ConnectionException {
         try {
-            return ((MetaService)callserver).getClasses(user, domain);
+            return ((MetaService)callserver).getClasses(user, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not retrieve the classes from domain '" + domain + "'", re);
             throw new ConnectionException("[ServerError] could not retrieve the classes from domain '" + domain + "': "
@@ -502,11 +629,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject insertMetaObject(final User user, final MetaObject MetaObject, final String domain)
             throws ConnectionException {
+        return insertMetaObject(user, MetaObject, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject insertMetaObject(final User user,
+            final MetaObject MetaObject,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).insertMetaObject(user, MetaObject, domain);
+            return ((MetaService)callserver).insertMetaObject(user, MetaObject, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not insert MetaObject '" + MetaObject + "'", re);
             final Throwable initialCause = getTopInitialCause(re);
@@ -522,11 +658,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public int updateMetaObject(final User user, final MetaObject MetaObject, final String domain)
             throws ConnectionException {
+        return updateMetaObject(user, MetaObject, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public int updateMetaObject(final User user,
+            final MetaObject MetaObject,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).updateMetaObject(user, MetaObject, domain);
+            return ((MetaService)callserver).updateMetaObject(user, MetaObject, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] could not update MetaObject '" + MetaObject + "'", re);
             final Throwable initialCause = getTopInitialCause(re);
@@ -542,11 +687,20 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public int deleteMetaObject(final User user, final MetaObject MetaObject, final String domain)
             throws ConnectionException {
+        return deleteMetaObject(user, MetaObject, domain, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public int deleteMetaObject(final User user,
+            final MetaObject MetaObject,
+            final String domain,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((MetaService)callserver).deleteMetaObject(user, MetaObject, domain);
+            return ((MetaService)callserver).deleteMetaObject(user, MetaObject, domain, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] deleteMetaObject(): could not delete MetaObject '" + MetaObject + "'", re);
             /*
@@ -566,15 +720,25 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject getInstance(final User user, final MetaClass c) throws ConnectionException {
+        return getInstance(user, c, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject getInstance(final User user, final MetaClass c, final ConnectionContext context)
+            throws ConnectionException {
         try {
             try {
-                final MetaObject mo = (MetaObject)CloneHelper.clone(((MetaService)callserver).getInstance(user, c));
+                final MetaObject mo = (MetaObject)CloneHelper.clone(((MetaService)callserver).getInstance(
+                            user,
+                            c,
+                            context));
                 return mo;
             } catch (CloneNotSupportedException ce) {
                 LOG.warn("could not clone MetaObject", ce);
-                return ((MetaService)callserver).getInstance(user, c);
+                return ((MetaService)callserver).getInstance(user, c, context);
             }
         } catch (RemoteException re) {
             LOG.error("[ServerError] getInstance(): could not get instance of class '" + c + "'", re);
@@ -585,21 +749,37 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
             final User user,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
+        return getAllLightweightMetaObjectsForClass(
+                classId,
+                user,
+                representationFields,
+                representationPattern,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
+            final User user,
+            final String[] representationFields,
+            final String representationPattern,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (IS_LEIGHTWEIGHT_MO_CODE_ENABLED) {
                 final LightweightMetaObject[] lwmos = ((MetaService)callserver).getAllLightweightMetaObjectsForClass(
                         classId,
                         user,
                         representationFields,
-                        representationPattern);
+                        representationPattern,
+                        context);
                 return initLightweightMetaObjectsWithMetaService(lwmos);
             } else {
-                return getLightweightMetaObjectsFallback(classId, user);
+                return getLightweightMetaObjectsFallback(classId, user, context);
             }
         } catch (RemoteException ex) {
             throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId,
@@ -607,25 +787,57 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
             final User user,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
+        return getAllLightweightMetaObjectsForClass(
+                classId,
+                user,
+                representationFields,
+                formater,
+                ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public MetaObject[] getAllLightweightMetaObjectsForClass(final int classId,
+            final User user,
+            final String[] representationFields,
+            final AbstractAttributeRepresentationFormater formater,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (IS_LEIGHTWEIGHT_MO_CODE_ENABLED) {
                 final LightweightMetaObject[] lwmos = ((MetaService)callserver).getAllLightweightMetaObjectsForClass(
                         classId,
                         user,
-                        representationFields);
+                        representationFields,
+                        context);
                 return initLightweightMetaObjectsWithMetaServiceAndFormater(lwmos, formater);
             } else {
-                return getLightweightMetaObjectsFallback(classId, user);
+                return getLightweightMetaObjectsFallback(classId, user, context);
             }
         } catch (RemoteException ex) {
             throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId,
                 ex);
         }
+    }
+
+    @Deprecated
+    @Override
+    public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
+            final User user,
+            final String query,
+            final String[] representationFields,
+            final String representationPattern) throws ConnectionException {
+        return getLightweightMetaObjectsByQuery(
+                classId,
+                user,
+                query,
+                representationFields,
+                representationPattern,
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -633,7 +845,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final User user,
             final String query,
             final String[] representationFields,
-            final String representationPattern) throws ConnectionException {
+            final String representationPattern,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (IS_LEIGHTWEIGHT_MO_CODE_ENABLED) {
                 final LightweightMetaObject[] lwmos = ((MetaService)callserver).getLightweightMetaObjectsByQuery(
@@ -641,15 +854,32 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
                         user,
                         query,
                         representationFields,
-                        representationPattern);
+                        representationPattern,
+                        context);
                 return initLightweightMetaObjectsWithMetaService(lwmos);
             } else {
-                return getLightweightMetaObjectsFallback(classId, user);
+                return getLightweightMetaObjectsFallback(classId, user, context);
             }
         } catch (RemoteException ex) {
             throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId,
                 ex);
         }
+    }
+
+    @Deprecated
+    @Override
+    public MetaObject[] getLightweightMetaObjectsByQuery(final int classId,
+            final User user,
+            final String query,
+            final String[] representationFields,
+            final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
+        return getLightweightMetaObjectsByQuery(
+                classId,
+                user,
+                query,
+                representationFields,
+                formater,
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -657,17 +887,19 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final User user,
             final String query,
             final String[] representationFields,
-            final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
+            final AbstractAttributeRepresentationFormater formater,
+            final ConnectionContext context) throws ConnectionException {
         try {
             if (IS_LEIGHTWEIGHT_MO_CODE_ENABLED) {
                 final LightweightMetaObject[] lwmos = ((MetaService)callserver).getLightweightMetaObjectsByQuery(
                         classId,
                         user,
                         query,
-                        representationFields);
+                        representationFields,
+                        context);
                 return initLightweightMetaObjectsWithMetaServiceAndFormater(lwmos, formater);
             } else {
-                return getLightweightMetaObjectsFallback(classId, user);
+                return getLightweightMetaObjectsFallback(classId, user, context);
             }
         } catch (RemoteException ex) {
             throw new ConnectionException("[ServerError] could not get all LightweightMetaObjects for class " + classId,
@@ -675,11 +907,19 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
     }
 
+    @Deprecated
     @Override
     public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
             throws ConnectionException {
+        return customServerSearch(user, serverSearch, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public Collection customServerSearch(final User user,
+            final CidsServerSearch serverSearch,
+            final ConnectionContext context) throws ConnectionException {
         try {
-            return ((SearchService)callserver).customServerSearch(user, serverSearch);
+            return ((SearchService)callserver).customServerSearch(user, serverSearch, context);
         } catch (RemoteException re) {
             LOG.error("[ServerError] error during custom search ", re);
             throw new ConnectionException("[ServerError] [ServerError] error during custom search "
@@ -709,13 +949,15 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
      *
      * @param   classId  DOCUMENT ME!
      * @param   user     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    private MetaObject[] getLightweightMetaObjectsFallback(final int classId, final User user)
-            throws ConnectionException {
+    private MetaObject[] getLightweightMetaObjectsFallback(final int classId,
+            final User user,
+            final ConnectionContext context) throws ConnectionException {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId);
         final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                                 // NOI18N
         String orderBy = "";                                                                                             // NOI18N
@@ -725,7 +967,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         }
         final String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName() + orderBy; // NOI18N
 
-        return getMetaObjectByQuery(user, query);
+        return getMetaObjectByQuery(user, query, context);
     }
 
     /**
@@ -769,24 +1011,48 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         return lwmos;
     }
 
+    @Deprecated
     @Override
     public String getConfigAttr(final User user, final String key) throws ConnectionException {
+        return getConfigAttr(user, key, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public String getConfigAttr(final User user, final String key, final ConnectionContext context)
+            throws ConnectionException {
         try {
             final UserService service = (UserService)callserver;
-            return service.getConfigAttr(user, key);
+            return service.getConfigAttr(user, key, context);
         } catch (final RemoteException ex) {
             throw new ConnectionException("could not get config attr for user: " + user, ex); // NOI18N
         }
     }
 
+    @Deprecated
     @Override
     public boolean hasConfigAttr(final User user, final String key) throws ConnectionException {
+        return hasConfigAttr(user, key, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean hasConfigAttr(final User user, final String key, final ConnectionContext context)
+            throws ConnectionException {
         try {
             final UserService service = (UserService)callserver;
-            return service.hasConfigAttr(user, key);
+            return service.hasConfigAttr(user, key, context);
         } catch (final RemoteException ex) {
             throw new ConnectionException("could not check config attr for user: " + user, ex); // NOI18N
         }
+    }
+
+    @Deprecated
+    @Override
+    public HistoryObject[] getHistory(final int classId,
+            final int objectId,
+            final String domain,
+            final User user,
+            final int elements) throws ConnectionException {
+        return getHistory(classId, objectId, domain, user, elements, ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -794,11 +1060,12 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final int objectId,
             final String domain,
             final User user,
-            final int elements) throws ConnectionException {
+            final int elements,
+            final ConnectionContext context) throws ConnectionException {
         try {
             final MetaService service = (MetaService)callserver;
 
-            return service.getHistory(classId, objectId, domain, user, elements);
+            return service.getHistory(classId, objectId, domain, user, elements, context);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not get history: classId: " + classId + " || objectId: " // NOI18N
                         + objectId
