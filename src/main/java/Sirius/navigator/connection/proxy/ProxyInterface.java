@@ -53,7 +53,19 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getRoots() throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getRoots(ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -64,7 +76,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getRoots(String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getRoots(String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -75,7 +100,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getChildren(Node node) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getChildren(Node node, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -87,7 +125,21 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node getNode(int nodeID, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   nodeID   DOCUMENT ME!
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node getNode(int nodeID, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -99,7 +151,21 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node addNode(Node node, Link parent) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   node     DOCUMENT ME!
+     * @param   parent   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node addNode(Node node, Link parent, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -110,19 +176,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     boolean deleteNode(Node node) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
      *
-     * @param   from  DOCUMENT ME!
-     * @param   to    DOCUMENT ME!
+     * @param   node     DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean addLink(Node from, Node to) throws ConnectionException;
+    boolean deleteNode(Node node, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -134,7 +201,47 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
+    boolean addLink(Node from, Node to) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   from     DOCUMENT ME!
+     * @param   to       DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean addLink(Node from, Node to, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   from  DOCUMENT ME!
+     * @param   to    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
     boolean deleteLink(Node from, Node to) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   from     DOCUMENT ME!
+     * @param   to       DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    boolean deleteLink(Node from, Node to, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -145,7 +252,21 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Sirius.server.localserver.method.Method getMethod(String methodKey) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   methodKey  DOCUMENT ME!
+     * @param   context    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Sirius.server.localserver.method.Method getMethod(String methodKey, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -154,7 +275,19 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Node[] getClassTreeNodes() throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Node[] getClassTreeNodes(ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -165,7 +298,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaClass[] getClasses(String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaClass[] getClasses(String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -174,7 +320,19 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaClass[] getClasses() throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaClass[] getClasses(ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -186,7 +344,21 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaClass getMetaClass(int classID, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classID  DOCUMENT ME!
+     * @param   domain   DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaClass getMetaClass(int classID, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -197,7 +369,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaClass getMetaClass(String classKey) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   classKey  DOCUMENT ME!
+     * @param   context   DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaClass getMetaClass(String classKey, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -237,6 +422,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject getMetaObject(String objectId) throws ConnectionException;
 
     /**
@@ -261,6 +447,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject[] getMetaObjectByQuery(String query, int sig) throws ConnectionException;
 
     /**
@@ -286,7 +473,22 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject insertMetaObject(MetaObject MetaObject, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   MetaObject  DOCUMENT ME!
+     * @param   domain      DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject insertMetaObject(MetaObject MetaObject, String domain, ConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -298,7 +500,35 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     int updateMetaObject(MetaObject MetaObject, String domain) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   MetaObject  DOCUMENT ME!
+     * @param   domain      DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    int updateMetaObject(MetaObject MetaObject, String domain, ConnectionContext context) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   MetaObject  DOCUMENT ME!
+     * @param   domain      DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    @Deprecated
+    int deleteMetaObject(MetaObject MetaObject, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -321,7 +551,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     MetaObject getInstance(MetaClass c) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   c        DOCUMENT ME!
+     * @param   context  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    MetaObject getInstance(MetaClass c, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -332,7 +575,20 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
+    @Deprecated
     Collection customServerSearch(CidsServerSearch serverSearch) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   serverSearch  DOCUMENT ME!
+     * @param   context       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Collection customServerSearch(CidsServerSearch serverSearch, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
