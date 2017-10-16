@@ -27,7 +27,7 @@ import javax.swing.Icon;
 
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.netutil.Proxy;
@@ -134,7 +134,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    String[] getDomains(ConnectionContext context) throws ConnectionException;
+    String[] getDomains(ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -200,7 +200,7 @@ public interface Connection {
             String userLsName,
             String userName,
             String password,
-            ConnectionContext context) throws ConnectionException, UserException;
+            ClientConnectionContext context) throws ConnectionException, UserException;
 
     /**
      * DOCUMENT ME!
@@ -221,7 +221,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Vector getUserGroupNames(ConnectionContext context) throws ConnectionException;
+    Vector getUserGroupNames(ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -249,8 +249,8 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
-    Vector getUserGroupNames(String username, String domain, ConnectionContext context) throws ConnectionException,
-        UserException;
+    Vector getUserGroupNames(String username, String domain, ClientConnectionContext context)
+            throws ConnectionException, UserException;
 
     /**
      * DOCUMENT ME!
@@ -280,7 +280,7 @@ public interface Connection {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
-    boolean changePassword(User user, String oldPassword, String newPassword, ConnectionContext context)
+    boolean changePassword(User user, String oldPassword, String newPassword, ClientConnectionContext context)
             throws ConnectionException, UserException;
 
     /**
@@ -305,7 +305,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getRoots(User user, ConnectionContext context) throws ConnectionException;
+    Node[] getRoots(User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -331,7 +331,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getRoots(User user, String domain, ConnectionContext context) throws ConnectionException;
+    Node[] getRoots(User user, String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -357,7 +357,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getChildren(Node node, User user, ConnectionContext context) throws ConnectionException;
+    Node[] getChildren(Node node, User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -385,7 +385,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node getNode(User user, int nodeID, String domain, ConnectionContext context) throws ConnectionException;
+    Node getNode(User user, int nodeID, String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -413,7 +413,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node addNode(Node node, Link parent, User user, ConnectionContext context) throws ConnectionException;
+    Node addNode(Node node, Link parent, User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -439,7 +439,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean deleteNode(Node node, User user, ConnectionContext context) throws ConnectionException;
+    boolean deleteNode(Node node, User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -467,7 +467,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean addLink(Node from, Node to, User user, ConnectionContext context) throws ConnectionException;
+    boolean addLink(Node from, Node to, User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -495,7 +495,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean deleteLink(Node from, Node to, User user, ConnectionContext context) throws ConnectionException;
+    boolean deleteLink(Node from, Node to, User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -522,7 +522,7 @@ public interface Connection {
      * @deprecated  DOCUMENT ME!
      */
     @Deprecated
-    Node[] getClassTreeNodes(User user, ConnectionContext context) throws ConnectionException;
+    Node[] getClassTreeNodes(User user, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -550,7 +550,8 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass getMetaClass(User user, int classID, String domain, ConnectionContext context) throws ConnectionException;
+    MetaClass getMetaClass(User user, int classID, String domain, ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -576,7 +577,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass[] getClasses(User user, String domain, ConnectionContext context) throws ConnectionException;
+    MetaClass[] getClasses(User user, String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -605,7 +606,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject getMetaObject(User user, int objectID, int classID, String domain, ConnectionContext context)
+    MetaObject getMetaObject(User user, int objectID, int classID, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -635,7 +636,8 @@ public interface Connection {
      * @Deprecated  DOCUMENT ME!
      */
     @Deprecated
-    MetaObject[] getMetaObjectByQuery(User user, String query, ConnectionContext context) throws ConnectionException;
+    MetaObject[] getMetaObjectByQuery(User user, String query, ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -665,7 +667,7 @@ public interface Connection {
      * @Deprecated  DOCUMENT ME!
      */
     @Deprecated
-    MetaObject[] getMetaObjectByQuery(User user, String query, String domain, ConnectionContext context)
+    MetaObject[] getMetaObjectByQuery(User user, String query, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -694,7 +696,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject insertMetaObject(User user, MetaObject MetaObject, String domain, ConnectionContext context)
+    MetaObject insertMetaObject(User user, MetaObject MetaObject, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -723,7 +725,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    int updateMetaObject(User user, MetaObject MetaObject, String domain, ConnectionContext context)
+    int updateMetaObject(User user, MetaObject MetaObject, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -752,7 +754,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    int deleteMetaObject(User user, MetaObject MetaObject, String domain, ConnectionContext context)
+    int deleteMetaObject(User user, MetaObject MetaObject, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -779,7 +781,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject getInstance(User user, MetaClass c, ConnectionContext context) throws ConnectionException;
+    MetaObject getInstance(User user, MetaClass c, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -815,7 +817,7 @@ public interface Connection {
             User user,
             String[] representationFields,
             String representationPattern,
-            ConnectionContext context) throws ConnectionException;
+            ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -852,7 +854,7 @@ public interface Connection {
             User user,
             String[] representationFields,
             AbstractAttributeRepresentationFormater formater,
-            ConnectionContext context) throws ConnectionException;
+            ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -896,7 +898,7 @@ public interface Connection {
             String query,
             String[] representationFields,
             String representationPattern,
-            ConnectionContext context) throws ConnectionException;
+            ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -940,7 +942,7 @@ public interface Connection {
             String query,
             String[] representationFields,
             AbstractAttributeRepresentationFormater formater,
-            ConnectionContext context) throws ConnectionException;
+            ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -958,7 +960,8 @@ public interface Connection {
     /**
      * @see  Sirius.server.middleware.interfaces.proxy.UserService#getConfigAttr(Sirius.server.newuser.User, java.lang.String)
      */
-    String getConfigAttr(final User user, final String key, final ConnectionContext context) throws ConnectionException;
+    String getConfigAttr(final User user, final String key, final ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -976,7 +979,7 @@ public interface Connection {
     /**
      * @see  Sirius.server.middleware.interfaces.proxy.UserService#hasConfigAttr(Sirius.server.newuser.User, java.lang.String)
      */
-    boolean hasConfigAttr(final User user, final String key, final ConnectionContext context)
+    boolean hasConfigAttr(final User user, final String key, final ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -1023,7 +1026,7 @@ public interface Connection {
             final String domain,
             final User user,
             final int elements,
-            final ConnectionContext context) throws ConnectionException;
+            final ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -1049,7 +1052,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Collection customServerSearch(User user, CidsServerSearch serverSearch, ConnectionContext context)
+    Collection customServerSearch(User user, CidsServerSearch serverSearch, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -1086,7 +1089,7 @@ public interface Connection {
     Object executeTask(User user,
             String taskname,
             String taskdomain,
-            final ConnectionContext context,
+            final ClientConnectionContext context,
             Object body,
             ServerActionParameter... params) throws ConnectionException;
 

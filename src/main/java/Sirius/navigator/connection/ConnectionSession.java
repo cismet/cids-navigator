@@ -38,13 +38,16 @@ import org.apache.log4j.*;
 
 import java.rmi.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * Stores a <code>Connection</code> and a <code>User</code> Object.
  *
  * @author   Pascal
  * @version  1.0 12/22/2002
  */
-public class ConnectionSession {
+public class ConnectionSession implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -230,7 +233,8 @@ public class ConnectionSession {
                     connectionInfo.getUsergroup(),
                     connectionInfo.getUserDomain(),
                     connectionInfo.getUsername(),
-                    connectionInfo.getPassword());
+                    connectionInfo.getPassword(),
+                    getClientConnectionContext());
         } catch (UserException ue) {
             logger.warn("can't login: wrong user informations", ue); // NOI18N
             throw ue;
@@ -281,5 +285,10 @@ public class ConnectionSession {
      */
     public ConnectionInfo getConnectionInfo() {
         return this.connectionInfo;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

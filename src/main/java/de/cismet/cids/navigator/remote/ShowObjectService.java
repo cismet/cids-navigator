@@ -34,6 +34,9 @@ import javax.ws.rs.core.Response;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
 
@@ -51,7 +54,8 @@ import de.cismet.remote.RESTRemoteControlMethod;
 //)
 @Produces({ MediaType.APPLICATION_JSON })
 @ServiceProvider(service = RESTRemoteControlMethod.class)
-public class ShowObjectService extends AbstractRESTRemoteControlMethod implements RESTRemoteControlMethod {
+public class ShowObjectService extends AbstractRESTRemoteControlMethod implements RESTRemoteControlMethod,
+    ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -111,7 +115,10 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
                         .append(");"); // NOI18N
 
             final MetaObject[] metaObjects = SessionManager.getProxy()
-                        .getMetaObjectByQuery(SessionManager.getSession().getUser(), query.toString(), domain);
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                            query.toString(),
+                            domain,
+                            getClientConnectionContext());
 
             if ((metaObjects != null) && (metaObjects.length == 0)) {
                 LOG.info("The query " + query.toString() + "returned with no results");
@@ -150,5 +157,10 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
         }
         return Response.ok("ok").build();
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

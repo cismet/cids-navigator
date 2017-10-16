@@ -20,13 +20,16 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * Works like the MetaObjectNodeComparator. Additionally sort order can be set to be ascending or descending.
  *
  * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
+public class DirectedMetaObjectNodeComparator implements Comparator<Node>, ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -104,7 +107,8 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                                         .getMetaObject(
                                                 ((MetaObjectNode)o1).getObjectId(),
                                                 o1.getClassId(),
-                                                o1.getDomain());
+                                                o1.getDomain(),
+                                                getClientConnectionContext());
                             if (mo1 != null) {
                                 mon1.setObject(mo1);
                                 mon1.setName(mo1.toString());
@@ -125,7 +129,8 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                                         .getMetaObject(
                                                 ((MetaObjectNode)o2).getObjectId(),
                                                 o2.getClassId(),
-                                                o2.getDomain());
+                                                o2.getDomain(),
+                                                getClientConnectionContext());
                             if (mo2 != null) {
                                 mon2.setObject(mo2);
                                 mon2.setName(mo2.toString());
@@ -168,5 +173,10 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
      */
     private boolean isSupported(final Node n) {
         return ((n instanceof MetaObjectNode) || (n instanceof MetaNode) || (n instanceof MetaClassNode));
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

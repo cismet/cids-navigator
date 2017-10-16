@@ -30,14 +30,17 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor // javax.swing.JPanel
-{
+public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor
+        implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -344,7 +347,10 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         logger.error("removeValue() method not supported"); // NOI18N
         return null;
     }
-
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
     /**
      * DefaultComplexMetaAttributeEditorMethoden ...........................................
      *
@@ -361,7 +367,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                 // klasse besorgen
 
                 final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
+                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey(),
+                                getClientConnectionContext());
 
                 return (!this.readOnly & !((Attribute)this.getValue()).isPrimaryKey())
                             && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)
@@ -371,7 +378,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                     // ((Attribute)this.getValue()).getPermissions().hasPermission(key,Sirius.navigator.connection.SessionManager.getSession().getWritePermission());
             } else {
                 final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
+                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey(),
+                                getClientConnectionContext());
                 return (!this.readOnly
                                 & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION))
                             && this.getMetaObject(this.getValue()).getBean()

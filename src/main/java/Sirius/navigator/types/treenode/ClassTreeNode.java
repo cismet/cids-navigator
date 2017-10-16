@@ -18,12 +18,15 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class ClassTreeNode extends DefaultMetaTreeNode {
+public class ClassTreeNode extends DefaultMetaTreeNode implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -59,6 +62,10 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
 
     //~ Methods ----------------------------------------------------------------
 
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
     /**
      * DefaultMetaTreeNode Methods -----------------------------------------------
      *
@@ -179,7 +186,8 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
      * @throws  Exception  DOCUMENT ME!
      */
     public final MetaClass getMetaClass() throws Exception {
-        return SessionManager.getProxy().getMetaClass(this.getMetaClassNode().getClassId(), this.getDomain());
+        return SessionManager.getProxy()
+                    .getMetaClass(this.getMetaClassNode().getClassId(), this.getDomain(), getClientConnectionContext());
     }
 
     /**

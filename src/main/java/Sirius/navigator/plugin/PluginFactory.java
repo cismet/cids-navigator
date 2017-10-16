@@ -33,13 +33,16 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * blah.
  *
  * @author   Pascal
  * @version  1.0 02/15/2003
  */
-public final class PluginFactory {
+public final class PluginFactory implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -202,6 +205,11 @@ public final class PluginFactory {
          * BufferedInputStream(pluginURL.openStream()); } else { if(logger.isDebugEnabled())logger.debug("loading plugin
          * XML descriptor from local filesystem '" + pluginDescriptorPath + "'"); File file = new
          * File(pluginDescriptorPath); return new BufferedInputStream(new FileInputStream(file));}*/
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -1030,7 +1038,7 @@ public final class PluginFactory {
                 final String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId(); // NOI18N
 
                 try {
-                    method = SessionManager.getProxy().getMethod(methodKey);
+                    method = SessionManager.getProxy().getMethod(methodKey, getClientConnectionContext());
 
                     if (method != null) {
                         final User user = SessionManager.getSession().getUser();
@@ -1120,7 +1128,7 @@ public final class PluginFactory {
                 final String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId(); // NOI18N
 
                 try {
-                    method = SessionManager.getProxy().getMethod(methodKey);
+                    method = SessionManager.getProxy().getMethod(methodKey, getClientConnectionContext());
                     if (method != null) {
                         final User user = SessionManager.getSession().getUser();
                         final UserGroup userGroup = user.getUserGroup();

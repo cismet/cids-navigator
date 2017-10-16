@@ -18,7 +18,7 @@ import Sirius.server.middleware.types.Node;
 import java.util.Collection;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 /**
@@ -65,7 +65,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getRoots(ConnectionContext context) throws ConnectionException;
+    Node[] getRoots(ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -89,7 +89,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getRoots(String domain, ConnectionContext context) throws ConnectionException;
+    Node[] getRoots(String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -113,7 +113,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getChildren(Node node, ConnectionContext context) throws ConnectionException;
+    Node[] getChildren(Node node, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -139,7 +139,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node getNode(int nodeID, String domain, ConnectionContext context) throws ConnectionException;
+    Node getNode(int nodeID, String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -165,7 +165,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node addNode(Node node, Link parent, ConnectionContext context) throws ConnectionException;
+    Node addNode(Node node, Link parent, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -189,7 +189,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean deleteNode(Node node, ConnectionContext context) throws ConnectionException;
+    boolean deleteNode(Node node, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -215,7 +215,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean addLink(Node from, Node to, ConnectionContext context) throws ConnectionException;
+    boolean addLink(Node from, Node to, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -241,7 +241,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean deleteLink(Node from, Node to, ConnectionContext context) throws ConnectionException;
+    boolean deleteLink(Node from, Node to, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -265,7 +265,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Sirius.server.localserver.method.Method getMethod(String methodKey, ConnectionContext context)
+    Sirius.server.localserver.method.Method getMethod(String methodKey, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -287,7 +287,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node[] getClassTreeNodes(ConnectionContext context) throws ConnectionException;
+    Node[] getClassTreeNodes(ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -311,7 +311,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass[] getClasses(String domain, ConnectionContext context) throws ConnectionException;
+    MetaClass[] getClasses(String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -332,7 +332,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass[] getClasses(ConnectionContext context) throws ConnectionException;
+    MetaClass[] getClasses(ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -358,7 +358,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass getMetaClass(int classID, String domain, ConnectionContext context) throws ConnectionException;
+    MetaClass getMetaClass(int classID, String domain, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -382,7 +382,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass getMetaClass(String classKey, ConnectionContext context) throws ConnectionException;
+    MetaClass getMetaClass(String classKey, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -410,7 +410,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject getMetaObject(int objectID, int classID, String domain, ConnectionContext context)
+    MetaObject getMetaObject(int objectID, int classID, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -435,7 +435,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject getMetaObject(String objectId, ConnectionContext context) throws ConnectionException;
+    MetaObject getMetaObject(String objectId, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -461,7 +461,8 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject[] getMetaObjectByQuery(String query, int sig, ConnectionContext context) throws ConnectionException;
+    MetaObject[] getMetaObjectByQuery(String query, int sig, ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -487,7 +488,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject insertMetaObject(MetaObject MetaObject, String domain, ConnectionContext context)
+    MetaObject insertMetaObject(MetaObject MetaObject, String domain, ClientConnectionContext context)
             throws ConnectionException;
 
     /**
@@ -514,7 +515,8 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    int updateMetaObject(MetaObject MetaObject, String domain, ConnectionContext context) throws ConnectionException;
+    int updateMetaObject(MetaObject MetaObject, String domain, ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -528,7 +530,8 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     @Deprecated
-    int deleteMetaObject(MetaObject MetaObject, String domain, ConnectionContext context) throws ConnectionException;
+    int deleteMetaObject(MetaObject MetaObject, String domain, ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -564,7 +567,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject getInstance(MetaClass c, ConnectionContext context) throws ConnectionException;
+    MetaObject getInstance(MetaClass c, ClientConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -588,7 +591,8 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Collection customServerSearch(CidsServerSearch serverSearch, ConnectionContext context) throws ConnectionException;
+    Collection customServerSearch(CidsServerSearch serverSearch, ClientConnectionContext context)
+            throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -621,7 +625,7 @@ public interface ProxyInterface {
      */
     Object executeTask(String taskname,
             String taskdomain,
-            ConnectionContext context,
+            ClientConnectionContext context,
             Object body,
             ServerActionParameter... params) throws ConnectionException;
 }

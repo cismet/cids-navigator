@@ -67,6 +67,8 @@ import javax.swing.text.BadLocationException;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.builtin.DistinctValuesSearch;
@@ -483,7 +485,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         try {
             final MetaClass[] metaClass = SessionManager.getProxy()
-                        .getClasses(SessionManager.getSession().getUser().getDomain());
+                        .getClasses(SessionManager.getSession().getUser().getDomain(), getConnectionContext());
             for (final MetaClass mClass : metaClass) {
                 if (!mClass.getAttributeByName("Queryable").isEmpty()) {
                     metaClassesWithAttribute.add(mClass);
@@ -558,7 +560,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                             + " from "
                             + foreignClass.getTableName();
                 final MetaObject[] mos = SessionManager.getProxy()
-                            .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
+                            .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getConnectionContext());
 
                 if (mos != null) {
                     values.addAll(Arrays.asList(mos));
@@ -569,7 +571,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         metaClass.getTableName(),
                         attribute.getFieldName());
                 final Collection resultCollection = SessionManager.getProxy()
-                            .customServerSearch(SessionManager.getSession().getUser(), search);
+                            .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
 
                 final ArrayList<ArrayList> resultArray = (ArrayList<ArrayList>)resultCollection;
 
@@ -632,7 +634,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     whereClause,
                     metaClass.getId());
             final Collection resultCollection = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
+                        .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
             final ArrayList<ArrayList> resultArray = (ArrayList<ArrayList>)resultCollection;
 
             if (resultArray.size() != 1) {
@@ -1368,7 +1370,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             result = SessionManager.getConnection()
                         .getConfigAttr(SessionManager.getSession().getUser(),
                                 ACTION_TAG
-                                + SessionManager.getSession().getUser().getDomain())
+                                + SessionManager.getSession().getUser().getDomain(),
+                                getConnectionContext())
                         != null;
         } catch (ConnectionException ex) {
             LOG.error("Can not check ActionTag!", ex);
@@ -1414,6 +1417,15 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             lblBusyIcon.setBusy(false);
             panPagination.setEnabled(true);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ClientConnectionContext getConnectionContext() {
+        return ClientConnectionContext.create(QuerySearch.class.getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------

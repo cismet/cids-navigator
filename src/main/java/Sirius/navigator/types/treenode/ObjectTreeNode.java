@@ -23,6 +23,9 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.tools.CurrentStackTrace;
 
 /**
@@ -30,7 +33,7 @@ import de.cismet.tools.CurrentStackTrace;
  *
  * @version  $Revision$, $Date$
  */
-public class ObjectTreeNode extends DefaultMetaTreeNode {
+public class ObjectTreeNode extends DefaultMetaTreeNode implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -99,6 +102,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
 
     //~ Methods ----------------------------------------------------------------
 
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
     /**
      * DOCUMENT ME!
      *
@@ -261,7 +268,8 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                         final int oid = mon.getObjectId();
                         final int cid = mon.getClassId();
                         final String domain = mon.getDomain();
-                        final MetaObject metaObject = SessionManager.getProxy().getMetaObject(oid, cid, domain);
+                        final MetaObject metaObject = SessionManager.getProxy()
+                                    .getMetaObject(oid, cid, domain, getClientConnectionContext());
                         mon.setObject(metaObject);
                         metaObjectFilled = true;
                         if ((mon.getName() == null) || mon.getName().equals("NameWirdGeladen")) {
@@ -306,7 +314,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      */
     public final MetaClass getMetaClass() throws Exception {
         if (metaClass == null) {
-            metaClass = SessionManager.getProxy().getMetaClass(this.getMetaObjectNode().getClassId(), this.getDomain());
+            metaClass = SessionManager.getProxy()
+                        .getMetaClass(this.getMetaObjectNode().getClassId(),
+                                this.getDomain(),
+                                getClientConnectionContext());
         }
         return metaClass;
     }

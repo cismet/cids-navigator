@@ -20,7 +20,6 @@ import Sirius.server.middleware.types.*;
 import org.apache.log4j.Logger;
 
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 
 import java.beans.PropertyChangeListener;
 
@@ -39,11 +38,11 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.DirectedMetaObjectNodeComparator;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.cids.utils.ClassloadingHelper;
-
-import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -57,7 +56,7 @@ import de.cismet.tools.collections.HashArrayList;
  *
  * @version  $Revision$, $Date$
  */
-public class SearchResultsTree extends MetaCatalogueTree {
+public class SearchResultsTree extends MetaCatalogueTree implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -160,7 +159,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
                             final MetaObject MetaObject = SessionManager.getProxy()
                                         .getMetaObject(mon.getObjectId(),
                                             mon.getClassId(),
-                                            mon.getDomain());
+                                            mon.getDomain(),
+                                            getClientConnectionContext());
                             mon.setObject(MetaObject);
                         } catch (ConnectionException e) {
                             log.error("Cannot load meta object to check the read permissions", e);
@@ -538,7 +538,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
                                     final MetaObject MetaObject = SessionManager.getProxy()
                                                 .getMetaObject(on.getMetaObjectNode().getObjectId(),
                                                     on.getMetaObjectNode().getClassId(),
-                                                    on.getMetaObjectNode().getDomain());
+                                                    on.getMetaObjectNode().getDomain(),
+                                                    getClientConnectionContext());
                                     on.getMetaObjectNode().setObject(MetaObject);
                                     EventQueue.invokeLater(new Runnable() {
 
@@ -795,6 +796,11 @@ public class SearchResultsTree extends MetaCatalogueTree {
      */
     public SwingWorker getNodeLoadingWorker() {
         return refreshWorker;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     /**

@@ -17,38 +17,28 @@ import Sirius.navigator.exception.*;
 import Sirius.navigator.method.*;
 import Sirius.navigator.plugin.interfaces.EmbededControlBar;
 import Sirius.navigator.resource.*;
-import Sirius.navigator.types.iterator.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 import Sirius.navigator.ui.attributes.*;
 import Sirius.navigator.ui.attributes.editor.metaobject.*;
-import Sirius.navigator.ui.widget.*;
 
-import Sirius.server.localserver.attribute.Attribute;
 import Sirius.server.middleware.types.*;
 
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
-
-import java.net.*;
 
 import java.util.*;
 
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.event.*;
-import javax.swing.table.*;
 import javax.swing.tree.*;
 
-import de.cismet.cids.editors.BeanInitializer;
-import de.cismet.cids.editors.EditorBeanInitializerStore;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
-
-import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -56,7 +46,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar {
+public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar, ClientConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -284,7 +274,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                             logger.info("commit(): insert meta object: " + editedMetaObject.getName()); // NOI18N
                                         }
                                         savedMetaObject = SessionManager.getProxy()
-                                                    .insertMetaObject(editedMetaObject, objectTreeNode.getDomain());
+                                                    .insertMetaObject(
+                                                            editedMetaObject,
+                                                            objectTreeNode.getDomain(),
+                                                            getClientConnectionContext());
 
                                         // neues objekt zuweisen
                                         objectTreeNode.setMetaObject(savedMetaObject);
@@ -293,7 +286,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                             logger.info("commit(): add node: " + objectTreeNode); // NOI18N
                                         }
                                         final Node node = SessionManager.getProxy()
-                                                    .addNode(objectTreeNode.getNode(), link);
+                                                    .addNode(
+                                                        objectTreeNode.getNode(),
+                                                        link,
+                                                        getClientConnectionContext());
 
                                         // parent permissions zuweisen...
                                         node.setPermissions(
@@ -312,7 +308,10 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                             logger.info("commit(): update meta object: " + editedMetaObject.getName()); // NOI18N
                                         }
                                         SessionManager.getProxy()
-                                                .updateMetaObject(editedMetaObject, objectTreeNode.getDomain());
+                                                .updateMetaObject(
+                                                    editedMetaObject,
+                                                    objectTreeNode.getDomain(),
+                                                    getClientConnectionContext());
                                         savedMetaObject = editedMetaObject;
 
                                         // neues altes objekt zuweisen
@@ -599,6 +598,11 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
 
         add(switchPanel, java.awt.BorderLayout.CENTER);
     } // </editor-fold>//GEN-END:initComponents
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
 
     //~ Inner Classes ----------------------------------------------------------
 

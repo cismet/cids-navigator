@@ -54,6 +54,9 @@ import javax.swing.Timer;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 
@@ -67,7 +70,7 @@ import de.cismet.tools.gui.WrappedComponent;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class NavigatorAttributeEditorGui extends AttributeEditor {
+public class NavigatorAttributeEditorGui extends AttributeEditor implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -307,7 +310,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final String domain = orig.getDomain();
             final User user = SessionManager.getSession().getUser();
             backupObject = null;
-            backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
+            backupObject = SessionManager.getConnection()
+                        .getMetaObject(user, oid, cid, domain, getClientConnectionContext());
         } catch (Exception e) {
             log.error("Error during Backupcreation. Cannot detect whether the object is changed.", e); // NOI18N
             JOptionPane.showMessageDialog(
@@ -338,7 +342,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final String domain = otn.getMetaObject().getDomain();
             final User user = SessionManager.getSession().getUser();
 
-            final MetaObject reloaded = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
+            final MetaObject reloaded = SessionManager.getConnection()
+                        .getMetaObject(user, oid, cid, domain, getClientConnectionContext());
             reloaded.setAllClasses();
             if (log.isDebugEnabled()) {
                 log.debug("Reloaded MO:" + reloaded.getDebugString()); // NOI18N
@@ -981,4 +986,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             }
         }
     } //GEN-LAST:event_pasteButtonActionPerformed
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
 }

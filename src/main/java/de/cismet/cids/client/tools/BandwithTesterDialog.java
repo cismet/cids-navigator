@@ -41,7 +41,7 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
@@ -380,7 +380,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                     .executeTask(
                         BandwidthTestAction.TASK_NAME,
                         domain,
-                        ConnectionContext.create(BandwithTesterDialog.class.getSimpleName()),
+                        ClientConnectionContext.create(BandwithTesterDialog.class.getSimpleName()),
                         fileSizeInMb);
 
         if (ret instanceof Exception) {

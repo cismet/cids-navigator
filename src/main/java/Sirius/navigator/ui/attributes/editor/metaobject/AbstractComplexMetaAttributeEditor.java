@@ -21,13 +21,17 @@ import Sirius.server.middleware.types.*;
 
 import java.util.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplexEditor {
+public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplexEditor
+        implements ClientConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -253,9 +257,11 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
             if (logger.isDebugEnabled()) {
                 logger.debug("getMetaObjectInstance(): try to retrive ObjectTemplate for Class '" + classKey + "'"); // NOI18N
             }
-            final MetaClass metaClass = SessionManager.getProxy().getMetaClass(classKey.toString());
+            final MetaClass metaClass = SessionManager.getProxy()
+                        .getMetaClass(classKey.toString(), getClientConnectionContext());
 
-            final MetaObject MetaObject = SessionManager.getProxy().getInstance(metaClass);
+            final MetaObject MetaObject = SessionManager.getProxy()
+                        .getInstance(metaClass, getClientConnectionContext());
             MetaObject.setStatus(MetaObject.NEW);
             return MetaObject;
         } catch (Throwable t) {
@@ -297,5 +303,10 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
         }
 
         return null;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

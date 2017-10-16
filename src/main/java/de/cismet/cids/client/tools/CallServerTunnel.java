@@ -40,7 +40,8 @@ import java.util.Map;
 
 import de.cismet.cids.server.actions.HttpTunnelAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 import de.cismet.commons.security.AccessHandler;
 import de.cismet.commons.security.Tunnel;
@@ -50,15 +51,13 @@ import de.cismet.netutil.tunnel.TunnelTargetGroup;
 
 import de.cismet.security.GUICredentialsProvider;
 
-import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-
 /**
  * DOCUMENT ME!
  *
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class CallServerTunnel implements Tunnel {
+public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -175,7 +174,7 @@ public class CallServerTunnel implements Tunnel {
                             .executeTask(
                                     tunnelActionName,
                                     callserverName,
-                                    ConnectionContext.create(CallServerTunnel.class.getSimpleName()),
+                                    getClientConnectionContext(),
                                     nullBody,
                                     urlSAP,
                                     parameterSAP,
@@ -252,7 +251,8 @@ public class CallServerTunnel implements Tunnel {
                 synchronized (this) {
                     if (userKeyList == null) {
                         user = SessionManager.getSession().getUser();
-                        final String configAttr = SessionManager.getProxy().getConfigAttr(user, "tunnel.targetgroups");
+                        final String configAttr = SessionManager.getProxy()
+                                    .getConfigAttr(user, "tunnel.targetgroups", getClientConnectionContext());
                         if (configAttr != null) {
                             final String[] keys = configAttr.split(",");
                             userKeyList = new ArrayList<String>(keys.length);
@@ -406,13 +406,18 @@ public class CallServerTunnel implements Tunnel {
                     .executeTask(
                         taskname,
                         taskdomain,
-                        ConnectionContext.create(CallServerTunnel.class.getSimpleName()),
+                        getClientConnectionContext(),
                         body,
                         urlSAP,
                         parameterSAP,
                         methodSAP,
                         optionsSAP,
                         credentialsSAP);
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------

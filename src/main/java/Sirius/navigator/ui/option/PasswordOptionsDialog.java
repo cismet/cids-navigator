@@ -23,6 +23,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
 
@@ -36,7 +39,7 @@ import de.cismet.lookupoptions.options.SecurityOptionsCategory;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class PasswordOptionsDialog extends AbstractOptionsPanel {
+public class PasswordOptionsDialog extends AbstractOptionsPanel implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -287,7 +290,8 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
                             final boolean success = proxy.changePassword(
                                     session.getUser(),
                                     String.valueOf(pwdOld),
-                                    String.valueOf(pwdNew));
+                                    String.valueOf(pwdNew),
+                                    getClientConnectionContext());
 
                             if (success) {
                                 JOptionPane.showMessageDialog(
@@ -342,5 +346,10 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
         return org.openide.util.NbBundle.getMessage(
                 PasswordOptionsDialog.class,
                 "PasswordOptionsDialog.tooltip"); // NOI18N
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

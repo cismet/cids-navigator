@@ -34,7 +34,7 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.actions.PasswordSwitcherAdminAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -372,7 +372,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog {
                     .executeTask(
                         PasswordSwitcherAdminAction.TASK_NAME,
                         "WUNDA_BLAU",
-                        ConnectionContext.create(PasswordSwitcherAdminAction.class.getSimpleName()),
+                        ClientConnectionContext.create(PasswordSwitcherAdminAction.class.getSimpleName()),
                         (Object)null,
                         paramLoginName,
                         paramRecoveryTimeout);

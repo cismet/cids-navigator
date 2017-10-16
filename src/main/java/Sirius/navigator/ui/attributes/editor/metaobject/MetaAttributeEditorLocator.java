@@ -26,6 +26,9 @@ import java.net.*;
 
 import java.util.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * Standardimplementierung des EditorLocator Interfaces, die eine Liste von Standard Editoren f\u00FCr bestimmte Klassen
  * bereith\u00E4lt.
@@ -33,7 +36,7 @@ import java.util.*;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class MetaAttributeEditorLocator implements EditorLocator {
+public class MetaAttributeEditorLocator implements EditorLocator, ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -246,7 +249,9 @@ public class MetaAttributeEditorLocator implements EditorLocator {
             } else {
                 try {
                     final BasicEditor editor = this.createEditor(this.createEditorClass(
-                                SessionManager.getProxy().getMetaClass(MetaObject.getClassKey()).getComplexEditor()));
+                                SessionManager.getProxy().getMetaClass(
+                                    MetaObject.getClassKey(),
+                                    getClientConnectionContext()).getComplexEditor()));
                     return editor;
                 } catch (Exception e) {
                     logger.fatal("MetaObjectEditorsuche Exception", e); // NOI18N
@@ -283,5 +288,10 @@ public class MetaAttributeEditorLocator implements EditorLocator {
      */
     public void setIgnoreInvisibleAttributes(final boolean ignoreInvisibleAttributes) {
         this.ignoreInvisibleAttributes = ignoreInvisibleAttributes;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

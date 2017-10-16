@@ -70,11 +70,8 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
-import de.cismet.cids.server.messages.CidsServerMessageManagerImpl;
-
-import de.cismet.cids.servermessage.CidsServerMessageNotifier;
-import de.cismet.cids.servermessage.CidsServerMessageNotifierListener;
-import de.cismet.cids.servermessage.CidsServerMessageNotifierListenerEvent;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
@@ -113,7 +110,7 @@ import static java.awt.Frame.MAXIMIZED_BOTH;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class Navigator extends JFrame {
+public class Navigator extends JFrame implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -427,7 +424,7 @@ public class Navigator extends JFrame {
 
         PropertyManager.getManager()
                 .setEditable(this.hasPermission(
-                        SessionManager.getProxy().getClasses(),
+                        SessionManager.getProxy().getClasses(getClientConnectionContext()),
                         PermissionHolder.WRITEPERMISSION));
         // PropertyManager.getManager().setEditable(true);
         if (logger.isInfoEnabled()) {
@@ -529,7 +526,8 @@ public class Navigator extends JFrame {
         progressObserver.setProgress(
             200,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_200")); // NOI18N
-        final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
+        final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
+                    getClientConnectionContext()));
         metaCatalogueTree = new MetaCatalogueTree(
                 rootTreeNode,
                 PropertyManager.getManager().isEditable(),
@@ -1263,6 +1261,11 @@ public class Navigator extends JFrame {
         } catch (Throwable e) {
             logger.error("Error during initializion of remote control server", e);
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------

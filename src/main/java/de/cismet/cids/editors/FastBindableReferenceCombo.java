@@ -43,6 +43,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch;
 
@@ -52,7 +55,10 @@ import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class FastBindableReferenceCombo extends JComboBox implements Bindable, MetaClassStore, Serializable {
+public class FastBindableReferenceCombo extends JComboBox implements Bindable,
+    MetaClassStore,
+    Serializable,
+    ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -428,7 +434,9 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
                 search.setRepresentationPattern(getRepresentation());
             }
             final Collection<LightweightMetaObject> results = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
+                        .customServerSearch(SessionManager.getSession().getUser(),
+                            search,
+                            getClientConnectionContext());
             if (representationFormater != null) {
                 for (final LightweightMetaObject result : results) {
                     result.setFormater(representationFormater);
@@ -441,13 +449,15 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
                             .getAllLightweightMetaObjectsForClass(mc.getID(),
                                     SessionManager.getSession().getUser(),
                                     getRepresentationFields(),
-                                    representationFormater);
+                                    representationFormater,
+                                    getClientConnectionContext());
             } else {
                 lwmos = SessionManager.getProxy()
                             .getAllLightweightMetaObjectsForClass(mc.getID(),
                                     SessionManager.getSession().getUser(),
                                     getRepresentationFields(),
-                                    getRepresentation());
+                                    getRepresentation(),
+                                    getClientConnectionContext());
             }
         }
         if (sorted) {
@@ -601,6 +611,11 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     private void setMetaClassImpl(final MetaClass metaClass) {
         this.metaClass = metaClass;
         init();
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }
 

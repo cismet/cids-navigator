@@ -45,6 +45,9 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -52,7 +55,7 @@ import javax.swing.border.SoftBevelBorder;
  * @deprecated  Password is now changed via Extras -> Optionen (See {@link PasswordOptionsDialog})
  */
 @Deprecated
-public class PasswordDialog extends JDialog {
+public class PasswordDialog extends JDialog implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -194,6 +197,11 @@ public class PasswordDialog extends JDialog {
         this.pack();
     }
 
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -242,7 +250,8 @@ public class PasswordDialog extends JDialog {
                             !SessionManager.getProxy().changePassword(
                                         SessionManager.getSession().getUser(),
                                         new String(password_old.getPassword()),
-                                        new String(password_new.getPassword()))) {
+                                        new String(password_new.getPassword()),
+                                        getClientConnectionContext())) {
                             // _TA_JOptionPane.showMessageDialog(null, "Ihr Kennwort konnte nicht geaendert werden.",
                             // "Kennwort aendern", JOptionPane.ERROR_MESSAGE);
                             JOptionPane.showMessageDialog(

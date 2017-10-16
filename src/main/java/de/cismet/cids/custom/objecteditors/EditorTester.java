@@ -30,6 +30,9 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
@@ -45,7 +48,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public abstract class EditorTester extends javax.swing.JFrame {
+public abstract class EditorTester extends javax.swing.JFrame implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -146,7 +149,7 @@ public abstract class EditorTester extends javax.swing.JFrame {
      */
     private void loadMetaObject(final int objectId) throws Exception {
         final int classId = ClassCacheMultiple.getMetaClass(domain, className).getId();
-        final MetaObject metaObject = proxy.getMetaObject(objectId, classId, domain);
+        final MetaObject metaObject = proxy.getMetaObject(objectId, classId, domain, getClientConnectionContext());
 
         if (metaObject != null) {
             cidsBeanStore.setCidsBean(metaObject.getBean());
@@ -336,4 +339,9 @@ public abstract class EditorTester extends javax.swing.JFrame {
      * DOCUMENT ME!
      */
     public abstract void run();
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
 }

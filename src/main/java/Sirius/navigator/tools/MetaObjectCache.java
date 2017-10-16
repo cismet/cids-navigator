@@ -23,13 +23,16 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class MetaObjectCache {
+public class MetaObjectCache implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -293,9 +296,13 @@ public class MetaObjectCache {
 
                         if (domain != null) {
                             cachedObjects = SessionManager.getProxy()
-                                        .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, domain);
+                                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                                                query,
+                                                domain,
+                                                getClientConnectionContext());
                         } else {
-                            cachedObjects = SessionManager.getProxy().getMetaObjectByQuery(iQuery, 0);
+                            cachedObjects = SessionManager.getProxy()
+                                        .getMetaObjectByQuery(iQuery, 0, getClientConnectionContext());
                         }
                         cache.put(qHash, new SoftReference<MetaObject[]>(cachedObjects));
                     } catch (final ConnectionException ex) {
@@ -339,6 +346,11 @@ public class MetaObjectCache {
      */
     private synchronized Collection<ReentrantReadWriteLock> getAllLocks() {
         return locks.values();
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------

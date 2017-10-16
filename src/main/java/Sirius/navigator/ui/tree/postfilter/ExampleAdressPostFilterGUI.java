@@ -28,6 +28,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -35,7 +38,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @version  $Revision$, $Date$
  */
 //@ServiceProvider(service = PostFilterGUI.class)
-public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
+public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements ClientConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -140,7 +143,8 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
                                     mo = SessionManager.getProxy()
                                                 .getMetaObject(((MetaObjectNode)n).getObjectId(),
                                                         ((MetaObjectNode)n).getClassId(),
-                                                        ((MetaObjectNode)n).getDomain());
+                                                        ((MetaObjectNode)n).getDomain(),
+                                                        getClientConnectionContext());
                                     ((MetaObjectNode)n).setObject(mo);
                                 }
                                 final CidsBean cb = mo.getBean();
@@ -319,4 +323,9 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
 }

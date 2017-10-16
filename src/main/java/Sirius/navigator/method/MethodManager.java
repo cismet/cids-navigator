@@ -51,6 +51,8 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
@@ -62,7 +64,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public class MethodManager {
+public class MethodManager implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -367,7 +369,7 @@ public class MethodManager {
                 logger.info("updateNode() updating node " + sourceNode); // NOI18N
             }
             // zuerst l\u00F6schen
-            SessionManager.getProxy().deleteNode(sourceNode.getNode());
+            SessionManager.getProxy().deleteNode(sourceNode.getNode(), getClientConnectionContext());
 
             // dann neu einf\u00FCgen
             this.addNode(metaTree, destinationNode, sourceNode);
@@ -446,7 +448,7 @@ public class MethodManager {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                SessionManager.getProxy().deleteNode(sourceNode.getNode());
+                SessionManager.getProxy().deleteNode(sourceNode.getNode(), getClientConnectionContext());
                 if (sourceNode.isObjectNode()) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("deleting object node's meta object"); // NOI18N
@@ -640,7 +642,10 @@ public class MethodManager {
                         logger.info("copy node(): copy meta object: " + oldMetaObject.getName()); // NOI18N
                     }
                     final MetaObject newMetaObject = SessionManager.getProxy()
-                                .insertMetaObject(oldMetaObject, sourceNodeCopy.getDomain());
+                                .insertMetaObject(
+                                    oldMetaObject,
+                                    sourceNodeCopy.getDomain(),
+                                    getClientConnectionContext());
 
                     // neues objekt zuweisen
                     ((ObjectTreeNode)sourceNodeCopy).setMetaObject(newMetaObject);
@@ -716,10 +721,12 @@ public class MethodManager {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                SessionManager.getProxy().deleteLink(sourceParentNode.getNode(), sourceNode.getNode());
+                SessionManager.getProxy()
+                        .deleteLink(sourceParentNode.getNode(), sourceNode.getNode(), getClientConnectionContext());
                 this.deleteTreeNode(metaTree, sourceNode);
 
-                SessionManager.getProxy().addLink(destinationNode.getNode(), sourceNode.getNode());
+                SessionManager.getProxy()
+                        .addLink(destinationNode.getNode(), sourceNode.getNode(), getClientConnectionContext());
                 this.addTreeNode(metaTree, destinationNode, sourceNode);
                 // destinationNode.explore();
                 ComponentRegistry.getRegistry()
@@ -819,7 +826,8 @@ public class MethodManager {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                SessionManager.getProxy().addLink(destinationNode.getNode(), sourceNode.getNode());
+                SessionManager.getProxy()
+                        .addLink(destinationNode.getNode(), sourceNode.getNode(), getClientConnectionContext());
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -839,7 +847,8 @@ public class MethodManager {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                final Node node = SessionManager.getProxy().addNode(sourceNode.getNode(), link);
+                final Node node = SessionManager.getProxy()
+                            .addNode(sourceNode.getNode(), link, getClientConnectionContext());
                 node.setPermissions(destinationNode.getNode().getPermissions());
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
@@ -1075,7 +1084,8 @@ public class MethodManager {
         boolean hasPermission = false;
         try {
             final String key = userGroup.getKey().toString();
-            final MetaClass c = SessionManager.getProxy().getMetaClass(node.getClassId(), node.getDomain());
+            final MetaClass c = SessionManager.getProxy()
+                        .getMetaClass(node.getClassId(), node.getDomain(), getClientConnectionContext());
 
             // wenn MON dann editieren wenn Rechte am Knoten und and der Klasse
             hasPermission = c.getPermissions().hasPermission(key, permission);
@@ -1152,5 +1162,10 @@ public class MethodManager {
         }
 
         return attributeName;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

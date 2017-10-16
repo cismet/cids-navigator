@@ -70,6 +70,9 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.cids.tools.metaobjectrenderer.CidsBeanAggregationHandler;
 import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
@@ -93,7 +96,7 @@ import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
-public abstract class DescriptionPane extends JPanel implements StatusChangeSupport {
+public abstract class DescriptionPane extends JPanel implements StatusChangeSupport, ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -898,7 +901,10 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     public void gotoMetaObject(final MetaObject to, final String optionalTitle) {
         showMetaObjectSingleRenderer(to, optionalTitle);
     }
-
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
     /**
      * DOCUMENT ME!
      *
@@ -915,7 +921,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected MetaObject doInBackground() throws Exception {
-                    return SessionManager.getProxy().getMetaObject(toObjectId, mc.getId(), mc.getDomain());
+                    return SessionManager.getProxy()
+                                .getMetaObject(toObjectId, mc.getId(), mc.getDomain(), getClientConnectionContext());
                 }
 
                 @Override

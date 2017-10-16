@@ -16,6 +16,8 @@ import org.jdom.Element;
 import org.openide.util.lookup.ServiceProvider;
 
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 
@@ -32,7 +34,7 @@ import de.cismet.tools.configuration.NoWriteError;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
+public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -203,12 +205,18 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
                         .hasConfigAttr(
                             SessionManager.getSession().getUser(),
                             "csa://"
-                            + CheckCidsServerMessageAction.TASK_NAME);
+                            + CheckCidsServerMessageAction.TASK_NAME,
+                            getClientConnectionContext());
         } catch (final Exception ex) {
             LOG.warn("could not check csa://" + CheckCidsServerMessageAction.TASK_NAME
                         + ". CidsServerMessageOptionsPanel is now disabled",
                 ex);
             return false;
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

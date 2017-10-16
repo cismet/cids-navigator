@@ -26,7 +26,7 @@ import javax.swing.JFrame;
 
 import de.cismet.cids.server.actions.PublishCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -248,11 +248,10 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
                     (String)jComboBox1.getSelectedItem());
 
             SessionManager.getConnection()
-                    .executeTask(
-                        SessionManager.getSession().getUser(),
+                    .executeTask(SessionManager.getSession().getUser(),
                         PublishCidsServerMessageAction.TASK_NAME,
                         SessionManager.getSession().getUser().getDomain(),
-                        ConnectionContext.create(RemoteLog4JConfigChangerDialog.class.getSimpleName()),
+                        ClientConnectionContext.create(RemoteLog4JConfigChangerDialog.class.getSimpleName()),
                         new ObjectMapper().writeValueAsString(remoteConfig),
                         new ServerActionParameter<String>(
                             PublishCidsServerMessageAction.ParameterType.CATEGORY.toString(),

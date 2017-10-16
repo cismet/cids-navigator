@@ -25,12 +25,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // implements Comparable
+public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode implements ClientConnectionContextProvider // implements Comparable
 {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -138,7 +141,8 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
     public Node[] getChildren() throws Exception {
         final Node node = this.getNode();
 
-        final Node[] c = SessionManager.getProxy().getChildren(node, SessionManager.getSession().getUser());
+        final Node[] c = SessionManager.getProxy()
+                    .getChildren(node, SessionManager.getSession().getUser(), getClientConnectionContext());
         if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
             return c;
         }
@@ -590,5 +594,10 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode // impl
      */
     public void setExplored(final boolean explored) {
         this.explored = explored;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

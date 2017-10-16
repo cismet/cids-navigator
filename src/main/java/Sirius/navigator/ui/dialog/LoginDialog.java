@@ -28,6 +28,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * Der Login Dialog in dem Benutzername, Passwort und Localserver angegeben werden muessen. Der Dialog ist modal, ein
  * Klick auf 'Abbrechen' beendet das Programm sofort.
@@ -35,7 +38,7 @@ import javax.swing.JOptionPane;
  * @author   Pascal Dih&eacute;
  * @version  1.0
  */
-public class LoginDialog extends JDialog {
+public class LoginDialog extends JDialog implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -470,7 +473,7 @@ public class LoginDialog extends JDialog {
             cb_userGroup.setModel(new DefaultComboBoxModel());
             cb_srv.setModel(new DefaultComboBoxModel());
 
-            final String[] domains = SessionManager.getProxy().getDomains();
+            final String[] domains = SessionManager.getProxy().getDomains(getClientConnectionContext());
 
             for (int i = 0; i < domains.length; i++) {
                 cb_srv.addItem(domains[i]);
@@ -710,7 +713,7 @@ public class LoginDialog extends JDialog {
         cb_userGroup.removeAllItems();
 
         if ((user == null) || (user.length() == 0) || (domain == null) || (domain.length() == 0)) {
-            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames();
+            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(getClientConnectionContext());
             userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
         } else {
             try {
@@ -718,7 +721,8 @@ public class LoginDialog extends JDialog {
                     LOG.debug("retrieving usergroups for user '" + user + "' @ domain '" + domain + "'"); // NOI18N
                 }
 
-                final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(user, domain);
+                final Vector tmpVector = SessionManager.getProxy()
+                            .getUserGroupNames(user, domain, getClientConnectionContext());
                 userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
             } catch (UserException ue) {
                 JOptionPane.showMessageDialog(
@@ -773,5 +777,10 @@ public class LoginDialog extends JDialog {
                 System.exit(1);
             }
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

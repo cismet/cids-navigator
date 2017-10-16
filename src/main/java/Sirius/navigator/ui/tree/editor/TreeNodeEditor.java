@@ -13,9 +13,7 @@
 package Sirius.navigator.ui.tree.editor;
 
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
 import Sirius.navigator.exception.*;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 
@@ -32,6 +30,9 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
@@ -40,7 +41,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class TreeNodeEditor extends javax.swing.JDialog {
+public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -277,7 +278,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
     public void show() {
         if (this.classBox.getModel().getSize() == 0) {
             try {
-                final MetaClass[] cs = SessionManager.getProxy().getClasses();
+                final MetaClass[] cs = SessionManager.getProxy().getClasses(getClientConnectionContext());
                 final ArrayList filtered = new ArrayList();
 
                 final User user = SessionManager.getSession().getUser();
@@ -363,6 +364,11 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         return this.metaTreeNode;
     }
 
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -413,7 +419,8 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
                                                     java.awt.Cursor.WAIT_CURSOR));
-                                    final MetaObject metaObject = SessionManager.getProxy().getInstance(metaClass);
+                                    final MetaObject metaObject = SessionManager.getProxy()
+                                                .getInstance(metaClass, getClientConnectionContext());
                                     ComponentRegistry.getRegistry()
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(

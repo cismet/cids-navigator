@@ -31,13 +31,17 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaAttributeEditor {
+public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaAttributeEditor
+        implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -445,7 +449,10 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
             return super.getMetaObjectAttributes(value);
         }
     }
-
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
+    }
     /*public void setValue(java.lang.Object key, java.lang.Object value)
      * { super.setValue(key, value); this.initUI(); this.setValueChanged(true);}*/
 
@@ -476,7 +483,8 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
 
                 // besorge klasse der ArryElementReferenzen (referenztabelle)
                 final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(String.valueOf(attribute.getClassID()) + '@' + MetaObject.getDomain());
+                            .getMetaClass(String.valueOf(attribute.getClassID()) + '@' + MetaObject.getDomain(),
+                                getClientConnectionContext());
 
                 // attributeinfo f\u00FCr arrayattribut
                 MemberAttributeInfo memberAttributeInfo = (MemberAttributeInfo)metaClass.getMemberAttributeInfos()
@@ -485,7 +493,8 @@ public class DefaultComplexMetaAttributeArrayEditor extends AbstractComplexMetaA
                 // klasse des referenzobjektes besorgen
                 final MetaClass arrayHelperClass = SessionManager.getProxy()
                             .getMetaClass(String.valueOf(memberAttributeInfo.getForeignKeyClassId()) + "@"
-                                + MetaObject.getDomain()); // NOI18N
+                                + MetaObject.getDomain(),
+                                getClientConnectionContext()); // NOI18N
 
                 // referenzObjekt besorgen
                 final MetaObject arrayHelperObject = DefaultComplexMetaAttributeArrayEditor.this.getMetaObjectInstance(

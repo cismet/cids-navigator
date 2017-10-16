@@ -30,6 +30,9 @@ import java.awt.dnd.*;
 
 import javax.swing.JOptionPane;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.cids.tools.fromstring.StringCreateable;
 
 /**
@@ -40,8 +43,8 @@ import de.cismet.cids.tools.fromstring.StringCreateable;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor                   // javax.swing.JPanel
-{
+public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor
+        implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -302,9 +305,11 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
             String newClassName = newMetaObject.getClassKey();
 
             try {
-                oldClassName = Sirius.navigator.connection.SessionManager.getProxy().getMetaClass(oldClassName)
+                oldClassName = Sirius.navigator.connection.SessionManager.getProxy()
+                            .getMetaClass(oldClassName, getClientConnectionContext())
                             .getName();
-                newClassName = Sirius.navigator.connection.SessionManager.getProxy().getMetaClass(newClassName)
+                newClassName = Sirius.navigator.connection.SessionManager.getProxy()
+                            .getMetaClass(newClassName, getClientConnectionContext())
                             .getName();
             } catch (Throwable t) {
                 logger.warn("setValueFromDragAndDrop(): could not retrieve class names", t); // NOI18N
@@ -329,6 +334,11 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
     protected Sirius.navigator.ui.attributes.editor.metaobject.AbstractSimpleMetaAttributeEditor.ValueChangeListener
     getValueChangeListener() {
         return new DefaultSimpleComplexValueChangeListener();
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------

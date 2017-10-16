@@ -24,6 +24,9 @@ import javax.swing.ImageIcon;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -31,7 +34,8 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsClientToolbarItem.class)
-public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem {
+public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem,
+    ClientConnectionContextProvider {
 
     //~ Constructors -----------------------------------------------------------
 
@@ -64,16 +68,23 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
             return (SessionManager.getConnection().getConfigAttr(
                         SessionManager.getSession().getUser(),
                         "navigator.querybuilder.toolbaricon@"
-                                + SessionManager.getSession().getUser().getDomain())
+                                + SessionManager.getSession().getUser().getDomain(),
+                        getClientConnectionContext())
                             != null)
                         && (SessionManager.getConnection().getConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 QuerySearch.ACTION_TAG
-                                + SessionManager.getSession().getUser().getDomain())
+                                + SessionManager.getSession().getUser().getDomain(),
+                                getClientConnectionContext())
                             != null);
         } catch (ConnectionException ex) {
             Log.error(ex);
         }
         return false;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

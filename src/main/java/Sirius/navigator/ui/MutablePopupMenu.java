@@ -73,6 +73,9 @@ import javax.swing.tree.TreePath;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
 
 import de.cismet.ext.CExtContext;
@@ -85,7 +88,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public final class MutablePopupMenu extends JPopupMenu {
+public final class MutablePopupMenu extends JPopupMenu implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -214,6 +217,10 @@ public final class MutablePopupMenu extends JPopupMenu {
      */
     public boolean isPluginMenuAvailable(final String id) {
         return this.pluginMenues.isAvailable(id);
+    }
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -805,7 +812,8 @@ public final class MutablePopupMenu extends JPopupMenu {
         public void invoke() throws Exception {
             final TreePath selectionPath = currentTree.getSelectionPath();
             if ((selectionPath != null) && (selectionPath.getPath().length > 0)) {
-                final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
+                final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
+                            getClientConnectionContext()));
 
                 final Runnable r = new Runnable() {
 

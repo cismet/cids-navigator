@@ -15,6 +15,8 @@ import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.List;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 import de.cismet.cids.server.search.builtin.CsvExportSearchStatement;
 
 import de.cismet.tools.gui.downloadmanager.AbstractDownload;
@@ -25,7 +27,7 @@ import de.cismet.tools.gui.downloadmanager.AbstractDownload;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CsvExportSearchDownload extends AbstractDownload {
+public class CsvExportSearchDownload extends AbstractDownload implements ClientConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -72,7 +74,9 @@ public class CsvExportSearchDownload extends AbstractDownload {
         final Collection<String> csvColl;
         try {
             csvColl = (Collection)SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
+                        .customServerSearch(SessionManager.getSession().getUser(),
+                                search,
+                                getClientConnectionContext());
         } catch (final ConnectionException ex) {
             error(ex);
             return;
@@ -119,5 +123,10 @@ public class CsvExportSearchDownload extends AbstractDownload {
             status = State.COMPLETED;
             stateChanged();
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(CsvExportSearchDownload.class.getSimpleName());
     }
 }

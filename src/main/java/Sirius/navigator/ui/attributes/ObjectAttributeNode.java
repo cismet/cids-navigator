@@ -14,21 +14,17 @@ package Sirius.navigator.ui.attributes;
 
 import Sirius.navigator.connection.*;
 import Sirius.navigator.resource.ResourceManager;
-import Sirius.navigator.types.iterator.AttributeIterator;
-import Sirius.navigator.types.iterator.AttributeRestriction;
-import Sirius.navigator.types.iterator.SimpleAttributeRestriction;
 import Sirius.navigator.types.iterator.SingleAttributeIterator;
-import Sirius.navigator.types.treenode.ClassTreeNode;
-import Sirius.navigator.types.treenode.ObjectTreeNode;
 
-import Sirius.server.localserver.attribute.Attribute;
 import Sirius.server.middleware.types.*;
 
 import java.util.*;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.tree.DefaultMutableTreeNode;
+
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -36,7 +32,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class ObjectAttributeNode extends AttributeNode {
+public class ObjectAttributeNode extends AttributeNode implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -94,7 +90,8 @@ public class ObjectAttributeNode extends AttributeNode {
 
         // load class icon ...
         try {
-            tempClass = SessionManager.getProxy().getMetaClass(metaObject.getClassID(), metaObject.getDomain());
+            tempClass = SessionManager.getProxy()
+                        .getMetaClass(metaObject.getClassID(), metaObject.getDomain(), getClientConnectionContext());
         } catch (Exception exp) {
             logger.error("could not load class for Object :" + metaObject, exp); // NOI18N
         }
@@ -156,5 +153,10 @@ public class ObjectAttributeNode extends AttributeNode {
     @Override
     public java.util.Collection getAttributes() {
         return this.MetaObject.getAttributes().values();
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

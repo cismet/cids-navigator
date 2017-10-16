@@ -18,6 +18,8 @@ import Sirius.server.middleware.types.MetaClass;
 
 import java.util.HashMap;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+
 import de.cismet.cids.utils.MetaClassUtils;
 
 /**
@@ -118,7 +120,7 @@ public class ClassCacheMultiple {
     public static void setInstance(final String domain) {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain);
+                        .getClasses(SessionManager.getSession().getUser(), domain, getConnectionContext());
             allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
@@ -134,7 +136,7 @@ public class ClassCacheMultiple {
     public static void addInstance(final String domain) {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain);
+                        .getClasses(SessionManager.getSession().getUser(), domain, getConnectionContext());
             allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
@@ -145,10 +147,10 @@ public class ClassCacheMultiple {
     /**
      * DOCUMENT ME!
      *
-     * @param   classes          DOCUMENT ME!
-     * @param   localServerName  DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
 
+    public static ClientConnectionContext getConnectionContext() {
+        return ClientConnectionContext.create(ClassCacheMultiple.class.getSimpleName());
+    }
 }

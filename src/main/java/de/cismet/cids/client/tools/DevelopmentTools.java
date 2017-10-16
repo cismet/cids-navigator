@@ -53,6 +53,7 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
@@ -321,7 +322,11 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject mo = SessionManager.getConnection()
-                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+                    .getMetaObject(SessionManager.getSession().getUser(),
+                        objectId,
+                        mc.getId(),
+                        domain,
+                        getConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -381,7 +386,11 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject mo = SessionManager.getConnection()
-                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+                    .getMetaObject(SessionManager.getSession().getUser(),
+                        objectId,
+                        mc.getId(),
+                        domain,
+                        getConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -415,7 +424,11 @@ public class DevelopmentTools {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
 
         final MetaObject mo = SessionManager.getConnection()
-                    .getMetaObject(SessionManager.getSession().getUser(), objectId, mc.getId(), domain);
+                    .getMetaObject(SessionManager.getSession().getUser(),
+                        objectId,
+                        mc.getId(),
+                        domain,
+                        getConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -514,7 +527,7 @@ public class DevelopmentTools {
                     + " "
                     + limitS;
         final MetaObject[] metaObjects = SessionManager.getConnection()
-                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
+                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getConnectionContext());
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
         for (int i = 0; i < metaObjects.length; i++) {
             final MetaObject metaObject = metaObjects[i];
@@ -545,7 +558,7 @@ public class DevelopmentTools {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
         }
         final Collection res = SessionManager.getConnection()
-                    .customServerSearch(SessionManager.getSession().getUser(), search);
+                    .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
 
         return (ArrayList<ArrayList>)res;
     }
@@ -880,5 +893,14 @@ public class DevelopmentTools {
         final JComponent c = CidsObjectEditorFactory.getInstance().getEditor(cb.getMetaObject());
         final JScrollPane jsp = new JScrollPane(c);
         showTestFrame(jsp, w, h);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ClientConnectionContext getConnectionContext() {
+        return ClientConnectionContext.create(DevelopmentTools.class.getSimpleName());
     }
 }

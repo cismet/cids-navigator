@@ -78,6 +78,9 @@ import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.cids.utils.ClassloadingHelper;
 
 import de.cismet.commons.classloading.BlacklistClassloading;
@@ -1055,7 +1058,12 @@ public class CidsObjectEditorFactory {
                         SessionManager.init(proxy);
 
                         final MetaObject MetaObject = SessionManager.getConnection()
-                                    .getMetaObject(SessionManager.getSession().getUser(), OBJECTID, CLASSID, domain); // meta.getMetaObject(u, 1, AAPERSON_CLASSID, domain);
+                                    .getMetaObject(
+                                        SessionManager.getSession().getUser(),
+                                        OBJECTID,
+                                        CLASSID,
+                                        domain,
+                                        getConnectionContext()); // meta.getMetaObject(u, 1, AAPERSON_CLASSID, domain);
 
                         log.fatal(MetaObject.getDebugString());
 
@@ -1133,7 +1141,8 @@ public class CidsObjectEditorFactory {
                                                     SessionManager.getSession().getUser(),
                                                     OBJECTID,
                                                     CLASSID,
-                                                    domain).getBean());
+                                                    domain,
+                                                    getConnectionContext()).getBean());
                                             abce.getBindingGroup().unbind();
                                             abce.getBindingGroup().bind();
                                         }
@@ -1155,6 +1164,15 @@ public class CidsObjectEditorFactory {
                     }
                 }
             });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ClientConnectionContext getConnectionContext() {
+        return ClientConnectionContext.create(CidsObjectEditorFactory.class.getSimpleName());
     }
 }
 /**

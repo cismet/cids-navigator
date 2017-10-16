@@ -34,13 +34,16 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class MetaObjectNodeComparator implements Comparator<Node> {
+public class MetaObjectNodeComparator implements Comparator<Node>, ClientConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -76,7 +79,8 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
                                 .getMetaObject(
                                         ((MetaObjectNode)o1).getObjectId(),
                                         o1.getClassId(),
-                                        o1.getDomain());
+                                        o1.getDomain(),
+                                        getClientConnectionContext());
                     mon1.setObject(mo1);
                     mon1.setName(mo1.toString());
                 }
@@ -94,7 +98,8 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
                                 .getMetaObject(
                                         ((MetaObjectNode)o2).getObjectId(),
                                         o2.getClassId(),
-                                        o2.getDomain());
+                                        o2.getDomain(),
+                                        getClientConnectionContext());
                     mon2.setObject(mo2);
                     mon2.setName(mo2.toString());
                 }
@@ -108,5 +113,10 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

@@ -51,6 +51,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.Converter;
@@ -70,7 +73,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class PerformanceComparisonDialog extends javax.swing.JDialog {
+public class PerformanceComparisonDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -351,7 +354,11 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
             final Map<String, Object> resultsMap) throws Exception {
         final long timeMs = System.currentTimeMillis();
         final MetaObject mo = SessionManager.getConnection()
-                    .getMetaObject(SessionManager.getSession().getUser(), objectId, classId, domain);
+                    .getMetaObject(SessionManager.getSession().getUser(),
+                        objectId,
+                        classId,
+                        domain,
+                        getClientConnectionContext());
         final long durationMs = System.currentTimeMillis() - timeMs;
 
         resultsMap.put("getMo (duration in ms)", durationMs);
@@ -407,7 +414,11 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
         mo.forceStatus(MetaObject.MODIFIED);
 
         final long timeMs = System.currentTimeMillis();
-        SessionManager.getConnection().updateMetaObject(SessionManager.getSession().getUser(), mo, mo.getDomain());
+        SessionManager.getConnection()
+                .updateMetaObject(SessionManager.getSession().getUser(),
+                    mo,
+                    mo.getDomain(),
+                    getClientConnectionContext());
         final long durationMs = System.currentTimeMillis() - timeMs;
 
         resultsMap.put("updateMo (duration in ms)", durationMs);
@@ -507,6 +518,11 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
         StaticSwingTools.showDialog(loginDialog);
 
         return loginDialog.getStatus() == JXLoginPane.Status.SUCCEEDED;
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------
