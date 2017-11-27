@@ -262,6 +262,33 @@ public class DevelopmentTools {
             final String pass,
             final boolean compressionEnabled) throws Exception {
         System.out.println("start");
+        initSessionManagerFromPureRestfulConnection(
+            domain,
+            group,
+            user,
+            pass,
+            compressionEnabled,
+            "http://localhost:8890/");
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain                   DOCUMENT ME!
+     * @param   group                    DOCUMENT ME!
+     * @param   user                     DOCUMENT ME!
+     * @param   pass                     DOCUMENT ME!
+     * @param   compressionEnabled       DOCUMENT ME!
+     * @param   hostWithPortAndProtocol  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void initSessionManagerFromPureRestfulConnection(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final boolean compressionEnabled,
+            final String hostWithPortAndProtocol) throws Exception {
         // lookup des callservers
         final Remote r;
         final SearchService ss;
@@ -272,7 +299,7 @@ public class DevelopmentTools {
 
         Log4JQuickConfig.configure4LumbermillOnLocalhost();
         final ConnectionInfo info = new ConnectionInfo();
-        info.setCallserverURL("http://localhost:8890/");
+        info.setCallserverURL(hostWithPortAndProtocol);
         info.setUsername(user);
         info.setUsergroup(group);
         info.setPassword(pass);
@@ -390,25 +417,35 @@ public class DevelopmentTools {
     /**
      * DOCUMENT ME!
      *
-     * @param   domain    DOCUMENT ME!
-     * @param   group     DOCUMENT ME!
-     * @param   user      DOCUMENT ME!
-     * @param   pass      DOCUMENT ME!
-     * @param   table     DOCUMENT ME!
-     * @param   objectId  DOCUMENT ME!
+     * @param   domain                   DOCUMENT ME!
+     * @param   group                    DOCUMENT ME!
+     * @param   user                     DOCUMENT ME!
+     * @param   pass                     DOCUMENT ME!
+     * @param   table                    DOCUMENT ME!
+     * @param   objectId                 DOCUMENT ME!
+     * @param   compressionEnabled       DOCUMENT ME!
+     * @param   hostWithPortAndProtocol  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public static CidsBean createCidsBeanFromPureRestfulConnectionOnLocalhost(final String domain,
+    public static CidsBean createCidsBeanFromPureRestfulConnection(final String domain,
             final String group,
             final String user,
             final String pass,
             final String table,
-            final int objectId) throws Exception {
+            final int objectId,
+            final boolean compressionEnabled,
+            final String hostWithPortAndProtocol) throws Exception {
         if (!SessionManager.isInitialized()) {
-            initSessionManagerFromPureRestfulConnectionOnLocalhost(domain, group, user, pass);
+            initSessionManagerFromPureRestfulConnection(
+                domain,
+                group,
+                user,
+                pass,
+                compressionEnabled,
+                hostWithPortAndProtocol);
         }
         System.out.println("MO abfragen");
 
