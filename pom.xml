@@ -13,21 +13,21 @@
 
     <groupId>de.cismet.cids.navigator</groupId>
     <artifactId>cids-navigator</artifactId>
-    <version>5.4</version>
+    <version>5.4.1</version>
     <packaging>jar</packaging>
     
     <properties>
         <names.cids-navigator>cids Navigator</names.cids-navigator>
     </properties>
     
-    <name>${names.cids-navigator}</name>
+    <name>${names.cids-navigator} [${project.version}]</name>
     <description>!!! description pending !!!</description>
 
     <scm>
         <connection>https://github.com/cismet/cids-navigator.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-navigator.git</developerConnection>
         <url>https://github.com/cismet/cids-navigator</url>
-        <tag>v5.4</tag>
+        <tag>v5.4.1</tag>
     </scm>
 
     <ciManagement>
