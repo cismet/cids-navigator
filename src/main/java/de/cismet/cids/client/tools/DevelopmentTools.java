@@ -806,6 +806,46 @@ public class DevelopmentTools {
      * @param   pass      DOCUMENT ME!
      * @param   table     DOCUMENT ME!
      * @param   objectId  DOCUMENT ME!
+     * @param   w         DOCUMENT ME!
+     * @param   h         DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void createEditorInFrameFromRestfulConnection(final String domain,
+            final String group,
+            final String user,
+            final String pass,
+            final String table,
+            final int objectId,
+            final int w,
+            final int h) throws Exception {
+        UIManager.installLookAndFeel("Plastic 3D", "com.jgoodies.looks.plastic.Plastic3DLookAndFeel"); // NOI18N
+        final String heavyComps = System.getProperty("contains.heavyweight.comps");
+        if ((heavyComps != null) && heavyComps.equals("true")) {
+            com.jgoodies.looks.Options.setPopupDropShadowEnabled(false);
+        }
+        UIManager.setLookAndFeel("com.jgoodies.looks.plastic.Plastic3DLookAndFeel");
+        final CidsBean cb = createCidsBeanFromRestfulConnectionOnLocalhost(
+                domain,
+                group,
+                user,
+                pass,
+                table,
+                objectId,
+                true);
+        final JComponent c = CidsObjectEditorFactory.getInstance().getEditor(cb.getMetaObject());
+        showTestFrame(c, w, h);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain    DOCUMENT ME!
+     * @param   group     DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   pass      DOCUMENT ME!
+     * @param   table     DOCUMENT ME!
+     * @param   objectId  DOCUMENT ME!
      * @param   title     DOCUMENT ME!
      * @param   w         DOCUMENT ME!
      * @param   h         DOCUMENT ME!

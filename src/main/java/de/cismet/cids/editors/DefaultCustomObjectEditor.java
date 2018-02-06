@@ -19,6 +19,7 @@ package de.cismet.cids.editors;
 import Sirius.server.localserver.attribute.ObjectAttribute;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
+import Sirius.server.middleware.types.MetaObject;
 
 import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.BindingGroup;
@@ -132,27 +133,29 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         for (final Binding binding : bindings) {
             if (binding.getTargetObject() instanceof MetaClassStore) {
                 // log.fatal("MetaClassStores gefunden");
-                String fieldname = null;
+                String expr = null;
                 try {
                     final MetaClassStore mcs = (MetaClassStore)binding.getTargetObject();
                     final ELProperty p = (ELProperty)binding.getSourceProperty();
-                    String expr = getPropertyStringOutOfELProperty(p);
-                    expr = expr.substring(expr.indexOf(".") + 1); // NOI18N
-                    expr = expr.substring(0, expr.length() - 1);
+                    expr = getPropertyStringOutOfELProperty(p);
+                    expr = expr.substring(2, expr.length() - 1);
 
-                    // in expr steckt in den allermeisten faellen ein feldname
-                    // es kann aber auch sein, dass ein zusammengesetzter feldname vorkommt: subobject.fieldname
-
-                    fieldname = expr;
-
-                    final ObjectAttribute oa = cidsBean.getMetaObject().getAttributeByFieldName(fieldname);
                     final String domain = cidsBean.getMetaObject().getDomain();
-                    final int foreignClassId = oa.getMai().getForeignKeyClassId();
+                    int foreignClassId = cidsBean.getMetaObject().getMetaClass().getId();
+                    ObjectAttribute oa;
+                    while (expr.contains(".")) {
+                        final MetaClass mc = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId);
+                        final MetaObject mo = mc.getEmptyInstance();
+                        expr = expr.substring(expr.indexOf(".") + 1); // NOI18N
+                        final String fieldname = expr.contains(".") ? expr.substring(0, expr.indexOf(".")) : expr;
+                        oa = mo.getAttributeByFieldName(fieldname);
+                        foreignClassId = oa.getMai().getForeignKeyClassId();
+                    }
 
                     final MetaClass foreignClass = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId);
                     mcs.setMetaClass(foreignClass);
                 } catch (Exception e) {
-                    log.error("Error during Bind: " + fieldname + " of " + cidsBean.getMetaObject().getMetaClass(), e);
+                    log.error("Error during Bind: " + expr + " of " + cidsBean.getMetaObject().getMetaClass(), e);
                 }
             }
         }
