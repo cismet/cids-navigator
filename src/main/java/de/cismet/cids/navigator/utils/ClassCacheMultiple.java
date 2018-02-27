@@ -120,7 +120,7 @@ public class ClassCacheMultiple {
     public static void setInstance(final String domain) {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain, getConnectionContext());
+                        .getClasses(SessionManager.getSession().getUser(), domain, getClientConnectionContext());
             allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
@@ -136,7 +136,7 @@ public class ClassCacheMultiple {
     public static void addInstance(final String domain) {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain, getConnectionContext());
+                        .getClasses(SessionManager.getSession().getUser(), domain, getClientConnectionContext());
             allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
@@ -150,7 +150,7 @@ public class ClassCacheMultiple {
      * @return  DOCUMENT ME!
      */
 
-    public static ClientConnectionContext getConnectionContext() {
+    public static ClientConnectionContext getClientConnectionContext() {
         return ClientConnectionContext.create(ClassCacheMultiple.class.getSimpleName());
     }
 }

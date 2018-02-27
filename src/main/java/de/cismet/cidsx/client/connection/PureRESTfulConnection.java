@@ -305,7 +305,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .executeTask(
                             "testAction",
                             "SWITCHON",
-                            ClientConnectionContext.create(PureRESTfulConnection.class.getSimpleName()),
+                            new PureRESTfulConnection().getClientConnectionContext(),
                             (Object)null,
                             actionParameterTest);
             System.out.println(taskResult);
@@ -1113,6 +1113,6 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
 
     @Override
     public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(PureRESTfulConnection.class.getSimpleName());
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

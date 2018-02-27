@@ -1101,6 +1101,6 @@ public class RESTfulConnection implements Connection,
 
     @Override
     public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(RESTfulConnection.class.getSimpleName());
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

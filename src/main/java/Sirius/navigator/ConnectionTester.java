@@ -391,6 +391,6 @@ public class ConnectionTester extends javax.swing.JFrame implements ClientConnec
 
     @Override
     public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(ConnectionTester.class.getSimpleName());
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

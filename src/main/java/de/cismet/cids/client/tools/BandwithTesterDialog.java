@@ -42,6 +42,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 import de.cismet.netutil.Proxy;
 
@@ -71,7 +72,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class BandwithTesterDialog extends javax.swing.JDialog {
+public class BandwithTesterDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -380,7 +381,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                     .executeTask(
                         BandwidthTestAction.TASK_NAME,
                         domain,
-                        ClientConnectionContext.create(BandwithTesterDialog.class.getSimpleName()),
+                        getClientConnectionContext(),
                         fileSizeInMb);
 
         if (ret instanceof Exception) {
@@ -415,6 +416,11 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
         if (loginDialog.getStatus() != JXLoginPane.Status.SUCCEEDED) {
             System.exit(0);
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 
     //~ Inner Classes ----------------------------------------------------------

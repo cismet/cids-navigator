@@ -1063,7 +1063,8 @@ public class CidsObjectEditorFactory {
                                         OBJECTID,
                                         CLASSID,
                                         domain,
-                                        getConnectionContext()); // meta.getMetaObject(u, 1, AAPERSON_CLASSID, domain);
+                                        getClientConnectionContext());    // meta.getMetaObject(u, 1, AAPERSON_CLASSID,
+                                                                          // domain);
 
                         log.fatal(MetaObject.getDebugString());
 
@@ -1142,7 +1143,7 @@ public class CidsObjectEditorFactory {
                                                     OBJECTID,
                                                     CLASSID,
                                                     domain,
-                                                    getConnectionContext()).getBean());
+                                                    getClientConnectionContext()).getBean());
                                             abce.getBindingGroup().unbind();
                                             abce.getBindingGroup().bind();
                                         }
@@ -1171,7 +1172,7 @@ public class CidsObjectEditorFactory {
      *
      * @return  DOCUMENT ME!
      */
-    public static ClientConnectionContext getConnectionContext() {
+    public static ClientConnectionContext getClientConnectionContext() {
         return ClientConnectionContext.create(CidsObjectEditorFactory.class.getSimpleName());
     }
 }

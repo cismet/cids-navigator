@@ -27,6 +27,7 @@ import javax.swing.JFrame;
 import de.cismet.cids.server.actions.PublishCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -37,7 +38,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
+public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -251,7 +252,7 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
                     .executeTask(SessionManager.getSession().getUser(),
                         PublishCidsServerMessageAction.TASK_NAME,
                         SessionManager.getSession().getUser().getDomain(),
-                        ClientConnectionContext.create(RemoteLog4JConfigChangerDialog.class.getSimpleName()),
+                        getClientConnectionContext(),
                         new ObjectMapper().writeValueAsString(remoteConfig),
                         new ServerActionParameter<String>(
                             PublishCidsServerMessageAction.ParameterType.CATEGORY.toString(),
@@ -345,5 +346,10 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
         if (loginDialog.getStatus() != JXLoginPane.Status.SUCCEEDED) {
             System.exit(0);
         }
+    }
+
+    @Override
+    public ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

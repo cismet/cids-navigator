@@ -127,6 +127,6 @@ public class CsvExportSearchDownload extends AbstractDownload implements ClientC
 
     @Override
     public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(CsvExportSearchDownload.class.getSimpleName());
+        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

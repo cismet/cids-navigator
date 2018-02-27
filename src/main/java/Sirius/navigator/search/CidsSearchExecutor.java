@@ -27,7 +27,6 @@ import java.util.Collection;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.SearchResultListener;
 import de.cismet.cids.server.search.SearchResultListenerProvider;
@@ -42,7 +41,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   stefan
  * @version  $Revision$, $Date$
  */
-public final class CidsSearchExecutor implements ClientConnectionContextProvider {
+public final class CidsSearchExecutor {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -130,7 +129,7 @@ public final class CidsSearchExecutor implements ClientConnectionContextProvider
                     final Collection res = SessionManager.getProxy()
                                 .customServerSearch(SessionManager.getSession().getUser(),
                                     search,
-                                    ClientConnectionContext.create(CidsSearchExecutor.class.getSimpleName()));
+                                    getClientConnectionContext());
                     if (!isCancelled()) {
                         final ArrayList<Node> aln = new ArrayList<Node>(res.size());
                         for (final Object o : res) {
@@ -224,7 +223,7 @@ public final class CidsSearchExecutor implements ClientConnectionContextProvider
                     final Collection searchResult = SessionManager.getProxy()
                                 .customServerSearch(SessionManager.getSession().getUser(),
                                     search,
-                                    ClientConnectionContext.create(CidsSearchExecutor.class.getSimpleName()));
+                                    getClientConnectionContext());
 
                     if (isCancelled()) {
                         return result;
@@ -283,8 +282,12 @@ public final class CidsSearchExecutor implements ClientConnectionContextProvider
         return searchProgressDialog;
     }
 
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static ClientConnectionContext getClientConnectionContext() {
+        return ClientConnectionContext.create(CidsSearchExecutor.class.getSimpleName());
     }
 }

@@ -326,7 +326,7 @@ public class DevelopmentTools {
                         objectId,
                         mc.getId(),
                         domain,
-                        getConnectionContext());
+                        getClientConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -390,7 +390,7 @@ public class DevelopmentTools {
                         objectId,
                         mc.getId(),
                         domain,
-                        getConnectionContext());
+                        getClientConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -428,7 +428,7 @@ public class DevelopmentTools {
                         objectId,
                         mc.getId(),
                         domain,
-                        getConnectionContext());
+                        getClientConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -527,7 +527,7 @@ public class DevelopmentTools {
                     + " "
                     + limitS;
         final MetaObject[] metaObjects = SessionManager.getConnection()
-                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getConnectionContext());
+                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getClientConnectionContext());
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
         for (int i = 0; i < metaObjects.length; i++) {
             final MetaObject metaObject = metaObjects[i];
@@ -558,7 +558,7 @@ public class DevelopmentTools {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
         }
         final Collection res = SessionManager.getConnection()
-                    .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
+                    .customServerSearch(SessionManager.getSession().getUser(), search, getClientConnectionContext());
 
         return (ArrayList<ArrayList>)res;
     }
@@ -940,7 +940,7 @@ public class DevelopmentTools {
      *
      * @return  DOCUMENT ME!
      */
-    public static ClientConnectionContext getConnectionContext() {
+    public static ClientConnectionContext getClientConnectionContext() {
         return ClientConnectionContext.create(DevelopmentTools.class.getSimpleName());
     }
 }

@@ -485,7 +485,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         try {
             final MetaClass[] metaClass = SessionManager.getProxy()
-                        .getClasses(SessionManager.getSession().getUser().getDomain(), getConnectionContext());
+                        .getClasses(SessionManager.getSession().getUser().getDomain(), getClientConnectionContext());
             for (final MetaClass mClass : metaClass) {
                 if (!mClass.getAttributeByName("Queryable").isEmpty()) {
                     metaClassesWithAttribute.add(mClass);
@@ -560,7 +560,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                             + " from "
                             + foreignClass.getTableName();
                 final MetaObject[] mos = SessionManager.getProxy()
-                            .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getConnectionContext());
+                            .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                                query,
+                                getClientConnectionContext());
 
                 if (mos != null) {
                     values.addAll(Arrays.asList(mos));
@@ -571,7 +573,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         metaClass.getTableName(),
                         attribute.getFieldName());
                 final Collection resultCollection = SessionManager.getProxy()
-                            .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
+                            .customServerSearch(SessionManager.getSession().getUser(),
+                                search,
+                                getClientConnectionContext());
 
                 final ArrayList<ArrayList> resultArray = (ArrayList<ArrayList>)resultCollection;
 
@@ -634,7 +638,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     whereClause,
                     metaClass.getId());
             final Collection resultCollection = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
+                        .customServerSearch(SessionManager.getSession().getUser(),
+                            search,
+                            getClientConnectionContext());
             final ArrayList<ArrayList> resultArray = (ArrayList<ArrayList>)resultCollection;
 
             if (resultArray.size() != 1) {
@@ -1371,7 +1377,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         .getConfigAttr(SessionManager.getSession().getUser(),
                                 ACTION_TAG
                                 + SessionManager.getSession().getUser().getDomain(),
-                                getConnectionContext())
+                                getClientConnectionContext())
                         != null;
         } catch (ConnectionException ex) {
             LOG.error("Can not check ActionTag!", ex);
@@ -1424,7 +1430,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @return  DOCUMENT ME!
      */
-    public static ClientConnectionContext getConnectionContext() {
+    public static ClientConnectionContext getClientConnectionContext() {
         return ClientConnectionContext.create(QuerySearch.class.getSimpleName());
     }
 
