@@ -92,6 +92,7 @@ public class CidsSearchInitializer {
                     if (itTS instanceof ClientConnectionContextStore) {
                         ((ClientConnectionContextStore)itTS).setConnectionContext(
                             new SearchConnectionContext(itTS.getClass().getCanonicalName()));
+                        ((ClientConnectionContextStore)itTS).initAfterConnectionContext();
                     }
                     if (!checkActionTag(itTS.next())) {
                         itTS.remove();
@@ -128,6 +129,7 @@ public class CidsSearchInitializer {
                 if (windowSearch instanceof ClientConnectionContextStore) {
                     ((ClientConnectionContextStore)windowSearch).setConnectionContext(
                         new SearchConnectionContext(windowSearch.getClass().getCanonicalName()));
+                    ((ClientConnectionContextStore)windowSearch).initAfterConnectionContext();
                 }
                 if (checkActionTag(windowSearch)) {
                     final MutableConstraints mutableConstraints = new MutableConstraints();

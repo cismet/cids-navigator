@@ -501,6 +501,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         for (final CidsClientToolbarItem ccti : sorted) {
             if (ccti instanceof ClientConnectionContextStore) {
                 ((ClientConnectionContextStore)ccti).setConnectionContext(getConnectionContext());
+                ((ClientConnectionContextStore)ccti).initAfterConnectionContext();
             }
             if (ccti.isVisible()) {
                 final JToolBar innerToolbar;

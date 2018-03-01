@@ -65,15 +65,18 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
                 CidsServerMessagesOptionsPanel.class,
                 "CidsServerMessagesOptionsDialog.title"), // NOI18N,
             GeneralOptionsCategory.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initAfterConnectionContext() {
         try {
             initComponents();
         } catch (Exception e) {
             LOG.error("Erro during Creation of Password Dialog", e);
-            ;
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The

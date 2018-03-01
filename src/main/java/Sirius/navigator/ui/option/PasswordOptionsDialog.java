@@ -72,6 +72,12 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
                 PasswordOptionsDialog.class,
                 "PasswordOptionsDialog.title"), // NOI18N,
             SecurityOptionsCategory.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initAfterConnectionContext() {
         try {
             initComponents();
 
@@ -83,8 +89,6 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
             ;
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
