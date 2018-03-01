@@ -17,7 +17,7 @@ import org.openide.util.lookup.ServiceProvider;
 
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 
@@ -34,7 +34,7 @@ import de.cismet.tools.configuration.NoWriteError;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel implements ClientConnectionContextProvider {
+public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel implements ClientConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -44,6 +44,8 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
 
     private int intervallInMs = CidsServerMessageNotifier.DEFAULT_SCHEDULE_INTERVAL;
     private boolean stillConfigured = false;
+
+    private ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass().getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
@@ -206,7 +208,7 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
                             SessionManager.getSession().getUser(),
                             "csa://"
                             + CheckCidsServerMessageAction.TASK_NAME,
-                            getClientConnectionContext());
+                            getConnectionContext());
         } catch (final Exception ex) {
             LOG.warn("could not check csa://" + CheckCidsServerMessageAction.TASK_NAME
                         + ". CidsServerMessageOptionsPanel is now disabled",
@@ -216,7 +218,12 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
+    @Override
+    public void setConnectionContext(final ClientConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
     }
 }

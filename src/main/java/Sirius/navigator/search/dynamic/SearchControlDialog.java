@@ -17,6 +17,8 @@ import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.EventQueue;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
@@ -28,11 +30,13 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class SearchControlDialog extends javax.swing.JDialog implements SearchControlListener {
+public class SearchControlDialog extends javax.swing.JDialog implements SearchControlListener,
+    ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     private MetaObjectNodeServerSearch search;
+    private final ClientConnectionContext connectionContext;
 
     private SearchControlPanel pnlSearchCancel;
     private Color foregroundColor;
@@ -51,29 +55,35 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     /**
      * Creates new form SearchControlDialog.
      *
-     * @param  parent  DOCUMENT ME!
-     * @param  modal   DOCUMENT ME!
+     * @param  parent             DOCUMENT ME!
+     * @param  modal              DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public SearchControlDialog(final java.awt.Frame parent, final boolean modal) {
-        this(parent, modal, null);
+    public SearchControlDialog(final java.awt.Frame parent,
+            final boolean modal,
+            final ClientConnectionContext connectionContext) {
+        this(parent, modal, null, connectionContext);
     }
 
     /**
      * Creates new form SearchControlDialog.
      *
-     * @param  parent  DOCUMENT ME!
-     * @param  modal   DOCUMENT ME!
-     * @param  search  DOCUMENT ME!
+     * @param  parent             DOCUMENT ME!
+     * @param  modal              DOCUMENT ME!
+     * @param  search             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
     public SearchControlDialog(final java.awt.Frame parent,
             final boolean modal,
-            final MetaObjectNodeServerSearch search) {
+            final MetaObjectNodeServerSearch search,
+            final ClientConnectionContext connectionContext) {
         super(parent, modal);
+        this.search = search;
+        this.connectionContext = connectionContext;
 
         initComponents();
 
-        this.search = search;
-        pnlSearchCancel = new SearchControlPanel(this);
+        pnlSearchCancel = new SearchControlPanel(this, getConnectionContext());
         foregroundColor = lblMessage.getForeground();
         lblMessage.setForeground(lblMessage.getBackground());
         pnlControls.add(pnlSearchCancel);
@@ -340,5 +350,10 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
             };
 
         EventQueue.invokeLater(run);
+    }
+
+    @Override
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

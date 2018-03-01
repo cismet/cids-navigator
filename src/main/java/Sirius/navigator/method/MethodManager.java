@@ -52,7 +52,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
@@ -64,7 +64,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public class MethodManager implements ClientConnectionContextProvider {
+public class MethodManager {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -355,24 +355,26 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * destinationNode = parentNode.
      *
-     * @param   metaTree         DOCUMENT ME!
-     * @param   destinationNode  DOCUMENT ME!
-     * @param   sourceNode       DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   destinationNode    DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean updateNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
-            final DefaultMetaTreeNode sourceNode) {
+            final DefaultMetaTreeNode sourceNode,
+            final ClientConnectionContext connectionContext) {
         try {
             if (logger.isInfoEnabled()) {
                 logger.info("updateNode() updating node " + sourceNode); // NOI18N
             }
             // zuerst l\u00F6schen
-            SessionManager.getProxy().deleteNode(sourceNode.getNode(), getClientConnectionContext());
+            SessionManager.getProxy().deleteNode(sourceNode.getNode(), connectionContext);
 
             // dann neu einf\u00FCgen
-            this.addNode(metaTree, destinationNode, sourceNode);
+            this.addNode(metaTree, destinationNode, sourceNode, connectionContext);
 
             return true;
         } catch (Exception exp) {
@@ -397,27 +399,32 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   metaTree    DOCUMENT ME!
-     * @param   sourceNode  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean deleteNode(final MetaCatalogueTree metaTree, final DefaultMetaTreeNode sourceNode) {
-        return deleteNode(metaTree, sourceNode, true);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   metaTree      DOCUMENT ME!
-     * @param   sourceNode    DOCUMENT ME!
-     * @param   withQuestion  DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean deleteNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode sourceNode,
-            final boolean withQuestion) {
+            final ClientConnectionContext connectionContext) {
+        return deleteNode(metaTree, sourceNode, true, connectionContext);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaTree           DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   withQuestion       DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean deleteNode(final MetaCatalogueTree metaTree,
+            final DefaultMetaTreeNode sourceNode,
+            final boolean withQuestion,
+            final ClientConnectionContext connectionContext) {
         boolean ans = false;
 
         if (withQuestion) {
@@ -448,7 +455,7 @@ public class MethodManager implements ClientConnectionContextProvider {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                SessionManager.getProxy().deleteNode(sourceNode.getNode(), getClientConnectionContext());
+                SessionManager.getProxy().deleteNode(sourceNode.getNode(), connectionContext);
                 if (sourceNode.isObjectNode()) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("deleting object node's meta object"); // NOI18N
@@ -576,30 +583,34 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   metaTree         DOCUMENT ME!
-     * @param   destinationNode  DOCUMENT ME!
-     * @param   sourceNode       DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   destinationNode    DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean addNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
-            final DefaultMetaTreeNode sourceNode) {
-        return this.addOrLinkNode(metaTree, destinationNode, sourceNode, false);
+            final DefaultMetaTreeNode sourceNode,
+            final ClientConnectionContext connectionContext) {
+        return this.addOrLinkNode(metaTree, destinationNode, sourceNode, false, connectionContext);
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   metaTree         DOCUMENT ME!
-     * @param   destinationNode  DOCUMENT ME!
-     * @param   sourceNode       DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   destinationNode    DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean copyNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
-            final DefaultMetaTreeNode sourceNode) {
+            final DefaultMetaTreeNode sourceNode,
+            final ClientConnectionContext connectionContext) {
         if (logger.isInfoEnabled()) {
             logger.info("copy node " + sourceNode + " -> " + destinationNode);                                                                       // NOI18N
         }
@@ -645,13 +656,13 @@ public class MethodManager implements ClientConnectionContextProvider {
                                 .insertMetaObject(
                                     oldMetaObject,
                                     sourceNodeCopy.getDomain(),
-                                    getClientConnectionContext());
+                                    connectionContext);
 
                     // neues objekt zuweisen
                     ((ObjectTreeNode)sourceNodeCopy).setMetaObject(newMetaObject);
                 }
 
-                if (this.addNode(metaTree, destinationNode, sourceNodeCopy)) {
+                if (this.addNode(metaTree, destinationNode, sourceNodeCopy, connectionContext)) {
                     this.addTreeNode(metaTree, destinationNode, sourceNodeCopy);
                     return true;
                 }
@@ -677,15 +688,17 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   metaTree         DOCUMENT ME!
-     * @param   destinationNode  DOCUMENT ME!
-     * @param   sourceNode       DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   destinationNode    DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean moveNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
-            final DefaultMetaTreeNode sourceNode) {
+            final DefaultMetaTreeNode sourceNode,
+            final ClientConnectionContext connectionContext) {
         if (logger.isInfoEnabled()) {
             logger.info("move node " + sourceNode + " -> " + destinationNode);                                                                       // NOI18N
         }
@@ -722,11 +735,10 @@ public class MethodManager implements ClientConnectionContextProvider {
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
                 SessionManager.getProxy()
-                        .deleteLink(sourceParentNode.getNode(), sourceNode.getNode(), getClientConnectionContext());
+                        .deleteLink(sourceParentNode.getNode(), sourceNode.getNode(), connectionContext);
                 this.deleteTreeNode(metaTree, sourceNode);
 
-                SessionManager.getProxy()
-                        .addLink(destinationNode.getNode(), sourceNode.getNode(), getClientConnectionContext());
+                SessionManager.getProxy().addLink(destinationNode.getNode(), sourceNode.getNode(), connectionContext);
                 this.addTreeNode(metaTree, destinationNode, sourceNode);
                 // destinationNode.explore();
                 ComponentRegistry.getRegistry()
@@ -806,17 +818,19 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * Hilfsmethoden ...........................................................
      *
-     * @param   metaTree         DOCUMENT ME!
-     * @param   destinationNode  DOCUMENT ME!
-     * @param   sourceNode       DOCUMENT ME!
-     * @param   linkOnly         DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   destinationNode    DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   linkOnly           DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     private boolean addOrLinkNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
-            final boolean linkOnly) {
+            final boolean linkOnly,
+            final ClientConnectionContext connectionContext) {
         try {
             if (linkOnly) {
                 if (logger.isDebugEnabled()) {
@@ -826,8 +840,7 @@ public class MethodManager implements ClientConnectionContextProvider {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                SessionManager.getProxy()
-                        .addLink(destinationNode.getNode(), sourceNode.getNode(), getClientConnectionContext());
+                SessionManager.getProxy().addLink(destinationNode.getNode(), sourceNode.getNode(), connectionContext);
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -847,8 +860,7 @@ public class MethodManager implements ClientConnectionContextProvider {
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-                final Node node = SessionManager.getProxy()
-                            .addNode(sourceNode.getNode(), link, getClientConnectionContext());
+                final Node node = SessionManager.getProxy().addNode(sourceNode.getNode(), link, connectionContext);
                 node.setPermissions(destinationNode.getNode().getPermissions());
                 ComponentRegistry.getRegistry()
                         .getMainWindow()
@@ -883,15 +895,17 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   metaTree         DOCUMENT ME!
-     * @param   destinationNode  DOCUMENT ME!
-     * @param   sourceNode       DOCUMENT ME!
+     * @param   metaTree           DOCUMENT ME!
+     * @param   destinationNode    DOCUMENT ME!
+     * @param   sourceNode         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public boolean linkNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
-            final DefaultMetaTreeNode sourceNode) {
+            final DefaultMetaTreeNode sourceNode,
+            final ClientConnectionContext connectionContext) {
         if (logger.isInfoEnabled()) {
             logger.info("link node " + sourceNode + " -> " + destinationNode);                                                                       // NOI18N
         }
@@ -924,7 +938,7 @@ public class MethodManager implements ClientConnectionContextProvider {
             try {
                 // copy node
                 final DefaultMetaTreeNode sourceNodeCopy = (DefaultMetaTreeNode)CloneHelper.clone(sourceNode);
-                if (this.addOrLinkNode(metaTree, destinationNode, sourceNodeCopy, true)) {
+                if (this.addOrLinkNode(metaTree, destinationNode, sourceNodeCopy, true, connectionContext)) {
                     this.addTreeNode(metaTree, destinationNode, sourceNodeCopy);
                     return true;
                 }
@@ -1074,18 +1088,22 @@ public class MethodManager implements ClientConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   node        DOCUMENT ME!
-     * @param   permission  DOCUMENT ME!
-     * @param   userGroup   DOCUMENT ME!
+     * @param   node               DOCUMENT ME!
+     * @param   permission         DOCUMENT ME!
+     * @param   userGroup          DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private boolean checkPermission(final MetaObjectNode node, final Permission permission, final UserGroup userGroup) {
+    private boolean checkPermission(final MetaObjectNode node,
+            final Permission permission,
+            final UserGroup userGroup,
+            final ClientConnectionContext connectionContext) {
         boolean hasPermission = false;
         try {
             final String key = userGroup.getKey().toString();
             final MetaClass c = SessionManager.getProxy()
-                        .getMetaClass(node.getClassId(), node.getDomain(), getClientConnectionContext());
+                        .getMetaClass(node.getClassId(), node.getDomain(), connectionContext);
 
             // wenn MON dann editieren wenn Rechte am Knoten und and der Klasse
             hasPermission = c.getPermissions().hasPermission(key, permission);
@@ -1162,10 +1180,5 @@ public class MethodManager implements ClientConnectionContextProvider {
         }
 
         return attributeName;
-    }
-
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

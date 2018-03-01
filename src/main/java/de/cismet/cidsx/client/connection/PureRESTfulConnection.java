@@ -20,8 +20,6 @@ import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
-import Sirius.server.newuser.User;
-import Sirius.server.newuser.UserException;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -35,14 +33,11 @@ import java.awt.GraphicsEnvironment;
 import java.net.URI;
 import java.net.URL;
 
-import java.rmi.RemoteException;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.swing.Icon;
 
@@ -57,7 +52,7 @@ import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
@@ -81,7 +76,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   Pascal DihÃ© <pascal.dihe@cismet.de>
  * @version  1.0 2015/04/17
  */
-public class PureRESTfulConnection extends RESTfulConnection implements ClientConnectionContextProvider {
+public class PureRESTfulConnection extends RESTfulConnection {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -167,7 +162,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
         this.legacyConnector = createLegacyConnector(callserverURL, proxy, compressionEnabled);
 
         try {
-            this.getDomains(getClientConnectionContext());
+            this.getDomains(getConnectionContext());
         } catch (final Exception e) {
             final String message = "Could not connect cids PURE REST Service at '" + callserverURL + "' (proxy: "
                         + proxy + ")"; // NOI18N
@@ -305,7 +300,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .executeTask(
                             "testAction",
                             "SWITCHON",
-                            new PureRESTfulConnection().getClientConnectionContext(),
+                            new PureRESTfulConnection().getConnectionContext(),
                             (Object)null,
                             actionParameterTest);
             System.out.println(taskResult);
@@ -440,7 +435,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                                 lwmoQuery,
                                 lwmoRepresentationFields,
                                 lwmoRepresentationPattern,
-                                new PureRESTfulConnection().getClientConnectionContext());
+                                ClientConnectionContext.createDeprecated());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -462,7 +457,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                                 lwmoQuery,
                                 lwmoRepresentationFields,
                                 lwmoRepresentationPattern,
-                                new PureRESTfulConnection().getClientConnectionContext());
+                                ClientConnectionContext.createDeprecated());
 
             if (lmoBinary.length != lmoRest.length) {
                 throw new Exception("lmoBinary.length != lmoRest.length");
@@ -591,7 +586,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .getMetaObjectByQuery(
                             SessionManager.getSession().getUser(),
                             moQuery,
-                            new PureRESTfulConnection().getClientConnectionContext());
+                            new PureRESTfulConnection().getConnectionContext());
             final MetaObject metaObjectBinary = metaObjectsBinary[0];
             final CidsBean cidsBeanBinary = metaObjectBinary.getBean();
             final CidsBeanInfo cidsBeanInfoBinary = cidsBeanBinary.getCidsBeanInfo();
@@ -610,7 +605,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .getMetaObjectByQuery(
                             SessionManager.getSession().getUser(),
                             moQuery,
-                            new PureRESTfulConnection().getClientConnectionContext());
+                            new PureRESTfulConnection().getConnectionContext());
             final MetaObject metaObjectRest = metaObjectRests[0];
             final CidsBean cidsBeanRest = metaObjectRest.getBean();
             // TEST updateMetaObject ...........................................
@@ -712,7 +707,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .getCallServerService()
                         .getMetaObjectNode(SessionManager.getSession().getUser(),
                             nodeQuery,
-                            new PureRESTfulConnection().getClientConnectionContext());
+                            new PureRESTfulConnection().getConnectionContext());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -730,7 +725,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .getCallServerService()
                         .getMetaObjectNode(SessionManager.getSession().getUser(),
                             nodeQuery,
-                            new PureRESTfulConnection().getClientConnectionContext());
+                            new PureRESTfulConnection().getConnectionContext());
 
             final int nodesArrayLength = (nodesBinary.length > 3) ? 3 : nodesBinary.length;
 
@@ -848,7 +843,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .getClassByTableName(SessionManager.getSession().getUser(),
                             "tag",
                             "SWITCHON",
-                            new PureRESTfulConnection().getClientConnectionContext());
+                            new PureRESTfulConnection().getConnectionContext());
 //            final MetaClass tagClassBinary = SessionManager.getConnection().getCallServerService()
 //                     .getClass(SessionManager.getSession().getUser(), 6, "SWITCHON");
 //            System.out.println(".getKey(): " + tagClassBinary.getKey());
@@ -863,7 +858,7 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
                         .getClassByTableName(SessionManager.getSession().getUser(),
                             "TAG",
                             "SWITCHON",
-                            new PureRESTfulConnection().getClientConnectionContext());
+                            new PureRESTfulConnection().getConnectionContext());
 
             System.out.println("tagClassBinary.equals(tagClassRest): "
                         + tagClassBinary.equals(tagClassRest));
@@ -1109,10 +1104,5 @@ public class PureRESTfulConnection extends RESTfulConnection implements ClientCo
             LOG.fatal(ex.getMessage(), ex);
             System.exit(1);
         }
-    }
-
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import java.util.Comparator;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -43,11 +43,32 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class MetaObjectNodeComparator implements Comparator<Node>, ClientConnectionContextProvider {
+public class MetaObjectNodeComparator implements Comparator<Node>, ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     protected final Logger LOG = Logger.getLogger(MetaObjectNodeComparator.class);
+
+    private final ClientConnectionContext connectionContext;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new MetaObjectNodeComparator object.
+     */
+    @Deprecated
+    public MetaObjectNodeComparator() {
+        this(ClientConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new MetaObjectNodeComparator object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public MetaObjectNodeComparator(final ClientConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -80,7 +101,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ClientConnect
                                         ((MetaObjectNode)o1).getObjectId(),
                                         o1.getClassId(),
                                         o1.getDomain(),
-                                        getClientConnectionContext());
+                                        getConnectionContext());
                     mon1.setObject(mo1);
                     mon1.setName(mo1.toString());
                 }
@@ -99,7 +120,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ClientConnect
                                         ((MetaObjectNode)o2).getObjectId(),
                                         o2.getClassId(),
                                         o2.getDomain(),
-                                        getClientConnectionContext());
+                                        getConnectionContext());
                     mon2.setObject(mo2);
                     mon2.setName(mo2.toString());
                 }
@@ -116,7 +137,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ClientConnect
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

@@ -24,7 +24,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -32,7 +32,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class MetaObjectCache implements ClientConnectionContextProvider {
+public class MetaObjectCache implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -46,14 +46,17 @@ public class MetaObjectCache implements ClientConnectionContextProvider {
     private final transient Map<Integer, SoftReference<MetaObject[]>> cache;
     private final transient Map<Integer, ReentrantReadWriteLock> locks;
 
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new MetaSearchCache object.
      */
     private MetaObjectCache() {
-        cache = new HashMap<Integer, SoftReference<MetaObject[]>>();
-        locks = new HashMap<Integer, ReentrantReadWriteLock>();
+        cache = new HashMap<>();
+        locks = new HashMap<>();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -299,10 +302,10 @@ public class MetaObjectCache implements ClientConnectionContextProvider {
                                         .getMetaObjectByQuery(SessionManager.getSession().getUser(),
                                                 query,
                                                 domain,
-                                                getClientConnectionContext());
+                                                getConnectionContext());
                         } else {
                             cachedObjects = SessionManager.getProxy()
-                                        .getMetaObjectByQuery(iQuery, 0, getClientConnectionContext());
+                                        .getMetaObjectByQuery(iQuery, 0, getConnectionContext());
                         }
                         cache.put(qHash, new SoftReference<MetaObject[]>(cachedObjects));
                     } catch (final ConnectionException ex) {
@@ -349,8 +352,8 @@ public class MetaObjectCache implements ClientConnectionContextProvider {
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

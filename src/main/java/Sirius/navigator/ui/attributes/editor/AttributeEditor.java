@@ -36,7 +36,7 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -46,7 +46,7 @@ import de.cismet.tools.CismetThreadPool;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar, ClientConnectionContextProvider {
+public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar, ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -56,6 +56,9 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     private Object treeNode = null;
     private ComplexEditor editor = null;
     private Object commitBlocker = new Object();
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private Sirius.navigator.ui.attributes.AttributeTree attributeTree;
     private javax.swing.JButton cancelButton;
@@ -277,7 +280,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                                     .insertMetaObject(
                                                             editedMetaObject,
                                                             objectTreeNode.getDomain(),
-                                                            getClientConnectionContext());
+                                                            getConnectionContext());
 
                                         // neues objekt zuweisen
                                         objectTreeNode.setMetaObject(savedMetaObject);
@@ -289,7 +292,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                                     .addNode(
                                                         objectTreeNode.getNode(),
                                                         link,
-                                                        getClientConnectionContext());
+                                                        getConnectionContext());
 
                                         // parent permissions zuweisen...
                                         node.setPermissions(
@@ -311,7 +314,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
                                                 .updateMetaObject(
                                                     editedMetaObject,
                                                     objectTreeNode.getDomain(),
-                                                    getClientConnectionContext());
+                                                    getConnectionContext());
                                         savedMetaObject = editedMetaObject;
 
                                         // neues altes objekt zuweisen
@@ -600,8 +603,8 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

@@ -46,7 +46,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -55,7 +55,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @deprecated  Password is now changed via Extras -> Optionen (See {@link PasswordOptionsDialog})
  */
 @Deprecated
-public class PasswordDialog extends JDialog implements ClientConnectionContextProvider {
+public class PasswordDialog extends JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -68,6 +68,9 @@ public class PasswordDialog extends JDialog implements ClientConnectionContextPr
     private JPasswordField password_old;
     private JPasswordField password_new;
     private JPasswordField password_again;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -198,8 +201,8 @@ public class PasswordDialog extends JDialog implements ClientConnectionContextPr
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -251,7 +254,7 @@ public class PasswordDialog extends JDialog implements ClientConnectionContextPr
                                         SessionManager.getSession().getUser(),
                                         new String(password_old.getPassword()),
                                         new String(password_new.getPassword()),
-                                        getClientConnectionContext())) {
+                                        getConnectionContext())) {
                             // _TA_JOptionPane.showMessageDialog(null, "Ihr Kennwort konnte nicht geaendert werden.",
                             // "Kennwort aendern", JOptionPane.ERROR_MESSAGE);
                             JOptionPane.showMessageDialog(

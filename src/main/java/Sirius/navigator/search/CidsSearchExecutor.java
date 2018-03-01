@@ -58,21 +58,49 @@ public final class CidsSearchExecutor {
      *
      * @param  search  DOCUMENT ME!
      */
+    @Deprecated
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search) {
-        searchAndDisplayResultsWithDialog(search, false);
+        searchAndDisplayResultsWithDialog(search, ClientConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  search             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final ClientConnectionContext connectionContext) {
+        searchAndDisplayResultsWithDialog(search, false, connectionContext);
     }
 
     /**
      * DOCUMENT ME!
      *
      * @param  search      DOCUMENT ME!
-     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
-     *                     sorting order is wished.
+     * @param  simpleSort  DOCUMENT ME!
      */
+    @Deprecated
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final boolean simpleSort) {
+        searchAndDisplayResultsWithDialog(search, simpleSort, ClientConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  search             DOCUMENT ME!
+     * @param  simpleSort         if true, sorts the search results alphabetically. Usually set to false, as a more
+     *                            specific sorting order is wished.
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final boolean simpleSort,
+            final ClientConnectionContext connectionContext) {
         if (searchControlDialog == null) {
-            searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
+            searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(),
+                    true,
+                    connectionContext);
             searchControlDialog.pack();
         }
 
@@ -94,12 +122,14 @@ public final class CidsSearchExecutor {
      * @param   search                 DOCUMENT ME!
      * @param   listener               DOCUMENT ME!
      * @param   searchResultsListener  DOCUMENT ME!
+     * @param   connectionContext      DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener listener,
-            final PropertyChangeListener searchResultsListener) {
+            final PropertyChangeListener searchResultsListener,
+            final ClientConnectionContext connectionContext) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 PropertyChangeListener cancelListener = null;
@@ -175,19 +205,22 @@ public final class CidsSearchExecutor {
      * @param   searchListener              DOCUMENT ME!
      * @param   searchResultsTreeListener   DOCUMENT ME!
      * @param   suppressEmptyResultMessage  DOCUMENT ME!
+     * @param   connectionContext           DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
-            final boolean suppressEmptyResultMessage) {
+            final boolean suppressEmptyResultMessage,
+            final ClientConnectionContext connectionContext) {
         return searchAndDisplayResults(
                 search,
                 searchListener,
                 searchResultsTreeListener,
                 suppressEmptyResultMessage,
-                false);
+                false,
+                connectionContext);
     }
 
     /**
@@ -205,6 +238,7 @@ public final class CidsSearchExecutor {
      *                                      or not.
      * @param   simpleSort                  if true, sorts the search results alphabetically. Usually set to false, as a
      *                                      more specific sorting order is wished.
+     * @param   connectionContext           DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -212,7 +246,8 @@ public final class CidsSearchExecutor {
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage,
-            final boolean simpleSort) {
+            final boolean simpleSort,
+            final ClientConnectionContext connectionContext) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 @Override

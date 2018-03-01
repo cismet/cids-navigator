@@ -79,7 +79,7 @@ import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
@@ -1063,8 +1063,8 @@ public class CidsObjectEditorFactory {
                                         OBJECTID,
                                         CLASSID,
                                         domain,
-                                        getClientConnectionContext());    // meta.getMetaObject(u, 1, AAPERSON_CLASSID,
-                                                                          // domain);
+                                        getConnectionContext()); // meta.getMetaObject(u, 1, AAPERSON_CLASSID,
+                                                                 // domain);
 
                         log.fatal(MetaObject.getDebugString());
 
@@ -1089,9 +1089,9 @@ public class CidsObjectEditorFactory {
                                     try {
                                         if (ed instanceof WrappedComponent) {
                                             ((DisposableCidsBeanStore)((WrappedComponent)ed).getOriginalComponent())
-                                                    .getCidsBean().persist();
+                                                    .getCidsBean().persist(getConnectionContext());
                                         } else {
-                                            ((DisposableCidsBeanStore)ed).getCidsBean().persist();
+                                            ((DisposableCidsBeanStore)ed).getCidsBean().persist(getConnectionContext());
                                         }
                                     } catch (Exception ex) {
                                         ex.printStackTrace();
@@ -1143,7 +1143,7 @@ public class CidsObjectEditorFactory {
                                                     OBJECTID,
                                                     CLASSID,
                                                     domain,
-                                                    getClientConnectionContext()).getBean());
+                                                    getConnectionContext()).getBean());
                                             abce.getBindingGroup().unbind();
                                             abce.getBindingGroup().bind();
                                         }
@@ -1172,7 +1172,7 @@ public class CidsObjectEditorFactory {
      *
      * @return  DOCUMENT ME!
      */
-    public static ClientConnectionContext getClientConnectionContext() {
+    public static ClientConnectionContext getConnectionContext() {
         return ClientConnectionContext.create(CidsObjectEditorFactory.class.getSimpleName());
     }
 }

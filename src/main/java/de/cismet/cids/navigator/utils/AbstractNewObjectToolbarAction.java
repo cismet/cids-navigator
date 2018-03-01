@@ -41,7 +41,8 @@ import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.tools.Static2DTools;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -49,13 +50,15 @@ import de.cismet.tools.Static2DTools;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public abstract class AbstractNewObjectToolbarAction extends AbstractAction implements CidsClientToolbarItem {
+public abstract class AbstractNewObjectToolbarAction extends AbstractAction implements CidsClientToolbarItem,
+    ClientConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
     ImageIcon add = new ImageIcon(this.getClass().getResource("/Sirius/navigator/resource/img/bullet_add.png"));
     private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private CidsBean cb = null;
+    private ClientConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -128,7 +131,7 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
                     -1,
                     null,
                     false);
-            final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(metaObjectNode);
+            final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(metaObjectNode, getConnectionContext());
             ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
             ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaTreeNode);
         } catch (Exception ex) {
@@ -155,4 +158,14 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
      * @return  DOCUMENT ME!
      */
     public abstract String getTooltipString();
+
+    @Override
+    public final void setConnectionContext(final ClientConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
+
+    @Override
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 }

@@ -15,7 +15,7 @@ import Sirius.server.newuser.User;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
 
 import de.cismet.cids.utils.CidsBeanPersistService;
 
@@ -26,7 +26,11 @@ import de.cismet.cids.utils.CidsBeanPersistService;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsBeanPersistService.class)
-public class NavigatorCidsBeanPersistService implements CidsBeanPersistService, ClientConnectionContextProvider {
+public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
+
+    //~ Instance fields --------------------------------------------------------
+
+    private ClientConnectionContext connectionContext;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -37,7 +41,7 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService, 
         final User user = SessionManager.getSession().getUser();
 
         if (metaObject.getStatus() == MetaObject.MODIFIED) {
-            SessionManager.getConnection().updateMetaObject(user, metaObject, domain, getClientConnectionContext());
+            SessionManager.getConnection().updateMetaObject(user, metaObject, domain, getConnectionContext());
 
             return SessionManager.getConnection()
                         .getMetaObject(
@@ -45,15 +49,15 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService, 
                                 metaObject.getID(),
                                 metaObject.getClassID(),
                                 domain,
-                                getClientConnectionContext())
+                                getConnectionContext())
                         .getBean();
         } else if (metaObject.getStatus() == MetaObject.TO_DELETE) {
-            SessionManager.getConnection().deleteMetaObject(user, metaObject, domain, getClientConnectionContext());
+            SessionManager.getConnection().deleteMetaObject(user, metaObject, domain, getConnectionContext());
 
             return null;
         } else if (metaObject.getStatus() == MetaObject.NEW) {
             final MetaObject mo = SessionManager.getConnection()
-                        .insertMetaObject(user, metaObject, domain, getClientConnectionContext());
+                        .insertMetaObject(user, metaObject, domain, getConnectionContext());
 
             // mo == null shall never occur
             assert mo != null : "illegal state: insert metaobject returned null"; // NOI18N
@@ -66,7 +70,12 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService, 
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
+    @Override
+    public void setClientConnectionContext(final ClientConnectionContext clientconnectionContext) {
+        this.connectionContext = clientconnectionContext;
     }
 }

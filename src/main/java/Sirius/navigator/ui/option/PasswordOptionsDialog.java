@@ -24,7 +24,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
@@ -39,11 +39,15 @@ import de.cismet.lookupoptions.options.SecurityOptionsCategory;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class PasswordOptionsDialog extends AbstractOptionsPanel implements ClientConnectionContextProvider {
+public class PasswordOptionsDialog extends AbstractOptionsPanel implements ClientConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(PasswordOptionsDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass().getSimpleName());
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
     private javax.swing.Box.Filler filler1;
@@ -291,7 +295,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
                                     session.getUser(),
                                     String.valueOf(pwdOld),
                                     String.valueOf(pwdNew),
-                                    getClientConnectionContext());
+                                    getConnectionContext());
 
                             if (success) {
                                 JOptionPane.showMessageDialog(
@@ -349,7 +353,12 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
+    @Override
+    public void setConnectionContext(final ClientConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
     }
 }

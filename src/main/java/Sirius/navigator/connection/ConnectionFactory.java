@@ -14,9 +14,6 @@ import Sirius.server.newuser.UserException;
 
 import org.apache.log4j.Logger;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
-
 import de.cismet.netutil.Proxy;
 
 /**
@@ -26,7 +23,7 @@ import de.cismet.netutil.Proxy;
  * @author   martin.scholl@cismet.de
  * @version  1.0 12/22/2002
  */
-public class ConnectionFactory implements ClientConnectionContextProvider {
+public class ConnectionFactory {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -361,10 +358,5 @@ public class ConnectionFactory implements ClientConnectionContextProvider {
             final String connectionProxyHandlerClassName,
             final ConnectionInfo connectionInfo) throws ConnectionException, UserException {
         return createProxy(connectionClassName, connectionProxyHandlerClassName, connectionInfo, true, false);
-    }
-
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

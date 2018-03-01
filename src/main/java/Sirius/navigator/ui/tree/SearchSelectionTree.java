@@ -41,6 +41,10 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -57,19 +61,22 @@ public final class SearchSelectionTree extends MetaCatalogueTree {
     /**
      * Creates a new SearchSelectionTree object.
      *
-     * @param  rootNodes  DOCUMENT ME!
+     * @param  rootNodes          DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public SearchSelectionTree(final Node[] rootNodes) {
-        this(new RootTreeNode(rootNodes, new SelectionTreeNodeLoader()));
+    public SearchSelectionTree(final Node[] rootNodes, final ClientConnectionContext connectionContext) {
+        this(new RootTreeNode(rootNodes, new SelectionTreeNodeLoader(connectionContext), connectionContext),
+            connectionContext);
     }
 
     /**
      * Creates a new SearchSelectionTree object.
      *
-     * @param  rootNode  DOCUMENT ME!
+     * @param  rootNode           DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public SearchSelectionTree(final RootTreeNode rootNode) {
-        super(rootNode, false, true, 1);
+    public SearchSelectionTree(final RootTreeNode rootNode, final ClientConnectionContext connectionContext) {
+        super(rootNode, false, true, 1, connectionContext);
 
         try {
             if (LOG.isDebugEnabled()) {
@@ -441,11 +448,26 @@ public final class SearchSelectionTree extends MetaCatalogueTree {
  *
  * @version  $Revision$, $Date$
  */
-final class SelectionTreeNodeLoader implements TreeNodeLoader {
+final class SelectionTreeNodeLoader implements TreeNodeLoader, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(SelectionTreeNodeLoader.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ClientConnectionContext connectionContext;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new SelectionTreeNodeLoader object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    SelectionTreeNodeLoader(final ClientConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -469,7 +491,7 @@ final class SelectionTreeNodeLoader implements TreeNodeLoader {
 
         for (int i = 0; i < children.length; i++) {
             if (children[i] instanceof MetaNode) {
-                childNode = new PureTreeNode((MetaNode)children[i]);
+                childNode = new PureTreeNode((MetaNode)children[i], getConnectionContext());
                 childNode.setAllowsChildren(checkForChildren(childNode));
                 childNode.setSelected(node.isSelected());
                 childNode.setEnabled(!childNode.isLeaf());
@@ -481,7 +503,7 @@ final class SelectionTreeNodeLoader implements TreeNodeLoader {
                     LOG.debug("[SelectionTreeNodeLoader] PureNode Children added"); // NOI18N
                 }
             } else if (children[i] instanceof MetaClassNode) {
-                childNode = new ClassTreeNode((MetaClassNode)children[i]);
+                childNode = new ClassTreeNode((MetaClassNode)children[i], getConnectionContext());
                 childNode.setAllowsChildren(checkForChildren(childNode));
                 childNode.setSelected(node.isSelected());
                 node.add(childNode);
@@ -565,5 +587,10 @@ final class SelectionTreeNodeLoader implements TreeNodeLoader {
             }
         }
         return false;
+    }
+
+    @Override
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

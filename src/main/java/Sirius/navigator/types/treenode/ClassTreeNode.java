@@ -19,20 +19,20 @@ import org.apache.log4j.Logger;
 import javax.swing.ImageIcon;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class ClassTreeNode extends DefaultMetaTreeNode implements ClientConnectionContextProvider {
+public class ClassTreeNode extends DefaultMetaTreeNode implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(ClassTreeNode.class);
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
 
@@ -43,29 +43,26 @@ public class ClassTreeNode extends DefaultMetaTreeNode implements ClientConnecti
     /**
      * Creates a new ClassTreeNode object.
      *
-     * @param  metaClassNode  DOCUMENT ME!
+     * @param  metaClassNode      DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public ClassTreeNode(final MetaClassNode metaClassNode) {
-        super(metaClassNode);
+    public ClassTreeNode(final MetaClassNode metaClassNode, final ClientConnectionContext connectionContext) {
+        super(metaClassNode, connectionContext);
 
         try {
             final MetaClass metaClass = this.getMetaClass();
             if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = resource.getIcon("ClassNodeIcon.gif"); // NOI18N
+                this.nodeIcon = RESOURCE.getIcon("ClassNodeIcon.gif"); // NOI18N
             }
         } catch (Exception exp) {
-            this.nodeIcon = resource.getIcon("ClassNodeIcon.gif");     // NOI18N
+            this.nodeIcon = RESOURCE.getIcon("ClassNodeIcon.gif");     // NOI18N
         }
     }
 
     //~ Methods ----------------------------------------------------------------
 
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
-    }
     /**
      * DefaultMetaTreeNode Methods -----------------------------------------------
      *
@@ -187,7 +184,7 @@ public class ClassTreeNode extends DefaultMetaTreeNode implements ClientConnecti
      */
     public final MetaClass getMetaClass() throws Exception {
         return SessionManager.getProxy()
-                    .getMetaClass(this.getMetaClassNode().getClassId(), this.getDomain(), getClientConnectionContext());
+                    .getMetaClass(this.getMetaClassNode().getClassId(), this.getDomain(), getConnectionContext());
     }
 
     /**

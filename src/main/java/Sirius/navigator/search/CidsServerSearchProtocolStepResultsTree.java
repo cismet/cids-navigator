@@ -9,6 +9,8 @@ package Sirius.navigator.search;
 
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+
 /**
  * DOCUMENT ME!
  *
@@ -22,20 +24,26 @@ public class CidsServerSearchProtocolStepResultsTree extends SearchResultsTree {
     /**
      * Creates a new ProtocolResultsTree object.
      *
+     * @param   connectionContext  DOCUMENT ME!
+     *
      * @throws  Exception  DOCUMENT ME!
      */
-    public CidsServerSearchProtocolStepResultsTree() throws Exception {
+    public CidsServerSearchProtocolStepResultsTree(final ClientConnectionContext connectionContext) throws Exception {
+        super(connectionContext);
     }
 
     /**
      * Creates a new WorkingSpaceTree object.
      *
-     * @param   useThread       DOCUMENT ME!
-     * @param   maxThreadCount  DOCUMENT ME!
+     * @param   useThread          DOCUMENT ME!
+     * @param   maxThreadCount     DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public CidsServerSearchProtocolStepResultsTree(final boolean useThread, final int maxThreadCount) throws Exception {
-        super(useThread, maxThreadCount);
+    public CidsServerSearchProtocolStepResultsTree(final boolean useThread,
+            final int maxThreadCount,
+            final ClientConnectionContext connectionContext) throws Exception {
+        super(useThread, maxThreadCount, connectionContext);
     }
 }

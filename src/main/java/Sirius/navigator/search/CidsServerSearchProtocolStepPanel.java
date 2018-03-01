@@ -22,6 +22,9 @@ import java.util.List;
 
 import javax.swing.JLabel;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
 
 /**
@@ -30,10 +33,14 @@ import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel<CidsServerSearchProtocolStep> {
+public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel<CidsServerSearchProtocolStep>
+        implements ConnectionContextProvider {
 
-//    private static final Map<String, ImageIcon> ICON_MAP = new HashMap<String, ImageIcon>();
+    //~ Instance fields --------------------------------------------------------
 
+// private static final Map<String, ImageIcon> ICON_MAP = new HashMap<String, ImageIcon>();
+
+    private final ClientConnectionContext connectionContext;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -50,16 +57,21 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      * konstruktor ohne parameter wird für gui designer gebraucht, wenn dieses panel in ein anderes benutzt werden soll.
      */
     public CidsServerSearchProtocolStepPanel() {
-        this(new CidsServerSearchProtocolStepImpl(null, new ArrayList<MetaObjectNode>()));
+        this(new CidsServerSearchProtocolStepImpl(null, new ArrayList<MetaObjectNode>()),
+            ClientConnectionContext.createDeprecated());
     }
 
     /**
      * Creates new form CidsSearchProtocolStepPanel.
      *
      * @param  cidsSearchProtocolStep  DOCUMENT ME!
+     * @param  connectionContext       DOCUMENT ME!
      */
-    public CidsServerSearchProtocolStepPanel(final CidsServerSearchProtocolStep cidsSearchProtocolStep) {
+    public CidsServerSearchProtocolStepPanel(final CidsServerSearchProtocolStep cidsSearchProtocolStep,
+            final ClientConnectionContext connectionContext) {
         super(cidsSearchProtocolStep);
+        this.connectionContext = connectionContext;
+
         initComponents();
 
         jXHyperlink2.setVisible(cidsSearchProtocolStep.isReExecuteSearchEnabled());
@@ -72,7 +84,9 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
             final JLabel dummy = (JLabel)protocolResultsTree1.getCellRenderer()
                         .getTreeCellRendererComponent(
                                 protocolResultsTree1,
-                                new ObjectTreeNode((MetaObjectNode)protocolResultsTree1.getResultNodes().get(0)),
+                                new ObjectTreeNode(
+                                    (MetaObjectNode)protocolResultsTree1.getResultNodes().get(0),
+                                    getConnectionContext()),
                                 false,
                                 false,
                                 false,
@@ -124,44 +138,44 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
         jPanel2 = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         try {
-            protocolResultsTree1 = new Sirius.navigator.search.CidsServerSearchProtocolStepResultsTree();
+            protocolResultsTree1 = new Sirius.navigator.search.CidsServerSearchProtocolStepResultsTree(
+                    getConnectionContext());
+            jXHyperlink3 = new org.jdesktop.swingx.JXHyperlink();
+            jXHyperlink2 = new org.jdesktop.swingx.JXHyperlink();
+
+            setLayout(new java.awt.GridBagLayout());
+
+            org.openide.awt.Mnemonics.setLocalizedText(
+                jXHyperlink1,
+                org.openide.util.NbBundle.getMessage(
+                    CidsServerSearchProtocolStepPanel.class,
+                    "CidsServerSearchProtocolStepPanel.jXHyperlink1.text_hide_multi")); // NOI18N
+            jXHyperlink1.addActionListener(new java.awt.event.ActionListener() {
+
+                    @Override
+                    public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                        jXHyperlink1ActionPerformed(evt);
+                    }
+                });
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 0;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
+            add(jXHyperlink1, gridBagConstraints);
+
+            jPanel1.setLayout(new java.awt.GridBagLayout());
+            gridBagConstraints = new java.awt.GridBagConstraints();
+            gridBagConstraints.gridx = 1;
+            gridBagConstraints.gridy = 0;
+            gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+            gridBagConstraints.weightx = 1.0;
+            add(jPanel1, gridBagConstraints);
+
+            jPanel2.setLayout(new java.awt.GridBagLayout());
         } catch (java.lang.Exception e1) {
             e1.printStackTrace();
         }
-        jXHyperlink3 = new org.jdesktop.swingx.JXHyperlink();
-        jXHyperlink2 = new org.jdesktop.swingx.JXHyperlink();
-
-        setLayout(new java.awt.GridBagLayout());
-
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jXHyperlink1,
-            org.openide.util.NbBundle.getMessage(
-                CidsServerSearchProtocolStepPanel.class,
-                "CidsServerSearchProtocolStepPanel.jXHyperlink1.text_hide_multi")); // NOI18N
-        jXHyperlink1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jXHyperlink1ActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.LINE_START;
-        add(jXHyperlink1, gridBagConstraints);
-
-        jPanel1.setLayout(new java.awt.GridBagLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.weightx = 1.0;
-        add(jPanel1, gridBagConstraints);
-
-        jPanel2.setLayout(new java.awt.GridBagLayout());
-
         jScrollPane2.setViewportView(protocolResultsTree1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -326,4 +340,9 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
     private void jXHyperlink3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink3ActionPerformed
         loadSearchResultsIntoTree();
     }                                                                                //GEN-LAST:event_jXHyperlink3ActionPerformed
+
+    @Override
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 }

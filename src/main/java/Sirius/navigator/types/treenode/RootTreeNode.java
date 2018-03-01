@@ -23,6 +23,10 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeModel;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -42,11 +46,13 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
     /**
      * Creates a new RootTreeNode object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public RootTreeNode() // throws Exception
+    public RootTreeNode(final ClientConnectionContext connectionContext) // throws Exception
     {
-        super(null);
-        this.treeNodeLoader = new DefaultTreeNodeLoader();
+        super(null, connectionContext);
+        this.treeNodeLoader = new DefaultTreeNodeLoader(connectionContext);
     }
 
     /**
@@ -54,20 +60,24 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      * Mit diesem Konstruktor ist es also moeglich einen kompletten Baum in einen bestehenden Baum einzuhaengen.<br>
      * Als RootNode sollte er nicht angezeigt werden. (JTree.setRootVisible(false);)
      *
-     * @param  topNodes  ein Array von Nodes
+     * @param  topNodes           ein Array von Nodes
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public RootTreeNode(final Node[] topNodes) {
-        this(topNodes, new DefaultTreeNodeLoader());
+    public RootTreeNode(final Node[] topNodes, final ClientConnectionContext connectionContext) {
+        this(topNodes, new DefaultTreeNodeLoader(connectionContext), connectionContext);
     }
 
     /**
      * Creates a new RootTreeNode object.
      *
-     * @param  topNodes        DOCUMENT ME!
-     * @param  treeNodeLoader  DOCUMENT ME!
+     * @param  topNodes           DOCUMENT ME!
+     * @param  treeNodeLoader     DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public RootTreeNode(final Node[] topNodes, final TreeNodeLoader treeNodeLoader) {
-        super(null);
+    public RootTreeNode(final Node[] topNodes,
+            final TreeNodeLoader treeNodeLoader,
+            final ClientConnectionContext connectionContext) {
+        super(null, connectionContext);
         this.treeNodeLoader = treeNodeLoader;
         this.setAllowsChildren(true);
 
@@ -210,7 +220,22 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      *
      * @version  $Revision$, $Date$
      */
-    private static final class DefaultTreeNodeLoader implements TreeNodeLoader {
+    private static final class DefaultTreeNodeLoader implements TreeNodeLoader, ConnectionContextProvider {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final ClientConnectionContext connectionContext;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new DefaultTreeNodeLoader object.
+         *
+         * @param  connectionContext  DOCUMENT ME!
+         */
+        DefaultTreeNodeLoader(final ClientConnectionContext connectionContext) {
+            this.connectionContext = connectionContext;
+        }
 
         //~ Methods ------------------------------------------------------------
 
@@ -246,7 +271,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
             for (int i = 0; i < children.length; i++) {
                 if (children[i] instanceof MetaNode) {
-                    final PureTreeNode iPTN = new PureTreeNode((MetaNode)children[i]);
+                    final PureTreeNode iPTN = new PureTreeNode((MetaNode)children[i], getConnectionContext());
 
                     final Runnable r = new Runnable() {
 
@@ -263,7 +288,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
                     explored &= children[i].isValid();
                 } else if (children[i] instanceof MetaClassNode) {
-                    final ClassTreeNode iCTN = new ClassTreeNode((MetaClassNode)children[i]);
+                    final ClassTreeNode iCTN = new ClassTreeNode((MetaClassNode)children[i], getConnectionContext());
 
                     final Runnable r = new Runnable() {
 
@@ -280,7 +305,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
                     explored &= children[i].isValid();
                 } else if (children[i] instanceof MetaObjectNode) {
-                    final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode)children[i]);
+                    final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode)children[i], getConnectionContext());
                     // getMetaobject aufrufen, damit das MetaObject nicht erst im CellRenderer des MetaCatalogueTree vom
                     // Server geholt wird
 
@@ -332,6 +357,11 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
             }
 
             return explored;
+        }
+
+        @Override
+        public ClientConnectionContext getConnectionContext() {
+            return connectionContext;
         }
     }
 }

@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.builtin.QueryEditorCountStatement;
 
@@ -44,9 +44,7 @@ import de.cismet.cids.server.search.builtin.QueryEditorCountStatement;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = QuerySearchMethod.class)
-public class SearchQuerySearchMethod implements QuerySearchMethod,
-    PropertyChangeListener,
-    ClientConnectionContextProvider {
+public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChangeListener, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -58,6 +56,9 @@ public class SearchQuerySearchMethod implements QuerySearchMethod,
     private boolean searching = false;
     private SwingWorker<Node[], Void> searchThread;
     private SwingWorker<Long, Void> searchCountThread;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Methods ----------------------------------------------------------------
 
@@ -99,7 +100,8 @@ public class SearchQuerySearchMethod implements QuerySearchMethod,
                     this,
                     this,
                     false,
-                    true);
+                    true,
+                    getConnectionContext());
 
             if (querySearch.getPanginationPanel().getParent() != null) {
                 searchCountThread = new SwingWorker<Long, Void>() {
@@ -113,7 +115,7 @@ public class SearchQuerySearchMethod implements QuerySearchMethod,
                                                     SessionManager.getSession().getUser().getDomain(),
                                                     querySearch.getMetaClass().getTableName(),
                                                     querySearch.getWhereCause()),
-                                                getClientConnectionContext());
+                                                getConnectionContext());
                             return result.get(0);
                         }
 
@@ -206,7 +208,7 @@ public class SearchQuerySearchMethod implements QuerySearchMethod,
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

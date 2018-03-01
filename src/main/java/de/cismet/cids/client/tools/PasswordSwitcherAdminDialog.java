@@ -35,7 +35,7 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.server.actions.PasswordSwitcherAdminAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -63,7 +63,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
+public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -79,6 +79,9 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
     private final Timer timer = new Timer();
     private String username = null;
     private CountDownTask countDownTask;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
@@ -373,7 +376,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                     .executeTask(
                         PasswordSwitcherAdminAction.TASK_NAME,
                         "WUNDA_BLAU",
-                        getClientConnectionContext(),
+                        getConnectionContext(),
                         (Object)null,
                         paramLoginName,
                         paramRecoveryTimeout);
@@ -411,8 +414,8 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

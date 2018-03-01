@@ -44,7 +44,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch;
@@ -58,7 +58,7 @@ import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch
 public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     MetaClassStore,
     Serializable,
-    ClientConnectionContextProvider {
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -87,13 +87,25 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     private MetaClass metaClass = null;
     private String nullValueRepresentation = "-"; // NOI18N
 
+    private final ClientConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new FastBindableReferenceCombo object.
      */
+    @Deprecated
     public FastBindableReferenceCombo() {
-        this("%1$2s", new String[] { "NAME" });
+        this(ClientConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public FastBindableReferenceCombo(final ClientConnectionContext connectionContext) {
+        this("%1$2s", new String[] { "NAME" }, connectionContext);
     }
 
     /**
@@ -102,8 +114,21 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
      * @param  representation        DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
      */
+    @Deprecated
     public FastBindableReferenceCombo(final String representation, final String[] representationFields) {
-        this((LightweightMetaObjectsSearch)null, representation, representationFields); // NOI18N
+        this(representation, representationFields, ClientConnectionContext.createDeprecated());
+    }
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  representation        DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     * @param  connectionContext     DOCUMENT ME!
+     */
+    public FastBindableReferenceCombo(final String representation,
+            final String[] representationFields,
+            final ClientConnectionContext connectionContext) {
+        this((LightweightMetaObjectsSearch)null, representation, representationFields, connectionContext); // NOI18N
     }
 
     /**
@@ -127,10 +152,11 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
      * @param  representation        DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
      */
+    @Deprecated
     public FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
             final String representation,
             final String[] representationFields) {
-        this(lwmoSearch, representation, null, representationFields);
+        this(lwmoSearch, representation, representationFields, ClientConnectionContext.createDeprecated());
     }
 
     /**
@@ -151,13 +177,30 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
      * Creates a new FastBindableReferenceCombo object.
      *
      * @param  lwmoSearch            DOCUMENT ME!
+     * @param  representation        DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     * @param  connectionContext     DOCUMENT ME!
+     */
+    public FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
+            final String representation,
+            final String[] representationFields,
+            final ClientConnectionContext connectionContext) {
+        this(lwmoSearch, representation, null, representationFields, connectionContext);
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  lwmoSearch            DOCUMENT ME!
      * @param  formater              DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
+     * @param  connectionContext     DOCUMENT ME!
      */
     public FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
             final AbstractAttributeRepresentationFormater formater,
-            final String[] representationFields) {
-        this(lwmoSearch, null, formater, representationFields);
+            final String[] representationFields,
+            final ClientConnectionContext connectionContext) {
+        this(lwmoSearch, null, formater, representationFields, connectionContext);
     }
 
     /**
@@ -173,7 +216,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
             final String representation,
             final AbstractAttributeRepresentationFormater formater,
             final String[] representationFields) {
-        this(null, query, representation, formater, representationFields);
+        this(null, query, representation, formater, representationFields, ClientConnectionContext.createDeprecated());
     }
 
     /**
@@ -184,11 +227,29 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
      * @param  formater              DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
      */
+    @Deprecated
     private FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
             final String representation,
             final AbstractAttributeRepresentationFormater formater,
             final String[] representationFields) {
-        this(lwmoSearch, null, representation, formater, representationFields);
+        this(lwmoSearch, representation, formater, representationFields, ClientConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new FastBindableReferenceCombo object.
+     *
+     * @param  lwmoSearch            DOCUMENT ME!
+     * @param  representation        DOCUMENT ME!
+     * @param  formater              DOCUMENT ME!
+     * @param  representationFields  DOCUMENT ME!
+     * @param  connectionContext     DOCUMENT ME!
+     */
+    private FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
+            final String representation,
+            final AbstractAttributeRepresentationFormater formater,
+            final String[] representationFields,
+            final ClientConnectionContext connectionContext) {
+        this(lwmoSearch, null, representation, formater, representationFields, connectionContext);
     }
 
     /**
@@ -199,13 +260,15 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
      * @param  representation        DOCUMENT ME!
      * @param  formater              DOCUMENT ME!
      * @param  representationFields  DOCUMENT ME!
+     * @param  connectionContext     DOCUMENT ME!
      */
     @Deprecated
     private FastBindableReferenceCombo(final LightweightMetaObjectsSearch lwmoSearch,
             final String query,
             final String representation,
             final AbstractAttributeRepresentationFormater formater,
-            final String[] representationFields) {
+            final String[] representationFields,
+            final ClientConnectionContext connectionContext) {
         final String[] s = new String[] { null };
         this.lwmoSearch = lwmoSearch;
         this.query = query;
@@ -213,6 +276,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
         this.representation = representation;
         this.representationFormater = formater;
         this.representationFields = representationFields;
+        this.connectionContext = connectionContext;
         setModel(new DefaultComboBoxModel(s));
         final DefaultListCellRenderer dlcr = new DefaultListCellRenderer();
         setRenderer(new ListCellRenderer() {
@@ -436,7 +500,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
             final Collection<LightweightMetaObject> results = SessionManager.getProxy()
                         .customServerSearch(SessionManager.getSession().getUser(),
                             search,
-                            getClientConnectionContext());
+                            getConnectionContext());
             if (representationFormater != null) {
                 for (final LightweightMetaObject result : results) {
                     result.setFormater(representationFormater);
@@ -450,14 +514,14 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
                                     SessionManager.getSession().getUser(),
                                     getRepresentationFields(),
                                     representationFormater,
-                                    getClientConnectionContext());
+                                    getConnectionContext());
             } else {
                 lwmos = SessionManager.getProxy()
                             .getAllLightweightMetaObjectsForClass(mc.getID(),
                                     SessionManager.getSession().getUser(),
                                     getRepresentationFields(),
                                     getRepresentation(),
-                                    getClientConnectionContext());
+                                    getConnectionContext());
             }
         }
         if (sorted) {
@@ -614,8 +678,8 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }
 

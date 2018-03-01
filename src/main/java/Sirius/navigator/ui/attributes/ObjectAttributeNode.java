@@ -24,7 +24,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -32,11 +32,11 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class ObjectAttributeNode extends AttributeNode implements ClientConnectionContextProvider {
+public class ObjectAttributeNode extends AttributeNode implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
 
@@ -44,6 +44,9 @@ public class ObjectAttributeNode extends AttributeNode implements ClientConnecti
     private final Icon icon;
 
     private final SingleAttributeIterator attributeIterator;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -91,7 +94,7 @@ public class ObjectAttributeNode extends AttributeNode implements ClientConnecti
         // load class icon ...
         try {
             tempClass = SessionManager.getProxy()
-                        .getMetaClass(metaObject.getClassID(), metaObject.getDomain(), getClientConnectionContext());
+                        .getMetaClass(metaObject.getClassID(), metaObject.getDomain(), getConnectionContext());
         } catch (Exception exp) {
             logger.error("could not load class for Object :" + metaObject, exp); // NOI18N
         }
@@ -100,7 +103,7 @@ public class ObjectAttributeNode extends AttributeNode implements ClientConnecti
         if ((tempClass != null) && (tempClass.getIconData().length > 0)) {
             this.icon = new ImageIcon(tempClass.getIconData());
         } else {
-            this.icon = resource.getIcon("ClassNodeIcon.gif"); // NOI18N
+            this.icon = RESOURCE.getIcon("ClassNodeIcon.gif"); // NOI18N
         }
 
         // ignore array attribute nodes
@@ -156,7 +159,7 @@ public class ObjectAttributeNode extends AttributeNode implements ClientConnecti
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

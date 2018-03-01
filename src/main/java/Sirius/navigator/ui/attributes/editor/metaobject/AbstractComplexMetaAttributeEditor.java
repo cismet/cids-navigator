@@ -22,7 +22,7 @@ import Sirius.server.middleware.types.*;
 import java.util.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -31,7 +31,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @version  $Revision$, $Date$
  */
 public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplexEditor
-        implements ClientConnectionContextProvider {
+        implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -258,10 +258,9 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
                 logger.debug("getMetaObjectInstance(): try to retrive ObjectTemplate for Class '" + classKey + "'"); // NOI18N
             }
             final MetaClass metaClass = SessionManager.getProxy()
-                        .getMetaClass(classKey.toString(), getClientConnectionContext());
+                        .getMetaClass(classKey.toString(), getConnectionContext());
 
-            final MetaObject MetaObject = SessionManager.getProxy()
-                        .getInstance(metaClass, getClientConnectionContext());
+            final MetaObject MetaObject = SessionManager.getProxy().getInstance(metaClass, getConnectionContext());
             MetaObject.setStatus(MetaObject.NEW);
             return MetaObject;
         } catch (Throwable t) {
@@ -306,7 +305,7 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
+    public ClientConnectionContext getConnectionContext() {
         return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

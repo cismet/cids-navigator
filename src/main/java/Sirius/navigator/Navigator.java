@@ -71,7 +71,8 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
@@ -110,7 +111,7 @@ import static java.awt.Frame.MAXIMIZED_BOTH;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class Navigator extends JFrame implements ClientConnectionContextProvider {
+public class Navigator extends JFrame implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -149,6 +150,9 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
     private DescriptionPane descriptionPane;
     private NavigatorSplashScreen splashScreen;
     private String title;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -424,7 +428,7 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
 
         PropertyManager.getManager()
                 .setEditable(this.hasPermission(
-                        SessionManager.getProxy().getClasses(getClientConnectionContext()),
+                        SessionManager.getProxy().getClasses(getConnectionContext()),
                         PermissionHolder.WRITEPERMISSION));
         // PropertyManager.getManager().setEditable(true);
         if (logger.isInfoEnabled()) {
@@ -495,6 +499,9 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
         Collections.sort(sorted, comp);
 
         for (final CidsClientToolbarItem ccti : sorted) {
+            if (ccti instanceof ClientConnectionContextStore) {
+                ((ClientConnectionContextStore)ccti).setConnectionContext(getConnectionContext());
+            }
             if (ccti.isVisible()) {
                 final JToolBar innerToolbar;
                 if (ccti instanceof RightStickyToolbarItem) {
@@ -527,12 +534,14 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
             200,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_200")); // NOI18N
         final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
-                    getClientConnectionContext()));
+                    getConnectionContext()),
+                getConnectionContext());
         metaCatalogueTree = new MetaCatalogueTree(
                 rootTreeNode,
                 PropertyManager.getManager().isEditable(),
                 true,
-                propertyManager.getMaxConnections());
+                propertyManager.getMaxConnections(),
+                getConnectionContext());
         // dnd
         final MetaTreeNodeDnDHandler dndHandler = new MetaTreeNodeDnDHandler(metaCatalogueTree);
 
@@ -553,9 +562,9 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
             225,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
         if (PropertyManager.getManager().isPostfilterEnabled()) {
-            searchResultsTree = new PostfilterEnabledSearchResultsTree();
+            searchResultsTree = new PostfilterEnabledSearchResultsTree(getConnectionContext());
         } else {
-            searchResultsTree = new SearchResultsTree();
+            searchResultsTree = new SearchResultsTree(getConnectionContext());
         }
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
@@ -578,7 +587,7 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
             progressObserver.setProgress(
                 235,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
-            workingSpaceTree = new WorkingSpaceTree();
+            workingSpaceTree = new WorkingSpaceTree(getConnectionContext());
             workingSpace = new WorkingSpace(workingSpaceTree, propertyManager.isAdvancedLayout());
             // dnd
             new MetaTreeNodeDnDHandler(workingSpaceTree);
@@ -1264,8 +1273,8 @@ public class Navigator extends JFrame implements ClientConnectionContextProvider
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

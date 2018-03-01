@@ -31,7 +31,7 @@ import java.util.*;
 import javax.swing.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -40,11 +40,16 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @version  $Revision$, $Date$
  */
 public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor
-        implements ClientConnectionContextProvider {
+        implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -122,7 +127,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         statusPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
         statusPanel.setLayout(new java.awt.GridBagLayout());
 
-        commitButton.setIcon(resource.getIcon("save_objekt.gif"));
+        commitButton.setIcon(RESOURCE.getIcon("save_objekt.gif"));
         commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(
                 DefaultComplexMetaAttributeEditor.class,
                 "DefaultComplexMetaAttributeEditor.commitButton.tooltip")); // NOI18N
@@ -147,7 +152,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         statusPanel.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resource.getIcon("zurueck_objekt.gif"));
+        cancelButton.setIcon(RESOURCE.getIcon("zurueck_objekt.gif"));
         cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(
                 DefaultComplexMetaAttributeEditor.class,
                 "DefaultComplexMetaAttributeEditor.cancelButton.tooltip")); // NOI18N
@@ -347,10 +352,12 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         logger.error("removeValue() method not supported"); // NOI18N
         return null;
     }
+
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
+
     /**
      * DefaultComplexMetaAttributeEditorMethoden ...........................................
      *
@@ -368,7 +375,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
 
                 final MetaClass metaClass = SessionManager.getProxy()
                             .getMetaClass(this.getMetaObject(this.getValue()).getClassKey(),
-                                getClientConnectionContext());
+                                getConnectionContext());
 
                 return (!this.readOnly & !((Attribute)this.getValue()).isPrimaryKey())
                             && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)
@@ -379,7 +386,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
             } else {
                 final MetaClass metaClass = SessionManager.getProxy()
                             .getMetaClass(this.getMetaObject(this.getValue()).getClassKey(),
-                                getClientConnectionContext());
+                                getConnectionContext());
                 return (!this.readOnly
                                 & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION))
                             && this.getMetaObject(this.getValue()).getBean()

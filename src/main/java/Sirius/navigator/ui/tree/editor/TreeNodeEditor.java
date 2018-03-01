@@ -31,7 +31,7 @@ import java.util.*;
 import javax.swing.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 
@@ -41,12 +41,16 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnectionContextProvider {
+public class TreeNodeEditor extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     private DefaultMetaTreeNode metaTreeNode = null;
     private Logger logger;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JComboBox classBox;
@@ -278,7 +282,7 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnect
     public void show() {
         if (this.classBox.getModel().getSize() == 0) {
             try {
-                final MetaClass[] cs = SessionManager.getProxy().getClasses(getClientConnectionContext());
+                final MetaClass[] cs = SessionManager.getProxy().getClasses(getConnectionContext());
                 final ArrayList filtered = new ArrayList();
 
                 final User user = SessionManager.getSession().getUser();
@@ -365,8 +369,8 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnect
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -399,7 +403,7 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnect
                                     null,
                                     false,
                                     -1);
-                            TreeNodeEditor.this.metaTreeNode = new PureTreeNode(metaNode);
+                            TreeNodeEditor.this.metaTreeNode = new PureTreeNode(metaNode, getConnectionContext());
 
                             TreeNodeEditor.this.dispose();
                         } else if (TreeNodeEditor.this.classNodeRadioButton.isSelected()) {
@@ -420,7 +424,7 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnect
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
                                                     java.awt.Cursor.WAIT_CURSOR));
                                     final MetaObject metaObject = SessionManager.getProxy()
-                                                .getInstance(metaClass, getClientConnectionContext());
+                                                .getInstance(metaClass, getConnectionContext());
                                     ComponentRegistry.getRegistry()
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
@@ -437,7 +441,9 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ClientConnect
                                             -1,
                                             null,
                                             false);
-                                    TreeNodeEditor.this.metaTreeNode = new ObjectTreeNode(MetaObjectNode);
+                                    TreeNodeEditor.this.metaTreeNode = new ObjectTreeNode(
+                                            MetaObjectNode,
+                                            getConnectionContext());
 
                                     TreeNodeEditor.this.dispose();
                                 } catch (Throwable t) {

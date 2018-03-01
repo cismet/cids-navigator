@@ -54,9 +54,6 @@ import javax.swing.Timer;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
-
 import de.cismet.tools.CismetThreadPool;
 import de.cismet.tools.StaticDebuggingTools;
 
@@ -70,7 +67,7 @@ import de.cismet.tools.gui.WrappedComponent;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class NavigatorAttributeEditorGui extends AttributeEditor implements ClientConnectionContextProvider {
+public class NavigatorAttributeEditorGui extends AttributeEditor {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -310,8 +307,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements Clie
             final String domain = orig.getDomain();
             final User user = SessionManager.getSession().getUser();
             backupObject = null;
-            backupObject = SessionManager.getConnection()
-                        .getMetaObject(user, oid, cid, domain, getClientConnectionContext());
+            backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain, getConnectionContext());
         } catch (Exception e) {
             log.error("Error during Backupcreation. Cannot detect whether the object is changed.", e); // NOI18N
             JOptionPane.showMessageDialog(
@@ -343,7 +339,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements Clie
             final User user = SessionManager.getSession().getUser();
 
             final MetaObject reloaded = SessionManager.getConnection()
-                        .getMetaObject(user, oid, cid, domain, getClientConnectionContext());
+                        .getMetaObject(user, oid, cid, domain, getConnectionContext());
             reloaded.setAllClasses();
             if (log.isDebugEnabled()) {
                 log.debug("Reloaded MO:" + reloaded.getDebugString()); // NOI18N
@@ -419,7 +415,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements Clie
             editorSaveListener = null;
         }
         try {
-            final CidsBean savedInstance = oldBean.persist();
+            final CidsBean savedInstance = oldBean.persist(getConnectionContext());
             ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
             if (closeEditor) {
                 final JOptionPane jop = new JOptionPane(
@@ -986,9 +982,4 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements Clie
             }
         }
     } //GEN-LAST:event_pasteButtonActionPerformed
-
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
-    }
 }

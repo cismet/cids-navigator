@@ -38,25 +38,33 @@ import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+
 /**
  * A list that can display cidsBeans with their icon and name and allows the drag operation.
  *
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class CidsBeanList extends JList implements DragSourceListener, DragGestureListener {
+public class CidsBeanList extends JList implements DragSourceListener, DragGestureListener, ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     private DragSource ds;
     private MetaTreeNodeTransferable metaTransferable;
+    private final ClientConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CidsBeanList object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public CidsBeanList() {
+    public CidsBeanList(final ClientConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         ds = DragSource.getDefaultDragSource();
         final DragGestureRecognizer dgr = ds.createDefaultDragGestureRecognizer(
                 this,
@@ -123,7 +131,7 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
         if (getSelectedValues() != null) {
             for (final Object bean : getSelectedValues()) {
                 final MetaObjectNode mon = new MetaObjectNode((CidsBean)bean);
-                final ObjectTreeNode metaTreeNode = new ObjectTreeNode(mon);
+                final ObjectTreeNode metaTreeNode = new ObjectTreeNode(mon, getConnectionContext());
 
                 selectedValues.add(metaTreeNode);
             }
@@ -136,5 +144,11 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
                 this.metaTransferable,
                 this);
         }
+    }
+
+    @Override
+    public ClientConnectionContext getConnectionContext() {
+        throw new UnsupportedOperationException("Not supported yet.");    // To change body of generated methods, choose
+                                                                          // Tools | Templates.
     }
 }

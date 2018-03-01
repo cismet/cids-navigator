@@ -27,7 +27,7 @@ import javax.swing.JFrame;
 import de.cismet.cids.server.actions.PublishCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -38,11 +38,16 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
+public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(RemoteLog4JConfigChangerDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -252,7 +257,7 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implemen
                     .executeTask(SessionManager.getSession().getUser(),
                         PublishCidsServerMessageAction.TASK_NAME,
                         SessionManager.getSession().getUser().getDomain(),
-                        getClientConnectionContext(),
+                        getConnectionContext(),
                         new ObjectMapper().writeValueAsString(remoteConfig),
                         new ServerActionParameter<String>(
                             PublishCidsServerMessageAction.ParameterType.CATEGORY.toString(),
@@ -349,7 +354,7 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implemen
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

@@ -39,7 +39,7 @@ import org.apache.log4j.*;
 import java.rmi.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * Stores a <code>Connection</code> and a <code>User</code> Object.
@@ -47,11 +47,11 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   Pascal
  * @version  1.0 12/22/2002
  */
-public class ConnectionSession implements ClientConnectionContextProvider {
+public class ConnectionSession implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(ConnectionSession.class);
+    private static final Logger LOGGER = Logger.getLogger(ConnectionSession.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -61,6 +61,9 @@ public class ConnectionSession implements ClientConnectionContextProvider {
 
     private boolean loggedin = false;
     private User user;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -103,8 +106,8 @@ public class ConnectionSession implements ClientConnectionContextProvider {
     protected ConnectionSession(final Connection connection,
             final ConnectionInfo connectionInfo,
             final boolean autoLogin) throws ConnectionException, UserException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("creating new connection session"); // NOI18N
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("creating new connection session"); // NOI18N
         }
 
         this.connection = connection;
@@ -157,11 +160,11 @@ public class ConnectionSession implements ClientConnectionContextProvider {
                     && connectionInfo.getUsergroup().equals(usergroup)
                     && connectionInfo.getUserDomain().equals(userDomain)
                     && connectionInfo.getUsername().equals(username) && connectionInfo.getPassword().equals(password)) {
-            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
+            LOGGER.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
         } else {
             if (loggedin && (user != null)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
                 }
             }
 
@@ -191,11 +194,11 @@ public class ConnectionSession implements ClientConnectionContextProvider {
         if (loggedin && (user != null)
                     && connectionInfo.getUserDomain().equals(userDomain)
                     && connectionInfo.getUsername().equals(username) && connectionInfo.getPassword().equals(password)) {
-            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
+            LOGGER.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
         } else {
             if (loggedin && (user != null)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
                 }
             }
 
@@ -219,13 +222,13 @@ public class ConnectionSession implements ClientConnectionContextProvider {
      */
     private boolean login() throws ConnectionException, UserException {
         if (!connection.isConnected()) {
-            logger.error("can't login: no connection established");                                             // NOI18N
+            LOGGER.error("can't login: no connection established");                                             // NOI18N
             throw new ConnectionException("can't login: no connection established", ConnectionException.ERROR); // NOI18N
         }
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("logging in user '" + connectionInfo.getUsergroupDomain() + "' '"
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("logging in user '" + connectionInfo.getUsergroupDomain() + "' '"
                             + connectionInfo.getUsergroup() + "' '" + connectionInfo.getUserDomain() + "' '"
                             + connectionInfo.getUsername() + "' '" /*+ connectionInfo.getPassword() + "'"*/); // NOI18N
             }
@@ -234,12 +237,12 @@ public class ConnectionSession implements ClientConnectionContextProvider {
                     connectionInfo.getUserDomain(),
                     connectionInfo.getUsername(),
                     connectionInfo.getPassword(),
-                    getClientConnectionContext());
+                    getConnectionContext());
         } catch (UserException ue) {
-            logger.warn("can't login: wrong user informations", ue); // NOI18N
+            LOGGER.warn("can't login: wrong user informations", ue); // NOI18N
             throw ue;
         } catch (ConnectionException ce) {
-            logger.fatal("[ServerError] can't login"); // NOI18N
+            LOGGER.fatal("[ServerError] can't login"); // NOI18N
             // throw new ConnectionException("[ServerError] can't login", ConnectionException.FATAL, re);
             throw ce;
         }
@@ -273,7 +276,7 @@ public class ConnectionSession implements ClientConnectionContextProvider {
         try {
             return this.connection.isConnected();
         } catch (Exception ex) {
-            logger.fatal("An unexpected exception occoured in method 'Connection.isConnected()'", ex); // NOI18N
+            LOGGER.fatal("An unexpected exception occoured in method 'Connection.isConnected()'", ex); // NOI18N
             return false;
         }
     }
@@ -288,7 +291,7 @@ public class ConnectionSession implements ClientConnectionContextProvider {
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

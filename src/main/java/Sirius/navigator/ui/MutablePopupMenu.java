@@ -74,7 +74,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
 
@@ -88,7 +88,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public final class MutablePopupMenu extends JPopupMenu implements ClientConnectionContextProvider {
+public final class MutablePopupMenu extends JPopupMenu implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -111,6 +111,9 @@ public final class MutablePopupMenu extends JPopupMenu implements ClientConnecti
 
     // we use this executor to limit the duration of the extension lookup (mscholl)
     private final ExecutorService extensionExecutor;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -218,9 +221,10 @@ public final class MutablePopupMenu extends JPopupMenu implements ClientConnecti
     public boolean isPluginMenuAvailable(final String id) {
         return this.pluginMenues.isAvailable(id);
     }
+
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -614,7 +618,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ClientConnecti
                         -1,
                         null,
                         false);
-                final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(MetaObjectNode);
+                final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(MetaObjectNode, getConnectionContext());
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
                 ComponentRegistry.getRegistry()
                         .getAttributeEditor()
@@ -748,7 +752,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ClientConnecti
                 boolean deleted = false;
                 for (final DefaultMetaTreeNode tmp : selectedNodes) {
                     final boolean deletedSingleNode = MethodManager.getManager()
-                                .deleteNode(currentTree, tmp, (selectedNodes.length == 1));
+                                .deleteNode(currentTree, tmp, (selectedNodes.length == 1), getConnectionContext());
                     deleted = deleted | deletedSingleNode;
 
                     if (deletedSingleNode) {
@@ -813,7 +817,8 @@ public final class MutablePopupMenu extends JPopupMenu implements ClientConnecti
             final TreePath selectionPath = currentTree.getSelectionPath();
             if ((selectionPath != null) && (selectionPath.getPath().length > 0)) {
                 final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
-                            getClientConnectionContext()));
+                            getConnectionContext()),
+                        getConnectionContext());
 
                 final Runnable r = new Runnable() {
 

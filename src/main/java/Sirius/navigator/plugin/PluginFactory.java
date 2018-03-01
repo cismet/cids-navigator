@@ -34,7 +34,7 @@ import java.util.*;
 import javax.swing.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * blah.
@@ -42,7 +42,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   Pascal
  * @version  1.0 02/15/2003
  */
-public final class PluginFactory implements ClientConnectionContextProvider {
+public final class PluginFactory implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -59,6 +59,9 @@ public final class PluginFactory implements ClientConnectionContextProvider {
     private final LoadPluginRuleSet loadRuleSet;
 
     private final String schemaLocation;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -208,8 +211,8 @@ public final class PluginFactory implements ClientConnectionContextProvider {
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -1038,7 +1041,7 @@ public final class PluginFactory implements ClientConnectionContextProvider {
                 final String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId(); // NOI18N
 
                 try {
-                    method = SessionManager.getProxy().getMethod(methodKey, getClientConnectionContext());
+                    method = SessionManager.getProxy().getMethod(methodKey, getConnectionContext());
 
                     if (method != null) {
                         final User user = SessionManager.getSession().getUser();
@@ -1128,7 +1131,7 @@ public final class PluginFactory implements ClientConnectionContextProvider {
                 final String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId(); // NOI18N
 
                 try {
-                    method = SessionManager.getProxy().getMethod(methodKey, getClientConnectionContext());
+                    method = SessionManager.getProxy().getMethod(methodKey, getConnectionContext());
                     if (method != null) {
                         final User user = SessionManager.getSession().getUser();
                         final UserGroup userGroup = user.getUserGroup();

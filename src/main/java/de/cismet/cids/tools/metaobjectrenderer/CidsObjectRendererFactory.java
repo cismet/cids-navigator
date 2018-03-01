@@ -22,6 +22,10 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.RendererConnectionContext;
+
 import de.cismet.cids.utils.ClassloadingHelper;
 
 import de.cismet.tools.collections.TypeSafeCollections;
@@ -108,16 +112,26 @@ public class CidsObjectRendererFactory {
         final JComponent componentReferenceHolder;
         JComponent rendererComp = null;
         try {
-            final Class<?> rendererClass = ClassloadingHelper.getDynamicClass(mo.getMetaClass(),
+            final MetaClass mc = mo.getMetaClass();
+            final Class<?> rendererClass = ClassloadingHelper.getDynamicClass(
+                    mc,
                     ClassloadingHelper.CLASS_TYPE.RENDERER);
             final CidsBean bean;
             if (rendererClass != null) {
+                final ClientConnectionContext rendererConnectionContext = new RendererConnectionContext(mo);
+                final Object o;
+                if (ConnectionContextProvider.class.isAssignableFrom(rendererClass)) {
+                    o = rendererClass.getConstructor(ClientConnectionContext.class)
+                                .newInstance(rendererConnectionContext);
+                } else {
+                    o = rendererClass.newInstance();
+                }
                 if (CidsBeanRenderer.class.isAssignableFrom(rendererClass)) {
                     bean = mo.getBean();
+//                    bean.setClientConnectionContext(rendererConnectionContext);
                 } else {
                     bean = null;
                 }
-                final Object o = rendererClass.newInstance();
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
                     renderer.setTitle(title);
@@ -139,7 +153,6 @@ public class CidsObjectRendererFactory {
             log.error("Error during creating the renderer.", e); // NOI18N
             return new ErrorRenderer(e, mo, title);
         }
-//                singleRenderer.put(mo.getMetaClass(), rendererComp);
         if ((cw != null) && !(rendererComp instanceof DoNotWrap)) {
             componentReferenceHolder = (JComponent)cw.wrapComponent(rendererComp);
         } else {

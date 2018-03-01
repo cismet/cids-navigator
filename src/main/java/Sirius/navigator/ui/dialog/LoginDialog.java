@@ -29,7 +29,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * Der Login Dialog in dem Benutzername, Passwort und Localserver angegeben werden muessen. Der Dialog ist modal, ein
@@ -38,7 +38,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   Pascal Dih&eacute;
  * @version  1.0
  */
-public class LoginDialog extends JDialog implements ClientConnectionContextProvider {
+public class LoginDialog extends JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -56,6 +56,9 @@ public class LoginDialog extends JDialog implements ClientConnectionContextProvi
                 == PropertyManager.PermissionModus.OPTIONAL;
     private boolean userGroupIsForbidden = PropertyManager.getManager().getPermissionModus()
                 == PropertyManager.PermissionModus.FORBIDDEN;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -473,7 +476,7 @@ public class LoginDialog extends JDialog implements ClientConnectionContextProvi
             cb_userGroup.setModel(new DefaultComboBoxModel());
             cb_srv.setModel(new DefaultComboBoxModel());
 
-            final String[] domains = SessionManager.getProxy().getDomains(getClientConnectionContext());
+            final String[] domains = SessionManager.getProxy().getDomains(getConnectionContext());
 
             for (int i = 0; i < domains.length; i++) {
                 cb_srv.addItem(domains[i]);
@@ -713,7 +716,7 @@ public class LoginDialog extends JDialog implements ClientConnectionContextProvi
         cb_userGroup.removeAllItems();
 
         if ((user == null) || (user.length() == 0) || (domain == null) || (domain.length() == 0)) {
-            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(getClientConnectionContext());
+            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(getConnectionContext());
             userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
         } else {
             try {
@@ -722,7 +725,7 @@ public class LoginDialog extends JDialog implements ClientConnectionContextProvi
                 }
 
                 final Vector tmpVector = SessionManager.getProxy()
-                            .getUserGroupNames(user, domain, getClientConnectionContext());
+                            .getUserGroupNames(user, domain, getConnectionContext());
                 userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
             } catch (UserException ue) {
                 JOptionPane.showMessageDialog(
@@ -780,7 +783,7 @@ public class LoginDialog extends JDialog implements ClientConnectionContextProvi
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

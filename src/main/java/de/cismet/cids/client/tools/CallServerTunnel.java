@@ -41,7 +41,7 @@ import java.util.Map;
 import de.cismet.cids.server.actions.HttpTunnelAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.commons.security.AccessHandler;
 import de.cismet.commons.security.Tunnel;
@@ -57,7 +57,7 @@ import de.cismet.security.GUICredentialsProvider;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider {
+public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -76,6 +76,8 @@ public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider
     private final transient Map<String, TunnelGUICredentialsProvider> credentialsForURLS =
         new HashMap<String, TunnelGUICredentialsProvider>();
 
+    private final ClientConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -83,9 +85,22 @@ public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider
      *
      * @param  callserverName  DOCUMENT ME!
      */
+    @Deprecated
     public CallServerTunnel(final String callserverName) {
+        this(callserverName, ClientConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new CallServerTunnel object.
+     *
+     * @param  callserverName     DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public CallServerTunnel(final String callserverName, final ClientConnectionContext connectionContext) {
+        this.callserverName = callserverName;
+        this.connectionContext = connectionContext;
+
         try {
-            this.callserverName = callserverName;
             final TunnelTargetGroup[] tGroups = mapper.readValue(CallServerTunnel.class.getResourceAsStream(
                         "/de/cismet/cids/client/tools/tunnelTargets.json"),
                     TunnelTargetGroup[].class);
@@ -174,7 +189,7 @@ public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider
                             .executeTask(
                                     tunnelActionName,
                                     callserverName,
-                                    getClientConnectionContext(),
+                                    getConnectionContext(),
                                     nullBody,
                                     urlSAP,
                                     parameterSAP,
@@ -252,7 +267,7 @@ public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider
                     if (userKeyList == null) {
                         user = SessionManager.getSession().getUser();
                         final String configAttr = SessionManager.getProxy()
-                                    .getConfigAttr(user, "tunnel.targetgroups", getClientConnectionContext());
+                                    .getConfigAttr(user, "tunnel.targetgroups", getConnectionContext());
                         if (configAttr != null) {
                             final String[] keys = configAttr.split(",");
                             userKeyList = new ArrayList<String>(keys.length);
@@ -406,7 +421,7 @@ public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider
                     .executeTask(
                         taskname,
                         taskdomain,
-                        getClientConnectionContext(),
+                        getConnectionContext(),
                         body,
                         urlSAP,
                         parameterSAP,
@@ -416,8 +431,8 @@ public class CallServerTunnel implements Tunnel, ClientConnectionContextProvider
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

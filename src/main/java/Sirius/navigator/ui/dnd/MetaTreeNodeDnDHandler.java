@@ -41,13 +41,20 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContext;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetListener, DragSourceListener {
+public class MetaTreeNodeDnDHandler implements DragGestureListener,
+    DropTargetListener,
+    DragSourceListener,
+    ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -80,6 +87,9 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     private Object lastNode = null;
     private long timestamp = 0;
     private Rectangle rect2D = new Rectangle();
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -295,7 +305,8 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                     dtde.dropComplete(MethodManager.getManager().copyNode(
                                             metaTree,
                                             destinationNode,
-                                            sourceNode));
+                                            sourceNode,
+                                            getConnectionContext()));
                                 }
                                 break;
                             }
@@ -310,7 +321,8 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                         dtde.dropComplete(MethodManager.getManager().moveNode(
                                                 metaTree,
                                                 destinationNode,
-                                                sourceNode));
+                                                sourceNode,
+                                                getConnectionContext()));
                                     }
                                 }
                                 break;
@@ -327,7 +339,8 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
                                         dtde.dropComplete(MethodManager.getManager().linkNode(
                                                 metaTree,
                                                 destinationNode,
-                                                sourceNode));
+                                                sourceNode,
+                                                getConnectionContext()));
                                     }
                                 }
                                 break;
@@ -756,5 +769,10 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener, DropTargetLi
     public void setDragImage(final BufferedImage dragImage) {
         this.dragImage = dragImage;
         metaTree.setDragImage(dragImage);
+    }
+
+    @Override
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

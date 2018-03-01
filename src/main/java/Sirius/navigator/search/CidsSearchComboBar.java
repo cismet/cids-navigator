@@ -36,6 +36,8 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 
 /**
@@ -454,7 +456,8 @@ public class CidsSearchComboBar extends javax.swing.JPanel implements ActionList
                             stopProgressAnimation();
                         }
                     }
-                });
+                },
+                ClientConnectionContext.createDeprecated());
         }
     }
 

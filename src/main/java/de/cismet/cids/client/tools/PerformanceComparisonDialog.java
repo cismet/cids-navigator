@@ -52,7 +52,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.netutil.Proxy;
 
@@ -73,7 +73,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class PerformanceComparisonDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
+public class PerformanceComparisonDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -84,6 +84,9 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
 
     private final HashMap<Integer, MetaClass> classMap = new HashMap<>();
     private final List<TestInfo> testInfos;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -358,7 +361,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                         objectId,
                         classId,
                         domain,
-                        getClientConnectionContext());
+                        getConnectionContext());
         final long durationMs = System.currentTimeMillis() - timeMs;
 
         resultsMap.put("getMo (duration in ms)", durationMs);
@@ -418,7 +421,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                 .updateMetaObject(SessionManager.getSession().getUser(),
                     mo,
                     mo.getDomain(),
-                    getClientConnectionContext());
+                    getConnectionContext());
         final long durationMs = System.currentTimeMillis() - timeMs;
 
         resultsMap.put("updateMo (duration in ms)", durationMs);
@@ -521,8 +524,8 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

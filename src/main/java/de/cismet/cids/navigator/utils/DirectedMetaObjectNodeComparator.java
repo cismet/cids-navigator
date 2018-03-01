@@ -21,7 +21,7 @@ import org.apache.log4j.Logger;
 import java.util.Comparator;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * Works like the MetaObjectNodeComparator. Additionally sort order can be set to be ascending or descending.
@@ -29,7 +29,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class DirectedMetaObjectNodeComparator implements Comparator<Node>, ClientConnectionContextProvider {
+public class DirectedMetaObjectNodeComparator implements Comparator<Node>, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -40,15 +40,28 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Clien
     private boolean ascending;
     private boolean cancelled = false;
 
+    private final ClientConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new DirectedMetaObjectNodeComparator object.
      *
-     * @param  ascending  Sort ascending?
+     * @param  ascending  DOCUMENT ME!
      */
+    @Deprecated
     public DirectedMetaObjectNodeComparator(final boolean ascending) {
+        this(ascending, ClientConnectionContext.createDeprecated());
+    }
+    /**
+     * Creates a new DirectedMetaObjectNodeComparator object.
+     *
+     * @param  ascending          Sort ascending?
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public DirectedMetaObjectNodeComparator(final boolean ascending, final ClientConnectionContext connectionContext) {
         this.ascending = ascending;
+        this.connectionContext = connectionContext;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -108,7 +121,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Clien
                                                 ((MetaObjectNode)o1).getObjectId(),
                                                 o1.getClassId(),
                                                 o1.getDomain(),
-                                                getClientConnectionContext());
+                                                getConnectionContext());
                             if (mo1 != null) {
                                 mon1.setObject(mo1);
                                 mon1.setName(mo1.toString());
@@ -130,7 +143,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Clien
                                                 ((MetaObjectNode)o2).getObjectId(),
                                                 o2.getClassId(),
                                                 o2.getDomain(),
-                                                getClientConnectionContext());
+                                                getConnectionContext());
                             if (mo2 != null) {
                                 mon2.setObject(mo2);
                                 mon2.setName(mo2.toString());
@@ -176,7 +189,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Clien
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

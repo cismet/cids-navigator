@@ -25,7 +25,7 @@ import javax.swing.ImageIcon;
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -34,8 +34,12 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsClientToolbarItem.class)
-public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem,
-    ClientConnectionContextProvider {
+public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem, ConnectionContextProvider {
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -69,13 +73,13 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
                         SessionManager.getSession().getUser(),
                         "navigator.querybuilder.toolbaricon@"
                                 + SessionManager.getSession().getUser().getDomain(),
-                        getClientConnectionContext())
+                        getConnectionContext())
                             != null)
                         && (SessionManager.getConnection().getConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 QuerySearch.ACTION_TAG
                                 + SessionManager.getSession().getUser().getDomain(),
-                                getClientConnectionContext())
+                                getConnectionContext())
                             != null);
         } catch (ConnectionException ex) {
             Log.error(ex);
@@ -84,7 +88,7 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

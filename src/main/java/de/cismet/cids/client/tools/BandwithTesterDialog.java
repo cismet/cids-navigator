@@ -42,7 +42,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.netutil.Proxy;
 
@@ -72,7 +72,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class BandwithTesterDialog extends javax.swing.JDialog implements ClientConnectionContextProvider {
+public class BandwithTesterDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -85,6 +85,9 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements ClientC
     private long stopTimeMs;
     private final String domain;
     private final Integer fileSizeInMb;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
@@ -381,7 +384,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements ClientC
                     .executeTask(
                         BandwidthTestAction.TASK_NAME,
                         domain,
-                        getClientConnectionContext(),
+                        getConnectionContext(),
                         fileSizeInMb);
 
         if (ret instanceof Exception) {
@@ -419,8 +422,8 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements ClientC
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

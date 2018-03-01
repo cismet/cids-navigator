@@ -27,7 +27,7 @@ import java.util.TimerTask;
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.messages.CidsServerMessage;
 
 import de.cismet.tools.configuration.Configurable;
@@ -39,7 +39,7 @@ import de.cismet.tools.configuration.NoWriteError;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CidsServerMessageNotifier implements Configurable, ClientConnectionContextProvider {
+public class CidsServerMessageNotifier implements Configurable, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -64,6 +64,9 @@ public class CidsServerMessageNotifier implements Configurable, ClientConnection
     private boolean running;
     private final Map<String, Collection> subscribers = new HashMap<String, Collection>();
     private int scheduleIntervall = DEFAULT_SCHEDULE_INTERVAL;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -96,7 +99,7 @@ public class CidsServerMessageNotifier implements Configurable, ClientConnection
                             SessionManager.getSession().getUser(),
                             "csa://"
                             + CheckCidsServerMessageAction.TASK_NAME,
-                            getClientConnectionContext())) {
+                            getConnectionContext())) {
                 synchronized (timer) {
                     if (!running) {
                         startTimer(true);
@@ -250,8 +253,8 @@ public class CidsServerMessageNotifier implements Configurable, ClientConnection
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -281,7 +284,7 @@ public class CidsServerMessageNotifier implements Configurable, ClientConnection
                                 SessionManager.getSession().getUser(),
                                 "csa://"
                                 + CheckCidsServerMessageAction.TASK_NAME,
-                                getClientConnectionContext())) {
+                                getConnectionContext())) {
                     final ServerActionParameter<Map> lastMessageIdParam = new ServerActionParameter<Map>(
                             CheckCidsServerMessageAction.Parameter.LAST_MESSAGE_IDS.toString(),
                             lastMessageIds);
@@ -293,7 +296,7 @@ public class CidsServerMessageNotifier implements Configurable, ClientConnection
                                 .executeTask(SessionManager.getSession().getUser(),
                                     CheckCidsServerMessageAction.TASK_NAME,
                                     SessionManager.getSession().getUser().getDomain(),
-                                    getClientConnectionContext(),
+                                    getConnectionContext(),
                                     (Object)null,
                                     lastMessageIdParam,
                                     intervallParam);

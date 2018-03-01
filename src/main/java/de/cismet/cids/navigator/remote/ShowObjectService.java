@@ -35,7 +35,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
@@ -55,11 +55,16 @@ import de.cismet.remote.RESTRemoteControlMethod;
 @Produces({ MediaType.APPLICATION_JSON })
 @ServiceProvider(service = RESTRemoteControlMethod.class)
 public class ShowObjectService extends AbstractRESTRemoteControlMethod implements RESTRemoteControlMethod,
-    ClientConnectionContextProvider {
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ShowObjectService.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -118,7 +123,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
                         .getMetaObjectByQuery(SessionManager.getSession().getUser(),
                             query.toString(),
                             domain,
-                            getClientConnectionContext());
+                            getConnectionContext());
 
             if ((metaObjects != null) && (metaObjects.length == 0)) {
                 LOG.info("The query " + query.toString() + "returned with no results");
@@ -131,7 +136,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             for (final MetaObject mo : metaObjects) {
                 final MetaObjectNode node = new MetaObjectNode(mo.getBean());
                 newNodes[i++] = node;
-                final ObjectTreeNode otn = new ObjectTreeNode(node);
+                final ObjectTreeNode otn = new ObjectTreeNode(node, getConnectionContext());
                 defaultMetaTreeNodes.add(otn);
             }
 
@@ -160,7 +165,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

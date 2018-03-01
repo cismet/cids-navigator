@@ -26,14 +26,14 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode implements ClientConnectionContextProvider // implements Comparable
+public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode implements ConnectionContextProvider // implements Comparable
 {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -52,6 +52,8 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
 
     private final transient NodeComparator nodeComparator;
 
+    private final ClientConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -59,10 +61,12 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
      * keine Suche durgefuehrt wurde und noch keine Knoten angezeigt werden koennen. Er sollte nicht angezeigt werden.
      * (JTree.setRootVisible(false);)
      *
-     * @param  node  DOCUMENT ME!
+     * @param  node               DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public DefaultMetaTreeNode(final Node node) {
+    public DefaultMetaTreeNode(final Node node, final ClientConnectionContext connectionContext) {
         super(node);
+        this.connectionContext = connectionContext;
 
         nodeComparator = new NodeComparator();
     }
@@ -142,7 +146,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
         final Node node = this.getNode();
 
         final Node[] c = SessionManager.getProxy()
-                    .getChildren(node, SessionManager.getSession().getUser(), getClientConnectionContext());
+                    .getChildren(node, SessionManager.getSession().getUser(), getConnectionContext());
         if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
             return c;
         }
@@ -163,7 +167,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
             removeAllChildren();
 
             for (final Node node : dbChildren) {
-                add(MetaCatalogueTree.createTreeNode(node));
+                add(MetaCatalogueTree.createTreeNode(node, getConnectionContext()));
             }
         } catch (final Exception e) {
             LOG.warn("cannot refresh node: " + this, e); // NOI18N
@@ -597,7 +601,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

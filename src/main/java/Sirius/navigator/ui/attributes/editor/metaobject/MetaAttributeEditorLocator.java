@@ -27,7 +27,7 @@ import java.net.*;
 import java.util.*;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * Standardimplementierung des EditorLocator Interfaces, die eine Liste von Standard Editoren f\u00FCr bestimmte Klassen
@@ -36,7 +36,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class MetaAttributeEditorLocator implements EditorLocator, ClientConnectionContextProvider {
+public class MetaAttributeEditorLocator implements EditorLocator, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -52,6 +52,9 @@ public class MetaAttributeEditorLocator implements EditorLocator, ClientConnecti
 
     /** Holds value of property ignoreInvisibleAttributes. */
     private boolean ignoreInvisibleAttributes = false;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -251,7 +254,7 @@ public class MetaAttributeEditorLocator implements EditorLocator, ClientConnecti
                     final BasicEditor editor = this.createEditor(this.createEditorClass(
                                 SessionManager.getProxy().getMetaClass(
                                     MetaObject.getClassKey(),
-                                    getClientConnectionContext()).getComplexEditor()));
+                                    getConnectionContext()).getComplexEditor()));
                     return editor;
                 } catch (Exception e) {
                     logger.fatal("MetaObjectEditorsuche Exception", e); // NOI18N
@@ -291,7 +294,7 @@ public class MetaAttributeEditorLocator implements EditorLocator, ClientConnecti
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

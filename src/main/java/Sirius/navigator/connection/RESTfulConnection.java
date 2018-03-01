@@ -44,7 +44,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
@@ -59,9 +59,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public class RESTfulConnection implements Connection,
-    Reconnectable<CallServerService>,
-    ClientConnectionContextProvider {
+public class RESTfulConnection implements Connection, Reconnectable<CallServerService>, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -75,6 +73,9 @@ public class RESTfulConnection implements Connection,
     protected transient CallServerService connector;
 
     private final transient boolean isLWMOEnabled;
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -140,7 +141,7 @@ public class RESTfulConnection implements Connection,
         connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         try {
-            connector.getDomains(getClientConnectionContext());
+            connector.getDomains(getConnectionContext());
         } catch (final Exception e) {
             final String message = "no connection to restful interface"; // NOI18N
             LOG.error(message, e);
@@ -177,6 +178,9 @@ public class RESTfulConnection implements Connection,
 
     @Override
     public String[] getDomains(final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getDomains(context);
         } catch (final Exception e) {
@@ -231,6 +235,9 @@ public class RESTfulConnection implements Connection,
             final String userName,
             final String password,
             final ClientConnectionContext context) throws ConnectionException, UserException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getUser(userGroupLsName, userGroupName, userLsName, userName, password, context);
         } catch (final UserException e) {
@@ -268,6 +275,9 @@ public class RESTfulConnection implements Connection,
 
     @Override
     public Vector getUserGroupNames(final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getUserGroupNames(context);
         } catch (final Exception e) {
@@ -287,6 +297,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public Vector getUserGroupNames(final String username, final String domain, final ClientConnectionContext context)
             throws ConnectionException, UserException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getUserGroupNames(username, domain, context);
         } catch (final Exception e) {
@@ -308,6 +321,9 @@ public class RESTfulConnection implements Connection,
             final String oldPassword,
             final String newPassword,
             final ClientConnectionContext context) throws ConnectionException, UserException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.changePassword(user, oldPassword, newPassword, context);
         } catch (final Exception e) {
@@ -325,6 +341,9 @@ public class RESTfulConnection implements Connection,
 
     @Override
     public Node[] getRoots(final User user, final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getRoots(user, context);
         } catch (final Exception e) {
@@ -343,6 +362,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public Node[] getRoots(final User user, final String domain, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getRoots(user, domain, context);
         } catch (final Exception e) {
@@ -361,6 +383,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public Node[] getChildren(final Node node, final User user, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getChildren(node, user, context);
         } catch (final Exception e) {
@@ -379,6 +404,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public Node getNode(final User user, final int nodeID, final String domain, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getMetaObjectNode(user, nodeID, domain, context);
         } catch (final Exception e) {
@@ -402,6 +430,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public Node addNode(final Node node, final Link parent, final User user, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.addNode(node, parent, user, context);
         } catch (final Exception e) {
@@ -420,6 +451,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public boolean deleteNode(final Node node, final User user, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.deleteNode(node, user, context);
         } catch (final Exception e) {
@@ -438,6 +472,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public boolean addLink(final Node from, final Node to, final User user, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.addLink(from, to, user, context);
         } catch (final Exception e) {
@@ -456,6 +493,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public boolean deleteLink(final Node from, final Node to, final User user, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.deleteLink(from, to, user, context);
         } catch (final Exception e) {
@@ -473,6 +513,9 @@ public class RESTfulConnection implements Connection,
 
     @Override
     public Node[] getClassTreeNodes(final User user, final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getClassTreeNodes(user, context);
         } catch (final Exception e) {
@@ -493,6 +536,9 @@ public class RESTfulConnection implements Connection,
             final int classID,
             final String domain,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getClass(user, classID, domain, context);
         } catch (final Exception e) {
@@ -516,6 +562,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public MetaClass[] getClasses(final User user, final String domain, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getClasses(user, domain, context);
         } catch (final Exception e) {
@@ -538,6 +587,9 @@ public class RESTfulConnection implements Connection,
             final int classID,
             final String domain,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getMetaObject(user, objectID, classID, domain, context);
         } catch (final Exception e) {
@@ -563,6 +615,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public MetaObject[] getMetaObjectByQuery(final User user, final String query, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getMetaObject(user, query, context);
         } catch (final Exception e) {
@@ -584,6 +639,9 @@ public class RESTfulConnection implements Connection,
             final String query,
             final String domain,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getMetaObject(user, query, domain, context);
         } catch (final Exception e) {
@@ -608,6 +666,9 @@ public class RESTfulConnection implements Connection,
             final MetaObject metaObject,
             final String domain,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.insertMetaObject(user, metaObject, domain, context);
         } catch (final Exception e) {
@@ -644,6 +705,9 @@ public class RESTfulConnection implements Connection,
             final MetaObject metaObject,
             final String domain,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.updateMetaObject(user, metaObject, domain, context);
         } catch (final Exception e) {
@@ -680,6 +744,9 @@ public class RESTfulConnection implements Connection,
             final MetaObject metaObject,
             final String domain,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.deleteMetaObject(user, metaObject, domain, context);
         } catch (final Exception e) {
@@ -713,6 +780,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public MetaObject getInstance(final User user, final MetaClass c, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getInstance(user, c, context);
         } catch (final Exception e) {
@@ -742,6 +812,9 @@ public class RESTfulConnection implements Connection,
             final String[] representationFields,
             final String representationPattern,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmos = connector.getAllLightweightMetaObjectsForClass(
@@ -750,9 +823,9 @@ public class RESTfulConnection implements Connection,
                         representationFields,
                         representationPattern,
                         context);
-                return initLWMOs(lwmos, null);
+                return initLWMOs(lwmos, null, connectionContext);
             } else {
-                return getLWMOFallback(classId, user);
+                return getLWMOFallback(classId, user, connectionContext);
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields, pattern: " // NOI18N
@@ -788,6 +861,9 @@ public class RESTfulConnection implements Connection,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmo = connector.getAllLightweightMetaObjectsForClass(
@@ -795,9 +871,9 @@ public class RESTfulConnection implements Connection,
                         user,
                         representationFields,
                         context);
-                return initLWMOs(lwmo, formater);
+                return initLWMOs(lwmo, formater, connectionContext);
             } else {
-                return getLWMOFallback(classId, user);
+                return getLWMOFallback(classId, user, connectionContext);
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields: " // NOI18N
@@ -834,6 +910,9 @@ public class RESTfulConnection implements Connection,
             final String[] representationFields,
             final String representationPattern,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmo = connector.getLightweightMetaObjectsByQuery(
@@ -843,9 +922,9 @@ public class RESTfulConnection implements Connection,
                         representationFields,
                         representationPattern,
                         context);
-                return initLWMOs(lwmo, null);
+                return initLWMOs(lwmo, null, connectionContext);
             } else {
-                return getLWMOFallback(classId, user);
+                return getLWMOFallback(classId, user, connectionContext);
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields, pattern: " // NOI18N
@@ -884,6 +963,9 @@ public class RESTfulConnection implements Connection,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             if (isLWMOEnabled) {
                 final LightweightMetaObject[] lwmo = connector.getLightweightMetaObjectsByQuery(
@@ -892,9 +974,9 @@ public class RESTfulConnection implements Connection,
                         query,
                         representationFields,
                         context);
-                return initLWMOs(lwmo, formater);
+                return initLWMOs(lwmo, formater, connectionContext);
             } else {
-                return getLWMOFallback(classId, user);
+                return getLWMOFallback(classId, user, connectionContext);
             }
         } catch (final Exception e) {
             final String message = "could not get all lightweight MOs for classid, user, fields: " // NOI18N
@@ -919,6 +1001,9 @@ public class RESTfulConnection implements Connection,
     public Collection customServerSearch(final User user,
             final CidsServerSearch serverSearch,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.customServerSearch(user, serverSearch, context);
         } catch (final Exception e) {
@@ -945,18 +1030,21 @@ public class RESTfulConnection implements Connection,
     /**
      * Initializes LWMOs with the appropriate metaservice and string formatter.
      *
-     * @param   lwmos     DOCUMENT ME!
-     * @param   formater  DOCUMENT ME!
+     * @param   lwmos              DOCUMENT ME!
+     * @param   formater           DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     private MetaObject[] initLWMOs(final LightweightMetaObject[] lwmos,
-            final AbstractAttributeRepresentationFormater formater) {
+            final AbstractAttributeRepresentationFormater formater,
+            final ClientConnectionContext connectionContext) {
         if (lwmos != null) {
             final MetaService msServer = (MetaService)connector;
             for (final LightweightMetaObject lwmo : lwmos) {
                 if (lwmo != null) {
                     lwmo.setMetaService(msServer);
+                    lwmo.setConnectionContext(connectionContext);
                     if (formater != null) {
                         lwmo.setFormater(formater);
                     }
@@ -970,14 +1058,17 @@ public class RESTfulConnection implements Connection,
     /**
      * !For debugging purpose only. Do not use!
      *
-     * @param   classId  DOCUMENT ME!
-     * @param   user     DOCUMENT ME!
+     * @param   classId            DOCUMENT ME!
+     * @param   user               DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    private MetaObject[] getLWMOFallback(final int classId, final User user) throws ConnectionException {
+    private MetaObject[] getLWMOFallback(final int classId,
+            final User user,
+            final ClientConnectionContext connectionContext) throws ConnectionException {
         final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId);
         final ClassAttribute ca = mc.getClassAttribute("sortingColumn"); // NOI18N
         final String orderBy;
@@ -997,7 +1088,7 @@ public class RESTfulConnection implements Connection,
                     + mc.getTableName()
                     + orderBy;
 
-        return getMetaObjectByQuery(user, query);
+        return getMetaObjectByQuery(user, query, connectionContext);
     }
 
     @Deprecated
@@ -1009,6 +1100,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public String getConfigAttr(final User user, final String key, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getConfigAttr(user, key, context);
         } catch (final RemoteException e) {
@@ -1025,6 +1119,9 @@ public class RESTfulConnection implements Connection,
     @Override
     public boolean hasConfigAttr(final User user, final String key, final ClientConnectionContext context)
             throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.hasConfigAttr(user, key, context);
         } catch (final RemoteException e) {
@@ -1049,6 +1146,9 @@ public class RESTfulConnection implements Connection,
             final User user,
             final int elements,
             final ClientConnectionContext context) throws ConnectionException {
+        if (context == null) {
+            throw new IllegalArgumentException("connection context is null");
+        }
         try {
             return connector.getHistory(classId, objectId, domain, user, elements, context);
         } catch (final RemoteException e) {
@@ -1077,6 +1177,9 @@ public class RESTfulConnection implements Connection,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
         try {
+            if (context == null) {
+                throw new IllegalArgumentException("connection context is null");
+            }
             // FIXME: workaround for legacy clients that do not support GenericResourceWithContentType
             final Object taskResult = connector.executeTask(user, taskname, taskdomain, context, body, params);
             if ((taskResult != null) && GenericResourceWithContentType.class.isAssignableFrom(taskResult.getClass())) {
@@ -1100,7 +1203,7 @@ public class RESTfulConnection implements Connection,
     }
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

@@ -13,6 +13,8 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+
 /**
  * DOCUMENT ME!
  *
@@ -29,9 +31,11 @@ public class WaitTreeNode extends DefaultMetaTreeNode {
     /**
      * Dieser Konstruktor erzeugt einen neue Wait Node. Diese Node wird angezeigt, w\u00E4hrend Daten vom Server geladen
      * werden.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public WaitTreeNode() {
-        super(null);
+    public WaitTreeNode(final ClientConnectionContext connectionContext) {
+        super(null, connectionContext);
         this.explored = true;
         this.setAllowsChildren(false);
     }

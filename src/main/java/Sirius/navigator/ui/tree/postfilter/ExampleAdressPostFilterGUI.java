@@ -29,7 +29,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -38,7 +38,7 @@ import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
  * @version  $Revision$, $Date$
  */
 //@ServiceProvider(service = PostFilterGUI.class)
-public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements ClientConnectionContextProvider {
+public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -89,6 +89,9 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
                 firePostFilterChanged();
             }
         };
+
+    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
+                    .getSimpleName());
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -144,7 +147,7 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
                                                 .getMetaObject(((MetaObjectNode)n).getObjectId(),
                                                         ((MetaObjectNode)n).getClassId(),
                                                         ((MetaObjectNode)n).getDomain(),
-                                                        getClientConnectionContext());
+                                                        getConnectionContext());
                                     ((MetaObjectNode)n).setObject(mo);
                                 }
                                 final CidsBean cb = mo.getBean();
@@ -325,7 +328,7 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public final ClientConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

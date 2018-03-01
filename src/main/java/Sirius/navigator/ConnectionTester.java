@@ -45,7 +45,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 
 import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextProvider;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
@@ -59,7 +58,7 @@ import de.cismet.tools.gui.TextAreaAppender;
  * @author   mscholl
  * @version  $Revision$, $Date$
  */
-public class ConnectionTester extends javax.swing.JFrame implements ClientConnectionContextProvider {
+public class ConnectionTester extends javax.swing.JFrame {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -276,7 +275,8 @@ public class ConnectionTester extends javax.swing.JFrame implements ClientConnec
                         @Override
                         public void run() {
                             try {
-                                final String ret = connector.getDomains(getClientConnectionContext()).length
+                                final String ret =
+                                    connector.getDomains(ClientConnectionContext.createDeprecated()).length
                                             + " domain(s) retrieved\n\nSUCCESS";
                                 EventQueue.invokeLater(new Runnable() {
 
@@ -387,10 +387,5 @@ public class ConnectionTester extends javax.swing.JFrame implements ClientConnec
                     new ConnectionTester(callserverUrl, compressionEnabled).setVisible(true);
                 }
             });
-    }
-
-    @Override
-    public ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
     }
 }

@@ -28,6 +28,8 @@ import java.util.List;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+
 import de.cismet.tools.collections.HashArrayList;
 
 /**
@@ -55,9 +57,12 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     /**
      * Creates a new PostfilterEnabledSearchResultsTree object.
      *
+     * @param   connectionContext  DOCUMENT ME!
+     *
      * @throws  Exception  DOCUMENT ME!
      */
-    public PostfilterEnabledSearchResultsTree() throws Exception {
+    public PostfilterEnabledSearchResultsTree(final ClientConnectionContext connectionContext) throws Exception {
+        super(connectionContext);
         final Collection<? extends PostFilterGUI> lookupResult = Lookup.getDefault().lookupAll(PostFilterGUI.class);
         availablePostFilterGUIs = new ArrayList<PostFilterGUI>(lookupResult);
 
@@ -75,13 +80,16 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     /**
      * Creates a new PostfilterEnabledSearchResultsTree object.
      *
-     * @param   useThread       DOCUMENT ME!
-     * @param   maxThreadCount  DOCUMENT ME!
+     * @param   useThread          DOCUMENT ME!
+     * @param   maxThreadCount     DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public PostfilterEnabledSearchResultsTree(final boolean useThread, final int maxThreadCount) throws Exception {
-        super(useThread, maxThreadCount);
+    public PostfilterEnabledSearchResultsTree(final boolean useThread,
+            final int maxThreadCount,
+            final ClientConnectionContext connectionContext) throws Exception {
+        super(useThread, maxThreadCount, connectionContext);
     }
 
     //~ Methods ----------------------------------------------------------------
