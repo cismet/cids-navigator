@@ -26,10 +26,11 @@ import java.util.Collection;
 
 import javax.swing.SwingWorker;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.SearchResultListener;
 import de.cismet.cids.server.search.SearchResultListenerProvider;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -159,7 +160,7 @@ public final class CidsSearchExecutor {
                     final Collection res = SessionManager.getProxy()
                                 .customServerSearch(SessionManager.getSession().getUser(),
                                     search,
-                                    getClientConnectionContext());
+                                    connectionContext);
                     if (!isCancelled()) {
                         final ArrayList<Node> aln = new ArrayList<Node>(res.size());
                         for (final Object o : res) {
@@ -258,7 +259,7 @@ public final class CidsSearchExecutor {
                     final Collection searchResult = SessionManager.getProxy()
                                 .customServerSearch(SessionManager.getSession().getUser(),
                                     search,
-                                    getClientConnectionContext());
+                                    connectionContext);
 
                     if (isCancelled()) {
                         return result;
@@ -315,14 +316,5 @@ public final class CidsSearchExecutor {
                     dscs);
         }
         return searchProgressDialog;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public static ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(CidsSearchExecutor.class.getSimpleName());
     }
 }

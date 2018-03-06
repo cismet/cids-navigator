@@ -30,9 +30,10 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Default implementation of the connection proxy interface.

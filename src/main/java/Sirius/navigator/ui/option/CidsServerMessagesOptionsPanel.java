@@ -16,10 +16,11 @@ import org.jdom.Element;
 import org.openide.util.lookup.ServiceProvider;
 
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;

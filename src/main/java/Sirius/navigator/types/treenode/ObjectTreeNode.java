@@ -23,8 +23,8 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CurrentStackTrace;
 

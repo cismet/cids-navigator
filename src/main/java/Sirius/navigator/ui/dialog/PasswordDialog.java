@@ -45,8 +45,8 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!

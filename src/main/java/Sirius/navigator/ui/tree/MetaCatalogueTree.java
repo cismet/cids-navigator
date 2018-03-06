@@ -75,11 +75,11 @@ import javax.swing.tree.TreeSelectionModel;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
-
 import de.cismet.commons.concurrency.CismetExecutors;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 

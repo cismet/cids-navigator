@@ -30,15 +30,15 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
-
 import de.cismet.cismap.commons.XBoundingBox;
 import de.cismet.cismap.commons.gui.MappingComponent;
 import de.cismet.cismap.commons.gui.layerwidget.ActiveLayerModel;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 

@@ -26,8 +26,8 @@ import java.net.*;
 
 import java.util.*;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Standardimplementierung des EditorLocator Interfaces, die eine Liste von Standard Editoren f\u00FCr bestimmte Klassen

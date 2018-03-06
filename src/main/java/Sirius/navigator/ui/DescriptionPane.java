@@ -70,14 +70,14 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.MetaTreeNodeStore;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
-
 import de.cismet.cids.tools.metaobjectrenderer.CidsBeanAggregationHandler;
 import de.cismet.cids.tools.metaobjectrenderer.CidsBeanRenderer;
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
 import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 

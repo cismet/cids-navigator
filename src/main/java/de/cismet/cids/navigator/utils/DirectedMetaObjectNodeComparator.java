@@ -20,8 +20,8 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Works like the MetaObjectNodeComparator. Additionally sort order can be set to be ascending or descending.

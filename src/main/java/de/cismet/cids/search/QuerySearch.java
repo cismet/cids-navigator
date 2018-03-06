@@ -67,8 +67,6 @@ import javax.swing.text.BadLocationException;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.builtin.DistinctValuesSearch;
@@ -88,6 +86,9 @@ import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.PaginationPanel;
 

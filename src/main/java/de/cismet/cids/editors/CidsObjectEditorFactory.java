@@ -51,7 +51,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,12 +77,14 @@ import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.cids.server.connectioncontext.EditorConnectionContext;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
 import de.cismet.commons.classloading.BlacklistClassloading;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
@@ -230,6 +231,12 @@ public class CidsObjectEditorFactory {
             editorComponent = (JComponent)getDefaultEditor(MetaObject.getMetaClass());
         }
         final JComponent finalEditorComponent = editorComponent;
+        if (editorComponent instanceof ClientConnectionContextStore) {
+            final ClientConnectionContext connectionContext = new EditorConnectionContext(MetaObject);
+            ((ClientConnectionContextStore)editorComponent).setConnectionContext(connectionContext);
+            ((ClientConnectionContextStore)editorComponent).initAfterConnectionContext();
+        }
+
         if (editorComponent instanceof DisposableCidsBeanStore) {
             final CidsBean bean = MetaObject.getBean();
 //            final Runnable setCidsBeanRunnable = new Runnable() {

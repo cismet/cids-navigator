@@ -23,8 +23,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;

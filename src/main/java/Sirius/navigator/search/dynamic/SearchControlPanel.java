@@ -37,10 +37,11 @@ import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.SwingWorker;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!

@@ -41,8 +41,8 @@ import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContextStore;
 
 /**
  * DOCUMENT ME!

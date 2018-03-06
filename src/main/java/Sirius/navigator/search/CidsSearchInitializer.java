@@ -31,8 +31,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.connectioncontext.SearchConnectionContext;
 
 import de.cismet.cids.tools.search.clientstuff.CidsDialogSearch;
@@ -40,6 +38,9 @@ import de.cismet.cids.tools.search.clientstuff.CidsSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
+
+import de.cismet.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.StaticDebuggingTools;
 

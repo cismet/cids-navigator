@@ -18,8 +18,8 @@ import org.apache.log4j.Logger;
 
 import org.openide.util.lookup.ServiceProvider;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.configuration.ConfigAttrProvider;
 

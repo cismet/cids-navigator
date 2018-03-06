@@ -51,8 +51,6 @@ import de.cismet.cids.dynamics.CidsBeanInfo;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.DefaultScheduledServerActionTestImpl;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
@@ -60,6 +58,9 @@ import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 import de.cismet.cidsx.server.api.types.ActionTask;
 
 import de.cismet.commons.security.AccessHandler;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.netutil.Proxy;
 

@@ -26,9 +26,10 @@ import java.util.TimerTask;
 
 import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.messages.CidsServerMessage;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.NoWriteError;

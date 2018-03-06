@@ -22,11 +22,12 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.connectioncontext.RendererConnectionContext;
 
 import de.cismet.cids.utils.ClassloadingHelper;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContextStore;
 
 import de.cismet.tools.collections.TypeSafeCollections;
 
@@ -118,22 +119,19 @@ public class CidsObjectRendererFactory {
                     ClassloadingHelper.CLASS_TYPE.RENDERER);
             final CidsBean bean;
             if (rendererClass != null) {
-                final ClientConnectionContext rendererConnectionContext = new RendererConnectionContext(mo);
-                final Object o;
-                if (ConnectionContextProvider.class.isAssignableFrom(rendererClass)) {
-                    o = rendererClass.getConstructor(ClientConnectionContext.class)
-                                .newInstance(rendererConnectionContext);
-                } else {
-                    o = rendererClass.newInstance();
-                }
+                final Object o = rendererClass.newInstance();
                 if (CidsBeanRenderer.class.isAssignableFrom(rendererClass)) {
                     bean = mo.getBean();
-//                    bean.setClientConnectionContext(rendererConnectionContext);
                 } else {
                     bean = null;
                 }
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
+                    if (renderer instanceof ClientConnectionContextStore) {
+                        final ClientConnectionContext rendererConnectionContext = new RendererConnectionContext(mo);
+                        ((ClientConnectionContextStore)renderer).setConnectionContext(rendererConnectionContext);
+                        ((ClientConnectionContextStore)renderer).initAfterConnectionContext();
+                    }
                     renderer.setTitle(title);
                     renderer.setCidsBean(bean);
                     rendererComp = (JComponent)renderer;

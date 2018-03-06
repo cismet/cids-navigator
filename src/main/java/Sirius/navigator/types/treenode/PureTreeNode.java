@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * DOCUMENT ME!

@@ -34,8 +34,9 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.actions.PasswordSwitcherAdminAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;

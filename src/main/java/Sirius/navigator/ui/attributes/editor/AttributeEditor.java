@@ -35,8 +35,8 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 

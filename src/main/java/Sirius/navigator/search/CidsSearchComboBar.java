@@ -36,9 +36,9 @@ import javax.swing.Timer;
 import javax.swing.UIManager;
 import javax.swing.text.JTextComponent;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-
 import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * DOCUMENT ME!

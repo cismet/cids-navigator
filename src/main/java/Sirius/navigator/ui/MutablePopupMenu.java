@@ -73,10 +73,10 @@ import javax.swing.tree.TreePath;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
-
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.ext.CExtContext;
 import de.cismet.ext.CExtManager;

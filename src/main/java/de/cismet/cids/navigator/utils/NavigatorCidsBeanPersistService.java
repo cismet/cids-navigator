@@ -14,10 +14,10 @@ import Sirius.server.newuser.User;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
-
 import de.cismet.cids.utils.CidsBeanPersistService;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!

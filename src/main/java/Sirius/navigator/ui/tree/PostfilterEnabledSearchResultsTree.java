@@ -28,7 +28,7 @@ import java.util.List;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 import de.cismet.tools.collections.HashArrayList;
 

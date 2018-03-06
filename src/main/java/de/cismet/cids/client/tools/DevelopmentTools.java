@@ -53,12 +53,13 @@ import de.cismet.cids.editors.CidsObjectEditorFactory;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
 import de.cismet.cids.utils.jasperreports.CidsBeanDataSource;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 import de.cismet.netutil.Proxy;
 

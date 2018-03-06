@@ -7,7 +7,7 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * DOCUMENT ME!

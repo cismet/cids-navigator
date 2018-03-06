@@ -9,7 +9,7 @@ package Sirius.navigator.search;
 
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * DOCUMENT ME!

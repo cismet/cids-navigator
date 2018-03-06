@@ -38,9 +38,9 @@ import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * A list that can display cidsBeans with their icon and name and allows the drag operation.
@@ -148,7 +148,7 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
 
     @Override
     public ClientConnectionContext getConnectionContext() {
-        throw new UnsupportedOperationException("Not supported yet.");    // To change body of generated methods, choose
-                                                                          // Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 }

@@ -17,10 +17,11 @@ import org.openide.util.Exceptions;
 import java.awt.Color;
 import java.awt.EventQueue;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 

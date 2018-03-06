@@ -18,8 +18,9 @@ import Sirius.server.middleware.types.Node;
 import java.util.Collection;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.search.CidsServerSearch;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * Default implementation of the connection proxy interface.

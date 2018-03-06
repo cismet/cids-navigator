@@ -18,9 +18,9 @@ import Sirius.server.middleware.types.MetaClass;
 
 import java.util.HashMap;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-
 import de.cismet.cids.utils.MetaClassUtils;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * DOCUMENT ME!

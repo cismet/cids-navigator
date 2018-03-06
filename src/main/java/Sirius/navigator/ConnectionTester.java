@@ -44,9 +44,10 @@ import java.util.Properties;
 import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 import de.cismet.netutil.Proxy;
 

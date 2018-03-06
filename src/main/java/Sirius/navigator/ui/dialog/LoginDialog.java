@@ -28,8 +28,8 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Der Login Dialog in dem Benutzername, Passwort und Localserver angegeben werden muessen. Der Dialog ist modal, ein
@@ -57,8 +57,7 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
     private boolean userGroupIsForbidden = PropertyManager.getManager().getPermissionModus()
                 == PropertyManager.PermissionModus.FORBIDDEN;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ClientConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -84,6 +83,12 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
      */
     public LoginDialog(final java.awt.Frame owner) {
         super(owner, true);
+        if (owner instanceof ConnectionContextProvider) {
+            connectionContext = (ClientConnectionContext)((ConnectionContextProvider)owner).getConnectionContext();
+        } else {
+            connectionContext = ClientConnectionContext.create(getClass().getSimpleName());
+        }
+
         preferences = Preferences.userNodeForPackage(getClass());
 
         setAlwaysOnTop(true);

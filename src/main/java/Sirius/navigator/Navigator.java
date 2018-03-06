@@ -70,12 +70,13 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ClientConnectionContextStore;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
-
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
@@ -563,9 +564,13 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             225,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
         if (PropertyManager.getManager().isPostfilterEnabled()) {
-            searchResultsTree = new PostfilterEnabledSearchResultsTree(getConnectionContext());
+            searchResultsTree = new PostfilterEnabledSearchResultsTree(ClientConnectionContext.create(
+                        ConnectionContext.Category.CATALOGUE,
+                        PostfilterEnabledSearchResultsTree.class.getSimpleName()));
         } else {
-            searchResultsTree = new SearchResultsTree(getConnectionContext());
+            searchResultsTree = new SearchResultsTree(ClientConnectionContext.create(
+                        ConnectionContext.Category.CATALOGUE,
+                        SearchResultsTree.class.getSimpleName()));
         }
         searchResultsTreePanel = new SearchResultsTreePanel(searchResultsTree, propertyManager.isAdvancedLayout());
         // dnd
@@ -588,7 +593,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             progressObserver.setProgress(
                 235,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
-            workingSpaceTree = new WorkingSpaceTree(getConnectionContext());
+            workingSpaceTree = new WorkingSpaceTree(ClientConnectionContext.create(
+                        ConnectionContext.Category.CATALOGUE,
+                        WorkingSpaceTree.class.getSimpleName()));
             workingSpace = new WorkingSpace(workingSpaceTree, propertyManager.isAdvancedLayout());
             // dnd
             new MetaTreeNodeDnDHandler(workingSpaceTree);

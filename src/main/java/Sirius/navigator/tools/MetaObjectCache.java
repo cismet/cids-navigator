@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -32,7 +31,7 @@ import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class MetaObjectCache implements ConnectionContextProvider {
+public class MetaObjectCache {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -45,9 +44,6 @@ public class MetaObjectCache implements ConnectionContextProvider {
     // store anyway
     private final transient Map<Integer, SoftReference<MetaObject[]>> cache;
     private final transient Map<Integer, ReentrantReadWriteLock> locks;
-
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -191,14 +187,30 @@ public class MetaObjectCache implements ConnectionContextProvider {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   query   DOCUMENT ME!
+     * @param   domain  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  CacheException  DOCUMENT ME!
+     */
+    @Deprecated
+    public MetaObject[] getMetaObjectsByQuery(final String query, final String domain) throws CacheException {
+        return getMetaObjectsByQuery(query, domain, ClientConnectionContext.createDeprecated());
+    }
+
+    /**
      * Get {@link MetaObject}s by query using the very same query string as one would request them from the server. This
      * operation simply calls {@link #getMetaObjectsByQuery(java.lang.String, boolean)} with the given query and <code>
      * false</code> for force reload. It throws an exception to indicate any errors so that it can maintain compliance
      * with a call to {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)} with regards to its return
      * value.
      *
-     * @param   query   the query to get the <code>MetaObject</code>s for
-     * @param   domain  the domai to get the <code>MetaObject</code>s from
+     * @param   query              the query to get the <code>MetaObject</code>s for
+     * @param   domain             the domai to get the <code>MetaObject</code>s from
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  an array of <code>MetaObject</code>s as they would have been returned from
      *          ConnectionProxy#getMetaObjectByQuery(java.lang.String, int) if used directly
@@ -207,7 +219,9 @@ public class MetaObjectCache implements ConnectionContextProvider {
      *
      * @see     #getMetaObjectsByQuery(java.lang.String, boolean)
      */
-    public MetaObject[] getMetaObjectsByQuery(final String query, final String domain) throws CacheException {
+    public MetaObject[] getMetaObjectsByQuery(final String query,
+            final String domain,
+            final ClientConnectionContext connectionContext) throws CacheException {
         return getMetaObjectsByQuery(query, domain, false);
     }
 
@@ -235,15 +249,33 @@ public class MetaObjectCache implements ConnectionContextProvider {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   query        DOCUMENT ME!
+     * @param   domain       DOCUMENT ME!
+     * @param   forceReload  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  CacheException  DOCUMENT ME!
+     */
+    @Deprecated
+    public MetaObject[] getMetaObjectsByQuery(final String query, final String domain, final boolean forceReload)
+            throws CacheException {
+        return getMetaObjectsByQuery(query, domain, forceReload, ClientConnectionContext.createDeprecated());
+    }
+
+    /**
      * Get {@link MetaObject}s by query using the very same query string as one would request them from the server. This
      * operation supports forcing of a reload so that callers are assured to receive a current result as it would have
      * been returned from {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)}. It throws an exception to
      * indicate any errors so that it can maintain compliance with a call to
      * {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)} with regards to its return value.
      *
-     * @param   query        the query to get the <code>MetaObject</code>s for
-     * @param   domain       the domain to get the <code>MetaObject</code>s from
-     * @param   forceReload  force a reload of the <code>MetaObject</code>s if they have already been cached
+     * @param   query              the query to get the <code>MetaObject</code>s for
+     * @param   domain             the domain to get the <code>MetaObject</code>s from
+     * @param   forceReload        force a reload of the <code>MetaObject</code>s if they have already been cached
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  an array of <code>MetaObject</code>s as they would have been returned from
      *          {@link ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)} if used directly
@@ -253,8 +285,10 @@ public class MetaObjectCache implements ConnectionContextProvider {
      *
      * @see     ConnectionProxy#getMetaObjectByQuery(java.lang.String, int)
      */
-    public MetaObject[] getMetaObjectsByQuery(final String query, final String domain, final boolean forceReload)
-            throws CacheException {
+    public MetaObject[] getMetaObjectsByQuery(final String query,
+            final String domain,
+            final boolean forceReload,
+            final ClientConnectionContext connectionContext) throws CacheException {
         if (query == null) {
             return null;
         }
@@ -302,10 +336,10 @@ public class MetaObjectCache implements ConnectionContextProvider {
                                         .getMetaObjectByQuery(SessionManager.getSession().getUser(),
                                                 query,
                                                 domain,
-                                                getConnectionContext());
+                                                connectionContext);
                         } else {
                             cachedObjects = SessionManager.getProxy()
-                                        .getMetaObjectByQuery(iQuery, 0, getConnectionContext());
+                                        .getMetaObjectByQuery(iQuery, 0, connectionContext);
                         }
                         cache.put(qHash, new SoftReference<MetaObject[]>(cachedObjects));
                     } catch (final ConnectionException ex) {
@@ -349,11 +383,6 @@ public class MetaObjectCache implements ConnectionContextProvider {
      */
     private synchronized Collection<ReentrantReadWriteLock> getAllLocks() {
         return locks.values();
-    }
-
-    @Override
-    public final ClientConnectionContext getConnectionContext() {
-        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

@@ -30,10 +30,10 @@ import java.awt.dnd.*;
 
 import javax.swing.JOptionPane;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
-
 import de.cismet.cids.tools.fromstring.StringCreateable;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Ein einfacher Standard Editor f\u00FCr komplexe Meta Attribute.

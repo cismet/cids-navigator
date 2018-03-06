@@ -38,8 +38,8 @@ import org.apache.log4j.*;
 
 import java.rmi.*;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Stores a <code>Connection</code> and a <code>User</code> Object.

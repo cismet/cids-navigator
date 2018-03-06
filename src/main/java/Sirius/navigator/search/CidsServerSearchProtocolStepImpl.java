@@ -19,13 +19,14 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.cismet.cids.server.connectioncontext.ClientConnectionContext;
-import de.cismet.cids.server.connectioncontext.ConnectionContextProvider;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.commons.gui.protocol.AbstractProtocolStep;
 import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
 import de.cismet.commons.gui.protocol.ProtocolStepMetaInfo;
+
+import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
