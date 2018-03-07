@@ -298,8 +298,8 @@ public class CidsServerMessageNotifier implements Configurable, ConnectionContex
                                 .executeTask(SessionManager.getSession().getUser(),
                                     CheckCidsServerMessageAction.TASK_NAME,
                                     SessionManager.getSession().getUser().getDomain(),
-                                    getConnectionContext(),
                                     (Object)null,
+                                    getConnectionContext(),
                                     lastMessageIdParam,
                                     intervallParam);
 

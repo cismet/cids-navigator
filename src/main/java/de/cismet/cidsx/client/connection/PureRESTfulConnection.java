@@ -327,8 +327,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final Object taskResult = SessionManager.getProxy()
                         .executeTask("testAction",
                             "SWITCHON",
-                            ConnectionContext.createDeprecated(),
                             (Object)null,
+                            ConnectionContext.createDeprecated(),
                             actionParameterTest);
             System.out.println(taskResult);
             System.exit(0);

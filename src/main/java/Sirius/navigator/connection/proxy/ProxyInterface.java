@@ -626,7 +626,7 @@ public interface ProxyInterface {
      */
     Object executeTask(String taskname,
             String taskdomain,
-            ConnectionContext context,
             Object body,
+            ConnectionContext context,
             ServerActionParameter... params) throws ConnectionException;
 }

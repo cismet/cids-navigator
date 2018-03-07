@@ -1189,15 +1189,15 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
-        return executeTask(user, taskname, taskdomain, ConnectionContext.createDeprecated(), body, params);
+        return executeTask(user, taskname, taskdomain, body, ConnectionContext.createDeprecated(), params);
     }
 
     @Override
     public Object executeTask(final User user,
             final String taskname,
             final String taskdomain,
-            final ConnectionContext connectionContext,
             final Object body,
+            final ConnectionContext connectionContext,
             final ServerActionParameter... params) throws ConnectionException {
         try {
             if (connectionContext == null) {
@@ -1208,8 +1208,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                     user,
                     taskname,
                     taskdomain,
-                    connectionContext,
                     body,
+                    connectionContext,
                     params);
             if ((taskResult != null) && GenericResourceWithContentType.class.isAssignableFrom(taskResult.getClass())) {
                 LOG.warn("REST Action  '" + taskname + "' completed, GenericResourceWithContentType with type '"

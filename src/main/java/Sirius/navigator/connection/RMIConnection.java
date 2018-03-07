@@ -1096,18 +1096,18 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
-        return executeTask(user, taskname, taskdomain, ConnectionContext.createDeprecated(), body, params);
+        return executeTask(user, taskname, taskdomain, body, ConnectionContext.createDeprecated(), params);
     }
 
     @Override
     public Object executeTask(final User user,
             final String taskname,
             final String taskdomain,
-            final ConnectionContext connectionContext,
             final Object body,
+            final ConnectionContext connectionContext,
             final ServerActionParameter... params) throws ConnectionException {
         try {
-            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, connectionContext, body, params);
+            return ((ActionService)callserver).executeTask(user, taskname, taskdomain, body, connectionContext, params);
         } catch (final RemoteException e) {
             throw new ConnectionException("could executeTask: taskname: " + taskname + " || taskdomain: " + taskdomain
                         + " || user: " + user,

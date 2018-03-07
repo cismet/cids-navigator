@@ -377,8 +377,8 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                     .executeTask(
                         PasswordSwitcherAdminAction.TASK_NAME,
                         "WUNDA_BLAU",
-                        getConnectionContext(),
                         (Object)null,
+                        getConnectionContext(),
                         paramLoginName,
                         paramRecoveryTimeout);
 

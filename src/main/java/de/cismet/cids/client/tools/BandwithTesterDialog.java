@@ -385,8 +385,8 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
                     .executeTask(
                         BandwidthTestAction.TASK_NAME,
                         domain,
-                        getConnectionContext(),
-                        fileSizeInMb);
+                        fileSizeInMb,
+                        getConnectionContext());
 
         if (ret instanceof Exception) {
             throw (Exception)ret;

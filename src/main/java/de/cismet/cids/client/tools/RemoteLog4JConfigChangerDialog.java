@@ -258,12 +258,12 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implemen
                     .executeTask(SessionManager.getSession().getUser(),
                         PublishCidsServerMessageAction.TASK_NAME,
                         SessionManager.getSession().getUser().getDomain(),
-                        getConnectionContext(),
                         new ObjectMapper().writeValueAsString(remoteConfig),
-                        new ServerActionParameter<String>(
+                        getConnectionContext(),
+                        new ServerActionParameter<>(
                             PublishCidsServerMessageAction.ParameterType.CATEGORY.toString(),
                             "log4j_remote_config"),
-                        new ServerActionParameter<String>(
+                        new ServerActionParameter<>(
                             PublishCidsServerMessageAction.ParameterType.USER.toString(),
                             userKey));
         } catch (final Exception ex) {
