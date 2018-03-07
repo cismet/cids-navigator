@@ -75,6 +75,10 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
 
     //~ Constructors -----------------------------------------------------------
 
+    public SearchControlPanel(final SearchControlListener listener) {
+        this(listener, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * Creates new form SearchControlPanel.
      *

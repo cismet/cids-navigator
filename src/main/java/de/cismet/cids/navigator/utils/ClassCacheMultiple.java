@@ -38,6 +38,11 @@ public class ClassCacheMultiple {
 
     //~ Methods ----------------------------------------------------------------
 
+    @Deprecated
+    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain) {
+        return getClassKeyHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -60,6 +65,11 @@ public class ClassCacheMultiple {
         return ret;
     }
 
+    @Deprecated
+    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain) {
+        return getTableNameHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -82,6 +92,11 @@ public class ClassCacheMultiple {
         return ret;
     }
 
+    @Deprecated
+    public static MetaClass getMetaClass(final String domain, final String tableName) {
+        return getMetaClass(domain, tableName, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -100,6 +115,11 @@ public class ClassCacheMultiple {
         }
     }
 
+    @Deprecated
+    public static MetaClass getMetaClass(final String domain, final int classId) {
+        return getMetaClass(domain, classId, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -112,6 +132,10 @@ public class ClassCacheMultiple {
         return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, connectionContext).get(domain + classId);
     }
 
+    public static void setInstance(final String domain) {    
+        setInstance(domain, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -128,6 +152,11 @@ public class ClassCacheMultiple {
         }
     }
 
+    @Deprecated
+    public static void addInstance(final String domain) {
+        addInstance(domain, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *

@@ -130,6 +130,12 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         return bindingGroup;
     }
 
+    @Deprecated
+    public static void setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(final BindingGroup bindingGroup,
+            final CidsBean cidsBean) {
+        setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *

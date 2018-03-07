@@ -390,6 +390,15 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         return comparator;
     }
 
+    @Deprecated
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator,
+            final boolean forceReload) {
+        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, ConnectionContext.createDeprecated());
+    }
+    
     /**
      * DOCUMENT ME!
      *
