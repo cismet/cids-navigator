@@ -41,7 +41,6 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -88,8 +87,8 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener,
     private long timestamp = 0;
     private Rectangle rect2D = new Rectangle();
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -772,7 +771,7 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener,
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

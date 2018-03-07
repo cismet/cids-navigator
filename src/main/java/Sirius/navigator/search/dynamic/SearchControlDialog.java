@@ -20,10 +20,10 @@ import java.awt.EventQueue;
 import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -37,7 +37,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     //~ Instance fields --------------------------------------------------------
 
     private MetaObjectNodeServerSearch search;
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     private SearchControlPanel pnlSearchCancel;
     private Color foregroundColor;
@@ -62,7 +62,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
      */
     public SearchControlDialog(final java.awt.Frame parent,
             final boolean modal,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         this(parent, modal, null, connectionContext);
     }
 
@@ -77,7 +77,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     public SearchControlDialog(final java.awt.Frame parent,
             final boolean modal,
             final MetaObjectNodeServerSearch search,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         super(parent, modal);
         this.search = search;
         this.connectionContext = connectionContext;
@@ -177,20 +177,20 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formWindowClosing(final java.awt.event.WindowEvent evt) { //GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(final java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         if (allowUserToCloseDialog) {
             setVisible(false);
         }
-    }                                                                      //GEN-LAST:event_formWindowClosing
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         setVisible(false);
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -354,7 +354,7 @@ public class SearchControlDialog extends javax.swing.JDialog implements SearchCo
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

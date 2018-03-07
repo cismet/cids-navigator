@@ -9,7 +9,6 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.NavigatorConcurrency;
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.method.MethodAvailability;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.interfaces.PluginMethod;
@@ -75,13 +74,13 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.ext.CExtContext;
 import de.cismet.ext.CExtManager;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -112,8 +111,8 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
     // we use this executor to limit the duration of the extension lookup (mscholl)
     private final ExecutorService extensionExecutor;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -223,7 +222,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 
@@ -304,7 +303,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
 
                     if (node.getClassId() > 0) {
                         final MetaClass metaClass = ClassCacheMultiple.getMetaClass(node.getDomain(),
-                                node.getClassId());
+                                node.getClassId(), getConnectionContext());
                         permission = permission && metaClass.getPermissions().hasWritePermission(u);
                     }
 
@@ -589,7 +588,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
         public void init(final int classID, final String domain) throws Exception {
             this.classID = classID;
             this.domain = domain;
-            metaClass = ClassCacheMultiple.getMetaClass(domain, classID);
+            metaClass = ClassCacheMultiple.getMetaClass(domain, classID, getConnectionContext());
             this.setText(org.openide.util.NbBundle.getMessage(
                     MutablePopupMenu.class,
                     "MutablePopupMenu.NewObjectMethod.text",

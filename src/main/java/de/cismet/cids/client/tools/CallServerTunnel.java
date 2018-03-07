@@ -45,12 +45,12 @@ import de.cismet.commons.security.AccessHandler;
 import de.cismet.commons.security.Tunnel;
 import de.cismet.commons.security.exceptions.CannotReadFromURLException;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.tunnel.TunnelTargetGroup;
 
 import de.cismet.security.GUICredentialsProvider;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -77,29 +77,17 @@ public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
     private final transient Map<String, TunnelGUICredentialsProvider> credentialsForURLS =
         new HashMap<String, TunnelGUICredentialsProvider>();
 
-    private final ClientConnectionContext connectionContext;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CallServerTunnel object.
      *
-     * @param  callserverName  DOCUMENT ME!
-     */
-    @Deprecated
-    public CallServerTunnel(final String callserverName) {
-        this(callserverName, ClientConnectionContext.createDeprecated());
-    }
-
-    /**
-     * Creates a new CallServerTunnel object.
-     *
      * @param  callserverName     DOCUMENT ME!
-     * @param  connectionContext  DOCUMENT ME!
      */
-    public CallServerTunnel(final String callserverName, final ClientConnectionContext connectionContext) {
+    public CallServerTunnel(final String callserverName) {
         this.callserverName = callserverName;
-        this.connectionContext = connectionContext;
 
         try {
             final TunnelTargetGroup[] tGroups = mapper.readValue(CallServerTunnel.class.getResourceAsStream(
@@ -432,7 +420,7 @@ public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

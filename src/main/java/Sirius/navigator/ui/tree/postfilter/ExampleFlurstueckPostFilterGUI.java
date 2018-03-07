@@ -17,6 +17,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -25,7 +27,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @version  $Revision$, $Date$
  */
 //@ServiceProvider(service = PostFilterGUI.class)
-public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
+public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI implements ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -59,7 +61,7 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
                 if (txtRegEx.getText().equals("")) {
                     return input;
                 } else {
-                    final ArrayList<Node> ret = new ArrayList<Node>();
+                    final ArrayList<Node> ret = new ArrayList<>();
                     for (final Node n : input) {
                         if (n.getClassId() == fstck.getId()) {
                             if (n.getName().contains(txtRegEx.getText())) {
@@ -75,6 +77,7 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
         };
 
     MetaClass fstck;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField txtRegEx;
@@ -86,12 +89,17 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
      * Creates new form ExampleFlurstueckPostFilterGUI.
      */
     public ExampleFlurstueckPostFilterGUI() {
-        initComponents();
-        fstck = ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "ALKIS_LANDPARCEL");
     }
 
     //~ Methods ----------------------------------------------------------------
 
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+        initComponents();
+        fstck = ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "ALKIS_LANDPARCEL", getConnectionContext());
+    }
+    
     @Override
     public void initializeFilter(final Collection<Node> nodes) {
         txtRegEx.getDocument().removeDocumentListener(dl);
@@ -178,6 +186,11 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtRegExActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtRegExActionPerformed
-    }                                                                            //GEN-LAST:event_txtRegExActionPerformed
+    private void txtRegExActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRegExActionPerformed
+    }//GEN-LAST:event_txtRegExActionPerformed
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 }

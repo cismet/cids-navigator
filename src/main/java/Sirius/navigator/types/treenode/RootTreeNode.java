@@ -23,7 +23,6 @@ import java.awt.EventQueue;
 import javax.swing.ImageIcon;
 import javax.swing.tree.DefaultTreeModel;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -49,7 +48,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      *
      * @param  connectionContext  DOCUMENT ME!
      */
-    public RootTreeNode(final ClientConnectionContext connectionContext) // throws Exception
+    public RootTreeNode(final ConnectionContext connectionContext) // throws Exception
     {
         super(null, connectionContext);
         this.treeNodeLoader = new DefaultTreeNodeLoader(connectionContext);
@@ -63,7 +62,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      * @param  topNodes           ein Array von Nodes
      * @param  connectionContext  DOCUMENT ME!
      */
-    public RootTreeNode(final Node[] topNodes, final ClientConnectionContext connectionContext) {
+    public RootTreeNode(final Node[] topNodes, final ConnectionContext connectionContext) {
         this(topNodes, new DefaultTreeNodeLoader(connectionContext), connectionContext);
     }
 
@@ -76,7 +75,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
      */
     public RootTreeNode(final Node[] topNodes,
             final TreeNodeLoader treeNodeLoader,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         super(null, connectionContext);
         this.treeNodeLoader = treeNodeLoader;
         this.setAllowsChildren(true);
@@ -224,7 +223,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
         //~ Instance fields ----------------------------------------------------
 
-        private final ClientConnectionContext connectionContext;
+        private final ConnectionContext connectionContext;
 
         //~ Constructors -------------------------------------------------------
 
@@ -233,7 +232,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
          *
          * @param  connectionContext  DOCUMENT ME!
          */
-        DefaultTreeNodeLoader(final ClientConnectionContext connectionContext) {
+        DefaultTreeNodeLoader(final ConnectionContext connectionContext) {
             this.connectionContext = connectionContext;
         }
 
@@ -360,7 +359,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
         }
 
         @Override
-        public ClientConnectionContext getConnectionContext() {
+        public ConnectionContext getConnectionContext() {
             return connectionContext;
         }
     }

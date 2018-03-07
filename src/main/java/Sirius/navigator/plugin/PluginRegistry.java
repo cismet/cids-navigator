@@ -9,18 +9,19 @@ package Sirius.navigator.plugin;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ExceptionManager;
-import Sirius.navigator.method.*;
-import Sirius.navigator.plugin.interfaces.*;
-import Sirius.navigator.plugin.ui.*;
-import Sirius.navigator.resource.*;
-import Sirius.navigator.ui.*;
+import Sirius.navigator.plugin.interfaces.PluginSupport;
+import Sirius.navigator.resource.PropertyManager;
+import Sirius.navigator.ui.ComponentRegistry;
+import Sirius.navigator.ui.MutableConstraints;
 
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserGroup;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import org.apache.log4j.Logger;
 
 import java.util.*;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -28,19 +29,20 @@ import java.util.*;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class PluginRegistry {
+public class PluginRegistry implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(PluginRegistry.class);
+    private static final Logger LOG = Logger.getLogger(PluginRegistry.class);
 
-    private static PluginRegistry registry = null;
-    private static final Object blocker = new Object();
+    private static PluginRegistry REGISTRY = null;
+    private static final Object BLOCKER = new Object();
 
     //~ Instance fields --------------------------------------------------------
 
     private final PluginFactory pluginFactory;
     private final Hashtable plugins;
+    private final ConnectionContext connectionContext = ConnectionContext.create(ConnectionContext.Category.OTHER, getClass().getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -48,7 +50,7 @@ public class PluginRegistry {
      * Creates a new instance of PluginPool.
      */
     private PluginRegistry() {
-        pluginFactory = new PluginFactory();
+        pluginFactory = new PluginFactory(getConnectionContext());
         plugins = new Hashtable();
     }
 
@@ -60,12 +62,12 @@ public class PluginRegistry {
      * @return  DOCUMENT ME!
      */
     public static final PluginRegistry getRegistry() {
-        synchronized (blocker) {
-            if (registry == null) {
-                registry = new PluginRegistry();
+        synchronized (BLOCKER) {
+            if (REGISTRY == null) {
+                REGISTRY = new PluginRegistry();
             }
 
-            return registry;
+            return REGISTRY;
         }
     }
 
@@ -73,16 +75,16 @@ public class PluginRegistry {
      * DOCUMENT ME!
      */
     public static final void destroy() {
-        synchronized (blocker) {
-            logger.warn("destroying singelton PluginRegistry instance"); // NOI18N
+        synchronized (BLOCKER) {
+            LOG.warn("destroying singelton PluginRegistry instance"); // NOI18N
 
             try {
                 PluginRegistry.getRegistry().deactivatePlugins();
             } catch (Throwable t) {
-                logger.error("could not deactivate plugins", t); // NOI18N
+                LOG.error("could not deactivate plugins", t); // NOI18N
             }
 
-            registry = null;
+            REGISTRY = null;
         }
     }
 
@@ -96,19 +98,19 @@ public class PluginRegistry {
         if (iterator != null) {
             while (iterator.hasNext()) {
                 final PluginDescriptor pluginDescriptor = new PluginDescriptor((String)iterator.next());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("preloading new plugin"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("preloading new plugin"); // NOI18N
                 }
 
                 try {
                     pluginFactory.preloadPlugin(pluginDescriptor, true);
                     this.registerPlugin(pluginDescriptor);
-                    if (logger.isInfoEnabled()) {
-                        logger.info("plugin' " + pluginDescriptor.getMetaInfo().getName() + " ("
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("plugin' " + pluginDescriptor.getMetaInfo().getName() + " ("
                                     + pluginDescriptor.getName() + ")' successfully registred");      // NOI18N
                     }
                 } catch (Throwable t) {
-                    logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);    // NOI18N
+                    LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);    // NOI18N
                     ExceptionManager.getManager()
                             .showExceptionDialog(
                                 ExceptionManager.ERROR,
@@ -130,8 +132,8 @@ public class PluginRegistry {
                  * } catch(Exception exp) { logger.fatal("could not load plugin", exp); System.exit(1);}*/
             }
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("no plugins found"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("no plugins found"); // NOI18N
             }
         }
     }
@@ -148,7 +150,7 @@ public class PluginRegistry {
         if (descriptor != null) {
             this.loadPlugin(descriptor);
         } else {
-            logger.error("plugin '" + id + "' not found"); // NOI18N
+            LOG.error("plugin '" + id + "' not found"); // NOI18N
         }
     }
 
@@ -162,13 +164,13 @@ public class PluginRegistry {
             while (iterator.hasNext()) {
                 final PluginDescriptor pluginDescriptor = (PluginDescriptor)iterator.next();
 
-                if (logger.isInfoEnabled()) {
-                    logger.info("users: " + pluginDescriptor.getUsers().size()); // NOI18N
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("users: " + pluginDescriptor.getUsers().size()); // NOI18N
                 }
                 final Iterator uIterator = pluginDescriptor.getUsers().iterator();
                 while (uIterator.hasNext()) {
-                    if (logger.isInfoEnabled()) {
-                        logger.info("user: '" + uIterator.next() + "'");         // NOI18N
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("user: '" + uIterator.next() + "'");         // NOI18N
                     }
                 }
 
@@ -190,7 +192,7 @@ public class PluginRegistry {
                         try {
                             this.loadPlugin(pluginDescriptor);
                         } catch (Throwable t) {
-                            logger.error("could not load plugin '" + pluginDescriptor.getName() + "'", t); // NOI18N
+                            LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t); // NOI18N
                             ExceptionManager.getManager()
                                     .showExceptionDialog(
                                         ExceptionManager.ERROR,
@@ -204,17 +206,17 @@ public class PluginRegistry {
                             pluginDescriptor.setLoaded(false);
                         }
                     } else {
-                        logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '" + userGroup
+                        LOG.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '" + userGroup
                                     + "'");                                                                // NOI18N
                     }
                 } else {
-                    logger.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no user  '"
+                    LOG.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no user  '"
                                 + SessionManager.getSession().getUser().getName() + "'");                  // NOI18N
                 }
             }
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("could not load any plugins: no plugins found or preloaded");                  // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("could not load any plugins: no plugins found or preloaded");                  // NOI18N
             }
         }
     }
@@ -231,7 +233,7 @@ public class PluginRegistry {
         if (descriptor != null) {
             this.activatePlugin(descriptor);
         } else {
-            logger.error("plugin '" + id + "' not found"); // NOI18N
+            LOG.error("plugin '" + id + "' not found"); // NOI18N
         }
     }
 
@@ -247,7 +249,7 @@ public class PluginRegistry {
         if (descriptor != null) {
             this.deactivatePlugin(descriptor);
         } else {
-            logger.error("plugin '" + id + "' not found"); // NOI18N
+            LOG.error("plugin '" + id + "' not found"); // NOI18N
         }
     }
 
@@ -263,8 +265,8 @@ public class PluginRegistry {
                 this.activatePlugin((PluginDescriptor)iterator.next());
             }
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("could not activate any plugins: no plugins found or preloaded"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("could not activate any plugins: no plugins found or preloaded"); // NOI18N
             }
         }
     }
@@ -281,8 +283,8 @@ public class PluginRegistry {
                 this.deactivatePlugin((PluginDescriptor)iterator.next());
             }
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("could not deactivate any plugins: no plugins found or preloaded"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("could not deactivate any plugins: no plugins found or preloaded"); // NOI18N
             }
         }
     }
@@ -299,8 +301,8 @@ public class PluginRegistry {
                 this.setPluginVisible((PluginDescriptor)iterator.next(), visible);
             }
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("could not activate any plugins: no plugins found or preloaded"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("could not activate any plugins: no plugins found or preloaded"); // NOI18N
             }
         }
     }
@@ -354,12 +356,12 @@ public class PluginRegistry {
      * @param  descriptor  DOCUMENT ME!
      */
     private void registerPlugin(final PluginDescriptor descriptor) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("register new plugin: name='" + descriptor.getName() + "', id='" + descriptor.getId() + "'"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("register new plugin: name='" + descriptor.getName() + "', id='" + descriptor.getId() + "'"); // NOI18N
         }
 
         if (plugins.containsKey(descriptor.getId())) {
-            logger.fatal("duplicate plugin id '" + descriptor.getId() + "' detected in plugin '"
+            LOG.fatal("duplicate plugin id '" + descriptor.getId() + "' detected in plugin '"
                         + descriptor.getMetaInfo().getName() + " (" + descriptor.getName() + ")'"); // NOI18N
         } else {
             plugins.put(descriptor.getId(), descriptor);
@@ -375,13 +377,13 @@ public class PluginRegistry {
      */
     private void loadPlugin(final PluginDescriptor descriptor) throws Exception {
         if (!descriptor.isLoaded()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("loading plugin '" + descriptor.getName() + "'");    // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading plugin '" + descriptor.getName() + "'");    // NOI18N
             }
             pluginFactory.loadPlugin(descriptor);
             descriptor.setLoaded(true);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("plugin '" + descriptor.getName() + "' already loaded"); // NOI18N
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("plugin '" + descriptor.getName() + "' already loaded"); // NOI18N
         }
     }
 
@@ -393,35 +395,35 @@ public class PluginRegistry {
     private void activatePlugin(final PluginDescriptor descriptor)                // throws Exception
     {
         if (descriptor.isLoaded() && !descriptor.isActivated()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("activating plugin '" + descriptor.getName() + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("activating plugin '" + descriptor.getName() + "'"); // NOI18N
             }
 
             // activate ui(s) ..................................................
             if (descriptor.isPluginToolBarAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("activating plugin '" + descriptor.getName() + "' toolbar"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("activating plugin '" + descriptor.getName() + "' toolbar"); // NOI18N
                 }
                 ComponentRegistry.getRegistry().getMutableToolBar().addPluginToolBar(descriptor.getPluginToolBar());
             }
 
             if (descriptor.isPluginMenuAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("activating plugin '" + descriptor.getName() + "' menu"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("activating plugin '" + descriptor.getName() + "' menu"); // NOI18N
                 }
                 ComponentRegistry.getRegistry().getMutableMenuBar().addPluginMenu(descriptor.getPluginMenu());
             }
 
             if (descriptor.isPluginPopupMenuAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("activating plugin '" + descriptor.getName() + "' popup menu"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("activating plugin '" + descriptor.getName() + "' popup menu"); // NOI18N
                 }
                 ComponentRegistry.getRegistry().getMutablePopupMenu().addPluginMenu(descriptor.getPluginPopupMenu());
             }
 
             if (descriptor.isPluginUIDescriptorsAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("activating plugin '" + descriptor.getName() + "' user interface"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("activating plugin '" + descriptor.getName() + "' user interface"); // NOI18N
                 }
                 final Iterator iterator = descriptor.getPluginUIDescriptors();
                 while (iterator.hasNext()) {
@@ -433,9 +435,9 @@ public class PluginRegistry {
             descriptor.setActivated(true);
         } else {
             if (!descriptor.isLoaded()) {
-                logger.warn("plugin '" + descriptor.getName() + "' could not be activated (not loaded)");         // NOI18N
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("plugin '" + descriptor.getName() + "' could not be activated (already activated)"); // NOI18N
+                LOG.warn("plugin '" + descriptor.getName() + "' could not be activated (not loaded)");         // NOI18N
+            } else if (LOG.isDebugEnabled()) {
+                LOG.debug("plugin '" + descriptor.getName() + "' could not be activated (already activated)"); // NOI18N
             }
         }
     }
@@ -448,35 +450,35 @@ public class PluginRegistry {
     private void deactivatePlugin(final PluginDescriptor descriptor)                // throws Exception
     {
         if (descriptor.isDeactivateable() && descriptor.isLoaded() && descriptor.isActivated()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("deactivating plugin '" + descriptor.getName() + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("deactivating plugin '" + descriptor.getName() + "'"); // NOI18N
             }
 
             // activate ui(s) ..................................................
             if (descriptor.isPluginToolBarAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deactivating plugin '" + descriptor.getName() + "' toolbar"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("deactivating plugin '" + descriptor.getName() + "' toolbar"); // NOI18N
                 }
                 ComponentRegistry.getRegistry().getMutableToolBar().removePluginToolBar(descriptor.getId());
             }
 
             if (descriptor.isPluginMenuAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deactivating plugin '" + descriptor.getName() + "' menu"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("deactivating plugin '" + descriptor.getName() + "' menu"); // NOI18N
                 }
                 ComponentRegistry.getRegistry().getMutableMenuBar().removePluginMenu(descriptor.getId());
             }
 
             if (descriptor.isPluginPopupMenuAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deactivating plugin '" + descriptor.getName() + "' popup menu"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("deactivating plugin '" + descriptor.getName() + "' popup menu"); // NOI18N
                 }
                 ComponentRegistry.getRegistry().getMutablePopupMenu().removePluginMenu(descriptor.getId());
             }
 
             if (descriptor.isPluginUIDescriptorsAvailable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("deactivating plugin '" + descriptor.getName() + "' user interface"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("deactivating plugin '" + descriptor.getName() + "' user interface"); // NOI18N
                 }
                 final Iterator iterator = descriptor.getPluginUIDescriptors();
                 while (iterator.hasNext()) {
@@ -491,9 +493,9 @@ public class PluginRegistry {
             System.gc();
         } else {
             if (!descriptor.isLoaded()) {
-                logger.warn("plugin '" + descriptor.getName() + "' could not be deactivated (not loaded)"); // NOI18N
-            } else if (logger.isDebugEnabled()) {
-                logger.debug("plugin '" + descriptor.getName()
+                LOG.warn("plugin '" + descriptor.getName() + "' could not be deactivated (not loaded)"); // NOI18N
+            } else if (LOG.isDebugEnabled()) {
+                LOG.debug("plugin '" + descriptor.getName()
                             + "' could not be deactivated (already deactivated or not deactivateable)");    // NOI18N
             }
         }
@@ -507,12 +509,17 @@ public class PluginRegistry {
      */
     private void setPluginVisible(final PluginDescriptor descriptor, final boolean visible) {
         if (descriptor.isActivated()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("setting plugin '" + descriptor.getName() + "' visible"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("setting plugin '" + descriptor.getName() + "' visible"); // NOI18N
             }
             descriptor.getPlugin().setVisible(visible);
-        } else if (logger.isDebugEnabled()) {
-            logger.debug("plugin '" + descriptor.getName() + "' is not activated");    // NOI18N
+        } else if (LOG.isDebugEnabled()) {
+            LOG.debug("plugin '" + descriptor.getName() + "' is not activated");    // NOI18N
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

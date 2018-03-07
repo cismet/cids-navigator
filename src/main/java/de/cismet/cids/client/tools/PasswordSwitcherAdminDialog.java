@@ -35,11 +35,11 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.server.actions.PasswordSwitcherAdminAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /*
  * Copyright (C) 2013 cismet GmbH
@@ -81,8 +81,8 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
     private String username = null;
     private CountDownTask countDownTask;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
@@ -230,16 +230,16 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnChangePasswordActionPerformed
+    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePasswordActionPerformed
         username = txtUsername.getText().trim();
 
         switchStarted();
@@ -273,7 +273,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_btnChangePasswordActionPerformed
+    }//GEN-LAST:event_btnChangePasswordActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -395,7 +395,11 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
      * @param  compressionEnabled  DOCUMENT ME!
      */
     private void login(final String callServerURL, final String domain, final boolean compressionEnabled) {
-        final CidsAuthentification cidsAuth = new CidsAuthentification(callServerURL, domain, compressionEnabled);
+        final CidsAuthentification cidsAuth = new CidsAuthentification(
+                callServerURL,
+                domain,
+                compressionEnabled,
+                getConnectionContext());
         final JXLoginPane login = new JXLoginPane(cidsAuth);
 
         final JXLoginPane.JXLoginDialog loginDialog = new JXLoginPane.JXLoginDialog((Frame)null, login);
@@ -415,7 +419,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

@@ -18,10 +18,10 @@ import org.apache.log4j.Logger;
 
 import org.openide.util.lookup.ServiceProvider;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.configuration.ConfigAttrProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -30,7 +30,7 @@ import de.cismet.tools.configuration.ConfigAttrProvider;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = de.cismet.tools.configuration.ConfigAttrProvider.class)
-public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrProvider, ConnectionContextProvider {
+public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrProvider, ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -38,11 +38,16 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
 
     //~ Instance fields --------------------------------------------------------
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Methods ----------------------------------------------------------------
 
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }    
+    
     @Override
     public String getUserConfigAttr(final String key) {
         final ConnectionSession session = SessionManager.getSession();
@@ -146,7 +151,7 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

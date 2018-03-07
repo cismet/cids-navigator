@@ -42,12 +42,12 @@ import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.CismetThreadPool;
 
 import de.cismet.tools.collections.HashArrayList;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Der SearchTree dient zum Anzeigen von Suchergebnissen. Neben der Funktionalit\u00E4t, die er von GenericMetaTree
@@ -90,7 +90,7 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public SearchResultsTree(final ClientConnectionContext connectionContext) throws Exception {
+    public SearchResultsTree(final ConnectionContext connectionContext) throws Exception {
         this(true, 2, connectionContext);
     }
 
@@ -105,7 +105,7 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
      */
     public SearchResultsTree(final boolean useThread,
             final int maxThreadCount,
-            final ClientConnectionContext connectionContext) throws Exception {
+            final ConnectionContext connectionContext) throws Exception {
         super(new RootTreeNode(connectionContext), false, useThread, maxThreadCount, connectionContext);
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         defaultTreeModel.setAsksAllowsChildren(true);
@@ -157,7 +157,7 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
         for (final Node nodeToCheck : nodes) {
             if (nodeToCheck instanceof MetaObjectNode) {
                 final MetaObjectNode mon = (MetaObjectNode)nodeToCheck;
-                final MetaClass mc = ClassCacheMultiple.getMetaClass(mon.getDomain(), mon.getClassId());
+                final MetaClass mc = ClassCacheMultiple.getMetaClass(mon.getDomain(), mon.getClassId(), getConnectionContext());
 
                 if (existsCustomBeanPermissonProviderForClass(mc)) {
                     if (mon.getObject() == null) {

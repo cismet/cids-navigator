@@ -41,7 +41,6 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -64,7 +63,7 @@ public final class SearchSelectionTree extends MetaCatalogueTree {
      * @param  rootNodes          DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public SearchSelectionTree(final Node[] rootNodes, final ClientConnectionContext connectionContext) {
+    public SearchSelectionTree(final Node[] rootNodes, final ConnectionContext connectionContext) {
         this(new RootTreeNode(rootNodes, new SelectionTreeNodeLoader(connectionContext), connectionContext),
             connectionContext);
     }
@@ -75,7 +74,7 @@ public final class SearchSelectionTree extends MetaCatalogueTree {
      * @param  rootNode           DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public SearchSelectionTree(final RootTreeNode rootNode, final ClientConnectionContext connectionContext) {
+    public SearchSelectionTree(final RootTreeNode rootNode, final ConnectionContext connectionContext) {
         super(rootNode, false, true, 1, connectionContext);
 
         try {
@@ -456,7 +455,7 @@ final class SelectionTreeNodeLoader implements TreeNodeLoader, ConnectionContext
 
     //~ Instance fields --------------------------------------------------------
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -465,7 +464,7 @@ final class SelectionTreeNodeLoader implements TreeNodeLoader, ConnectionContext
      *
      * @param  connectionContext  DOCUMENT ME!
      */
-    SelectionTreeNodeLoader(final ClientConnectionContext connectionContext) {
+    SelectionTreeNodeLoader(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
     }
 
@@ -590,7 +589,7 @@ final class SelectionTreeNodeLoader implements TreeNodeLoader, ConnectionContext
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

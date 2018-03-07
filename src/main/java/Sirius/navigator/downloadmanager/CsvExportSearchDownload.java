@@ -17,11 +17,10 @@ import java.util.List;
 
 import de.cismet.cids.server.search.builtin.CsvExportSearchStatement;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.downloadmanager.AbstractDownload;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -36,7 +35,7 @@ public class CsvExportSearchDownload extends AbstractDownload implements Connect
     private final CsvExportSearchStatement search;
     private final List<String> header;
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -72,7 +71,7 @@ public class CsvExportSearchDownload extends AbstractDownload implements Connect
             final String directory,
             final String filename,
             final List<String> header,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         this.search = search;
         this.title = title;
         this.directory = directory;
@@ -150,7 +149,7 @@ public class CsvExportSearchDownload extends AbstractDownload implements Connect
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

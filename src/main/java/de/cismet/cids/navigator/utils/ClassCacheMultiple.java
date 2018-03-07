@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 import de.cismet.cids.utils.MetaClassUtils;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -45,11 +45,11 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain) {
+    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain, final ConnectionContext connectionContext) {
         HashMap ret = allClassCaches.get(domain);
         if (ret == null) {
             try {
-                addInstance(domain);
+                addInstance(domain, connectionContext);
                 ret = allClassCaches.get(domain);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
@@ -67,11 +67,11 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain) {
+    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain, final ConnectionContext connectionContext) {
         HashMap ret = allTableNameClassCaches.get(domain);
         if (ret == null) {
             try {
-                addInstance(domain);
+                addInstance(domain, connectionContext);
                 ret = allTableNameClassCaches.get(domain);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
@@ -90,9 +90,9 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static MetaClass getMetaClass(final String domain, final String tableName) {
+    public static MetaClass getMetaClass(final String domain, final String tableName, final ConnectionContext connectionContext) {
         try {
-            final HashMap ht = getTableNameHashtableOfClassesForOneDomain(domain);
+            final HashMap ht = getTableNameHashtableOfClassesForOneDomain(domain, connectionContext);
             return (MetaClass)ht.get(tableName.toLowerCase());
         } catch (Exception e) {
             log.warn("Couldn't get Class for Table " + tableName + "@" + domain, e); // NOI18N
@@ -108,8 +108,8 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static MetaClass getMetaClass(final String domain, final int classId) {
-        return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain).get(domain + classId);
+    public static MetaClass getMetaClass(final String domain, final int classId, final ConnectionContext connectionContext) {
+        return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, connectionContext).get(domain + classId);
     }
 
     /**
@@ -117,10 +117,10 @@ public class ClassCacheMultiple {
      *
      * @param  domain  DOCUMENT ME!
      */
-    public static void setInstance(final String domain) {
+    public static void setInstance(final String domain, final ConnectionContext connectionContext) {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain, getClientConnectionContext());
+                        .getClasses(SessionManager.getSession().getUser(), domain, connectionContext);
             allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
@@ -133,10 +133,10 @@ public class ClassCacheMultiple {
      *
      * @param  domain  DOCUMENT ME!
      */
-    public static void addInstance(final String domain) {
+    public static void addInstance(final String domain, final ConnectionContext connectionContext) {
         try {
             final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain, getClientConnectionContext());
+                        .getClasses(SessionManager.getSession().getUser(), domain, connectionContext);
             allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
             allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
         } catch (ConnectionException connectionException) {
@@ -144,13 +144,4 @@ public class ClassCacheMultiple {
         }
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-
-    public static ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(ClassCacheMultiple.class.getSimpleName());
-    }
 }

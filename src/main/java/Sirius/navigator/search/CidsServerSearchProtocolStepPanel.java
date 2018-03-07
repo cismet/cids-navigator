@@ -24,7 +24,7 @@ import javax.swing.JLabel;
 
 import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -40,7 +40,7 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
 
 // private static final Map<String, ImageIcon> ICON_MAP = new HashMap<String, ImageIcon>();
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -58,7 +58,7 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      */
     public CidsServerSearchProtocolStepPanel() {
         this(new CidsServerSearchProtocolStepImpl(null, new ArrayList<MetaObjectNode>()),
-            ClientConnectionContext.createDeprecated());
+            ConnectionContext.createDeprecated());
     }
 
     /**
@@ -68,7 +68,7 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      * @param  connectionContext       DOCUMENT ME!
      */
     public CidsServerSearchProtocolStepPanel(final CidsServerSearchProtocolStep cidsSearchProtocolStep,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         super(cidsSearchProtocolStep);
         this.connectionContext = connectionContext;
 
@@ -239,9 +239,9 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink1ActionPerformed
+    private void jXHyperlink1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jXHyperlink1ActionPerformed
         toggleSearchResultsPanelVisibility();
-    }                                                                                //GEN-LAST:event_jXHyperlink1ActionPerformed
+    }//GEN-LAST:event_jXHyperlink1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -328,21 +328,21 @@ public class CidsServerSearchProtocolStepPanel extends AbstractProtocolStepPanel
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink2ActionPerformed
+    private void jXHyperlink2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jXHyperlink2ActionPerformed
         ((CidsServerSearchProtocolStep)getProtocolStep()).reExecuteSearch();
-    }                                                                                //GEN-LAST:event_jXHyperlink2ActionPerformed
+    }//GEN-LAST:event_jXHyperlink2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jXHyperlink3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jXHyperlink3ActionPerformed
+    private void jXHyperlink3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jXHyperlink3ActionPerformed
         loadSearchResultsIntoTree();
-    }                                                                                //GEN-LAST:event_jXHyperlink3ActionPerformed
+    }//GEN-LAST:event_jXHyperlink3ActionPerformed
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

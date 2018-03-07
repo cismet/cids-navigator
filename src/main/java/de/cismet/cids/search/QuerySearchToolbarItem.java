@@ -24,8 +24,8 @@ import javax.swing.ImageIcon;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -34,12 +34,12 @@ import de.cismet.connectioncontext.ConnectionContextProvider;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsClientToolbarItem.class)
-public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem, ConnectionContextProvider {
+public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem, ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -55,6 +55,11 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
 
     //~ Methods ----------------------------------------------------------------
 
+    @Override
+    public void initWithConnectionContext(ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
+    
     @Override
     public void actionPerformed(final ActionEvent e) {
         final String id = QuerySearch.class.getName();
@@ -88,7 +93,7 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

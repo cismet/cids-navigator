@@ -30,7 +30,7 @@ import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.SearchResultListener;
 import de.cismet.cids.server.search.SearchResultListenerProvider;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -61,7 +61,7 @@ public final class CidsSearchExecutor {
      */
     @Deprecated
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search) {
-        searchAndDisplayResultsWithDialog(search, ClientConnectionContext.createDeprecated());
+        searchAndDisplayResultsWithDialog(search, ConnectionContext.createDeprecated());
     }
 
     /**
@@ -71,7 +71,7 @@ public final class CidsSearchExecutor {
      * @param  connectionContext  DOCUMENT ME!
      */
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         searchAndDisplayResultsWithDialog(search, false, connectionContext);
     }
 
@@ -84,7 +84,7 @@ public final class CidsSearchExecutor {
     @Deprecated
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final boolean simpleSort) {
-        searchAndDisplayResultsWithDialog(search, simpleSort, ClientConnectionContext.createDeprecated());
+        searchAndDisplayResultsWithDialog(search, simpleSort, ConnectionContext.createDeprecated());
     }
 
     /**
@@ -97,7 +97,7 @@ public final class CidsSearchExecutor {
      */
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final boolean simpleSort,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         if (searchControlDialog == null) {
             searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(),
                     true,
@@ -130,7 +130,7 @@ public final class CidsSearchExecutor {
     public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener listener,
             final PropertyChangeListener searchResultsListener,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 PropertyChangeListener cancelListener = null;
@@ -214,7 +214,7 @@ public final class CidsSearchExecutor {
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         return searchAndDisplayResults(
                 search,
                 searchListener,
@@ -248,7 +248,7 @@ public final class CidsSearchExecutor {
             final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage,
             final boolean simpleSort,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 @Override

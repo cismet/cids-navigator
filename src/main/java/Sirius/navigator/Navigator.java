@@ -73,10 +73,7 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ClientConnectionContextStore;
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
@@ -105,6 +102,8 @@ import static Sirius.navigator.Navigator.NAVIGATOR_HOME;
 import static Sirius.navigator.Navigator.NAVIGATOR_HOME_DIR;
 
 import static java.awt.Frame.MAXIMIZED_BOTH;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -152,8 +151,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
     private NavigatorSplashScreen splashScreen;
     private String title;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.create(
+            ConnectionContext.Category.OTHER,
+            getClass().getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -387,7 +387,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
                         proxyConfig,
-                        propertyManager.isCompressionEnabled());
+                        propertyManager.isCompressionEnabled(),
+                        getConnectionContext());
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
@@ -401,8 +402,13 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             }
             try {
                 session = ConnectionFactory.getFactory()
-                            .createSession(connection, propertyManager.getConnectionInfo(), true);
-                proxy = ConnectionFactory.getFactory().createProxy(propertyManager.getConnectionProxyClass(), session);
+                            .createSession(
+                                    connection,
+                                    propertyManager.getConnectionInfo(),
+                                    true,
+                                    getConnectionContext());
+                proxy = ConnectionFactory.getFactory()
+                            .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
                 SessionManager.init(proxy);
             } catch (UserException uexp) {
                 logger.error("autologin failed", uexp);                                                                  // NOI18N
@@ -417,10 +423,15 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             }
             try {
                 session = ConnectionFactory.getFactory()
-                            .createSession(connection, propertyManager.getConnectionInfo(), false);
+                            .createSession(
+                                    connection,
+                                    propertyManager.getConnectionInfo(),
+                                    false,
+                                    getConnectionContext());
             } catch (UserException uexp) {
             }                                    // should never happen
-            proxy = ConnectionFactory.getFactory().createProxy(propertyManager.getConnectionProxyClass(), session);
+            proxy = ConnectionFactory.getFactory()
+                        .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
             SessionManager.init(proxy);
 
             loginDialog = new LoginDialog(this);
@@ -500,9 +511,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         Collections.sort(sorted, comp);
 
         for (final CidsClientToolbarItem ccti : sorted) {
-            if (ccti instanceof ClientConnectionContextStore) {
-                ((ClientConnectionContextStore)ccti).setConnectionContext(getConnectionContext());
-                ((ClientConnectionContextStore)ccti).initAfterConnectionContext();
+            if (ccti instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)ccti).initWithConnectionContext(getConnectionContext());
             }
             if (ccti.isVisible()) {
                 final JToolBar innerToolbar;
@@ -564,11 +574,11 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             225,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
         if (PropertyManager.getManager().isPostfilterEnabled()) {
-            searchResultsTree = new PostfilterEnabledSearchResultsTree(ClientConnectionContext.create(
+            searchResultsTree = new PostfilterEnabledSearchResultsTree(ConnectionContext.create(
                         ConnectionContext.Category.CATALOGUE,
                         PostfilterEnabledSearchResultsTree.class.getSimpleName()));
         } else {
-            searchResultsTree = new SearchResultsTree(ClientConnectionContext.create(
+            searchResultsTree = new SearchResultsTree(ConnectionContext.create(
                         ConnectionContext.Category.CATALOGUE,
                         SearchResultsTree.class.getSimpleName()));
         }
@@ -593,7 +603,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             progressObserver.setProgress(
                 235,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_225")); // NOI18N
-            workingSpaceTree = new WorkingSpaceTree(ClientConnectionContext.create(
+            workingSpaceTree = new WorkingSpaceTree(ConnectionContext.create(
                         ConnectionContext.Category.CATALOGUE,
                         WorkingSpaceTree.class.getSimpleName()));
             workingSpace = new WorkingSpace(workingSpaceTree, propertyManager.isAdvancedLayout());
@@ -921,6 +931,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         final Collection<? extends StartupHook> hooks = Lookup.getDefault().lookupAll(StartupHook.class);
 
         for (final StartupHook hook : hooks) {
+            if (hook instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)hook).initWithConnectionContext(ConnectionContext.create(ConnectionContext.Category.STARTUP, hook.getClass().getSimpleName()));
+            }
             hook.applicationStarted();
         }
 
@@ -1281,7 +1294,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

@@ -30,7 +30,7 @@ import java.util.*;
 
 import javax.swing.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -48,8 +48,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
 
     //~ Instance fields --------------------------------------------------------
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -183,24 +183,24 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void commitButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_commitButtonActionPerformed
-    {                                                                              //GEN-HEADEREND:event_commitButtonActionPerformed
+    private void commitButtonActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_commitButtonActionPerformed
+    {//GEN-HEADEREND:event_commitButtonActionPerformed
         this.editorActivationDelegate.setPropertyChangeEnabled(true);
         this.stopEditing();
         this.editorActivationDelegate.setPropertyChangeEnabled(false);
-    }                                                                              //GEN-LAST:event_commitButtonActionPerformed
+    }//GEN-LAST:event_commitButtonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cancelButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_cancelButtonActionPerformed
-    {                                                                              //GEN-HEADEREND:event_cancelButtonActionPerformed
+    private void cancelButtonActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_cancelButtonActionPerformed
+    {//GEN-HEADEREND:event_cancelButtonActionPerformed
         this.editorActivationDelegate.setPropertyChangeEnabled(true);
         this.cancelCellEditing();
         this.editorActivationDelegate.setPropertyChangeEnabled(false);
-    }                                                                              //GEN-LAST:event_cancelButtonActionPerformed
+    }//GEN-LAST:event_cancelButtonActionPerformed
 
     @Override
     public void setValueChanged(final boolean valueChanged) {
@@ -354,7 +354,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -46,7 +46,7 @@ public class ClassTreeNode extends DefaultMetaTreeNode implements ConnectionCont
      * @param  metaClassNode      DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public ClassTreeNode(final MetaClassNode metaClassNode, final ClientConnectionContext connectionContext) {
+    public ClassTreeNode(final MetaClassNode metaClassNode, final ConnectionContext connectionContext) {
         super(metaClassNode, connectionContext);
 
         try {

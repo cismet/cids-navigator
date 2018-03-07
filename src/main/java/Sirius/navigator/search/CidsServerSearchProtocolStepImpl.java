@@ -25,7 +25,7 @@ import de.cismet.commons.gui.protocol.AbstractProtocolStep;
 import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
 import de.cismet.commons.gui.protocol.ProtocolStepMetaInfo;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -51,8 +51,8 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
 
     @Getter @JsonIgnore private final transient List<MetaObjectNode> searchResultNodes;
 
-    @JsonIgnore private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    @JsonIgnore private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     @Getter
     @JsonProperty(required = true)
@@ -143,7 +143,7 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

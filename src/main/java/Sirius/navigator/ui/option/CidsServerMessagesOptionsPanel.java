@@ -19,8 +19,7 @@ import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
@@ -28,6 +27,7 @@ import de.cismet.lookupoptions.OptionsPanelController;
 import de.cismet.lookupoptions.options.GeneralOptionsCategory;
 
 import de.cismet.tools.configuration.NoWriteError;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -35,7 +35,7 @@ import de.cismet.tools.configuration.NoWriteError;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel implements ClientConnectionContextStore {
+public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel implements ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -46,7 +46,7 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
     private int intervallInMs = CidsServerMessageNotifier.DEFAULT_SCHEDULE_INTERVAL;
     private boolean stillConfigured = false;
 
-    private ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass().getSimpleName());
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
@@ -71,7 +71,9 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void initAfterConnectionContext() {
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+
         try {
             initComponents();
         } catch (Exception e) {
@@ -222,12 +224,7 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel impleme
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
-    }
-
-    @Override
-    public void setConnectionContext(final ClientConnectionContext connectionContext) {
-        this.connectionContext = connectionContext;
     }
 }

@@ -23,7 +23,7 @@ import java.util.*;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -45,8 +45,8 @@ public class ObjectAttributeNode extends AttributeNode implements ConnectionCont
 
     private final SingleAttributeIterator attributeIterator;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -159,7 +159,7 @@ public class ObjectAttributeNode extends AttributeNode implements ConnectionCont
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

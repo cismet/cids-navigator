@@ -34,14 +34,14 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
 
-import de.cismet.cids.client.tools.ClientConnectionContextUtils;
+import de.cismet.cids.client.tools.ConnectionContextUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.CismetThreadPool;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -384,7 +384,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
-        return ClientConnectionContextUtils.getFirstParentClientConnectionContext(this);
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
     }
 }

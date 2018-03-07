@@ -20,7 +20,7 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -40,7 +40,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Conne
     private boolean ascending;
     private boolean cancelled = false;
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -51,7 +51,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Conne
      */
     @Deprecated
     public DirectedMetaObjectNodeComparator(final boolean ascending) {
-        this(ascending, ClientConnectionContext.createDeprecated());
+        this(ascending, ConnectionContext.createDeprecated());
     }
     /**
      * Creates a new DirectedMetaObjectNodeComparator object.
@@ -59,7 +59,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Conne
      * @param  ascending          Sort ascending?
      * @param  connectionContext  DOCUMENT ME!
      */
-    public DirectedMetaObjectNodeComparator(final boolean ascending, final ClientConnectionContext connectionContext) {
+    public DirectedMetaObjectNodeComparator(final boolean ascending, final ConnectionContext connectionContext) {
         this.ascending = ascending;
         this.connectionContext = connectionContext;
     }
@@ -189,7 +189,7 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node>, Conne
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

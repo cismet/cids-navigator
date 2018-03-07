@@ -9,7 +9,7 @@ package Sirius.navigator.search;
 
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -28,7 +28,7 @@ public class CidsServerSearchProtocolStepResultsTree extends SearchResultsTree {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public CidsServerSearchProtocolStepResultsTree(final ClientConnectionContext connectionContext) throws Exception {
+    public CidsServerSearchProtocolStepResultsTree(final ConnectionContext connectionContext) throws Exception {
         super(connectionContext);
     }
 
@@ -43,7 +43,7 @@ public class CidsServerSearchProtocolStepResultsTree extends SearchResultsTree {
      */
     public CidsServerSearchProtocolStepResultsTree(final boolean useThread,
             final int maxThreadCount,
-            final ClientConnectionContext connectionContext) throws Exception {
+            final ConnectionContext connectionContext) throws Exception {
         super(useThread, maxThreadCount, connectionContext);
     }
 }

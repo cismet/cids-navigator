@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -49,7 +49,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ConnectionCon
 
     protected final Logger LOG = Logger.getLogger(MetaObjectNodeComparator.class);
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -58,7 +58,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ConnectionCon
      */
     @Deprecated
     public MetaObjectNodeComparator() {
-        this(ClientConnectionContext.createDeprecated());
+        this(ConnectionContext.createDeprecated());
     }
 
     /**
@@ -66,7 +66,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ConnectionCon
      *
      * @param  connectionContext  DOCUMENT ME!
      */
-    public MetaObjectNodeComparator(final ClientConnectionContext connectionContext) {
+    public MetaObjectNodeComparator(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
     }
 
@@ -137,7 +137,7 @@ public class MetaObjectNodeComparator implements Comparator<Node>, ConnectionCon
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

@@ -16,6 +16,9 @@ import Sirius.server.middleware.types.MetaClass;
 import java.util.HashMap;
 
 import de.cismet.cids.utils.MetaClassCacheService;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.AbstractConnectionContext.Category;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -27,37 +30,48 @@ import de.cismet.cids.utils.MetaClassCacheService;
     service = MetaClassCacheService.class,
     position = 100
 )
-public class NavigatorMetaClassService implements MetaClassCacheService {
+public class NavigatorMetaClassService implements MetaClassCacheService, ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(NavigatorMetaClassService.class);
 
     //~ Constructors -----------------------------------------------------------
 
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
     /**
      * Creates a new NavigatorMetaClassService object.
      */
     public NavigatorMetaClassService() {
-        if (log.isDebugEnabled()) {
-            log.debug("inited"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("inited"); // NOI18N
         }
     }
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
+    
+    @Override
     public HashMap getAllClasses(final String domain) {
-        return ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain);
+        return ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, getConnectionContext());
     }
 
     @Override
     public MetaClass getMetaClass(final String domain, final String tableName) {
-        return ClassCacheMultiple.getMetaClass(domain, tableName);
+        return ClassCacheMultiple.getMetaClass(domain, tableName, getConnectionContext());
     }
 
     @Override
     public MetaClass getMetaClass(final String domain, final int classId) {
-        return ClassCacheMultiple.getMetaClass(domain, classId);
+        return ClassCacheMultiple.getMetaClass(domain, classId, getConnectionContext());
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

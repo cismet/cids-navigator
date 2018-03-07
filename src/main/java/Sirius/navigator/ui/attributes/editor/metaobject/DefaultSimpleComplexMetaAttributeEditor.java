@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 
 import de.cismet.cids.tools.fromstring.StringCreateable;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -58,8 +58,8 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
 
     protected ValueChangeListener valueChangeListener;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JButton complexEditorButton;
@@ -155,10 +155,10 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void complexEditorButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_complexEditorButtonActionPerformed
-    {                                                                                     //GEN-HEADEREND:event_complexEditorButtonActionPerformed
+    private void complexEditorButtonActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_complexEditorButtonActionPerformed
+    {//GEN-HEADEREND:event_complexEditorButtonActionPerformed
 // TODO add your handling code here:
-    } //GEN-LAST:event_complexEditorButtonActionPerformed
+    }//GEN-LAST:event_complexEditorButtonActionPerformed
 
     /**
      * Der Wert wurde schon im ValueChanged Listener ver\u00E4ndert.
@@ -340,7 +340,7 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

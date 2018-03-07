@@ -35,10 +35,10 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.tree.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.CismetThreadPool;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -57,8 +57,8 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     private ComplexEditor editor = null;
     private Object commitBlocker = new Object();
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private Sirius.navigator.ui.attributes.AttributeTree attributeTree;
     private javax.swing.JButton cancelButton;
@@ -603,7 +603,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

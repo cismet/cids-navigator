@@ -28,7 +28,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -57,7 +57,7 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
     private boolean userGroupIsForbidden = PropertyManager.getManager().getPermissionModus()
                 == PropertyManager.PermissionModus.FORBIDDEN;
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -84,9 +84,9 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
     public LoginDialog(final java.awt.Frame owner) {
         super(owner, true);
         if (owner instanceof ConnectionContextProvider) {
-            connectionContext = (ClientConnectionContext)((ConnectionContextProvider)owner).getConnectionContext();
+            connectionContext = (ConnectionContext)((ConnectionContextProvider)owner).getConnectionContext();
         } else {
-            connectionContext = ClientConnectionContext.create(getClass().getSimpleName());
+            connectionContext = ConnectionContext.createDummy();
         }
 
         preferences = Preferences.userNodeForPackage(getClass());
@@ -338,54 +338,54 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tf_nameActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tf_nameActionPerformed
+    private void tf_nameActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_nameActionPerformed
         refreshLogin(evt);
-    }                                                                           //GEN-LAST:event_tf_nameActionPerformed
+    }//GEN-LAST:event_tf_nameActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pf_passActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pf_passActionPerformed
+    private void pf_passActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pf_passActionPerformed
         refreshLogin(evt);
-    }                                                                           //GEN-LAST:event_pf_passActionPerformed
+    }//GEN-LAST:event_pf_passActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btn_okActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btn_okActionPerformed
+    private void btn_okActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_okActionPerformed
         refreshLogin(evt);
-    }                                                                          //GEN-LAST:event_btn_okActionPerformed
+    }//GEN-LAST:event_btn_okActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btn_cancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btn_cancelActionPerformed
+    private void btn_cancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
         refreshLogin(evt);
-    }                                                                              //GEN-LAST:event_btn_cancelActionPerformed
+    }//GEN-LAST:event_btn_cancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tf_nameFocusLost(final java.awt.event.FocusEvent evt) { //GEN-FIRST:event_tf_nameFocusLost
+    private void tf_nameFocusLost(final java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_nameFocusLost
         refreshFocus(evt);
-    }                                                                    //GEN-LAST:event_tf_nameFocusLost
+    }//GEN-LAST:event_tf_nameFocusLost
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cb_srvItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_cb_srvItemStateChanged
+    private void cb_srvItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cb_srvItemStateChanged
         domainRefresh(evt);
-    }                                                                         //GEN-LAST:event_cb_srvItemStateChanged
+    }//GEN-LAST:event_cb_srvItemStateChanged
 
     /**
      * DOCUMENT ME!
@@ -788,7 +788,7 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

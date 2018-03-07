@@ -14,7 +14,6 @@ package de.cismet.cids.client.tools;
 
 import java.awt.Component;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -24,7 +23,7 @@ import de.cismet.connectioncontext.ConnectionContextProvider;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class ClientConnectionContextUtils {
+public class ConnectionContextUtils {
 
     //~ Methods ----------------------------------------------------------------
 
@@ -35,7 +34,7 @@ public class ClientConnectionContextUtils {
      *
      * @return  DOCUMENT ME!
      */
-    public static ClientConnectionContext getFirstParentClientConnectionContext(final Component component) {
+    public static ConnectionContext getFirstParentClientConnectionContext(final Component component) {
         if (component == null) {
             return null;
         }
@@ -44,12 +43,12 @@ public class ClientConnectionContextUtils {
         while ((parent = child.getParent()) != null) {
             if (parent instanceof ConnectionContextProvider) {
                 final ConnectionContext context = ((ConnectionContextProvider)parent).getConnectionContext();
-                if (context instanceof ClientConnectionContext) {
-                    return (ClientConnectionContext)context;
+                if (context instanceof ConnectionContext) {
+                    return (ConnectionContext)context;
                 }
             }
             child = parent;
         }
-        return ClientConnectionContext.createDeprecated();
+        return ConnectionContext.createDeprecated();
     }
 }

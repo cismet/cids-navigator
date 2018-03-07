@@ -21,7 +21,7 @@ import Sirius.server.middleware.types.*;
 
 import java.util.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -305,7 +305,7 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContext.createDummy();
     }
 }

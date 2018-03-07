@@ -28,9 +28,10 @@ import java.util.List;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.collections.HashArrayList;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -46,11 +47,9 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
 
     //~ Instance fields --------------------------------------------------------
 
-    private HashArrayList<Node> resultNodesOriginal = new HashArrayList<Node>();
-
-    private ArrayList<PostFilterGUI> availablePostFilterGUIs = new ArrayList<PostFilterGUI>();
-
-    private ArrayList<PostFilter> filterArray = new ArrayList<PostFilter>();
+    private HashArrayList<Node> resultNodesOriginal = new HashArrayList<>();
+    private ArrayList<PostFilterGUI> availablePostFilterGUIs = new ArrayList<>();
+    private ArrayList<PostFilter> filterArray = new ArrayList<>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -61,9 +60,14 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public PostfilterEnabledSearchResultsTree(final ClientConnectionContext connectionContext) throws Exception {
+    public PostfilterEnabledSearchResultsTree(final ConnectionContext connectionContext) throws Exception {
         super(connectionContext);
         final Collection<? extends PostFilterGUI> lookupResult = Lookup.getDefault().lookupAll(PostFilterGUI.class);
+        for (final PostFilterGUI gui : lookupResult) {
+            if (gui instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)gui).initWithConnectionContext(getConnectionContext());
+            }
+        }
         availablePostFilterGUIs = new ArrayList<PostFilterGUI>(lookupResult);
 
         Collections.sort(availablePostFilterGUIs, new Comparator<PostFilterGUI>() {
@@ -88,7 +92,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      */
     public PostfilterEnabledSearchResultsTree(final boolean useThread,
             final int maxThreadCount,
-            final ClientConnectionContext connectionContext) throws Exception {
+            final ConnectionContext connectionContext) throws Exception {
         super(useThread, maxThreadCount, connectionContext);
     }
 
@@ -111,7 +115,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
             final boolean sortActive) {
         super.setResultNodes(nodes, append, listener, simpleSort, sortActive); // To change body of generated
         // methods, choose Tools | Templates.
-        resultNodesOriginal = new HashArrayList<Node>(super.resultNodes);
+        resultNodesOriginal = new HashArrayList<>(super.resultNodes);
     }
 
     /**
@@ -144,7 +148,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     @Override
     public void setResultNodes(final Node[] nodes) {
         super.setResultNodes(nodes);
-        resultNodesOriginal = new HashArrayList<Node>(super.resultNodes);
+        resultNodesOriginal = new HashArrayList<>(super.resultNodes);
     }
 
     /**
@@ -322,10 +326,10 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      *
      * @return  DOCUMENT ME!
      */
-    public static Collection<MetaClass> getAllMetaClassesForNodeCollection(final Collection<Node> collection) {
-        final ArrayList<MetaClass> result = new ArrayList<MetaClass>();
+    public static Collection<MetaClass> getAllMetaClassesForNodeCollection(final Collection<Node> collection, final ConnectionContext connectionContext) {
+        final ArrayList<MetaClass> result = new ArrayList<>();
         for (final Node n : collection) {
-            final MetaClass mc = ClassCacheMultiple.getMetaClass(n.getDomain(), n.getClassId());
+            final MetaClass mc = ClassCacheMultiple.getMetaClass(n.getDomain(), n.getClassId(), connectionContext);
             if (!result.contains(mc)) {
                 result.add(mc);
             }
@@ -340,9 +344,9 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      *
      * @return  DOCUMENT ME!
      */
-    public static Collection<String> getAllTableNamesForNodeCollection(final Collection<Node> collection) {
-        final ArrayList<MetaClass> classes = new ArrayList<MetaClass>(getAllMetaClassesForNodeCollection(collection));
-        final ArrayList<String> result = new ArrayList<String>(classes.size());
+    public static Collection<String> getAllTableNamesForNodeCollection(final Collection<Node> collection, final ConnectionContext connectionContext) {
+        final ArrayList<MetaClass> classes = new ArrayList<>(getAllMetaClassesForNodeCollection(collection, connectionContext));
+        final ArrayList<String> result = new ArrayList<>(classes.size());
         for (final MetaClass mc : classes) {
             result.add(mc.getTableName());
         }
@@ -355,7 +359,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      * @return  DOCUMENT ME!
      */
     public List<Node> getOriginalResultNodes() {
-        final ArrayList<Node> originalResultNodes = new ArrayList<Node>(this.resultNodesOriginal.size());
+        final ArrayList<Node> originalResultNodes = new ArrayList<>(this.resultNodesOriginal.size());
         originalResultNodes.addAll(this.resultNodesOriginal);
         return originalResultNodes;
     }

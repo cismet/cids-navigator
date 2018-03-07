@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -34,7 +34,7 @@ public class WaitTreeNode extends DefaultMetaTreeNode {
      *
      * @param  connectionContext  DOCUMENT ME!
      */
-    public WaitTreeNode(final ClientConnectionContext connectionContext) {
+    public WaitTreeNode(final ConnectionContext connectionContext) {
         super(null, connectionContext);
         this.explored = true;
         this.setAllowsChildren(false);

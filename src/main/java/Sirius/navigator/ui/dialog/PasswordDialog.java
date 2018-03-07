@@ -45,7 +45,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -69,8 +69,8 @@ public class PasswordDialog extends JDialog implements ConnectionContextProvider
     private JPasswordField password_new;
     private JPasswordField password_again;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -201,7 +201,7 @@ public class PasswordDialog extends JDialog implements ConnectionContextProvider
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

@@ -39,7 +39,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-import de.cismet.cids.client.tools.ClientConnectionContextUtils;
+import de.cismet.cids.client.tools.ConnectionContextUtils;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -48,7 +48,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -242,8 +242,8 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
-        return ClientConnectionContextUtils.getFirstParentClientConnectionContext(this);
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
     }
 
     /**
@@ -428,7 +428,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
 
         if ((query != null) && (query.trim().length() > 1)) {
             search = new LightweightMetaObjectsByQuerySearch();
-            ((LightweightMetaObjectsByQuerySearch)search).setConnectionContext(getConnectionContext());
+            ((LightweightMetaObjectsByQuerySearch)search).initWithConnectionContext(getConnectionContext());
             ((LightweightMetaObjectsByQuerySearch)search).setDomain(mc.getDomain());
             ((LightweightMetaObjectsByQuerySearch)search).setClassId(mc.getID());
             ((LightweightMetaObjectsByQuerySearch)search).setQuery(query);
@@ -578,7 +578,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
      */
     private void setMetaClassFromTableNameImpl(final String domain, final String tabname) {
         if ((tabname != null) && (tabname.length() > 0)) {
-            this.metaClass = ClassCacheMultiple.getMetaClass(domain, tabname);
+            this.metaClass = ClassCacheMultiple.getMetaClass(domain, tabname, getConnectionContext());
             if (metaClass == null) {
                 LOG.error("Could not find MetaClass for Table " + tabname + " in domain " + domain); // NOI18N
             }

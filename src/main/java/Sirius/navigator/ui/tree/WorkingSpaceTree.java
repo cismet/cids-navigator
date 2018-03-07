@@ -7,7 +7,7 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -26,7 +26,7 @@ public class WorkingSpaceTree extends SearchResultsTree {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public WorkingSpaceTree(final ClientConnectionContext connectionContext) throws Exception {
+    public WorkingSpaceTree(final ConnectionContext connectionContext) throws Exception {
         super(connectionContext);
     }
 
@@ -41,7 +41,7 @@ public class WorkingSpaceTree extends SearchResultsTree {
      */
     public WorkingSpaceTree(final boolean useThread,
             final int maxThreadCount,
-            final ClientConnectionContext connectionContext) throws Exception {
+            final ConnectionContext connectionContext) throws Exception {
         super(useThread, maxThreadCount, connectionContext);
     }
 }

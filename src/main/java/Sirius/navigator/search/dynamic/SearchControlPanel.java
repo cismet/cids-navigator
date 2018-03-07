@@ -39,7 +39,6 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -66,7 +65,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     private ImageIcon iconCancel;
 
     private boolean simpleSort;
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -82,7 +81,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      * @param  listener           DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public SearchControlPanel(final SearchControlListener listener, final ClientConnectionContext connectionContext) {
+    public SearchControlPanel(final SearchControlListener listener, final ConnectionContext connectionContext) {
         if (listener == null) {
             LOG.warn("Given listener is null. Panel won't work.");
         }
@@ -164,7 +163,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
         if (LOG.isInfoEnabled()) {
             LOG.info((searching ? "Cancel" : "Search") + " button was clicked.");
         }
@@ -239,7 +238,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 };
             searchPreparationThread.execute();
         }
-    } //GEN-LAST:event_btnSearchCancelActionPerformed
+    }//GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * This method is called before the search is actually started and gives a possibility to abort the search. In the
@@ -405,7 +404,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

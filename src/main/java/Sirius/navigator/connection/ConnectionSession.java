@@ -38,7 +38,7 @@ import org.apache.log4j.*;
 
 import java.rmi.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -62,25 +62,39 @@ public class ConnectionSession implements ConnectionContextProvider {
     private boolean loggedin = false;
     private User user;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new instance of ConnectionSession.
+     * Creates a new ConnectionSession object.
      *
      * @param   connection  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     protected ConnectionSession(final Connection connection) throws ConnectionException, UserException {
-        this(connection, new ConnectionInfo(), false);
+        this(connection, ConnectionContext.createDeprecated());
     }
 
     /**
      * Creates a new instance of ConnectionSession.
+     *
+     * @param   connection         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    protected ConnectionSession(final Connection connection, final ConnectionContext connectionContext)
+            throws ConnectionException, UserException {
+        this(connection, new ConnectionInfo(), false, connectionContext);
+    }
+
+    /**
+     * Creates a new ConnectionSession object.
      *
      * @param   connection      DOCUMENT ME!
      * @param   connectionInfo  DOCUMENT ME!
@@ -88,9 +102,26 @@ public class ConnectionSession implements ConnectionContextProvider {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     protected ConnectionSession(final Connection connection, final ConnectionInfo connectionInfo)
             throws ConnectionException, UserException {
-        this(connection, connectionInfo, true);
+        this(connection, connectionInfo, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new instance of ConnectionSession.
+     *
+     * @param   connection         DOCUMENT ME!
+     * @param   connectionInfo     DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    protected ConnectionSession(final Connection connection,
+            final ConnectionInfo connectionInfo,
+            final ConnectionContext connectionContext) throws ConnectionException, UserException {
+        this(connection, connectionInfo, true, connectionContext);
     }
 
     /**
@@ -103,15 +134,36 @@ public class ConnectionSession implements ConnectionContextProvider {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     protected ConnectionSession(final Connection connection,
             final ConnectionInfo connectionInfo,
             final boolean autoLogin) throws ConnectionException, UserException {
+        this(connection, connectionInfo, autoLogin, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new ConnectionSession object.
+     *
+     * @param   connection      DOCUMENT ME!
+     * @param   connectionInfo  DOCUMENT ME!
+     * @param   autoLogin       DOCUMENT ME!
+     * @param   connectContext  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    protected ConnectionSession(final Connection connection,
+            final ConnectionInfo connectionInfo,
+            final boolean autoLogin,
+            final ConnectionContext connectContext) throws ConnectionException, UserException {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("creating new connection session"); // NOI18N
         }
 
         this.connection = connection;
         this.connectionInfo = connectionInfo;
+        this.connectionContext = connectContext;
+
         // this.writePermission = new Permission(PermissionHolder.WRITE, "write", "accessExplicit");
 
         if (autoLogin) {
@@ -291,7 +343,7 @@ public class ConnectionSession implements ConnectionContextProvider {
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

@@ -51,8 +51,7 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
@@ -60,6 +59,7 @@ import de.cismet.tools.Converter;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -85,8 +85,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
     private final HashMap<Integer, MetaClass> classMap = new HashMap<>();
     private final List<TestInfo> testInfos;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -101,10 +100,13 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
     /**
      * Creates new form PerformanceComparisonDialog.
      *
-     * @param  testInfos  DOCUMENT ME!
+     * @param  testInfos          DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public PerformanceComparisonDialog(final List<TestInfo> testInfos) {
+    public PerformanceComparisonDialog(final List<TestInfo> testInfos,
+            final ConnectionContext connectionContext) {
         super(new javax.swing.JFrame(), true);
+        this.connectionContext = connectionContext;
 
         this.testInfos = testInfos;
 
@@ -193,7 +195,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         jProgressBar1.setIndeterminate(true);
         jButton1.setEnabled(false);
@@ -229,7 +231,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                                     if (classMap.containsKey(classId)) {
                                         mc = classMap.get(classId);
                                     } else {
-                                        mc = ClassCacheMultiple.getMetaClass(testInfo.getDomain(), classId);
+                                        mc = ClassCacheMultiple.getMetaClass(testInfo.getDomain(), classId, getConnectionContext());
                                         classMap.put(classId, mc);
                                     }
 
@@ -278,7 +280,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                     jButton1.setEnabled(true);
                 }
             }.execute();
-    } //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -466,7 +468,9 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                 @Override
                 public void run() {
                     try {
-                        final PerformanceComparisonDialog dialog = new PerformanceComparisonDialog(testInfos);
+                        final PerformanceComparisonDialog dialog = new PerformanceComparisonDialog(
+                                testInfos,
+                                ConnectionContext.createDeprecated());
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                                 @Override
@@ -524,7 +528,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 
@@ -589,7 +593,8 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                                 CONNECTION_CLASS,
                                 callserverURL,
                                 Proxy.fromPreferences(),
-                                compressionEnabled);
+                                compressionEnabled,
+                                getConnectionContext());
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callserverURL);
                 connectionInfo.setPassword(new String(password));
@@ -598,12 +603,12 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                 connectionInfo.setUsergroupDomain(domain);
                 connectionInfo.setUsername(user);
                 final ConnectionSession session = ConnectionFactory.getFactory()
-                            .createSession(connection, connectionInfo, true);
+                            .createSession(connection, connectionInfo, true, getConnectionContext());
                 final ConnectionProxy proxy = ConnectionFactory.getFactory()
-                            .createProxy(CONNECTION_PROXY_CLASS, session);
+                            .createProxy(CONNECTION_PROXY_CLASS, session, getConnectionContext());
                 SessionManager.init(proxy);
 
-                ClassCacheMultiple.setInstance(domain);
+                ClassCacheMultiple.setInstance(domain, getConnectionContext());
                 return true;
             } catch (Throwable t) {
                 LOG.error("Fehler beim Anmelden", t);

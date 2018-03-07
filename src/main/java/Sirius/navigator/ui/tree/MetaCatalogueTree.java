@@ -49,7 +49,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -77,11 +76,10 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.commons.concurrency.CismetExecutors;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DefaultMetaTree ist ein Navigationsbaum.
@@ -106,7 +104,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
     private final transient MetaTreeRefreshCache refreshCache;
     private final transient ExecutorService treePool;
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -119,7 +117,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      */
     public MetaCatalogueTree(final RootTreeNode rootTreeNode,
             final boolean editable,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         this(rootTreeNode, editable, true, 3, connectionContext);
     }
 
@@ -136,11 +134,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             final boolean editable,
             final boolean useThread,
             final int maxThreadCount,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+        this.useThread = useThread;
         this.setModel(new DefaultTreeModel(rootTreeNode, true));
         this.setEditable(editable);
-        this.useThread = useThread;
-        this.connectionContext = connectionContext;
 
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
         this.defaultTreeModel = (DefaultTreeModel)this.getModel();
@@ -155,7 +153,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 NavigatorConcurrency.createThreadFactory("meta-tree")); // NOI18N
 
         this.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        this.setCellRenderer(new MetaTreeNodeRenderer());
+        this.setCellRenderer(new MetaTreeNodeRenderer(getConnectionContext()));
         this.putClientProperty("JTree.lineStyle", "Angled"); // NOI18N
         this.setShowsRootHandles(true);
         this.setRootVisible(false);
@@ -529,7 +527,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      *
      * @throws  IllegalArgumentException  DOCUMENT ME!
      */
-    public static DefaultMetaTreeNode createTreeNode(final Node node, final ClientConnectionContext connectionContext) {
+    public static DefaultMetaTreeNode createTreeNode(final Node node, final ConnectionContext connectionContext) {
         if (node instanceof MetaObjectNode) {
             return new ObjectTreeNode((MetaObjectNode)node, connectionContext);
         } else if (node instanceof MetaNode) {
@@ -542,7 +540,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

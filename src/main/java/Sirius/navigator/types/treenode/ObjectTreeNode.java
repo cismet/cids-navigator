@@ -23,10 +23,10 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.CurrentStackTrace;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -79,7 +79,7 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      * @param  metaObjectNode     DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public ObjectTreeNode(final MetaObjectNode metaObjectNode, final ClientConnectionContext connectionContext) {
+    public ObjectTreeNode(final MetaObjectNode metaObjectNode, final ConnectionContext connectionContext) {
         super(metaObjectNode, connectionContext);
 
         try {

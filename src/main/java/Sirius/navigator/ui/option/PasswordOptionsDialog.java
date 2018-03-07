@@ -23,13 +23,13 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
 
 import de.cismet.lookupoptions.options.SecurityOptionsCategory;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * The PasswordOptionsDialog is intended to provide the user with means for changing her password. It is displayed in
@@ -39,7 +39,7 @@ import de.cismet.lookupoptions.options.SecurityOptionsCategory;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class PasswordOptionsDialog extends AbstractOptionsPanel implements ClientConnectionContextStore {
+public class PasswordOptionsDialog extends AbstractOptionsPanel implements ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -47,7 +47,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
 
     //~ Instance fields --------------------------------------------------------
 
-    private ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass().getSimpleName());
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
     private javax.swing.Box.Filler filler1;
@@ -77,7 +77,8 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void initAfterConnectionContext() {
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         try {
             initComponents();
 
@@ -254,7 +255,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnChangePasswordActionPerformed
+    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePasswordActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -337,7 +338,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
                     }
                 }
             });
-    }                             //GEN-LAST:event_btnChangePasswordActionPerformed
+    }//GEN-LAST:event_btnChangePasswordActionPerformed
 
     @Override
     public void update() {
@@ -357,12 +358,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Clien
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
-    }
-
-    @Override
-    public void setConnectionContext(final ClientConnectionContext connectionContext) {
-        this.connectionContext = connectionContext;
     }
 }

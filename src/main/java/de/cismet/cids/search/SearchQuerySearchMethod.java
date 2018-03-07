@@ -35,7 +35,7 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.builtin.QueryEditorCountStatement;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -58,8 +58,8 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
     private SwingWorker<Node[], Void> searchThread;
     private SwingWorker<Long, Void> searchCountThread;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Methods ----------------------------------------------------------------
 
@@ -209,7 +209,7 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

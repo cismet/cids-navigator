@@ -38,7 +38,6 @@ import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -54,7 +53,7 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
 
     private DragSource ds;
     private MetaTreeNodeTransferable metaTransferable;
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -63,7 +62,7 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
      *
      * @param  connectionContext  DOCUMENT ME!
      */
-    public CidsBeanList(final ClientConnectionContext connectionContext) {
+    public CidsBeanList(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
         ds = DragSource.getDefaultDragSource();
         final DragGestureRecognizer dgr = ds.createDefaultDragGestureRecognizer(
@@ -147,7 +146,7 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
                                                                        // Tools | Templates.
     }

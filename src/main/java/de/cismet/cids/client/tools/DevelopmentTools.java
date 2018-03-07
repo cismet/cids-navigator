@@ -59,7 +59,7 @@ import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
 import de.cismet.cids.utils.jasperreports.CidsBeanDataSource;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
@@ -121,18 +121,20 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.RMIConnection",
                         info.getCallserverURL(),
-                        false);
+                        false,
+                        getConnectionContext());
 
         session = ConnectionFactory.getFactory().createSession(connection,
-                info, true);
+                info, true, getConnectionContext());
         proxy = ConnectionFactory.getFactory()
                     .createProxy(
                             "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
-                            session);
+                            session,
+                            getConnectionContext());
         System.out.println("sessionmanager initialisieren");
         SessionManager.init(proxy);
 
-        ClassCacheMultiple.setInstance(domain);
+        ClassCacheMultiple.setInstance(domain, getConnectionContext());
     }
 
     /**
@@ -220,13 +222,18 @@ public class DevelopmentTools {
                         "Sirius.navigator.connection.RESTfulConnection",
                         info.getCallserverURL(),
                         Proxy.fromPreferences(),
-                        compressionEnabled);
-        final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
+                        compressionEnabled,
+                        getConnectionContext());
+        final ConnectionSession session = ConnectionFactory.getFactory()
+                    .createSession(connection, info, true, getConnectionContext());
         final ConnectionProxy conProxy = ConnectionFactory.getFactory()
-                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    .createProxy(
+                        "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                        session,
+                        getConnectionContext());
         SessionManager.init(conProxy);
 
-        ClassCacheMultiple.setInstance(domain);
+        ClassCacheMultiple.setInstance(domain, getConnectionContext());
     }
 
     /**
@@ -286,13 +293,18 @@ public class DevelopmentTools {
                         "Sirius.navigator.connection.PureRESTfulConnection",
                         info.getCallserverURL(),
                         Proxy.fromPreferences(),
-                        compressionEnabled);
-        final ConnectionSession session = ConnectionFactory.getFactory().createSession(connection, info, true);
+                        compressionEnabled,
+                        getConnectionContext());
+        final ConnectionSession session = ConnectionFactory.getFactory()
+                    .createSession(connection, info, true, getConnectionContext());
         final ConnectionProxy conProxy = ConnectionFactory.getFactory()
-                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    .createProxy(
+                        "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                        session,
+                        getConnectionContext());
         SessionManager.init(conProxy);
 
-        ClassCacheMultiple.setInstance(domain);
+        ClassCacheMultiple.setInstance(domain, getConnectionContext());
     }
 
     /**
@@ -320,14 +332,14 @@ public class DevelopmentTools {
         }
         System.out.println("MO abfragen");
 
-        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table, getConnectionContext());
 
         final MetaObject mo = SessionManager.getConnection()
                     .getMetaObject(SessionManager.getSession().getUser(),
                         objectId,
                         mc.getId(),
                         domain,
-                        getClientConnectionContext());
+                        getConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -384,14 +396,14 @@ public class DevelopmentTools {
         }
         System.out.println("MO abfragen");
 
-        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table, getConnectionContext());
 
         final MetaObject mo = SessionManager.getConnection()
                     .getMetaObject(SessionManager.getSession().getUser(),
                         objectId,
                         mc.getId(),
                         domain,
-                        getClientConnectionContext());
+                        getConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -422,14 +434,14 @@ public class DevelopmentTools {
         }
         System.out.println("MO abfragen");
 
-        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table, getConnectionContext());
 
         final MetaObject mo = SessionManager.getConnection()
                     .getMetaObject(SessionManager.getSession().getUser(),
                         objectId,
                         mc.getId(),
                         domain,
-                        getClientConnectionContext());
+                        getConnectionContext());
         final CidsBean cidsBean = mo.getBean();
         System.out.println("cidsBean erzeugt");
         return cidsBean;
@@ -513,7 +525,7 @@ public class DevelopmentTools {
         if (!SessionManager.isInitialized()) {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
         }
-        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table);
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, table, getConnectionContext());
 
         final String query = "SELECT "
                     + mc.getID()
@@ -528,7 +540,7 @@ public class DevelopmentTools {
                     + " "
                     + limitS;
         final MetaObject[] metaObjects = SessionManager.getConnection()
-                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getClientConnectionContext());
+                    .getMetaObjectByQuery(SessionManager.getSession().getUser(), query, getConnectionContext());
         final CidsBean[] cidsBeans = new CidsBean[metaObjects.length];
         for (int i = 0; i < metaObjects.length; i++) {
             final MetaObject metaObject = metaObjects[i];
@@ -559,7 +571,7 @@ public class DevelopmentTools {
             initSessionManagerFromRMIConnectionOnLocalhost(domain, group, user, pass);
         }
         final Collection res = SessionManager.getConnection()
-                    .customServerSearch(SessionManager.getSession().getUser(), search, getClientConnectionContext());
+                    .customServerSearch(SessionManager.getSession().getUser(), search, getConnectionContext());
 
         return (ArrayList<ArrayList>)res;
     }
@@ -941,7 +953,7 @@ public class DevelopmentTools {
      *
      * @return  DOCUMENT ME!
      */
-    public static ClientConnectionContext getClientConnectionContext() {
-        return ClientConnectionContext.create(DevelopmentTools.class.getSimpleName());
+    private static ConnectionContext getConnectionContext() {
+        return ConnectionContext.createDummy();
     }
 }

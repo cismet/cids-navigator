@@ -59,8 +59,7 @@ import de.cismet.cidsx.server.api.types.ActionTask;
 
 import de.cismet.commons.security.AccessHandler;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
@@ -141,6 +140,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
      * @return  PureRESTfulReconnector
      */
     @Override
+    @Deprecated
     protected Reconnector<CallServerService> createReconnector(final String callserverURL,
             final Proxy proxy,
             final boolean compressionEnabled) {
@@ -150,20 +150,47 @@ public class PureRESTfulConnection extends RESTfulConnection {
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
-        return connect(callserverURL, proxy, false);
+        return connect(callserverURL, proxy, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverURL      DOCUMENT ME!
+     * @param   proxy              DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public boolean connect(final String callserverURL,
+            final Proxy proxy,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        return connect(callserverURL, proxy, false, connectionContext);
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
             throws ConnectionException {
+        return connect(callserverURL, proxy, compressionEnabled, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean connect(final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) throws ConnectionException {
         this.connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         // FIXME: remove when all methods implemented in pure RESTful Service
         this.legacyConnector = createLegacyConnector(callserverURL, proxy, compressionEnabled);
 
         try {
-            this.getDomains(getConnectionContext());
+            this.getDomains(connectionContext);
         } catch (final Exception e) {
             final String message = "Could not connect cids PURE REST Service at '" + callserverURL + "' (proxy: "
                         + proxy + ")"; // NOI18N
@@ -298,10 +325,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // "httpTunnelAction", "SWITCHON", null, actionParameterUrl, actionParameterMethod);
 
             final Object taskResult = SessionManager.getProxy()
-                        .executeTask(
-                            "testAction",
+                        .executeTask("testAction",
                             "SWITCHON",
-                            new PureRESTfulConnection().getConnectionContext(),
+                            ConnectionContext.createDeprecated(),
                             (Object)null,
                             actionParameterTest);
             System.out.println(taskResult);
@@ -430,13 +456,12 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                                representationPattern);
 
             final LightweightMetaObject[] lmoBinary = (LightweightMetaObject[])SessionManager.getProxy()
-                        .getLightweightMetaObjectsByQuery(
-                                relationshipClassId,
+                        .getLightweightMetaObjectsByQuery(relationshipClassId,
                                 SessionManager.getSession().getUser(),
                                 lwmoQuery,
                                 lwmoRepresentationFields,
                                 lwmoRepresentationPattern,
-                                ClientConnectionContext.createDeprecated());
+                                ConnectionContext.createDeprecated());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -452,13 +477,12 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                            representationPattern);
 
             final LightweightMetaObject[] lmoRest = (LightweightMetaObject[])SessionManager.getProxy()
-                        .getLightweightMetaObjectsByQuery(
-                                relationshipClassId,
+                        .getLightweightMetaObjectsByQuery(relationshipClassId,
                                 SessionManager.getSession().getUser(),
                                 lwmoQuery,
                                 lwmoRepresentationFields,
                                 lwmoRepresentationPattern,
-                                ClientConnectionContext.createDeprecated());
+                                ConnectionContext.createDeprecated());
 
             if (lmoBinary.length != lmoRest.length) {
                 throw new Exception("lmoBinary.length != lmoRest.length");
@@ -584,10 +608,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // final MetaObject metaObjectBinary = SessionManager.getProxy()
 // .getMetaObject(metaObjectId, metaClassId, domain);
             final MetaObject[] metaObjectsBinary = SessionManager.getProxy()
-                        .getMetaObjectByQuery(
-                            SessionManager.getSession().getUser(),
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
                             moQuery,
-                            new PureRESTfulConnection().getConnectionContext());
+                            ConnectionContext.createDeprecated());
             final MetaObject metaObjectBinary = metaObjectsBinary[0];
             final CidsBean cidsBeanBinary = metaObjectBinary.getBean();
             final CidsBeanInfo cidsBeanInfoBinary = cidsBeanBinary.getCidsBeanInfo();
@@ -603,10 +626,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                        .getMetaObject(metaObjectId, metaClassId, domain);
 
             final MetaObject[] metaObjectRests = SessionManager.getProxy()
-                        .getMetaObjectByQuery(
-                            SessionManager.getSession().getUser(),
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
                             moQuery,
-                            new PureRESTfulConnection().getConnectionContext());
+                            ConnectionContext.createDeprecated());
             final MetaObject metaObjectRest = metaObjectRests[0];
             final CidsBean cidsBeanRest = metaObjectRest.getBean();
             // TEST updateMetaObject ...........................................
@@ -708,7 +730,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                         .getCallServerService()
                         .getMetaObjectNode(SessionManager.getSession().getUser(),
                             nodeQuery,
-                            new PureRESTfulConnection().getConnectionContext());
+                            ConnectionContext.createDeprecated());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -726,7 +748,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                         .getCallServerService()
                         .getMetaObjectNode(SessionManager.getSession().getUser(),
                             nodeQuery,
-                            new PureRESTfulConnection().getConnectionContext());
+                            ConnectionContext.createDeprecated());
 
             final int nodesArrayLength = (nodesBinary.length > 3) ? 3 : nodesBinary.length;
 
@@ -844,7 +866,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                         .getClassByTableName(SessionManager.getSession().getUser(),
                             "tag",
                             "SWITCHON",
-                            new PureRESTfulConnection().getConnectionContext());
+                            ConnectionContext.createDeprecated());
 //            final MetaClass tagClassBinary = SessionManager.getConnection().getCallServerService()
 //                     .getClass(SessionManager.getSession().getUser(), 6, "SWITCHON");
 //            System.out.println(".getKey(): " + tagClassBinary.getKey());
@@ -859,7 +881,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
                         .getClassByTableName(SessionManager.getSession().getUser(),
                             "TAG",
                             "SWITCHON",
-                            new PureRESTfulConnection().getConnectionContext());
+                            ConnectionContext.createDeprecated());
 
             System.out.println("tagClassBinary.equals(tagClassRest): "
                         + tagClassBinary.equals(tagClassRest));

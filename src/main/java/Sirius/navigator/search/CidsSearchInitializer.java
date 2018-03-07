@@ -39,12 +39,12 @@ import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
 
-import de.cismet.connectioncontext.ClientConnectionContextStore;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * This class is responsibility is to lookup all relevant search components, to initialize and to plug them into the
@@ -90,10 +90,9 @@ public class CidsSearchInitializer {
                 final CidsSearchComboBar searchBar = new CidsSearchComboBar();
                 final Iterator<? extends CidsToolbarSearch> itTS = toolbarSearches.iterator();
                 while (itTS.hasNext()) {
-                    if (itTS instanceof ClientConnectionContextStore) {
-                        ((ClientConnectionContextStore)itTS).setConnectionContext(
+                    if (itTS instanceof ConnectionContextStore) {
+                        ((ConnectionContextStore)itTS).initWithConnectionContext(
                             new SearchConnectionContext(itTS.getClass().getCanonicalName()));
-                        ((ClientConnectionContextStore)itTS).initAfterConnectionContext();
                     }
                     if (!checkActionTag(itTS.next())) {
                         itTS.remove();
@@ -127,10 +126,9 @@ public class CidsSearchInitializer {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Initializing window search '" + windowSearch.getName() + "'.");
                 }
-                if (windowSearch instanceof ClientConnectionContextStore) {
-                    ((ClientConnectionContextStore)windowSearch).setConnectionContext(
+                if (windowSearch instanceof ConnectionContextStore) {
+                    ((ConnectionContextStore)windowSearch).initWithConnectionContext(
                         new SearchConnectionContext(windowSearch.getClass().getCanonicalName()));
-                    ((ClientConnectionContextStore)windowSearch).initAfterConnectionContext();
                 }
                 if (checkActionTag(windowSearch)) {
                     final MutableConstraints mutableConstraints = new MutableConstraints();

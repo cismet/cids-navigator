@@ -41,8 +41,8 @@ import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -51,14 +51,14 @@ import de.cismet.connectioncontext.ClientConnectionContextStore;
  * @version  $Revision$, $Date$
  */
 public abstract class AbstractNewObjectToolbarAction extends AbstractAction implements CidsClientToolbarItem,
-    ClientConnectionContextStore {
+    ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
     ImageIcon add = new ImageIcon(this.getClass().getResource("/Sirius/navigator/resource/img/bullet_add.png"));
     private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private CidsBean cb = null;
-    private ClientConnectionContext connectionContext;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -160,12 +160,12 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
     public abstract String getTooltipString();
 
     @Override
-    public final void setConnectionContext(final ClientConnectionContext connectionContext) {
+    public final void initWithConnectionContext(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

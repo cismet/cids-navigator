@@ -25,7 +25,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -52,7 +52,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
 
     private final transient NodeComparator nodeComparator;
 
-    private final ClientConnectionContext connectionContext;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -64,7 +64,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
      * @param  node               DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public DefaultMetaTreeNode(final Node node, final ClientConnectionContext connectionContext) {
+    public DefaultMetaTreeNode(final Node node, final ConnectionContext connectionContext) {
         super(node);
         this.connectionContext = connectionContext;
 
@@ -601,7 +601,7 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

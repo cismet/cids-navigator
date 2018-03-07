@@ -26,7 +26,7 @@ import java.net.*;
 
 import java.util.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -53,8 +53,8 @@ public class MetaAttributeEditorLocator implements EditorLocator, ConnectionCont
     /** Holds value of property ignoreInvisibleAttributes. */
     private boolean ignoreInvisibleAttributes = false;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -294,7 +294,7 @@ public class MetaAttributeEditorLocator implements EditorLocator, ConnectionCont
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

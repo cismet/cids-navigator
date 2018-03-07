@@ -16,7 +16,6 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.utils.CidsBeanPersistService;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 
 /**
@@ -30,7 +29,7 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
 
     //~ Instance fields --------------------------------------------------------
 
-    private ClientConnectionContext connectionContext;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Methods ----------------------------------------------------------------
 
@@ -70,12 +69,12 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
+    public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 
     @Override
-    public void setClientConnectionContext(final ClientConnectionContext clientconnectionContext) {
+    public void setClientConnectionContext(final ConnectionContext clientconnectionContext) {
         this.connectionContext = clientconnectionContext;
     }
 }

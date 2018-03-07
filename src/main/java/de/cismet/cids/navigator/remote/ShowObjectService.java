@@ -34,11 +34,11 @@ import javax.ws.rs.core.Response;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 //Swagger annotations are comented out, due to a incompatibility of slf4j
 /**
@@ -63,9 +63,8 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
 
     //~ Instance fields --------------------------------------------------------
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
-
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -102,7 +101,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             if (domain == null) {
                 domain = SessionManager.getSession().getUser().getDomain();
             }
-            final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, tablename);
+            final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, tablename, getConnectionContext());
             if (mc == null) {
                 LOG.warn("The Class with the tablename " + tablename + "was not dound in the domain " + domain + ".");
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -165,7 +164,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 }

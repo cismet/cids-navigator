@@ -37,10 +37,10 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -148,7 +148,7 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
      * @throws  Exception  DOCUMENT ME!
      */
     private void loadMetaObject(final int objectId) throws Exception {
-        final int classId = ClassCacheMultiple.getMetaClass(domain, className).getId();
+        final int classId = ClassCacheMultiple.getMetaClass(domain, className, getConnectionContext()).getId();
         final MetaObject metaObject = proxy.getMetaObject(objectId, classId, domain, getConnectionContext());
 
         if (metaObject != null) {
@@ -227,10 +227,13 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
         final ConnectionInfo connectionInfo = getConnectionInfo();
 
         final ConnectionSession session = ConnectionFactory.getFactory()
-                    .createSession(connection, connectionInfo, true);
+                    .createSession(connection, connectionInfo, true, getConnectionContext());
 
         proxy = ConnectionFactory.getFactory()
-                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    .createProxy(
+                            "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                            session,
+                            getConnectionContext());
 
         SessionManager.init(proxy);
     }
@@ -299,7 +302,7 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
         try {
             loadMetaObject((Integer)jSpinner1.getValue());
         } catch (Exception ex) {
@@ -310,7 +313,7 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
                 "Fehler",
                 JOptionPane.ERROR_MESSAGE);
         }
-    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
+    }//GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -341,7 +344,7 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
     public abstract void run();
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
-        return ClientConnectionContext.create(getClass().getSimpleName());
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContext.createDummy();
     }
 }

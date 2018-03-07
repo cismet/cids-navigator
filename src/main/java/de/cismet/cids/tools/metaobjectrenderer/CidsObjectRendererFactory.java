@@ -26,13 +26,13 @@ import de.cismet.cids.server.connectioncontext.RendererConnectionContext;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ClientConnectionContextStore;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.collections.TypeSafeCollections;
 
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -127,10 +127,9 @@ public class CidsObjectRendererFactory {
                 }
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
-                    if (renderer instanceof ClientConnectionContextStore) {
-                        final ClientConnectionContext rendererConnectionContext = new RendererConnectionContext(mo);
-                        ((ClientConnectionContextStore)renderer).setConnectionContext(rendererConnectionContext);
-                        ((ClientConnectionContextStore)renderer).initAfterConnectionContext();
+                    if (renderer instanceof ConnectionContextStore) {
+                        final ConnectionContext rendererConnectionContext = new RendererConnectionContext(mo);
+                        ((ConnectionContextStore)renderer).initWithConnectionContext(rendererConnectionContext);
                     }
                     renderer.setTitle(title);
                     renderer.setCidsBean(bean);

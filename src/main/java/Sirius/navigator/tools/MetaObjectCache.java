@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -198,7 +198,7 @@ public class MetaObjectCache {
      */
     @Deprecated
     public MetaObject[] getMetaObjectsByQuery(final String query, final String domain) throws CacheException {
-        return getMetaObjectsByQuery(query, domain, ClientConnectionContext.createDeprecated());
+        return getMetaObjectsByQuery(query, domain, ConnectionContext.createDeprecated());
     }
 
     /**
@@ -221,7 +221,7 @@ public class MetaObjectCache {
      */
     public MetaObject[] getMetaObjectsByQuery(final String query,
             final String domain,
-            final ClientConnectionContext connectionContext) throws CacheException {
+            final ConnectionContext connectionContext) throws CacheException {
         return getMetaObjectsByQuery(query, domain, false);
     }
 
@@ -262,7 +262,7 @@ public class MetaObjectCache {
     @Deprecated
     public MetaObject[] getMetaObjectsByQuery(final String query, final String domain, final boolean forceReload)
             throws CacheException {
-        return getMetaObjectsByQuery(query, domain, forceReload, ClientConnectionContext.createDeprecated());
+        return getMetaObjectsByQuery(query, domain, forceReload, ConnectionContext.createDeprecated());
     }
 
     /**
@@ -288,7 +288,7 @@ public class MetaObjectCache {
     public MetaObject[] getMetaObjectsByQuery(final String query,
             final String domain,
             final boolean forceReload,
-            final ClientConnectionContext connectionContext) throws CacheException {
+            final ConnectionContext connectionContext) throws CacheException {
         if (query == null) {
             return null;
         }

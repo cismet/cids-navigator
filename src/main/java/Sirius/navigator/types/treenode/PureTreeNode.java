@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
+import de.cismet.connectioncontext.ConnectionContext;
 
 /**
  * DOCUMENT ME!
@@ -45,7 +45,7 @@ public class PureTreeNode extends DefaultMetaTreeNode {
      * @param  metaNode           DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
      */
-    public PureTreeNode(final MetaNode metaNode, final ClientConnectionContext connectionContext) {
+    public PureTreeNode(final MetaNode metaNode, final ConnectionContext connectionContext) {
         super(metaNode, connectionContext);
 
         openIcon = resource.getIcon("NodeIconOpen.gif");     // NOI18N

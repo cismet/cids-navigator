@@ -42,13 +42,13 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /*
  * Copyright (C) 2013 cismet GmbH
@@ -87,8 +87,8 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
     private final String domain;
     private final Integer fileSizeInMb;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
@@ -226,16 +226,16 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnStartDownloadActionPerformed
+    private void btnStartDownloadActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnStartDownloadActionPerformed
         downloadStarted();
 
         new SwingWorker<byte[], Object>() {
@@ -274,7 +274,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_btnStartDownloadActionPerformed
+    }//GEN-LAST:event_btnStartDownloadActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -423,7 +423,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 
@@ -486,7 +486,8 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
                                 CONNECTION_CLASS,
                                 callServerURL,
                                 Proxy.fromPreferences(),
-                                compressionEnabled);
+                                compressionEnabled,
+                                getConnectionContext());
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
@@ -495,12 +496,16 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
                 connectionInfo.setUsergroupDomain(domain);
                 connectionInfo.setUsername(user);
                 final ConnectionSession session = ConnectionFactory.getFactory()
-                            .createSession(connection, connectionInfo, true);
+                            .createSession(
+                                connection,
+                                connectionInfo,
+                                true,
+                                getConnectionContext());
                 final ConnectionProxy proxy = ConnectionFactory.getFactory()
-                            .createProxy(CONNECTION_PROXY_CLASS, session);
+                            .createProxy(CONNECTION_PROXY_CLASS, session, getConnectionContext());
                 SessionManager.init(proxy);
 
-                ClassCacheMultiple.setInstance(domain);
+                ClassCacheMultiple.setInstance(domain, getConnectionContext());
                 return true;
             } catch (Throwable t) {
                 LOG.error("Fehler beim Anmelden", t);

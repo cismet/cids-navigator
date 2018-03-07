@@ -40,15 +40,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
-import de.cismet.cids.client.tools.ClientConnectionContextUtils;
+import de.cismet.cids.client.tools.ConnectionContextUtils;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -303,7 +302,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable,
                 if (tmp instanceof MemberAttributeInfo) {
                     if (((MemberAttributeInfo)tmp).isForeignKey()) {
                         final int classId = ((MemberAttributeInfo)tmp).getForeignKeyClassId();
-                        result = ClassCacheMultiple.getMetaClass(mclass.getDomain(), classId);
+                        result = ClassCacheMultiple.getMetaClass(mclass.getDomain(), classId, getConnectionContext());
                     }
                 }
             }
@@ -505,7 +504,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable,
     }
 
     @Override
-    public ClientConnectionContext getConnectionContext() {
-        return ClientConnectionContextUtils.getFirstParentClientConnectionContext(this);
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
     }
 }

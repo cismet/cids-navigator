@@ -30,10 +30,10 @@ import java.util.*;
 
 import javax.swing.*;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Dialog zum Ausw\u00E4hlen einer Klasse.
@@ -48,8 +48,8 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ConnectionCon
     private DefaultMetaTreeNode metaTreeNode = null;
     private Logger logger;
 
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -369,7 +369,7 @@ public class TreeNodeEditor extends javax.swing.JDialog implements ConnectionCon
     }
 
     @Override
-    public final ClientConnectionContext getConnectionContext() {
+    public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
 

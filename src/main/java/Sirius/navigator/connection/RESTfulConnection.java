@@ -47,8 +47,7 @@ import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
@@ -60,7 +59,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public class RESTfulConnection implements Connection, Reconnectable<CallServerService>, ConnectionContextProvider {
+public class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -74,9 +73,6 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     protected transient CallServerService connector;
 
     private final transient boolean isLWMOEnabled;
-
-    private final ClientConnectionContext connectionContext = ClientConnectionContext.create(getClass()
-                    .getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -122,27 +118,46 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL) throws ConnectionException {
         return connect(callserverURL, false);
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final boolean compressionEnabled) throws ConnectionException {
-        return connect(callserverURL, null, compressionEnabled);
+        return connect(callserverURL, compressionEnabled, ConnectionContext.createDeprecated());
     }
 
     @Override
+    public boolean connect(final String callserverURL,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        return connect(callserverURL, null, compressionEnabled, connectionContext);
+    }
+
+    @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
         return connect(callserverURL, proxy, false);
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
             throws ConnectionException {
+        return connect(callserverURL, proxy, compressionEnabled, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean connect(final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) throws ConnectionException {
         connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         try {
-            connector.getDomains(getConnectionContext());
+            connector.getDomains(connectionContext);
         } catch (final Exception e) {
             final String message = "no connection to restful interface"; // NOI18N
             LOG.error(message, e);
@@ -174,16 +189,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public String[] getDomains() throws ConnectionException {
-        return getDomains(ClientConnectionContext.createDeprecated());
+        return getDomains(ConnectionContext.createDeprecated());
     }
 
     @Override
-    public String[] getDomains(final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public String[] getDomains(final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getDomains(context);
+            return connector.getDomains(connectionContext);
         } catch (final Exception e) {
             final String message = "cannot get domains"; // NOI18N
             LOG.error(message, e);
@@ -220,13 +235,12 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String userLsName,
             final String userName,
             final String password) throws ConnectionException, UserException {
-        return getUser(
-                userGroupLsName,
+        return getUser(userGroupLsName,
                 userGroupName,
                 userLsName,
                 userName,
                 password,
-                ClientConnectionContext.createDeprecated());
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -235,12 +249,12 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String userLsName,
             final String userName,
             final String password,
-            final ClientConnectionContext context) throws ConnectionException, UserException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException, UserException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getUser(userGroupLsName, userGroupName, userLsName, userName, password, context);
+            return connector.getUser(userGroupLsName, userGroupName, userLsName, userName, password, connectionContext);
         } catch (final UserException e) {
             final String message = "cannot get user: " // NOI18N
                         + userGroupLsName
@@ -271,16 +285,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Vector getUserGroupNames() throws ConnectionException {
-        return getUserGroupNames(ClientConnectionContext.createDeprecated());
+        return getUserGroupNames(ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Vector getUserGroupNames(final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public Vector getUserGroupNames(final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getUserGroupNames(context);
+            return connector.getUserGroupNames(connectionContext);
         } catch (final Exception e) {
             final String message = "could not get usergroup names"; // NOI18N
             LOG.error(message, e);
@@ -292,17 +306,18 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public Vector getUserGroupNames(final String username, final String domain) throws ConnectionException,
         UserException {
-        return getUserGroupNames(username, domain, ClientConnectionContext.createDeprecated());
+        return getUserGroupNames(username, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Vector getUserGroupNames(final String username, final String domain, final ClientConnectionContext context)
-            throws ConnectionException, UserException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public Vector getUserGroupNames(final String username,
+            final String domain,
+            final ConnectionContext connectionContext) throws ConnectionException, UserException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getUserGroupNames(username, domain, context);
+            return connector.getUserGroupNames(username, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get usergroup names by username,domain: " + username + "@" + domain; // NOI18N
             LOG.error(message, e);
@@ -314,19 +329,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public boolean changePassword(final User user, final String oldPassword, final String newPassword)
             throws ConnectionException, UserException {
-        return changePassword(user, oldPassword, newPassword, ClientConnectionContext.createDeprecated());
+        return changePassword(user, oldPassword, newPassword, ConnectionContext.createDeprecated());
     }
 
     @Override
     public boolean changePassword(final User user,
             final String oldPassword,
             final String newPassword,
-            final ClientConnectionContext context) throws ConnectionException, UserException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException, UserException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.changePassword(user, oldPassword, newPassword, context);
+            return connector.changePassword(user, oldPassword, newPassword, connectionContext);
         } catch (final Exception e) {
             final String message = "could not change password: " + user + " :: " + oldPassword + " :: " + newPassword; // NOI18N
             LOG.error(message, e);
@@ -337,16 +352,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Node[] getRoots(final User user) throws ConnectionException {
-        return getRoots(user, ClientConnectionContext.createDeprecated());
+        return getRoots(user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Node[] getRoots(final User user, final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public Node[] getRoots(final User user, final ConnectionContext connectionContext)
+            throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getRoots(user, context);
+            return connector.getRoots(user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get roots for user: " + user; // NOI18N
             LOG.error(message, e);
@@ -357,17 +373,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Node[] getRoots(final User user, final String domain) throws ConnectionException {
-        return getRoots(user, domain, ClientConnectionContext.createDeprecated());
+        return getRoots(user, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Node[] getRoots(final User user, final String domain, final ClientConnectionContext context)
+    public Node[] getRoots(final User user, final String domain, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getRoots(user, domain, context);
+            return connector.getRoots(user, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get roots for user: " + user + "@" + domain; // NOI18N
             LOG.error(message, e);
@@ -378,17 +394,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Node[] getChildren(final Node node, final User user) throws ConnectionException {
-        return getChildren(node, user, ClientConnectionContext.createDeprecated());
+        return getChildren(node, user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Node[] getChildren(final Node node, final User user, final ClientConnectionContext context)
+    public Node[] getChildren(final Node node, final User user, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getChildren(node, user, context);
+            return connector.getChildren(node, user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get children for node and user: " + node + " :: " + user; // NOI18N
             LOG.error(message, e);
@@ -399,17 +415,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Node getNode(final User user, final int nodeID, final String domain) throws ConnectionException {
-        return getNode(user, nodeID, domain, ClientConnectionContext.createDeprecated());
+        return getNode(user, nodeID, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Node getNode(final User user, final int nodeID, final String domain, final ClientConnectionContext context)
-            throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public Node getNode(final User user,
+            final int nodeID,
+            final String domain,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getMetaObjectNode(user, nodeID, domain, context);
+            return connector.getMetaObjectNode(user, nodeID, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get node for user, nodeID, domain: " // NOI18N
                         + user
@@ -425,17 +443,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Node addNode(final Node node, final Link parent, final User user) throws ConnectionException {
-        return addNode(node, parent, user, ClientConnectionContext.createDeprecated());
+        return addNode(node, parent, user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Node addNode(final Node node, final Link parent, final User user, final ClientConnectionContext context)
-            throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public Node addNode(final Node node,
+            final Link parent,
+            final User user,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.addNode(node, parent, user, context);
+            return connector.addNode(node, parent, user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not add node with parent and user: " + node + " :: " + parent + " :: " + user; // NOI18N
             LOG.error(message, e);
@@ -446,17 +466,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public boolean deleteNode(final Node node, final User user) throws ConnectionException {
-        return deleteNode(node, user, ClientConnectionContext.createDeprecated());
+        return deleteNode(node, user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public boolean deleteNode(final Node node, final User user, final ClientConnectionContext context)
+    public boolean deleteNode(final Node node, final User user, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.deleteNode(node, user, context);
+            return connector.deleteNode(node, user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not delete node for user: " + node + " :: " + user; // NOI18N
             LOG.error(message, e);
@@ -467,17 +487,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public boolean addLink(final Node from, final Node to, final User user) throws ConnectionException {
-        return addLink(from, to, user, ClientConnectionContext.createDeprecated());
+        return addLink(from, to, user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public boolean addLink(final Node from, final Node to, final User user, final ClientConnectionContext context)
-            throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public boolean addLink(final Node from,
+            final Node to,
+            final User user,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.addLink(from, to, user, context);
+            return connector.addLink(from, to, user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not add link, node from, to, user: " + from + " :: " + to + ":: " + user; // NOI18N
             LOG.error(message, e);
@@ -488,17 +510,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public boolean deleteLink(final Node from, final Node to, final User user) throws ConnectionException {
-        return deleteLink(from, to, user, ClientConnectionContext.createDeprecated());
+        return deleteLink(from, to, user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public boolean deleteLink(final Node from, final Node to, final User user, final ClientConnectionContext context)
-            throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public boolean deleteLink(final Node from,
+            final Node to,
+            final User user,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.deleteLink(from, to, user, context);
+            return connector.deleteLink(from, to, user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not delete link, node from, to, user: " + from + " :: " + to + ":: " + user; // NOI18N
             LOG.error(message, e);
@@ -509,16 +533,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public Node[] getClassTreeNodes(final User user) throws ConnectionException {
-        return getClassTreeNodes(user, ClientConnectionContext.createDeprecated());
+        return getClassTreeNodes(user, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public Node[] getClassTreeNodes(final User user, final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public Node[] getClassTreeNodes(final User user, final ConnectionContext connectionContext)
+            throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getClassTreeNodes(user, context);
+            return connector.getClassTreeNodes(user, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get classtree nodes for user: " + user; // NOI18N
             LOG.error(message, e);
@@ -529,19 +554,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public MetaClass getMetaClass(final User user, final int classID, final String domain) throws ConnectionException {
-        return getMetaClass(user, classID, domain, ClientConnectionContext.createDeprecated());
+        return getMetaClass(user, classID, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
     public MetaClass getMetaClass(final User user,
             final int classID,
             final String domain,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getClass(user, classID, domain, context);
+            return connector.getClass(user, classID, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get metaclass for user, domain, classid " // NOI18N
                         + user
@@ -557,17 +582,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public MetaClass[] getClasses(final User user, final String domain) throws ConnectionException {
-        return getClasses(user, domain, ClientConnectionContext.createDeprecated());
+        return getClasses(user, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public MetaClass[] getClasses(final User user, final String domain, final ClientConnectionContext context)
+    public MetaClass[] getClasses(final User user, final String domain, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getClasses(user, domain, context);
+            return connector.getClasses(user, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get classes for user, doamin: " + user + "@" + domain; // NOI18N
             LOG.error(message, e);
@@ -579,7 +604,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     public MetaObject getMetaObject(final User user, final int objectID, final int classID, final String domain)
             throws ConnectionException {
-        return getMetaObject(user, objectID, classID, domain, ClientConnectionContext.createDeprecated());
+        return getMetaObject(user, objectID, classID, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -587,12 +612,12 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final int objectID,
             final int classID,
             final String domain,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getMetaObject(user, objectID, classID, domain, context);
+            return connector.getMetaObject(user, objectID, classID, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, objectid, classid, domain: " // NOI18N
                         + user
@@ -610,17 +635,18 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     @Deprecated
     public MetaObject[] getMetaObjectByQuery(final User user, final String query) throws ConnectionException {
-        return getMetaObjectByQuery(user, query, ClientConnectionContext.createDeprecated());
+        return getMetaObjectByQuery(user, query, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public MetaObject[] getMetaObjectByQuery(final User user, final String query, final ClientConnectionContext context)
-            throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+    public MetaObject[] getMetaObjectByQuery(final User user,
+            final String query,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getMetaObject(user, query, context);
+            return connector.getMetaObject(user, query, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, query: " + user + " :: " + query; // NOI18N
             LOG.error(message, e);
@@ -632,19 +658,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public MetaObject[] getMetaObjectByQuery(final User user, final String query, final String domain)
             throws ConnectionException {
-        return getMetaObjectByQuery(user, query, domain, ClientConnectionContext.createDeprecated());
+        return getMetaObjectByQuery(user, query, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
     public MetaObject[] getMetaObjectByQuery(final User user,
             final String query,
             final String domain,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getMetaObject(user, query, domain, context);
+            return connector.getMetaObject(user, query, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get metaobject for user, query, domain: " + user + " :: " // NOI18N
                         + query
@@ -659,19 +685,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public MetaObject insertMetaObject(final User user, final MetaObject metaObject, final String domain)
             throws ConnectionException {
-        return insertMetaObject(user, metaObject, domain, ClientConnectionContext.createDeprecated());
+        return insertMetaObject(user, metaObject, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
     public MetaObject insertMetaObject(final User user,
             final MetaObject metaObject,
             final String domain,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.insertMetaObject(user, metaObject, domain, context);
+            return connector.insertMetaObject(user, metaObject, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not insert metaobject for user, metaobject, domain: " // NOI18N
                         + user
@@ -698,19 +724,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public int updateMetaObject(final User user, final MetaObject metaObject, final String domain)
             throws ConnectionException {
-        return updateMetaObject(user, metaObject, domain, ClientConnectionContext.createDeprecated());
+        return updateMetaObject(user, metaObject, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
     public int updateMetaObject(final User user,
             final MetaObject metaObject,
             final String domain,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.updateMetaObject(user, metaObject, domain, context);
+            return connector.updateMetaObject(user, metaObject, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not update metaobject for user, metaobject, domain: " // NOI18N
                         + user
@@ -737,19 +763,19 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public int deleteMetaObject(final User user, final MetaObject metaObject, final String domain)
             throws ConnectionException {
-        return deleteMetaObject(user, metaObject, domain, ClientConnectionContext.createDeprecated());
+        return deleteMetaObject(user, metaObject, domain, ConnectionContext.createDeprecated());
     }
 
     @Override
     public int deleteMetaObject(final User user,
             final MetaObject metaObject,
             final String domain,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.deleteMetaObject(user, metaObject, domain, context);
+            return connector.deleteMetaObject(user, metaObject, domain, connectionContext);
         } catch (final Exception e) {
             final String message = "could not delete metaobject for user, metaobject, domain: " // NOI18N
                         + user
@@ -775,17 +801,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public MetaObject getInstance(final User user, final MetaClass c) throws ConnectionException {
-        return getInstance(user, c, ClientConnectionContext.createDeprecated());
+        return getInstance(user, c, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public MetaObject getInstance(final User user, final MetaClass c, final ClientConnectionContext context)
+    public MetaObject getInstance(final User user, final MetaClass c, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getInstance(user, c, context);
+            return connector.getInstance(user, c, connectionContext);
         } catch (final Exception e) {
             final String message = "could not get instance for user, metaclass: " + user + " :: " + c; // NOI18N
             LOG.error(message, e);
@@ -799,12 +825,11 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final User user,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
-        return getAllLightweightMetaObjectsForClass(
-                classId,
+        return getAllLightweightMetaObjectsForClass(classId,
                 user,
                 representationFields,
                 representationPattern,
-                ClientConnectionContext.createDeprecated());
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -812,9 +837,9 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final User user,
             final String[] representationFields,
             final String representationPattern,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
             if (isLWMOEnabled) {
@@ -823,7 +848,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         user,
                         representationFields,
                         representationPattern,
-                        context);
+                        connectionContext);
                 return initLWMOs(lwmos, null, connectionContext);
             } else {
                 return getLWMOFallback(classId, user, connectionContext);
@@ -848,12 +873,11 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final User user,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
-        return getAllLightweightMetaObjectsForClass(
-                classId,
+        return getAllLightweightMetaObjectsForClass(classId,
                 user,
                 representationFields,
                 formater,
-                ClientConnectionContext.createDeprecated());
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -861,9 +885,9 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final User user,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
             if (isLWMOEnabled) {
@@ -871,7 +895,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         classId,
                         user,
                         representationFields,
-                        context);
+                        connectionContext);
                 return initLWMOs(lwmo, formater, connectionContext);
             } else {
                 return getLWMOFallback(classId, user, connectionContext);
@@ -895,13 +919,12 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String query,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
-        return getLightweightMetaObjectsByQuery(
-                classId,
+        return getLightweightMetaObjectsByQuery(classId,
                 user,
                 query,
                 representationFields,
                 representationPattern,
-                ClientConnectionContext.createDeprecated());
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -910,9 +933,9 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String query,
             final String[] representationFields,
             final String representationPattern,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
             if (isLWMOEnabled) {
@@ -922,7 +945,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         query,
                         representationFields,
                         representationPattern,
-                        context);
+                        connectionContext);
                 return initLWMOs(lwmo, null, connectionContext);
             } else {
                 return getLWMOFallback(classId, user, connectionContext);
@@ -948,13 +971,12 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String query,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
-        return getLightweightMetaObjectsByQuery(
-                classId,
+        return getLightweightMetaObjectsByQuery(classId,
                 user,
                 query,
                 representationFields,
                 formater,
-                ClientConnectionContext.createDeprecated());
+                ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -963,9 +985,9 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String query,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
             if (isLWMOEnabled) {
@@ -974,7 +996,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         user,
                         query,
                         representationFields,
-                        context);
+                        connectionContext);
                 return initLWMOs(lwmo, formater, connectionContext);
             } else {
                 return getLWMOFallback(classId, user, connectionContext);
@@ -995,18 +1017,18 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public Collection customServerSearch(final User user, final CidsServerSearch serverSearch)
             throws ConnectionException {
-        return customServerSearch(user, serverSearch, ClientConnectionContext.createDeprecated());
+        return customServerSearch(user, serverSearch, ConnectionContext.createDeprecated());
     }
 
     @Override
     public Collection customServerSearch(final User user,
             final CidsServerSearch serverSearch,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.customServerSearch(user, serverSearch, context);
+            return connector.customServerSearch(user, serverSearch, connectionContext);
         } catch (final Exception e) {
             final String message = "error during custom search";
             throw new ConnectionException(message, e);
@@ -1039,13 +1061,13 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
      */
     private MetaObject[] initLWMOs(final LightweightMetaObject[] lwmos,
             final AbstractAttributeRepresentationFormater formater,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         if (lwmos != null) {
             final MetaService msServer = (MetaService)connector;
             for (final LightweightMetaObject lwmo : lwmos) {
                 if (lwmo != null) {
                     lwmo.setMetaService(msServer);
-                    lwmo.setConnectionContext(connectionContext);
+                    lwmo.initWithConnectionContext(connectionContext);
                     if (formater != null) {
                         lwmo.setFormater(formater);
                     }
@@ -1069,8 +1091,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
      */
     private MetaObject[] getLWMOFallback(final int classId,
             final User user,
-            final ClientConnectionContext connectionContext) throws ConnectionException {
-        final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId);
+            final ConnectionContext connectionContext) throws ConnectionException {
+        final MetaClass mc = ClassCacheMultiple.getMetaClass(user.getDomain(), classId, connectionContext);
         final ClassAttribute ca = mc.getClassAttribute("sortingColumn"); // NOI18N
         final String orderBy;
 
@@ -1095,17 +1117,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public String getConfigAttr(final User user, final String key) throws ConnectionException {
-        return getConfigAttr(user, key, ClientConnectionContext.createDeprecated());
+        return getConfigAttr(user, key, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public String getConfigAttr(final User user, final String key, final ClientConnectionContext context)
+    public String getConfigAttr(final User user, final String key, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getConfigAttr(user, key, context);
+            return connector.getConfigAttr(user, key, connectionContext);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not get config attr for user: " + user, e); // NOI18N
         }
@@ -1114,17 +1136,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Deprecated
     @Override
     public boolean hasConfigAttr(final User user, final String key) throws ConnectionException {
-        return hasConfigAttr(user, key, ClientConnectionContext.createDeprecated());
+        return hasConfigAttr(user, key, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public boolean hasConfigAttr(final User user, final String key, final ClientConnectionContext context)
+    public boolean hasConfigAttr(final User user, final String key, final ConnectionContext connectionContext)
             throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.hasConfigAttr(user, key, context);
+            return connector.hasConfigAttr(user, key, connectionContext);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not check config attr for user: " + user, e); // NOI18N
         }
@@ -1137,7 +1159,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String domain,
             final User user,
             final int elements) throws ConnectionException {
-        return getHistory(classId, objectId, domain, user, elements, ClientConnectionContext.createDeprecated());
+        return getHistory(classId, objectId, domain, user, elements, ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -1146,12 +1168,12 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String domain,
             final User user,
             final int elements,
-            final ClientConnectionContext context) throws ConnectionException {
-        if (context == null) {
-            throw new IllegalArgumentException("connection context is null");
+            final ConnectionContext connectionContext) throws ConnectionException {
+        if (connectionContext == null) {
+            throw new IllegalArgumentException("connection connectionContext is null");
         }
         try {
-            return connector.getHistory(classId, objectId, domain, user, elements, context);
+            return connector.getHistory(classId, objectId, domain, user, elements, connectionContext);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not get history: classId: " + classId + " || objectId: " // NOI18N
                         + objectId
@@ -1167,22 +1189,28 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String taskdomain,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
-        return executeTask(user, taskname, taskdomain, ClientConnectionContext.createDeprecated(), body, params);
+        return executeTask(user, taskname, taskdomain, ConnectionContext.createDeprecated(), body, params);
     }
 
     @Override
     public Object executeTask(final User user,
             final String taskname,
             final String taskdomain,
-            final ClientConnectionContext context,
+            final ConnectionContext connectionContext,
             final Object body,
             final ServerActionParameter... params) throws ConnectionException {
         try {
-            if (context == null) {
-                throw new IllegalArgumentException("connection context is null");
+            if (connectionContext == null) {
+                throw new IllegalArgumentException("connection connectionContext is null");
             }
             // FIXME: workaround for legacy clients that do not support GenericResourceWithContentType
-            final Object taskResult = connector.executeTask(user, taskname, taskdomain, context, body, params);
+            final Object taskResult = connector.executeTask(
+                    user,
+                    taskname,
+                    taskdomain,
+                    connectionContext,
+                    body,
+                    params);
             if ((taskResult != null) && GenericResourceWithContentType.class.isAssignableFrom(taskResult.getClass())) {
                 LOG.warn("REST Action  '" + taskname + "' completed, GenericResourceWithContentType with type '"
                             + ((GenericResourceWithContentType)taskResult).getContentType() + "' generated.");
@@ -1201,10 +1229,5 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public CallServerService getCallServerService() {
         return (CallServerService)connector;
-    }
-
-    @Override
-    public final ClientConnectionContext getConnectionContext() {
-        return connectionContext;
     }
 }

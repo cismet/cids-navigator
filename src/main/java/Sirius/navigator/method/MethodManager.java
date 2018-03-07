@@ -53,12 +53,12 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
-import de.cismet.connectioncontext.ClientConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
 import de.cismet.tools.gui.StaticSwingTools;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -366,7 +366,7 @@ public class MethodManager {
     public boolean updateNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         try {
             if (logger.isInfoEnabled()) {
                 logger.info("updateNode() updating node " + sourceNode); // NOI18N
@@ -408,7 +408,7 @@ public class MethodManager {
      */
     public boolean deleteNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode sourceNode,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         return deleteNode(metaTree, sourceNode, true, connectionContext);
     }
 
@@ -425,7 +425,7 @@ public class MethodManager {
     public boolean deleteNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode sourceNode,
             final boolean withQuestion,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         boolean ans = false;
 
         if (withQuestion) {
@@ -594,7 +594,7 @@ public class MethodManager {
     public boolean addNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         return this.addOrLinkNode(metaTree, destinationNode, sourceNode, false, connectionContext);
     }
 
@@ -611,7 +611,7 @@ public class MethodManager {
     public boolean copyNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         if (logger.isInfoEnabled()) {
             logger.info("copy node " + sourceNode + " -> " + destinationNode);                                                                       // NOI18N
         }
@@ -699,7 +699,7 @@ public class MethodManager {
     public boolean moveNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         if (logger.isInfoEnabled()) {
             logger.info("move node " + sourceNode + " -> " + destinationNode);                                                                       // NOI18N
         }
@@ -831,7 +831,7 @@ public class MethodManager {
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
             final boolean linkOnly,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         try {
             if (linkOnly) {
                 if (logger.isDebugEnabled()) {
@@ -906,7 +906,7 @@ public class MethodManager {
     public boolean linkNode(final MetaCatalogueTree metaTree,
             final DefaultMetaTreeNode destinationNode,
             final DefaultMetaTreeNode sourceNode,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         if (logger.isInfoEnabled()) {
             logger.info("link node " + sourceNode + " -> " + destinationNode);                                                                       // NOI18N
         }
@@ -1099,7 +1099,7 @@ public class MethodManager {
     private boolean checkPermission(final MetaObjectNode node,
             final Permission permission,
             final UserGroup userGroup,
-            final ClientConnectionContext connectionContext) {
+            final ConnectionContext connectionContext) {
         boolean hasPermission = false;
         try {
             final String key = userGroup.getKey().toString();
