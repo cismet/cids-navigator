@@ -8,10 +8,12 @@
 package Sirius.navigator.resource;
 
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
 import Sirius.navigator.exception.*;
 
 import Sirius.util.image.*;
+import de.cismet.connectioncontext.AbstractConnectionContext.Category;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import org.apache.log4j.Logger;
 
@@ -30,11 +32,11 @@ import javax.swing.*;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class ResourceManager {
+public class ResourceManager implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(ResourceManager.class);
+    private static final Logger LOG = Logger.getLogger(ResourceManager.class);
 
     public static final String VALUE_STRING = "%VALUE%";   // NOI18N
     public static final String ERROR_STRING = "[ ERROR ]"; // NOI18N
@@ -48,6 +50,7 @@ public class ResourceManager {
 
     private ImageHashMap remoteIconCache = null;
     private final Hashtable localIconCache;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -57,8 +60,9 @@ public class ResourceManager {
     /**
      * Creates a new instance of ResourceManager.
      */
-    private ResourceManager() {
-        logger.info("creating new singleton resource manager instance"); // NOI18N
+    private ResourceManager(final ConnectionContext connectionContext) {
+        LOG.info("creating new singleton resource manager instance"); // NOI18N
+        this.connectionContext = connectionContext;
         localIconCache = new Hashtable();
         ERROR_ICON = getIcon("x.gif");                                   // NOI18N
     }
@@ -72,12 +76,17 @@ public class ResourceManager {
      */
     public static final ResourceManager getManager() {
         if (manager == null) {
-            manager = new ResourceManager();
+            manager = new ResourceManager(ConnectionContext.create(Category.STATIC, ResourceManager.class.getSimpleName()));
         }
 
         return manager;
     }
 
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+    
     /**
      * DOCUMENT ME!
      *
@@ -87,7 +96,7 @@ public class ResourceManager {
      */
     @Deprecated
     public String getString(final String key) {
-        logger.error(
+        LOG.error(
             "The ResourceManager.getString() method was called. This method should not be used.",
             new Throwable()); // NOI18N
         return "";            // NOI18N
@@ -102,7 +111,7 @@ public class ResourceManager {
      */
     @Deprecated
     public char getMnemonic(final String key) {
-        logger.error(
+        LOG.error(
             "The ResourceManager.getMnemonic() method was called. This method should not be used.",
             new Throwable()); // NOI18N
         return 'a';
@@ -286,7 +295,7 @@ public class ResourceManager {
      * @return  DOCUMENT ME!
      */
     private String getException(final String errorcode) {
-        logger.error(
+        LOG.error(
             "The ResourceManager.getException() method was called. This method should not be used.",
             new Throwable()); // NOI18N
         return "";            // NOI18N
@@ -300,53 +309,53 @@ public class ResourceManager {
      * @return  DOCUMENT ME!
      */
     public ImageIcon getIcon(final String name) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("searching icon '" + name + "'"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("searching icon '" + name + "'"); // NOI18N
         }
 
         if (remoteIconCache == null) {
             if (SessionManager.isConnected()) {
-                logger.info("initializing remote icon cache"); // NOI18N
+                LOG.info("initializing remote icon cache"); // NOI18N
 
                 try {
-                    remoteIconCache = SessionManager.getProxy().getDefaultIcons();
+                    remoteIconCache = SessionManager.getProxy().getDefaultIcons(getConnectionContext());
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("remote icons cached: "); // NOI18N
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("remote icons cached: "); // NOI18N
                         final Iterator keys = remoteIconCache.keySet().iterator();
 
                         while (keys.hasNext()) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug(keys.next());
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug(keys.next());
                             }
                         }
                     }
                 } catch (ConnectionException cexp) {
-                    logger.error("could not initializing remote icon cache: '" + cexp.getMessage() + "'"); // NOI18N
+                    LOG.error("could not initializing remote icon cache: '" + cexp.getMessage() + "'"); // NOI18N
                 }
             }
         }
 
         if ((remoteIconCache != null) && remoteIconCache.containsKey(name)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("icon '" + name + "' found in remote icon cache");    // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("icon '" + name + "' found in remote icon cache");    // NOI18N
             }
             return remoteIconCache.get(name);
         } else if (localIconCache.containsKey(name)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("icon '" + name + "' found in local icon cache");     // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("icon '" + name + "' found in local icon cache");     // NOI18N
             }
             return (ImageIcon)localIconCache.get(name);
         } else {
             final ImageIcon icon = findIcon(name);
             if (icon != null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("icon '" + name + "' added to local icon cache"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("icon '" + name + "' added to local icon cache"); // NOI18N
                 }
                 localIconCache.put(name, icon);
                 return icon;
             } else {
-                logger.error("!!!could not find icon !!! '" + name + "'");         // NOI18N
+                LOG.error("!!!could not find icon !!! '" + name + "'");         // NOI18N
                 return ERROR_ICON;
             }
         }
@@ -368,7 +377,7 @@ public class ResourceManager {
                 return null;
             }
         } catch (Exception exp) {
-            logger.error("could not load icon '" + name + "'", exp);        // NOI18N
+            LOG.error("could not load icon '" + name + "'", exp);        // NOI18N
             return null;
         }
     }
@@ -401,15 +410,15 @@ public class ResourceManager {
                         + fileExtension; // NOI18N
 
             try {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("loading navigator resource '" + resourceUri + "'"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading navigator resource '" + resourceUri + "'"); // NOI18N
                 }
                 return this.getResourceAsStream(resourceUri);                         // NOI18N
             } catch (IOException ioexp) {
-                logger.warn("Resource with the uri '" + resourceUri + "' not found"); // NOI18N
+                LOG.warn("Resource with the uri '" + resourceUri + "' not found"); // NOI18N
                 final String altResourceName = resourceNameBase + suffix + fileExtension;
-                if (logger.isDebugEnabled()) {
-                    logger.debug("loading navigator resource '" + this.getClass().getPackage().getName() + "."
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading navigator resource '" + this.getClass().getPackage().getName() + "."
                                 + altResourceName + "'");                             // NOI18N
                 }
                 final InputStream is = this.getClass().getResourceAsStream(altResourceName);
@@ -417,20 +426,20 @@ public class ResourceManager {
                 if (is != null) {
                     return is;
                 } else {
-                    logger.warn("Resource with name '" + altResourceName + "' not found"); // NOI18N
+                    LOG.warn("Resource with name '" + altResourceName + "' not found"); // NOI18N
                 }
             }
         }
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("loading navigator resource '" + PropertyManager.getManager().getBasePath() + "res/"
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading navigator resource '" + PropertyManager.getManager().getBasePath() + "res/"
                             + resourceName + "'");                                                               // NOI18N
             }
             return this.getResourceAsStream(PropertyManager.getManager().getBasePath() + "res/" + resourceName); // NOI18N
         } catch (IOException ioexp) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("loading navigator resource '" + this.getClass().getPackage().getName() + resourceName
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading navigator resource '" + this.getClass().getPackage().getName() + resourceName
                             + "'");                                                                              // NOI18N
             }
             return this.getClass().getResourceAsStream(resourceName);
@@ -451,8 +460,8 @@ public class ResourceManager {
             final URL url = new URL(path);
             return url.openStream();
         } catch (MalformedURLException uexp) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("no remote url: '" + path + "' loading resource from local filesystem: '"
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("no remote url: '" + path + "' loading resource from local filesystem: '"
                             + uexp.getMessage() + "'"); // NOI18N
             }
             final File file = new File(path);
@@ -474,8 +483,8 @@ public class ResourceManager {
             url = new URL(path);
             // return url.openStream();
         } catch (MalformedURLException uexp) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("no valid url: '" + path + "' trying to build url for local filesystem: "
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("no valid url: '" + path + "' trying to build url for local filesystem: "
                             + uexp.getMessage());                                                          // NOI18N
             }
             try {
@@ -486,7 +495,7 @@ public class ResourceManager {
                     url = new URL("file://" + path);                                                       // NOI18N
                 }
             } catch (MalformedURLException exp) {
-                logger.error("could not transform path '" + path + "' to local URL: " + exp.getMessage()); // NOI18N
+                LOG.error("could not transform path '" + path + "' to local URL: " + exp.getMessage()); // NOI18N
             }
         }
 
@@ -494,7 +503,7 @@ public class ResourceManager {
             try {
                 return new URI(url.toString());
             } catch (URISyntaxException usexp) {
-                logger.error("could not transform path '" + path + "' to URI : " + usexp.getMessage()); // NOI18N
+                LOG.error("could not transform path '" + path + "' to URI : " + usexp.getMessage()); // NOI18N
             }
         }
 

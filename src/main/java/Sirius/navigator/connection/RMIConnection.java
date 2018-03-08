@@ -221,9 +221,15 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
+    @Deprecated
     public ImageHashMap getDefaultIcons() throws ConnectionException {
+        return getDefaultIcons(ConnectionContext.createDeprecated());
+    }
+    
+    @Override
+    public ImageHashMap getDefaultIcons(final ConnectionContext connectionContext) throws ConnectionException {
         try {
-            return new ImageHashMap(((SystemService)callserver).getDefaultIcons());
+            return new ImageHashMap(((SystemService)callserver).getDefaultIcons(connectionContext));
         } catch (RemoteException re) {
             LOG.fatal("[ServerError] could not retrieve the default icons", re);
             throw new ConnectionException("[ServerError] could not retrieve the default icons: " + re.getMessage(),
@@ -233,10 +239,16 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
+    @Deprecated
     public Icon getDefaultIcon(final String name) throws ConnectionException {
+        return getDefaultIcon(name, ConnectionContext.createDeprecated());
+    }
+    
+    @Override
+    public Icon getDefaultIcon(final String name, final ConnectionContext connectionContext) throws ConnectionException {
         try {
             // proxy should implement caching here
-            return this.getDefaultIcons().get(name);
+            return this.getDefaultIcons(connectionContext).get(name);
         } catch (ConnectionException ce) {
             LOG.fatal("[ServerError] could not retrieve the default icon for '" + name + "'");
             throw ce;

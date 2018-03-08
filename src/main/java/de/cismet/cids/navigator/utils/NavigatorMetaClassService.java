@@ -17,8 +17,6 @@ import java.util.HashMap;
 
 import de.cismet.cids.utils.MetaClassCacheService;
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.AbstractConnectionContext.Category;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -30,7 +28,7 @@ import de.cismet.connectioncontext.ConnectionContextStore;
     service = MetaClassCacheService.class,
     position = 100
 )
-public class NavigatorMetaClassService implements MetaClassCacheService, ConnectionContextStore {
+public class NavigatorMetaClassService implements MetaClassCacheService {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -38,7 +36,6 @@ public class NavigatorMetaClassService implements MetaClassCacheService, Connect
 
     //~ Constructors -----------------------------------------------------------
 
-    private ConnectionContext connectionContext = ConnectionContext.createDummy();
     /**
      * Creates a new NavigatorMetaClassService object.
      */
@@ -51,27 +48,36 @@ public class NavigatorMetaClassService implements MetaClassCacheService, Connect
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void initWithConnectionContext(final ConnectionContext connectionContext) {
-        this.connectionContext = connectionContext;
+    @Deprecated
+    public HashMap getAllClasses(final String domain) {
+        return getAllClasses(domain, ConnectionContext.createDeprecated());
     }
     
     @Override
-    public HashMap getAllClasses(final String domain) {
-        return ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, getConnectionContext());
+    public HashMap getAllClasses(final String domain, final ConnectionContext connectionContext) {
+        return ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, connectionContext);
     }
 
     @Override
+    @Deprecated
     public MetaClass getMetaClass(final String domain, final String tableName) {
-        return ClassCacheMultiple.getMetaClass(domain, tableName, getConnectionContext());
+        return getMetaClass(domain, tableName, ConnectionContext.createDeprecated());
+    }
+    
+    @Override
+    public MetaClass getMetaClass(final String domain, final String tableName, final ConnectionContext connectionContext) {
+        return ClassCacheMultiple.getMetaClass(domain, tableName, connectionContext);
     }
 
     @Override
+    @Deprecated
     public MetaClass getMetaClass(final String domain, final int classId) {
-        return ClassCacheMultiple.getMetaClass(domain, classId, getConnectionContext());
+        return ClassCacheMultiple.getMetaClass(domain, classId, ConnectionContext.createDeprecated());
     }
 
     @Override
-    public ConnectionContext getConnectionContext() {
-        return connectionContext;
+    public MetaClass getMetaClass(final String domain, final int classId, final ConnectionContext connectionContext) {
+        return getMetaClass(domain, classId, connectionContext);
     }
+    
 }

@@ -182,6 +182,9 @@ public interface Connection {
     @Deprecated
     ImageHashMap getDefaultIcons() throws ConnectionException;
 
+    @Deprecated
+    ImageHashMap getDefaultIcons(ConnectionContext connectionContext) throws ConnectionException;
+    
     /**
      * DOCUMENT ME!
      *
@@ -195,6 +198,9 @@ public interface Connection {
      */
     @Deprecated
     Icon getDefaultIcon(String name) throws ConnectionException;
+
+    @Deprecated
+    Icon getDefaultIcon(String name, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!

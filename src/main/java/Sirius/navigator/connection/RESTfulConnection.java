@@ -120,7 +120,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     @Deprecated
     public boolean connect(final String callserverURL) throws ConnectionException {
-        return connect(callserverURL, false);
+        return connect(callserverURL, false, ConnectionContext.createDeprecated());
     }
 
     @Override
@@ -207,9 +207,15 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    @Deprecated
     public ImageHashMap getDefaultIcons() throws ConnectionException {
+        return getDefaultIcons(ConnectionContext.createDeprecated());
+    }
+    
+    @Override
+    public ImageHashMap getDefaultIcons(final ConnectionContext connectionContext) throws ConnectionException {
         try {
-            return new ImageHashMap(connector.getDefaultIcons());
+            return new ImageHashMap(connector.getDefaultIcons(connectionContext));
         } catch (final Exception e) {
             final String message = "cannot get default icons"; // NOI18N
             LOG.error(message, e);
@@ -218,9 +224,15 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    @Deprecated
     public Icon getDefaultIcon(final String name) throws ConnectionException {
+        return getDefaultIcon(name, ConnectionContext.createDeprecated());
+    }
+    
+    @Override
+    public Icon getDefaultIcon(final String name, final ConnectionContext connectionContext) throws ConnectionException {
         try {
-            return getDefaultIcons().get(name);
+            return getDefaultIcons(connectionContext).get(name);
         } catch (final Exception e) {
             final String message = "cannot get default icon with name: " + name; // NOI18N
             LOG.error(message, e);

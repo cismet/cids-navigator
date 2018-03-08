@@ -66,8 +66,16 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
      * Creates a new AbstractNewObjectToolbarAction object.
      */
     public AbstractNewObjectToolbarAction() {
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public final void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+
         try {
-            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName());
+            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName(), getConnectionContext());
             final ImageIcon iconIcon = new ImageIcon(cb.getMetaObject().getMetaClass().getIconData());
             final Icon base = (((iconIcon.getIconHeight() < 0) || (iconIcon.getIconWidth() < 0))
                     ? UIManager.getIcon("FileView.fileIcon") : iconIcon);
@@ -81,8 +89,6 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
                 e);
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     @Override
     public boolean isVisible() {
@@ -119,7 +125,7 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
     @Override
     public void actionPerformed(final ActionEvent ae) {
         try {
-            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName());
+            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName(), getConnectionContext());
             final MetaObjectNode metaObjectNode = new MetaObjectNode(
                     -1,
                     SessionManager.getSession().getUser().getDomain(),
@@ -158,11 +164,6 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
      * @return  DOCUMENT ME!
      */
     public abstract String getTooltipString();
-
-    @Override
-    public final void initWithConnectionContext(final ConnectionContext connectionContext) {
-        this.connectionContext = connectionContext;
-    }
 
     @Override
     public final ConnectionContext getConnectionContext() {
