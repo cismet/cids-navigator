@@ -916,21 +916,21 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         if ((getTreeNode() != null) && (getTreeNode() instanceof ObjectTreeNode)) {
             final MetaObject mo = ((ObjectTreeNode)getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());              // NOI18N
             EditorBeanInitializerStore.getInstance()
-                    .registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
+                    .registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean(), getConnectionContext()));
         }
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {      //GEN-FIRST:event_copyButtonActionPerformed
+    private void copyButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_copyButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
             final boolean isNewBean = bean.getMetaObject().getStatus() == MetaObject.NEW;
@@ -944,7 +944,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     log.error("BeanInitializerProvider delivers null as initializer."); ////NOI18N
                 }
             } else {
-                currentInitializer = new DefaultBeanInitializer(bean);
+                currentInitializer = new DefaultBeanInitializer(bean, getConnectionContext());
                 EditorBeanInitializerStore.getInstance()
                         .registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
             }
@@ -953,14 +953,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             pasteButton.setEnabled((currentInitializer != null)
                         && (isNewBean || (currentInitializer instanceof BeanInitializerForcePaste)));
         }
-    } //GEN-LAST:event_copyButtonActionPerformed
+    }//GEN-LAST:event_copyButtonActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pasteButtonActionPerformed
+    private void pasteButtonActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pasteButtonActionPerformed
         if (currentBeanStore != null) {
             final CidsBean bean = currentBeanStore.getCidsBean();
 
@@ -981,5 +981,5 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                 }
             }
         }
-    } //GEN-LAST:event_pasteButtonActionPerformed
+    }//GEN-LAST:event_pasteButtonActionPerformed
 }

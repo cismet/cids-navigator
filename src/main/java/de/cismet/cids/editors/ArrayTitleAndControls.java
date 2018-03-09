@@ -18,13 +18,14 @@ package de.cismet.cids.editors;
 
 import Sirius.server.middleware.types.MetaClass;
 
-import org.jdesktop.observablecollections.ObservableList;
 
 import java.util.List;
 
 import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -32,7 +33,7 @@ import de.cismet.cids.dynamics.CidsBean;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class ArrayTitleAndControls extends javax.swing.JPanel {
+public class ArrayTitleAndControls extends javax.swing.JPanel implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -40,6 +41,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
     private CidsBean cidsBean;
     private String arrayProperty;
     private JList jList;
+    private final ConnectionContext connectionContext;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdRemove;
@@ -63,8 +65,10 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
     public ArrayTitleAndControls(final String title,
             final MetaClass detailClass,
             final String arrayProperty,
-            final JList jList) {
+            final JList jList,
+            final ConnectionContext connectionContext) {
         super();
+        this.connectionContext = connectionContext;
         this.jList = jList;
         initComponents();
         this.detailClass = detailClass;
@@ -166,7 +170,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveActionPerformed
+    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveActionPerformed
         final Object o = jList.getSelectedValue();
         if ((o instanceof CidsBean) && (o != null)) {
             try {
@@ -184,16 +188,16 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
                 ex.printStackTrace();
             }
         }
-    } //GEN-LAST:event_cmdRemoveActionPerformed
+    }//GEN-LAST:event_cmdRemoveActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
         try {
-            final CidsBean newOne = detailClass.getEmptyInstance().getBean();
+            final CidsBean newOne = detailClass.getEmptyInstance(getConnectionContext()).getBean();
 
             final CidsBean sourcebean = (CidsBean)jList.getClientProperty(CidsObjectEditorFactory.CIDS_BEAN);
             final JList sourcelist = (JList)jList.getClientProperty(CidsObjectEditorFactory.SOURCE_LIST);
@@ -209,5 +213,10 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }                                                                                                   //GEN-LAST:event_cmdAddActionPerformed
+    }//GEN-LAST:event_cmdAddActionPerformed
+
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
 }

@@ -604,7 +604,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
         public void invoke() throws Exception {
             final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser())) {
-                final MetaObject metaObject = metaClass.getEmptyInstance();
+                final MetaObject metaObject = metaClass.getEmptyInstance(getConnectionContext());
                 metaObject.setStatus(MetaObject.NEW);
                 final MetaObjectNode MetaObjectNode = new MetaObjectNode(
                         -1,

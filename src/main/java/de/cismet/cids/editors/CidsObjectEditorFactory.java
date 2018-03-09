@@ -482,7 +482,7 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
                                 lblDescription.getText(),
                                 detailClass,
                                 field,
-                                lstArrayMaster);
+                                lstArrayMaster, getConnectionContext());
                         cidsEditor.add(arrayTitleAndControls, gbc);
 
                         gbc = getCommonConstraints();
@@ -979,7 +979,7 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
                                 actionBean.getMetaObject().getDomain(),
                                 oa.getMai().getForeignKeyClassId(),
                                 getConnectionContext());
-                        final CidsBean newOne = mc.getEmptyInstance().getBean();
+                        final CidsBean newOne = mc.getEmptyInstance(getConnectionContext()).getBean();
                         try {
                             actionBean.setProperty(attributeName, newOne);
                         } catch (Exception ex) {

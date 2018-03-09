@@ -160,7 +160,7 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
                     ObjectAttribute oa;
                     while (expr.contains(".")) {
                         final MetaClass mc = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId, connectionContext);
-                        final MetaObject mo = mc.getEmptyInstance();
+                        final MetaObject mo = mc.getEmptyInstance(connectionContext);
                         expr = expr.substring(expr.indexOf(".") + 1); // NOI18N
                         final String fieldname = expr.contains(".") ? expr.substring(0, expr.indexOf(".")) : expr;
                         oa = mo.getAttributeByFieldName(fieldname);

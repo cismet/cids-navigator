@@ -63,9 +63,9 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
             if (logger.isDebugEnabled()) {
                 logger.debug("setValue(" + this + ") setting new meta attribute");                             // NOI18N
             }
-            MetaObject MetaObject = this.getMetaObject(value);
+            MetaObject mo = this.getMetaObject(value);
 
-            if (MetaObject == null) {
+            if (mo == null) {
                 if (logger.isDebugEnabled()) {
                     logger.warn("setValue(" + this
                                 + ") the value of this attribute is null, creating new empty meta object"); // NOI18N
@@ -73,18 +73,19 @@ public abstract class AbstractComplexMetaAttributeEditor extends AbstractComplex
                 if (((Attribute)value).isArray()) {
                     final String domain = ((Attribute)value).getClassKey().split("@")[1];                   // NOI18N
                     try {
-                        MetaObject = new DefaultMetaObject(new Sirius.server.localserver.object.DefaultObject(
+                        mo = new DefaultMetaObject(new Sirius.server.localserver.object.DefaultObject(
                                     -1,
                                     ((ObjectAttribute)value).getClassID()),
                                 domain);
-                        MetaObject.setDummy(true);
+                        mo.setDummy(true);
+                        ((DefaultMetaObject)mo).initWithConnectionContext(getConnectionContext());
                     } catch (Exception e) {
                         logger.error("Error while creating a ArrayDummyObjektes", e);                       // NOI18N
                     }
                 } else {
-                    MetaObject = this.getMetaObjectInstance(((Attribute)value).getClassKey());
+                    mo = this.getMetaObjectInstance(((Attribute)value).getClassKey());
                 }
-                ((Attribute)value).setValue(MetaObject);
+                ((Attribute)value).setValue(mo);
             }
 
             super.setValue(value);

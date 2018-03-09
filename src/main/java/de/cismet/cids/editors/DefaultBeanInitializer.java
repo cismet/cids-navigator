@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.collections.TypeSafeCollections;
 
@@ -23,7 +25,7 @@ import de.cismet.tools.collections.TypeSafeCollections;
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class DefaultBeanInitializer implements BeanInitializer {
+public class DefaultBeanInitializer implements BeanInitializer, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -38,15 +40,23 @@ public class DefaultBeanInitializer implements BeanInitializer {
     protected final Map<String, Object> simpleProperties;
     protected final Map<String, CidsBean> complexProperties;
     protected final Map<String, Collection<CidsBean>> arrayProperties;
+    
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
+
+    @Deprecated
+    public DefaultBeanInitializer(final CidsBean template) {
+        this(template, ConnectionContext.createDeprecated());
+    }
 
     /**
      * Creates a new DefaultBeanInitializer object.
      *
      * @param  template  DOCUMENT ME!
      */
-    public DefaultBeanInitializer(final CidsBean template) {
+    public DefaultBeanInitializer(final CidsBean template, final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         metaClass = template.getMetaObject().getMetaClass();
         primaryKeyField = metaClass.getPrimaryKey().toLowerCase();
         simpleProperties = TypeSafeCollections.newHashMap();
@@ -170,7 +180,7 @@ public class DefaultBeanInitializer implements BeanInitializer {
             final CidsBean complexValueToProcess) throws Exception {
         // default impl delivers deep copy of geom attributes and ignores all others
         if (complexValueToProcess.getMetaObject().getMetaClass().getTableName().equalsIgnoreCase(GEOM_TABLE_NAME)) {
-            final CidsBean geomBean = complexValueToProcess.getMetaObject().getMetaClass().getEmptyInstance().getBean();
+            final CidsBean geomBean = complexValueToProcess.getMetaObject().getMetaClass().getEmptyInstance(getConnectionContext()).getBean();
             geomBean.setProperty(GEOM_FIELD_NAME, complexValueToProcess.getProperty(GEOM_FIELD_NAME));
             beanToInit.setProperty(propertyName, geomBean);
         }
@@ -191,5 +201,10 @@ public class DefaultBeanInitializer implements BeanInitializer {
         // does nothing but clear in default impl
         final Collection<CidsBean> collectionToInitialize = (Collection<CidsBean>)beanToInit.getProperty(propertyName);
         collectionToInitialize.clear();
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }
