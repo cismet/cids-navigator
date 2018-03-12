@@ -77,9 +77,9 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import de.cismet.commons.concurrency.CismetExecutors;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DefaultMetaTree ist ein Navigationsbaum.
@@ -111,6 +111,18 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     /**
      * Creates a new MetaCatalogueTree object.
      *
+     * @param  rootTreeNode  DOCUMENT ME!
+     * @param  editable      DOCUMENT ME!
+     */
+    @Deprecated
+    public MetaCatalogueTree(final RootTreeNode rootTreeNode,
+            final boolean editable) {
+        this(rootTreeNode, editable, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new MetaCatalogueTree object.
+     *
      * @param  rootTreeNode       DOCUMENT ME!
      * @param  editable           DOCUMENT ME!
      * @param  connectionContext  DOCUMENT ME!
@@ -119,6 +131,22 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             final boolean editable,
             final ConnectionContext connectionContext) {
         this(rootTreeNode, editable, true, 3, connectionContext);
+    }
+
+    /**
+     * Creates a new MetaCatalogueTree object.
+     *
+     * @param  rootTreeNode    DOCUMENT ME!
+     * @param  editable        DOCUMENT ME!
+     * @param  useThread       DOCUMENT ME!
+     * @param  maxThreadCount  DOCUMENT ME!
+     */
+    @Deprecated
+    public MetaCatalogueTree(final RootTreeNode rootTreeNode,
+            final boolean editable,
+            final boolean useThread,
+            final int maxThreadCount) {
+        this(rootTreeNode, editable, useThread, maxThreadCount, ConnectionContext.createDeprecated());
     }
 
     /**
@@ -193,7 +221,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     super.mouseClicked(e);
                     if (e.getClickCount() > 1) {
                         try {
-                            final ArrayList<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
+                            final ArrayList<DefaultMetaTreeNode> v = new ArrayList<>();
                             final DefaultMetaTreeNode[] resultNodes = getSelectedNodesArray();
                             for (int i = 0; i < resultNodes.length; ++i) {
                                 if (LOG.isDebugEnabled()) {
@@ -251,7 +279,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             LOG.debug("refresh for artificial id requested: " + artificialId); // NOI18N
         }
 
-        final Set<Future> futures = new HashSet<Future>();
+        final Set<Future> futures = new HashSet<>();
 
         if (refreshCache.isValid()) {
             final Set<DefaultMetaTreeNode> nodes = refreshCache.get(artificialId);
@@ -282,10 +310,10 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * @return  DOCUMENT ME!
      */
     public Future exploreSubtree(final TreePath treePath) {
-        final Set<Future> futures = new HashSet<Future>();
+        final Set<Future> futures = new HashSet<>();
         final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
-        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
+        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<>();
 
         if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
@@ -599,7 +627,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                         final Enumeration<DefaultMetaTreeNode> currentChildren = node.children();
                         final Node[] dbChildren = node.getChildren();
 
-                        final List<Node> foundDbNodes = new ArrayList<Node>(dbChildren.length);
+                        final List<Node> foundDbNodes = new ArrayList<>(dbChildren.length);
 
                         while (currentChildren.hasMoreElements()) {
                             final DefaultMetaTreeNode treeNode = currentChildren.nextElement();

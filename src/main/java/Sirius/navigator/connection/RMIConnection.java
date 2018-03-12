@@ -225,7 +225,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     public ImageHashMap getDefaultIcons() throws ConnectionException {
         return getDefaultIcons(ConnectionContext.createDeprecated());
     }
-    
+
     @Override
     public ImageHashMap getDefaultIcons(final ConnectionContext connectionContext) throws ConnectionException {
         try {
@@ -243,9 +243,10 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     public Icon getDefaultIcon(final String name) throws ConnectionException {
         return getDefaultIcon(name, ConnectionContext.createDeprecated());
     }
-    
+
     @Override
-    public Icon getDefaultIcon(final String name, final ConnectionContext connectionContext) throws ConnectionException {
+    public Icon getDefaultIcon(final String name, final ConnectionContext connectionContext)
+            throws ConnectionException {
         try {
             // proxy should implement caching here
             return this.getDefaultIcons(connectionContext).get(name);
@@ -264,7 +265,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final String userLocalserver,
             final String username,
             final String password) throws ConnectionException, UserException {
-        return getUser(usergroupLocalserver,
+        return getUser(
+                usergroupLocalserver,
                 usergroup,
                 userLocalserver,
                 username,
@@ -324,8 +326,9 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public Vector getUserGroupNames(final String username, final String domain, final ConnectionContext connectionContext)
-            throws ConnectionException, UserException {
+    public Vector getUserGroupNames(final String username,
+            final String domain,
+            final ConnectionContext connectionContext) throws ConnectionException, UserException {
         try {
             return ((UserService)callserver).getUserGroupNames(username, domain, connectionContext);
         } catch (RemoteException re) {
@@ -439,8 +442,10 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public Node getNode(final User user, final int nodeID, final String domain, final ConnectionContext connectionContext)
-            throws ConnectionException {
+    public Node getNode(final User user,
+            final int nodeID,
+            final String domain,
+            final ConnectionContext connectionContext) throws ConnectionException {
         try {
             return ((MetaService)callserver).getMetaObjectNode(user, nodeID, domain, connectionContext);
         } catch (RemoteException re) {
@@ -518,8 +523,10 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public boolean deleteLink(final Node from, final Node to, final User user, final ConnectionContext connectionContext)
-            throws ConnectionException {
+    public boolean deleteLink(final Node from,
+            final Node to,
+            final User user,
+            final ConnectionContext connectionContext) throws ConnectionException {
         try {
             return ((CatalogueService)callserver).deleteLink(from, to, user, connectionContext);
         } catch (RemoteException re) {
@@ -537,7 +544,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public Node[] getClassTreeNodes(final User user, final ConnectionContext connectionContext) throws ConnectionException {
+    public Node[] getClassTreeNodes(final User user, final ConnectionContext connectionContext)
+            throws ConnectionException {
         try {
             return ((MetaService)callserver).getClassTreeNodes(user, connectionContext);
         } catch (RemoteException re) {
@@ -600,8 +608,9 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     }
 
     @Override
-    public MetaObject[] getMetaObjectByQuery(final User user, final String query, final ConnectionContext connectionContext)
-            throws ConnectionException {
+    public MetaObject[] getMetaObjectByQuery(final User user,
+            final String query,
+            final ConnectionContext connectionContext) throws ConnectionException {
         try {
             return ((MetaService)callserver).getMetaObject(user, query, connectionContext);
         } catch (RemoteException re) {
@@ -786,7 +795,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final User user,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
-        return getAllLightweightMetaObjectsForClass(classId,
+        return getAllLightweightMetaObjectsForClass(
+                classId,
                 user,
                 representationFields,
                 representationPattern,
@@ -823,7 +833,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final User user,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
-        return getAllLightweightMetaObjectsForClass(classId,
+        return getAllLightweightMetaObjectsForClass(
+                classId,
                 user,
                 representationFields,
                 formater,
@@ -860,7 +871,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final String query,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
-        return getLightweightMetaObjectsByQuery(classId,
+        return getLightweightMetaObjectsByQuery(
+                classId,
                 user,
                 query,
                 representationFields,
@@ -901,7 +913,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final String query,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
-        return getLightweightMetaObjectsByQuery(classId,
+        return getLightweightMetaObjectsByQuery(
+                classId,
                 user,
                 query,
                 representationFields,
@@ -974,8 +987,8 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     /**
      * !For debugging purpose only. Do not use!
      *
-     * @param   classId  DOCUMENT ME!
-     * @param   user     DOCUMENT ME!
+     * @param   classId            DOCUMENT ME!
+     * @param   user               DOCUMENT ME!
      * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!

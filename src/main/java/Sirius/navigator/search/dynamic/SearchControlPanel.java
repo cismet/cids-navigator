@@ -75,10 +75,15 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
 
     //~ Constructors -----------------------------------------------------------
 
+    /**
+     * Creates a new SearchControlPanel object.
+     *
+     * @param  listener  DOCUMENT ME!
+     */
     public SearchControlPanel(final SearchControlListener listener) {
         this(listener, ConnectionContext.createDeprecated());
     }
-    
+
     /**
      * Creates new form SearchControlPanel.
      *
@@ -167,7 +172,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
         if (LOG.isInfoEnabled()) {
             LOG.info((searching ? "Cancel" : "Search") + " button was clicked.");
         }
@@ -242,7 +247,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 };
             searchPreparationThread.execute();
         }
-    }//GEN-LAST:event_btnSearchCancelActionPerformed
+    } //GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * This method is called before the search is actually started and gives a possibility to abort the search. In the

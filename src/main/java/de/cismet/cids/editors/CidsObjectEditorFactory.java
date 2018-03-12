@@ -83,15 +83,16 @@ import de.cismet.cids.utils.ClassloadingHelper;
 
 import de.cismet.commons.classloading.BlacklistClassloading;
 
-import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.AbstractConnectionContext.Category;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
 import de.cismet.tools.gui.WrappedComponent;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import de.cismet.connectioncontext.ConnectionContextProvider;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -130,6 +131,8 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
 
     /**
      * Creates a new CidsObjectEditorFactory object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
     private CidsObjectEditorFactory(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
@@ -159,7 +162,9 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
      */
     public static CidsObjectEditorFactory getInstance() {
         if (editorFactory == null) {
-            editorFactory = new CidsObjectEditorFactory(ConnectionContext.create(Category.INSTANCE, CidsObjectEditorFactory.class.getSimpleName()));
+            editorFactory = new CidsObjectEditorFactory(ConnectionContext.create(
+                        Category.INSTANCE,
+                        CidsObjectEditorFactory.class.getSimpleName()));
             editorFactory.user = SessionManager.getSession().getUser();
         }
         return editorFactory;
@@ -212,12 +217,15 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   domain   DOCUMENT ME!
-     * @param   classid  DOCUMENT ME!
+     * @param   domain             DOCUMENT ME!
+     * @param   classid            DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public static MetaClass getMetaClass(final String domain, final int classid, final ConnectionContext connectionContext) {
+    public static MetaClass getMetaClass(final String domain,
+            final int classid,
+            final ConnectionContext connectionContext) {
         return ClassCacheMultiple.getMetaClass(domain, classid, connectionContext);
     }
 
@@ -307,7 +315,9 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
             } else if (attributeClassname.equals(java.lang.Boolean.class.getName())) {
                 ret = new DefaultBindableJCheckBox();
             } else if (mai.isForeignKey() && mai.isSubstitute()) {
-                final MetaClass foreignClass = getMetaClass(metaClass.getDomain(), mai.getForeignKeyClassId(), getConnectionContext());
+                final MetaClass foreignClass = getMetaClass(metaClass.getDomain(),
+                        mai.getForeignKeyClassId(),
+                        getConnectionContext());
                 if (foreignClass.getClassAttribute("reasonable_few") != null) {                          // NOI18N
                     ret = new DefaultBindableReferenceCombo(foreignClass);
                 }
@@ -362,8 +372,7 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
      * @throws  UnsupportedOperationException  DOCUMENT ME!
      */
     private AutoBindableCidsEditor getDefaultEditor(final MetaClass metaClass) {
-        final Vector<MemberAttributeInfo> mais = new Vector<>(metaClass.getMemberAttributeInfos()
-                        .values());
+        final Vector<MemberAttributeInfo> mais = new Vector<>(metaClass.getMemberAttributeInfos().values());
 //        final FinalReference<AutoBindableCidsEditor> result = new FinalReference<AutoBindableCidsEditor>();
 //        final Runnable createDefaultEditorRunnable = new Runnable() {
 //
@@ -482,7 +491,8 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
                                 lblDescription.getText(),
                                 detailClass,
                                 field,
-                                lstArrayMaster, getConnectionContext());
+                                lstArrayMaster,
+                                getConnectionContext());
                         cidsEditor.add(arrayTitleAndControls, gbc);
 
                         gbc = getCommonConstraints();
@@ -648,7 +658,9 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
             if (attrEditorClass != null) {
                 final MetaClass foreignClass;
                 if (MetaClassStore.class.isAssignableFrom(attrEditorClass) && mai.isForeignKey()) {
-                    foreignClass = getMetaClass(metaClass.getDomain(), mai.getForeignKeyClassId(), getConnectionContext());
+                    foreignClass = getMetaClass(metaClass.getDomain(),
+                            mai.getForeignKeyClassId(),
+                            getConnectionContext());
                 } else {
                     foreignClass = null;
                 }
@@ -1079,7 +1091,7 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
                                         CLASSID,
                                         domain,
                                         connectionContext); // meta.getMetaObject(u, 1, AAPERSON_CLASSID,
-                                                                 // domain);
+                                                            // domain);
 
                         log.fatal(MetaObject.getDebugString());
 

@@ -35,10 +35,10 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 //Swagger annotations are comented out, due to a incompatibility of slf4j
 /**
@@ -64,7 +64,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
     //~ Instance fields --------------------------------------------------------
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
+
     //~ Constructors -----------------------------------------------------------
 
     /**

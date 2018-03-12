@@ -182,9 +182,18 @@ public interface Connection {
     @Deprecated
     ImageHashMap getDefaultIcons() throws ConnectionException;
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
     @Deprecated
     ImageHashMap getDefaultIcons(ConnectionContext connectionContext) throws ConnectionException;
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -199,6 +208,16 @@ public interface Connection {
     @Deprecated
     Icon getDefaultIcon(String name) throws ConnectionException;
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   name               DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
     @Deprecated
     Icon getDefaultIcon(String name, ConnectionContext connectionContext) throws ConnectionException;
 
@@ -425,8 +444,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node getNode(User user, int nodeID, String domain, ConnectionContext connectionContext)
-            throws ConnectionException;
+    Node getNode(User user, int nodeID, String domain, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -454,8 +472,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Node addNode(Node node, Link parent, User user, ConnectionContext connectionContext)
-            throws ConnectionException;
+    Node addNode(Node node, Link parent, User user, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -509,8 +526,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean addLink(Node from, Node to, User user, ConnectionContext connectionContext)
-            throws ConnectionException;
+    boolean addLink(Node from, Node to, User user, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -538,8 +554,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    boolean deleteLink(Node from, Node to, User user, ConnectionContext connectionContext)
-            throws ConnectionException;
+    boolean deleteLink(Node from, Node to, User user, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -621,8 +636,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaClass[] getClasses(User user, String domain, ConnectionContext connectionContext)
-            throws ConnectionException;
+    MetaClass[] getClasses(User user, String domain, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -831,8 +845,7 @@ public interface Connection {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject getInstance(User user, MetaClass c, ConnectionContext connectionContext)
-            throws ConnectionException;
+    MetaObject getInstance(User user, MetaClass c, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -1127,8 +1140,8 @@ public interface Connection {
      * @param   user               DOCUMENT ME!
      * @param   taskname           DOCUMENT ME!
      * @param   taskdomain         DOCUMENT ME!
-     * @param   connectionContext  DOCUMENT ME!
      * @param   body               DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      * @param   params             DOCUMENT ME!
      *
      * @return  DOCUMENT ME!

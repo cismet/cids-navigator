@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -40,11 +41,16 @@ public class DefaultBeanInitializer implements BeanInitializer, ConnectionContex
     protected final Map<String, Object> simpleProperties;
     protected final Map<String, CidsBean> complexProperties;
     protected final Map<String, Collection<CidsBean>> arrayProperties;
-    
+
     private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
+    /**
+     * Creates a new DefaultBeanInitializer object.
+     *
+     * @param  template  DOCUMENT ME!
+     */
     @Deprecated
     public DefaultBeanInitializer(final CidsBean template) {
         this(template, ConnectionContext.createDeprecated());
@@ -53,7 +59,8 @@ public class DefaultBeanInitializer implements BeanInitializer, ConnectionContex
     /**
      * Creates a new DefaultBeanInitializer object.
      *
-     * @param  template  DOCUMENT ME!
+     * @param  template           DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
     public DefaultBeanInitializer(final CidsBean template, final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
@@ -180,7 +187,10 @@ public class DefaultBeanInitializer implements BeanInitializer, ConnectionContex
             final CidsBean complexValueToProcess) throws Exception {
         // default impl delivers deep copy of geom attributes and ignores all others
         if (complexValueToProcess.getMetaObject().getMetaClass().getTableName().equalsIgnoreCase(GEOM_TABLE_NAME)) {
-            final CidsBean geomBean = complexValueToProcess.getMetaObject().getMetaClass().getEmptyInstance(getConnectionContext()).getBean();
+            final CidsBean geomBean = complexValueToProcess.getMetaObject()
+                        .getMetaClass()
+                        .getEmptyInstance(getConnectionContext())
+                        .getBean();
             geomBean.setProperty(GEOM_FIELD_NAME, complexValueToProcess.getProperty(GEOM_FIELD_NAME));
             beanToInit.setProperty(propertyName, geomBean);
         }

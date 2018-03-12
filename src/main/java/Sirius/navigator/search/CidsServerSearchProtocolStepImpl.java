@@ -52,7 +52,6 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
     @Getter @JsonIgnore private final transient List<MetaObjectNode> searchResultNodes;
 
     @JsonIgnore private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     @Getter
     @JsonProperty(required = true)

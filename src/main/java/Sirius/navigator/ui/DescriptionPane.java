@@ -77,6 +77,7 @@ import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
 import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -88,7 +89,6 @@ import de.cismet.tools.gui.WrappedComponent;
 import de.cismet.tools.gui.breadcrumb.BreadCrumb;
 import de.cismet.tools.gui.breadcrumb.DefaultBreadCrumbModel;
 import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -120,7 +120,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     private final MultiMap sharedHandlersHM = new MultiMap();
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;

@@ -39,9 +39,9 @@ import de.cismet.cids.client.tools.ConnectionContextUtils;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!

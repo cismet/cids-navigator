@@ -29,10 +29,10 @@ import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.messages.CidsServerMessage;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.NoWriteError;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!

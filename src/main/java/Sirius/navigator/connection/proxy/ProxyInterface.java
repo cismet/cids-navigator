@@ -462,8 +462,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    MetaObject[] getMetaObjectByQuery(String query, int sig, ConnectionContext context)
-            throws ConnectionException;
+    MetaObject[] getMetaObjectByQuery(String query, int sig, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -516,8 +515,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    int updateMetaObject(MetaObject MetaObject, String domain, ConnectionContext context)
-            throws ConnectionException;
+    int updateMetaObject(MetaObject MetaObject, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -531,8 +529,7 @@ public interface ProxyInterface {
      * @throws  ConnectionException  DOCUMENT ME!
      */
     @Deprecated
-    int deleteMetaObject(MetaObject MetaObject, String domain, ConnectionContext context)
-            throws ConnectionException;
+    int deleteMetaObject(MetaObject MetaObject, String domain, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -592,8 +589,7 @@ public interface ProxyInterface {
      *
      * @throws  ConnectionException  DOCUMENT ME!
      */
-    Collection customServerSearch(CidsServerSearch serverSearch, ConnectionContext context)
-            throws ConnectionException;
+    Collection customServerSearch(CidsServerSearch serverSearch, ConnectionContext context) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
@@ -616,8 +612,8 @@ public interface ProxyInterface {
      *
      * @param   taskname    DOCUMENT ME!
      * @param   taskdomain  DOCUMENT ME!
-     * @param   context     DOCUMENT ME!
      * @param   body        DOCUMENT ME!
+     * @param   context     DOCUMENT ME!
      * @param   params      DOCUMENT ME!
      *
      * @return  DOCUMENT ME!

@@ -86,10 +86,11 @@ import de.cismet.cismap.commons.gui.layerwidget.ZoomToLayerWorker;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
+
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.gui.PaginationPanel;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -101,7 +102,7 @@ import de.cismet.connectioncontext.ConnectionContextStore;
 public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry,
     ActionTagProtected,
     ActionListener,
-        ConnectionContextStore{
+    ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -276,7 +277,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         this.paginationEnabled = paginationEnabled;
         this.choosenLayers = choosenLayers;
     }
-    
+
     //~ Methods ----------------------------------------------------------------
 
     @Override
@@ -401,7 +402,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         }
 
         jLayerCBActionPerformed(null);
-}
+    }
 
     /**
      * Enables line wrap in the query text area.
@@ -486,6 +487,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * Retrieves all configured cids layer classes.
      *
+     * @param   connectionContext  DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     private static List<MetaClass> getClasses(final ConnectionContext connectionContext) {
@@ -552,17 +555,22 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * DOCUMENT ME!
      *
-     * @param   metaClass  DOCUMENT ME!
-     * @param   attribute  DOCUMENT ME!
+     * @param   metaClass          DOCUMENT ME!
+     * @param   attribute          DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private static List<Object> getValuesFromAttribute(final MetaClass metaClass, final MemberAttributeInfo attribute, final ConnectionContext connectionContext) {
+    private static List<Object> getValuesFromAttribute(final MetaClass metaClass,
+            final MemberAttributeInfo attribute,
+            final ConnectionContext connectionContext) {
         final List<Object> values = new ArrayList<>();
 
         try {
             if (attribute.isForeignKey() && !attribute.isArray()) {
-                final MetaClass foreignClass = ClassCacheMultiple.getMetaClass(metaClass.getDomain(), attribute.getForeignKeyClassId(), connectionContext);
+                final MetaClass foreignClass = ClassCacheMultiple.getMetaClass(metaClass.getDomain(),
+                        attribute.getForeignKeyClassId(),
+                        connectionContext);
                 final String query = "select " + foreignClass.getID() + ", " + foreignClass.getPrimaryKey()
                             + " from "
                             + foreignClass.getTableName();
@@ -632,12 +640,15 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * DOCUMENT ME!
      *
-     * @param   metaClass    DOCUMENT ME!
-     * @param   whereClause  DOCUMENT ME!
+     * @param   metaClass          DOCUMENT ME!
+     * @param   whereClause        DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private static int getCount(final MetaClass metaClass, final String whereClause, final ConnectionContext connectionContext) {
+    private static int getCount(final MetaClass metaClass,
+            final String whereClause,
+            final ConnectionContext connectionContext) {
         // int values = -1;
         try {
             final CidsServerSearch search = new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
@@ -1084,7 +1095,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
         setMetaClass(null);
         if (jLayerCB.getSelectedItem() instanceof MetaClass) {
             setMetaClass((MetaClass)jLayerCB.getSelectedItem());
@@ -1161,14 +1172,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         firePropertyChange(PROP_VALUES, old, values);
 
         fillButtonPanel();
-    }//GEN-LAST:event_jLayerCBActionPerformed
+    } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -1186,7 +1197,10 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     public void run() {
                         lblBusyValueIcon.setEnabled(true);
                         lblBusyValueIcon.setBusy(true);
-                        final List<Object> newValues = getValuesFromAttribute(metaClass, attributeInfo, getConnectionContext());
+                        final List<Object> newValues = getValuesFromAttribute(
+                                metaClass,
+                                attributeInfo,
+                                getConnectionContext());
 
                         SwingUtilities.invokeLater(new Runnable() {
 
@@ -1270,19 +1284,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
                 currentlyExpandedAttribute));
-    }//GEN-LAST:event_jGetValuesBnActionPerformed
+    } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
         if (panPagination.getParent() != null) {
             panPagination.reset();
         }
         performSearch();
-    }//GEN-LAST:event_btnSearchCancelActionPerformed
+    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1306,17 +1320,17 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
-    }//GEN-LAST:event_jMethodCBItemStateChanged
+    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
+    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jLayerCBItemStateChanged
+    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
         taQuery.setText("");
-    }//GEN-LAST:event_jLayerCBItemStateChanged
+    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
 
     /**
      * DOCUMENT ME!

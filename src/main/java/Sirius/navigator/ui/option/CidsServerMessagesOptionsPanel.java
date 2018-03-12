@@ -20,6 +20,7 @@ import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
@@ -27,7 +28,6 @@ import de.cismet.lookupoptions.OptionsPanelController;
 import de.cismet.lookupoptions.options.GeneralOptionsCategory;
 
 import de.cismet.tools.configuration.NoWriteError;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!

@@ -59,7 +59,6 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
     private SwingWorker<Long, Void> searchCountThread;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Methods ----------------------------------------------------------------
 

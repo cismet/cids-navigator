@@ -48,9 +48,9 @@ import de.cismet.cids.client.tools.ConnectionContextUtils;
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -390,15 +390,32 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         return comparator;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc           DOCUMENT ME!
+     * @param   nullable     DOCUMENT ME!
+     * @param   onlyUsed     DOCUMENT ME!
+     * @param   comparator   DOCUMENT ME!
+     * @param   forceReload  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload) {
-        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, ConnectionContext.createDeprecated());
+        return getModelByMetaClass(
+                mc,
+                nullable,
+                onlyUsed,
+                comparator,
+                forceReload,
+                ConnectionContext.createDeprecated());
     }
-    
+
     /**
      * DOCUMENT ME!
      *

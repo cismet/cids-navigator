@@ -16,11 +16,12 @@ import Sirius.navigator.ui.MutableConstraints;
 
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserGroup;
-import de.cismet.connectioncontext.ConnectionContext;
 
 import org.apache.log4j.Logger;
 
 import java.util.*;
+
+import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
@@ -42,7 +43,9 @@ public class PluginRegistry implements ConnectionContextProvider {
 
     private final PluginFactory pluginFactory;
     private final Hashtable plugins;
-    private final ConnectionContext connectionContext = ConnectionContext.create(ConnectionContext.Category.OTHER, getClass().getSimpleName());
+    private final ConnectionContext connectionContext = ConnectionContext.create(
+            ConnectionContext.Category.OTHER,
+            getClass().getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -110,7 +113,7 @@ public class PluginRegistry implements ConnectionContextProvider {
                                     + pluginDescriptor.getName() + ")' successfully registred");      // NOI18N
                     }
                 } catch (Throwable t) {
-                    LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);    // NOI18N
+                    LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);       // NOI18N
                     ExceptionManager.getManager()
                             .showExceptionDialog(
                                 ExceptionManager.ERROR,
@@ -192,7 +195,7 @@ public class PluginRegistry implements ConnectionContextProvider {
                         try {
                             this.loadPlugin(pluginDescriptor);
                         } catch (Throwable t) {
-                            LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t); // NOI18N
+                            LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);    // NOI18N
                             ExceptionManager.getManager()
                                     .showExceptionDialog(
                                         ExceptionManager.ERROR,
@@ -216,7 +219,7 @@ public class PluginRegistry implements ConnectionContextProvider {
             }
         } else {
             if (LOG.isInfoEnabled()) {
-                LOG.info("could not load any plugins: no plugins found or preloaded");                  // NOI18N
+                LOG.info("could not load any plugins: no plugins found or preloaded");                     // NOI18N
             }
         }
     }
@@ -392,7 +395,7 @@ public class PluginRegistry implements ConnectionContextProvider {
      *
      * @param  descriptor  DOCUMENT ME!
      */
-    private void activatePlugin(final PluginDescriptor descriptor)                // throws Exception
+    private void activatePlugin(final PluginDescriptor descriptor)             // throws Exception
     {
         if (descriptor.isLoaded() && !descriptor.isActivated()) {
             if (LOG.isDebugEnabled()) {
@@ -447,7 +450,7 @@ public class PluginRegistry implements ConnectionContextProvider {
      *
      * @param  descriptor  DOCUMENT ME!
      */
-    private void deactivatePlugin(final PluginDescriptor descriptor)                // throws Exception
+    private void deactivatePlugin(final PluginDescriptor descriptor)             // throws Exception
     {
         if (descriptor.isDeactivateable() && descriptor.isLoaded() && descriptor.isActivated()) {
             if (LOG.isDebugEnabled()) {
@@ -496,7 +499,7 @@ public class PluginRegistry implements ConnectionContextProvider {
                 LOG.warn("plugin '" + descriptor.getName() + "' could not be deactivated (not loaded)"); // NOI18N
             } else if (LOG.isDebugEnabled()) {
                 LOG.debug("plugin '" + descriptor.getName()
-                            + "' could not be deactivated (already deactivated or not deactivateable)");    // NOI18N
+                            + "' could not be deactivated (already deactivated or not deactivateable)"); // NOI18N
             }
         }
     }

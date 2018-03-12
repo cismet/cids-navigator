@@ -74,6 +74,8 @@ import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
@@ -102,8 +104,6 @@ import static Sirius.navigator.Navigator.NAVIGATOR_HOME;
 import static Sirius.navigator.Navigator.NAVIGATOR_HOME_DIR;
 
 import static java.awt.Frame.MAXIMIZED_BOTH;
-import de.cismet.connectioncontext.ConnectionContextProvider;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -932,7 +932,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
         for (final StartupHook hook : hooks) {
             if (hook instanceof ConnectionContextStore) {
-                ((ConnectionContextStore)hook).initWithConnectionContext(ConnectionContext.create(ConnectionContext.Category.STARTUP, hook.getClass().getSimpleName()));
+                ((ConnectionContextStore)hook).initWithConnectionContext(ConnectionContext.create(
+                        ConnectionContext.Category.STARTUP,
+                        hook.getClass().getSimpleName()));
             }
             hook.applicationStarted();
         }

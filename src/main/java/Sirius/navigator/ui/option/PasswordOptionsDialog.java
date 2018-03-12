@@ -24,12 +24,12 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
 
 import de.cismet.lookupoptions.options.SecurityOptionsCategory;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * The PasswordOptionsDialog is intended to provide the user with means for changing her password. It is displayed in
@@ -255,7 +255,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePasswordActionPerformed
+    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnChangePasswordActionPerformed
         SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -338,7 +338,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
                     }
                 }
             });
-    }//GEN-LAST:event_btnChangePasswordActionPerformed
+    }                             //GEN-LAST:event_btnChangePasswordActionPerformed
 
     @Override
     public void update() {

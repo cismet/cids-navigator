@@ -54,11 +54,11 @@ import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.lookupoptions.gui.OptionsDialog;
 
 import de.cismet.tools.gui.StaticSwingTools;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!

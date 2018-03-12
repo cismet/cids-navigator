@@ -26,7 +26,6 @@ import javax.swing.ImageIcon;
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.CurrentStackTrace;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -72,6 +71,16 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
     private MetaClass metaClass;
 
     //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new ObjectTreeNode object.
+     *
+     * @param  metaObjectNode  DOCUMENT ME!
+     */
+    @Deprecated
+    public ObjectTreeNode(final MetaObjectNode metaObjectNode) {
+        this(metaObjectNode, ConnectionContext.createDeprecated());
+    }
 
     /**
      * Creates a new ObjectTreeNode object.

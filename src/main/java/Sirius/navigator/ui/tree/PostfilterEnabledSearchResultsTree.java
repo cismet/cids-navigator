@@ -29,9 +29,9 @@ import java.util.List;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.collections.HashArrayList;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -322,11 +322,13 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     /**
      * DOCUMENT ME!
      *
-     * @param   collection  DOCUMENT ME!
+     * @param   collection         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public static Collection<MetaClass> getAllMetaClassesForNodeCollection(final Collection<Node> collection, final ConnectionContext connectionContext) {
+    public static Collection<MetaClass> getAllMetaClassesForNodeCollection(final Collection<Node> collection,
+            final ConnectionContext connectionContext) {
         final ArrayList<MetaClass> result = new ArrayList<>();
         for (final Node n : collection) {
             final MetaClass mc = ClassCacheMultiple.getMetaClass(n.getDomain(), n.getClassId(), connectionContext);
@@ -340,12 +342,16 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     /**
      * DOCUMENT ME!
      *
-     * @param   collection  DOCUMENT ME!
+     * @param   collection         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public static Collection<String> getAllTableNamesForNodeCollection(final Collection<Node> collection, final ConnectionContext connectionContext) {
-        final ArrayList<MetaClass> classes = new ArrayList<>(getAllMetaClassesForNodeCollection(collection, connectionContext));
+    public static Collection<String> getAllTableNamesForNodeCollection(final Collection<Node> collection,
+            final ConnectionContext connectionContext) {
+        final ArrayList<MetaClass> classes = new ArrayList<>(getAllMetaClassesForNodeCollection(
+                    collection,
+                    connectionContext));
         final ArrayList<String> result = new ArrayList<>(classes.size());
         for (final MetaClass mc : classes) {
             result.add(mc.getTableName());

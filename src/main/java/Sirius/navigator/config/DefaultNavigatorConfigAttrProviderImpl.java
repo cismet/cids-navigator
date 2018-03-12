@@ -19,9 +19,9 @@ import org.apache.log4j.Logger;
 import org.openide.util.lookup.ServiceProvider;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.configuration.ConfigAttrProvider;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -39,15 +39,14 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
     //~ Instance fields --------------------------------------------------------
 
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
     public void initWithConnectionContext(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
-    }    
-    
+    }
+
     @Override
     public String getUserConfigAttr(final String key) {
         final ConnectionSession session = SessionManager.getSession();

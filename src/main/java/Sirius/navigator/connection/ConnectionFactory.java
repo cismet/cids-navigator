@@ -87,7 +87,8 @@ public class ConnectionFactory {
     public Connection createConnection(final String connectionClassName,
             final String callserverURL,
             final boolean compressionEnabled) throws ConnectionException {
-        return createConnection(connectionClassName,
+        return createConnection(
+                connectionClassName,
                 callserverURL,
                 compressionEnabled,
                 ConnectionContext.createDeprecated());
@@ -149,7 +150,8 @@ public class ConnectionFactory {
             final String callserverURL,
             final Proxy proxy,
             final boolean compressionEnabled) throws ConnectionException {
-        return createConnection(connectionClassName,
+        return createConnection(
+                connectionClassName,
                 callserverURL,
                 proxy,
                 compressionEnabled,
@@ -343,7 +345,8 @@ public class ConnectionFactory {
             final String userDomain,
             final String username,
             final String password) throws ConnectionException, UserException {
-        return createSession(connection,
+        return createSession(
+                connection,
                 usergroupDomain,
                 usergroup,
                 userDomain,
@@ -470,7 +473,8 @@ public class ConnectionFactory {
             final String connectionProxyHandlerClassName,
             final ConnectionInfo connectionInfo,
             final boolean autoLogin) throws ConnectionException, UserException {
-        return createProxy(connectionClassName,
+        return createProxy(
+                connectionClassName,
                 connectionProxyHandlerClassName,
                 connectionInfo,
                 autoLogin,
@@ -498,7 +502,8 @@ public class ConnectionFactory {
             final ConnectionInfo connectionInfo,
             final boolean autoLogin,
             final boolean compressionEnabled) throws ConnectionException, UserException {
-        return createProxy(connectionClassName,
+        return createProxy(
+                connectionClassName,
                 connectionProxyHandlerClassName,
                 connectionInfo,
                 autoLogin,
@@ -557,7 +562,8 @@ public class ConnectionFactory {
     public ConnectionProxy createProxy(final String connectionClassName,
             final String connectionProxyHandlerClassName,
             final ConnectionInfo connectionInfo) throws ConnectionException, UserException {
-        return createProxy(connectionClassName,
+        return createProxy(
+                connectionClassName,
                 connectionProxyHandlerClassName,
                 connectionInfo,
                 true,

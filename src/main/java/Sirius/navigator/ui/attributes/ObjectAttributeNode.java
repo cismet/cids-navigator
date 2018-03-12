@@ -46,7 +46,6 @@ public class ObjectAttributeNode extends AttributeNode implements ConnectionCont
     private final SingleAttributeIterator attributeIterator;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Constructors -----------------------------------------------------------
 

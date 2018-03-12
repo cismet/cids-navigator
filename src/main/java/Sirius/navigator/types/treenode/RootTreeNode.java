@@ -43,11 +43,14 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
 
     //~ Constructors -----------------------------------------------------------
 
+    /**
+     * Creates a new RootTreeNode object.
+     */
     @Deprecated
     public RootTreeNode() {
         this(ConnectionContext.createDeprecated());
     }
-    
+
     /**
      * Creates a new RootTreeNode object.
      *
@@ -58,11 +61,16 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
         this.treeNodeLoader = new DefaultTreeNodeLoader(connectionContext);
     }
 
+    /**
+     * Creates a new RootTreeNode object.
+     *
+     * @param  topNodes  DOCUMENT ME!
+     */
     @Deprecated
     public RootTreeNode(final Node[] topNodes) {
         this(topNodes, ConnectionContext.createDeprecated());
     }
-    
+
     /**
      * Dieser Konstruktor erzeugt einen neue RootNode bzw. DefaultMetaTreeNode und heangt auch schon einige Children an.
      * Mit diesem Konstruktor ist es also moeglich einen kompletten Baum in einen bestehenden Baum einzuhaengen.<br>
@@ -75,12 +83,18 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
         this(topNodes, new DefaultTreeNodeLoader(connectionContext), connectionContext);
     }
 
+    /**
+     * Creates a new RootTreeNode object.
+     *
+     * @param  topNodes        DOCUMENT ME!
+     * @param  treeNodeLoader  DOCUMENT ME!
+     */
     @Deprecated
     public RootTreeNode(final Node[] topNodes,
             final TreeNodeLoader treeNodeLoader) {
         this(topNodes, treeNodeLoader, ConnectionContext.createDeprecated());
     }
-    
+
     /**
      * Creates a new RootTreeNode object.
      *

@@ -70,7 +70,6 @@ public class PasswordDialog extends JDialog implements ConnectionContextProvider
     private JPasswordField password_again;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Constructors -----------------------------------------------------------
 

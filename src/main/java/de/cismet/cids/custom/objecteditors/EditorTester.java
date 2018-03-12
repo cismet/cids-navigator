@@ -38,9 +38,9 @@ import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -302,7 +302,7 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
+    private void jToggleButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jToggleButton1ActionPerformed
         try {
             loadMetaObject((Integer)jSpinner1.getValue());
         } catch (Exception ex) {
@@ -313,7 +313,7 @@ public abstract class EditorTester extends javax.swing.JFrame implements Connect
                 "Fehler",
                 JOptionPane.ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
+    }                                                                                  //GEN-LAST:event_jToggleButton1ActionPerformed
 
     /**
      * DOCUMENT ME!

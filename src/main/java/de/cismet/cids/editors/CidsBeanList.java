@@ -59,6 +59,13 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
 
     /**
      * Creates a new CidsBeanList object.
+     */
+    public CidsBeanList() {
+        this(ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new CidsBeanList object.
      *
      * @param  connectionContext  DOCUMENT ME!
      */
@@ -125,7 +132,7 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
 
     @Override
     public void dragGestureRecognized(final DragGestureEvent dge) {
-        final List<DefaultMetaTreeNode> selectedValues = new ArrayList<DefaultMetaTreeNode>();
+        final List<DefaultMetaTreeNode> selectedValues = new ArrayList<>();
 
         if (getSelectedValues() != null) {
             for (final Object bean : getSelectedValues()) {
@@ -147,7 +154,6 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
 
     @Override
     public ConnectionContext getConnectionContext() {
-        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-                                                                       // Tools | Templates.
+        return connectionContext;
     }
 }

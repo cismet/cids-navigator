@@ -17,6 +17,7 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.utils.CidsBeanPersistService;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -25,7 +26,7 @@ import de.cismet.connectioncontext.ConnectionContext;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsBeanPersistService.class)
-public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
+public class NavigatorCidsBeanPersistService implements CidsBeanPersistService, ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -74,7 +75,7 @@ public class NavigatorCidsBeanPersistService implements CidsBeanPersistService {
     }
 
     @Override
-    public void setClientConnectionContext(final ConnectionContext clientconnectionContext) {
+    public void initWithConnectionContext(final ConnectionContext clientconnectionContext) {
         this.connectionContext = clientconnectionContext;
     }
 }

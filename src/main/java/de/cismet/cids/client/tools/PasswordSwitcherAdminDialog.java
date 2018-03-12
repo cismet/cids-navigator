@@ -36,10 +36,10 @@ import de.cismet.cids.server.actions.PasswordSwitcherAdminAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /*
  * Copyright (C) 2013 cismet GmbH
@@ -82,7 +82,6 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
     private CountDownTask countDownTask;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
@@ -230,16 +229,16 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }//GEN-LAST:event_btnCloseActionPerformed
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePasswordActionPerformed
+    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnChangePasswordActionPerformed
         username = txtUsername.getText().trim();
 
         switchStarted();
@@ -273,7 +272,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                     }
                 }
             }.execute();
-    }//GEN-LAST:event_btnChangePasswordActionPerformed
+    } //GEN-LAST:event_btnChangePasswordActionPerformed
 
     /**
      * DOCUMENT ME!

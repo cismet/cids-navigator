@@ -18,12 +18,12 @@ package de.cismet.cids.editors;
 
 import Sirius.server.middleware.types.MetaClass;
 
-
 import java.util.List;
 
 import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -57,10 +57,11 @@ public class ArrayTitleAndControls extends javax.swing.JPanel implements Connect
     /**
      * Creates a new ArrayTitleAndControls object.
      *
-     * @param  title          DOCUMENT ME!
-     * @param  detailClass    DOCUMENT ME!
-     * @param  arrayProperty  DOCUMENT ME!
-     * @param  jList          DOCUMENT ME!
+     * @param  title              DOCUMENT ME!
+     * @param  detailClass        DOCUMENT ME!
+     * @param  arrayProperty      DOCUMENT ME!
+     * @param  jList              DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
     public ArrayTitleAndControls(final String title,
             final MetaClass detailClass,
@@ -170,7 +171,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel implements Connect
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdRemoveActionPerformed
+    private void cmdRemoveActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdRemoveActionPerformed
         final Object o = jList.getSelectedValue();
         if ((o instanceof CidsBean) && (o != null)) {
             try {
@@ -188,14 +189,14 @@ public class ArrayTitleAndControls extends javax.swing.JPanel implements Connect
                 ex.printStackTrace();
             }
         }
-    }//GEN-LAST:event_cmdRemoveActionPerformed
+    } //GEN-LAST:event_cmdRemoveActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmdAddActionPerformed
+    private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         try {
             final CidsBean newOne = detailClass.getEmptyInstance(getConnectionContext()).getBean();
 
@@ -213,10 +214,10 @@ public class ArrayTitleAndControls extends javax.swing.JPanel implements Connect
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-    }//GEN-LAST:event_cmdAddActionPerformed
+    }                                                                                                   //GEN-LAST:event_cmdAddActionPerformed
 
+    @Override
     public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
-
 }

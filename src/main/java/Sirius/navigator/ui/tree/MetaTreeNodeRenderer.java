@@ -38,6 +38,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.utils.ClassloadingHelper;
+
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -103,10 +104,13 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer implements Con
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(getClass());
 
     private final ConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new MetaTreeNodeRenderer object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
     public MetaTreeNodeRenderer(final ConnectionContext connectionContext) {
         super();

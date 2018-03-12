@@ -39,12 +39,12 @@ import de.cismet.cids.tools.search.clientstuff.CidsToolbarSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 import de.cismet.cids.tools.search.clientstuff.CidsWindowSearchWithMenuEntry;
 
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.StaticDebuggingTools;
 
 import de.cismet.tools.gui.StaticSwingTools;
-import de.cismet.connectioncontext.ConnectionContextProvider;
-import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * This class is responsibility is to lookup all relevant search components, to initialize and to plug them into the

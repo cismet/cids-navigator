@@ -39,7 +39,6 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
     //~ Instance fields --------------------------------------------------------
 
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -56,10 +55,10 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void initWithConnectionContext(ConnectionContext connectionContext) {
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
     }
-    
+
     @Override
     public void actionPerformed(final ActionEvent e) {
         final String id = QuerySearch.class.getName();

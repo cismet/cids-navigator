@@ -52,7 +52,6 @@ public final class PluginFactory implements ConnectionContextProvider {
     private static final ResourceManager RESOURCE = ResourceManager.getManager();
     private static final Logger LOG = Logger.getLogger(PluginFactory.class);
 
-
     //~ Instance fields --------------------------------------------------------
 
     private final PreloadPluginRuleSet preloadRuleSet;
@@ -66,6 +65,8 @@ public final class PluginFactory implements ConnectionContextProvider {
 
     /**
      * Creates the singleton shared instance of PluginFactory.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
     protected PluginFactory(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
@@ -741,7 +742,7 @@ public final class PluginFactory implements ConnectionContextProvider {
             PluginProgressObserver progressObserver = null;
             if (descriptor.isProgressObservable()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("setting plugin progress observer");       // NOI18N
+                    LOG.debug("setting plugin progress observer");          // NOI18N
                 }
                 progressObserver = new PluginProgressObserver(this.descriptor.getName());
                 PropertyManager.getManager().getSharedProgressObserver().setSubProgressObserver(progressObserver);
@@ -808,8 +809,8 @@ public final class PluginFactory implements ConnectionContextProvider {
                 }
                 pluginClass = classLoader.loadClass(className);
             } else {
-                pluginClass = this.getClass().getClassLoader().loadClass(className);      // HELL \u00C4nderung quick &
-                                                                                          // Dirty
+                pluginClass = this.getClass().getClassLoader().loadClass(className);   // HELL \u00C4nderung quick &
+                                                                                       // Dirty
             }
 
             // ...........................................
@@ -1031,7 +1032,7 @@ public final class PluginFactory implements ConnectionContextProvider {
         public void addMenuItem(final PluginActionDescriptor actionDescriptor) {
             if (descriptor.isPluginMethodAvailable(actionDescriptor.getMethodId())) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'"); // NOI18N
+                    LOG.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'");    // NOI18N
                 }
                 final PluginMethodDescriptor methodDescriptor = descriptor.getMethodDescriptor(
                         actionDescriptor.getMethodId());

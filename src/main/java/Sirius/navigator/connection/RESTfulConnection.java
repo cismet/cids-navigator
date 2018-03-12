@@ -211,7 +211,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     public ImageHashMap getDefaultIcons() throws ConnectionException {
         return getDefaultIcons(ConnectionContext.createDeprecated());
     }
-    
+
     @Override
     public ImageHashMap getDefaultIcons(final ConnectionContext connectionContext) throws ConnectionException {
         try {
@@ -228,9 +228,10 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     public Icon getDefaultIcon(final String name) throws ConnectionException {
         return getDefaultIcon(name, ConnectionContext.createDeprecated());
     }
-    
+
     @Override
-    public Icon getDefaultIcon(final String name, final ConnectionContext connectionContext) throws ConnectionException {
+    public Icon getDefaultIcon(final String name, final ConnectionContext connectionContext)
+            throws ConnectionException {
         try {
             return getDefaultIcons(connectionContext).get(name);
         } catch (final Exception e) {
@@ -247,7 +248,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String userLsName,
             final String userName,
             final String password) throws ConnectionException, UserException {
-        return getUser(userGroupLsName,
+        return getUser(
+                userGroupLsName,
                 userGroupName,
                 userLsName,
                 userName,
@@ -368,8 +370,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
-    public Node[] getRoots(final User user, final ConnectionContext connectionContext)
-            throws ConnectionException {
+    public Node[] getRoots(final User user, final ConnectionContext connectionContext) throws ConnectionException {
         if (connectionContext == null) {
             throw new IllegalArgumentException("connection connectionContext is null");
         }
@@ -837,7 +838,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final User user,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
-        return getAllLightweightMetaObjectsForClass(classId,
+        return getAllLightweightMetaObjectsForClass(
+                classId,
                 user,
                 representationFields,
                 representationPattern,
@@ -885,7 +887,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final User user,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
-        return getAllLightweightMetaObjectsForClass(classId,
+        return getAllLightweightMetaObjectsForClass(
+                classId,
                 user,
                 representationFields,
                 formater,
@@ -931,7 +934,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String query,
             final String[] representationFields,
             final String representationPattern) throws ConnectionException {
-        return getLightweightMetaObjectsByQuery(classId,
+        return getLightweightMetaObjectsByQuery(
+                classId,
                 user,
                 query,
                 representationFields,
@@ -983,7 +987,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final String query,
             final String[] representationFields,
             final AbstractAttributeRepresentationFormater formater) throws ConnectionException {
-        return getLightweightMetaObjectsByQuery(classId,
+        return getLightweightMetaObjectsByQuery(
+                classId,
                 user,
                 query,
                 representationFields,

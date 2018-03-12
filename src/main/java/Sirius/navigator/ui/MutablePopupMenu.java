@@ -75,12 +75,12 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
 
 import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.ext.CExtContext;
 import de.cismet.ext.CExtManager;
 
 import de.cismet.tools.gui.StaticSwingTools;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -112,7 +112,6 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
     private final ExecutorService extensionExecutor;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Constructors -----------------------------------------------------------
 
@@ -303,7 +302,8 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
 
                     if (node.getClassId() > 0) {
                         final MetaClass metaClass = ClassCacheMultiple.getMetaClass(node.getDomain(),
-                                node.getClassId(), getConnectionContext());
+                                node.getClassId(),
+                                getConnectionContext());
                         permission = permission && metaClass.getPermissions().hasWritePermission(u);
                     }
 

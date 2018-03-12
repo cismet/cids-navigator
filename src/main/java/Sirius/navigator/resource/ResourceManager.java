@@ -11,9 +11,6 @@ import Sirius.navigator.connection.*;
 import Sirius.navigator.exception.*;
 
 import Sirius.util.image.*;
-import de.cismet.connectioncontext.AbstractConnectionContext.Category;
-import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import org.apache.log4j.Logger;
 
@@ -24,6 +21,11 @@ import java.net.*;
 import java.util.*;
 
 import javax.swing.*;
+
+import de.cismet.connectioncontext.AbstractConnectionContext.Category;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * The deprecated methods should not be used, because they are obsolete since the migration to the netbeans
@@ -59,12 +61,14 @@ public class ResourceManager implements ConnectionContextProvider {
 
     /**
      * Creates a new instance of ResourceManager.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
     private ResourceManager(final ConnectionContext connectionContext) {
         LOG.info("creating new singleton resource manager instance"); // NOI18N
         this.connectionContext = connectionContext;
         localIconCache = new Hashtable();
-        ERROR_ICON = getIcon("x.gif");                                   // NOI18N
+        ERROR_ICON = getIcon("x.gif");                                // NOI18N
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -76,7 +80,9 @@ public class ResourceManager implements ConnectionContextProvider {
      */
     public static final ResourceManager getManager() {
         if (manager == null) {
-            manager = new ResourceManager(ConnectionContext.create(Category.STATIC, ResourceManager.class.getSimpleName()));
+            manager = new ResourceManager(ConnectionContext.create(
+                        Category.STATIC,
+                        ResourceManager.class.getSimpleName()));
         }
 
         return manager;
@@ -86,7 +92,7 @@ public class ResourceManager implements ConnectionContextProvider {
     public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
-    
+
     /**
      * DOCUMENT ME!
      *
@@ -377,7 +383,7 @@ public class ResourceManager implements ConnectionContextProvider {
                 return null;
             }
         } catch (Exception exp) {
-            LOG.error("could not load icon '" + name + "'", exp);        // NOI18N
+            LOG.error("could not load icon '" + name + "'", exp);           // NOI18N
             return null;
         }
     }
@@ -413,13 +419,13 @@ public class ResourceManager implements ConnectionContextProvider {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("loading navigator resource '" + resourceUri + "'"); // NOI18N
                 }
-                return this.getResourceAsStream(resourceUri);                         // NOI18N
+                return this.getResourceAsStream(resourceUri);                      // NOI18N
             } catch (IOException ioexp) {
                 LOG.warn("Resource with the uri '" + resourceUri + "' not found"); // NOI18N
                 final String altResourceName = resourceNameBase + suffix + fileExtension;
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("loading navigator resource '" + this.getClass().getPackage().getName() + "."
-                                + altResourceName + "'");                             // NOI18N
+                                + altResourceName + "'");                          // NOI18N
                 }
                 final InputStream is = this.getClass().getResourceAsStream(altResourceName);
 
@@ -485,14 +491,14 @@ public class ResourceManager implements ConnectionContextProvider {
         } catch (MalformedURLException uexp) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("no valid url: '" + path + "' trying to build url for local filesystem: "
-                            + uexp.getMessage());                                                          // NOI18N
+                            + uexp.getMessage());                                                       // NOI18N
             }
             try {
-                if (System.getProperty("os.name").toLowerCase().indexOf("windows") != -1)                  // NOI18N
+                if (System.getProperty("os.name").toLowerCase().indexOf("windows") != -1)               // NOI18N
                 {
-                    url = new URL("file:/" + path);                                                        // NOI18N
+                    url = new URL("file:/" + path);                                                     // NOI18N
                 } else {
-                    url = new URL("file://" + path);                                                       // NOI18N
+                    url = new URL("file://" + path);                                                    // NOI18N
                 }
             } catch (MalformedURLException exp) {
                 LOG.error("could not transform path '" + path + "' to local URL: " + exp.getMessage()); // NOI18N

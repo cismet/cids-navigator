@@ -117,13 +117,26 @@ public final class CidsSearchExecutor {
         StaticSwingTools.showDialog(searchControlDialog);
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   search                 DOCUMENT ME!
+     * @param   listener               DOCUMENT ME!
+     * @param   searchResultsListener  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     @Deprecated
     public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener listener,
             final PropertyChangeListener searchResultsListener) {
-        return searchAndDisplayResultsWithDialog(search, listener, searchResultsListener, ConnectionContext.createDeprecated());
+        return searchAndDisplayResultsWithDialog(
+                search,
+                listener,
+                searchResultsListener,
+                ConnectionContext.createDeprecated());
     }
-    
+
     /**
      * DOCUMENT ME!
      *

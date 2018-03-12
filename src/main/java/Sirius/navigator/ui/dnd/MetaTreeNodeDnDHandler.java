@@ -88,7 +88,6 @@ public class MetaTreeNodeDnDHandler implements DragGestureListener,
     private Rectangle rect2D = new Rectangle();
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Constructors -----------------------------------------------------------
 

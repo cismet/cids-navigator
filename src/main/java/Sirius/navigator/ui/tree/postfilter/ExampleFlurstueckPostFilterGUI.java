@@ -17,6 +17,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
 
@@ -99,7 +100,7 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI implem
         initComponents();
         fstck = ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "ALKIS_LANDPARCEL", getConnectionContext());
     }
-    
+
     @Override
     public void initializeFilter(final Collection<Node> nodes) {
         txtRegEx.getDocument().removeDocumentListener(dl);
@@ -186,8 +187,8 @@ public class ExampleFlurstueckPostFilterGUI extends AbstractPostFilterGUI implem
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void txtRegExActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRegExActionPerformed
-    }//GEN-LAST:event_txtRegExActionPerformed
+    private void txtRegExActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_txtRegExActionPerformed
+    }                                                                            //GEN-LAST:event_txtRegExActionPerformed
 
     @Override
     public ConnectionContext getConnectionContext() {

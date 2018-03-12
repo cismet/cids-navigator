@@ -59,7 +59,6 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
     protected ValueChangeListener valueChangeListener;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JButton complexEditorButton;
@@ -155,10 +154,10 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void complexEditorButtonActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_complexEditorButtonActionPerformed
-    {//GEN-HEADEREND:event_complexEditorButtonActionPerformed
+    private void complexEditorButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_complexEditorButtonActionPerformed
+    {                                                                                     //GEN-HEADEREND:event_complexEditorButtonActionPerformed
 // TODO add your handling code here:
-    }//GEN-LAST:event_complexEditorButtonActionPerformed
+    } //GEN-LAST:event_complexEditorButtonActionPerformed
 
     /**
      * Der Wert wurde schon im ValueChanged Listener ver\u00E4ndert.

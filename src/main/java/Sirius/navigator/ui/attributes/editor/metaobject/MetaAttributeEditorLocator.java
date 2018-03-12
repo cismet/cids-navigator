@@ -54,7 +54,6 @@ public class MetaAttributeEditorLocator implements EditorLocator, ConnectionCont
     private boolean ignoreInvisibleAttributes = false;
 
     private final ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     //~ Constructors -----------------------------------------------------------
 

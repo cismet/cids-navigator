@@ -91,7 +91,6 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
         };
 
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
-                    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -121,7 +120,7 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
         prbLoading.setVisible(false);
         adressClass = ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "ADRESSE", getConnectionContext());
     }
-    
+
     @Override
     public void initializeFilter(final Collection<Node> nodes) {
         EventQueue.invokeLater(new Runnable() {
@@ -200,7 +199,8 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
 
     @Override
     public boolean canHandle(final Collection<Node> nodes) {
-        return PostfilterEnabledSearchResultsTree.getAllTableNamesForNodeCollection(nodes, getConnectionContext()).contains("ADRESSE");
+        return PostfilterEnabledSearchResultsTree.getAllTableNamesForNodeCollection(nodes, getConnectionContext())
+                    .contains("ADRESSE");
     }
 
     @Override
@@ -336,5 +336,4 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements
     public final ConnectionContext getConnectionContext() {
         return connectionContext;
     }
-
 }

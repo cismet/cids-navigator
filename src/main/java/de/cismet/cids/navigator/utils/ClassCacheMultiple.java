@@ -38,11 +38,6 @@ public class ClassCacheMultiple {
 
     //~ Methods ----------------------------------------------------------------
 
-    @Deprecated
-    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain) {
-        return getClassKeyHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
-    }
-    
     /**
      * DOCUMENT ME!
      *
@@ -50,7 +45,21 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain, final ConnectionContext connectionContext) {
+    @Deprecated
+    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain) {
+        return getClassKeyHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain,
+            final ConnectionContext connectionContext) {
         HashMap ret = allClassCaches.get(domain);
         if (ret == null) {
             try {
@@ -65,11 +74,6 @@ public class ClassCacheMultiple {
         return ret;
     }
 
-    @Deprecated
-    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain) {
-        return getTableNameHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
-    }
-    
     /**
      * DOCUMENT ME!
      *
@@ -77,7 +81,21 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain, final ConnectionContext connectionContext) {
+    @Deprecated
+    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain) {
+        return getTableNameHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain,
+            final ConnectionContext connectionContext) {
         HashMap ret = allTableNameClassCaches.get(domain);
         if (ret == null) {
             try {
@@ -92,11 +110,6 @@ public class ClassCacheMultiple {
         return ret;
     }
 
-    @Deprecated
-    public static MetaClass getMetaClass(final String domain, final String tableName) {
-        return getMetaClass(domain, tableName, ConnectionContext.createDeprecated());
-    }
-    
     /**
      * DOCUMENT ME!
      *
@@ -105,7 +118,23 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static MetaClass getMetaClass(final String domain, final String tableName, final ConnectionContext connectionContext) {
+    @Deprecated
+    public static MetaClass getMetaClass(final String domain, final String tableName) {
+        return getMetaClass(domain, tableName, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   tableName          DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static MetaClass getMetaClass(final String domain,
+            final String tableName,
+            final ConnectionContext connectionContext) {
         try {
             final HashMap ht = getTableNameHashtableOfClassesForOneDomain(domain, connectionContext);
             return (MetaClass)ht.get(tableName.toLowerCase());
@@ -115,11 +144,6 @@ public class ClassCacheMultiple {
         }
     }
 
-    @Deprecated
-    public static MetaClass getMetaClass(final String domain, final int classId) {
-        return getMetaClass(domain, classId, ConnectionContext.createDeprecated());
-    }
-    
     /**
      * DOCUMENT ME!
      *
@@ -128,18 +152,41 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
-    public static MetaClass getMetaClass(final String domain, final int classId, final ConnectionContext connectionContext) {
-        return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, connectionContext).get(domain + classId);
+    @Deprecated
+    public static MetaClass getMetaClass(final String domain, final int classId) {
+        return getMetaClass(domain, classId, ConnectionContext.createDeprecated());
     }
 
-    public static void setInstance(final String domain) {    
-        setInstance(domain, ConnectionContext.createDeprecated());
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   classId            DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static MetaClass getMetaClass(final String domain,
+            final int classId,
+            final ConnectionContext connectionContext) {
+        return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, connectionContext)
+                    .get(domain + classId);
     }
-    
+
     /**
      * DOCUMENT ME!
      *
      * @param  domain  DOCUMENT ME!
+     */
+    public static void setInstance(final String domain) {
+        setInstance(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
     public static void setInstance(final String domain, final ConnectionContext connectionContext) {
         try {
@@ -152,15 +199,21 @@ public class ClassCacheMultiple {
         }
     }
 
-    @Deprecated
-    public static void addInstance(final String domain) {
-        addInstance(domain, ConnectionContext.createDeprecated());
-    }
-    
     /**
      * DOCUMENT ME!
      *
      * @param  domain  DOCUMENT ME!
+     */
+    @Deprecated
+    public static void addInstance(final String domain) {
+        addInstance(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
     public static void addInstance(final String domain, final ConnectionContext connectionContext) {
         try {
@@ -172,5 +225,4 @@ public class ClassCacheMultiple {
             log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
         }
     }
-
 }

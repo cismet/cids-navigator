@@ -325,7 +325,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // "httpTunnelAction", "SWITCHON", null, actionParameterUrl, actionParameterMethod);
 
             final Object taskResult = SessionManager.getProxy()
-                        .executeTask("testAction",
+                        .executeTask(
+                            "testAction",
                             "SWITCHON",
                             (Object)null,
                             ConnectionContext.createDeprecated(),
@@ -456,7 +457,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                                representationPattern);
 
             final LightweightMetaObject[] lmoBinary = (LightweightMetaObject[])SessionManager.getProxy()
-                        .getLightweightMetaObjectsByQuery(relationshipClassId,
+                        .getLightweightMetaObjectsByQuery(
+                                relationshipClassId,
                                 SessionManager.getSession().getUser(),
                                 lwmoQuery,
                                 lwmoRepresentationFields,
@@ -477,7 +479,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                            representationPattern);
 
             final LightweightMetaObject[] lmoRest = (LightweightMetaObject[])SessionManager.getProxy()
-                        .getLightweightMetaObjectsByQuery(relationshipClassId,
+                        .getLightweightMetaObjectsByQuery(
+                                relationshipClassId,
                                 SessionManager.getSession().getUser(),
                                 lwmoQuery,
                                 lwmoRepresentationFields,
