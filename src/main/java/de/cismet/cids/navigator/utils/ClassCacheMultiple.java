@@ -178,6 +178,7 @@ public class ClassCacheMultiple {
      *
      * @param  domain  DOCUMENT ME!
      */
+    @Deprecated
     public static void setInstance(final String domain) {
         setInstance(domain, ConnectionContext.createDeprecated());
     }
