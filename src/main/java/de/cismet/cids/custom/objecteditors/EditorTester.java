@@ -37,6 +37,9 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWMS;
 import de.cismet.cismap.commons.raster.wms.simple.SimpleWmsGetMapUrl;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
@@ -45,7 +48,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public abstract class EditorTester extends javax.swing.JFrame {
+public abstract class EditorTester extends javax.swing.JFrame implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -145,8 +148,8 @@ public abstract class EditorTester extends javax.swing.JFrame {
      * @throws  Exception  DOCUMENT ME!
      */
     private void loadMetaObject(final int objectId) throws Exception {
-        final int classId = ClassCacheMultiple.getMetaClass(domain, className).getId();
-        final MetaObject metaObject = proxy.getMetaObject(objectId, classId, domain);
+        final int classId = ClassCacheMultiple.getMetaClass(domain, className, getConnectionContext()).getId();
+        final MetaObject metaObject = proxy.getMetaObject(objectId, classId, domain, getConnectionContext());
 
         if (metaObject != null) {
             cidsBeanStore.setCidsBean(metaObject.getBean());
@@ -224,10 +227,13 @@ public abstract class EditorTester extends javax.swing.JFrame {
         final ConnectionInfo connectionInfo = getConnectionInfo();
 
         final ConnectionSession session = ConnectionFactory.getFactory()
-                    .createSession(connection, connectionInfo, true);
+                    .createSession(connection, connectionInfo, true, getConnectionContext());
 
         proxy = ConnectionFactory.getFactory()
-                    .createProxy("Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler", session);
+                    .createProxy(
+                            "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                            session,
+                            getConnectionContext());
 
         SessionManager.init(proxy);
     }
@@ -336,4 +342,9 @@ public abstract class EditorTester extends javax.swing.JFrame {
      * DOCUMENT ME!
      */
     public abstract void run();
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContext.createDummy();
+    }
 }

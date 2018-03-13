@@ -40,7 +40,12 @@ import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.border.EmptyBorder;
 
+import de.cismet.cids.client.tools.ConnectionContextUtils;
+
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -50,7 +55,10 @@ import de.cismet.tools.CismetThreadPool;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class DefaultBindableCheckboxField extends JPanel implements Bindable, MetaClassStore, ActionListener {
+public class DefaultBindableCheckboxField extends JPanel implements Bindable,
+    MetaClassStore,
+    ActionListener,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -61,12 +69,12 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
     private PropertyChangeSupport propertyChangeSupport;
     private List selectedElements = null;
     private MetaClass mc = null;
-    private Map<JCheckBox, MetaObject> boxToObjectMapping = new HashMap<JCheckBox, MetaObject>();
+    private Map<JCheckBox, MetaObject> boxToObjectMapping = new HashMap<>();
     private volatile boolean threadRunning = false;
     private Color backgroundSelected = null;
     private Color backgroundUnselected = null;
     private boolean readOnly = false;
-    private Comparator<MetaObject> comparator;
+    private final Comparator<MetaObject> comparator;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -74,6 +82,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
      * Creates a new CustomReferencedCheckboxField object.
      */
     public DefaultBindableCheckboxField() {
+        this(null);
     }
 
     /**
@@ -198,7 +207,8 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                                     + " from "
                                     + foreignClass.getTableName();
 
-                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query, mc.getDomain());
+                        return MetaObjectCache.getInstance()
+                                    .getMetaObjectsByQuery(query, mc.getDomain(), getConnectionContext());
                     } else {
                         LOG.error("The meta class was not set.", new Throwable());
                     }
@@ -292,7 +302,7 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
                 if (tmp instanceof MemberAttributeInfo) {
                     if (((MemberAttributeInfo)tmp).isForeignKey()) {
                         final int classId = ((MemberAttributeInfo)tmp).getForeignKeyClassId();
-                        result = ClassCacheMultiple.getMetaClass(mclass.getDomain(), classId);
+                        result = ClassCacheMultiple.getMetaClass(mclass.getDomain(), classId, getConnectionContext());
                     }
                 }
             }
@@ -491,5 +501,10 @@ public class DefaultBindableCheckboxField extends JPanel implements Bindable, Me
             final JCheckBox box = it.next();
             box.setEnabled(!readOnly && box.isEnabled());
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
     }
 }

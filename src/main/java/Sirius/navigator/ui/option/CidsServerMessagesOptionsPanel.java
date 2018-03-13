@@ -19,6 +19,9 @@ import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 
 import de.cismet.cids.servermessage.CidsServerMessageNotifier;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
 
@@ -32,7 +35,7 @@ import de.cismet.tools.configuration.NoWriteError;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
+public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel implements ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -42,6 +45,8 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
 
     private int intervallInMs = CidsServerMessageNotifier.DEFAULT_SCHEDULE_INTERVAL;
     private boolean stillConfigured = false;
+
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.Box.Filler filler1;
@@ -61,15 +66,20 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
                 CidsServerMessagesOptionsPanel.class,
                 "CidsServerMessagesOptionsDialog.title"), // NOI18N,
             GeneralOptionsCategory.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+
         try {
             initComponents();
         } catch (Exception e) {
             LOG.error("Erro during Creation of Password Dialog", e);
-            ;
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -203,12 +213,18 @@ public class CidsServerMessagesOptionsPanel extends AbstractOptionsPanel {
                         .hasConfigAttr(
                             SessionManager.getSession().getUser(),
                             "csa://"
-                            + CheckCidsServerMessageAction.TASK_NAME);
+                            + CheckCidsServerMessageAction.TASK_NAME,
+                            getConnectionContext());
         } catch (final Exception ex) {
             LOG.warn("could not check csa://" + CheckCidsServerMessageAction.TASK_NAME
                         + ". CidsServerMessageOptionsPanel is now disabled",
                 ex);
             return false;
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

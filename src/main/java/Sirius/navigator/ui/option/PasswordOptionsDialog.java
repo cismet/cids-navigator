@@ -23,6 +23,9 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.lookupoptions.AbstractOptionsPanel;
 import de.cismet.lookupoptions.OptionsPanelController;
 
@@ -36,11 +39,15 @@ import de.cismet.lookupoptions.options.SecurityOptionsCategory;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = OptionsPanelController.class)
-public class PasswordOptionsDialog extends AbstractOptionsPanel {
+public class PasswordOptionsDialog extends AbstractOptionsPanel implements ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(PasswordOptionsDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnChangePassword;
     private javax.swing.Box.Filler filler1;
@@ -65,6 +72,13 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
                 PasswordOptionsDialog.class,
                 "PasswordOptionsDialog.title"), // NOI18N,
             SecurityOptionsCategory.class);
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         try {
             initComponents();
 
@@ -76,8 +90,6 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
             ;
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
@@ -287,7 +299,8 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
                             final boolean success = proxy.changePassword(
                                     session.getUser(),
                                     String.valueOf(pwdOld),
-                                    String.valueOf(pwdNew));
+                                    String.valueOf(pwdNew),
+                                    getConnectionContext());
 
                             if (success) {
                                 JOptionPane.showMessageDialog(
@@ -342,5 +355,10 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel {
         return org.openide.util.NbBundle.getMessage(
                 PasswordOptionsDialog.class,
                 "PasswordOptionsDialog.tooltip"); // NOI18N
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

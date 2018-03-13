@@ -38,17 +38,20 @@ import org.apache.log4j.*;
 
 import java.rmi.*;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * Stores a <code>Connection</code> and a <code>User</code> Object.
  *
  * @author   Pascal
  * @version  1.0 12/22/2002
  */
-public class ConnectionSession {
+public class ConnectionSession implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(ConnectionSession.class);
+    private static final Logger LOGGER = Logger.getLogger(ConnectionSession.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -59,22 +62,39 @@ public class ConnectionSession {
     private boolean loggedin = false;
     private User user;
 
+    private final ConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new instance of ConnectionSession.
+     * Creates a new ConnectionSession object.
      *
      * @param   connection  DOCUMENT ME!
      *
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     protected ConnectionSession(final Connection connection) throws ConnectionException, UserException {
-        this(connection, new ConnectionInfo(), false);
+        this(connection, ConnectionContext.createDeprecated());
     }
 
     /**
      * Creates a new instance of ConnectionSession.
+     *
+     * @param   connection         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    protected ConnectionSession(final Connection connection, final ConnectionContext connectionContext)
+            throws ConnectionException, UserException {
+        this(connection, new ConnectionInfo(), false, connectionContext);
+    }
+
+    /**
+     * Creates a new ConnectionSession object.
      *
      * @param   connection      DOCUMENT ME!
      * @param   connectionInfo  DOCUMENT ME!
@@ -82,9 +102,26 @@ public class ConnectionSession {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     protected ConnectionSession(final Connection connection, final ConnectionInfo connectionInfo)
             throws ConnectionException, UserException {
-        this(connection, connectionInfo, true);
+        this(connection, connectionInfo, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new instance of ConnectionSession.
+     *
+     * @param   connection         DOCUMENT ME!
+     * @param   connectionInfo     DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    protected ConnectionSession(final Connection connection,
+            final ConnectionInfo connectionInfo,
+            final ConnectionContext connectionContext) throws ConnectionException, UserException {
+        this(connection, connectionInfo, true, connectionContext);
     }
 
     /**
@@ -97,15 +134,36 @@ public class ConnectionSession {
      * @throws  ConnectionException  DOCUMENT ME!
      * @throws  UserException        DOCUMENT ME!
      */
+    @Deprecated
     protected ConnectionSession(final Connection connection,
             final ConnectionInfo connectionInfo,
             final boolean autoLogin) throws ConnectionException, UserException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("creating new connection session"); // NOI18N
+        this(connection, connectionInfo, autoLogin, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new ConnectionSession object.
+     *
+     * @param   connection      DOCUMENT ME!
+     * @param   connectionInfo  DOCUMENT ME!
+     * @param   autoLogin       DOCUMENT ME!
+     * @param   connectContext  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     * @throws  UserException        DOCUMENT ME!
+     */
+    protected ConnectionSession(final Connection connection,
+            final ConnectionInfo connectionInfo,
+            final boolean autoLogin,
+            final ConnectionContext connectContext) throws ConnectionException, UserException {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("creating new connection session"); // NOI18N
         }
 
         this.connection = connection;
         this.connectionInfo = connectionInfo;
+        this.connectionContext = connectContext;
+
         // this.writePermission = new Permission(PermissionHolder.WRITE, "write", "accessExplicit");
 
         if (autoLogin) {
@@ -154,11 +212,11 @@ public class ConnectionSession {
                     && connectionInfo.getUsergroup().equals(usergroup)
                     && connectionInfo.getUserDomain().equals(userDomain)
                     && connectionInfo.getUsername().equals(username) && connectionInfo.getPassword().equals(password)) {
-            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
+            LOGGER.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
         } else {
             if (loggedin && (user != null)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
                 }
             }
 
@@ -188,11 +246,11 @@ public class ConnectionSession {
         if (loggedin && (user != null)
                     && connectionInfo.getUserDomain().equals(userDomain)
                     && connectionInfo.getUsername().equals(username) && connectionInfo.getPassword().equals(password)) {
-            logger.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
+            LOGGER.warn("can't perform login: this user '" + connectionInfo.getUsername() + "' is already logged in"); // NOI18N
         } else {
             if (loggedin && (user != null)) {
-                if (logger.isInfoEnabled()) {
-                    logger.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("logging out user '" + connectionInfo.getUsername() + "'");                            // NOI18N
                 }
             }
 
@@ -216,13 +274,13 @@ public class ConnectionSession {
      */
     private boolean login() throws ConnectionException, UserException {
         if (!connection.isConnected()) {
-            logger.error("can't login: no connection established");                                             // NOI18N
+            LOGGER.error("can't login: no connection established");                                             // NOI18N
             throw new ConnectionException("can't login: no connection established", ConnectionException.ERROR); // NOI18N
         }
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("logging in user '" + connectionInfo.getUsergroupDomain() + "' '"
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("logging in user '" + connectionInfo.getUsergroupDomain() + "' '"
                             + connectionInfo.getUsergroup() + "' '" + connectionInfo.getUserDomain() + "' '"
                             + connectionInfo.getUsername() + "' '" /*+ connectionInfo.getPassword() + "'"*/); // NOI18N
             }
@@ -230,12 +288,13 @@ public class ConnectionSession {
                     connectionInfo.getUsergroup(),
                     connectionInfo.getUserDomain(),
                     connectionInfo.getUsername(),
-                    connectionInfo.getPassword());
+                    connectionInfo.getPassword(),
+                    getConnectionContext());
         } catch (UserException ue) {
-            logger.warn("can't login: wrong user informations", ue); // NOI18N
+            LOGGER.warn("can't login: wrong user informations", ue); // NOI18N
             throw ue;
         } catch (ConnectionException ce) {
-            logger.fatal("[ServerError] can't login"); // NOI18N
+            LOGGER.fatal("[ServerError] can't login"); // NOI18N
             // throw new ConnectionException("[ServerError] can't login", ConnectionException.FATAL, re);
             throw ce;
         }
@@ -269,7 +328,7 @@ public class ConnectionSession {
         try {
             return this.connection.isConnected();
         } catch (Exception ex) {
-            logger.fatal("An unexpected exception occoured in method 'Connection.isConnected()'", ex); // NOI18N
+            LOGGER.fatal("An unexpected exception occoured in method 'Connection.isConnected()'", ex); // NOI18N
             return false;
         }
     }
@@ -281,5 +340,10 @@ public class ConnectionSession {
      */
     public ConnectionInfo getConnectionInfo() {
         return this.connectionInfo;
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

@@ -20,13 +20,16 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * Works like the MetaObjectNodeComparator. Additionally sort order can be set to be ascending or descending.
  *
  * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
+public class DirectedMetaObjectNodeComparator implements Comparator<Node>, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -37,15 +40,28 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
     private boolean ascending;
     private boolean cancelled = false;
 
+    private final ConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new DirectedMetaObjectNodeComparator object.
      *
-     * @param  ascending  Sort ascending?
+     * @param  ascending  DOCUMENT ME!
      */
+    @Deprecated
     public DirectedMetaObjectNodeComparator(final boolean ascending) {
+        this(ascending, ConnectionContext.createDeprecated());
+    }
+    /**
+     * Creates a new DirectedMetaObjectNodeComparator object.
+     *
+     * @param  ascending          Sort ascending?
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public DirectedMetaObjectNodeComparator(final boolean ascending, final ConnectionContext connectionContext) {
         this.ascending = ascending;
+        this.connectionContext = connectionContext;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -104,7 +120,8 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                                         .getMetaObject(
                                                 ((MetaObjectNode)o1).getObjectId(),
                                                 o1.getClassId(),
-                                                o1.getDomain());
+                                                o1.getDomain(),
+                                                getConnectionContext());
                             if (mo1 != null) {
                                 mon1.setObject(mo1);
                                 mon1.setName(mo1.toString());
@@ -125,7 +142,8 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
                                         .getMetaObject(
                                                 ((MetaObjectNode)o2).getObjectId(),
                                                 o2.getClassId(),
-                                                o2.getDomain());
+                                                o2.getDomain(),
+                                                getConnectionContext());
                             if (mo2 != null) {
                                 mon2.setObject(mo2);
                                 mon2.setName(mo2.toString());
@@ -168,5 +186,10 @@ public class DirectedMetaObjectNodeComparator implements Comparator<Node> {
      */
     private boolean isSupported(final Node n) {
         return ((n instanceof MetaObjectNode) || (n instanceof MetaNode) || (n instanceof MetaClassNode));
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

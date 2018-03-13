@@ -41,7 +41,8 @@ import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 
-import de.cismet.tools.Static2DTools;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 /**
  * DOCUMENT ME!
@@ -49,13 +50,15 @@ import de.cismet.tools.Static2DTools;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public abstract class AbstractNewObjectToolbarAction extends AbstractAction implements CidsClientToolbarItem {
+public abstract class AbstractNewObjectToolbarAction extends AbstractAction implements CidsClientToolbarItem,
+    ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
     ImageIcon add = new ImageIcon(this.getClass().getResource("/Sirius/navigator/resource/img/bullet_add.png"));
     private final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
     private CidsBean cb = null;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -63,8 +66,16 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
      * Creates a new AbstractNewObjectToolbarAction object.
      */
     public AbstractNewObjectToolbarAction() {
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public final void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+
         try {
-            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName());
+            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName(), getConnectionContext());
             final ImageIcon iconIcon = new ImageIcon(cb.getMetaObject().getMetaClass().getIconData());
             final Icon base = (((iconIcon.getIconHeight() < 0) || (iconIcon.getIconWidth() < 0))
                     ? UIManager.getIcon("FileView.fileIcon") : iconIcon);
@@ -78,8 +89,6 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
                 e);
         }
     }
-
-    //~ Methods ----------------------------------------------------------------
 
     @Override
     public boolean isVisible() {
@@ -116,7 +125,7 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
     @Override
     public void actionPerformed(final ActionEvent ae) {
         try {
-            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName());
+            cb = CidsBean.createNewCidsBeanFromTableName(getDomain(), getTableName(), getConnectionContext());
             final MetaObjectNode metaObjectNode = new MetaObjectNode(
                     -1,
                     SessionManager.getSession().getUser().getDomain(),
@@ -128,7 +137,7 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
                     -1,
                     null,
                     false);
-            final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(metaObjectNode);
+            final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(metaObjectNode, getConnectionContext());
             ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
             ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(metaTreeNode);
         } catch (Exception ex) {
@@ -155,4 +164,9 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
      * @return  DOCUMENT ME!
      */
     public abstract String getTooltipString();
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 }

@@ -45,6 +45,9 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.SoftBevelBorder;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -52,7 +55,7 @@ import javax.swing.border.SoftBevelBorder;
  * @deprecated  Password is now changed via Extras -> Optionen (See {@link PasswordOptionsDialog})
  */
 @Deprecated
-public class PasswordDialog extends JDialog {
+public class PasswordDialog extends JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -65,6 +68,8 @@ public class PasswordDialog extends JDialog {
     private JPasswordField password_old;
     private JPasswordField password_new;
     private JPasswordField password_again;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -194,6 +199,11 @@ public class PasswordDialog extends JDialog {
         this.pack();
     }
 
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -242,7 +252,8 @@ public class PasswordDialog extends JDialog {
                             !SessionManager.getProxy().changePassword(
                                         SessionManager.getSession().getUser(),
                                         new String(password_old.getPassword()),
-                                        new String(password_new.getPassword()))) {
+                                        new String(password_new.getPassword()),
+                                        getConnectionContext())) {
                             // _TA_JOptionPane.showMessageDialog(null, "Ihr Kennwort konnte nicht geaendert werden.",
                             // "Kennwort aendern", JOptionPane.ERROR_MESSAGE);
                             JOptionPane.showMessageDialog(

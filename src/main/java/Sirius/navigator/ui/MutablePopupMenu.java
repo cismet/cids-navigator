@@ -9,7 +9,6 @@ package Sirius.navigator.ui;
 
 import Sirius.navigator.NavigatorConcurrency;
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.exception.ConnectionException;
 import Sirius.navigator.method.MethodAvailability;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.interfaces.PluginMethod;
@@ -75,6 +74,9 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.cids.utils.interfaces.CidsBeanAction;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.ext.CExtContext;
 import de.cismet.ext.CExtManager;
 
@@ -85,7 +87,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public final class MutablePopupMenu extends JPopupMenu {
+public final class MutablePopupMenu extends JPopupMenu implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -108,6 +110,8 @@ public final class MutablePopupMenu extends JPopupMenu {
 
     // we use this executor to limit the duration of the extension lookup (mscholl)
     private final ExecutorService extensionExecutor;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -216,6 +220,11 @@ public final class MutablePopupMenu extends JPopupMenu {
         return this.pluginMenues.isAvailable(id);
     }
 
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -293,7 +302,8 @@ public final class MutablePopupMenu extends JPopupMenu {
 
                     if (node.getClassId() > 0) {
                         final MetaClass metaClass = ClassCacheMultiple.getMetaClass(node.getDomain(),
-                                node.getClassId());
+                                node.getClassId(),
+                                getConnectionContext());
                         permission = permission && metaClass.getPermissions().hasWritePermission(u);
                     }
 
@@ -578,7 +588,7 @@ public final class MutablePopupMenu extends JPopupMenu {
         public void init(final int classID, final String domain) throws Exception {
             this.classID = classID;
             this.domain = domain;
-            metaClass = ClassCacheMultiple.getMetaClass(domain, classID);
+            metaClass = ClassCacheMultiple.getMetaClass(domain, classID, getConnectionContext());
             this.setText(org.openide.util.NbBundle.getMessage(
                     MutablePopupMenu.class,
                     "MutablePopupMenu.NewObjectMethod.text",
@@ -594,7 +604,7 @@ public final class MutablePopupMenu extends JPopupMenu {
         public void invoke() throws Exception {
             final DefaultMetaTreeNode selectedNode = currentTree.getSelectedNode();
             if (metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser())) {
-                final MetaObject metaObject = metaClass.getEmptyInstance();
+                final MetaObject metaObject = metaClass.getEmptyInstance(getConnectionContext());
                 metaObject.setStatus(MetaObject.NEW);
                 final MetaObjectNode MetaObjectNode = new MetaObjectNode(
                         -1,
@@ -607,7 +617,7 @@ public final class MutablePopupMenu extends JPopupMenu {
                         -1,
                         null,
                         false);
-                final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(MetaObjectNode);
+                final DefaultMetaTreeNode metaTreeNode = new ObjectTreeNode(MetaObjectNode, getConnectionContext());
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
                 ComponentRegistry.getRegistry()
                         .getAttributeEditor()
@@ -741,7 +751,7 @@ public final class MutablePopupMenu extends JPopupMenu {
                 boolean deleted = false;
                 for (final DefaultMetaTreeNode tmp : selectedNodes) {
                     final boolean deletedSingleNode = MethodManager.getManager()
-                                .deleteNode(currentTree, tmp, (selectedNodes.length == 1));
+                                .deleteNode(currentTree, tmp, (selectedNodes.length == 1), getConnectionContext());
                     deleted = deleted | deletedSingleNode;
 
                     if (deletedSingleNode) {
@@ -805,7 +815,9 @@ public final class MutablePopupMenu extends JPopupMenu {
         public void invoke() throws Exception {
             final TreePath selectionPath = currentTree.getSelectionPath();
             if ((selectionPath != null) && (selectionPath.getPath().length > 0)) {
-                final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
+                final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
+                            getConnectionContext()),
+                        getConnectionContext());
 
                 final Runnable r = new Runnable() {
 

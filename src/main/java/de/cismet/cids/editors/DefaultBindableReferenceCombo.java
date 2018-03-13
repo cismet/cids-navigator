@@ -43,7 +43,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.SwingWorker;
 
+import de.cismet.cids.client.tools.ConnectionContextUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -53,7 +58,10 @@ import de.cismet.tools.CismetThreadPool;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class DefaultBindableReferenceCombo extends JComboBox implements Bindable, MetaClassStore, Serializable {
+public class DefaultBindableReferenceCombo extends JComboBox implements Bindable,
+    MetaClassStore,
+    Serializable,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -213,7 +221,14 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                     @Override
                     protected DefaultComboBoxModel doInBackground() throws Exception {
                         Thread.currentThread().setName("DefaultBindableReferenceCombo init()");
-                        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, sortingColumn);
+                        return getModelByMetaClass(
+                                mc,
+                                nullable,
+                                onlyUsed,
+                                comparator,
+                                forceReload,
+                                sortingColumn,
+                                getConnectionContext());
                     }
 
                     @Override
@@ -386,23 +401,30 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload) {
-        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, null);
+        return getModelByMetaClass(
+                mc,
+                nullable,
+                onlyUsed,
+                comparator,
+                forceReload,
+                ConnectionContext.createDeprecated());
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   mc             DOCUMENT ME!
-     * @param   nullable       DOCUMENT ME!
-     * @param   onlyUsed       DOCUMENT ME!
-     * @param   comparator     DOCUMENT ME!
-     * @param   forceReload    DOCUMENT ME!
-     * @param   sortingColumn  DOCUMENT ME!
+     * @param   mc                 DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   onlyUsed           DOCUMENT ME!
+     * @param   comparator         DOCUMENT ME!
+     * @param   forceReload        DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -411,7 +433,30 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload,
-            final String sortingColumn) {
+            final ConnectionContext connectionContext) {
+        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, null, connectionContext);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc                 DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   onlyUsed           DOCUMENT ME!
+     * @param   comparator         DOCUMENT ME!
+     * @param   forceReload        DOCUMENT ME!
+     * @param   sortingColumn      DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator,
+            final boolean forceReload,
+            final String sortingColumn,
+            final ConnectionContext connectionContext) {
         if (mc != null) {
             final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                 // NOI18N
             final String orderBy;                                                                            // NOI18N
@@ -433,7 +478,8 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
             MetaObject[] metaObjects;
             try {
-                metaObjects = MetaObjectCache.getInstance().getMetaObjectsByQuery(query, mc.getDomain(), forceReload);
+                metaObjects = MetaObjectCache.getInstance()
+                            .getMetaObjectsByQuery(query, mc.getDomain(), forceReload, connectionContext);
             } catch (final CacheException ex) {
                 LOG.warn("cache could not come up with appropriate objects", ex); // NOI18N
                 metaObjects = new MetaObject[0];
@@ -469,11 +515,33 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator) throws Exception {
-        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, false);
+        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc                 DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   onlyUsed           DOCUMENT ME!
+     * @param   comparator         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator,
+            final ConnectionContext connectionContext) throws Exception {
+        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, false, connectionContext);
     }
 
     /**
@@ -487,10 +555,30 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
             final boolean nullable,
             final boolean onlyUsed) throws Exception {
-        return getModelByMetaClass(mc, nullable, onlyUsed, BEAN_TOSTRING_COMPARATOR, false);
+        return getModelByMetaClass(mc, nullable, onlyUsed, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc                 DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   onlyUsed           DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final ConnectionContext connectionContext) throws Exception {
+        return getModelByMetaClass(mc, nullable, onlyUsed, BEAN_TOSTRING_COMPARATOR, false, connectionContext);
     }
 
     /**
@@ -503,9 +591,32 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc, final boolean nullable)
             throws Exception {
-        return getModelByMetaClass(mc, nullable, false, BEAN_TOSTRING_COMPARATOR, false);
+        return getModelByMetaClass(mc, nullable, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc                 DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final ConnectionContext connectionContext) throws Exception {
+        return getModelByMetaClass(mc, nullable, false, BEAN_TOSTRING_COMPARATOR, false, connectionContext);
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
     }
 
     //~ Inner Classes ----------------------------------------------------------

@@ -33,45 +33,50 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * blah.
  *
  * @author   Pascal
  * @version  1.0 02/15/2003
  */
-public final class PluginFactory {
+public final class PluginFactory implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     /** singleton shared instance. */
     // private static PluginFactory factory = null;
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
+    private static final Logger LOG = Logger.getLogger(PluginFactory.class);
 
     //~ Instance fields --------------------------------------------------------
-
-    private final Logger logger;
 
     private final PreloadPluginRuleSet preloadRuleSet;
     private final LoadPluginRuleSet loadRuleSet;
 
     private final String schemaLocation;
 
+    private final ConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates the singleton shared instance of PluginFactory.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
-    protected PluginFactory() {
-        logger = Logger.getLogger(this.getClass());
-        // log = new Log4jFactory().getInstance("navigator.plugin.factory.digester");
+    protected PluginFactory(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         final Logger digesterLogger = Logger.getLogger(PluginFactory.LoadPluginRuleSet.class);
         digesterLogger.setLevel(Level.WARN);
 
         preloadRuleSet = new PreloadPluginRuleSet();
         loadRuleSet = new LoadPluginRuleSet();
 
-        schemaLocation = resource.pathToIURIString(PropertyManager.getManager().getPluginPath() + "plugin.xsd"); // NOI18N
+        schemaLocation = RESOURCE.pathToIURIString(PropertyManager.getManager().getPluginPath() + "plugin.xsd"); // NOI18N
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -99,8 +104,8 @@ public final class PluginFactory {
         final Digester digester = new Digester();
 
         if (validating) {
-            if (logger.isInfoEnabled()) {
-                logger.info("plugin xml schema validation turned off to improve performance"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("plugin xml schema validation turned off to improve performance"); // NOI18N
             }
             // if(logger.isDebugEnabled())logger.debug("enabling xml schema validation: '" + this.getSchemaLocation() +
             // "'"); digester.setSchema(this.getSchemaLocation()); digester.setValidating(validating);
@@ -166,8 +171,8 @@ public final class PluginFactory {
     private InputStream getXMLDescriptorInputStream(final URL pluginUrl) throws URISyntaxException,
         FileNotFoundException,
         IOException {
-        if (logger.isDebugEnabled()) {
-            logger.debug("loading plugin XML descriptor '" + pluginUrl.toString() + "/"
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("loading plugin XML descriptor '" + pluginUrl.toString() + "/"
                         + PluginDescriptor.XML_DESCRIPTOR + "'"); // NOI18N
         }
 
@@ -190,11 +195,11 @@ public final class PluginFactory {
         MalformedURLException,
         IOException {
         final String pluginDescriptorPath = pluginPath + PluginDescriptor.XML_DESCRIPTOR;
-        if (logger.isDebugEnabled()) {
-            logger.debug("loading plugin XML descriptor from remote URL '" + pluginDescriptorPath + "'"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("loading plugin XML descriptor from remote URL '" + pluginDescriptorPath + "'"); // NOI18N
         }
 
-        return new BufferedInputStream(resource.getResourceAsStream(pluginDescriptorPath), 16384);
+        return new BufferedInputStream(RESOURCE.getResourceAsStream(pluginDescriptorPath), 16384);
 
         /*if(pluginPath.indexOf("http://") == 0 || pluginPath.indexOf("https://") == 0)
          * { if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor from remote URL '" +
@@ -202,6 +207,11 @@ public final class PluginFactory {
          * BufferedInputStream(pluginURL.openStream()); } else { if(logger.isDebugEnabled())logger.debug("loading plugin
          * XML descriptor from local filesystem '" + pluginDescriptorPath + "'"); File file = new
          * File(pluginDescriptorPath); return new BufferedInputStream(new FileInputStream(file));}*/
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -560,8 +570,8 @@ public final class PluginFactory {
          * @param  descriptor  DOCUMENT ME!
          */
         private FactoryCore(final PluginDescriptor descriptor) {
-            if (logger.isInfoEnabled()) {
-                logger.info("new Plugin Factory Core instance created"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("new Plugin Factory Core instance created"); // NOI18N
             }
             this.descriptor = descriptor;
         }
@@ -591,8 +601,8 @@ public final class PluginFactory {
                 final Boolean internationalized,
                 final Boolean unloadable,
                 final Boolean deactivateable) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("setting plugin capabilities"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("setting plugin capabilities"); // NOI18N
             }
             this.descriptor.setProgressObservable(progressObservable.booleanValue());
             this.descriptor.setPropertyObservable(propertyObservable.booleanValue());
@@ -622,8 +632,8 @@ public final class PluginFactory {
                 final String language,
                 final String country,
                 final String resourceFile) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding new plugin locale '" + name + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("adding new plugin locale '" + name + "'"); // NOI18N
             }
             if (this.pluginLocales == null) {
                 this.pluginLocales = new HashMap();
@@ -639,8 +649,8 @@ public final class PluginFactory {
          * @param  className  DOCUMENT ME!
          */
         public void setClassName(final String className) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("setting plugin class name " + className + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("setting plugin class name " + className + "'"); // NOI18N
             }
             this.className = className;
         }
@@ -651,8 +661,8 @@ public final class PluginFactory {
          * @param  jar  DOCUMENT ME!
          */
         public void addLibrary(final String jar) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding library " + jar + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("adding library " + jar + "'"); // NOI18N
             }
             libraries.add(jar);
         }
@@ -666,12 +676,12 @@ public final class PluginFactory {
          * @param  attributeId    the id of the meta attribute, e.g. XYZ123
          */
         public void addAttributeMapping(final String attributeName, final String attributeId) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding attribute mapping '" + attributeName + "' = '" + attributeId + "'");        // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("adding attribute mapping '" + attributeName + "' = '" + attributeId + "'");        // NOI18N
             }
             if (mappingTable.containsKey(attributeName)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("attribute '" + attributeName + "' already in map, adding id to String array"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("attribute '" + attributeName + "' already in map, adding id to String array"); // NOI18N
                 }
 
                 // String[] currentIds = (String[])mappingTable.get(attributeName);
@@ -701,8 +711,8 @@ public final class PluginFactory {
          * @param  paramValue  DOCUMENT ME!
          */
         public void addParameter(final String paramName, final String paramValue) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding parameter " + paramName + "' = '" + paramValue + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("adding parameter " + paramName + "' = '" + paramValue + "'"); // NOI18N
             }
             paramTable.put(paramName, paramValue);
         }
@@ -725,20 +735,20 @@ public final class PluginFactory {
             IllegalAccessException,
             InvocationTargetException,
             InterruptedException {
-            if (logger.isInfoEnabled()) {
-                logger.info("creating new plugin '" + className + "' instance"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("creating new plugin '" + className + "' instance"); // NOI18N
             }
 
             PluginProgressObserver progressObserver = null;
             if (descriptor.isProgressObservable()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("setting plugin progress observer");       // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("setting plugin progress observer");          // NOI18N
                 }
                 progressObserver = new PluginProgressObserver(this.descriptor.getName());
                 PropertyManager.getManager().getSharedProgressObserver().setSubProgressObserver(progressObserver);
-            } else if (logger.isDebugEnabled()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("plugin " + descriptor.getName() + "' is not progressobservable ("
+            } else if (LOG.isDebugEnabled()) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("plugin " + descriptor.getName() + "' is not progressobservable ("
                                 + descriptor.isProgressObservable() + ")"); // NOI18N
                 }
             }
@@ -752,26 +762,26 @@ public final class PluginFactory {
                     this.defaultLocale);
             descriptor.setContext(context);
             if (descriptor.isInternationalized() && !context.getI18n().isInternationalized()) {
-                logger.warn("internationalization broken, check plugin descriptor &  resource files"); // NOI18N
+                LOG.warn("internationalization broken, check plugin descriptor &  resource files"); // NOI18N
                 descriptor.setInternationalized(false);
             }
 
             // load jar files
             final URL[] urls = new URL[libraries.size() + 1];
-            final String jarBase = resource.pathToIURIString(descriptor.getPluginPath() + "lib/"); // NOI18N
+            final String jarBase = RESOURCE.pathToIURIString(descriptor.getPluginPath() + "lib/"); // NOI18N
 
             // /res implements classpath ...
-            urls[0] = new URL(resource.pathToIURIString(descriptor.getPluginPath() + "res/")); // NOI18N
+            urls[0] = new URL(RESOURCE.pathToIURIString(descriptor.getPluginPath() + "res/")); // NOI18N
 
             for (int i = 0; i < libraries.size(); i++) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("loading plugin library: '" + jarBase + libraries.get(i).toString() + "'"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("loading plugin library: '" + jarBase + libraries.get(i).toString() + "'"); // NOI18N
                 }
                 urls[i + 1] = new URL(jarBase + libraries.get(i).toString());
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("the current classloader is '" + this.getClass().getClassLoader().getClass().getName()
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("the current classloader is '" + this.getClass().getClassLoader().getClass().getName()
                             + "'"); // NOI18N
             }
             // URLClassLoader classLoader = new URLClassLoader(urls, this.getClass().getClassLoader());
@@ -781,26 +791,26 @@ public final class PluginFactory {
                                                                                        // normalen als Fallback hat
                                                                                        // ///HELL
                 final PluginClassLoader classLoader = new PluginClassLoader(urls, this.getClass().getClassLoader());
-                if (logger.isDebugEnabled()) {
-                    logger.debug("the current url parent classloader is '"
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("the current url parent classloader is '"
                                 + classLoader.getParent().getClass().getName() + "'"); // NOI18N
                 }
 
                 final URL[] jarURLs = classLoader.getURLs();
                 for (int i = 0; i < jarURLs.length; i++) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("loadign jar file at '" + jarURLs[i] + "'"); // NOI18N
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("loadign jar file at '" + jarURLs[i] + "'"); // NOI18N
                     }
                 }
 
                 // create plugin instance
-                if (logger.isInfoEnabled()) {
-                    logger.info("creating plugin instance of class '" + className + "'"); // NOI18N
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("creating plugin instance of class '" + className + "'"); // NOI18N
                 }
                 pluginClass = classLoader.loadClass(className);
             } else {
-                pluginClass = this.getClass().getClassLoader().loadClass(className);      // HELL \u00C4nderung quick &
-                                                                                          // Dirty
+                pluginClass = this.getClass().getClassLoader().loadClass(className);   // HELL \u00C4nderung quick &
+                                                                                       // Dirty
             }
 
             // ...........................................
@@ -812,8 +822,8 @@ public final class PluginFactory {
                 progressObserver.setFinished(true);
             }
             // ..................................................................
-            if (logger.isInfoEnabled()) {
-                logger.info("plugin instance created!"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("plugin instance created!"); // NOI18N
             }
             descriptor.setPlugin((PluginSupport)pluginObject);
         }
@@ -832,8 +842,8 @@ public final class PluginFactory {
                 final String description,
                 final Boolean multithreaded,
                 final Long availability) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("addingr new plugin method: id='" + id + "', name='" + name + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("addingr new plugin method: id='" + id + "', name='" + name + "'"); // NOI18N
             }
             final Object object = descriptor.getPlugin().getMethod(id);
 
@@ -852,7 +862,7 @@ public final class PluginFactory {
                         (PluginMethod)object);
                 methodDescriptors.put(methodDescriptor.getId(), methodDescriptor);
             } else {
-                logger.error("plugin method '" + id + "' could not be found: '" + object + "'"); // NOI18N
+                LOG.error("plugin method '" + id + "' could not be found: '" + object + "'"); // NOI18N
             }
         }
 
@@ -864,8 +874,8 @@ public final class PluginFactory {
          * @param  uiDescriptor  DOCUMENT ME!
          */
         public void addUIDescriptor(final PluginUIDescriptor uiDescriptor) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("adding plugin ui descriptor " + uiDescriptor.getName() + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("adding plugin ui descriptor " + uiDescriptor.getName() + "'"); // NOI18N
             }
             if (uiDescriptors == null) {
                 uiDescriptors = new HashMap();
@@ -892,12 +902,12 @@ public final class PluginFactory {
 
                     return pluginUI;
                 } else {
-                    logger.error("plugin ui '" + uiDescriptor.getId() + "' could not be found"); // NOI18N
+                    LOG.error("plugin ui '" + uiDescriptor.getId() + "' could not be found"); // NOI18N
                     uiDescriptors.remove(uiDescriptor.getId());
                     return null;
                 }
             } else {
-                logger.fatal("synchronization error: plugin ui descriptor generation failed");   // NOI18N
+                LOG.fatal("synchronization error: plugin ui descriptor generation failed");   // NOI18N
                 return null;
             }
         }
@@ -953,7 +963,7 @@ public final class PluginFactory {
                 if (pluginUI instanceof FloatingPluginUI) {
                     uiDescriptor.addAsFloatingFrame((FloatingPluginUI)pluginUI, configurator);
                 } else {
-                    logger.error("wrong plugin ui type'" + pluginUI.getClass().getName()
+                    LOG.error("wrong plugin ui type'" + pluginUI.getClass().getName()
                                 + "',  'Sirius.navigator.plugin.interfaces.FloatingPluginUI' expected"); // NOI18N
                     uiDescriptors.remove(uiDescriptor.getId());
                 }
@@ -966,8 +976,8 @@ public final class PluginFactory {
          * @param  actionDescriptor  DOCUMENT ME!
          */
         public void createPluginToolBar(final PluginActionDescriptor actionDescriptor) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("createPluginToolBar, floatable: '" + actionDescriptor.isFloatable() + "'"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("createPluginToolBar, floatable: '" + actionDescriptor.isFloatable() + "'"); // NOI18N
             }
             pluginToolBar = new EmbeddedToolBar(descriptor.getId());
             pluginToolBar.setName(actionDescriptor.getName());
@@ -983,8 +993,8 @@ public final class PluginFactory {
          */
         public void addToolBarButton(final PluginActionDescriptor actionDescriptor) {
             if (descriptor.isPluginMethodAvailable(actionDescriptor.getMethodId())) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("creating new plugin toolbar button: '" + actionDescriptor.getName() + "'"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("creating new plugin toolbar button: '" + actionDescriptor.getName() + "'"); // NOI18N
                 }
                 final PluginToolBarButton button = new PluginToolBarButton(descriptor.getMethodDescriptor(
                             actionDescriptor.getMethodId()).getMethod());
@@ -993,7 +1003,7 @@ public final class PluginFactory {
 
                 pluginToolBar.addButton(button);
             } else {
-                logger.error("plugin toolbar button '" + actionDescriptor.getName()
+                LOG.error("plugin toolbar button '" + actionDescriptor.getName()
                             + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'"); // NOI18N
             }
         }
@@ -1004,8 +1014,8 @@ public final class PluginFactory {
          * @param  actionDescriptor  DOCUMENT ME!
          */
         public void createPluginMenu(final PluginActionDescriptor actionDescriptor) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("createPluginMenu"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("createPluginMenu"); // NOI18N
             }
             pluginMenu = new PluginMenu(descriptor.getId(), actionDescriptor.getName());
             // pluginMenu.setText(actionDescriptor.getName());
@@ -1021,8 +1031,8 @@ public final class PluginFactory {
          */
         public void addMenuItem(final PluginActionDescriptor actionDescriptor) {
             if (descriptor.isPluginMethodAvailable(actionDescriptor.getMethodId())) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'");    // NOI18N
                 }
                 final PluginMethodDescriptor methodDescriptor = descriptor.getMethodDescriptor(
                         actionDescriptor.getMethodId());
@@ -1030,7 +1040,7 @@ public final class PluginFactory {
                 final String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId(); // NOI18N
 
                 try {
-                    method = SessionManager.getProxy().getMethod(methodKey);
+                    method = SessionManager.getProxy().getMethod(methodKey, getConnectionContext());
 
                     if (method != null) {
                         final User user = SessionManager.getSession().getUser();
@@ -1065,18 +1075,18 @@ public final class PluginFactory {
                                 pluginMenu.addSeparator();
                             }
                         } else {
-                            if (logger.isDebugEnabled()) {
-                                logger.warn("no permission to show method '" + method.getKey() + "'"); // NOI18N
+                            if (LOG.isDebugEnabled()) {
+                                LOG.warn("no permission to show method '" + method.getKey() + "'"); // NOI18N
                             }
                         }
                     } else {
-                        logger.error("method '" + methodKey + "' is not registered, ignoring method"); // NOI18N
+                        LOG.error("method '" + methodKey + "' is not registered, ignoring method"); // NOI18N
                     }
                 } catch (Throwable t) {
-                    logger.warn("could not retrieve method '" + methodKey + "'");                      // NOI18N
+                    LOG.warn("could not retrieve method '" + methodKey + "'");                      // NOI18N
                 }
             } else {
-                logger.error("plugin menu item '" + actionDescriptor.getName()
+                LOG.error("plugin menu item '" + actionDescriptor.getName()
                             + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'"); // NOI18N
             }
         }
@@ -1087,8 +1097,8 @@ public final class PluginFactory {
          * @param  actionDescriptor  DOCUMENT ME!
          */
         public void createPluginPopupMenu(final PluginActionDescriptor actionDescriptor) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("createPluginPopupMenu"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("createPluginPopupMenu"); // NOI18N
             }
             pluginPopupMenu = new PluginMenu(descriptor.getId(), actionDescriptor.getName());
             // pluginPopupMenu.setText(actionDescriptor.getName());
@@ -1109,8 +1119,8 @@ public final class PluginFactory {
                     descriptor.setPluginPopupMenu(pluginPopupMenu);
                 }
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("creating new plugin menu item: '" + actionDescriptor.getName() + "'"); // NOI18N
                 }
                 // PluginMenuItem menuItem = new
                 // PluginMenuItem(descriptor.getMethodDescriptor(actionDescriptor.getMethodId()).getMethod());
@@ -1120,7 +1130,7 @@ public final class PluginFactory {
                 final String methodKey = actionDescriptor.getMethodId() + '@' + this.descriptor.getId(); // NOI18N
 
                 try {
-                    method = SessionManager.getProxy().getMethod(methodKey);
+                    method = SessionManager.getProxy().getMethod(methodKey, getConnectionContext());
                     if (method != null) {
                         final User user = SessionManager.getSession().getUser();
                         final UserGroup userGroup = user.getUserGroup();
@@ -1157,16 +1167,16 @@ public final class PluginFactory {
                                 pluginPopupMenu.addSeparator();
                             }
                         } else {
-                            logger.warn("no permission to show method '" + method.getKey() + "'");    // NOI18N
+                            LOG.warn("no permission to show method '" + method.getKey() + "'");    // NOI18N
                         }
                     } else {
-                        logger.error("method '" + methodKey + "' is not available, ignoring method"); // NOI18N
+                        LOG.error("method '" + methodKey + "' is not available, ignoring method"); // NOI18N
                     }
                 } catch (Throwable t) {
-                    logger.warn("could not retrieve method '" + methodKey + "'");                     // NOI18N
+                    LOG.warn("could not retrieve method '" + methodKey + "'");                     // NOI18N
                 }
             } else {
-                logger.error("plugin menu item '" + actionDescriptor.getName()
+                LOG.error("plugin menu item '" + actionDescriptor.getName()
                             + "' refers to an unknown plugin method: '" + actionDescriptor.getMethodId() + "'"); // NOI18N
             }
         }

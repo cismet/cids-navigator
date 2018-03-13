@@ -45,11 +45,12 @@ import de.cismet.commons.security.AccessHandler;
 import de.cismet.commons.security.Tunnel;
 import de.cismet.commons.security.exceptions.CannotReadFromURLException;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.netutil.tunnel.TunnelTargetGroup;
 
 import de.cismet.security.GUICredentialsProvider;
-
-import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
  * DOCUMENT ME!
@@ -57,7 +58,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class CallServerTunnel implements Tunnel {
+public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -76,6 +77,8 @@ public class CallServerTunnel implements Tunnel {
     private final transient Map<String, TunnelGUICredentialsProvider> credentialsForURLS =
         new HashMap<String, TunnelGUICredentialsProvider>();
 
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -84,8 +87,9 @@ public class CallServerTunnel implements Tunnel {
      * @param  callserverName  DOCUMENT ME!
      */
     public CallServerTunnel(final String callserverName) {
+        this.callserverName = callserverName;
+
         try {
-            this.callserverName = callserverName;
             final TunnelTargetGroup[] tGroups = mapper.readValue(CallServerTunnel.class.getResourceAsStream(
                         "/de/cismet/cids/client/tools/tunnelTargets.json"),
                     TunnelTargetGroup[].class);
@@ -175,6 +179,7 @@ public class CallServerTunnel implements Tunnel {
                                     tunnelActionName,
                                     callserverName,
                                     nullBody,
+                                    getConnectionContext(),
                                     urlSAP,
                                     parameterSAP,
                                     methodSAP,
@@ -250,7 +255,8 @@ public class CallServerTunnel implements Tunnel {
                 synchronized (this) {
                     if (userKeyList == null) {
                         user = SessionManager.getSession().getUser();
-                        final String configAttr = SessionManager.getProxy().getConfigAttr(user, "tunnel.targetgroups");
+                        final String configAttr = SessionManager.getProxy()
+                                    .getConfigAttr(user, "tunnel.targetgroups", getConnectionContext());
                         if (configAttr != null) {
                             final String[] keys = configAttr.split(",");
                             userKeyList = new ArrayList<String>(keys.length);
@@ -405,11 +411,17 @@ public class CallServerTunnel implements Tunnel {
                         taskname,
                         taskdomain,
                         body,
+                        getConnectionContext(),
                         urlSAP,
                         parameterSAP,
                         methodSAP,
                         optionsSAP,
                         credentialsSAP);
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

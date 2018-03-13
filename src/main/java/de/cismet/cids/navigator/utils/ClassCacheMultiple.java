@@ -20,6 +20,8 @@ import java.util.HashMap;
 
 import de.cismet.cids.utils.MetaClassUtils;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 /**
  * DOCUMENT ME!
  *
@@ -43,11 +45,25 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain) {
+        return getClassKeyHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static HashMap getClassKeyHashtableOfClassesForOneDomain(final String domain,
+            final ConnectionContext connectionContext) {
         HashMap ret = allClassCaches.get(domain);
         if (ret == null) {
             try {
-                addInstance(domain);
+                addInstance(domain, connectionContext);
                 ret = allClassCaches.get(domain);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
@@ -65,11 +81,25 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain) {
+        return getTableNameHashtableOfClassesForOneDomain(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static HashMap getTableNameHashtableOfClassesForOneDomain(final String domain,
+            final ConnectionContext connectionContext) {
         HashMap ret = allTableNameClassCaches.get(domain);
         if (ret == null) {
             try {
-                addInstance(domain);
+                addInstance(domain, connectionContext);
                 ret = allTableNameClassCaches.get(domain);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
@@ -88,9 +118,25 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static MetaClass getMetaClass(final String domain, final String tableName) {
+        return getMetaClass(domain, tableName, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   domain             DOCUMENT ME!
+     * @param   tableName          DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static MetaClass getMetaClass(final String domain,
+            final String tableName,
+            final ConnectionContext connectionContext) {
         try {
-            final HashMap ht = getTableNameHashtableOfClassesForOneDomain(domain);
+            final HashMap ht = getTableNameHashtableOfClassesForOneDomain(domain, connectionContext);
             return (MetaClass)ht.get(tableName.toLowerCase());
         } catch (Exception e) {
             log.warn("Couldn't get Class for Table " + tableName + "@" + domain, e); // NOI18N
@@ -106,49 +152,78 @@ public class ClassCacheMultiple {
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static MetaClass getMetaClass(final String domain, final int classId) {
-        return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain).get(domain + classId);
+        return getMetaClass(domain, classId, ConnectionContext.createDeprecated());
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param  domain  DOCUMENT ME!
-     */
-    public static void setInstance(final String domain) {
-        try {
-            final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain);
-            allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
-            allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
-        } catch (ConnectionException connectionException) {
-            log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  domain  DOCUMENT ME!
-     */
-    public static void addInstance(final String domain) {
-        try {
-            final MetaClass[] mcArr = SessionManager.getConnection()
-                        .getClasses(SessionManager.getSession().getUser(), domain);
-            allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
-            allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
-        } catch (ConnectionException connectionException) {
-            log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   classes          DOCUMENT ME!
-     * @param   localServerName  DOCUMENT ME!
+     * @param   domain             DOCUMENT ME!
+     * @param   classId            DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
+    public static MetaClass getMetaClass(final String domain,
+            final int classId,
+            final ConnectionContext connectionContext) {
+        return (MetaClass)ClassCacheMultiple.getClassKeyHashtableOfClassesForOneDomain(domain, connectionContext)
+                    .get(domain + classId);
+    }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain  DOCUMENT ME!
+     */
+    @Deprecated
+    public static void setInstance(final String domain) {
+        setInstance(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void setInstance(final String domain, final ConnectionContext connectionContext) {
+        try {
+            final MetaClass[] mcArr = SessionManager.getConnection()
+                        .getClasses(SessionManager.getSession().getUser(), domain, connectionContext);
+            allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
+            allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
+        } catch (ConnectionException connectionException) {
+            log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain  DOCUMENT ME!
+     */
+    @Deprecated
+    public static void addInstance(final String domain) {
+        addInstance(domain, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  domain             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void addInstance(final String domain, final ConnectionContext connectionContext) {
+        try {
+            final MetaClass[] mcArr = SessionManager.getConnection()
+                        .getClasses(SessionManager.getSession().getUser(), domain, connectionContext);
+            allClassCaches.put(domain, MetaClassUtils.getClassHashtable(mcArr, domain));
+            allTableNameClassCaches.put(domain, MetaClassUtils.getClassByTableNameHashtable(mcArr));
+        } catch (ConnectionException connectionException) {
+            log.error("Error in setInstance of ClassCacheMultiple", connectionException); // NOI18N
+        }
+    }
 }

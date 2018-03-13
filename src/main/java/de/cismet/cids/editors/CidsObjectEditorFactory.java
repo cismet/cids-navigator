@@ -51,7 +51,6 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,9 +77,17 @@ import de.cismet.cids.editors.converters.SqlDateToStringConverter;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.cids.server.connectioncontext.EditorConnectionContext;
+
 import de.cismet.cids.utils.ClassloadingHelper;
 
 import de.cismet.commons.classloading.BlacklistClassloading;
+
+import de.cismet.connectioncontext.AbstractConnectionContext.Category;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.gui.ComponentWrapper;
 import de.cismet.tools.gui.DoNotWrap;
@@ -93,7 +100,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class CidsObjectEditorFactory {
+public class CidsObjectEditorFactory implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -115,16 +122,20 @@ public class CidsObjectEditorFactory {
 
     //~ Instance fields --------------------------------------------------------
 
-    private HashMap<String, Converter> defaultConverter = new HashMap<String, Converter>();
+    private HashMap<String, Converter> defaultConverter = new HashMap<>();
     private User user;
     private ComponentWrapper componentWrapper = null;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new CidsObjectEditorFactory object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
-    private CidsObjectEditorFactory() {
+    private CidsObjectEditorFactory(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         // Die Klassennamen werden über class.getName() erzeugt. So checkt der Compiler ob sie korrekt referenziert
         // wurden
         defaultConverter.put(com.vividsolutions.jts.geom.Geometry.class.getName(), new GeometryToStringConverter());
@@ -151,7 +162,9 @@ public class CidsObjectEditorFactory {
      */
     public static CidsObjectEditorFactory getInstance() {
         if (editorFactory == null) {
-            editorFactory = new CidsObjectEditorFactory();
+            editorFactory = new CidsObjectEditorFactory(ConnectionContext.create(
+                        Category.INSTANCE,
+                        CidsObjectEditorFactory.class.getSimpleName()));
             editorFactory.user = SessionManager.getSession().getUser();
         }
         return editorFactory;
@@ -204,13 +217,16 @@ public class CidsObjectEditorFactory {
     /**
      * DOCUMENT ME!
      *
-     * @param   domain   DOCUMENT ME!
-     * @param   classid  DOCUMENT ME!
+     * @param   domain             DOCUMENT ME!
+     * @param   classid            DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public static MetaClass getMetaClass(final String domain, final int classid) {
-        return ClassCacheMultiple.getMetaClass(domain, classid);
+    public static MetaClass getMetaClass(final String domain,
+            final int classid,
+            final ConnectionContext connectionContext) {
+        return ClassCacheMultiple.getMetaClass(domain, classid, connectionContext);
     }
 
     /**
@@ -227,6 +243,11 @@ public class CidsObjectEditorFactory {
             editorComponent = (JComponent)getDefaultEditor(MetaObject.getMetaClass());
         }
         final JComponent finalEditorComponent = editorComponent;
+        if (editorComponent instanceof ConnectionContextStore) {
+            final ConnectionContext connectionContext = new EditorConnectionContext(MetaObject);
+            ((ConnectionContextStore)editorComponent).initWithConnectionContext(connectionContext);
+        }
+
         if (editorComponent instanceof DisposableCidsBeanStore) {
             final CidsBean bean = MetaObject.getBean();
 //            final Runnable setCidsBeanRunnable = new Runnable() {
@@ -294,7 +315,9 @@ public class CidsObjectEditorFactory {
             } else if (attributeClassname.equals(java.lang.Boolean.class.getName())) {
                 ret = new DefaultBindableJCheckBox();
             } else if (mai.isForeignKey() && mai.isSubstitute()) {
-                final MetaClass foreignClass = getMetaClass(metaClass.getDomain(), mai.getForeignKeyClassId());
+                final MetaClass foreignClass = getMetaClass(metaClass.getDomain(),
+                        mai.getForeignKeyClassId(),
+                        getConnectionContext());
                 if (foreignClass.getClassAttribute("reasonable_few") != null) {                          // NOI18N
                     ret = new DefaultBindableReferenceCombo(foreignClass);
                 }
@@ -349,8 +372,7 @@ public class CidsObjectEditorFactory {
      * @throws  UnsupportedOperationException  DOCUMENT ME!
      */
     private AutoBindableCidsEditor getDefaultEditor(final MetaClass metaClass) {
-        final Vector<MemberAttributeInfo> mais = new Vector<MemberAttributeInfo>(metaClass.getMemberAttributeInfos()
-                        .values());
+        final Vector<MemberAttributeInfo> mais = new Vector<>(metaClass.getMemberAttributeInfos().values());
 //        final FinalReference<AutoBindableCidsEditor> result = new FinalReference<AutoBindableCidsEditor>();
 //        final Runnable createDefaultEditorRunnable = new Runnable() {
 //
@@ -381,7 +403,7 @@ public class CidsObjectEditorFactory {
                 if (mai.isForeignKey()) {
                     final int foreignKey = mai.getForeignKeyClassId();
                     final String domain = metaClass.getDomain();
-                    final MetaClass foreignClass = getMetaClass(domain, foreignKey);
+                    final MetaClass foreignClass = getMetaClass(domain, foreignKey, getConnectionContext());
 
                     if (mai.isArray()) {
                         // --------------------------------------------------
@@ -390,12 +412,12 @@ public class CidsObjectEditorFactory {
                         MetaClass detailClass = null;
 
                         // Detaileditorcomponent
-                        final Vector<MemberAttributeInfo> arrayAttrs = new Vector<MemberAttributeInfo>(
+                        final Vector<MemberAttributeInfo> arrayAttrs = new Vector<>(
                                 foreignClass.getMemberAttributeInfos().values());
                         for (final MemberAttributeInfo arrayMai : arrayAttrs) {
                             if (arrayMai.isForeignKey()) {
                                 final int detailKey = arrayMai.getForeignKeyClassId();
-                                detailClass = getMetaClass(domain, detailKey);
+                                detailClass = getMetaClass(domain, detailKey, getConnectionContext());
                                 cmpEditor = (JComponent)getObjectEditor(detailClass);
                                 if (cmpEditor == null) {
                                     cmpEditor = (JComponent)getDefaultEditor(detailClass);
@@ -469,7 +491,8 @@ public class CidsObjectEditorFactory {
                                 lblDescription.getText(),
                                 detailClass,
                                 field,
-                                lstArrayMaster);
+                                lstArrayMaster,
+                                getConnectionContext());
                         cidsEditor.add(arrayTitleAndControls, gbc);
 
                         gbc = getCommonConstraints();
@@ -635,7 +658,9 @@ public class CidsObjectEditorFactory {
             if (attrEditorClass != null) {
                 final MetaClass foreignClass;
                 if (MetaClassStore.class.isAssignableFrom(attrEditorClass) && mai.isForeignKey()) {
-                    foreignClass = getMetaClass(metaClass.getDomain(), mai.getForeignKeyClassId());
+                    foreignClass = getMetaClass(metaClass.getDomain(),
+                            mai.getForeignKeyClassId(),
+                            getConnectionContext());
                 } else {
                     foreignClass = null;
                 }
@@ -964,8 +989,9 @@ public class CidsObjectEditorFactory {
                         final ObjectAttribute oa = actionBean.getMetaObject().getAttributeByFieldName(attributeName);
                         final MetaClass mc = getMetaClass(
                                 actionBean.getMetaObject().getDomain(),
-                                oa.getMai().getForeignKeyClassId());
-                        final CidsBean newOne = mc.getEmptyInstance().getBean();
+                                oa.getMai().getForeignKeyClassId(),
+                                getConnectionContext());
+                        final CidsBean newOne = mc.getEmptyInstance(getConnectionContext()).getBean();
                         try {
                             actionBean.setProperty(attributeName, newOne);
                         } catch (Exception ex) {
@@ -1039,23 +1065,33 @@ public class CidsObjectEditorFactory {
                         connectionInfo.setUsergroupDomain("WUNDA_DEMO");               // NOI18N
                         connectionInfo.setUsername("demo");                            // NOI18N
 
+                        final ConnectionContext connectionContext = ConnectionContext.createDeprecated();
                         final Connection connection = ConnectionFactory.getFactory()
                                     .createConnection(
                                         "Sirius.navigator.connection.RMIConnection",
                                         connectionInfo.getCallserverURL(),
-                                        false); // NOI18N
+                                        false,
+                                        connectionContext); // NOI18N
 
                         // connection.g
 
-                        session = ConnectionFactory.getFactory().createSession(connection, connectionInfo, true);
+                        session = ConnectionFactory.getFactory()
+                                    .createSession(connection, connectionInfo, true, connectionContext);
                         proxy = ConnectionFactory.getFactory()
                                     .createProxy(
                                             "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
-                                            session); // NOI18N
+                                            session,
+                                            connectionContext); // NOI18N
                         SessionManager.init(proxy);
 
                         final MetaObject MetaObject = SessionManager.getConnection()
-                                    .getMetaObject(SessionManager.getSession().getUser(), OBJECTID, CLASSID, domain); // meta.getMetaObject(u, 1, AAPERSON_CLASSID, domain);
+                                    .getMetaObject(
+                                        SessionManager.getSession().getUser(),
+                                        OBJECTID,
+                                        CLASSID,
+                                        domain,
+                                        connectionContext); // meta.getMetaObject(u, 1, AAPERSON_CLASSID,
+                                                            // domain);
 
                         log.fatal(MetaObject.getDebugString());
 
@@ -1080,9 +1116,9 @@ public class CidsObjectEditorFactory {
                                     try {
                                         if (ed instanceof WrappedComponent) {
                                             ((DisposableCidsBeanStore)((WrappedComponent)ed).getOriginalComponent())
-                                                    .getCidsBean().persist();
+                                                    .getCidsBean().persist(connectionContext);
                                         } else {
-                                            ((DisposableCidsBeanStore)ed).getCidsBean().persist();
+                                            ((DisposableCidsBeanStore)ed).getCidsBean().persist(connectionContext);
                                         }
                                     } catch (Exception ex) {
                                         ex.printStackTrace();
@@ -1133,7 +1169,8 @@ public class CidsObjectEditorFactory {
                                                     SessionManager.getSession().getUser(),
                                                     OBJECTID,
                                                     CLASSID,
-                                                    domain).getBean());
+                                                    domain,
+                                                    connectionContext).getBean());
                                             abce.getBindingGroup().unbind();
                                             abce.getBindingGroup().bind();
                                         }
@@ -1155,6 +1192,11 @@ public class CidsObjectEditorFactory {
                     }
                 }
             });
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }
 /**

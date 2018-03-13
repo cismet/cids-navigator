@@ -18,18 +18,21 @@ import org.apache.log4j.Logger;
 
 import javax.swing.ImageIcon;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class ClassTreeNode extends DefaultMetaTreeNode {
+public class ClassTreeNode extends DefaultMetaTreeNode implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(ClassTreeNode.class);
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
 
@@ -40,20 +43,21 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
     /**
      * Creates a new ClassTreeNode object.
      *
-     * @param  metaClassNode  DOCUMENT ME!
+     * @param  metaClassNode      DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public ClassTreeNode(final MetaClassNode metaClassNode) {
-        super(metaClassNode);
+    public ClassTreeNode(final MetaClassNode metaClassNode, final ConnectionContext connectionContext) {
+        super(metaClassNode, connectionContext);
 
         try {
             final MetaClass metaClass = this.getMetaClass();
             if ((metaClass != null) && (metaClass.getObjectIconData().length > 0)) {
                 this.nodeIcon = new ImageIcon(metaClass.getObjectIconData());
             } else {
-                this.nodeIcon = resource.getIcon("ClassNodeIcon.gif"); // NOI18N
+                this.nodeIcon = RESOURCE.getIcon("ClassNodeIcon.gif"); // NOI18N
             }
         } catch (Exception exp) {
-            this.nodeIcon = resource.getIcon("ClassNodeIcon.gif");     // NOI18N
+            this.nodeIcon = RESOURCE.getIcon("ClassNodeIcon.gif");     // NOI18N
         }
     }
 
@@ -179,7 +183,8 @@ public class ClassTreeNode extends DefaultMetaTreeNode {
      * @throws  Exception  DOCUMENT ME!
      */
     public final MetaClass getMetaClass() throws Exception {
-        return SessionManager.getProxy().getMetaClass(this.getMetaClassNode().getClassId(), this.getDomain());
+        return SessionManager.getProxy()
+                    .getMetaClass(this.getMetaClassNode().getClassId(), this.getDomain(), getConnectionContext());
     }
 
     /**

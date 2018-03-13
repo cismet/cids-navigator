@@ -34,17 +34,41 @@ import org.apache.log4j.Logger;
 
 import java.util.Comparator;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class MetaObjectNodeComparator implements Comparator<Node> {
+public class MetaObjectNodeComparator implements Comparator<Node>, ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     protected final Logger LOG = Logger.getLogger(MetaObjectNodeComparator.class);
+
+    private final ConnectionContext connectionContext;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new MetaObjectNodeComparator object.
+     */
+    @Deprecated
+    public MetaObjectNodeComparator() {
+        this(ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new MetaObjectNodeComparator object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public MetaObjectNodeComparator(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -76,7 +100,8 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
                                 .getMetaObject(
                                         ((MetaObjectNode)o1).getObjectId(),
                                         o1.getClassId(),
-                                        o1.getDomain());
+                                        o1.getDomain(),
+                                        getConnectionContext());
                     mon1.setObject(mo1);
                     mon1.setName(mo1.toString());
                 }
@@ -94,7 +119,8 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
                                 .getMetaObject(
                                         ((MetaObjectNode)o2).getObjectId(),
                                         o2.getClassId(),
-                                        o2.getDomain());
+                                        o2.getDomain(),
+                                        getConnectionContext());
                     mon2.setObject(mo2);
                     mon2.setName(mo2.toString());
                 }
@@ -108,5 +134,10 @@ public class MetaObjectNodeComparator implements Comparator<Node> {
         } else {
             return 0;
         }
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

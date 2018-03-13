@@ -34,6 +34,9 @@ import javax.ws.rs.core.Response;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
 
@@ -51,11 +54,16 @@ import de.cismet.remote.RESTRemoteControlMethod;
 //)
 @Produces({ MediaType.APPLICATION_JSON })
 @ServiceProvider(service = RESTRemoteControlMethod.class)
-public class ShowObjectService extends AbstractRESTRemoteControlMethod implements RESTRemoteControlMethod {
+public class ShowObjectService extends AbstractRESTRemoteControlMethod implements RESTRemoteControlMethod,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ShowObjectService.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -93,7 +101,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             if (domain == null) {
                 domain = SessionManager.getSession().getUser().getDomain();
             }
-            final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, tablename);
+            final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, tablename, getConnectionContext());
             if (mc == null) {
                 LOG.warn("The Class with the tablename " + tablename + "was not dound in the domain " + domain + ".");
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -111,7 +119,10 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
                         .append(");"); // NOI18N
 
             final MetaObject[] metaObjects = SessionManager.getProxy()
-                        .getMetaObjectByQuery(SessionManager.getSession().getUser(), query.toString(), domain);
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                            query.toString(),
+                            domain,
+                            getConnectionContext());
 
             if ((metaObjects != null) && (metaObjects.length == 0)) {
                 LOG.info("The query " + query.toString() + "returned with no results");
@@ -124,7 +135,7 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             for (final MetaObject mo : metaObjects) {
                 final MetaObjectNode node = new MetaObjectNode(mo.getBean());
                 newNodes[i++] = node;
-                final ObjectTreeNode otn = new ObjectTreeNode(node);
+                final ObjectTreeNode otn = new ObjectTreeNode(node, getConnectionContext());
                 defaultMetaTreeNodes.add(otn);
             }
 
@@ -150,5 +161,10 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e).build();
         }
         return Response.ok("ok").build();
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

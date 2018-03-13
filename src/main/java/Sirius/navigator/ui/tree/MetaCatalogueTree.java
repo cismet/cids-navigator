@@ -49,7 +49,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -77,6 +76,9 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 
 import de.cismet.commons.concurrency.CismetExecutors;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.CismetThreadPool;
 
 /**
@@ -84,7 +86,7 @@ import de.cismet.tools.CismetThreadPool;
  *
  * @version  $Revision$, $Date$
  */
-public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll {
+public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -102,6 +104,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
     private final transient MetaTreeRefreshCache refreshCache;
     private final transient ExecutorService treePool;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -111,8 +114,23 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * @param  rootTreeNode  DOCUMENT ME!
      * @param  editable      DOCUMENT ME!
      */
-    public MetaCatalogueTree(final RootTreeNode rootTreeNode, final boolean editable) {
-        this(rootTreeNode, editable, true, 3);
+    @Deprecated
+    public MetaCatalogueTree(final RootTreeNode rootTreeNode,
+            final boolean editable) {
+        this(rootTreeNode, editable, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new MetaCatalogueTree object.
+     *
+     * @param  rootTreeNode       DOCUMENT ME!
+     * @param  editable           DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public MetaCatalogueTree(final RootTreeNode rootTreeNode,
+            final boolean editable,
+            final ConnectionContext connectionContext) {
+        this(rootTreeNode, editable, true, 3, connectionContext);
     }
 
     /**
@@ -123,13 +141,32 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * @param  useThread       DOCUMENT ME!
      * @param  maxThreadCount  DOCUMENT ME!
      */
+    @Deprecated
     public MetaCatalogueTree(final RootTreeNode rootTreeNode,
             final boolean editable,
             final boolean useThread,
             final int maxThreadCount) {
+        this(rootTreeNode, editable, useThread, maxThreadCount, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new MetaCatalogueTree object.
+     *
+     * @param  rootTreeNode       DOCUMENT ME!
+     * @param  editable           DOCUMENT ME!
+     * @param  useThread          DOCUMENT ME!
+     * @param  maxThreadCount     DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public MetaCatalogueTree(final RootTreeNode rootTreeNode,
+            final boolean editable,
+            final boolean useThread,
+            final int maxThreadCount,
+            final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+        this.useThread = useThread;
         this.setModel(new DefaultTreeModel(rootTreeNode, true));
         this.setEditable(editable);
-        this.useThread = useThread;
 
         this.statusChangeSupport = new DefaultStatusChangeSupport(this);
         this.defaultTreeModel = (DefaultTreeModel)this.getModel();
@@ -144,7 +181,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                 NavigatorConcurrency.createThreadFactory("meta-tree")); // NOI18N
 
         this.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
-        this.setCellRenderer(new MetaTreeNodeRenderer());
+        this.setCellRenderer(new MetaTreeNodeRenderer(getConnectionContext()));
         this.putClientProperty("JTree.lineStyle", "Angled"); // NOI18N
         this.setShowsRootHandles(true);
         this.setRootVisible(false);
@@ -168,7 +205,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                             if (MethodManager.getManager().checkPermission(
                                             selectedNode.getNode(),
                                             PermissionHolder.WRITEPERMISSION)) {
-                                MethodManager.getManager().deleteNode(MetaCatalogueTree.this, selectedNode);
+                                MethodManager.getManager()
+                                        .deleteNode(MetaCatalogueTree.this, selectedNode, getConnectionContext());
                             } else if (LOG.isDebugEnabled()) {
                                 LOG.warn("actionPerformed() deleting not possible, no node selected"); // NOI18N
                             }
@@ -183,7 +221,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                     super.mouseClicked(e);
                     if (e.getClickCount() > 1) {
                         try {
-                            final ArrayList<DefaultMetaTreeNode> v = new ArrayList<DefaultMetaTreeNode>();
+                            final ArrayList<DefaultMetaTreeNode> v = new ArrayList<>();
                             final DefaultMetaTreeNode[] resultNodes = getSelectedNodesArray();
                             for (int i = 0; i < resultNodes.length; ++i) {
                                 if (LOG.isDebugEnabled()) {
@@ -241,7 +279,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
             LOG.debug("refresh for artificial id requested: " + artificialId); // NOI18N
         }
 
-        final Set<Future> futures = new HashSet<Future>();
+        final Set<Future> futures = new HashSet<>();
 
         if (refreshCache.isValid()) {
             final Set<DefaultMetaTreeNode> nodes = refreshCache.get(artificialId);
@@ -272,10 +310,10 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
      * @return  DOCUMENT ME!
      */
     public Future exploreSubtree(final TreePath treePath) {
-        final Set<Future> futures = new HashSet<Future>();
+        final Set<Future> futures = new HashSet<>();
         final Object[] nodes = treePath.getPath();
         final Object rootNode = this.getModel().getRoot();
-        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<DefaultMetaTreeNode>();
+        final ArrayList<DefaultMetaTreeNode> dmtnNodeList = new ArrayList<>();
 
         if ((rootNode != null) && (nodes != null) && (nodes.length > 1)) {
             if (LOG.isDebugEnabled()) {
@@ -510,22 +548,28 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     /**
      * DOCUMENT ME!
      *
-     * @param   node  DOCUMENT ME!
+     * @param   node               DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      *
      * @throws  IllegalArgumentException  DOCUMENT ME!
      */
-    public static DefaultMetaTreeNode createTreeNode(final Node node) {
+    public static DefaultMetaTreeNode createTreeNode(final Node node, final ConnectionContext connectionContext) {
         if (node instanceof MetaObjectNode) {
-            return new ObjectTreeNode((MetaObjectNode)node);
+            return new ObjectTreeNode((MetaObjectNode)node, connectionContext);
         } else if (node instanceof MetaNode) {
-            return new PureTreeNode((MetaNode)node);
+            return new PureTreeNode((MetaNode)node, connectionContext);
         } else if (node instanceof MetaClassNode) {
-            return new ClassTreeNode((MetaClassNode)node);
+            return new ClassTreeNode((MetaClassNode)node, connectionContext);
         } else {
             throw new IllegalArgumentException("unknown node type: " + node); // NOI18N
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -583,7 +627,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
                         final Enumeration<DefaultMetaTreeNode> currentChildren = node.children();
                         final Node[] dbChildren = node.getChildren();
 
-                        final List<Node> foundDbNodes = new ArrayList<Node>(dbChildren.length);
+                        final List<Node> foundDbNodes = new ArrayList<>(dbChildren.length);
 
                         while (currentChildren.hasMoreElements()) {
                             final DefaultMetaTreeNode treeNode = currentChildren.nextElement();
@@ -608,7 +652,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
                         for (final Node dbNode : dbChildren) {
                             if (!foundDbNodes.contains(dbNode)) {
-                                scheduleAddition(createTreeNode(dbNode));
+                                scheduleAddition(createTreeNode(dbNode, getConnectionContext()));
                             }
                         }
                     } catch (final Exception e) {
@@ -722,7 +766,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
 
         //~ Instance fields ----------------------------------------------------
 
-        final WaitTreeNode waitNode = new WaitTreeNode();
+        final WaitTreeNode waitNode = new WaitTreeNode(getConnectionContext());
 
         //~ Methods ------------------------------------------------------------
 

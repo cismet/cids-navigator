@@ -28,6 +28,9 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * Der Login Dialog in dem Benutzername, Passwort und Localserver angegeben werden muessen. Der Dialog ist modal, ein
  * Klick auf 'Abbrechen' beendet das Programm sofort.
@@ -35,7 +38,7 @@ import javax.swing.JOptionPane;
  * @author   Pascal Dih&eacute;
  * @version  1.0
  */
-public class LoginDialog extends JDialog {
+public class LoginDialog extends JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -53,6 +56,8 @@ public class LoginDialog extends JDialog {
                 == PropertyManager.PermissionModus.OPTIONAL;
     private boolean userGroupIsForbidden = PropertyManager.getManager().getPermissionModus()
                 == PropertyManager.PermissionModus.FORBIDDEN;
+
+    private final ConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -78,6 +83,12 @@ public class LoginDialog extends JDialog {
      */
     public LoginDialog(final java.awt.Frame owner) {
         super(owner, true);
+        if (owner instanceof ConnectionContextProvider) {
+            connectionContext = (ConnectionContext)((ConnectionContextProvider)owner).getConnectionContext();
+        } else {
+            connectionContext = ConnectionContext.createDummy();
+        }
+
         preferences = Preferences.userNodeForPackage(getClass());
 
         setAlwaysOnTop(true);
@@ -470,7 +481,7 @@ public class LoginDialog extends JDialog {
             cb_userGroup.setModel(new DefaultComboBoxModel());
             cb_srv.setModel(new DefaultComboBoxModel());
 
-            final String[] domains = SessionManager.getProxy().getDomains();
+            final String[] domains = SessionManager.getProxy().getDomains(getConnectionContext());
 
             for (int i = 0; i < domains.length; i++) {
                 cb_srv.addItem(domains[i]);
@@ -710,7 +721,7 @@ public class LoginDialog extends JDialog {
         cb_userGroup.removeAllItems();
 
         if ((user == null) || (user.length() == 0) || (domain == null) || (domain.length() == 0)) {
-            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames();
+            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(getConnectionContext());
             userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
         } else {
             try {
@@ -718,7 +729,8 @@ public class LoginDialog extends JDialog {
                     LOG.debug("retrieving usergroups for user '" + user + "' @ domain '" + domain + "'"); // NOI18N
                 }
 
-                final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(user, domain);
+                final Vector tmpVector = SessionManager.getProxy()
+                            .getUserGroupNames(user, domain, getConnectionContext());
                 userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
             } catch (UserException ue) {
                 JOptionPane.showMessageDialog(
@@ -773,5 +785,10 @@ public class LoginDialog extends JDialog {
                 System.exit(1);
             }
         }
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

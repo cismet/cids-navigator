@@ -34,7 +34,12 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.SwingWorker;
 
+import de.cismet.cids.client.tools.ConnectionContextUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -44,7 +49,10 @@ import de.cismet.tools.CismetThreadPool;
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class DefaultBindableRadioButtonField extends JPanel implements Bindable, MetaClassStore, ActionListener {
+public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
+    MetaClassStore,
+    ActionListener,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -175,7 +183,8 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
                         final String query = "select " + mc.getID() + ", " + mc.getPrimaryKey() + " from "
                                     + mc.getTableName();
 
-                        return MetaObjectCache.getInstance().getMetaObjectsByQuery(query, mc.getDomain());
+                        return MetaObjectCache.getInstance()
+                                    .getMetaObjectsByQuery(query, mc.getDomain(), getConnectionContext());
                     } else {
                         LOG.error("Meta class is null.", new Throwable());
                     }
@@ -372,5 +381,10 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
             threadRunning = true;
             return true;
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
     }
 }
