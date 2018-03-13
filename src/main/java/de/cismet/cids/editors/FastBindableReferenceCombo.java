@@ -39,6 +39,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+import de.cismet.cids.client.tools.ConnectionContextUtils;
+
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
@@ -46,13 +48,19 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsByQuerySearch;
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   srichter
  * @version  $Revision$, $Date$
  */
-public class FastBindableReferenceCombo extends JComboBox implements Bindable, MetaClassStore, Serializable {
+public class FastBindableReferenceCombo extends JComboBox implements Bindable,
+    MetaClassStore,
+    Serializable,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -232,6 +240,11 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
+    }
 
     /**
      * DOCUMENT ME!
@@ -415,6 +428,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
 
         if ((query != null) && (query.trim().length() > 1)) {
             search = new LightweightMetaObjectsByQuerySearch();
+            ((LightweightMetaObjectsByQuerySearch)search).initWithConnectionContext(getConnectionContext());
             ((LightweightMetaObjectsByQuerySearch)search).setDomain(mc.getDomain());
             ((LightweightMetaObjectsByQuerySearch)search).setClassId(mc.getID());
             ((LightweightMetaObjectsByQuerySearch)search).setQuery(query);
@@ -428,7 +442,9 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
                 search.setRepresentationPattern(getRepresentation());
             }
             final Collection<LightweightMetaObject> results = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
+                        .customServerSearch(SessionManager.getSession().getUser(),
+                            search,
+                            getConnectionContext());
             if (representationFormater != null) {
                 for (final LightweightMetaObject result : results) {
                     result.setFormater(representationFormater);
@@ -441,13 +457,15 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
                             .getAllLightweightMetaObjectsForClass(mc.getID(),
                                     SessionManager.getSession().getUser(),
                                     getRepresentationFields(),
-                                    representationFormater);
+                                    representationFormater,
+                                    getConnectionContext());
             } else {
                 lwmos = SessionManager.getProxy()
                             .getAllLightweightMetaObjectsForClass(mc.getID(),
                                     SessionManager.getSession().getUser(),
                                     getRepresentationFields(),
-                                    getRepresentation());
+                                    getRepresentation(),
+                                    getConnectionContext());
             }
         }
         if (sorted) {
@@ -560,7 +578,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable, M
      */
     private void setMetaClassFromTableNameImpl(final String domain, final String tabname) {
         if ((tabname != null) && (tabname.length() > 0)) {
-            this.metaClass = ClassCacheMultiple.getMetaClass(domain, tabname);
+            this.metaClass = ClassCacheMultiple.getMetaClass(domain, tabname, getConnectionContext());
             if (metaClass == null) {
                 LOG.error("Could not find MetaClass for Table " + tabname + " in domain " + domain); // NOI18N
             }

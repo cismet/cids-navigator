@@ -13,7 +13,7 @@
 
     <groupId>de.cismet.cids.navigator</groupId>
     <artifactId>cids-navigator</artifactId>
-    <version>6.1-SNAPSHOT</version>
+    <version>6.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -55,13 +55,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>6.0.2</version>
+                <version>6.1</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>6.0.2</version>
+                <version>6.1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -69,13 +69,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>6.0.2</version>
+                <version>6.1</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>6.0.2</version>
+                <version>6.1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -97,13 +97,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>6.0.2</version>
+                <version>6.1</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>6.0.2</version>
+                <version>6.1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -126,7 +126,7 @@
             <dependency>
                 <groupId>de.cismet.cismap</groupId>
                 <artifactId>cismap-plugin</artifactId>
-                <version>6.0</version>
+                <version>6.1</version>
                 <scope>runtime</scope>
                 <exclusions>
                     <exclusion>

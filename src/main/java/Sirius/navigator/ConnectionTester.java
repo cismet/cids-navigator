@@ -47,6 +47,8 @@ import javax.swing.JTextArea;
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.gui.TextAreaAppender;
@@ -274,7 +276,8 @@ public class ConnectionTester extends javax.swing.JFrame {
                         @Override
                         public void run() {
                             try {
-                                final String ret = connector.getDomains().length + " domain(s) retrieved\n\nSUCCESS";
+                                final String ret = connector.getDomains(ConnectionContext.createDeprecated()).length
+                                            + " domain(s) retrieved\n\nSUCCESS";
                                 EventQueue.invokeLater(new Runnable() {
 
                                         @Override

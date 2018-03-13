@@ -39,13 +39,17 @@ import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   jweintraut
  * @version  $Revision$, $Date$
  */
-public class SearchControlPanel extends javax.swing.JPanel implements PropertyChangeListener {
+public class SearchControlPanel extends javax.swing.JPanel implements PropertyChangeListener,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -61,6 +65,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     private ImageIcon iconCancel;
 
     private boolean simpleSort;
+    private final ConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -71,16 +76,28 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates new form SearchControlPanel.
+     * Creates a new SearchControlPanel object.
      *
      * @param  listener  DOCUMENT ME!
      */
     public SearchControlPanel(final SearchControlListener listener) {
+        this(listener, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates new form SearchControlPanel.
+     *
+     * @param  listener           DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public SearchControlPanel(final SearchControlListener listener, final ConnectionContext connectionContext) {
         if (listener == null) {
             LOG.warn("Given listener is null. Panel won't work.");
         }
 
         this.listener = listener;
+        this.connectionContext = connectionContext;
+
         initComponents();
 
         final URL iconSearch = getClass().getResource(
@@ -219,7 +236,8 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                                     SearchControlPanel.this,
                                     SearchControlPanel.this,
                                     listener.suppressEmptyResultMessage(),
-                                    simpleSort);
+                                    simpleSort,
+                                    getConnectionContext());
                         } else {
                             searching = false;
                             setControlsAccordingToState();
@@ -392,5 +410,10 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
                 100,
                 (new Double(preferredSize.getHeight()).intValue())));
         super.setPreferredSize(preferredSize);
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

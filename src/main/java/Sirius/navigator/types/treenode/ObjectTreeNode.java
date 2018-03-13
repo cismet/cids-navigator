@@ -23,6 +23,8 @@ import java.util.HashMap;
 
 import javax.swing.ImageIcon;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 import de.cismet.tools.CurrentStackTrace;
 
 /**
@@ -75,8 +77,19 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      *
      * @param  metaObjectNode  DOCUMENT ME!
      */
+    @Deprecated
     public ObjectTreeNode(final MetaObjectNode metaObjectNode) {
-        super(metaObjectNode);
+        this(metaObjectNode, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new ObjectTreeNode object.
+     *
+     * @param  metaObjectNode     DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public ObjectTreeNode(final MetaObjectNode metaObjectNode, final ConnectionContext connectionContext) {
+        super(metaObjectNode, connectionContext);
 
         try {
             final MetaClass myMetaClass = this.getMetaClass();
@@ -261,7 +274,8 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
                         final int oid = mon.getObjectId();
                         final int cid = mon.getClassId();
                         final String domain = mon.getDomain();
-                        final MetaObject metaObject = SessionManager.getProxy().getMetaObject(oid, cid, domain);
+                        final MetaObject metaObject = SessionManager.getProxy()
+                                    .getMetaObject(oid, cid, domain, getConnectionContext());
                         mon.setObject(metaObject);
                         metaObjectFilled = true;
                         if ((mon.getName() == null) || mon.getName().equals("NameWirdGeladen")) {
@@ -306,7 +320,10 @@ public class ObjectTreeNode extends DefaultMetaTreeNode {
      */
     public final MetaClass getMetaClass() throws Exception {
         if (metaClass == null) {
-            metaClass = SessionManager.getProxy().getMetaClass(this.getMetaObjectNode().getClassId(), this.getDomain());
+            metaClass = SessionManager.getProxy()
+                        .getMetaClass(this.getMetaObjectNode().getClassId(),
+                                this.getDomain(),
+                                getConnectionContext());
         }
         return metaClass;
     }

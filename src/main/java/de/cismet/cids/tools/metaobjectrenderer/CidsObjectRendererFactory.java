@@ -22,7 +22,12 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
+import de.cismet.cids.server.connectioncontext.RendererConnectionContext;
+
 import de.cismet.cids.utils.ClassloadingHelper;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.collections.TypeSafeCollections;
 
@@ -108,18 +113,24 @@ public class CidsObjectRendererFactory {
         final JComponent componentReferenceHolder;
         JComponent rendererComp = null;
         try {
-            final Class<?> rendererClass = ClassloadingHelper.getDynamicClass(mo.getMetaClass(),
+            final MetaClass mc = mo.getMetaClass();
+            final Class<?> rendererClass = ClassloadingHelper.getDynamicClass(
+                    mc,
                     ClassloadingHelper.CLASS_TYPE.RENDERER);
             final CidsBean bean;
             if (rendererClass != null) {
+                final Object o = rendererClass.newInstance();
                 if (CidsBeanRenderer.class.isAssignableFrom(rendererClass)) {
                     bean = mo.getBean();
                 } else {
                     bean = null;
                 }
-                final Object o = rendererClass.newInstance();
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
+                    if (renderer instanceof ConnectionContextStore) {
+                        final ConnectionContext rendererConnectionContext = new RendererConnectionContext(mo);
+                        ((ConnectionContextStore)renderer).initWithConnectionContext(rendererConnectionContext);
+                    }
                     renderer.setTitle(title);
                     renderer.setCidsBean(bean);
                     rendererComp = (JComponent)renderer;
@@ -139,7 +150,6 @@ public class CidsObjectRendererFactory {
             log.error("Error during creating the renderer.", e); // NOI18N
             return new ErrorRenderer(e, mo, title);
         }
-//                singleRenderer.put(mo.getMetaClass(), rendererComp);
         if ((cw != null) && !(rendererComp instanceof DoNotWrap)) {
             componentReferenceHolder = (JComponent)cw.wrapComponent(rendererComp);
         } else {

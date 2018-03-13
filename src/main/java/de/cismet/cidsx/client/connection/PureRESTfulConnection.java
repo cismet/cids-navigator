@@ -20,8 +20,6 @@ import Sirius.server.middleware.types.MetaNode;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.middleware.types.Node;
-import Sirius.server.newuser.User;
-import Sirius.server.newuser.UserException;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -35,14 +33,11 @@ import java.awt.GraphicsEnvironment;
 import java.net.URI;
 import java.net.URL;
 
-import java.rmi.RemoteException;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.swing.Icon;
 
@@ -63,6 +58,8 @@ import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 import de.cismet.cidsx.server.api.types.ActionTask;
 
 import de.cismet.commons.security.AccessHandler;
+
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
 
@@ -143,6 +140,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
      * @return  PureRESTfulReconnector
      */
     @Override
+    @Deprecated
     protected Reconnector<CallServerService> createReconnector(final String callserverURL,
             final Proxy proxy,
             final boolean compressionEnabled) {
@@ -152,20 +150,47 @@ public class PureRESTfulConnection extends RESTfulConnection {
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final Proxy proxy) throws ConnectionException {
-        return connect(callserverURL, proxy, false);
+        return connect(callserverURL, proxy, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverURL      DOCUMENT ME!
+     * @param   proxy              DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    public boolean connect(final String callserverURL,
+            final Proxy proxy,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        return connect(callserverURL, proxy, false, connectionContext);
     }
 
     @Override
+    @Deprecated
     public boolean connect(final String callserverURL, final Proxy proxy, final boolean compressionEnabled)
             throws ConnectionException {
+        return connect(callserverURL, proxy, compressionEnabled, ConnectionContext.createDeprecated());
+    }
+
+    @Override
+    public boolean connect(final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) throws ConnectionException {
         this.connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
 
         // FIXME: remove when all methods implemented in pure RESTful Service
         this.legacyConnector = createLegacyConnector(callserverURL, proxy, compressionEnabled);
 
         try {
-            this.getDomains();
+            this.getDomains(connectionContext);
         } catch (final Exception e) {
             final String message = "Could not connect cids PURE REST Service at '" + callserverURL + "' (proxy: "
                         + proxy + ")"; // NOI18N
@@ -174,68 +199,6 @@ public class PureRESTfulConnection extends RESTfulConnection {
         }
 
         return true;
-    }
-
-    /**
-     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    @Override
-    public String[] getDomains() throws ConnectionException {
-        try {
-            LOG.warn("delegating getDomains() to legacy REST Connection");
-            return this.legacyConnector.getDomains();
-        } catch (final Exception e) {
-            final String message = "cannot get domains: " + e.getMessage(); // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    /**
-     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    @Override
-    public Vector getUserGroupNames() throws ConnectionException {
-        try {
-            LOG.warn("delegating getUserGroupNames() to legacy REST Connection");
-            return this.legacyConnector.getUserGroupNames();
-        } catch (final Exception e) {
-            final String message = "could not get usergroup names: " + e.getMessage(); // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    /**
-     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service
-     *
-     * @param   username  DOCUMENT ME!
-     * @param   domain    DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     * @throws  UserException        DOCUMENT ME!
-     */
-    @Override
-    public Vector getUserGroupNames(final String username, final String domain) throws ConnectionException,
-        UserException {
-        try {
-            LOG.warn("delegating getUserGroupNames(" + username + ", " + domain + ") to legacy REST Connection");
-            return this.legacyConnector.getUserGroupNames(username, domain);
-        } catch (final Exception e) {
-            final String message = "could not get usergroup names by username, domain: " + username + "@" + domain; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
     }
 
     /**
@@ -275,59 +238,6 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final String message = "cannot get default icon with name '" + name + "' from from legacy REST Server"; // NOI18N
             LOG.error(message, e);
             throw new ConnectionException(message, e);
-        }
-    }
-
-    @Override
-    public boolean changePassword(final User user, final String oldPassword, final String newPassword)
-            throws ConnectionException, UserException {
-        try {
-            LOG.warn("delegating changePassword() to legacy REST Connection");
-            return this.legacyConnector.changePassword(user, oldPassword, newPassword);
-        } catch (final Exception e) {
-            final String message = "could not change password: " + user + " :: " + oldPassword + " :: " + newPassword; // NOI18N
-            LOG.error(message, e);
-            throw new ConnectionException(message, e);
-        }
-    }
-
-    /**
-     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service
-     *
-     * @param   user  DOCUMENT ME!
-     * @param   key   DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    @Override
-    public String getConfigAttr(final User user, final String key) throws ConnectionException {
-        try {
-            LOG.warn("delegating getConfigAttr(" + user.getName() + ", " + key + ") to legacy REST Connection");
-            return this.legacyConnector.getConfigAttr(user, key);
-        } catch (final RemoteException e) {
-            throw new ConnectionException("could not get config attr for user: " + user, e); // NOI18N
-        }
-    }
-
-    /**
-     * FIXME: Operation currently delegated to legacy REST Connection! Implement in pure RESTful Service.
-     *
-     * @param   user  DOCUMENT ME!
-     * @param   key   DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  ConnectionException  DOCUMENT ME!
-     */
-    @Override
-    public boolean hasConfigAttr(final User user, final String key) throws ConnectionException {
-        try {
-            LOG.warn("delegating hasConfigAttr(" + user.getName() + ", " + key + ") to legacy REST Connection");
-            return this.legacyConnector.hasConfigAttr(user, key);
-        } catch (final RemoteException e) {
-            throw new ConnectionException("could not check config attr for user: " + user, e); // NOI18N
         }
     }
 
@@ -418,7 +328,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                         .executeTask(
                             "testAction",
                             "SWITCHON",
-                            null,
+                            (Object)null,
+                            ConnectionContext.createDeprecated(),
                             actionParameterTest);
             System.out.println(taskResult);
             System.exit(0);
@@ -551,7 +462,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                                 SessionManager.getSession().getUser(),
                                 lwmoQuery,
                                 lwmoRepresentationFields,
-                                lwmoRepresentationPattern);
+                                lwmoRepresentationPattern,
+                                ConnectionContext.createDeprecated());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -572,7 +484,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                                 SessionManager.getSession().getUser(),
                                 lwmoQuery,
                                 lwmoRepresentationFields,
-                                lwmoRepresentationPattern);
+                                lwmoRepresentationPattern,
+                                ConnectionContext.createDeprecated());
 
             if (lmoBinary.length != lmoRest.length) {
                 throw new Exception("lmoBinary.length != lmoRest.length");
@@ -698,9 +611,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 // final MetaObject metaObjectBinary = SessionManager.getProxy()
 // .getMetaObject(metaObjectId, metaClassId, domain);
             final MetaObject[] metaObjectsBinary = SessionManager.getProxy()
-                        .getMetaObjectByQuery(
-                            SessionManager.getSession().getUser(),
-                            moQuery);
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                            moQuery,
+                            ConnectionContext.createDeprecated());
             final MetaObject metaObjectBinary = metaObjectsBinary[0];
             final CidsBean cidsBeanBinary = metaObjectBinary.getBean();
             final CidsBeanInfo cidsBeanInfoBinary = cidsBeanBinary.getCidsBeanInfo();
@@ -716,9 +629,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 //                        .getMetaObject(metaObjectId, metaClassId, domain);
 
             final MetaObject[] metaObjectRests = SessionManager.getProxy()
-                        .getMetaObjectByQuery(
-                            SessionManager.getSession().getUser(),
-                            moQuery);
+                        .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                            moQuery,
+                            ConnectionContext.createDeprecated());
             final MetaObject metaObjectRest = metaObjectRests[0];
             final CidsBean cidsBeanRest = metaObjectRest.getBean();
             // TEST updateMetaObject ...........................................
@@ -818,7 +731,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 
             final Node[] nodesBinary = SessionManager.getConnection()
                         .getCallServerService()
-                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
+                        .getMetaObjectNode(SessionManager.getSession().getUser(),
+                            nodeQuery,
+                            ConnectionContext.createDeprecated());
 
             DevelopmentTools.initSessionManagerFromPureRestfulConnectionOnLocalhost(
                 "SWITCHON",
@@ -834,7 +749,9 @@ public class PureRESTfulConnection extends RESTfulConnection {
 
             final Node[] nodesRest = SessionManager.getConnection()
                         .getCallServerService()
-                        .getMetaObjectNode(SessionManager.getSession().getUser(), nodeQuery);
+                        .getMetaObjectNode(SessionManager.getSession().getUser(),
+                            nodeQuery,
+                            ConnectionContext.createDeprecated());
 
             final int nodesArrayLength = (nodesBinary.length > 3) ? 3 : nodesBinary.length;
 
@@ -949,7 +866,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "cismet");
             final MetaClass tagClassBinary = SessionManager.getConnection()
                         .getCallServerService()
-                        .getClassByTableName(SessionManager.getSession().getUser(), "tag", "SWITCHON");
+                        .getClassByTableName(SessionManager.getSession().getUser(),
+                            "tag",
+                            "SWITCHON",
+                            ConnectionContext.createDeprecated());
 //            final MetaClass tagClassBinary = SessionManager.getConnection().getCallServerService()
 //                     .getClass(SessionManager.getSession().getUser(), 6, "SWITCHON");
 //            System.out.println(".getKey(): " + tagClassBinary.getKey());
@@ -961,7 +881,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "cismet");
             final MetaClass tagClassRest = SessionManager.getConnection()
                         .getCallServerService()
-                        .getClassByTableName(SessionManager.getSession().getUser(), "TAG", "SWITCHON");
+                        .getClassByTableName(SessionManager.getSession().getUser(),
+                            "TAG",
+                            "SWITCHON",
+                            ConnectionContext.createDeprecated());
 
             System.out.println("tagClassBinary.equals(tagClassRest): "
                         + tagClassBinary.equals(tagClassRest));

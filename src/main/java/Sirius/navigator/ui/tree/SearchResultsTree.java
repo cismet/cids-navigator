@@ -20,7 +20,6 @@ import Sirius.server.middleware.types.*;
 import org.apache.log4j.Logger;
 
 import java.awt.EventQueue;
-import java.awt.Toolkit;
 
 import java.beans.PropertyChangeListener;
 
@@ -43,7 +42,8 @@ import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
-import de.cismet.cismap.commons.interaction.CismapBroker;
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -57,7 +57,7 @@ import de.cismet.tools.collections.HashArrayList;
  *
  * @version  $Revision$, $Date$
  */
-public class SearchResultsTree extends MetaCatalogueTree {
+public class SearchResultsTree extends MetaCatalogueTree implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -65,7 +65,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected HashArrayList<Node> resultNodes = new HashArrayList<Node>();
+    protected HashArrayList<Node> resultNodes = new HashArrayList<>();
 
     protected boolean muteResultNodeListeners = false;
 
@@ -75,21 +75,33 @@ public class SearchResultsTree extends MetaCatalogueTree {
     private SwingWorker<ArrayList<DefaultMetaTreeNode>, Void> refreshWorker;
     private boolean syncWithMap = false;
     private boolean ascending = true;
-    private final WaitTreeNode waitTreeNode = new WaitTreeNode();
+    private final WaitTreeNode waitTreeNode = new WaitTreeNode(getConnectionContext());
     private boolean syncWithRenderer;
     private MetaObjectNodeServerSearch underlyingSearch;
 
-    private ArrayList<ResultNodeListener> resultNodeListeners = new ArrayList<ResultNodeListener>();
+    private ArrayList<ResultNodeListener> resultNodeListeners = new ArrayList<>();
 
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Erzeugt einen neuen, leeren, SearchTree. Es werden jeweils 50 Objekte angezeigt.
+     * Creates a new SearchResultsTree object.
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public SearchResultsTree() throws Exception {
-        this(true, 2);
+        this(ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Erzeugt einen neuen, leeren, SearchTree. Es werden jeweils 50 Objekte angezeigt.
+     *
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public SearchResultsTree(final ConnectionContext connectionContext) throws Exception {
+        this(true, 2, connectionContext);
     }
 
     /**
@@ -100,8 +112,24 @@ public class SearchResultsTree extends MetaCatalogueTree {
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public SearchResultsTree(final boolean useThread, final int maxThreadCount) throws Exception {
-        super(new RootTreeNode(), false, useThread, maxThreadCount);
+        this(useThread, maxThreadCount, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new SearchResultsTree object.
+     *
+     * @param   useThread          DOCUMENT ME!
+     * @param   maxThreadCount     DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public SearchResultsTree(final boolean useThread,
+            final int maxThreadCount,
+            final ConnectionContext connectionContext) throws Exception {
+        super(new RootTreeNode(connectionContext), false, useThread, maxThreadCount, connectionContext);
         this.rootNode = (RootTreeNode)this.defaultTreeModel.getRoot();
         defaultTreeModel.setAsksAllowsChildren(true);
         this.defaultTreeModel.setAsksAllowsChildren(true);
@@ -152,7 +180,9 @@ public class SearchResultsTree extends MetaCatalogueTree {
         for (final Node nodeToCheck : nodes) {
             if (nodeToCheck instanceof MetaObjectNode) {
                 final MetaObjectNode mon = (MetaObjectNode)nodeToCheck;
-                final MetaClass mc = ClassCacheMultiple.getMetaClass(mon.getDomain(), mon.getClassId());
+                final MetaClass mc = ClassCacheMultiple.getMetaClass(mon.getDomain(),
+                        mon.getClassId(),
+                        getConnectionContext());
 
                 if (existsCustomBeanPermissonProviderForClass(mc)) {
                     if (mon.getObject() == null) {
@@ -160,7 +190,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
                             final MetaObject MetaObject = SessionManager.getProxy()
                                         .getMetaObject(mon.getObjectId(),
                                             mon.getClassId(),
-                                            mon.getDomain());
+                                            mon.getDomain(),
+                                            getConnectionContext());
                             mon.setObject(MetaObject);
                         } catch (ConnectionException e) {
                             log.error("Cannot load meta object to check the read permissions", e);
@@ -376,7 +407,7 @@ public class SearchResultsTree extends MetaCatalogueTree {
     public static void main(final String[] args) {
         final JFrame frame = new JFrame();
         try {
-            final SearchResultsTree tree = new SearchResultsTree();
+            final SearchResultsTree tree = new SearchResultsTree(null);
             frame.setSize(100, 100);
             frame.setVisible(true);
         } catch (Exception e) {
@@ -538,7 +569,8 @@ public class SearchResultsTree extends MetaCatalogueTree {
                                     final MetaObject MetaObject = SessionManager.getProxy()
                                                 .getMetaObject(on.getMetaObjectNode().getObjectId(),
                                                     on.getMetaObjectNode().getClassId(),
-                                                    on.getMetaObjectNode().getDomain());
+                                                    on.getMetaObjectNode().getDomain(),
+                                                    getConnectionContext());
                                     on.getMetaObjectNode().setObject(MetaObject);
                                     EventQueue.invokeLater(new Runnable() {
 
@@ -863,16 +895,16 @@ public class SearchResultsTree extends MetaCatalogueTree {
 
             for (int i = 0; i < resultNodes.size(); i++) {
                 if (resultNodes.get(i) instanceof MetaNode) {
-                    final PureTreeNode iPTN = new PureTreeNode((MetaNode) resultNodes.get(i));
+                    final PureTreeNode iPTN = new PureTreeNode((MetaNode) resultNodes.get(i), getConnectionContext());
                     nodesToAdd.add(iPTN);
 
                     // if(LOG.isDebugEnabled())LOG.debug("[DefaultTreeNodeLoader] PureNode Children added");
                 } else if (resultNodes.get(i) instanceof MetaClassNode) {
-                    final ClassTreeNode iCTN = new ClassTreeNode((MetaClassNode) resultNodes.get(i));
+                    final ClassTreeNode iCTN = new ClassTreeNode((MetaClassNode) resultNodes.get(i), getConnectionContext());
                     nodesToAdd.add(iCTN);
                     // if(LOG.isDebugEnabled())LOG.debug("[DefaultTreeNodeLoader] ClassNode Children added");
                 } else if (resultNodes.get(i) instanceof MetaObjectNode) {
-                    final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode) resultNodes.get(i));
+                    final ObjectTreeNode otn = new ObjectTreeNode((MetaObjectNode) resultNodes.get(i), getConnectionContext());
                     // toString aufrufen, damit das MetaObject nicht erst im CellRenderer des MetaCatalogueTree vom
                     // Server geholt wird
                     otn.toString();

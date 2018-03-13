@@ -30,6 +30,8 @@ import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.SearchResultListener;
 import de.cismet.cids.server.search.SearchResultListenerProvider;
 
+import de.cismet.connectioncontext.ConnectionContext;
+
 import de.cismet.tools.CismetThreadPool;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -57,21 +59,49 @@ public final class CidsSearchExecutor {
      *
      * @param  search  DOCUMENT ME!
      */
+    @Deprecated
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search) {
-        searchAndDisplayResultsWithDialog(search, false);
+        searchAndDisplayResultsWithDialog(search, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  search             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final ConnectionContext connectionContext) {
+        searchAndDisplayResultsWithDialog(search, false, connectionContext);
     }
 
     /**
      * DOCUMENT ME!
      *
      * @param  search      DOCUMENT ME!
-     * @param  simpleSort  if true, sorts the search results alphabetically. Usually set to false, as a more specific
-     *                     sorting order is wished.
+     * @param  simpleSort  DOCUMENT ME!
      */
+    @Deprecated
     public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final boolean simpleSort) {
+        searchAndDisplayResultsWithDialog(search, simpleSort, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  search             DOCUMENT ME!
+     * @param  simpleSort         if true, sorts the search results alphabetically. Usually set to false, as a more
+     *                            specific sorting order is wished.
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final boolean simpleSort,
+            final ConnectionContext connectionContext) {
         if (searchControlDialog == null) {
-            searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(), true);
+            searchControlDialog = new SearchControlDialog(ComponentRegistry.getRegistry().getNavigator(),
+                    true,
+                    connectionContext);
             searchControlDialog.pack();
         }
 
@@ -96,9 +126,31 @@ public final class CidsSearchExecutor {
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener listener,
             final PropertyChangeListener searchResultsListener) {
+        return searchAndDisplayResultsWithDialog(
+                search,
+                listener,
+                searchResultsListener,
+                ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   search                 DOCUMENT ME!
+     * @param   listener               DOCUMENT ME!
+     * @param   searchResultsListener  DOCUMENT ME!
+     * @param   connectionContext      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public static SwingWorker<Node[], Void> searchAndDisplayResultsWithDialog(final MetaObjectNodeServerSearch search,
+            final PropertyChangeListener listener,
+            final PropertyChangeListener searchResultsListener,
+            final ConnectionContext connectionContext) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 PropertyChangeListener cancelListener = null;
@@ -126,7 +178,9 @@ public final class CidsSearchExecutor {
                         });
 
                     final Collection res = SessionManager.getProxy()
-                                .customServerSearch(SessionManager.getSession().getUser(), search);
+                                .customServerSearch(SessionManager.getSession().getUser(),
+                                    search,
+                                    connectionContext);
                     if (!isCancelled()) {
                         final ArrayList<Node> aln = new ArrayList<Node>(res.size());
                         for (final Object o : res) {
@@ -172,19 +226,22 @@ public final class CidsSearchExecutor {
      * @param   searchListener              DOCUMENT ME!
      * @param   searchResultsTreeListener   DOCUMENT ME!
      * @param   suppressEmptyResultMessage  DOCUMENT ME!
+     * @param   connectionContext           DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
     public static SwingWorker<Node[], Void> searchAndDisplayResults(final MetaObjectNodeServerSearch search,
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
-            final boolean suppressEmptyResultMessage) {
+            final boolean suppressEmptyResultMessage,
+            final ConnectionContext connectionContext) {
         return searchAndDisplayResults(
                 search,
                 searchListener,
                 searchResultsTreeListener,
                 suppressEmptyResultMessage,
-                false);
+                false,
+                connectionContext);
     }
 
     /**
@@ -202,6 +259,7 @@ public final class CidsSearchExecutor {
      *                                      or not.
      * @param   simpleSort                  if true, sorts the search results alphabetically. Usually set to false, as a
      *                                      more specific sorting order is wished.
+     * @param   connectionContext           DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
@@ -209,7 +267,8 @@ public final class CidsSearchExecutor {
             final PropertyChangeListener searchListener,
             final PropertyChangeListener searchResultsTreeListener,
             final boolean suppressEmptyResultMessage,
-            final boolean simpleSort) {
+            final boolean simpleSort,
+            final ConnectionContext connectionContext) {
         final SwingWorker<Node[], Void> worker = new SwingWorker<Node[], Void>() {
 
                 @Override
@@ -218,7 +277,9 @@ public final class CidsSearchExecutor {
 
                     Node[] result = null;
                     final Collection searchResult = SessionManager.getProxy()
-                                .customServerSearch(SessionManager.getSession().getUser(), search);
+                                .customServerSearch(SessionManager.getSession().getUser(),
+                                    search,
+                                    connectionContext);
 
                     if (isCancelled()) {
                         return result;

@@ -28,7 +28,7 @@ public class DefaultBindableComboboxCellEditor extends AbstractCellEditor implem
 
     //~ Instance fields --------------------------------------------------------
 
-    private DefaultBindableReferenceCombo comboBox;
+    private final DefaultBindableReferenceCombo comboBox;
 
     //~ Constructors -----------------------------------------------------------
 

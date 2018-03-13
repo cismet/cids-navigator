@@ -87,6 +87,9 @@ import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.DefaultQueryButtonAction;
 import de.cismet.cismap.commons.rasterservice.MapService;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.tools.gui.PaginationPanel;
 
 /**
@@ -98,7 +101,8 @@ import de.cismet.tools.gui.PaginationPanel;
 @org.openide.util.lookup.ServiceProvider(service = CidsWindowSearch.class)
 public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchWithMenuEntry,
     ActionTagProtected,
-    ActionListener {
+    ActionListener,
+    ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -133,6 +137,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private MetaClass metaClass;
 
     private final boolean paginationEnabled;
+    private final transient AbstractFeatureService[] choosenLayers;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -269,17 +275,24 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         this.methodList = methodList;
         this.additionalMethods = additionalMethods;
         this.paginationEnabled = paginationEnabled;
+        this.choosenLayers = choosenLayers;
+    }
 
+    //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         if (choosenLayers == null) {
             services = getFeatureServices(model);
-            classes = GetClasses();
+            classes = getClasses(getConnectionContext());
             layers = new ArrayList<Object>(services);
             layers.addAll(classes);
         } else {
             layers = new ArrayList<Object>(Arrays.asList(choosenLayers));
-            services = new ArrayList<AbstractFeatureService>();
+            services = new ArrayList<>();
             services.addAll(Arrays.asList(choosenLayers));
-            classes = new ArrayList<MetaClass>();
+            classes = new ArrayList<>();
         }
         initComponents();
         jMethodCB.setVisible((jMethodCB.getModel().getSize() > 1));
@@ -391,8 +404,6 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         jLayerCBActionPerformed(null);
     }
 
-    //~ Methods ----------------------------------------------------------------
-
     /**
      * Enables line wrap in the query text area.
      *
@@ -476,14 +487,16 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * Retrieves all configured cids layer classes.
      *
+     * @param   connectionContext  DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
-    private static List<MetaClass> GetClasses() {
-        final List<MetaClass> metaClassesWithAttribute = new LinkedList<MetaClass>();
+    private static List<MetaClass> getClasses(final ConnectionContext connectionContext) {
+        final List<MetaClass> metaClassesWithAttribute = new LinkedList<>();
 
         try {
             final MetaClass[] metaClass = SessionManager.getProxy()
-                        .getClasses(SessionManager.getSession().getUser().getDomain());
+                        .getClasses(SessionManager.getSession().getUser().getDomain(), connectionContext);
             for (final MetaClass mClass : metaClass) {
                 if (!mClass.getAttributeByName("Queryable").isEmpty()) {
                     metaClassesWithAttribute.add(mClass);
@@ -503,7 +516,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      * @return  all feature services from the model
      */
     private List<AbstractFeatureService> getFeatureServices(final ActiveLayerModel model) {
-        final List<AbstractFeatureService> list = new ArrayList<AbstractFeatureService>();
+        final List<AbstractFeatureService> list = new ArrayList<>();
 
         if (model != null) {
             final TreeMap<Integer, MapService> map = model.getMapServices();
@@ -529,7 +542,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      */
     public static List<MemberAttributeInfo> getAttributesFromClass(final MetaClass metaClass) {
         final HashMap map = metaClass.getMemberAttributeInfos();
-        final List<MemberAttributeInfo> attributes = new ArrayList<MemberAttributeInfo>(map.size());
+        final List<MemberAttributeInfo> attributes = new ArrayList<>(map.size());
         for (final Object o : map.entrySet()) {
             final MemberAttributeInfo mai = (MemberAttributeInfo)((java.util.Map.Entry)o).getValue();
             if (!mai.isExtensionAttribute()) {
@@ -542,23 +555,29 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * DOCUMENT ME!
      *
-     * @param   metaClass  DOCUMENT ME!
-     * @param   attribute  DOCUMENT ME!
+     * @param   metaClass          DOCUMENT ME!
+     * @param   attribute          DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private static List<Object> GetValuesFromAttribute(final MetaClass metaClass, final MemberAttributeInfo attribute) {
-        final List<Object> values = new ArrayList<Object>();
+    private static List<Object> getValuesFromAttribute(final MetaClass metaClass,
+            final MemberAttributeInfo attribute,
+            final ConnectionContext connectionContext) {
+        final List<Object> values = new ArrayList<>();
 
         try {
             if (attribute.isForeignKey() && !attribute.isArray()) {
                 final MetaClass foreignClass = ClassCacheMultiple.getMetaClass(metaClass.getDomain(),
-                        attribute.getForeignKeyClassId());
+                        attribute.getForeignKeyClassId(),
+                        connectionContext);
                 final String query = "select " + foreignClass.getID() + ", " + foreignClass.getPrimaryKey()
                             + " from "
                             + foreignClass.getTableName();
                 final MetaObject[] mos = SessionManager.getProxy()
-                            .getMetaObjectByQuery(SessionManager.getSession().getUser(), query);
+                            .getMetaObjectByQuery(SessionManager.getSession().getUser(),
+                                query,
+                                connectionContext);
 
                 if (mos != null) {
                     values.addAll(Arrays.asList(mos));
@@ -569,7 +588,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                         metaClass.getTableName(),
                         attribute.getFieldName());
                 final Collection resultCollection = SessionManager.getProxy()
-                            .customServerSearch(SessionManager.getSession().getUser(), search);
+                            .customServerSearch(SessionManager.getSession().getUser(),
+                                search,
+                                connectionContext);
 
                 final ArrayList<ArrayList> resultArray = (ArrayList<ArrayList>)resultCollection;
 
@@ -595,7 +616,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         final Collection<? extends QuerySearchMethod> searchMethods = Lookup.getDefault()
                     .lookupAll(QuerySearchMethod.class);
 
-        final Vector<QuerySearchMethod> methods = new Vector<QuerySearchMethod>();
+        final Vector<QuerySearchMethod> methods = new Vector<>();
         if (methodList != null) {
             Arrays.sort(methodList);
         }
@@ -619,12 +640,15 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     /**
      * DOCUMENT ME!
      *
-     * @param   metaClass    DOCUMENT ME!
-     * @param   whereClause  DOCUMENT ME!
+     * @param   metaClass          DOCUMENT ME!
+     * @param   whereClause        DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    private static int GetCount(final MetaClass metaClass, final String whereClause) {
+    private static int getCount(final MetaClass metaClass,
+            final String whereClause,
+            final ConnectionContext connectionContext) {
         // int values = -1;
         try {
             final CidsServerSearch search = new QueryEditorSearch(SessionManager.getSession().getUser().getDomain(),
@@ -632,7 +656,9 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     whereClause,
                     metaClass.getId());
             final Collection resultCollection = SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
+                        .customServerSearch(SessionManager.getSession().getUser(),
+                            search,
+                            connectionContext);
             final ArrayList<ArrayList> resultArray = (ArrayList<ArrayList>)resultCollection;
 
             if (resultArray.size() != 1) {
@@ -1107,7 +1133,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         } else if (jLayerCB.getSelectedItem() instanceof AbstractFeatureService) {
             final AbstractFeatureService afs = (AbstractFeatureService)jLayerCB.getSelectedItem();
             final Map<String, FeatureServiceAttribute> newAttribMap = afs.getFeatureServiceAttributes();
-            final List<FeatureServiceAttribute> newAttributes = new ArrayList<FeatureServiceAttribute>();
+            final List<FeatureServiceAttribute> newAttributes = new ArrayList<>();
 
             for (final String attr : (List<String>)afs.getOrderedFeatureServiceAttributes()) {
                 final FeatureServiceAttribute fsa = newAttribMap.get(attr);
@@ -1142,7 +1168,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
         jlEinzelwerteAnzeigen.setText("");
         final List<Object> old = values;
-        values = new LinkedList<Object>();
+        values = new LinkedList<>();
         firePropertyChange(PROP_VALUES, old, values);
 
         fillButtonPanel();
@@ -1171,7 +1197,10 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                     public void run() {
                         lblBusyValueIcon.setEnabled(true);
                         lblBusyValueIcon.setBusy(true);
-                        final List<Object> newValues = GetValuesFromAttribute(metaClass, attributeInfo);
+                        final List<Object> newValues = getValuesFromAttribute(
+                                metaClass,
+                                attributeInfo,
+                                getConnectionContext());
 
                         SwingUtilities.invokeLater(new Runnable() {
 
@@ -1238,7 +1267,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                                 @Override
                                 public void run() {
                                     final List<Object> old = values;
-                                    values = new ArrayList<Object>(set);
+                                    values = new ArrayList<>(set);
                                     lblBusyValueIcon.setEnabled(false);
                                     lblBusyValueIcon.setBusy(false);
                                     jGetValuesBn.setEnabled(true);
@@ -1368,7 +1397,8 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             result = SessionManager.getConnection()
                         .getConfigAttr(SessionManager.getSession().getUser(),
                                 ACTION_TAG
-                                + SessionManager.getSession().getUser().getDomain())
+                                + SessionManager.getSession().getUser().getDomain(),
+                                connectionContext)
                         != null;
         } catch (ConnectionException ex) {
             LOG.error("Can not check ActionTag!", ex);
@@ -1414,6 +1444,11 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
             lblBusyIcon.setBusy(false);
             panPagination.setEnabled(true);
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

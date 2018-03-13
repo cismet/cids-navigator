@@ -17,6 +17,9 @@ import java.util.List;
 
 import de.cismet.cids.server.search.builtin.CsvExportSearchStatement;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.gui.downloadmanager.AbstractDownload;
 
 /**
@@ -25,12 +28,14 @@ import de.cismet.tools.gui.downloadmanager.AbstractDownload;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CsvExportSearchDownload extends AbstractDownload {
+public class CsvExportSearchDownload extends AbstractDownload implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     private final CsvExportSearchStatement search;
     private final List<String> header;
+
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -43,15 +48,35 @@ public class CsvExportSearchDownload extends AbstractDownload {
      * @param  filename   DOCUMENT ME!
      * @param  header     DOCUMENT ME!
      */
+    @Deprecated
     public CsvExportSearchDownload(final CsvExportSearchStatement search,
             final String title,
             final String directory,
             final String filename,
             final List<String> header) {
+        this(search, title, directory, filename, header, null);
+    }
+    /**
+     * Creates a new CsvExportSearchDownload object.
+     *
+     * @param  search             DOCUMENT ME!
+     * @param  title              DOCUMENT ME!
+     * @param  directory          DOCUMENT ME!
+     * @param  filename           DOCUMENT ME!
+     * @param  header             DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public CsvExportSearchDownload(final CsvExportSearchStatement search,
+            final String title,
+            final String directory,
+            final String filename,
+            final List<String> header,
+            final ConnectionContext connectionContext) {
         this.search = search;
         this.title = title;
         this.directory = directory;
         this.header = header;
+        this.connectionContext = connectionContext;
 
         status = State.WAITING;
 
@@ -72,7 +97,9 @@ public class CsvExportSearchDownload extends AbstractDownload {
         final Collection<String> csvColl;
         try {
             csvColl = (Collection)SessionManager.getProxy()
-                        .customServerSearch(SessionManager.getSession().getUser(), search);
+                        .customServerSearch(SessionManager.getSession().getUser(),
+                                search,
+                                getConnectionContext());
         } catch (final ConnectionException ex) {
             error(ex);
             return;
@@ -119,5 +146,10 @@ public class CsvExportSearchDownload extends AbstractDownload {
             status = State.COMPLETED;
             stateChanged();
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

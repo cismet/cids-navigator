@@ -26,6 +26,9 @@ import java.net.*;
 
 import java.util.*;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * Standardimplementierung des EditorLocator Interfaces, die eine Liste von Standard Editoren f\u00FCr bestimmte Klassen
  * bereith\u00E4lt.
@@ -33,7 +36,7 @@ import java.util.*;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class MetaAttributeEditorLocator implements EditorLocator {
+public class MetaAttributeEditorLocator implements EditorLocator, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -49,6 +52,8 @@ public class MetaAttributeEditorLocator implements EditorLocator {
 
     /** Holds value of property ignoreInvisibleAttributes. */
     private boolean ignoreInvisibleAttributes = false;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -246,7 +251,9 @@ public class MetaAttributeEditorLocator implements EditorLocator {
             } else {
                 try {
                     final BasicEditor editor = this.createEditor(this.createEditorClass(
-                                SessionManager.getProxy().getMetaClass(MetaObject.getClassKey()).getComplexEditor()));
+                                SessionManager.getProxy().getMetaClass(
+                                    MetaObject.getClassKey(),
+                                    getConnectionContext()).getComplexEditor()));
                     return editor;
                 } catch (Exception e) {
                     logger.fatal("MetaObjectEditorsuche Exception", e); // NOI18N
@@ -283,5 +290,10 @@ public class MetaAttributeEditorLocator implements EditorLocator {
      */
     public void setIgnoreInvisibleAttributes(final boolean ignoreInvisibleAttributes) {
         this.ignoreInvisibleAttributes = ignoreInvisibleAttributes;
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

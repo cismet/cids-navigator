@@ -30,18 +30,25 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor // javax.swing.JPanel
-{
+public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttributeEditor
+        implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -119,7 +126,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         statusPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 10, 10));
         statusPanel.setLayout(new java.awt.GridBagLayout());
 
-        commitButton.setIcon(resource.getIcon("save_objekt.gif"));
+        commitButton.setIcon(RESOURCE.getIcon("save_objekt.gif"));
         commitButton.setToolTipText(org.openide.util.NbBundle.getMessage(
                 DefaultComplexMetaAttributeEditor.class,
                 "DefaultComplexMetaAttributeEditor.commitButton.tooltip")); // NOI18N
@@ -144,7 +151,7 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         statusPanel.add(commitButton, gridBagConstraints);
 
-        cancelButton.setIcon(resource.getIcon("zurueck_objekt.gif"));
+        cancelButton.setIcon(RESOURCE.getIcon("zurueck_objekt.gif"));
         cancelButton.setToolTipText(org.openide.util.NbBundle.getMessage(
                 DefaultComplexMetaAttributeEditor.class,
                 "DefaultComplexMetaAttributeEditor.cancelButton.tooltip")); // NOI18N
@@ -345,6 +352,11 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
         return null;
     }
 
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     /**
      * DefaultComplexMetaAttributeEditorMethoden ...........................................
      *
@@ -361,7 +373,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                 // klasse besorgen
 
                 final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
+                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey(),
+                                getConnectionContext());
 
                 return (!this.readOnly & !((Attribute)this.getValue()).isPrimaryKey())
                             && metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION)
@@ -371,7 +384,8 @@ public class DefaultComplexMetaAttributeEditor extends AbstractComplexMetaAttrib
                     // ((Attribute)this.getValue()).getPermissions().hasPermission(key,Sirius.navigator.connection.SessionManager.getSession().getWritePermission());
             } else {
                 final MetaClass metaClass = SessionManager.getProxy()
-                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey());
+                            .getMetaClass(this.getMetaObject(this.getValue()).getClassKey(),
+                                getConnectionContext());
                 return (!this.readOnly
                                 & metaClass.getPermissions().hasPermission(key, PermissionHolder.WRITEPERMISSION))
                             && this.getMetaObject(this.getValue()).getBean()

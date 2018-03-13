@@ -32,6 +32,9 @@ import javax.swing.JOptionPane;
 
 import de.cismet.cids.tools.fromstring.StringCreateable;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * Ein einfacher Standard Editor f\u00FCr komplexe Meta Attribute.
  *
@@ -40,12 +43,12 @@ import de.cismet.cids.tools.fromstring.StringCreateable;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor                   // javax.swing.JPanel
-{
+public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaAttributeEditor
+        implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final ResourceManager resource = ResourceManager.getManager();
+    private static final ResourceManager RESOURCE = ResourceManager.getManager();
 
     //~ Instance fields --------------------------------------------------------
 
@@ -54,6 +57,8 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
     // protected ValueChangeListener valueChangeListener;
 
     protected ValueChangeListener valueChangeListener;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JButton complexEditorButton;
@@ -204,9 +209,9 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
 
         if ((this.getValue() != null) && (this.getMetaObject(this.getValue()) != null)
                     && (this.getMetaObject(this.getValue()).getID() != -1)) {
-            this.linkLabel.setIcon(resource.getIcon("link_icon.gif")); // NOI18N
+            this.linkLabel.setIcon(RESOURCE.getIcon("link_icon.gif")); // NOI18N
         } else {
-            this.linkLabel.setIcon(resource.getIcon("copy_icon.gif")); // NOI18N
+            this.linkLabel.setIcon(RESOURCE.getIcon("copy_icon.gif")); // NOI18N
         }
     }
     /**
@@ -286,12 +291,12 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
                     logger.debug("setValueFromDragAndDrop() creating a copy of the selected meta object"); // NOI18N
                 }
                 this.getMetaObject(this.getValue()).setPrimaryKey(new Integer(-1));
-                this.linkLabel.setIcon(resource.getIcon("copy_icon.gif"));                                 // NOI18N
+                this.linkLabel.setIcon(RESOURCE.getIcon("copy_icon.gif"));                                 // NOI18N
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("setValueFromDragAndDrop() creating a link to the selected meta object"); // NOI18N
                 }
-                this.linkLabel.setIcon(resource.getIcon("link_icon.gif"));                                 // NOI18N
+                this.linkLabel.setIcon(RESOURCE.getIcon("link_icon.gif"));                                 // NOI18N
             }
 
             this.setComponentValue(this.getValue());
@@ -302,9 +307,11 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
             String newClassName = newMetaObject.getClassKey();
 
             try {
-                oldClassName = Sirius.navigator.connection.SessionManager.getProxy().getMetaClass(oldClassName)
+                oldClassName = Sirius.navigator.connection.SessionManager.getProxy()
+                            .getMetaClass(oldClassName, getConnectionContext())
                             .getName();
-                newClassName = Sirius.navigator.connection.SessionManager.getProxy().getMetaClass(newClassName)
+                newClassName = Sirius.navigator.connection.SessionManager.getProxy()
+                            .getMetaClass(newClassName, getConnectionContext())
                             .getName();
             } catch (Throwable t) {
                 logger.warn("setValueFromDragAndDrop(): could not retrieve class names", t); // NOI18N
@@ -329,6 +336,11 @@ public class DefaultSimpleComplexMetaAttributeEditor extends AbstractSimpleMetaA
     protected Sirius.navigator.ui.attributes.editor.metaobject.AbstractSimpleMetaAttributeEditor.ValueChangeListener
     getValueChangeListener() {
         return new DefaultSimpleComplexValueChangeListener();
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------

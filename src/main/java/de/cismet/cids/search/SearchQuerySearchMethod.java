@@ -35,6 +35,9 @@ import javax.swing.SwingWorker;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.builtin.QueryEditorCountStatement;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -42,7 +45,7 @@ import de.cismet.cids.server.search.builtin.QueryEditorCountStatement;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = QuerySearchMethod.class)
-public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChangeListener {
+public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChangeListener, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -54,6 +57,8 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
     private boolean searching = false;
     private SwingWorker<Node[], Void> searchThread;
     private SwingWorker<Long, Void> searchCountThread;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Methods ----------------------------------------------------------------
 
@@ -95,7 +100,8 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
                     this,
                     this,
                     false,
-                    true);
+                    true,
+                    getConnectionContext());
 
             if (querySearch.getPanginationPanel().getParent() != null) {
                 searchCountThread = new SwingWorker<Long, Void>() {
@@ -108,7 +114,8 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
                                                 new QueryEditorCountStatement(
                                                     SessionManager.getSession().getUser().getDomain(),
                                                     querySearch.getMetaClass().getTableName(),
-                                                    querySearch.getWhereCause()));
+                                                    querySearch.getWhereCause()),
+                                                getConnectionContext());
                             return result.get(0);
                         }
 
@@ -198,5 +205,10 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
     @Override
     public String toString() {
         return NbBundle.getMessage(SearchQuerySearchMethod.class, "SearchQuerySearchMethod.toString");
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

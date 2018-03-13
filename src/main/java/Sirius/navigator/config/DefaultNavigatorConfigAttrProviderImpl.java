@@ -18,6 +18,9 @@ import org.apache.log4j.Logger;
 
 import org.openide.util.lookup.ServiceProvider;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.tools.configuration.ConfigAttrProvider;
 
 /**
@@ -27,13 +30,22 @@ import de.cismet.tools.configuration.ConfigAttrProvider;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = de.cismet.tools.configuration.ConfigAttrProvider.class)
-public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrProvider {
+public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrProvider, ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final transient Logger LOG = Logger.getLogger(DefaultNavigatorConfigAttrProviderImpl.class);
 
+    //~ Instance fields --------------------------------------------------------
+
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
+
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
 
     @Override
     public String getUserConfigAttr(final String key) {
@@ -43,7 +55,7 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
         }
 
         try {
-            return session.getConnection().getConfigAttr(session.getUser(), key);
+            return session.getConnection().getConfigAttr(session.getUser(), key, getConnectionContext());
         } catch (final ConnectionException ex) {
             LOG.error("could not get user config attr for key: " + key, ex); // NOI18N
             return null;
@@ -86,7 +98,7 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
         try {
             final User queryUser = new User(-1, "", userDomain, userGroup); // NOI18N
 
-            return session.getConnection().getConfigAttr(queryUser, key);
+            return session.getConnection().getConfigAttr(queryUser, key, getConnectionContext());
         } catch (final ConnectionException e) {
             LOG.error("could not get group config attr for key: " + key, e); // NOI18N
             return null;
@@ -130,10 +142,15 @@ public final class DefaultNavigatorConfigAttrProviderImpl implements ConfigAttrP
             final UserGroup queryUg = new UserGroup(-1, "", userGroup.getDomain()); // NOI18N
             final User queryUser = new User(-1, "", userDomain, queryUg);           // NOI18N
 
-            return session.getConnection().getConfigAttr(queryUser, key);
+            return session.getConnection().getConfigAttr(queryUser, key, getConnectionContext());
         } catch (final ConnectionException e) {
             LOG.error("could not get domain config attr for key: " + key, e); // NOI18N
             return null;
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

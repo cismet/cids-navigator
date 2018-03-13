@@ -33,22 +33,27 @@ import java.util.List;
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 /**
  * DOCUMENT ME!
  *
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class DefaultCustomObjectEditor extends javax.swing.JPanel implements DisposableCidsBeanStore {
+public class DefaultCustomObjectEditor extends javax.swing.JPanel implements DisposableCidsBeanStore,
+    ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             DefaultCustomObjectEditor.class);
 
     //~ Instance fields --------------------------------------------------------
 
     protected CidsBean cidsBean;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -56,10 +61,15 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
      * Creates new form DefaultCustomObjectEditor.
      */
     public DefaultCustomObjectEditor() {
-        initComponents();
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+        initComponents();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -86,7 +96,10 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         this.cidsBean = cidsBean;
         try {
             final BindingGroup bindingGroup = getBindingGroupFormChildClass();
-            setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(bindingGroup, cidsBean);
+            setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(
+                bindingGroup,
+                cidsBean,
+                getConnectionContext());
 
             bindingGroup.unbind();
             bindingGroup.bind();
@@ -127,8 +140,25 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
      * @param  bindingGroup  DOCUMENT ME!
      * @param  cidsBean      DOCUMENT ME!
      */
+    @Deprecated
     public static void setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(final BindingGroup bindingGroup,
             final CidsBean cidsBean) {
+        setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(
+            bindingGroup,
+            cidsBean,
+            ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  bindingGroup       DOCUMENT ME!
+     * @param  cidsBean           DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public static void setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(final BindingGroup bindingGroup,
+            final CidsBean cidsBean,
+            final ConnectionContext connectionContext) {
         final List<Binding> bindings = bindingGroup.getBindings();
         for (final Binding binding : bindings) {
             if (binding.getTargetObject() instanceof MetaClassStore) {
@@ -144,18 +174,24 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
                     int foreignClassId = cidsBean.getMetaObject().getMetaClass().getId();
                     ObjectAttribute oa;
                     while (expr.contains(".")) {
-                        final MetaClass mc = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId);
-                        final MetaObject mo = mc.getEmptyInstance();
+                        final MetaClass mc = CidsObjectEditorFactory.getMetaClass(
+                                domain,
+                                foreignClassId,
+                                connectionContext);
+                        final MetaObject mo = mc.getEmptyInstance(connectionContext);
                         expr = expr.substring(expr.indexOf(".") + 1); // NOI18N
                         final String fieldname = expr.contains(".") ? expr.substring(0, expr.indexOf(".")) : expr;
                         oa = mo.getAttributeByFieldName(fieldname);
                         foreignClassId = oa.getMai().getForeignKeyClassId();
                     }
 
-                    final MetaClass foreignClass = CidsObjectEditorFactory.getMetaClass(domain, foreignClassId);
+                    final MetaClass foreignClass = CidsObjectEditorFactory.getMetaClass(
+                            domain,
+                            foreignClassId,
+                            connectionContext);
                     mcs.setMetaClass(foreignClass);
                 } catch (Exception e) {
-                    log.error("Error during Bind: " + expr + " of " + cidsBean.getMetaObject().getMetaClass(), e);
+                    LOG.error("Error during Bind: " + expr + " of " + cidsBean.getMetaObject().getMetaClass(), e);
                 }
             }
         }
@@ -192,6 +228,11 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         } catch (Exception ex) {
             throw new RuntimeException("Binding Problem!", ex); // NOI18N
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
