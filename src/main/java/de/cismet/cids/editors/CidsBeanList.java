@@ -38,18 +38,22 @@ import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * A list that can display cidsBeans with their icon and name and allows the drag operation.
  *
  * @author   therter
  * @version  $Revision$, $Date$
  */
-public class CidsBeanList extends JList implements DragSourceListener, DragGestureListener {
+public class CidsBeanList extends JList implements DragSourceListener, DragGestureListener, ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     private DragSource ds;
     private MetaTreeNodeTransferable metaTransferable;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -57,6 +61,16 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
      * Creates a new CidsBeanList object.
      */
     public CidsBeanList() {
+        this(ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new CidsBeanList object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
+     */
+    public CidsBeanList(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
         ds = DragSource.getDefaultDragSource();
         final DragGestureRecognizer dgr = ds.createDefaultDragGestureRecognizer(
                 this,
@@ -118,12 +132,12 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
 
     @Override
     public void dragGestureRecognized(final DragGestureEvent dge) {
-        final List<DefaultMetaTreeNode> selectedValues = new ArrayList<DefaultMetaTreeNode>();
+        final List<DefaultMetaTreeNode> selectedValues = new ArrayList<>();
 
         if (getSelectedValues() != null) {
             for (final Object bean : getSelectedValues()) {
                 final MetaObjectNode mon = new MetaObjectNode((CidsBean)bean);
-                final ObjectTreeNode metaTreeNode = new ObjectTreeNode(mon);
+                final ObjectTreeNode metaTreeNode = new ObjectTreeNode(mon, getConnectionContext());
 
                 selectedValues.add(metaTreeNode);
             }
@@ -136,5 +150,10 @@ public class CidsBeanList extends JList implements DragSourceListener, DragGestu
                 this.metaTransferable,
                 this);
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

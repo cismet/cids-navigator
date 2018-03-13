@@ -13,9 +13,7 @@
 package Sirius.navigator.ui.tree.editor;
 
 import Sirius.navigator.connection.*;
-import Sirius.navigator.connection.proxy.*;
 import Sirius.navigator.exception.*;
-import Sirius.navigator.resource.*;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.*;
 
@@ -32,6 +30,9 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
@@ -40,12 +41,15 @@ import de.cismet.tools.gui.StaticSwingTools;
  * @author   Pascal
  * @version  $Revision$, $Date$
  */
-public class TreeNodeEditor extends javax.swing.JDialog {
+public class TreeNodeEditor extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
     private DefaultMetaTreeNode metaTreeNode = null;
     private Logger logger;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
     private javax.swing.JComboBox classBox;
@@ -277,7 +281,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
     public void show() {
         if (this.classBox.getModel().getSize() == 0) {
             try {
-                final MetaClass[] cs = SessionManager.getProxy().getClasses();
+                final MetaClass[] cs = SessionManager.getProxy().getClasses(getConnectionContext());
                 final ArrayList filtered = new ArrayList();
 
                 final User user = SessionManager.getSession().getUser();
@@ -363,6 +367,11 @@ public class TreeNodeEditor extends javax.swing.JDialog {
         return this.metaTreeNode;
     }
 
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -393,7 +402,7 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                     null,
                                     false,
                                     -1);
-                            TreeNodeEditor.this.metaTreeNode = new PureTreeNode(metaNode);
+                            TreeNodeEditor.this.metaTreeNode = new PureTreeNode(metaNode, getConnectionContext());
 
                             TreeNodeEditor.this.dispose();
                         } else if (TreeNodeEditor.this.classNodeRadioButton.isSelected()) {
@@ -413,7 +422,8 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
                                                     java.awt.Cursor.WAIT_CURSOR));
-                                    final MetaObject metaObject = SessionManager.getProxy().getInstance(metaClass);
+                                    final MetaObject metaObject = SessionManager.getProxy()
+                                                .getInstance(metaClass, getConnectionContext());
                                     ComponentRegistry.getRegistry()
                                             .getMainWindow()
                                             .setCursor(java.awt.Cursor.getPredefinedCursor(
@@ -430,7 +440,9 @@ public class TreeNodeEditor extends javax.swing.JDialog {
                                             -1,
                                             null,
                                             false);
-                                    TreeNodeEditor.this.metaTreeNode = new ObjectTreeNode(MetaObjectNode);
+                                    TreeNodeEditor.this.metaTreeNode = new ObjectTreeNode(
+                                            MetaObjectNode,
+                                            getConnectionContext());
 
                                     TreeNodeEditor.this.dispose();
                                 } catch (Throwable t) {

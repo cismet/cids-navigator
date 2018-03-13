@@ -124,7 +124,7 @@
         <Component class="javax.swing.JButton" name="commitButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resource.getIcon(&quot;save_objekt.gif&quot;)" type="code"/>
+              <Connection code="RESOURCE.getIcon(&quot;save_objekt.gif&quot;)" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="Sirius/navigator/ui/attributes/editor/metaobject/Bundle.properties" key="DefaultComplexMetaAttributeEditor.commitButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
@@ -160,7 +160,7 @@
         <Component class="javax.swing.JButton" name="cancelButton">
           <Properties>
             <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
-              <Connection code="resource.getIcon(&quot;zurueck_objekt.gif&quot;)" type="code"/>
+              <Connection code="RESOURCE.getIcon(&quot;zurueck_objekt.gif&quot;)" type="code"/>
             </Property>
             <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
               <ResourceString bundle="Sirius/navigator/ui/attributes/editor/metaobject/Bundle.properties" key="DefaultComplexMetaAttributeEditor.cancelButton.tooltip" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>

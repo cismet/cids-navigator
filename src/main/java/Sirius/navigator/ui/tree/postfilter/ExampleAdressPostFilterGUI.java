@@ -28,6 +28,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 /**
  * DOCUMENT ME!
  *
@@ -35,7 +38,7 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
  * @version  $Revision$, $Date$
  */
 //@ServiceProvider(service = PostFilterGUI.class)
-public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
+public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI implements ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -49,7 +52,7 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
             @Override
             public Collection<Node> filter(final Collection<Node> input) {
                 if ((input != null)) {
-                    final ArrayList<Node> ret = new ArrayList<Node>();
+                    final ArrayList<Node> ret = new ArrayList<>();
                     for (final Node n : input) {
                         if (n.getClassId() == adressClass.getId()) {
                             if (n instanceof MetaObjectNode) {
@@ -87,6 +90,8 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
             }
         };
 
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -104,12 +109,17 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
      * Creates new form ExampleAdressPostFilterGUI.
      */
     public ExampleAdressPostFilterGUI() {
-        initComponents();
-        prbLoading.setVisible(false);
-        adressClass = ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "ADRESSE");
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+        initComponents();
+        prbLoading.setVisible(false);
+        adressClass = ClassCacheMultiple.getMetaClass("WUNDA_BLAU", "ADRESSE", getConnectionContext());
+    }
 
     @Override
     public void initializeFilter(final Collection<Node> nodes) {
@@ -140,7 +150,8 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
                                     mo = SessionManager.getProxy()
                                                 .getMetaObject(((MetaObjectNode)n).getObjectId(),
                                                         ((MetaObjectNode)n).getClassId(),
-                                                        ((MetaObjectNode)n).getDomain());
+                                                        ((MetaObjectNode)n).getDomain(),
+                                                        getConnectionContext());
                                     ((MetaObjectNode)n).setObject(mo);
                                 }
                                 final CidsBean cb = mo.getBean();
@@ -188,7 +199,8 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
 
     @Override
     public boolean canHandle(final Collection<Node> nodes) {
-        return PostfilterEnabledSearchResultsTree.getAllTableNamesForNodeCollection(nodes).contains("ADRESSE");
+        return PostfilterEnabledSearchResultsTree.getAllTableNamesForNodeCollection(nodes, getConnectionContext())
+                    .contains("ADRESSE");
     }
 
     @Override
@@ -319,4 +331,9 @@ public class ExampleAdressPostFilterGUI extends AbstractPostFilterGUI {
 
         bindingGroup.bind();
     } // </editor-fold>//GEN-END:initComponents
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 }

@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,13 +25,17 @@ import de.cismet.commons.gui.protocol.AbstractProtocolStep;
 import de.cismet.commons.gui.protocol.AbstractProtocolStepPanel;
 import de.cismet.commons.gui.protocol.ProtocolStepMetaInfo;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep implements CidsServerSearchProtocolStep {
+public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep implements CidsServerSearchProtocolStep,
+    ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -47,6 +50,8 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
     @Getter @JsonIgnore private final transient CidsServerSearch search;
 
     @Getter @JsonIgnore private final transient List<MetaObjectNode> searchResultNodes;
+
+    @JsonIgnore private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     @Getter
     @JsonProperty(required = true)
@@ -133,6 +138,11 @@ public class CidsServerSearchProtocolStepImpl extends AbstractProtocolStep imple
 
     @Override
     public AbstractProtocolStepPanel visualize() {
-        return new CidsServerSearchProtocolStepPanel(this);
+        return new CidsServerSearchProtocolStepPanel(this, getConnectionContext());
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

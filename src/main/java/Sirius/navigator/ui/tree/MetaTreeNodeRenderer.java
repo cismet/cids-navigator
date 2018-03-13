@@ -29,13 +29,9 @@ import Sirius.server.middleware.types.*;
 
 import java.awt.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
@@ -43,12 +39,15 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @version  $Revision$, $Date$
  */
-public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
+public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -57,9 +56,9 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
     // private   LocalClassNode lcn;
     // private   LocalObjectNode lon;
     // private java.lang.Object userObject;
-    private static String CLASS_PREFIX = "de.cismet.cids.custom.treeicons."; // NOI18N
-    private static String CLASS_POSTFIX = "IconFactory";                     // NOI18N
-    private static CidsTreeObjectIconFactory NO_ICON_FACTORY = new CidsTreeObjectIconFactory() {
+    private static final String CLASS_PREFIX = "de.cismet.cids.custom.treeicons."; // NOI18N
+    private static final String CLASS_POSTFIX = "IconFactory";                     // NOI18N
+    private static final CidsTreeObjectIconFactory NO_ICON_FACTORY = new CidsTreeObjectIconFactory() {
 
             @Override
             public Icon getClosedPureNodeIcon(final PureTreeNode ptn) {
@@ -104,13 +103,18 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
 
     private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(getClass());
 
+    private final ConnectionContext connectionContext;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new MetaTreeNodeRenderer object.
+     *
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public MetaTreeNodeRenderer() {
+    public MetaTreeNodeRenderer(final ConnectionContext connectionContext) {
         super();
+        this.connectionContext = connectionContext;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -195,7 +199,7 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
                 // Iconfactroy from classname
                 if ((iconFactory == null) && (cid > 0) && (domain != null)) {
                     try {
-                        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid);
+                        final MetaClass mc = ClassCacheMultiple.getMetaClass(domain, cid, getConnectionContext());
                         final Class<?> iconFactoryClass = ClassloadingHelper.getDynamicClass(
                                 mc,
                                 ClassloadingHelper.CLASS_TYPE.ICON_FACTORY);
@@ -264,5 +268,10 @@ public class MetaTreeNodeRenderer extends DefaultTreeCellRenderer {
             }
         }
         return this;
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

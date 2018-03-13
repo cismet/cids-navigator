@@ -16,8 +16,6 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
-import Sirius.server.search.SearchOption;
-import Sirius.server.search.SearchResult;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -28,12 +26,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * Default implementation of the connection proxy interface.
@@ -49,7 +49,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
     protected ImageHashMap iconCache = null;
     protected ClassAndMethodCache classAndMethodCache = null;
     protected HashMap objectCache = new HashMap();
-    private final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
+    private org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(this.getClass());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -96,10 +96,10 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 log.error("[ConnectionProxy] undeclared method '" + method.getName() + "'");                  // NOI18N
                 throw new RuntimeException("[ConnectionProxy] undeclared method '" + method.getName() + "'"); // NOI18N
             }
-        } catch (final InvocationTargetException itex) {
+        } catch (InvocationTargetException itex) {
             // ok, no need to worry about
             throw itex.getTargetException();
-        } catch (final Exception ex) {
+        } catch (Exception ex) {
             log.error("[ConnectionProxy] unexpected invocation exception' " + ex.getMessage() + "'", ex);              // NOI18N
             throw new RuntimeException("[ConnectionProxy] unexpected invocation exception' " + ex.getMessage() + "'"); // NOI18N
         }
@@ -139,8 +139,9 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
          *
          * @param  user              User
          * @param  localServerNames  DOCUMENT ME!
+         * @param  context           DOCUMENT ME!
          */
-        public ClassAndMethodCache(final User user, final String[] localServerNames) {
+        public ClassAndMethodCache(final User user, final String[] localServerNames, final ConnectionContext context) {
             classHash = new HashMap(50, 0.5f);
             methodHash = new HashMap(25, 0.5f);
             lsNames = new ArrayList((localServerNames.length + 1));
@@ -148,12 +149,15 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
 
             for (int i = 0; i < localServerNames.length; i++) {
                 try {
-                    final MetaClass[] tmpClasses = connection.getClasses(user, localServerNames[i]); // .getClasses(user, localServerNames[i]);
+                    final MetaClass[] tmpClasses = connection.getClasses(
+                            user,
+                            localServerNames[i],
+                            context); // .getClasses(user, localServerNames[i]);
 
                     if (tmpClasses != null) {
                         putClasses(tmpClasses, localServerNames[i]);
                     }
-                } catch (final Exception e) {
+                } catch (Exception e) {
                     log.fatal("Ausnahme im ClassAndMethodCache beim Aufruf von remoteNodeRef.getClasses(...): ", e); // NOI18N
                 }
             }
@@ -178,18 +182,21 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
          * @param   user             User.
          * @param   classID          Die ID der zu ladenden Class.
          * @param   localServerName  Der LocalServer des Users.
+         * @param   context          DOCUMENT ME!
          *
          * @return  DOCUMENT ME!
          *
          * @throws  ConnectionException  DOCUMENT ME!
          */
-        public MetaClass getCachedClass(final User user, final int classID, final String localServerName)
-                throws ConnectionException {
+        public MetaClass getCachedClass(final User user,
+                final int classID,
+                final String localServerName,
+                final ConnectionContext context) throws ConnectionException {
             final String key = new String(localServerName + classID);
             // Falls noch keine Class von diesem LocalServer geladen wurde,
             // -> alle Classes des LocalServer cachen
             if (!lsNames.contains(localServerName)) {
-                final MetaClass[] tmpClasses = connection.getClasses(user, localServerName);
+                final MetaClass[] tmpClasses = connection.getClasses(user, localServerName, context);
                 this.putClasses(tmpClasses, localServerName);
                 if (log.isDebugEnabled()) {
                     log.debug("<CC> Classes von neuem LocalServer " + localServerName + " gecacht");
@@ -199,7 +206,11 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             // Falls die Class nicht im Cache enthalten ist
             // -> Class vom Server laden
             if (!classHash.containsKey(key)) {
-                final MetaClass tmpClass = connection.getMetaClass(user, classID, localServerName);
+                final MetaClass tmpClass = connection.getMetaClass(
+                        user,
+                        classID,
+                        localServerName,
+                        context);
                 this.putClass(tmpClass, localServerName);
                 return tmpClass;
             } else {
@@ -328,19 +339,37 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             return session;
         }
 
+        @Deprecated
         @Override
         public Node[] getRoots() throws ConnectionException {
-            return connection.getRoots(session.getUser());
+            return getRoots(ConnectionContext.createDeprecated());
         }
 
+        @Override
+        public Node[] getRoots(final ConnectionContext context) throws ConnectionException {
+            return connection.getRoots(session.getUser(), context);
+        }
+
+        @Deprecated
         @Override
         public Node[] getRoots(final String domain) throws ConnectionException {
-            return connection.getRoots(session.getUser(), domain);
+            return getRoots(domain, ConnectionContext.createDeprecated());
         }
 
         @Override
+        public Node[] getRoots(final String domain, final ConnectionContext context) throws ConnectionException {
+            return connection.getRoots(session.getUser(), domain, context);
+        }
+
+        @Deprecated
+        @Override
         public Node[] getChildren(final Node node) throws ConnectionException {
-            final Node[] c = connection.getChildren(node, session.getUser());
+            return getChildren(node, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public Node[] getChildren(final Node node, final ConnectionContext context) throws ConnectionException {
+            final Node[] c = connection.getChildren(node, session.getUser(), context);
 
             if ((node.getDynamicChildrenStatement() != null) && node.isSqlSort()) {
                 return c;
@@ -349,46 +378,92 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             return Sirius.navigator.tools.NodeSorter.sortNodes(c);
         }
 
+        @Deprecated
         @Override
         public Node getNode(final int nodeID, final String domain) throws ConnectionException {
-            return connection.getNode(session.getUser(), nodeID, domain);
+            return getNode(nodeID, domain, ConnectionContext.createDeprecated());
         }
 
+        @Override
+        public Node getNode(final int nodeID, final String domain, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.getNode(session.getUser(), nodeID, domain, context);
+        }
+
+        @Deprecated
         @Override
         public Node addNode(final Node node, final Link parent) throws ConnectionException {
-            return connection.addNode(node, parent, session.getUser());
+            return addNode(node, parent, ConnectionContext.createDeprecated());
         }
 
+        @Override
+        public Node addNode(final Node node, final Link parent, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.addNode(node, parent, session.getUser(), context);
+        }
+
+        @Deprecated
         @Override
         public boolean deleteNode(final Node node) throws ConnectionException {
-            return connection.deleteNode(node, session.getUser());
+            return deleteNode(node, ConnectionContext.createDeprecated());
         }
 
         @Override
-        public boolean addLink(final Node from, final Node to) throws ConnectionException {
-            return connection.addLink(from, to, session.getUser());
+        public boolean deleteNode(final Node node, final ConnectionContext context) throws ConnectionException {
+            return connection.deleteNode(node, session.getUser(), context);
         }
 
+        @Override
+        @Deprecated
+        public boolean addLink(final Node from, final Node to) throws ConnectionException {
+            return addLink(from, to, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public boolean addLink(final Node from, final Node to, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.addLink(from, to, session.getUser(), context);
+        }
+
+        @Deprecated
         @Override
         public boolean deleteLink(final Node from, final Node to) throws ConnectionException {
-            return connection.deleteLink(from, to, session.getUser());
+            return deleteLink(from, to, ConnectionContext.createDeprecated());
         }
 
+        @Override
+        public boolean deleteLink(final Node from, final Node to, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.deleteLink(from, to, session.getUser(), context);
+        }
+
+        @Deprecated
         @Override
         public Node[] getClassTreeNodes() throws ConnectionException {
-            return connection.getClassTreeNodes(session.getUser());
+            return getClassTreeNodes(ConnectionContext.createDeprecated());
         }
 
         @Override
+        public Node[] getClassTreeNodes(final ConnectionContext context) throws ConnectionException {
+            return connection.getClassTreeNodes(session.getUser(), context);
+        }
+
+        @Deprecated
+        @Override
         public MetaClass[] getClasses() throws ConnectionException {
-            final String[] domains = connection.getDomains();
+            return getClasses(ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaClass[] getClasses(final ConnectionContext context) throws ConnectionException {
+            final String[] domains = connection.getDomains(context);
             final ArrayList classes = new ArrayList();
 
             for (int i = 0; i < domains.length; i++) {
                 MetaClass[] classArray = new MetaClass[0];
                 try {
-                    classArray = this.getClasses(domains[i]);
-                } catch (final Exception t) {
+                    classArray = this.getClasses(domains[i], context);
+                } catch (Exception t) {
                     log.error("Fehler im DefaultConnectionProxyHandler bei getClasses", t);
                 }
 
@@ -400,30 +475,48 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             return (MetaClass[])classes.toArray(new MetaClass[classes.size()]);
         }
 
+        @Deprecated
         @Override
         public MetaClass[] getClasses(final String domain) throws ConnectionException {
-            return connection.getClasses(session.getUser(), domain);
+            return getClasses(domain, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaClass[] getClasses(final String domain, final ConnectionContext context) throws ConnectionException {
+            return connection.getClasses(session.getUser(), domain, context);
         }
 
         /**
          * DOCUMENT ME!
          *
+         * @param   context  DOCUMENT ME!
+         *
          * @throws  ConnectionException  DOCUMENT ME!
          */
-        public void initClassAndMethodCache() throws ConnectionException {
-            classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
+        public void initClassAndMethodCache(final ConnectionContext context) throws ConnectionException {
+            classAndMethodCache = new ClassAndMethodCache(session.getUser(),
+                    connection.getDomains(context), context);
+        }
+
+        @Deprecated
+        @Override
+        public MetaClass getMetaClass(final int classID, final String domain) throws ConnectionException {
+            return getMetaClass(classID, domain, ConnectionContext.createDeprecated());
         }
 
         @Override
-        public MetaClass getMetaClass(final int classID, final String domain) throws ConnectionException {
+        public MetaClass getMetaClass(final int classID, final String domain, final ConnectionContext context)
+                throws ConnectionException {
             if (classAndMethodCache == null) {
                 if (log.isInfoEnabled()) {
                     log.info("[ConnectionProxy] filling meta class cache"); // NOI18N
                 }
-                classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
+                classAndMethodCache = new ClassAndMethodCache(session.getUser(),
+                        connection.getDomains(context),
+                        context);
             }
 
-            final MetaClass metaClass = classAndMethodCache.getCachedClass(session.getUser(), classID, domain);
+            final MetaClass metaClass = classAndMethodCache.getCachedClass(session.getUser(), classID, domain, context);
             if (log.isDebugEnabled()) {
                 log.debug("getgetMetaClass(): classID=" + classID + ", domain=" + domain);
                 log.debug("MetaClass: " + metaClass + "\nMetaClass.getName(): " + metaClass.getName()
@@ -434,17 +527,24 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             return metaClass;
         }
 
+        @Deprecated
         @Override
         public MetaClass getMetaClass(final String classKey) throws ConnectionException {
+            return getMetaClass(classKey, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaClass getMetaClass(final String classKey, final ConnectionContext context)
+                throws ConnectionException {
             try {
                 final StringTokenizer tokenizer = new StringTokenizer(classKey, "@"); // NOI18N
                 final int classID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 final String domain = tokenizer.nextToken();
 
-                return this.getMetaClass(classID, domain);
-            } catch (final ConnectionException cexp) {
+                return this.getMetaClass(classID, domain, context);
+            } catch (ConnectionException cexp) {
                 throw cexp;
-            } catch (final Exception t) {
+            } catch (Exception t) {
                 log.error("malformed classKey: '" + classKey + "' (classId@domain expected)"); // NOI18N
                 throw new ConnectionException("malformed class key: '" + classKey + "' (classId@domain expected)",
                     ConnectionException.ERROR,
@@ -452,30 +552,52 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             }
         }
 
+        @Deprecated
         @Override
         public Sirius.server.localserver.method.Method getMethod(final String methodKey) throws ConnectionException {
+            return getMethod(methodKey, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public Sirius.server.localserver.method.Method getMethod(final String methodKey,
+                final ConnectionContext context) throws ConnectionException {
             if (classAndMethodCache == null) {
                 if (log.isInfoEnabled()) {
                     log.info("[ConnectionProxy] filling meta class cache"); // NOI18N
                 }
-                classAndMethodCache = new ClassAndMethodCache(session.getUser(), connection.getDomains());
+                classAndMethodCache = new ClassAndMethodCache(session.getUser(),
+                        connection.getDomains(context),
+                        context);
             }
 
             return classAndMethodCache.getCachedMethod(methodKey);
         }
 
         @Override
+        @Deprecated
         public MetaObject getMetaObject(final int objectID, final int classID, final String domain)
                 throws ConnectionException {
+            return getMetaObject(objectID, classID, domain, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject getMetaObject(final int objectID,
+                final int classID,
+                final String domain,
+                final ConnectionContext context) throws ConnectionException {
             if (classAndMethodCache == null) {
-                initClassAndMethodCache();
+                initClassAndMethodCache(context);
             }
 
             if (log.isDebugEnabled()) {
                 log.debug("getMetaObject(): objectID=" + objectID + ", classID=" + classID + ", domain=" + domain); // NOI18N
             }
 
-            final MetaObject metaObject = connection.getMetaObject(session.getUser(), objectID, classID, domain);
+            final MetaObject metaObject = connection.getMetaObject(session.getUser(),
+                    objectID,
+                    classID,
+                    domain,
+                    context);
             if (metaObject != null) {
                 if (log.isDebugEnabled()) {
                     log.debug(" MetaObject: " + metaObject + " MetaObject.getName(): " + metaObject.getName()
@@ -491,17 +613,24 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
+        @Deprecated
         public MetaObject getMetaObject(final String objectId) throws ConnectionException {
+            return getMetaObject(objectId, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject getMetaObject(final String objectId, final ConnectionContext context)
+                throws ConnectionException {
             try {
                 final StringTokenizer tokenizer = new StringTokenizer(objectId, "@"); // NOI18N
                 final int objectID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 final int classID = Integer.valueOf(tokenizer.nextToken()).intValue();
                 final String domain = tokenizer.nextToken();
 
-                return this.getMetaObject(objectID, classID, domain);
-            } catch (final ConnectionException cexp) {
+                return this.getMetaObject(objectID, classID, domain, context);
+            } catch (ConnectionException cexp) {
                 throw cexp;
-            } catch (final Exception t) {
+            } catch (Exception t) {
                 log.error("malformed object id: '" + objectId + "' (objectID@classID@domain expected)"); // NOI18N
                 throw new ConnectionException("malformed object id: '" + objectId
                             + "' (objectID@classID@domain expected)",
@@ -511,9 +640,16 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
         }
 
         @Override
+        @Deprecated
         public MetaObject[] getMetaObjectByQuery(final String query, final int sig) throws ConnectionException {
+            return getMetaObjectByQuery(query, sig, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject[] getMetaObjectByQuery(final String query, final int sig, final ConnectionContext context)
+                throws ConnectionException {
             if (classAndMethodCache == null) {
-                initClassAndMethodCache();
+                initClassAndMethodCache(context);
             }
 
             if (log.isDebugEnabled()) {
@@ -521,7 +657,7 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             }
 
             try {
-                final MetaObject[] obs = connection.getMetaObjectByQuery(session.getUser(), query);
+                final MetaObject[] obs = connection.getMetaObjectByQuery(session.getUser(), query, context);
 
                 for (int i = 0; i < obs.length; i++) {
                     if (obs[i] != null) {
@@ -537,44 +673,88 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
             return null;
         }
 
+        @Deprecated
         @Override
         public MetaObject insertMetaObject(final MetaObject MetaObject, final String domain)
                 throws ConnectionException {
-            return connection.insertMetaObject(session.getUser(), MetaObject, domain);
+            return insertMetaObject(MetaObject, domain, ConnectionContext.createDeprecated());
         }
 
+        @Override
+        public MetaObject insertMetaObject(final MetaObject MetaObject,
+                final String domain,
+                final ConnectionContext context) throws ConnectionException {
+            return connection.insertMetaObject(session.getUser(), MetaObject, domain, context);
+        }
+
+        @Deprecated
         @Override
         public int updateMetaObject(final MetaObject MetaObject, final String domain) throws ConnectionException {
-            return connection.updateMetaObject(session.getUser(), MetaObject, domain);
+            return updateMetaObject(MetaObject, domain, ConnectionContext.createDeprecated());
         }
 
+        @Override
+        public int updateMetaObject(final MetaObject MetaObject, final String domain, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.updateMetaObject(session.getUser(), MetaObject, domain, context);
+        }
+
+        @Deprecated
         @Override
         public int deleteMetaObject(final MetaObject MetaObject, final String domain) throws ConnectionException {
-            return connection.deleteMetaObject(session.getUser(), MetaObject, domain);
+            return deleteMetaObject(MetaObject, domain, ConnectionContext.createDeprecated());
         }
 
         @Override
+        public int deleteMetaObject(final MetaObject MetaObject, final String domain, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.deleteMetaObject(session.getUser(), MetaObject, domain, context);
+        }
+
+        @Deprecated
+        @Override
         public MetaObject getInstance(final MetaClass c) throws ConnectionException {
+            return getInstance(c, ConnectionContext.createDeprecated());
+        }
+
+        @Override
+        public MetaObject getInstance(final MetaClass c, final ConnectionContext context) throws ConnectionException {
             MetaObject MetaObject = null;
 
-            MetaObject = connection.getInstance(session.getUser(), c);
+            MetaObject = connection.getInstance(session.getUser(), c, context);
             MetaObject.setAllClasses(classAndMethodCache.getClassHash());
 
             return MetaObject;
         }
 
+        @Deprecated
         @Override
         public Collection customServerSearch(final CidsServerSearch serverSearch) throws ConnectionException {
-            return connection.customServerSearch(session.getUser(), serverSearch);
+            return customServerSearch(serverSearch, ConnectionContext.createDeprecated());
         }
 
         @Override
-        public Object executeTask(
-                final String taskname,
+        public Collection customServerSearch(final CidsServerSearch serverSearch, final ConnectionContext context)
+                throws ConnectionException {
+            return connection.customServerSearch(session.getUser(), serverSearch, context);
+        }
+
+        @Override
+        @Deprecated
+        public Object executeTask(final String taskname,
                 final String taskdomain,
                 final Object body,
                 final ServerActionParameter... params) throws ConnectionException {
-            return connection.executeTask(session.getUser(), taskname, taskdomain, body, params);
+            return executeTask(taskname, taskdomain, body, ConnectionContext.createDeprecated(), params);
+        }
+
+        @Override
+        public Object executeTask(final String taskname,
+                final String taskdomain,
+                final Object body,
+                final ConnectionContext context,
+                final ServerActionParameter... params) throws ConnectionException {
+            return connection.executeTask(session.getUser(), taskname, taskdomain, body, context, params);
         }
     }
 }

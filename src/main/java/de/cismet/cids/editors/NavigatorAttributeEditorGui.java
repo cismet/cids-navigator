@@ -307,7 +307,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final String domain = orig.getDomain();
             final User user = SessionManager.getSession().getUser();
             backupObject = null;
-            backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
+            backupObject = SessionManager.getConnection().getMetaObject(user, oid, cid, domain, getConnectionContext());
         } catch (Exception e) {
             log.error("Error during Backupcreation. Cannot detect whether the object is changed.", e); // NOI18N
             JOptionPane.showMessageDialog(
@@ -338,7 +338,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final String domain = otn.getMetaObject().getDomain();
             final User user = SessionManager.getSession().getUser();
 
-            final MetaObject reloaded = SessionManager.getConnection().getMetaObject(user, oid, cid, domain);
+            final MetaObject reloaded = SessionManager.getConnection()
+                        .getMetaObject(user, oid, cid, domain, getConnectionContext());
             reloaded.setAllClasses();
             if (log.isDebugEnabled()) {
                 log.debug("Reloaded MO:" + reloaded.getDebugString()); // NOI18N
@@ -414,7 +415,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             editorSaveListener = null;
         }
         try {
-            final CidsBean savedInstance = oldBean.persist();
+            final CidsBean savedInstance = oldBean.persist(getConnectionContext());
             ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
             if (closeEditor) {
                 final JOptionPane jop = new JOptionPane(
@@ -920,7 +921,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
             final MetaObject mo = ((ObjectTreeNode)getTreeNode()).getMetaObject();
             log.fatal("Current MetaObject:" + mo.getDebugString());              // NOI18N
             EditorBeanInitializerStore.getInstance()
-                    .registerInitializer(mo.getMetaClass(), new DefaultBeanInitializer(mo.getBean()));
+                    .registerInitializer(mo.getMetaClass(),
+                        new DefaultBeanInitializer(mo.getBean(), getConnectionContext()));
         }
     }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
@@ -943,7 +945,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor {
                     log.error("BeanInitializerProvider delivers null as initializer."); ////NOI18N
                 }
             } else {
-                currentInitializer = new DefaultBeanInitializer(bean);
+                currentInitializer = new DefaultBeanInitializer(bean, getConnectionContext());
                 EditorBeanInitializerStore.getInstance()
                         .registerInitializer(bean.getMetaObject().getMetaClass(), currentInitializer);
             }

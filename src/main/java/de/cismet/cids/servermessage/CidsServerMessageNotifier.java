@@ -28,6 +28,9 @@ import de.cismet.cids.server.actions.CheckCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.messages.CidsServerMessage;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.configuration.Configurable;
 import de.cismet.tools.configuration.NoWriteError;
 
@@ -37,7 +40,7 @@ import de.cismet.tools.configuration.NoWriteError;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CidsServerMessageNotifier implements Configurable {
+public class CidsServerMessageNotifier implements Configurable, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -56,12 +59,16 @@ public class CidsServerMessageNotifier implements Configurable {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final Map<String, Integer> lastMessageIds = new HashMap<String, Integer>();
+    private final Map<String, Integer> lastMessageIds = new HashMap<>();
 
     private final Timer timer = new Timer();
     private boolean running;
-    private final Map<String, Collection> subscribers = new HashMap<String, Collection>();
+    private final Map<String, Collection> subscribers = new HashMap<>();
     private int scheduleIntervall = DEFAULT_SCHEDULE_INTERVAL;
+
+    private final ConnectionContext connectionContext = ConnectionContext.create(
+            ConnectionContext.Category.OTHER,
+            getClass().getSimpleName());
 
     //~ Constructors -----------------------------------------------------------
 
@@ -93,7 +100,8 @@ public class CidsServerMessageNotifier implements Configurable {
             if (SessionManager.getSession().getConnection().hasConfigAttr(
                             SessionManager.getSession().getUser(),
                             "csa://"
-                            + CheckCidsServerMessageAction.TASK_NAME)) {
+                            + CheckCidsServerMessageAction.TASK_NAME,
+                            getConnectionContext())) {
                 synchronized (timer) {
                     if (!running) {
                         startTimer(true);
@@ -246,6 +254,11 @@ public class CidsServerMessageNotifier implements Configurable {
         configure(parent);
     }
 
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     //~ Inner Classes ----------------------------------------------------------
 
     /**
@@ -272,7 +285,8 @@ public class CidsServerMessageNotifier implements Configurable {
                 if (SessionManager.getSession().getConnection().hasConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 "csa://"
-                                + CheckCidsServerMessageAction.TASK_NAME)) {
+                                + CheckCidsServerMessageAction.TASK_NAME,
+                                getConnectionContext())) {
                     final ServerActionParameter<Map> lastMessageIdParam = new ServerActionParameter<Map>(
                             CheckCidsServerMessageAction.Parameter.LAST_MESSAGE_IDS.toString(),
                             lastMessageIds);
@@ -281,11 +295,11 @@ public class CidsServerMessageNotifier implements Configurable {
                             scheduleIntervall);
                     final Object ret = SessionManager.getSession()
                                 .getConnection()
-                                .executeTask(
-                                    SessionManager.getSession().getUser(),
+                                .executeTask(SessionManager.getSession().getUser(),
                                     CheckCidsServerMessageAction.TASK_NAME,
                                     SessionManager.getSession().getUser().getDomain(),
-                                    null,
+                                    (Object)null,
+                                    getConnectionContext(),
                                     lastMessageIdParam,
                                     intervallParam);
 

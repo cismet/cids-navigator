@@ -20,13 +20,16 @@ import org.jdesktop.swingx.auth.LoginService;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class CidsAuthentification extends LoginService {
+public class CidsAuthentification extends LoginService implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -42,6 +45,7 @@ public class CidsAuthentification extends LoginService {
     private final String callServerURL;
     private final String domain;
     private final boolean compressionEnabled;
+    private final ConnectionContext connectionContext;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -52,11 +56,30 @@ public class CidsAuthentification extends LoginService {
      * @param  domain              DOCUMENT ME!
      * @param  compressionEnabled  DOCUMENT ME!
      */
-    public CidsAuthentification(final String callServerURL, final String domain, final boolean compressionEnabled) {
+    @Deprecated
+    public CidsAuthentification(final String callServerURL,
+            final String domain,
+            final boolean compressionEnabled) {
+        this(callServerURL, domain, compressionEnabled, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new CidsAuthentification object.
+     *
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
+     * @param  connectionContext   DOCUMENT ME!
+     */
+    public CidsAuthentification(final String callServerURL,
+            final String domain,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) {
         this.connectionClass = CONNECTION_CLASS;
         this.callServerURL = callServerURL;
         this.domain = domain;
         this.compressionEnabled = compressionEnabled;
+        this.connectionContext = connectionContext;
     }
 
     /**
@@ -67,14 +90,33 @@ public class CidsAuthentification extends LoginService {
      * @param  domain              DOCUMENT ME!
      * @param  compressionEnabled  DOCUMENT ME!
      */
+    @Deprecated
     public CidsAuthentification(final String connectionClass,
             final String callServerURL,
             final String domain,
             final boolean compressionEnabled) {
+        this(connectionClass, callServerURL, domain, compressionEnabled, ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new CidsAuthentification object.
+     *
+     * @param  connectionClass     DOCUMENT ME!
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
+     * @param  connectionContext   DOCUMENT ME!
+     */
+    public CidsAuthentification(final String connectionClass,
+            final String callServerURL,
+            final String domain,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) {
         this.connectionClass = connectionClass;
         this.callServerURL = callServerURL;
         this.domain = domain;
         this.compressionEnabled = compressionEnabled;
+        this.connectionContext = connectionContext;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -99,7 +141,7 @@ public class CidsAuthentification extends LoginService {
 
         try {
             final Connection connection = ConnectionFactory.getFactory()
-                        .createConnection(connectionClass, callServerURL, compressionEnabled);
+                        .createConnection(connectionClass, callServerURL, compressionEnabled, getConnectionContext());
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
             connectionInfo.setPassword(new String(password));
@@ -108,15 +150,21 @@ public class CidsAuthentification extends LoginService {
             connectionInfo.setUsergroupDomain(domain);
             connectionInfo.setUsername(user);
             final ConnectionSession session = ConnectionFactory.getFactory()
-                        .createSession(connection, connectionInfo, true);
-            final ConnectionProxy proxy = ConnectionFactory.getFactory().createProxy(CONNECTION_PROXY_CLASS, session);
+                        .createSession(connection, connectionInfo, true, getConnectionContext());
+            final ConnectionProxy proxy = ConnectionFactory.getFactory()
+                        .createProxy(CONNECTION_PROXY_CLASS, session, getConnectionContext());
             SessionManager.init(proxy);
 
-            ClassCacheMultiple.setInstance(domain);
+            ClassCacheMultiple.setInstance(domain, getConnectionContext());
             return true;
         } catch (Throwable t) {
             LOG.error("Fehler beim Anmelden", t);
             return false;
         }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

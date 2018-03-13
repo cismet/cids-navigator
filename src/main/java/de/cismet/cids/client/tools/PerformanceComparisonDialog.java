@@ -51,6 +51,9 @@ import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.Converter;
@@ -70,7 +73,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class PerformanceComparisonDialog extends javax.swing.JDialog {
+public class PerformanceComparisonDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -81,6 +84,8 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
 
     private final HashMap<Integer, MetaClass> classMap = new HashMap<>();
     private final List<TestInfo> testInfos;
+
+    private final ConnectionContext connectionContext;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -95,10 +100,13 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
     /**
      * Creates new form PerformanceComparisonDialog.
      *
-     * @param  testInfos  DOCUMENT ME!
+     * @param  testInfos          DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
-    public PerformanceComparisonDialog(final List<TestInfo> testInfos) {
+    public PerformanceComparisonDialog(final List<TestInfo> testInfos,
+            final ConnectionContext connectionContext) {
         super(new javax.swing.JFrame(), true);
+        this.connectionContext = connectionContext;
 
         this.testInfos = testInfos;
 
@@ -223,7 +231,9 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
                                     if (classMap.containsKey(classId)) {
                                         mc = classMap.get(classId);
                                     } else {
-                                        mc = ClassCacheMultiple.getMetaClass(testInfo.getDomain(), classId);
+                                        mc = ClassCacheMultiple.getMetaClass(testInfo.getDomain(),
+                                                classId,
+                                                getConnectionContext());
                                         classMap.put(classId, mc);
                                     }
 
@@ -351,7 +361,11 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
             final Map<String, Object> resultsMap) throws Exception {
         final long timeMs = System.currentTimeMillis();
         final MetaObject mo = SessionManager.getConnection()
-                    .getMetaObject(SessionManager.getSession().getUser(), objectId, classId, domain);
+                    .getMetaObject(SessionManager.getSession().getUser(),
+                        objectId,
+                        classId,
+                        domain,
+                        getConnectionContext());
         final long durationMs = System.currentTimeMillis() - timeMs;
 
         resultsMap.put("getMo (duration in ms)", durationMs);
@@ -407,7 +421,11 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
         mo.forceStatus(MetaObject.MODIFIED);
 
         final long timeMs = System.currentTimeMillis();
-        SessionManager.getConnection().updateMetaObject(SessionManager.getSession().getUser(), mo, mo.getDomain());
+        SessionManager.getConnection()
+                .updateMetaObject(SessionManager.getSession().getUser(),
+                    mo,
+                    mo.getDomain(),
+                    getConnectionContext());
         final long durationMs = System.currentTimeMillis() - timeMs;
 
         resultsMap.put("updateMo (duration in ms)", durationMs);
@@ -452,7 +470,9 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
                 @Override
                 public void run() {
                     try {
-                        final PerformanceComparisonDialog dialog = new PerformanceComparisonDialog(testInfos);
+                        final PerformanceComparisonDialog dialog = new PerformanceComparisonDialog(
+                                testInfos,
+                                ConnectionContext.createDeprecated());
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                                 @Override
@@ -507,6 +527,11 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
         StaticSwingTools.showDialog(loginDialog);
 
         return loginDialog.getStatus() == JXLoginPane.Status.SUCCEEDED;
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -570,7 +595,8 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
                                 CONNECTION_CLASS,
                                 callserverURL,
                                 Proxy.fromPreferences(),
-                                compressionEnabled);
+                                compressionEnabled,
+                                getConnectionContext());
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callserverURL);
                 connectionInfo.setPassword(new String(password));
@@ -579,12 +605,12 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog {
                 connectionInfo.setUsergroupDomain(domain);
                 connectionInfo.setUsername(user);
                 final ConnectionSession session = ConnectionFactory.getFactory()
-                            .createSession(connection, connectionInfo, true);
+                            .createSession(connection, connectionInfo, true, getConnectionContext());
                 final ConnectionProxy proxy = ConnectionFactory.getFactory()
-                            .createProxy(CONNECTION_PROXY_CLASS, session);
+                            .createProxy(CONNECTION_PROXY_CLASS, session, getConnectionContext());
                 SessionManager.init(proxy);
 
-                ClassCacheMultiple.setInstance(domain);
+                ClassCacheMultiple.setInstance(domain, getConnectionContext());
                 return true;
             } catch (Throwable t) {
                 LOG.error("Fehler beim Anmelden", t);

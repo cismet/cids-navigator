@@ -18,13 +18,14 @@ package de.cismet.cids.editors;
 
 import Sirius.server.middleware.types.MetaClass;
 
-import org.jdesktop.observablecollections.ObservableList;
-
 import java.util.List;
 
 import javax.swing.JList;
 
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
 
 /**
  * DOCUMENT ME!
@@ -32,7 +33,7 @@ import de.cismet.cids.dynamics.CidsBean;
  * @author   thorsten
  * @version  $Revision$, $Date$
  */
-public class ArrayTitleAndControls extends javax.swing.JPanel {
+public class ArrayTitleAndControls extends javax.swing.JPanel implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -40,6 +41,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
     private CidsBean cidsBean;
     private String arrayProperty;
     private JList jList;
+    private final ConnectionContext connectionContext;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cmdAdd;
     private javax.swing.JButton cmdRemove;
@@ -55,16 +57,19 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
     /**
      * Creates a new ArrayTitleAndControls object.
      *
-     * @param  title          DOCUMENT ME!
-     * @param  detailClass    DOCUMENT ME!
-     * @param  arrayProperty  DOCUMENT ME!
-     * @param  jList          DOCUMENT ME!
+     * @param  title              DOCUMENT ME!
+     * @param  detailClass        DOCUMENT ME!
+     * @param  arrayProperty      DOCUMENT ME!
+     * @param  jList              DOCUMENT ME!
+     * @param  connectionContext  DOCUMENT ME!
      */
     public ArrayTitleAndControls(final String title,
             final MetaClass detailClass,
             final String arrayProperty,
-            final JList jList) {
+            final JList jList,
+            final ConnectionContext connectionContext) {
         super();
+        this.connectionContext = connectionContext;
         this.jList = jList;
         initComponents();
         this.detailClass = detailClass;
@@ -193,7 +198,7 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
      */
     private void cmdAddActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_cmdAddActionPerformed
         try {
-            final CidsBean newOne = detailClass.getEmptyInstance().getBean();
+            final CidsBean newOne = detailClass.getEmptyInstance(getConnectionContext()).getBean();
 
             final CidsBean sourcebean = (CidsBean)jList.getClientProperty(CidsObjectEditorFactory.CIDS_BEAN);
             final JList sourcelist = (JList)jList.getClientProperty(CidsObjectEditorFactory.SOURCE_LIST);
@@ -210,4 +215,9 @@ public class ArrayTitleAndControls extends javax.swing.JPanel {
             ex.printStackTrace();
         }
     }                                                                                                   //GEN-LAST:event_cmdAddActionPerformed
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
 }

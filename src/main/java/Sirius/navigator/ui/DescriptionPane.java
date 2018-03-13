@@ -76,6 +76,9 @@ import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
 import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.CismetThreadPool;
 
 import de.cismet.tools.collections.MultiMap;
@@ -93,7 +96,7 @@ import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
-public abstract class DescriptionPane extends JPanel implements StatusChangeSupport {
+public abstract class DescriptionPane extends JPanel implements StatusChangeSupport, ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -115,6 +118,9 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     // will only be accessed in EDT !
     private transient boolean fullScreenRenderer;
     private final MultiMap sharedHandlersHM = new MultiMap();
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
@@ -380,7 +386,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     public void gotoMetaObjectNodes(final MetaObjectNode[] mons) {
         final Collection<ObjectTreeNode> otns = new ArrayList<ObjectTreeNode>();
         for (final MetaObjectNode mon : mons) {
-            otns.add(new ObjectTreeNode(mon));
+            otns.add(new ObjectTreeNode(mon, getConnectionContext()));
         }
         gotoObjectTreeNodes(otns.toArray(new ObjectTreeNode[0]));
     }
@@ -763,7 +769,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
      */
     public void gotoMetaObjectNode(final MetaObjectNode mon,
             final boolean clearBreadcrumb) {
-        gotoObjectTreeNode(new ObjectTreeNode(mon), clearBreadcrumb);
+        gotoObjectTreeNode(new ObjectTreeNode(mon, getConnectionContext()), clearBreadcrumb);
     }
 
     /**
@@ -899,6 +905,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         showMetaObjectSingleRenderer(to, optionalTitle);
     }
 
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     /**
      * DOCUMENT ME!
      *
@@ -915,7 +926,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
                 @Override
                 protected MetaObject doInBackground() throws Exception {
-                    return SessionManager.getProxy().getMetaObject(toObjectId, mc.getId(), mc.getDomain());
+                    return SessionManager.getProxy()
+                                .getMetaObject(toObjectId, mc.getId(), mc.getDomain(), getConnectionContext());
                 }
 
                 @Override

@@ -27,8 +27,6 @@ import Sirius.navigator.ui.embedded.EmbeddedMenu;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
-
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -46,6 +44,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.gui.StaticSwingTools;
 
 /**
@@ -53,7 +54,7 @@ import de.cismet.tools.gui.StaticSwingTools;
  *
  * @version  $Revision$, $Date$
  */
-public class MutableMenuBar extends JMenuBar {
+public class MutableMenuBar extends JMenuBar implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -71,6 +72,8 @@ public class MutableMenuBar extends JMenuBar {
 
     private String helpUrl;
     private String newsUrl;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -105,6 +108,11 @@ public class MutableMenuBar extends JMenuBar {
      */
     public void removeMoveableMenues(final String id) {
         this.moveableMenues.remove(id);
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     /**
@@ -541,7 +549,9 @@ public class MutableMenuBar extends JMenuBar {
                                 .getCatalogueTree()
                                 .getSelectionPath();
                     if ((selectionPath != null) && (selectionPath.getPath().length > 0)) {
-                        final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
+                        final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
+                                    getConnectionContext()),
+                                getConnectionContext());
                         ((DefaultTreeModel)ComponentRegistry.getRegistry().getCatalogueTree().getModel()).setRoot(
                             rootTreeNode);
                         ((DefaultTreeModel)ComponentRegistry.getRegistry().getCatalogueTree().getModel()).reload();

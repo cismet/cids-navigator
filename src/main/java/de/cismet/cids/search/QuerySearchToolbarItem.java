@@ -24,6 +24,9 @@ import javax.swing.ImageIcon;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 /**
  * DOCUMENT ME!
  *
@@ -31,7 +34,11 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsClientToolbarItem.class)
-public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem {
+public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem, ConnectionContextStore {
+
+    //~ Instance fields --------------------------------------------------------
+
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -46,6 +53,11 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
+    }
 
     @Override
     public void actionPerformed(final ActionEvent e) {
@@ -64,16 +76,23 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
             return (SessionManager.getConnection().getConfigAttr(
                         SessionManager.getSession().getUser(),
                         "navigator.querybuilder.toolbaricon@"
-                                + SessionManager.getSession().getUser().getDomain())
+                                + SessionManager.getSession().getUser().getDomain(),
+                        getConnectionContext())
                             != null)
                         && (SessionManager.getConnection().getConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 QuerySearch.ACTION_TAG
-                                + SessionManager.getSession().getUser().getDomain())
+                                + SessionManager.getSession().getUser().getDomain(),
+                                getConnectionContext())
                             != null);
         } catch (ConnectionException ex) {
             Log.error(ex);
         }
         return false;
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }

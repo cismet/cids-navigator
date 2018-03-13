@@ -42,6 +42,9 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.actions.BandwidthTestAction;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.netutil.Proxy;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -70,7 +73,7 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class BandwithTesterDialog extends javax.swing.JDialog {
+public class BandwithTesterDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -83,6 +86,8 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
     private long stopTimeMs;
     private final String domain;
     private final Integer fileSizeInMb;
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
@@ -375,10 +380,12 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
      * @throws  Exception  DOCUMENT ME!
      */
     private byte[] downloadTestFile(final String domain, final int fileSizeInMb) throws Exception {
-        final Object ret = SessionManager.getProxy().executeTask(
-                BandwidthTestAction.TASK_NAME,
-                domain,
-                fileSizeInMb);
+        final Object ret = SessionManager.getProxy()
+                    .executeTask(
+                        BandwidthTestAction.TASK_NAME,
+                        domain,
+                        fileSizeInMb,
+                        getConnectionContext());
 
         if (ret instanceof Exception) {
             throw (Exception)ret;
@@ -412,6 +419,11 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
         if (loginDialog.getStatus() != JXLoginPane.Status.SUCCEEDED) {
             System.exit(0);
         }
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 
     //~ Inner Classes ----------------------------------------------------------
@@ -473,7 +485,8 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                                 CONNECTION_CLASS,
                                 callServerURL,
                                 Proxy.fromPreferences(),
-                                compressionEnabled);
+                                compressionEnabled,
+                                getConnectionContext());
                 final ConnectionInfo connectionInfo = new ConnectionInfo();
                 connectionInfo.setCallserverURL(callServerURL);
                 connectionInfo.setPassword(new String(password));
@@ -482,12 +495,16 @@ public class BandwithTesterDialog extends javax.swing.JDialog {
                 connectionInfo.setUsergroupDomain(domain);
                 connectionInfo.setUsername(user);
                 final ConnectionSession session = ConnectionFactory.getFactory()
-                            .createSession(connection, connectionInfo, true);
+                            .createSession(
+                                connection,
+                                connectionInfo,
+                                true,
+                                getConnectionContext());
                 final ConnectionProxy proxy = ConnectionFactory.getFactory()
-                            .createProxy(CONNECTION_PROXY_CLASS, session);
+                            .createProxy(CONNECTION_PROXY_CLASS, session, getConnectionContext());
                 SessionManager.init(proxy);
 
-                ClassCacheMultiple.setInstance(domain);
+                ClassCacheMultiple.setInstance(domain, getConnectionContext());
                 return true;
             } catch (Throwable t) {
                 LOG.error("Fehler beim Anmelden", t);

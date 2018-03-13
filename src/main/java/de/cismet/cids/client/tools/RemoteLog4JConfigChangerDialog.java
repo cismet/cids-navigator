@@ -27,6 +27,9 @@ import javax.swing.JFrame;
 import de.cismet.cids.server.actions.PublishCidsServerMessageAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -36,11 +39,15 @@ import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
+public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(RemoteLog4JConfigChangerDialog.class);
+
+    //~ Instance fields --------------------------------------------------------
+
+    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -247,15 +254,15 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
                     (String)jComboBox1.getSelectedItem());
 
             SessionManager.getConnection()
-                    .executeTask(
-                        SessionManager.getSession().getUser(),
+                    .executeTask(SessionManager.getSession().getUser(),
                         PublishCidsServerMessageAction.TASK_NAME,
                         SessionManager.getSession().getUser().getDomain(),
                         new ObjectMapper().writeValueAsString(remoteConfig),
-                        new ServerActionParameter<String>(
+                        getConnectionContext(),
+                        new ServerActionParameter<>(
                             PublishCidsServerMessageAction.ParameterType.CATEGORY.toString(),
                             "log4j_remote_config"),
-                        new ServerActionParameter<String>(
+                        new ServerActionParameter<>(
                             PublishCidsServerMessageAction.ParameterType.USER.toString(),
                             userKey));
         } catch (final Exception ex) {
@@ -328,7 +335,11 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
      * @param  compressionEnabled  DOCUMENT ME!
      */
     private void login(final String callServerURL, final String domain, final boolean compressionEnabled) {
-        final CidsAuthentification cidsAuth = new CidsAuthentification(callServerURL, domain, compressionEnabled);
+        final CidsAuthentification cidsAuth = new CidsAuthentification(
+                callServerURL,
+                domain,
+                compressionEnabled,
+                getConnectionContext());
         final JXLoginPane login = new JXLoginPane(cidsAuth);
         final JXLoginPane.JXLoginDialog loginDialog = new JXLoginPane.JXLoginDialog((Frame)null, login);
 
@@ -344,5 +355,10 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog {
         if (loginDialog.getStatus() != JXLoginPane.Status.SUCCEEDED) {
             System.exit(0);
         }
+    }
+
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
     }
 }
