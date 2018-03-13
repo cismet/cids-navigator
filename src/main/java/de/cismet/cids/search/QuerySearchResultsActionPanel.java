@@ -56,6 +56,9 @@ import javax.swing.table.TableCellEditor;
 
 import de.cismet.cids.dynamics.CidsBean;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+
 /**
  * DOCUMENT ME!
  *
@@ -72,7 +75,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
 
     private QuerySearchResultsAction selectedAction;
 
-    private final HashMap<String, String> attributeNames = new HashMap<String, String>();
+    private final HashMap<String, String> attributeNames = new HashMap<>();
     private final Multimap<MetaClass, String> attributesToDisplay = ArrayListMultimap.create();
 
     private final QuerySearch querySearch = new QuerySearch(true);
@@ -141,7 +144,6 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
      */
     public QuerySearchResultsActionPanel(final Action closeAction) {
         this.closeAction = closeAction;
-        initComponents();
     }
 
     /**
@@ -181,6 +183,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel {
     public QuerySearchResultsActionPanel(final List<QuerySearchResultsAction> actions,
             final Action closeAction) {
         this.closeAction = closeAction;
+        querySearch.initWithConnectionContext(ConnectionContext.createDeprecated());
 
         initComponents();
 
