@@ -12,6 +12,8 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 
 import org.openide.util.Lookup;
 
+import java.rmi.RemoteException;
+
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.ws.SSLConfig;
 import de.cismet.cids.server.ws.SSLConfigProvider;
@@ -92,10 +94,18 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
     }
 
     @Override
-    protected ReconnectorException getReconnectorException(final Throwable exception) throws Throwable {
+    protected ReconnectorException getReconnectorException(final Throwable e) throws Throwable {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("getReconnectorException(exception) invoked", exception);
+            LOG.debug("getReconnectorException(exception) invoked", e);
         }
+
+        final Throwable exception;
+        if ((e instanceof RemoteException) && (e.getCause() != null)) {
+            exception = e.getCause();
+        } else {
+            exception = e;
+        }
+
         boolean error = false;
         if (exception instanceof UniformInterfaceException) {
             if (exception instanceof UniformInterfaceException) {
