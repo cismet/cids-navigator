@@ -243,9 +243,8 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
             editorComponent = (JComponent)getDefaultEditor(metaObject.getMetaClass());
         }
         final JComponent finalEditorComponent = editorComponent;
-        if (finalEditorComponent instanceof ConnectionContextStore) {
-            final ConnectionContext connectionContext = new EditorConnectionContext(finalEditorComponent.getClass(),
-                    metaObject);
+        if (editorComponent instanceof ConnectionContextStore) {
+            final ConnectionContext connectionContext = new EditorConnectionContext(metaObject);
             ((ConnectionContextStore)editorComponent).initWithConnectionContext(connectionContext);
         }
 
