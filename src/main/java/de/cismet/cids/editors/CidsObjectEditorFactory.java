@@ -232,24 +232,24 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
     /**
      * DOCUMENT ME!
      *
-     * @param   MetaObject  DOCUMENT ME!
+     * @param   metaObject  DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    public JComponent getEditor(final MetaObject MetaObject) {
+    public JComponent getEditor(final MetaObject metaObject) {
         // Hier kann man noch mit Caching arbeiten
-        JComponent editorComponent = getObjectEditor(MetaObject.getMetaClass());
+        JComponent editorComponent = getObjectEditor(metaObject.getMetaClass());
         if (editorComponent == null) {
-            editorComponent = (JComponent)getDefaultEditor(MetaObject.getMetaClass());
+            editorComponent = (JComponent)getDefaultEditor(metaObject.getMetaClass());
         }
         final JComponent finalEditorComponent = editorComponent;
         if (editorComponent instanceof ConnectionContextStore) {
-            final ConnectionContext connectionContext = new EditorConnectionContext(MetaObject);
+            final ConnectionContext connectionContext = new EditorConnectionContext(metaObject);
             ((ConnectionContextStore)editorComponent).initWithConnectionContext(connectionContext);
         }
 
         if (editorComponent instanceof DisposableCidsBeanStore) {
-            final CidsBean bean = MetaObject.getBean();
+            final CidsBean bean = metaObject.getBean();
 //            final Runnable setCidsBeanRunnable = new Runnable() {
 //
 //                @Override
