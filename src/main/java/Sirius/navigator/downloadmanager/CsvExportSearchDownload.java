@@ -54,7 +54,7 @@ public class CsvExportSearchDownload extends AbstractDownload implements Connect
             final String directory,
             final String filename,
             final List<String> header) {
-        this(search, title, directory, filename, header, null);
+        this(search, title, directory, filename, header, ConnectionContext.createDeprecated());
     }
     /**
      * Creates a new CsvExportSearchDownload object.
