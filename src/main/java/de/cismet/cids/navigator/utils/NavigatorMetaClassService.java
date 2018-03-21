@@ -76,11 +76,11 @@ public class NavigatorMetaClassService implements MetaClassCacheService {
     @Override
     @Deprecated
     public MetaClass getMetaClass(final String domain, final int classId) {
-        return ClassCacheMultiple.getMetaClass(domain, classId, ConnectionContext.createDeprecated());
+        return getMetaClass(domain, classId, ConnectionContext.createDeprecated());
     }
 
     @Override
     public MetaClass getMetaClass(final String domain, final int classId, final ConnectionContext connectionContext) {
-        return getMetaClass(domain, classId, connectionContext);
+        return ClassCacheMultiple.getMetaClass(domain, classId, connectionContext);
     }
 }
