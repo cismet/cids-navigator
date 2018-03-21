@@ -26,8 +26,6 @@ import de.cismet.cids.server.connectioncontext.RendererConnectionContext;
 
 import de.cismet.cids.utils.ClassloadingHelper;
 
-import de.cismet.connectioncontext.AbstractConnectionContext.Category;
-
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
 
@@ -130,9 +128,9 @@ public class CidsObjectRendererFactory {
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
                     if (renderer instanceof ConnectionContextStore) {
-                        final ConnectionContext rendererConnectionContext = ConnectionContext.create(
-                            Category.RENDERER,
-                            getClass().getSimpleName());
+                        final ConnectionContext rendererConnectionContext = new RendererConnectionContext(
+                                rendererClass,
+                                mo);
                         ((ConnectionContextStore)renderer).initWithConnectionContext(rendererConnectionContext);
                     }
                     renderer.setTitle(title);
