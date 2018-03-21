@@ -130,9 +130,9 @@ public class CidsObjectRendererFactory {
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
                     if (renderer instanceof ConnectionContextStore) {
-                        final ConnectionContext rendererConnectionContext = new RendererConnectionContext(
-                                rendererClass,
-                                mo);
+                        final ConnectionContext rendererConnectionContext = ConnectionContext.create(
+                            Category.RENDERER,
+                            getClass().getSimpleName());
                         ((ConnectionContextStore)renderer).initWithConnectionContext(rendererConnectionContext);
                     }
                     renderer.setTitle(title);
