@@ -7,10 +7,11 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
-import de.cismet.connectioncontext.ConnectionContext;
 import Sirius.navigator.resource.PropertyManager;
 
 import javax.swing.JComponent;
+
+import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.GUIWindow;
 
@@ -24,6 +25,15 @@ import de.cismet.tools.gui.GUIWindow;
 public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow {
 
     //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new WorkingSpaceTree object.
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public WorkingSpaceTree() throws Exception {
+        super(ConnectionContext.createDeprecated());
+    }
 
     /**
      * Creates a new WorkingSpaceTree object.

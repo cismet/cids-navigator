@@ -90,7 +90,10 @@ import de.cismet.tools.gui.GUIWindow;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
-public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Autoscroll, ConnectionContextProvider, GUIWindow {
+public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
+    Autoscroll,
+    ConnectionContextProvider,
+    GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -598,7 +601,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport, Aut
     public ConnectionContext getConnectionContext() {
         return connectionContext;
     }
-    
+
+    @Override
     public JComponent getGuiComponent() {
         return this;
     }
