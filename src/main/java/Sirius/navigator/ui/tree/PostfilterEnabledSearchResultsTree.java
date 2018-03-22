@@ -56,6 +56,15 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     /**
      * Creates a new PostfilterEnabledSearchResultsTree object.
      *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public PostfilterEnabledSearchResultsTree() throws Exception {
+        this(ConnectionContext.createDeprecated());
+    }
+
+    /**
+     * Creates a new PostfilterEnabledSearchResultsTree object.
+     *
      * @param   connectionContext  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!

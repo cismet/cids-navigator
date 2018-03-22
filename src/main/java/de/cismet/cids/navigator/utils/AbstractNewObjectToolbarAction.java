@@ -94,8 +94,6 @@ public abstract class AbstractNewObjectToolbarAction extends AbstractAction impl
         putValue(CidsUiAction.CIDS_ACTION_KEY, getActionName());
     }
 
-    //~ Methods ----------------------------------------------------------------
-
     /**
      * DOCUMENT ME!
      *
