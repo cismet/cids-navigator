@@ -1104,7 +1104,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jLayerCBActionPerformed
+    private void jLayerCBActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jLayerCBActionPerformed
         setMetaClass(null);
         if (jLayerCB.getSelectedItem() instanceof MetaClass) {
             setMetaClass((MetaClass)jLayerCB.getSelectedItem());
@@ -1181,14 +1181,14 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         firePropertyChange(PROP_VALUES, old, values);
 
         fillButtonPanel();
-    }//GEN-LAST:event_jLayerCBActionPerformed
+    } //GEN-LAST:event_jLayerCBActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jGetValuesBnActionPerformed
+    private void jGetValuesBnActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jGetValuesBnActionPerformed
         if (jAttributesLi.getSelectedValue() == null) {
             return;
         }
@@ -1293,19 +1293,19 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
                 QuerySearch.class,
                 "QuerySearch.jGetValuesBnActionPerformed().jlEinzelwerteAnzeigen.text",
                 currentlyExpandedAttribute));
-    }//GEN-LAST:event_jGetValuesBnActionPerformed
+    } //GEN-LAST:event_jGetValuesBnActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSearchCancelActionPerformed
+    private void btnSearchCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSearchCancelActionPerformed
         if (panPagination.getParent() != null) {
             panPagination.reset();
         }
         performSearch();
-    }//GEN-LAST:event_btnSearchCancelActionPerformed
+    }                                                                                   //GEN-LAST:event_btnSearchCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1329,17 +1329,17 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jMethodCBItemStateChanged
-    }//GEN-LAST:event_jMethodCBItemStateChanged
+    private void jMethodCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jMethodCBItemStateChanged
+    }                                                                            //GEN-LAST:event_jMethodCBItemStateChanged
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jLayerCBItemStateChanged
+    private void jLayerCBItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_jLayerCBItemStateChanged
         taQuery.setText("");
-    }//GEN-LAST:event_jLayerCBItemStateChanged
+    }                                                                           //GEN-LAST:event_jLayerCBItemStateChanged
 
     /**
      * DOCUMENT ME!
@@ -1460,6 +1460,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         return connectionContext;
     }
 
+    @Override
     public Object getValue(final String key) {
         if (key.equals(CidsUiAction.CIDS_ACTION_KEY)) {
             return "query.search";

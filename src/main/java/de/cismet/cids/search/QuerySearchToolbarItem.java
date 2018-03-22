@@ -26,6 +26,7 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.tools.gui.menu.CidsUiAction;
 
 /**
@@ -35,7 +36,9 @@ import de.cismet.tools.gui.menu.CidsUiAction;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsClientToolbarItem.class)
-public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem, ConnectionContextStore, CidsUiAction {
+public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem,
+    ConnectionContextStore,
+    CidsUiAction {
 
     //~ Instance fields --------------------------------------------------------
 
