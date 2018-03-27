@@ -287,7 +287,8 @@ public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
                 "WUNDA_BLAU",
                 null,
                 "admin",
-                "leo");
+                "leo",
+                true);
             final CallServerTunnel cst = new CallServerTunnel("kjdfhg");
 
             System.out.println(cst.isResponsible(

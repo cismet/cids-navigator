@@ -20,11 +20,7 @@ import Sirius.navigator.connection.SessionManager;
 import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.JXErrorPane;
-import org.jdesktop.swingx.JXLoginPane;
-import org.jdesktop.swingx.JXPanel;
 import org.jdesktop.swingx.error.ErrorInfo;
-
-import java.awt.Frame;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -331,7 +327,11 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                         final String callServerURL = args[0];
                         final String domain = args[1];
                         final boolean compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);
-                        dialog.login(callServerURL, domain, compressionEnabled);
+                        DevelopmentTools.showSimpleLoginDialog(
+                            callServerURL,
+                            domain,
+                            compressionEnabled,
+                            dialog.getConnectionContext());
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                                 @Override
@@ -383,37 +383,6 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
 
         if (ret instanceof Exception) {
             throw (Exception)ret;
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  callServerURL       DOCUMENT ME!
-     * @param  domain              DOCUMENT ME!
-     * @param  compressionEnabled  DOCUMENT ME!
-     */
-    private void login(final String callServerURL, final String domain, final boolean compressionEnabled) {
-        final CidsAuthentification cidsAuth = new CidsAuthentification(
-                callServerURL,
-                domain,
-                compressionEnabled,
-                getConnectionContext());
-        final JXLoginPane login = new JXLoginPane(cidsAuth);
-
-        final JXLoginPane.JXLoginDialog loginDialog = new JXLoginPane.JXLoginDialog((Frame)null, login);
-
-        login.setPassword("".toCharArray());
-
-        try {
-            ((JXPanel)((JXPanel)login.getComponent(1)).getComponent(1)).getComponent(3).requestFocus();
-        } catch (final Exception ex) {
-            LOG.info("could nor request focus", ex);
-        }
-        StaticSwingTools.showDialog(loginDialog);
-
-        if (loginDialog.getStatus() != JXLoginPane.Status.SUCCEEDED) {
-            System.exit(0);
         }
     }
 
