@@ -298,7 +298,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
 
             // fails with: java.lang.ClassCastException: [B cannot be cast to java.lang.String Object taskResult =
             // SessionManager.getProxy().executeTask("downloadFile", "SWITCHON", "C:\\pagefile.sys");
@@ -447,7 +448,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
 
 //            final LightweightMetaObject[] lmoBinary = (LightweightMetaObject[])SessionManager.getProxy()
 //                        .getAllLightweightMetaObjectsForClass(
@@ -469,7 +471,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
 
 //            final LightweightMetaObject[] lmoRest = (LightweightMetaObject[]) SessionManager.getProxy()
 //                    .getAllLightweightMetaObjectsForClass(
@@ -603,7 +606,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
 
             // SessionManager.getProxy().getSearchOptions();
             // SessionManager.getProxy().getClassTreeNodes();
@@ -623,7 +627,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
 //
 //            final MetaObject metaObjectRest = SessionManager.getProxy()
 //                        .getMetaObject(metaObjectId, metaClassId, domain);
@@ -720,7 +725,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
             // final Node[] nodesBinary = SessionManager.getProxy().getRoots();
 // final Node nodeBinary = SessionManager.getProxy().getNode(7, "SWITCHON");
             // final Node[] nodesBinary = new Node[]{nodeBinary};
@@ -739,7 +745,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
 //            final Node nodeRest = SessionManager.getProxy().getNode(7, "SWITCHON");
             // final Node[] nodesRest = new Node[]{nodeRest};
 //            final Node[] nodesRest = SessionManager.getProxy()
@@ -863,7 +870,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
             final MetaClass tagClassBinary = SessionManager.getConnection()
                         .getCallServerService()
                         .getClassByTableName(SessionManager.getSession().getUser(),
@@ -878,7 +886,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
                 "SWITCHON",
                 "Administratoren",
                 "admin",
-                "cismet");
+                "cismet",
+                true);
             final MetaClass tagClassRest = SessionManager.getConnection()
                         .getCallServerService()
                         .getClassByTableName(SessionManager.getSession().getUser(),
