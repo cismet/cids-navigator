@@ -554,7 +554,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                         panRenderer.setLayout(new GridBagLayout());
                                         panRenderer.add(sdp, gridBagConstraints);
                                     }
-                                    sdp.startChecking();
                                     panRenderer.revalidate();
                                     revalidate();
                                     repaint();
@@ -586,8 +585,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
                                         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
                                         panRenderer.add(comp, gridBagConstraints);
-
-                                        comp.startChecking();
 
                                         panRenderer.revalidate();
                                         panRenderer.repaint();
@@ -1061,7 +1058,6 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 panRenderer.setLayout(new GridBagLayout());
                                 panRenderer.add(sdp, gridBagConstraints);
                             }
-                            sdp.startChecking();
                             panRenderer.revalidate();
                             revalidate();
                             repaint();

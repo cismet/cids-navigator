@@ -11,6 +11,8 @@
  */
 package de.cismet.cids.tools.metaobjectrenderer;
 
+import Sirius.navigator.ui.DisposableAgent;
+
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 
@@ -19,6 +21,7 @@ import java.util.Collection;
 import javax.swing.JComponent;
 
 import de.cismet.cids.dynamics.CidsBean;
+import de.cismet.cids.dynamics.Disposable;
 
 import de.cismet.cids.editors.CidsObjectEditorFactory;
 
@@ -127,6 +130,9 @@ public class CidsObjectRendererFactory {
                 }
                 if (bean != null) {
                     final CidsBeanRenderer renderer = (CidsBeanRenderer)o;
+                    if (renderer instanceof Disposable) {
+                        DisposableAgent.getInstance().register((Disposable)renderer);
+                    }
                     if (renderer instanceof ConnectionContextStore) {
                         final ConnectionContext rendererConnectionContext = new RendererConnectionContext(
                                 rendererClass,
@@ -188,6 +194,9 @@ public class CidsObjectRendererFactory {
             final Object rendererInstanceObject = rendererClass.newInstance();
             if (beans != null) {
                 final CidsBeanAggregationRenderer rendererComp = (CidsBeanAggregationRenderer)rendererInstanceObject;
+                if (rendererComp instanceof Disposable) {
+                    DisposableAgent.getInstance().register((Disposable)rendererComp);
+                }
                 if (rendererComp instanceof ConnectionContextStore) {
                     final ConnectionContext rendererConnectionContext = new RendererConnectionContext(
                             rendererClass,
