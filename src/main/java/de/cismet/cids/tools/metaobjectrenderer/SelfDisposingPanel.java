@@ -7,6 +7,7 @@
 ****************************************************/
 package de.cismet.cids.tools.metaobjectrenderer;
 
+import Sirius.navigator.ui.DisposableAgent;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 
 import java.beans.PropertyChangeListener;
@@ -19,6 +20,8 @@ import javax.swing.JPanel;
 
 import de.cismet.cids.dynamics.Disposable;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
+
+import de.cismet.tools.gui.CoolEditor;
 
 /**
  * DOCUMENT ME!
@@ -70,6 +73,7 @@ public class SelfDisposingPanel extends JPanel {
             checkTimer = new Timer();
         }
         setOpaque(false);
+        startChecking();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -77,7 +81,7 @@ public class SelfDisposingPanel extends JPanel {
     /**
      * DOCUMENT ME!
      */
-    public void startChecking() {
+    private void startChecking() {
         if (checkTimer != null) {
             checkTimer.scheduleAtFixedRate(new TimerTask() {
 
@@ -85,12 +89,21 @@ public class SelfDisposingPanel extends JPanel {
                     public void run() {
                         // TODO: this should not only check for the parent but rather if the component is in the
                         // windows hierarchy!
-                        if (getParent() == null) {
-                            SelfDisposingPanel.this.disposableBeanStore.dispose();
-                            SelfDisposingPanel.this.checkTimer.cancel();
+                        if (DisposableAgent.getInstance().isRegistered(disposableBeanStore)) {
+                            // just unregister and wait for the next cycle
+                            DisposableAgent.getInstance().unregister(disposableBeanStore);
+                        } else {
+                            if (getParent() == null) {
+                                checkTimer.cancel();
+                                DisposableAgent.getInstance().dispose(disposableBeanStore);
+                                setStrongListenerReference(null);
+                                if (getParent() instanceof CoolEditor) {
+                                    ((CoolEditor)getParent()).setOriginalComponent(null);
+                                }
+                            }
                         }
                     }
-                }, CHECK_INTERVAL, CHECK_INTERVAL);
+                }, 0, CHECK_INTERVAL);
         }
     }
 
