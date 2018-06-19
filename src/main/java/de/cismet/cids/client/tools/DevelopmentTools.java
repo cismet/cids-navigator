@@ -88,7 +88,7 @@ public class DevelopmentTools {
 
     private static final Logger LOG = Logger.getLogger(DevelopmentTools.class);
 
-    private static final String DEFAULT_RESTFULL_CALLSERVER = "http://localhost:9986/callserver/binary";
+    public static final String RESTFUL_CALLSERVER_CALLSERVER = "http://localhost:9986/callserver/binary";
     private static final int DEFAULT_RENDERER_WIDTH = 800;
     private static final int DEFAULT_RENDERER_HEIGHT = 600;
 
@@ -210,7 +210,7 @@ public class DevelopmentTools {
             final String pass,
             final boolean compressionEnabled) throws Exception {
         initSessionManagerFromRestfulConnection(
-            DEFAULT_RESTFULL_CALLSERVER,
+            RESTFUL_CALLSERVER_CALLSERVER,
             domain,
             group,
             user,
@@ -375,7 +375,7 @@ public class DevelopmentTools {
             final String table,
             final int objectId) throws Exception {
         return createCidsBeanFromRestfulConnection(
-                DEFAULT_RESTFULL_CALLSERVER,
+                RESTFUL_CALLSERVER_CALLSERVER,
                 domain,
                 group,
                 user,
@@ -440,9 +440,44 @@ public class DevelopmentTools {
             final String table,
             final int objectId) throws Exception {
         if (!SessionManager.isInitialized()) {
-            initSessionManagerFromRestfulConnection(callserverUrl, domain, group, user, pass, compressionEnabled);
+            if ((user == null) || (pass == null)) {
+                showSimpleLoginDialog(callserverUrl, domain, compressionEnabled, ConnectionContext.createDeprecated());
+            } else {
+                initSessionManagerFromRestfulConnection(callserverUrl, domain, group, user, pass, compressionEnabled);
+            }
         }
         return createCidsBeanFromCurrentSession(domain, table, objectId);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserverUrl       DOCUMENT ME!
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     * @param   table               DOCUMENT ME!
+     * @param   objectId            DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static CidsBean createCidsBeanFromRestfulConnection(final String callserverUrl,
+            final String domain,
+            final String group,
+            final boolean compressionEnabled,
+            final String table,
+            final int objectId) throws Exception {
+        return createCidsBeanFromRestfulConnection(
+                callserverUrl,
+                domain,
+                group,
+                null,
+                null,
+                compressionEnabled,
+                table,
+                objectId);
     }
 
     /**
@@ -889,7 +924,7 @@ public class DevelopmentTools {
             final int w,
             final int h) throws Exception {
         createEditorFromRestfulConnection(
-            DEFAULT_RESTFULL_CALLSERVER,
+            RESTFUL_CALLSERVER_CALLSERVER,
             domain,
             group,
             user,
@@ -933,6 +968,38 @@ public class DevelopmentTools {
                 group,
                 user,
                 pass,
+                compressionEnabled,
+                table,
+                objectId);
+        showEditor(cb, w, h);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   callserver          DOCUMENT ME!
+     * @param   domain              DOCUMENT ME!
+     * @param   group               DOCUMENT ME!
+     * @param   compressionEnabled  DOCUMENT ME!
+     * @param   table               DOCUMENT ME!
+     * @param   objectId            DOCUMENT ME!
+     * @param   w                   DOCUMENT ME!
+     * @param   h                   DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void createEditorFromRestfulConnection(final String callserver,
+            final String domain,
+            final String group,
+            final boolean compressionEnabled,
+            final String table,
+            final int objectId,
+            final int w,
+            final int h) throws Exception {
+        final CidsBean cb = createCidsBeanFromRestfulConnection(
+                callserver,
+                domain,
+                group,
                 compressionEnabled,
                 table,
                 objectId);
