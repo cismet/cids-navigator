@@ -249,7 +249,7 @@ public class NavigatorX extends javax.swing.JFrame {
     /** Holds value of property disposed. */
     private boolean disposed = false;    // InfoNode
     // Panels
-    private NavigatorSplashScreen splashScreen;
+    private NavigatorXSplashScreen splashScreen;
     private String title;
     private RootWindow rootWindow;
     private StringViewMap viewMap = new StringViewMap();
@@ -306,7 +306,7 @@ public class NavigatorX extends javax.swing.JFrame {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public NavigatorX(final ProgressObserver progressObserver, final NavigatorSplashScreen splashScreen)
+    public NavigatorX(final ProgressObserver progressObserver, final NavigatorXSplashScreen splashScreen)
             throws Exception {
         this.progressObserver = progressObserver;
         this.splashScreen = splashScreen;
@@ -741,11 +741,21 @@ public class NavigatorX extends javax.swing.JFrame {
 
         config.configureMainMenu(menuBar);
         toolbars = config.getToolbars();
+        double maxHeight = 0;
 
         if ((toolbars != null) && !toolbars.isEmpty()) {
             toolbarPanel.setLayout(new WrapLayout(FlowLayout.LEFT, 1, 0));
 
             for (final ConfiguredToolBar toolbar : toolbars) {
+                if (maxHeight < toolbar.getToolbar().getPreferredSize().getHeight()) {
+                    maxHeight = toolbar.getToolbar().getPreferredSize().getHeight();
+                }
+            }
+            for (final ConfiguredToolBar toolbar : toolbars) {
+                toolbar.getToolbar()
+                        .setMinimumSize(new Dimension(
+                                (int)toolbar.getToolbar().getMinimumSize().getWidth(),
+                                (int)maxHeight));
                 toolbarPanel.add(toolbar.getToolbar());
             }
             this.getContentPane().add(toolbarPanel, BorderLayout.NORTH);
@@ -1143,12 +1153,6 @@ public class NavigatorX extends javax.swing.JFrame {
             }
 //            v.restoreFocus();
         }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void initCismapPlugin() {
     }
 
     /**
@@ -2033,7 +2037,7 @@ public class NavigatorX extends javax.swing.JFrame {
             // look and feel ...................................................
             LAFManager.getManager().changeLookAndFeel(PropertyManager.getManager().getLookAndFeel());
 
-            final NavigatorSplashScreen navigatorSplashScreen = new NavigatorSplashScreen(PropertyManager.getManager()
+            final NavigatorXSplashScreen navigatorSplashScreen = new NavigatorXSplashScreen(PropertyManager.getManager()
                             .getSharedProgressObserver(),
                     // FIXME: illegal icon
                     resourceManager.getIcon("wundaLogo.png"));

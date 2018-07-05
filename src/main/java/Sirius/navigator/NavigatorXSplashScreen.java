@@ -34,7 +34,7 @@ import de.cismet.tools.CismetThreadPool;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class NavigatorSplashScreen extends JFrame {
+public class NavigatorXSplashScreen extends JFrame {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -65,7 +65,7 @@ public class NavigatorSplashScreen extends JFrame {
      * @param  progressObserver  DOCUMENT ME!
      * @param  logo              DOCUMENT ME!
      */
-    public NavigatorSplashScreen(final ProgressObserver progressObserver, final Icon logo) {
+    public NavigatorXSplashScreen(final ProgressObserver progressObserver, final Icon logo) {
         this.setUndecorated(true);
         // this.setAlwaysOnTop(true);
         this.initComponents();
@@ -162,9 +162,7 @@ public class NavigatorSplashScreen extends JFrame {
         progressBarPlugin.setBorderPainted(false);
         progressBarPlugin.setDoubleBuffered(true);
         progressBarPlugin.setFocusable(false);
-        progressBarPlugin.setString(org.openide.util.NbBundle.getMessage(
-                NavigatorSplashScreen.class,
-                "NavigatorSplashSceen.progressBarPlugin.string")); // NOI18N
+        progressBarPlugin.setString("Plugins");
         progressBarPlugin.setStringPainted(true);
         progressBarPlugin.setVerifyInputWhenFocusTarget(false);
         panProgress.add(progressBarPlugin, java.awt.BorderLayout.SOUTH);
@@ -327,9 +325,9 @@ public class NavigatorSplashScreen extends JFrame {
                             if (logger.isInfoEnabled()) {
                                 logger.info("creating navigator instance");    // NOI18N
                             }
-                            final Navigator navigator = new Navigator(
+                            final NavigatorX navigator = new NavigatorX(
                                     NavigatorLoader.this.progressObserver,
-                                    NavigatorSplashScreen.this);
+                                    NavigatorXSplashScreen.this);
                             if (logger.isInfoEnabled()) {
                                 logger.info("new navigator instance created"); // NOI18N
                             }
@@ -346,10 +344,10 @@ public class NavigatorSplashScreen extends JFrame {
                                     .showExceptionDialog(
                                         ExceptionManager.FATAL,
                                         org.openide.util.NbBundle.getMessage(
-                                            NavigatorSplashScreen.class,
+                                            NavigatorXSplashScreen.class,
                                             "NavigatorSplashScreen.NavigatorLoader.doInvoke().ExceptionManager_anon.name"),    // NOI18N
                                         org.openide.util.NbBundle.getMessage(
-                                            NavigatorSplashScreen.class,
+                                            NavigatorXSplashScreen.class,
                                             "NavigatorSplashScreen.NavigatorLoader.doInvoke().ExceptionManager_anon.message"), // NOI18N
                                         t);
                             System.exit(1);
