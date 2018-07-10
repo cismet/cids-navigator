@@ -27,16 +27,18 @@ import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
 
-import org.openide.util.Exceptions;
-
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractButton;
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.*;
+
+import de.cismet.tools.gui.GUIWindow;
 
 /**
  * DOCUMENT ME!
@@ -44,7 +46,8 @@ import javax.swing.event.*;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class AttributeViewer extends javax.swing.JPanel implements EmbededControlBar, GUIWindow {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -323,6 +326,26 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
             }
         }
     }                                                                                //GEN-LAST:event_editButtonActionPerformed
+
+    @Override
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        return GUIWindow.NO_PERMISSION;
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
+    }
 
     //~ Inner Classes ----------------------------------------------------------
 

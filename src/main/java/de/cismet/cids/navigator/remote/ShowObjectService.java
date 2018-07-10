@@ -141,20 +141,21 @@ public class ShowObjectService extends AbstractRESTRemoteControlMethod implement
 
             if ((search == null) || search) {
                 ComponentRegistry.getRegistry().getSearchResultsTree().setResultNodes(newNodes, false, null);
-                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.SEARCHRESULTS_TREE);
+                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.SEARCHRESULTS_TREE);
             }
 
             if ((map != null) && map) {
-                PluginRegistry.getRegistry()
-                        .getPluginDescriptor("cismap")
-                        .getUIDescriptor("cismap")
-                        .getView()
-                        .makeVisible();
+                ComponentRegistry.getRegistry().showComponent("map");
+//                PluginRegistry.getRegistry()
+//                        .getPluginDescriptor("cismap")
+//                        .getUIDescriptor("cismap")
+//                        .getView()
+//                        .makeVisible();
                 MetaTreeNodeVisualization.getInstance().addVisualization(defaultMetaTreeNodes);
             }
             if ((renderer != null) && renderer) {
                 ComponentRegistry.getRegistry().getDescriptionPane().setNodesDescriptions(defaultMetaTreeNodes);
-                ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.DESCRIPTION_PANE);
+                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.DESCRIPTION_PANE);
             }
         } catch (Exception e) {
             LOG.error("Problem during remote-showing an object", e);

@@ -24,7 +24,9 @@ public interface GUIContainer {
     /**
      * DOCUMENT ME!
      *
-     * @param  id  DOCUMENT ME!
+     * @param       id  DOCUMENT ME!
+     *
+     * @deprecated  does not work with the new navigator. Use ComponentRegistry.getRegistry().showComponent(String id).
      */
     void select(String id);
     /**

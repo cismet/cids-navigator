@@ -183,7 +183,7 @@ public class MethodManager {
      * DOCUMENT ME!
      */
     public void showSearchResults() {
-        ComponentRegistry.getRegistry().getGUIContainer().select(ComponentRegistry.SEARCHRESULTS_TREE);
+        ComponentRegistry.getRegistry().showComponent(ComponentRegistry.SEARCHRESULTS_TREE);
     }
 
     /**

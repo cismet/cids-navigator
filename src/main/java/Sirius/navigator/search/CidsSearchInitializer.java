@@ -152,9 +152,7 @@ public class CidsSearchInitializer {
 
                                 @Override
                                 public void actionPerformed(final ActionEvent e) {
-                                    ComponentRegistry.getRegistry()
-                                            .getGUIContainer()
-                                            .select(windowSearch.getClass().getName());
+                                    ComponentRegistry.getRegistry().showComponent(windowSearch.getClass().getName());
                                 }
                             });
                     }
