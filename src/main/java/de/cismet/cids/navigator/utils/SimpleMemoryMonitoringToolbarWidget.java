@@ -18,6 +18,8 @@ import javax.swing.Timer;
 
 import de.cismet.tools.StaticDebuggingTools;
 
+import de.cismet.tools.gui.menu.CidsUiAction;
+
 /**
  * DOCUMENT ME!
  *
@@ -25,7 +27,7 @@ import de.cismet.tools.StaticDebuggingTools;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = CidsClientToolbarItem.class)
-public class SimpleMemoryMonitoringToolbarWidget extends AbstractAction implements CidsClientToolbarItem {
+public class SimpleMemoryMonitoringToolbarWidget extends AbstractAction implements CidsClientToolbarItem, CidsUiAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -61,6 +63,7 @@ public class SimpleMemoryMonitoringToolbarWidget extends AbstractAction implemen
         if (isVisible()) {
             timer.start();
         }
+        putValue(CidsUiAction.CIDS_ACTION_KEY, "SimpleMemoryMonitoringToolbarWidget");
     }
 
     //~ Methods ----------------------------------------------------------------

@@ -7,6 +7,7 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
+import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.ui.status.Status;
 
 import org.xhtmlrenderer.extend.NamespaceHandler;
@@ -17,9 +18,12 @@ import org.xhtmlrenderer.swing.LinkListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import de.cismet.tools.gui.GUIWindow;
 import de.cismet.tools.gui.xhtmlrenderer.WebAccessManagerUserAgent;
 
 /**
@@ -30,7 +34,8 @@ import de.cismet.tools.gui.xhtmlrenderer.WebAccessManagerUserAgent;
  *
  * @version  $Revision$, $Date$
  */
-public class DescriptionPaneFS extends DescriptionPane {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class DescriptionPaneFS extends DescriptionPane implements GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -191,5 +196,30 @@ public class DescriptionPaneFS extends DescriptionPane {
                 Status.ICON_DEACTIVATED,
                 Status.ICON_ACTIVATED);
         }
+    }
+
+    @Override
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FLYING_SAUCER_HTML_RENDERER)) {
+            return GUIWindow.NO_PERMISSION;
+        } else {
+            return "DescriptionPaneFS";
+        }
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
     }
 }

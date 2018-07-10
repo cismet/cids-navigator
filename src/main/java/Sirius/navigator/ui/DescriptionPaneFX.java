@@ -7,41 +7,24 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
+import Sirius.navigator.resource.PropertyManager;
+
 import javafx.application.Platform;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-
-import javafx.concurrent.Worker.State;
-
-import javafx.embed.swing.JFXPanel;
-
-import javafx.geometry.Insets;
-
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.web.WebEngine;
-import javafx.scene.web.WebView;
 
 import org.apache.log4j.Logger;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.html.HTMLAnchorElement;
-
 import java.awt.event.ActionListener;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
-import de.cismet.tools.BrowserLauncher;
-
 import de.cismet.tools.gui.FXWebViewPanel;
+import de.cismet.tools.gui.GUIWindow;
 
 /**
  * An implementation of DescriptionPane which uses JavaFX WebKit Component to render XHTML content.
@@ -49,7 +32,8 @@ import de.cismet.tools.gui.FXWebViewPanel;
  * @author   daniel
  * @version  $Revision$, $Date$
  */
-public class DescriptionPaneFX extends DescriptionPane {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class DescriptionPaneFX extends DescriptionPane implements GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -123,5 +107,29 @@ public class DescriptionPaneFX extends DescriptionPane {
     public void setPageFromContent(final String page,
             final String baseURL) {
         browserPanel.loadContent(page);
+    }
+
+    @Override
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        if (PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(PropertyManager.FX_HTML_RENDERER)) {
+            return GUIWindow.NO_PERMISSION;
+        } else {
+            return "DescriptionPaneFX";
+        }
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
     }
 }

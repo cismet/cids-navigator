@@ -8,6 +8,8 @@
 package Sirius.navigator.ui;
 
 import Sirius.navigator.Navigator;
+import Sirius.navigator.NavigatorX;
+import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.plugin.ui.manager.PluginManager;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.attributes.editor.AttributeEditor;
@@ -348,7 +350,19 @@ public class ComponentRegistry {
      * @param  id  DOCUMENT ME!
      */
     public void showComponent(final String id) {
-        guiContainer.select(id);
+        if (guiContainer != null) {
+            if (id.equals("map")) {
+                // This is required for compatibility with the old navigator version ( < NavigatorX)
+                PluginRegistry.getRegistry()
+                        .getPluginDescriptor("cismap")
+                        .getUIDescriptor("cismap")
+                        .getView()
+                        .makeVisible();
+            }
+            guiContainer.select(id);
+        } else {
+            ((NavigatorX)mainFrame).select(id);
+        }
     }
 
     /**

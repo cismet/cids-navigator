@@ -7,6 +7,7 @@
 ****************************************************/
 package Sirius.navigator.ui;
 
+import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.ui.status.Status;
 
 import calpa.html.CalCons;
@@ -17,12 +18,18 @@ import calpa.html.DefaultCalHTMLObserver;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import javax.swing.Icon;
+import javax.swing.JComponent;
+
+import de.cismet.tools.gui.GUIWindow;
+
 /**
  * An implementation of DescriptionPane which uses CalpaHTML to render HTML documents.
  *
  * @version  $Revision$, $Date$
  */
-public class DescriptionPaneCalpa extends DescriptionPane {
+@org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
+public class DescriptionPaneCalpa extends DescriptionPane implements GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -212,5 +219,33 @@ public class DescriptionPaneCalpa extends DescriptionPane {
     @Override
     public void setPageFromContent(final String markup, final String baseURL) {
         setPageFromContent(markup);
+    }
+
+    @Override
+    public JComponent getGuiComponent() {
+        return this;
+    }
+
+    @Override
+    public String getPermissionString() {
+        if (
+            !PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FLYING_SAUCER_HTML_RENDERER)
+                    && !PropertyManager.getManager().getDescriptionPaneHtmlRenderer().equals(
+                        PropertyManager.FX_HTML_RENDERER)) {
+            return GUIWindow.NO_PERMISSION;
+        } else {
+            return "DescriptionPaneCalpa";
+        }
+    }
+
+    @Override
+    public String getViewTitle() {
+        return null;
+    }
+
+    @Override
+    public Icon getViewIcon() {
+        return null;
     }
 }

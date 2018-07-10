@@ -27,6 +27,8 @@ import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
 
+import de.cismet.tools.gui.menu.CidsUiAction;
+
 /**
  * DOCUMENT ME!
  *
@@ -34,7 +36,9 @@ import de.cismet.connectioncontext.ConnectionContextStore;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsClientToolbarItem.class)
-public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem, ConnectionContextStore {
+public class QuerySearchToolbarItem extends AbstractAction implements CidsClientToolbarItem,
+    ConnectionContextStore,
+    CidsUiAction {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -50,6 +54,7 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
             Action.SHORT_DESCRIPTION,
             NbBundle.getMessage(QuerySearchToolbarItem.class, "QuerySearchToolbarItem.short_description"));
         putValue(Action.SMALL_ICON, new ImageIcon(this.getClass().getResource("/de/cismet/cids/search/binocular.png")));
+        putValue(CidsUiAction.CIDS_ACTION_KEY, "QuerySearchToolbarItem");
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -62,7 +67,7 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
     @Override
     public void actionPerformed(final ActionEvent e) {
         final String id = QuerySearch.class.getName();
-        ComponentRegistry.getRegistry().getGUIContainer().select(id);
+        ComponentRegistry.getRegistry().showComponent(id);
     }
 
     @Override
