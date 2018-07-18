@@ -977,9 +977,13 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
      */
     private Throwable getTopInitialCause(final Exception e) {
         Throwable initialCause = e.getCause();
-        while (initialCause.getCause() != null) {
-            initialCause = initialCause.getCause();
+        
+        if (initialCause != null) {
+            while (initialCause.getCause() != null) {
+                initialCause = initialCause.getCause();
+            }
         }
+        
         return initialCause;
     }
 
