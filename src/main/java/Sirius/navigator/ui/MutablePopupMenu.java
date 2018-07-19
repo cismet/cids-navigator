@@ -639,7 +639,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
          * Creates a new EditObjectMethod object.
          */
         public EditObjectMethod() {
-            super(MethodManager.OBJECT_NODE + MethodManager.SINGLE);
+            super(MethodManager.OBJECT_NODE + MethodManager.SINGLE + MethodManager.WRITE);
 
             this.pluginMethod = this;
 
