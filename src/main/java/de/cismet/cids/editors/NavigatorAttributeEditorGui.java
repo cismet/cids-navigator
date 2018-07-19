@@ -137,7 +137,9 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                                     && (editorObject.getBean().hasArtificialChangeFlag()
                                         || editorObject.isChanged()))
                                 || (backupObject == null)) {
-                        if (editorObject.getBean().hasObjectWritePermission(SessionManager.getSession().getUser())) {
+                        if (CidsBean.checkWritePermission(
+                                        SessionManager.getSession().getUser(),
+                                        editorObject.getBean())) {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
                                 final int answer = JOptionPane.showConfirmDialog(
                                         NavigatorAttributeEditorGui.this,
@@ -525,21 +527,25 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
     public void setTreeNode(final Object node) {
         if ((treeNode != null) && (editorObject != null)) {
             if (editorObject.getBean().hasArtificialChangeFlag() || editorObject.isChanged()) {
-                final int answer = JOptionPane.showConfirmDialog(
-                        NavigatorAttributeEditorGui.this,
-                        org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"), // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"), // NOI18N
-                        JOptionPane.YES_NO_CANCEL_OPTION);
-                if (answer == JOptionPane.YES_OPTION) {
-                    saveIt();
-                } else if (answer == JOptionPane.NO_OPTION) {
+                if (CidsBean.checkWritePermission(SessionManager.getSession().getUser(), editorObject.getBean())) {
+                    final int answer = JOptionPane.showConfirmDialog(
+                            NavigatorAttributeEditorGui.this,
+                            org.openide.util.NbBundle.getMessage(
+                                NavigatorAttributeEditorGui.class,
+                                "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.message"), // NOI18N
+                            org.openide.util.NbBundle.getMessage(
+                                NavigatorAttributeEditorGui.class,
+                                "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"), // NOI18N
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        saveIt();
+                    } else if (answer == JOptionPane.NO_OPTION) {
+                        reloadFromDB();
+                    } else {                                                                      // Cancel
+                        return;
+                    }
+                } else {
                     reloadFromDB();
-                } else {                                                                      // Cancel
-                    return;
                 }
             }
         }

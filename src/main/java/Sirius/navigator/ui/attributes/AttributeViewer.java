@@ -38,6 +38,8 @@ import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.event.*;
 
+import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.tools.gui.GUIWindow;
 
 /**
@@ -125,9 +127,9 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                     && (treeNode instanceof ObjectTreeNode)) {
             final ObjectTreeNode objectTreeNode = (ObjectTreeNode)treeNode;
             if (objectTreeNode.isMetaObjectFilled()) {
-                this.editButton.setEnabled(
-                    objectTreeNode.getMetaObject().getBean().hasObjectWritePermission(
-                        SessionManager.getSession().getUser()));
+                this.editButton.setEnabled(CidsBean.checkWritePermission(
+                        SessionManager.getSession().getUser(),
+                        objectTreeNode.getMetaObject().getBean()));
             } else {
                 if (logger.isDebugEnabled()) {
                     logger.debug("starting getMetaObject worker thread for tree node " + treeNode.hashCode());
@@ -148,8 +150,9 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                                 final MetaObject metaObject = this.get();
 
                                 if (!isCancelled()) {
-                                    editButton.setEnabled(metaObject.getBean().hasObjectWritePermission(
-                                            SessionManager.getSession().getUser()));
+                                    editButton.setEnabled(CidsBean.checkWritePermission(
+                                            SessionManager.getSession().getUser(),
+                                            metaObject.getBean()));
                                 } else {
                                     logger.warn("getMetaObject worker cancelled for tree node " + treeNode.hashCode());
                                 }
