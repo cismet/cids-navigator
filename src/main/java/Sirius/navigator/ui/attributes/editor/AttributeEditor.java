@@ -37,6 +37,7 @@ import javax.swing.tree.*;
 
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -46,7 +47,7 @@ import de.cismet.tools.CismetThreadPool;
  * @author   pascal
  * @version  $Revision$, $Date$
  */
-public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar, ConnectionContextProvider {
+public class AttributeEditor extends javax.swing.JPanel implements EmbededControlBar, ConnectionContextStore {
 
     //~ Instance fields --------------------------------------------------------
 
@@ -57,7 +58,7 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     private ComplexEditor editor = null;
     private Object commitBlocker = new Object();
 
-    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private Sirius.navigator.ui.attributes.AttributeTree attributeTree;
@@ -605,6 +606,11 @@ public class AttributeEditor extends javax.swing.JPanel implements EmbededContro
     @Override
     public final ConnectionContext getConnectionContext() {
         return connectionContext;
+    }
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext cc) {
+        this.connectionContext = cc;
     }
 
     //~ Inner Classes ----------------------------------------------------------

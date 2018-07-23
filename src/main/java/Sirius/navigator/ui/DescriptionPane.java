@@ -77,7 +77,7 @@ import de.cismet.cids.tools.metaobjectrenderer.ScrollableFlowPanel;
 import de.cismet.cids.tools.metaobjectrenderer.SelfDisposingPanel;
 
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -96,7 +96,7 @@ import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
-public abstract class DescriptionPane extends JPanel implements StatusChangeSupport, ConnectionContextProvider {
+public abstract class DescriptionPane extends JPanel implements StatusChangeSupport, ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -119,7 +119,7 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     private transient boolean fullScreenRenderer;
     private final MultiMap sharedHandlersHM = new MultiMap();
 
-    private final ConnectionContext connectionContext = ConnectionContext.createDummy();
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     protected javax.swing.JPanel jPanel2;
@@ -315,6 +315,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     @Override
     public void removeStatusChangeListener(final StatusChangeListener listener) {
         this.statusChangeSupport.removeStatusChangeListener(listener);
+    }
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext cc) {
+        this.connectionContext = cc;
     }
 
     /**

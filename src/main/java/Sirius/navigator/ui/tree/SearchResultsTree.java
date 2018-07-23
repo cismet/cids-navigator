@@ -9,8 +9,6 @@ package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
-import Sirius.navigator.plugin.PluginRegistry;
-import Sirius.navigator.plugin.interfaces.PluginSupport;
 import Sirius.navigator.resource.PropertyManager;
 import Sirius.navigator.types.treenode.*;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -43,7 +41,7 @@ import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.utils.ClassloadingHelper;
 
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -57,7 +55,7 @@ import de.cismet.tools.collections.HashArrayList;
  *
  * @version  $Revision$, $Date$
  */
-public class SearchResultsTree extends MetaCatalogueTree implements ConnectionContextProvider {
+public class SearchResultsTree extends MetaCatalogueTree implements ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -827,6 +825,12 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
      */
     public SwingWorker getNodeLoadingWorker() {
         return refreshWorker;
+    }
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext cc) {
+        super.initWithConnectionContext(cc);
+        init(new RootTreeNode(cc), editable, useThread, 2);
     }
 
     /**

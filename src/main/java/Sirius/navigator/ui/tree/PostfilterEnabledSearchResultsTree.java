@@ -58,6 +58,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      *
      * @throws  Exception  DOCUMENT ME!
      */
+    @Deprecated
     public PostfilterEnabledSearchResultsTree() throws Exception {
         this(ConnectionContext.createDeprecated());
     }
@@ -71,23 +72,7 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
      */
     public PostfilterEnabledSearchResultsTree(final ConnectionContext connectionContext) throws Exception {
         super(connectionContext);
-        final Collection<? extends PostFilterGUI> lookupResult = Lookup.getDefault().lookupAll(PostFilterGUI.class);
-        for (final PostFilterGUI gui : lookupResult) {
-            if (gui instanceof ConnectionContextStore) {
-                ((ConnectionContextStore)gui).initWithConnectionContext(getConnectionContext());
-            }
-        }
-        availablePostFilterGUIs = new ArrayList<PostFilterGUI>(lookupResult);
-
-        Collections.sort(availablePostFilterGUIs, new Comparator<PostFilterGUI>() {
-
-                @Override
-                public int compare(final PostFilterGUI o1, final PostFilterGUI o2) {
-                    return o1.getDisplayOrderKeyPrio().compareTo(o2.getDisplayOrderKeyPrio());
-                }
-            });
-
-        LOG.info(availablePostFilterGUIs.size() + " post filter GUIs available");
+        initPostgisFilter();
     }
 
     /**
@@ -106,6 +91,29 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void initPostgisFilter() {
+        final Collection<? extends PostFilterGUI> lookupResult = Lookup.getDefault().lookupAll(PostFilterGUI.class);
+        for (final PostFilterGUI gui : lookupResult) {
+            if (gui instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)gui).initWithConnectionContext(getConnectionContext());
+            }
+        }
+        availablePostFilterGUIs = new ArrayList<PostFilterGUI>(lookupResult);
+
+        Collections.sort(availablePostFilterGUIs, new Comparator<PostFilterGUI>() {
+
+                @Override
+                public int compare(final PostFilterGUI o1, final PostFilterGUI o2) {
+                    return o1.getDisplayOrderKeyPrio().compareTo(o2.getDisplayOrderKeyPrio());
+                }
+            });
+
+        LOG.info(availablePostFilterGUIs.size() + " post filter GUIs available");
+    }
 
     /**
      * DOCUMENT ME!
@@ -158,6 +166,12 @@ public class PostfilterEnabledSearchResultsTree extends SearchResultsTree implem
     public void setResultNodes(final Node[] nodes) {
         super.setResultNodes(nodes);
         resultNodesOriginal = new HashArrayList<>(super.resultNodes);
+    }
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext cc) {
+        super.initWithConnectionContext(cc);
+        initPostgisFilter();
     }
 
     /**
