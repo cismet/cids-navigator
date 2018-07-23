@@ -90,14 +90,21 @@
                             ]
                 },
                 {
-                    "name": "S&uche und Finde",
+                    "name": "P&ositionieren",
                     "items":
                             [
-                                {"actionKey": "MapWindowActstrasse_hausnummerWindowActionion"},
+                                {"actionKey": "strasse_hausnummerWindowAction"},
+                                {"actionKey": "stadt_strasse_hausnummerWindowAction"},
                                 {"actionKey": "gemarkung_flur_flurstueckWindowAction"},
+                                {"actionKey": "stadtbezirk_quartierWindowAction"},
                                 {"actionKey": "bplan_sucheWindowAction"},
                                 {"actionKey": "poi_themaWindowAction"},
-                                {"actionKey": "poi_sucheWindowAction"}
+                                {"actionKey": "poi_sucheWindowAction"},
+                                {"actionKey": "gewaesser_sucheWindowAction"},
+                                {"actionKey": "verteiler_sucheWindowAction"},
+                                {"actionKey": "gewanne_sucheWindowAction"},
+                                {"actionKey": "gruenflaechen_sucheWindowAction"},
+                                {"actionKey": "psa_sucheWindowAction"}
                             ]
                 },
                 {
