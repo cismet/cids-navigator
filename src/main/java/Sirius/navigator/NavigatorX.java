@@ -39,6 +39,7 @@ import Sirius.navigator.ui.LayoutedContainer;
 import Sirius.navigator.ui.MutablePopupMenu;
 import Sirius.navigator.ui.NavigatorStatusBar;
 import Sirius.navigator.ui.ShowObjectsInGuiMethod;
+import Sirius.navigator.ui.Windows;
 import Sirius.navigator.ui.attributes.AttributeViewer;
 import Sirius.navigator.ui.dialog.LoginDialog;
 import Sirius.navigator.ui.dnd.MetaTreeNodeDnDHandler;
@@ -59,10 +60,13 @@ import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.Permission;
 import Sirius.server.newuser.permission.PermissionHolder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.infonode.docking.DockingWindow;
 import net.infonode.docking.DockingWindowAdapter;
 import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
+import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
 import net.infonode.docking.theme.DockingWindowsTheme;
@@ -99,24 +103,25 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import java.net.URL;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -182,6 +187,10 @@ import de.cismet.cismap.commons.wfsforms.WFSFormFactory;
 import de.cismet.commons.gui.protocol.ProtocolHandler;
 import de.cismet.commons.gui.protocol.ProtocolPanel;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.layout.WrapLayout;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
@@ -221,7 +230,7 @@ import static java.awt.Frame.MAXIMIZED_BOTH;
  * @author   Puhl
  * @version  $Revision$, $Date$
  */
-public class NavigatorX extends javax.swing.JFrame {
+public class NavigatorX extends javax.swing.JFrame implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -269,6 +278,10 @@ public class NavigatorX extends javax.swing.JFrame {
     private ShowObjectsInGuiMethod showObjectMethod = null;
     private HashMap<String, View> attributeTableMap = new HashMap<String, View>();
     private int progress = 200;
+    private final ConnectionContext connectionContext = ConnectionContext.create(
+            ConnectionContext.Category.OTHER,
+            getClass().getSimpleName());
+    private Windows windowsConfig = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -318,12 +331,13 @@ public class NavigatorX extends javax.swing.JFrame {
             final String titleNamesFile = System.getProperty(
                     "jnlp.titleName",
                     "/Sirius/navigator/titleNames.properties");
-            // todo: load user defined name titles from the configuration attribute
+
             titleNames.load(getClass().getResourceAsStream(titleNamesFile));
         } catch (Exception e) {
             LOG.warn("Cannot load titles property file", e);
         }
 
+        initWindowConfig();
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
         this.exceptionManager = ExceptionManager.getManager();
@@ -333,7 +347,6 @@ public class NavigatorX extends javax.swing.JFrame {
         mapC.setReadOnly(false);
         mapC.unlock();
         CismapBroker.getInstance().addMapDnDListener(new CustomMapDnDListener());
-//        CismapBroker.getInstance().addStatusListener(this);
 
         startupFinished = true;
     }
@@ -464,6 +477,43 @@ public class NavigatorX extends javax.swing.JFrame {
 
         if (sl != null) {
             sl.setFeaturesFromServicesSelectable(true);
+        }
+    }
+
+    /**
+     * Loads the window configuration from the corresponding JSon file.
+     */
+    private void initWindowConfig() {
+        try {
+            final String allowedWindowNamesFile = System.getProperty(
+                    "jnlp.allowedWindows",
+                    "/Sirius/navigator/windows.json");
+
+            if ((allowedWindowNamesFile != null) && !allowedWindowNamesFile.equals("")) {
+                final ObjectMapper mapper = new ObjectMapper();
+
+                BufferedReader reader = null;
+                final InputStream is = this.getClass().getResourceAsStream(allowedWindowNamesFile);
+
+                if (is != null) {
+                    try {
+                        reader = new BufferedReader(new InputStreamReader(is));
+                        windowsConfig = mapper.readValue(reader, Windows.class);
+
+                        if ((windowsConfig != null) && (windowsConfig.getAllowedWindows() != null)) {
+                            Arrays.sort(windowsConfig.getAllowedWindows());
+                        }
+                    } finally {
+                        is.close();
+
+                        if (reader != null) {
+                            reader.close();
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.warn("Cannot load windows property file", e);
         }
     }
 
@@ -737,7 +787,7 @@ public class NavigatorX extends javax.swing.JFrame {
         }
         final String configFile = System.getProperty("jnlp.menuConfigFile", "/Sirius/navigator/MenuConfig.json");
         // todo: load user defined menu configuration from the configuration attribute
-        final ActionConfiguration config = new ActionConfiguration(configFile, windowActions);
+        final ActionConfiguration config = new ActionConfiguration(configFile, windowActions, getConnectionContext());
 
         config.configureMainMenu(menuBar);
         toolbars = config.getToolbars();
@@ -785,6 +835,13 @@ public class NavigatorX extends javax.swing.JFrame {
         String viewId = null;
 
         for (final GUIWindow window : windows) {
+            if ((windowsConfig != null) && (windowsConfig.getAllowedWindows() != null)
+                        && (Arrays.binarySearch(windowsConfig.getAllowedWindows(), window.getClass().getName()) < 0)) {
+                continue;
+            }
+            if (window instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)window).initWithConnectionContext(getConnectionContext());
+            }
             if (window.getPermissionString().equals(GUIWindow.NO_PERMISSION)) {
                 progress = ((progress < 500) ? (progress + 30) : progress);
                 progressObserver.setProgress(
@@ -793,7 +850,8 @@ public class NavigatorX extends javax.swing.JFrame {
                         "NavigatorX.progressObserver.loadWindow")); // NOI18N
                 final String titleName = ((window.getViewTitle() != null) ? window.getViewTitle() : "");
                 if (window instanceof MetaCatalogueTree) {
-                    final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots());
+                    final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(),
+                            getConnectionContext());
                     ((MetaCatalogueTree)window).init(
                         rootTreeNode,
                         PropertyManager.getManager().isEditable(),
@@ -812,9 +870,9 @@ public class NavigatorX extends javax.swing.JFrame {
                     viewMap.addView(ComponentRegistry.CATALOGUE_TREE, view);
                 } else if (window instanceof SearchResultsTreePanel) {
                     if (PropertyManager.getManager().isPostfilterEnabled()) {
-                        searchResultsTree = new PostfilterEnabledSearchResultsTree();
+                        searchResultsTree = new PostfilterEnabledSearchResultsTree(getConnectionContext());
                     } else {
-                        searchResultsTree = new SearchResultsTree();
+                        searchResultsTree = new SearchResultsTree(getConnectionContext());
                     }
                     ((SearchResultsTreePanel)window).init(searchResultsTree, propertyManager.isAdvancedLayout());
                     viewId = ComponentRegistry.SEARCHRESULTS_TREE;
@@ -1101,6 +1159,10 @@ public class NavigatorX extends javax.swing.JFrame {
 
         for (final String key : keySet) {
             // View
+            if ((windowsConfig != null) && (windowsConfig.getAllowedWindows() != null)
+                        && (Arrays.binarySearch(windowsConfig.getAllowedWindows(), key) < 0)) {
+                continue;
+            }
             final AbstractWFSForm form = wfsFormFactory.getForms().get(key);
             form.setMappingComponent(mapC);
             if (LOG.isDebugEnabled()) {
@@ -1131,10 +1193,45 @@ public class NavigatorX extends javax.swing.JFrame {
 
         if (v != null) {
             if (!v.isClosable()) {
-                v.restore();
+                if (v.isRestorable()) {
+                    v.restore();
+                } else {
+                    final TabWindow tabWindow = getTabWindowForNewView(rootWindow.getWindow());
+
+                    if (tabWindow == null) {
+                        LOG.error("No suitable tab window found");
+                    } else {
+                        tabWindow.addTab(v);
+                        v.restore();
+                    }
+                }
             }
             v.restoreFocus();
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   window  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private TabWindow getTabWindowForNewView(final DockingWindow window) {
+        if (window instanceof TabWindow) {
+            return (TabWindow)window;
+        } else if (window instanceof SplitWindow) {
+            final TabWindow windowLeft = getTabWindowForNewView(((SplitWindow)window).getLeftWindow());
+            final TabWindow windowRight = getTabWindowForNewView(((SplitWindow)window).getRightWindow());
+
+            if (windowLeft != null) {
+                return windowLeft;
+            } else if (windowRight != null) {
+                return windowRight;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1217,6 +1314,15 @@ public class NavigatorX extends javax.swing.JFrame {
             for (final CidsWindowSearch windowSearch : windowSearches) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Initializing window search '" + windowSearch.getName() + "'.");
+                }
+                if (windowSearch instanceof ConnectionContextStore) {
+                    ((ConnectionContextStore)windowSearch).initWithConnectionContext(getConnectionContext());
+                }
+                if ((windowsConfig != null) && (windowsConfig.getAllowedWindows() != null)
+                            && (Arrays.binarySearch(
+                                    windowsConfig.getAllowedWindows(),
+                                    windowSearch.getClass().getName()) < 0)) {
+                    continue;
                 }
 
                 if (checkActionTag(windowSearch)) {
@@ -1605,6 +1711,11 @@ public class NavigatorX extends javax.swing.JFrame {
         }
     }
 
+    @Override
+    public final ConnectionContext getConnectionContext() {
+        return connectionContext;
+    }
+
     /**
      * DOCUMENT ME!
      *
@@ -1760,6 +1871,8 @@ public class NavigatorX extends javax.swing.JFrame {
                 in.close();
                 rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                 rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
+                rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
+                rootWindow.getWindowBar(Direction.UP).setEnabled(true);
                 if (isInit) {
                     final int count = viewMap.getViewCount();
                     for (int i = 0; i < count; i++) {

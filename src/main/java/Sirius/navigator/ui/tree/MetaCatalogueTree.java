@@ -39,6 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 
 import java.util.ArrayList;
@@ -78,7 +79,7 @@ import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
 import de.cismet.commons.concurrency.CismetExecutors;
 
 import de.cismet.connectioncontext.ConnectionContext;
-import de.cismet.connectioncontext.ConnectionContextProvider;
+import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.tools.CismetThreadPool;
 
@@ -92,7 +93,7 @@ import de.cismet.tools.gui.GUIWindow;
 @org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
 public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
     Autoscroll,
-    ConnectionContextProvider,
+    ConnectionContextStore,
     GUIWindow {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -111,7 +112,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
 
     private transient MetaTreeRefreshCache refreshCache;
     private transient ExecutorService treePool;
-    private final ConnectionContext connectionContext;
+    private ConnectionContext connectionContext = ConnectionContext.createDummy();
+    private MouseListener mouseListener = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -120,7 +122,6 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
      * <code>init(RootTreeNode, boolean, boolean, int)</code> should be invoked, to initialise this component
      */
     public MetaCatalogueTree() {
-        connectionContext = ConnectionContext.createDeprecated();
     }
 
     /**
@@ -188,6 +189,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
     /**
      * Should be invoked, if the default constructor was used.
      *
+     * <p>Note: This method can be invoked multiple times.</p>
+     *
      * @param  rootTreeNode    DOCUMENT ME!
      * @param  editable        DOCUMENT ME!
      * @param  useThread       DOCUMENT ME!
@@ -246,7 +249,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
                     }
                 });
         }
-        addMouseListener(new MouseAdapter() {
+        // The init method can be invoked multiple times, so the old mouseListener should be removed
+        if (mouseListener != null) {
+            removeMouseListener(mouseListener);
+        }
+        mouseListener = new MouseAdapter() {
 
                 @Override
                 public void mouseClicked(final MouseEvent e) {
@@ -272,7 +279,8 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
                         }
                     }
                 }
-            });
+            };
+        addMouseListener(mouseListener);
     }
 
     /**
@@ -620,6 +628,11 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
     @Override
     public Icon getViewIcon() {
         return null;
+    }
+
+    @Override
+    public void initWithConnectionContext(final ConnectionContext cc) {
+        this.connectionContext = cc;
     }
 
     //~ Inner Classes ----------------------------------------------------------

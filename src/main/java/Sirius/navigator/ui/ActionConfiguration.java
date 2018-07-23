@@ -55,6 +55,9 @@ import de.cismet.cids.tools.search.clientstuff.CidsWindowSearch;
 
 import de.cismet.cismap.commons.gui.ToolbarComponentsProvider;
 
+import de.cismet.connectioncontext.ConnectionContext;
+import de.cismet.connectioncontext.ConnectionContextStore;
+
 import de.cismet.tools.gui.JPopupMenuButton;
 import de.cismet.tools.gui.ToolbarSeparator;
 import de.cismet.tools.gui.menu.ApplyIconFromSubAction;
@@ -90,6 +93,7 @@ public class ActionConfiguration {
     private final Map<String, ButtonGroup> buttonGroupMap = new HashMap<String, ButtonGroup>();
     private final Map<String, CidsUiMenuProvider> menuMap = new HashMap<String, CidsUiMenuProvider>();
     private final Menu menu;
+    private final ConnectionContext context;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -98,8 +102,12 @@ public class ActionConfiguration {
      *
      * @param  configurationFile  the path to the configuration
      * @param  additionalActions  DOCUMENT ME!
+     * @param  context            DOCUMENT ME!
      */
-    public ActionConfiguration(final String configurationFile, final Map<String, Action> additionalActions) {
+    public ActionConfiguration(final String configurationFile,
+            final Map<String, Action> additionalActions,
+            final ConnectionContext context) {
+        this.context = context;
         lookup();
         menu = readConfiguration(configurationFile);
 
@@ -113,8 +121,12 @@ public class ActionConfiguration {
      *
      * @param  configurationFile  the configuration as input stream
      * @param  additionalActions  DOCUMENT ME!
+     * @param  context            DOCUMENT ME!
      */
-    public ActionConfiguration(final InputStream configurationFile, final Map<String, Action> additionalActions) {
+    public ActionConfiguration(final InputStream configurationFile,
+            final Map<String, Action> additionalActions,
+            final ConnectionContext context) {
+        this.context = context;
         lookup();
         menu = readConfiguration(configurationFile);
 
@@ -633,6 +645,20 @@ public class ActionConfiguration {
         for (final CidsUiActionProvider provider : actionProvider) {
             for (final CidsUiAction action : provider.getActions()) {
                 actionMap.put((String)action.getValue(CidsUiAction.CIDS_ACTION_KEY), action);
+            }
+        }
+
+        final List<Object> allCreatedObjects = new ArrayList<>();
+
+        allCreatedObjects.addAll(actionMap.values());
+        allCreatedObjects.addAll(menuMap.values());
+        allCreatedObjects.addAll(componentMap.values());
+        allCreatedObjects.addAll(windowSearchWithMenuItemActionMap.values());
+        allCreatedObjects.addAll(toolbarItemActionMap.values());
+
+        for (final Object o : allCreatedObjects) {
+            if (o instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)o).initWithConnectionContext(context);
             }
         }
     }
