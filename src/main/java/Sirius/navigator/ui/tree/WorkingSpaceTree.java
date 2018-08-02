@@ -27,12 +27,12 @@ public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow {
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates a new WorkingSpaceTree object.
+     * Creates a new WorkingSpaceTree object. This constructor will be used by the lookup
      *
      * @throws  Exception  DOCUMENT ME!
      */
     public WorkingSpaceTree() throws Exception {
-        super(ConnectionContext.createDeprecated());
+        super(ConnectionContext.createDummy());
     }
 
     /**
