@@ -179,6 +179,7 @@ import de.cismet.cismap.commons.gui.shapeexport.ShapeExport;
 import de.cismet.cismap.commons.interaction.CismapBroker;
 import de.cismet.cismap.commons.interaction.MapDnDListener;
 import de.cismet.cismap.commons.interaction.events.MapDnDEvent;
+import de.cismet.cismap.commons.rasterservice.georeferencing.RasterGeoReferencingBackend;
 import de.cismet.cismap.commons.util.DnDUtils;
 import de.cismet.cismap.commons.util.SelectionManager;
 import de.cismet.cismap.commons.wfsforms.AbstractWFSForm;
@@ -347,6 +348,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         mapC.setReadOnly(false);
         mapC.unlock();
         CismapBroker.getInstance().addMapDnDListener(new CustomMapDnDListener());
+        CismapBroker.getInstance()
+                .addActiveLayerListener(RasterGeoReferencingBackend.getInstance().getActiveLayerListenerHandler());
 
         startupFinished = true;
     }
