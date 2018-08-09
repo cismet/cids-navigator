@@ -15,6 +15,7 @@ package Sirius.navigator;
 import Sirius.navigator.actiontag.ActionTagProtected;
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
+import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
@@ -1727,42 +1728,69 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         progressObserver.setProgress(
             50,
             org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.progressObserver.message_50")); // NOI18N
-        // autologin
-        if (propertyManager.isAutoLogin()) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'"); // NOI18N
-            }
+
+        // autologin with jnlp parameter
+        final String username = System.getProperty("jnlp.username", null);
+        final String password = System.getProperty("jnlp.password", null);
+        final String domain = System.getProperty("jnlp.domain", null);
+        final String usergroup = System.getProperty("jnlp.usergroup", null);
+        boolean autoLogin = false;
+
+        if (username != null) {
+            propertyManager.getConnectionInfo().setUsername(username);
+        }
+        if (domain != null) {
+            propertyManager.getConnectionInfo().setUserDomain(domain);
+            propertyManager.getConnectionInfo().setUsergroupDomain(domain);
+        }
+        if (usergroup != null) {
+            propertyManager.getConnectionInfo().setUsergroup(usergroup);
+        }
+        if ((username != null) && (password != null) && (domain != null) && (usergroup != null)) {
             try {
+                propertyManager.getConnectionInfo().setPassword(password);
                 session = ConnectionFactory.getFactory()
-                            .createSession(connection, propertyManager.getConnectionInfo(), true);
-                proxy = ConnectionFactory.getFactory().createProxy(propertyManager.getConnectionProxyClass(), session);
+                            .createSession(
+                                    connection,
+                                    propertyManager.getConnectionInfo(),
+                                    true,
+                                    getConnectionContext());
+                proxy = ConnectionFactory.getFactory()
+                            .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
                 SessionManager.init(proxy);
+                autoLogin = true;
             } catch (UserException uexp) {
-                LOG.error("autologin failed", uexp);                                                                  // NOI18N
+                LOG.error("login from jnlp parameters failed", uexp); // NOI18N
                 session = null;
             }
         }
 
         // autologin = false || autologin failed
-        if (!propertyManager.isAutoLogin() || (session == null)) {
+        if ((!autoLogin && !propertyManager.isAutoLogin()) || (session == null)) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("performing login"); // NOI18N
             }
             try {
                 session = ConnectionFactory.getFactory()
-                            .createSession(connection, propertyManager.getConnectionInfo(), false);
+                            .createSession(
+                                    connection,
+                                    propertyManager.getConnectionInfo(),
+                                    false,
+                                    getConnectionContext());
             } catch (UserException uexp) {
             }                                 // should never happen
-            proxy = ConnectionFactory.getFactory().createProxy(propertyManager.getConnectionProxyClass(), session);
+            proxy = ConnectionFactory.getFactory()
+                        .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
             SessionManager.init(proxy);
 
             loginDialog = new LoginDialog(this);
+            loginDialog.setDefaultValues(username, usergroup, domain);
             StaticSwingTools.showDialog(loginDialog);
         }
 
         PropertyManager.getManager()
                 .setEditable(this.hasPermission(
-                        SessionManager.getProxy().getClasses(),
+                        SessionManager.getProxy().getClasses(getConnectionContext()),
                         PermissionHolder.WRITEPERMISSION));
         // PropertyManager.getManager().setEditable(true);
         if (LOG.isInfoEnabled()) {
