@@ -58,6 +58,9 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
                 == PropertyManager.PermissionModus.FORBIDDEN;
 
     private final ConnectionContext connectionContext;
+    private String startName = null;
+    private String startGroup = null;
+    private String startDomain = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -388,6 +391,20 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
     }                                                                         //GEN-LAST:event_cb_srvItemStateChanged
 
     /**
+     * Set the default user, usergroup and domain, if they should not be taken from the preferences. If a parameter is
+     * null, the value from the preferences will be used.
+     *
+     * @param  name       DOCUMENT ME!
+     * @param  userGroup  DOCUMENT ME!
+     * @param  domain     DOCUMENT ME!
+     */
+    public void setDefaultValues(final String name, final String userGroup, final String domain) {
+        this.startName = name;
+        this.startGroup = userGroup;
+        this.startDomain = domain;
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
@@ -487,19 +504,21 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
                 cb_srv.addItem(domains[i]);
             }
 
-            final String name = preferences.get(PREF_NAME, null);
+            final String name = ((startName == null) ? preferences.get(PREF_NAME, null) : startName);
             if ((name != null) && (name.length() > 0)) {
                 tf_name.setText(name);
             }
 
-            final String domain = preferences.get(PREF_DOMAIN, null);
+            final String domain = ((startDomain == null) ? preferences.get(PREF_DOMAIN, null) : startDomain);
             if ((domain != null) && (domain.length() > 0)) {
                 cb_srv.setSelectedItem(domain);
             }
 
             updateUserGroups(tf_name.getText(), cb_srv.getSelectedItem().toString());
+            final String groupAndDomain = (((startGroup != null) && (domain != null)) ? (startGroup + "@" + domain)
+                                                                                      : "");
 
-            final String usergroup = preferences.get(PREF_USERGROUP, null);
+            final String usergroup = ((startGroup == null) ? preferences.get(PREF_USERGROUP, null) : groupAndDomain);
             if ((usergroup != null) && (usergroup.length() > 0)) {
                 cb_userGroup.setSelectedItem(usergroup);
             }
