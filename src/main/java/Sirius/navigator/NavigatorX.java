@@ -93,6 +93,7 @@ import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -283,6 +284,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             ConnectionContext.Category.OTHER,
             getClass().getSimpleName());
     private Windows windowsConfig = null;
+    private String applicationKey = "";
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -327,18 +329,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
         initComponents();
         this.propertyManager = PropertyManager.getManager();
+        this.applicationKey = System.getProperty("jnlp.applicationKey", "");
 
-        try {
-            final String titleNamesFile = System.getProperty(
-                    "jnlp.titleName",
-                    "/Sirius/navigator/titleNames.properties");
-
-            titleNames.load(getClass().getResourceAsStream(titleNamesFile));
-        } catch (Exception e) {
-            LOG.warn("Cannot load titles property file", e);
-        }
-
-        initWindowConfig();
         this.preferences = Preferences.userNodeForPackage(this.getClass());
 
         this.exceptionManager = ExceptionManager.getManager();
@@ -411,6 +403,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             checkNavigatorHome();
             initConfigurationManager();
             initCismapConfigurationManager();
+            initWindowConfig();
             initUI();
             initWidgets();
             addWfsForms();
@@ -488,9 +481,15 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
      */
     private void initWindowConfig() {
         try {
-            final String allowedWindowNamesFile = System.getProperty(
-                    "jnlp.allowedWindows",
-                    "/Sirius/navigator/windows.json");
+            final User usr = SessionManager.getSession().getUser();
+            String allowedWindowNamesFile = SessionManager.getProxy()
+                        .getConfigAttr(usr, "navigatorx." + applicationKey + ".allowedWindows", getConnectionContext());
+
+            if ((allowedWindowNamesFile == null) || allowedWindowNamesFile.equals("")) {
+                allowedWindowNamesFile = System.getProperty(
+                        "jnlp.allowedWindows",
+                        "/Sirius/navigator/windows.json");
+            }
 
             if ((allowedWindowNamesFile != null) && !allowedWindowNamesFile.equals("")) {
                 final ObjectMapper mapper = new ObjectMapper();
@@ -513,10 +512,50 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                             reader.close();
                         }
                     }
+                } else {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        NbBundle.getMessage(
+                            NavigatorX.class,
+                            "NavigatorX.initWindowConfig.fileNotFound.message",
+                            allowedWindowNamesFile),
+                        NbBundle.getMessage(NavigatorX.class, "NavigatorX.initWindowConfig.fileNotFound.title"),
+                        JOptionPane.ERROR_MESSAGE);
+                    System.exit(1);
                 }
             }
         } catch (Exception e) {
             LOG.warn("Cannot load windows property file", e);
+        }
+
+        try {
+            final User usr = SessionManager.getSession().getUser();
+            String titleNamesFile = SessionManager.getProxy()
+                        .getConfigAttr(usr, "navigatorx." + applicationKey + ".titleName", getConnectionContext());
+
+            if ((titleNamesFile == null) || titleNamesFile.equals("")) {
+                titleNamesFile = System.getProperty(
+                        "jnlp.titleName",
+                        "/Sirius/navigator/titleNames.properties");
+            }
+
+            final InputStream is = this.getClass().getResourceAsStream(titleNamesFile);
+
+            if (is != null) {
+                titleNames.load(is);
+            } else {
+                JOptionPane.showMessageDialog(
+                    this,
+                    NbBundle.getMessage(
+                        NavigatorX.class,
+                        "NavigatorX.initWindowConfig.fileNotFound.message",
+                        titleNamesFile),
+                    NbBundle.getMessage(NavigatorX.class, "NavigatorX.initWindowConfig.fileNotFound.title"),
+                    JOptionPane.ERROR_MESSAGE);
+                System.exit(1);
+            }
+        } catch (Exception e) {
+            LOG.warn("Cannot load titles property file", e);
         }
     }
 
@@ -788,9 +827,26 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         } catch (InterruptedException ex) {
             // nothing to do
         }
-        final String configFile = System.getProperty("jnlp.menuConfigFile", "/Sirius/navigator/MenuConfig.json");
-        // todo: load user defined menu configuration from the configuration attribute
-        final ActionConfiguration config = new ActionConfiguration(configFile, windowActions, getConnectionContext());
+        final User usr = SessionManager.getSession().getUser();
+        String configFile = SessionManager.getProxy()
+                    .getConfigAttr(usr, "navigatorx." + applicationKey + ".menuConfigFile", getConnectionContext());
+
+        if ((configFile == null) || configFile.equals("")) {
+            configFile = System.getProperty("jnlp.menuConfigFile", "/Sirius/navigator/MenuConfig.json");
+        }
+
+        final InputStream is = this.getClass().getResourceAsStream(configFile);
+
+        if (is == null) {
+            JOptionPane.showMessageDialog(
+                this,
+                NbBundle.getMessage(NavigatorX.class, "NavigatorX.initWindowConfig.fileNotFound.message", configFile),
+                NbBundle.getMessage(NavigatorX.class, "NavigatorX.initWindowConfig.fileNotFound.title"),
+                JOptionPane.ERROR_MESSAGE);
+            System.exit(1);
+        }
+
+        final ActionConfiguration config = new ActionConfiguration(is, windowActions, getConnectionContext());
 
         config.configureMainMenu(menuBar);
         toolbars = config.getToolbars();
@@ -826,7 +882,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             org.openide.util.NbBundle.getMessage(NavigatorX.class,
                 "NavigatorX.progressObserver.loadWindow")); // NOI18N
         final Collection<? extends GUIWindow> windows = Lookup.getDefault().lookupAll(GUIWindow.class);
-        LOG.error("windows found: " + windows.size());
         MetaCatalogueTree catalogueTree = null;
         SearchResultsTree searchResultsTree = null;
         WorkingSpaceTree workingSpaceTree = null;
@@ -1073,22 +1128,23 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         final CatalogueSelectionListener catalogueSelectionListener = new CatalogueSelectionListener(
                 attributeViewer,
                 description);
-        catalogueTree.addTreeSelectionListener(catalogueSelectionListener);
-        searchResultsTree.addTreeSelectionListener(catalogueSelectionListener);
-
-        catalogueTree.addComponentListener(new CatalogueActivationListener(
-                catalogueTree,
-                attributeViewer,
-                description));
-        searchResultsTree.addComponentListener(new CatalogueActivationListener(
-                searchResultsTree,
-                attributeViewer,
-                description));
-
         final DefaultPopupMenuListener cataloguePopupMenuListener = new DefaultPopupMenuListener(popupMenu);
-        catalogueTree.addMouseListener(cataloguePopupMenuListener);
-        searchResultsTree.addMouseListener(cataloguePopupMenuListener);
-
+        if (catalogueTree != null) {
+            catalogueTree.addTreeSelectionListener(catalogueSelectionListener);
+            catalogueTree.addMouseListener(cataloguePopupMenuListener);
+            catalogueTree.addComponentListener(new CatalogueActivationListener(
+                    catalogueTree,
+                    attributeViewer,
+                    description));
+        }
+        if (searchResultsTree != null) {
+            searchResultsTree.addTreeSelectionListener(catalogueSelectionListener);
+            searchResultsTree.addMouseListener(cataloguePopupMenuListener);
+            searchResultsTree.addComponentListener(new CatalogueActivationListener(
+                    searchResultsTree,
+                    attributeViewer,
+                    description));
+        }
         if (workingSpaceTree != null) {
             workingSpaceTree.addTreeSelectionListener(catalogueSelectionListener);
             workingSpaceTree.addComponentListener(new CatalogueActivationListener(
