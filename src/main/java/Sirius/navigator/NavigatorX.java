@@ -1732,21 +1732,21 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         // autologin with jnlp parameter
         final String username = System.getProperty("jnlp.username", null);
         final String password = System.getProperty("jnlp.password", null);
-        final String domain = System.getProperty("jnlp.domain", null);
-        final String usergroup = System.getProperty("jnlp.usergroup", null);
+        final String userDomain = System.getProperty("jnlp.userDomain", null);
+        final String userGroupDomain = System.getProperty("jnlp.userGroupDomain", null);
+        final String usergroup = System.getProperty("jnlp.userGroup", null);
         boolean autoLogin = false;
 
         if (username != null) {
             propertyManager.getConnectionInfo().setUsername(username);
         }
-        if (domain != null) {
-            propertyManager.getConnectionInfo().setUserDomain(domain);
-            propertyManager.getConnectionInfo().setUsergroupDomain(domain);
+        if (userDomain != null) {
+            propertyManager.getConnectionInfo().setUserDomain(userDomain);
         }
-        if (usergroup != null) {
-            propertyManager.getConnectionInfo().setUsergroup(usergroup);
-        }
-        if ((username != null) && (password != null) && (domain != null) && (usergroup != null)) {
+        propertyManager.getConnectionInfo().setUsergroupDomain(userGroupDomain);
+        propertyManager.getConnectionInfo().setUsergroup(usergroup);
+
+        if ((username != null) && (password != null) && (userDomain != null)) {
             try {
                 propertyManager.getConnectionInfo().setPassword(password);
                 session = ConnectionFactory.getFactory()
@@ -1767,6 +1767,16 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
         // autologin = false || autologin failed
         if ((!autoLogin && !propertyManager.isAutoLogin()) || (session == null)) {
+            String userGroupWithDomain = null;
+
+            if ((usergroup != null) && (userGroupDomain != null)) {
+                userGroupWithDomain = usergroup + "@" + userGroupDomain;
+            } else if ((usergroup != null) && (userDomain != null)) {
+                // if the user group domain is not set, it will be assumed that the user domain is also the domain of
+                // the group
+                userGroupWithDomain = usergroup + "@" + userDomain;
+            }
+
             if (LOG.isInfoEnabled()) {
                 LOG.info("performing login"); // NOI18N
             }
@@ -1782,9 +1792,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             proxy = ConnectionFactory.getFactory()
                         .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
             SessionManager.init(proxy);
-
             loginDialog = new LoginDialog(this);
-            loginDialog.setDefaultValues(username, usergroup, domain);
+            loginDialog.setDefaultValues(username, userGroupWithDomain, userDomain);
             StaticSwingTools.showDialog(loginDialog);
         }
 
