@@ -58,6 +58,9 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
                 == PropertyManager.PermissionModus.FORBIDDEN;
 
     private final ConnectionContext connectionContext;
+    private String startName = null;
+    private String startGroup = null;
+    private String startUserDomain = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -338,54 +341,68 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tf_nameActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_tf_nameActionPerformed
+    private void tf_nameActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tf_nameActionPerformed
         refreshLogin(evt);
-    }                                                                           //GEN-LAST:event_tf_nameActionPerformed
+    }//GEN-LAST:event_tf_nameActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void pf_passActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_pf_passActionPerformed
+    private void pf_passActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pf_passActionPerformed
         refreshLogin(evt);
-    }                                                                           //GEN-LAST:event_pf_passActionPerformed
+    }//GEN-LAST:event_pf_passActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btn_okActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btn_okActionPerformed
+    private void btn_okActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_okActionPerformed
         refreshLogin(evt);
-    }                                                                          //GEN-LAST:event_btn_okActionPerformed
+    }//GEN-LAST:event_btn_okActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btn_cancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btn_cancelActionPerformed
+    private void btn_cancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_cancelActionPerformed
         refreshLogin(evt);
-    }                                                                              //GEN-LAST:event_btn_cancelActionPerformed
+    }//GEN-LAST:event_btn_cancelActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void tf_nameFocusLost(final java.awt.event.FocusEvent evt) { //GEN-FIRST:event_tf_nameFocusLost
+    private void tf_nameFocusLost(final java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tf_nameFocusLost
         refreshFocus(evt);
-    }                                                                    //GEN-LAST:event_tf_nameFocusLost
+    }//GEN-LAST:event_tf_nameFocusLost
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void cb_srvItemStateChanged(final java.awt.event.ItemEvent evt) { //GEN-FIRST:event_cb_srvItemStateChanged
+    private void cb_srvItemStateChanged(final java.awt.event.ItemEvent evt) {//GEN-FIRST:event_cb_srvItemStateChanged
         domainRefresh(evt);
-    }                                                                         //GEN-LAST:event_cb_srvItemStateChanged
+    }//GEN-LAST:event_cb_srvItemStateChanged
+
+    /**
+     * Set the default user, usergroup and domain, if they should not be taken from the preferences. If a parameter is
+     * null, the value from the preferences will be used.
+     *
+     * @param  name        DOCUMENT ME!
+     * @param  userGroup   DOCUMENT ME!
+     * @param  userDomain  domain DOCUMENT ME!
+     */
+    public void setDefaultValues(final String name, final String userGroup, final String userDomain) {
+        this.startName = name;
+        this.startGroup = userGroup;
+        this.startUserDomain = userDomain;
+    }
 
     /**
      * DOCUMENT ME!
@@ -487,19 +504,19 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
                 cb_srv.addItem(domains[i]);
             }
 
-            final String name = preferences.get(PREF_NAME, null);
+            final String name = ((startName == null) ? preferences.get(PREF_NAME, null) : startName);
             if ((name != null) && (name.length() > 0)) {
                 tf_name.setText(name);
             }
 
-            final String domain = preferences.get(PREF_DOMAIN, null);
+            final String domain = ((startUserDomain == null) ? preferences.get(PREF_DOMAIN, null) : startUserDomain);
             if ((domain != null) && (domain.length() > 0)) {
                 cb_srv.setSelectedItem(domain);
             }
 
             updateUserGroups(tf_name.getText(), cb_srv.getSelectedItem().toString());
 
-            final String usergroup = preferences.get(PREF_USERGROUP, null);
+            final String usergroup = ((startGroup == null) ? preferences.get(PREF_USERGROUP, null) : startGroup);
             if ((usergroup != null) && (usergroup.length() > 0)) {
                 cb_userGroup.setSelectedItem(usergroup);
             }
