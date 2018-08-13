@@ -110,7 +110,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
      */
     public void setTreeNode(final Object treeNode) {
         if (logger.isDebugEnabled()) {
-            logger.debug("setTreeNode: " + treeNode.hashCode());
+            logger.debug("setTreeNode: " + treeNode != null ? treeNode.hashCode() : null);
         }
         editButton.setEnabled(false);
         if ((worker != null) && !worker.isDone() && !worker.isCancelled()) {
@@ -293,8 +293,8 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void editButtonActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_editButtonActionPerformed
-    {                                                                            //GEN-HEADEREND:event_editButtonActionPerformed
+    private void editButtonActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_editButtonActionPerformed
+    {//GEN-HEADEREND:event_editButtonActionPerformed
         if ((this.getTreeNode() != null) && (this.getTreeNode() instanceof ObjectTreeNode)
                     && (ComponentRegistry.getRegistry().getAttributeEditor() != null)) {
             final ObjectTreeNode selectedNode = (ObjectTreeNode)this.getTreeNode();
@@ -328,7 +328,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
                 logger.warn("insufficient permission to edit node " + selectedNode); // NOI18N
             }
         }
-    }                                                                                //GEN-LAST:event_editButtonActionPerformed
+    }//GEN-LAST:event_editButtonActionPerformed
 
     @Override
     public JComponent getGuiComponent() {
