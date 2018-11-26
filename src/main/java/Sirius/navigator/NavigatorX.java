@@ -15,7 +15,6 @@ package Sirius.navigator;
 import Sirius.navigator.actiontag.ActionTagProtected;
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
-import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.connection.proxy.ConnectionProxy;
@@ -70,12 +69,14 @@ import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
+import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
 import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.title.DockingWindowTitleProvider;
 import net.infonode.docking.title.SimpleDockingWindowTitleProvider;
 import net.infonode.docking.util.DeveloperUtil;
 import net.infonode.docking.util.DockingUtil;
+import net.infonode.docking.util.PropertiesUtil;
 import net.infonode.docking.util.StringViewMap;
 import net.infonode.gui.componentpainter.AlphaGradientComponentPainter;
 import net.infonode.util.Direction;
@@ -126,6 +127,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -285,6 +287,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             ConnectionContext.Category.OTHER,
             getClass().getSimpleName());
     private Windows windowsConfig = null;
+    private String[] windowsPriority = null;
     private String applicationKey = "";
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -502,6 +505,9 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     try {
                         reader = new BufferedReader(new InputStreamReader(is));
                         windowsConfig = mapper.readValue(reader, Windows.class);
+                        final String[] windowArray = windowsConfig.getAllowedWindows();
+                        windowsPriority = new String[windowArray.length];
+                        System.arraycopy(windowArray, 0, windowsPriority, 0, windowArray.length);
 
                         if ((windowsConfig != null) && (windowsConfig.getAllowedWindows() != null)) {
                             Arrays.sort(windowsConfig.getAllowedWindows());
@@ -577,6 +583,9 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         final DockingWindowsTheme theme = new ShapedGradientDockingTheme();
         rootWindow.getRootWindowProperties().addSuperObject(
             theme.getRootWindowProperties());
+//        final RootWindowProperties titleBarStyleProperties = PropertiesUtil.createTitleBarStyleRootWindowProperties();
+//        rootWindow.getRootWindowProperties().addSuperObject(
+//            titleBarStyleProperties);
         rootWindow.getRootWindowProperties().getDockingWindowProperties().setUndockEnabled(true);
         final AlphaGradientComponentPainter x = new AlphaGradientComponentPainter(
                 java.awt.SystemColor.inactiveCaptionText,
@@ -2408,22 +2417,73 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 }
 
                 if (builder != null) {
-                    return " " + getTitleByKey(builder.toString());
+                    String title = getTitleByKey(builder.toString());
+                    final String tooltip = createToolTipString(window);
+                    setTooltipText(window, tooltip);
+
+                    if (title.equals(builder.toString()) && (window.getChildWindowCount() > 1)) {
+                        // no name was found in the titles files
+                        title = getDefaultTitle(window);
+                    }
+
+                    return " " + title;
                 } else {
                     // should never happen
-                    return " " + SimpleDockingWindowTitleProvider.INSTANCE.getTitle(window);
+                    final String title = SimpleDockingWindowTitleProvider.INSTANCE.getTitle(window);
+                    setTooltipText(window, title);
+                    return " " + title;
                 }
             } else {
-                return " " + SimpleDockingWindowTitleProvider.INSTANCE.getTitle(window);
+                final String title = SimpleDockingWindowTitleProvider.INSTANCE.getTitle(window);
+                setTooltipText(window, title);
+                return " " + title;
             }
         }
 
         /**
-         * DOCUMENT ME!
+         * Set the tooltip text for the given window.
+         *
+         * @param  window  DOCUMENT ME!
+         * @param  text    DOCUMENT ME!
+         */
+        private void setTooltipText(final DockingWindow window, final String text) {
+            window.getWindowProperties()
+                    .getTabProperties()
+                    .getTitledTabProperties()
+                    .getNormalProperties()
+                    .setToolTipText(text);
+        }
+
+        /**
+         * Creates the default title for the given window.
+         *
+         * @param   window  key DOCUMENT ME!
+         *
+         * @return  the default title
+         */
+        private String createToolTipString(final DockingWindow window) {
+            final List<DockingWindow> windows = getWindows(window);
+            Collections.sort(windows, new WindowComparator());
+            final StringBuilder titleString = new StringBuilder("<html>");
+
+            for (int i = 0; i < windows.size(); i++) {
+                if (i == 0) {
+                    titleString.append(windows.get(i).getTitle());
+                } else {
+                    titleString.append("<br>").append(windows.get(i).getTitle());
+                }
+            }
+
+            titleString.append("</html>");
+            return titleString.toString();
+        }
+
+        /**
+         * Creates a list with all window titles.
          *
          * @param   window  DOCUMENT ME!
          *
-         * @return  DOCUMENT ME!
+         * @return  a list with all window titles
          */
         private List<String> getTitleNames(final DockingWindow window) {
             final List<String> names = new ArrayList<String>();
@@ -2440,11 +2500,32 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         }
 
         /**
-         * DOCUMENT ME!
+         * Creates a list with all sub windows.
+         *
+         * @param   window  DOCUMENT ME!
+         *
+         * @return  a list with all sub windows
+         */
+        private List<DockingWindow> getWindows(final DockingWindow window) {
+            final List<DockingWindow> names = new ArrayList<DockingWindow>();
+
+            if (window.getChildWindowCount() > 0) {
+                for (int i = 0; i < window.getChildWindowCount(); ++i) {
+                    names.addAll(getWindows(window.getChildWindow(i)));
+                }
+
+                return names;
+            } else {
+                return Collections.nCopies(1, window);
+            }
+        }
+
+        /**
+         * Get the predefined title from the titles file.
          *
          * @param   key  DOCUMENT ME!
          *
-         * @return  DOCUMENT ME!
+         * @return  the predefined title from the titles file or the given key, if no predefined title exists
          */
         private String getTitleByKey(final String key) {
             if (titleNames != null) {
@@ -2478,6 +2559,48 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         }
 
         /**
+         * Creates the default title for the given window.
+         *
+         * @param   window  key DOCUMENT ME!
+         *
+         * @return  the default title
+         */
+        private String getDefaultTitle(final DockingWindow window) {
+            final List<DockingWindow> windows = getWindows(window);
+            Collections.sort(windows, new WindowComparator());
+            final StringBuilder titleString = new StringBuilder();
+
+            for (int i = 0; i < windows.size(); i++) {
+                if (i == 0) {
+                    String title = windows.get(i).getTitle();
+                    if (title.startsWith(" ")) {
+                        title = title.substring(1);
+                    }
+                    titleString.append(title);
+                } else if (i == 1) {
+                    titleString.append(",").append(windows.get(i).getTitle());
+                } else {
+                    titleString.append(", ");
+
+                    if (windows.size() > 3) {
+                        titleString.append(NbBundle.getMessage(
+                                CustomTitleProvider.class,
+                                "NavigatorX.CustomTitleProvider.getDefaultTitle",
+                                (windows.size() - 2)));
+                    } else {
+                        titleString.append(NbBundle.getMessage(
+                                CustomTitleProvider.class,
+                                "NavigatorX.CustomTitleProvider.getDefaultTitle.single",
+                                (windows.size() - 2)));
+                    }
+                    break;
+                }
+            }
+
+            return titleString.toString();
+        }
+
+        /**
          * DOCUMENT ME!
          *
          * @param   title  DOCUMENT ME!
@@ -2493,6 +2616,64 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             }
 
             return allToken;
+        }
+
+        //~ Inner Classes ------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @version  $Revision$, $Date$
+         */
+        class WindowComparator implements Comparator<DockingWindow> {
+
+            //~ Methods --------------------------------------------------------
+
+            @Override
+            public int compare(final DockingWindow o1, final DockingWindow o2) {
+                final Integer index1 = getIndex(o1);
+                final Integer index2 = getIndex(o2);
+
+                return index1.compareTo(index2);
+            }
+
+            /**
+             * DOCUMENT ME!
+             *
+             * @param   window  DOCUMENT ME!
+             *
+             * @return  DOCUMENT ME!
+             */
+            private int getIndex(final DockingWindow window) {
+                if (windowsPriority != null) {
+                    for (int i = 0; i < windowsPriority.length; ++i) {
+                        if (window instanceof View) {
+                            final Component c = ((View)window).getComponent();
+
+                            if (c instanceof AbstractWFSForm) {
+                                final AbstractWFSForm form = (AbstractWFSForm)c;
+
+                                if (form.getId().equals(windowsPriority[i])) {
+                                    return i;
+                                }
+                            } else if (c.getClass().getName().equals(windowsPriority[i])) {
+                                return i;
+                            }
+                        }
+                        if (window.getClass().getName().equals(windowsPriority[i])) {
+                            return i;
+                        }
+                    }
+                }
+
+                // this can only happen, when the given window does not
+                // exist in the windows file. And this should be impossible.
+                // (If the window does not exist in the windows file,
+                // then it should not be used in the navigator and so it
+                // cannot be asked for the index of this window)
+                LOG.error("window not found");
+                return 0;
+            }
         }
     }
 
