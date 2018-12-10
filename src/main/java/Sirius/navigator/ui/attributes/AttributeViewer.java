@@ -302,17 +302,7 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
 
             final MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
 
-            if ((java.awt.event.ActionEvent.CTRL_MASK & evt.getModifiers()) > 0) {
-                logger.warn("performing unauthorized edit action"); // NOI18N
-                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
-                if (ComponentRegistry.getRegistry().getActiveCatalogue() == metaCatalogueTree) {
-                    ComponentRegistry.getRegistry()
-                            .getAttributeEditor()
-                            .setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
-                } else {
-                    ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(selectedNode);
-                }
-            } else if (MethodManager.getManager().checkPermission(
+            if (MethodManager.getManager().checkPermission(
                             (MetaObjectNode)selectedNode.getNode(),
                             PermissionHolder.WRITEPERMISSION)) {
                 ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);

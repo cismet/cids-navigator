@@ -8,6 +8,9 @@
 package Sirius.navigator.ui;
 
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.method.MethodManager;
+import Sirius.navigator.plugin.interfaces.EmbededControlBar;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
@@ -16,10 +19,13 @@ import Sirius.navigator.ui.status.DefaultStatusChangeSupport;
 import Sirius.navigator.ui.status.Status;
 import Sirius.navigator.ui.status.StatusChangeListener;
 import Sirius.navigator.ui.status.StatusChangeSupport;
+import Sirius.navigator.ui.tree.MetaCatalogueTree;
 
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
+import Sirius.server.newuser.User;
+import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.openide.util.Lookup;
 import org.openide.util.WeakListeners;
@@ -56,9 +62,11 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.Vector;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.AbstractButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -96,7 +104,9 @@ import de.cismet.tools.gui.breadcrumb.LinkStyleBreadCrumbGui;
  * @author   thorsten.hell@cismet.de
  * @version  $Revision$, $Date$
  */
-public abstract class DescriptionPane extends JPanel implements StatusChangeSupport, ConnectionContextStore {
+public abstract class DescriptionPane extends JPanel implements EmbededControlBar,
+    StatusChangeSupport,
+    ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -118,10 +128,13 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     // will only be accessed in EDT !
     private transient boolean fullScreenRenderer;
     private final MultiMap sharedHandlersHM = new MultiMap();
+    private DefaultMetaTreeNode lastNode;
 
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel controlBar;
+    private javax.swing.JButton editButton;
     protected javax.swing.JPanel jPanel2;
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
     protected javax.swing.JPanel panBreadCrump;
@@ -237,7 +250,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        final java.awt.GridBagConstraints gridBagConstraints;
+
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
+        controlBar = new javax.swing.JPanel();
+        editButton = new javax.swing.JButton();
         panObjects = new javax.swing.JPanel();
         scpRenderer = new javax.swing.JScrollPane();
         jPanel2 = new javax.swing.JPanel();
@@ -246,6 +263,34 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         lblRendererCreationWaitingLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblRendererCreationWaitingLabel.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+
+        controlBar.setLayout(new java.awt.GridBagLayout());
+
+        editButton.setIcon(RESOURCE.getIcon("objekt_bearbeiten.gif"));
+        editButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                DescriptionPane.class,
+                "DescriptionPane.editButton.toolTipText")); // NOI18N
+        editButton.setActionCommand(org.openide.util.NbBundle.getMessage(
+                DescriptionPane.class,
+                "DescriptionPane.editButton.actionCommand",
+                new Object[] {}));                          // NOI18N
+        editButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        editButton.setContentAreaFilled(false);
+        editButton.setEnabled(false);
+        editButton.setFocusPainted(false);
+        editButton.setMaximumSize(new java.awt.Dimension(16, 16));
+        editButton.setMinimumSize(new java.awt.Dimension(16, 16));
+        editButton.setPreferredSize(new java.awt.Dimension(16, 16));
+        editButton.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    editButtonActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        controlBar.add(editButton, gridBagConstraints);
 
         setLayout(new java.awt.CardLayout());
 
@@ -261,6 +306,36 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
 
         add(panObjects, "objects");
     } // </editor-fold>//GEN-END:initComponents
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void editButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_editButtonActionPerformed
+        if (lastNode != null) {
+            final DefaultMetaTreeNode selectedNode = lastNode;
+            LOG.info("evt.getModifiers():" + evt.getModifiers());                  // NOI18N
+
+            final MetaCatalogueTree metaCatalogueTree = ComponentRegistry.getRegistry().getCatalogueTree();
+
+            if (MethodManager.getManager().checkPermission(
+                            (MetaObjectNode)selectedNode.getNode(),
+                            PermissionHolder.WRITEPERMISSION)) {
+                ComponentRegistry.getRegistry().showComponent(ComponentRegistry.ATTRIBUTE_EDITOR);
+
+                if (ComponentRegistry.getRegistry().getActiveCatalogue() == metaCatalogueTree) {
+                    ComponentRegistry.getRegistry()
+                            .getAttributeEditor()
+                            .setTreeNode(metaCatalogueTree.getSelectionPath(), selectedNode);
+                } else {
+                    ComponentRegistry.getRegistry().getAttributeEditor().setTreeNode(selectedNode);
+                }
+            } else {
+                LOG.warn("insufficient permission to edit node " + selectedNode); // NOI18N
+            }
+        }
+    }                                                                             //GEN-LAST:event_editButtonActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -353,6 +428,8 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         if (objects.size() == 1) {
             setNodeDescription(objects.get(0));
         } else {
+            lastNode = null;
+            editButton.setEnabled(false);
             new SwingWorker<List<ObjectTreeNode>, Void>() {
 
                     @Override
@@ -363,6 +440,9 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                                 final DefaultMetaTreeNode node = (DefaultMetaTreeNode)object;
                                 if (!node.isWaitNode() && !node.isRootNode() && !node.isPureNode()
                                             && node.isObjectNode()) {
+                                    if (lastNode == null) {
+                                        lastNode = node;
+                                    }
                                     otns.add((ObjectTreeNode)node);
                                 }
                             }
@@ -635,6 +715,25 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
         } else {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("last breadcrumb is no CidsMetaObjectbreadCrumb");                                    // NOI18N
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public MetaObject currentMetaObject() {
+        final BreadCrumb bc = breadCrumbModel.getLastCrumb();
+
+        if (bc instanceof CidsMetaObjectBreadCrumb) {
+            return ((CidsMetaObjectBreadCrumb)bc).getMetaObject();
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("last breadcrumb is no CidsMetaObjectbreadCrumb"); // NOI18N
             }
         }
 
@@ -1137,7 +1236,11 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
                 showWaitScreen();
             }
             performSetNode(n);
+            lastNode = n;
+            editButton.setEnabled(true);
         } else {
+            lastNode = null;
+            editButton.setEnabled(false);
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
                     DescriptionPane.class,
@@ -1175,6 +1278,34 @@ public abstract class DescriptionPane extends JPanel implements StatusChangeSupp
             worker.cancel(true);
         }
         showWaitScreen();
+    }
+
+    @Override
+    public void setControlBarVisible(final boolean isVisible) {
+        controlBar.setVisible(isVisible);
+    }
+
+    @Override
+    public Vector<AbstractButton> getControlBarButtons() {
+        boolean showEditButton = false;
+
+        try {
+            showEditButton = SessionManager.getConnection()
+                        .getConfigAttr(SessionManager.getSession().getUser(),
+                                "navigator.descriptionPane.editButton",
+                                connectionContext)
+                        != null;
+        } catch (ConnectionException e) {
+            LOG.error("Connection exception", e);
+        }
+
+        if (showEditButton) {
+            final Vector<AbstractButton> buttons = new Vector<AbstractButton>();
+            buttons.add(editButton);
+            return buttons;
+        } else {
+            return null;
+        }
     }
 
     //~ Inner Classes ----------------------------------------------------------
