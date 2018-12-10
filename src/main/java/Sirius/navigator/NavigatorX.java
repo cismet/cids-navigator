@@ -13,6 +13,7 @@
 package Sirius.navigator;
 
 import Sirius.navigator.actiontag.ActionTagProtected;
+import Sirius.navigator.config.TitleOrientationConfiguration;
 import Sirius.navigator.connection.Connection;
 import Sirius.navigator.connection.ConnectionFactory;
 import Sirius.navigator.connection.ConnectionSession;
@@ -64,11 +65,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.infonode.docking.DockingWindow;
 import net.infonode.docking.DockingWindowAdapter;
+import net.infonode.docking.DockingWindowListener;
 import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
+import net.infonode.docking.properties.DockingWindowProperties;
 import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
 import net.infonode.docking.theme.ShapedGradientDockingTheme;
@@ -79,7 +82,16 @@ import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.PropertiesUtil;
 import net.infonode.docking.util.StringViewMap;
 import net.infonode.gui.componentpainter.AlphaGradientComponentPainter;
+import net.infonode.gui.mouse.MouseButtonListener;
+import net.infonode.properties.propertymap.PropertyMap;
+import net.infonode.properties.propertymap.PropertyMapListener;
+import net.infonode.properties.propertymap.PropertyMapTreeListener;
+import net.infonode.properties.types.DirectionProperty;
+import net.infonode.tabbedpanel.TabAreaVisiblePolicy;
+import net.infonode.tabbedpanel.TabLayoutPolicy;
+import net.infonode.tabbedpanel.TabbedPanel;
 import net.infonode.util.Direction;
+import net.infonode.util.ValueChange;
 
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.log4j.Logger;
@@ -106,9 +118,18 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -136,6 +157,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.WeakHashMap;
 import java.util.prefs.Preferences;
 
 import javax.servlet.ServletException;
@@ -151,6 +173,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
@@ -289,6 +312,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     private Windows windowsConfig = null;
     private String[] windowsPriority = null;
     private String applicationKey = "";
+    private Map<TabWindow, TreeListener> tabListeners = new WeakHashMap<TabWindow, TreeListener>();
+    private TitleOrientationConfiguration titleOrientation = new TitleOrientationConfiguration();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -579,6 +604,37 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         this.setContentPane(new JPanel(new BorderLayout(), true));
         this.setJMenuBar(menuBar);
         rootWindow = DockingUtil.createRootWindow(viewMap, true);
+        rootWindow.addListener(new DockingWindowAdapter() {
+
+                @Override
+                public void windowAdded(final DockingWindow addedToWindow, final DockingWindow addedWindow) {
+                    if (addedWindow instanceof TabWindow) {
+                        final TabWindow tab = (TabWindow)addedWindow;
+                        TreeListener li = tabListeners.get(tab);
+
+                        if (li == null) {
+                            li = new TreeListener(tab);
+                            tabListeners.put(tab, li);
+                        }
+
+                        tab.getTabWindowProperties().getTabbedPanelProperties().getMap().removeTreeListener(li);
+                        tab.getTabWindowProperties().getTabbedPanelProperties().getMap().addTreeListener(li);
+                    }
+                }
+
+                @Override
+                public void windowRemoved(final DockingWindow removedFromWindow, final DockingWindow removedWindow) {
+                    if (removedWindow instanceof TabWindow) {
+                        final TabWindow tab = (TabWindow)removedWindow;
+                        final TreeListener li = tabListeners.get(tab);
+
+                        if (li != null) {
+                            tab.getTabWindowProperties().getTabbedPanelProperties().getMap().removeTreeListener(li);
+                            tabListeners.remove(tab);
+                        }
+                    }
+                }
+            });
 
         final DockingWindowsTheme theme = new ShapedGradientDockingTheme();
         rootWindow.getRootWindowProperties().addSuperObject(
@@ -587,12 +643,12 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 //        rootWindow.getRootWindowProperties().addSuperObject(
 //            titleBarStyleProperties);
         rootWindow.getRootWindowProperties().getDockingWindowProperties().setUndockEnabled(true);
-        final AlphaGradientComponentPainter x = new AlphaGradientComponentPainter(
-                java.awt.SystemColor.inactiveCaptionText,
-                java.awt.SystemColor.activeCaptionText,
-                java.awt.SystemColor.activeCaptionText,
-                java.awt.SystemColor.inactiveCaptionText);
-        rootWindow.getRootWindowProperties().getDragRectangleShapedPanelProperties().setComponentPainter(x);
+//        final AlphaGradientComponentPainter x = new AlphaGradientComponentPainter(
+//                java.awt.SystemColor.inactiveCaptionText,
+//                java.awt.SystemColor.activeCaptionText,
+//                java.awt.SystemColor.activeCaptionText,
+//                java.awt.SystemColor.inactiveCaptionText);
+//        rootWindow.getRootWindowProperties().getDragRectangleShapedPanelProperties().setComponentPainter(x);
         rootWindow.getRootWindowProperties()
                 .getTabWindowProperties()
                 .getTabbedPanelProperties()
@@ -870,12 +926,35 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     maxHeight = toolbar.getToolbar().getPreferredSize().getHeight();
                 }
             }
+
+            final double finalHeight = maxHeight;
             for (final ConfiguredToolBar toolbar : toolbars) {
+                toolbar.getToolbar().layout();
                 toolbar.getToolbar()
                         .setMinimumSize(new Dimension(
                                 (int)toolbar.getToolbar().getMinimumSize().getWidth(),
                                 (int)maxHeight));
+                toolbar.getToolbar().setFloatable(false);
                 toolbarPanel.add(toolbar.getToolbar());
+                toolbar.getToolbar().addComponentListener(new ComponentAdapter() {
+
+                        boolean resize = false;
+
+                        @Override
+                        public void componentResized(final ComponentEvent e) {
+                            if (!resize && ((int)((JToolBar)e.getSource()).getSize().getHeight() != (int)finalHeight)) {
+                                resize = true;
+                                ((JToolBar)e.getSource()).setSize(
+                                    (int)((JToolBar)e.getSource()).getSize().getWidth(),
+                                    (int)finalHeight);
+                                ((JToolBar)e.getSource()).setPreferredSize(
+                                    new Dimension(
+                                        (int)((JToolBar)e.getSource()).getSize().getWidth(),
+                                        (int)finalHeight));
+                            }
+                            resize = false;
+                        }
+                    });
             }
             this.getContentPane().add(toolbarPanel, BorderLayout.NORTH);
         }
@@ -1978,6 +2057,12 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
                 rootWindow.getWindowBar(Direction.UP).setEnabled(true);
+                rootWindow.invalidate();
+                rootWindow.updateUI();
+                rootWindow.revalidate();
+                rootWindow.repaint();
+                rootWindow.doLayout();
+                addTabbedPanelListener(rootWindow);
                 if (isInit) {
                     final int count = viewMap.getViewCount();
                     for (int i = 0; i < count; i++) {
@@ -2028,6 +2113,37 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     "Das angegebene Layout konnte nicht gefunden werden.",
                     "Fehler",
                     JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
+    /**
+     * Show the view title bar dependent on the tab orientation.
+     *
+     * @param  window  DOCUMENT ME!
+     */
+    private void addTabbedPanelListener(final DockingWindow window) {
+        if (window instanceof TabWindow) {
+            final TabWindow tab = (TabWindow)window;
+            TreeListener li = tabListeners.get(tab);
+
+            if (li == null) {
+                li = new TreeListener(tab);
+                tabListeners.put(tab, li);
+            }
+
+            final Direction d = tab.getTabWindowProperties().getTabbedPanelProperties().getTabAreaOrientation();
+            if (titleOrientation.showTitleForDirection(d)) {
+                setupTitleBarStyleProperties(tab, true);
+            } else {
+                setupTitleBarStyleProperties(tab, false);
+            }
+            tab.getTabWindowProperties().getTabbedPanelProperties().getMap().removeTreeListener(li);
+            tab.getTabWindowProperties().getTabbedPanelProperties().getMap().addTreeListener(li);
+        }
+        if (window.getChildWindowCount() > 0) {
+            for (int i = 0; i < window.getChildWindowCount(); ++i) {
+                addTabbedPanelListener(window.getChildWindow(i));
             }
         }
     }
@@ -2311,7 +2427,72 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         return cismapDirectory;
     }
 
+    /**
+     * activate or deactivate the title bar of the child views.
+     *
+     * @param  window   DOCUMENT ME!
+     * @param  visible  true, if the titel bar should be activated
+     */
+    private void setupTitleBarStyleProperties(final TabWindow window, final boolean visible) {
+        for (int i = 0; i < window.getChildWindowCount(); ++i) {
+            if (window.getChildWindow(i) instanceof View) {
+                ((View)window.getChildWindow(i)).getViewProperties().getViewTitleBarProperties().setVisible(visible);
+            }
+        }
+    }
+
     //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class TreeListener implements PropertyMapTreeListener {
+
+        //~ Instance fields ----------------------------------------------------
+
+        TabWindow window;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new TreeListener object.
+         *
+         * @param  window  DOCUMENT ME!
+         */
+        public TreeListener(final TabWindow window) {
+            this.window = window;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public void propertyValuesChanged(final Map changes) {
+            for (final Object key : changes.keySet()) {
+                final Object o = changes.get(key);
+
+                for (final Object prop : ((Map)o).keySet()) {
+                    if (prop instanceof DirectionProperty) {
+                        final Object valObject = ((Map)o).get(prop);
+
+                        if (valObject instanceof ValueChange) {
+                            final ValueChange value = (ValueChange)valObject;
+                            final Object newVal = value.getNewValue();
+
+                            if (newVal instanceof Direction) {
+                                if (titleOrientation.showTitleForDirection((Direction)newVal)) {
+                                    setupTitleBarStyleProperties(window, true);
+                                } else {
+                                    setupTitleBarStyleProperties(window, false);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * DOCUMENT ME!
