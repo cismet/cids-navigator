@@ -2118,7 +2118,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     }
 
     /**
-     * Show the view title bar dependent on the tab orientation
+     * Show the view title bar dependent on the tab orientation.
      *
      * @param  window  DOCUMENT ME!
      */
@@ -2428,7 +2428,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     }
 
     /**
-     * activate or deactivate the title bar of the child views 
+     * activate or deactivate the title bar of the child views.
      *
      * @param  window   DOCUMENT ME!
      * @param  visible  true, if the titel bar should be activated
