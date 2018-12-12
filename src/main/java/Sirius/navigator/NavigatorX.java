@@ -638,6 +638,13 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                         tabListeners.put(tab, li);
                     }
 
+                    final Direction d = tab.getTabWindowProperties().getTabbedPanelProperties().getTabAreaOrientation();
+
+                    if (d.equals(Direction.UP)) {
+                        tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.DOWN);
+                        tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.UP);
+                    }
+
                     tab.getTabWindowProperties().getTabbedPanelProperties().getMap().removeTreeListener(li);
                     tab.getTabWindowProperties().getTabbedPanelProperties().getMap().addTreeListener(li);
                 }
@@ -2164,6 +2171,12 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             }
 
             final Direction d = tab.getTabWindowProperties().getTabbedPanelProperties().getTabAreaOrientation();
+
+            if (d.equals(Direction.UP)) {
+                tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.DOWN);
+                tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.UP);
+            }
+
             if (titleOrientation.showTitleForDirection(d)) {
                 setupTitleBarStyleProperties(tab, true);
             } else {
