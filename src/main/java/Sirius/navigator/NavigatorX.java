@@ -609,17 +609,37 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 @Override
                 public void windowAdded(final DockingWindow addedToWindow, final DockingWindow addedWindow) {
                     if (addedWindow instanceof TabWindow) {
-                        final TabWindow tab = (TabWindow)addedWindow;
-                        TreeListener li = tabListeners.get(tab);
+                        final TabWindow tabWindow = (TabWindow)addedWindow;
 
-                        if (li == null) {
-                            li = new TreeListener(tab);
-                            tabListeners.put(tab, li);
-                        }
-
-                        tab.getTabWindowProperties().getTabbedPanelProperties().getMap().removeTreeListener(li);
-                        tab.getTabWindowProperties().getTabbedPanelProperties().getMap().addTreeListener(li);
+                        addTabListener(tabWindow);
                     }
+                    if (addedToWindow instanceof TabWindow) {
+                        final TabWindow tabWindow = (TabWindow)addedToWindow;
+                        addTabListener(tabWindow);
+
+                        // set title bar properly
+                        final Direction d = tabWindow.getTabWindowProperties()
+                                    .getTabbedPanelProperties()
+                                    .getTabAreaOrientation();
+
+                        if (titleOrientation.showTitleForDirection(d)) {
+                            setupTitleBarStyleProperties(tabWindow, true);
+                        } else {
+                            setupTitleBarStyleProperties(tabWindow, false);
+                        }
+                    }
+                }
+
+                private void addTabListener(final TabWindow tab) {
+                    TreeListener li = tabListeners.get(tab);
+
+                    if (li == null) {
+                        li = new TreeListener(tab);
+                        tabListeners.put(tab, li);
+                    }
+
+                    tab.getTabWindowProperties().getTabbedPanelProperties().getMap().removeTreeListener(li);
+                    tab.getTabWindowProperties().getTabbedPanelProperties().getMap().addTreeListener(li);
                 }
 
                 @Override
@@ -1351,6 +1371,16 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     } else {
                         tabWindow.addTab(v);
                         v.restore();
+                        // set title bar properly
+                        final Direction d = tabWindow.getTabWindowProperties()
+                                    .getTabbedPanelProperties()
+                                    .getTabAreaOrientation();
+
+                        if (titleOrientation.showTitleForDirection(d)) {
+                            setupTitleBarStyleProperties(tabWindow, true);
+                        } else {
+                            setupTitleBarStyleProperties(tabWindow, false);
+                        }
                     }
                 }
             }
@@ -2062,7 +2092,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 rootWindow.revalidate();
                 rootWindow.repaint();
                 rootWindow.doLayout();
-                addTabbedPanelListener(rootWindow);
                 if (isInit) {
                     final int count = viewMap.getViewCount();
                     for (int i = 0; i < count; i++) {
@@ -2103,6 +2132,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                             // setupDefaultLayout();
                             // DeveloperUtil.createWindowLayoutFrame("nach setup1",rootWindow).setVisible(true);
                             doLayoutInfoNode();
+                            addTabbedPanelListener(rootWindow);
                             // DeveloperUtil.createWindowLayoutFrame("nach setup2",rootWindow).setVisible(true);
                         }
                     });
@@ -2115,6 +2145,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     JOptionPane.INFORMATION_MESSAGE);
             }
         }
+        addTabbedPanelListener(rootWindow);
     }
 
     /**
@@ -2434,9 +2465,53 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
      * @param  visible  true, if the titel bar should be activated
      */
     private void setupTitleBarStyleProperties(final TabWindow window, final boolean visible) {
+        if (visible) {
+            window.getTabWindowProperties()
+                    .getTabbedPanelProperties()
+                    .getTabAreaProperties()
+                    .setTabAreaVisiblePolicy(TabAreaVisiblePolicy.MORE_THAN_ONE_TAB);
+        } else {
+            window.getTabWindowProperties()
+                    .getTabbedPanelProperties()
+                    .getTabAreaProperties()
+                    .setTabAreaVisiblePolicy(TabAreaVisiblePolicy.TABS_EXIST);
+        }
+
+        window.getTabWindowProperties()
+                .getTabProperties()
+                .getHighlightedButtonProperties()
+                .getCloseButtonProperties()
+                .setVisible(!visible);
+        window.getTabWindowProperties()
+                .getTabProperties()
+                .getHighlightedButtonProperties()
+                .getMinimizeButtonProperties()
+                .setVisible(!visible);
+        window.getTabWindowProperties()
+                .getTabProperties()
+                .getHighlightedButtonProperties()
+                .getUndockButtonProperties()
+                .setVisible(!visible);
+
         for (int i = 0; i < window.getChildWindowCount(); ++i) {
             if (window.getChildWindow(i) instanceof View) {
-                ((View)window.getChildWindow(i)).getViewProperties().getViewTitleBarProperties().setVisible(visible);
+                final View childView = ((View)window.getChildWindow(i));
+
+                childView.getViewProperties().getViewTitleBarProperties().setVisible(visible);
+
+                if (visible) {
+                    if (childView.getCustomTabComponents().size() > 0) {
+                        final List customTabs = new ArrayList(childView.getCustomTabComponents());
+                        childView.getCustomTabComponents().clear();
+                        childView.getCustomTitleBarComponents().addAll(customTabs);
+                    }
+                } else {
+                    if (childView.getCustomTitleBarComponents().size() > 0) {
+                        final List customTabs = new ArrayList(childView.getCustomTitleBarComponents());
+                        childView.getCustomTitleBarComponents().clear();
+                        childView.getCustomTabComponents().addAll(customTabs);
+                    }
+                }
             }
         }
     }
