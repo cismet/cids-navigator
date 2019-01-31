@@ -71,6 +71,7 @@ import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
+import net.infonode.docking.internal.ReadContext;
 import net.infonode.docking.properties.DockingWindowProperties;
 import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
@@ -91,6 +92,7 @@ import net.infonode.tabbedpanel.TabAreaVisiblePolicy;
 import net.infonode.tabbedpanel.TabLayoutPolicy;
 import net.infonode.tabbedpanel.TabbedPanel;
 import net.infonode.util.Direction;
+import net.infonode.util.StreamUtil;
 import net.infonode.util.ValueChange;
 
 import org.apache.commons.collections.MultiHashMap;
@@ -133,6 +135,7 @@ import java.beans.PropertyChangeListener;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -2086,10 +2089,48 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 LOG.debug("Layout File exists");
             }
             try {
-                final FileInputStream layoutInput = new FileInputStream(layoutFile);
-                final ObjectInputStream in = new ObjectInputStream(layoutInput);
-                rootWindow.read(in);
-                in.close();
+                try {
+                    // determine the used views
+                    FileInputStream layoutInput = new FileInputStream(layoutFile);
+                    ObjectInputStream in = new ObjectInputStream(layoutInput);
+
+                    final int serializeVersion = in.readInt();
+                    final boolean con = in.readBoolean();
+                    final int viewCount = in.readInt();
+                    final List<String> usedViews = new ArrayList<String>();
+                    final List<String> missedViews = new ArrayList<String>();
+
+                    for (int i = 0; i < viewCount; i++) {
+                        final int size = in.readInt();
+                        final byte[] viewData = new byte[size];
+                        StreamUtil.readAll(in, viewData);
+                        final ObjectInputStream viewIn = new ObjectInputStream(new ByteArrayInputStream(viewData));
+                        final String viewName = viewIn.readUTF();
+                        usedViews.add(viewName);
+
+                        if (viewMap.getView(viewName) == null) {
+                            missedViews.add(viewName);
+                            viewMap.addView(viewName, new View("test", null, new JPanel()));
+                        }
+                    }
+                    in.close();
+                    // read the layout
+                    layoutInput = new FileInputStream(layoutFile);
+                    in = new ObjectInputStream(layoutInput);
+                    rootWindow.read(in);
+
+                    for (final String viewName : missedViews) {
+                        rootWindow.removeView(viewMap.getView(viewName));
+                        viewMap.removeView(viewName);
+                    }
+                    in.close();
+                } catch (Throwable t) {
+                    LOG.error("Layout File IO Exception --> loading default Layout. Try it again", t);
+                    final FileInputStream layoutInput = new FileInputStream(layoutFile);
+                    final ObjectInputStream in = new ObjectInputStream(layoutInput);
+                    rootWindow.read(in);
+                    in.close();
+                }
                 rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                 rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
                 rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
@@ -2139,6 +2180,10 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                             // setupDefaultLayout();
                             // DeveloperUtil.createWindowLayoutFrame("nach setup1",rootWindow).setVisible(true);
                             doLayoutInfoNode();
+                            rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
+                            rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
+                            rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
+                            rootWindow.getWindowBar(Direction.UP).setEnabled(true);
                             addTabbedPanelListener(rootWindow);
                             // DeveloperUtil.createWindowLayoutFrame("nach setup2",rootWindow).setVisible(true);
                         }
@@ -2175,6 +2220,10 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             if (d.equals(Direction.UP)) {
                 tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.DOWN);
                 tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.UP);
+            }
+            if (d.equals(Direction.DOWN)) {
+                tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.UP);
+                tab.getTabWindowProperties().getTabbedPanelProperties().setTabAreaOrientation(Direction.DOWN);
             }
 
             if (titleOrientation.showTitleForDirection(d)) {
@@ -3075,6 +3124,62 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         @Override
         public void actionPerformed(final ActionEvent e) {
             select(viewId);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class CustomStringViewMap extends StringViewMap {
+
+        //~ Instance fields ----------------------------------------------------
+
+        StringViewMap map = new StringViewMap();
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new CustomStringViewMap object.
+         *
+         * @param  map  DOCUMENT ME!
+         */
+        public CustomStringViewMap(final StringViewMap map) {
+            this.map = map;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public View getViewAtIndex(final int index) {
+            final View v = map.getViewAtIndex(index);
+
+            if (v == null) {
+            }
+
+            return v;
+        }
+
+        @Override
+        public View getView(final String id) {
+            final View v = map.getView(id);
+
+            if (v == null) {
+                System.out.println("view not found: " + id);
+                return new View("test", null, new JPanel());
+            }
+
+            return v;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public StringViewMap getMap() {
+            return this;
         }
     }
 }
