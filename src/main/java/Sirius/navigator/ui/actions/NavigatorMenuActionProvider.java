@@ -38,6 +38,8 @@ import javax.swing.filechooser.FileFilter;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import de.cismet.tools.JnlpSystemPropertyHelper;
+
 import de.cismet.tools.gui.menu.CidsUiAction;
 import de.cismet.tools.gui.menu.CidsUiActionProvider;
 
@@ -61,6 +63,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
     private static final Logger LOG = Logger.getLogger(NavigatorMenuActionProvider.class);
     private static final ResourceManager RESOURCES = ResourceManager.getManager();
     private static Sirius.navigator.plugin.interfaces.LayoutManager layoutManager;
+    private static String EXTENSION = JnlpSystemPropertyHelper.getProperty("directory.extension", "");
 
     //~ Methods ----------------------------------------------------------------
 
@@ -150,7 +153,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
                     @Override
                     public boolean accept(final File f) {
                         return f.isDirectory()
-                                    || f.getName().toLowerCase().endsWith(".layout"); // NOI18N
+                                    || f.getName().toLowerCase().endsWith(".layout" + EXTENSION.toLowerCase()); // NOI18N
                     }
 
                     @Override
@@ -169,10 +172,10 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
                     LOG.debug("file:" + file); // NOI18N
                 }
                 final String name = file.getAbsolutePath();
-                if (name.endsWith(".layout")) { // NOI18N
+                if (name.toLowerCase().endsWith(".layout" + EXTENSION.toLowerCase())) { // NOI18N
                     parent.saveLayout(name, parent);
                 } else {
-                    parent.saveLayout(name + ".layout", parent); // NOI18N
+                    parent.saveLayout(name + ".layout" + EXTENSION, parent); // NOI18N
                 }
             }
         }
@@ -241,7 +244,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
                     @Override
                     public boolean accept(final File f) {
                         return f.isDirectory()
-                                    || f.getName().toLowerCase().endsWith(".layout"); // NOI18N
+                                    || f.getName().toLowerCase().endsWith(".layout" + EXTENSION.toLowerCase()); // NOI18N
                     }
 
                     @Override
@@ -254,7 +257,7 @@ public class NavigatorMenuActionProvider implements CidsUiActionProvider {
             if (state == JFileChooser.APPROVE_OPTION) {
                 final File file = fc.getSelectedFile();
                 final String name = file.getAbsolutePath();
-                if (name.endsWith(".layout")) { // NOI18N
+                if (name.toLowerCase().endsWith(".layout" + EXTENSION.toLowerCase())) { // NOI18N
                     parent.loadLayout(name, false);
                 } else {
                     JOptionPane.showMessageDialog(
