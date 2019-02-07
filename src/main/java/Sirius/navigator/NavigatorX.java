@@ -136,6 +136,7 @@ import java.beans.PropertyChangeListener;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -272,6 +273,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
     public static final String DEFAULT_LAYOUT = NAVIGATOR_HOME + "navigatorx.layout"; // NOI18N
+    private static final String SELECTED_WINDOW_ID = "$selectedWindow";
     private static volatile boolean startupFinished = false;
 
     //~ Instance fields --------------------------------------------------------
@@ -1027,7 +1029,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                         "NavigatorX.progressObserver.loadWindow")); // NOI18N
                 final String titleName = ((window.getViewTitle() != null) ? window.getViewTitle() : "");
                 if (window instanceof MetaCatalogueTree) {
-                    final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(),
+                    final RootTreeNode rootTreeNode = new RootTreeNode(SessionManager.getProxy().getRoots(
+                                getConnectionContext()),
                             getConnectionContext());
                     ((MetaCatalogueTree)window).init(
                         rootTreeNode,
@@ -2089,6 +2092,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 LOG.debug("Layout File exists");
             }
             try {
+                final List<String> missedViews = new ArrayList<String>();
+
                 try {
                     // determine the used views
                     FileInputStream layoutInput = new FileInputStream(layoutFile);
@@ -2098,7 +2103,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     final boolean con = in.readBoolean();
                     final int viewCount = in.readInt();
                     final List<String> usedViews = new ArrayList<String>();
-                    final List<String> missedViews = new ArrayList<String>();
 
                     for (int i = 0; i < viewCount; i++) {
                         final int size = in.readInt();
@@ -2119,9 +2123,14 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     in = new ObjectInputStream(layoutInput);
                     rootWindow.read(in);
 
-                    for (final String viewName : missedViews) {
-                        rootWindow.removeView(viewMap.getView(viewName));
-                        viewMap.removeView(viewName);
+                    try {
+                        final Object o = in.readObject();
+
+                        if (o instanceof Map) {
+                            loadTabPositions((Map<String, Integer>)o, rootWindow);
+                        }
+                    } catch (EOFException e) {
+                        // nothing to do. The layout file does not contain any tab order infos
                     }
                     in.close();
                 } catch (Throwable t) {
@@ -2129,7 +2138,22 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     final FileInputStream layoutInput = new FileInputStream(layoutFile);
                     final ObjectInputStream in = new ObjectInputStream(layoutInput);
                     rootWindow.read(in);
+
+                    try {
+                        final Object o = in.readObject();
+
+                        if (o instanceof Map) {
+                            loadTabPositions((Map<String, Integer>)o, rootWindow);
+                        }
+                    } catch (Exception e) {
+                        // nothing to do. The layout file does not contain any tab order infos
+                    }
                     in.close();
+                }
+                // remove missed views again
+                for (final String viewName : missedViews) {
+                    rootWindow.removeView(viewMap.getView(viewName));
+                    viewMap.removeView(viewName);
                 }
                 rootWindow.getWindowBar(Direction.LEFT).setEnabled(true);
                 rootWindow.getWindowBar(Direction.RIGHT).setEnabled(true);
@@ -2198,6 +2222,46 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             }
         }
         addTabbedPanelListener(rootWindow);
+    }
+
+    /**
+     * Load the tab window positions.
+     *
+     * @param  position  the positions
+     * @param  window    the root window
+     */
+    private void loadTabPositions(final Map<String, Integer> position, final DockingWindow window) {
+        if (window instanceof TabWindow) {
+            final TabWindow tab = (TabWindow)window;
+            int iterations = 0;
+            boolean positionChanged = false;
+
+            do {
+                positionChanged = false;
+                iterations++;
+
+                for (int i = 0; i < tab.getChildWindowCount(); ++i) {
+                    final String id = tab.getChildWindow(i).getTitle() + "@" + tab.getTitle();
+                    final Integer index = position.get(id);
+
+                    if ((index != null) && (i != index)) {
+                        tab.addTab(tab.getChildWindow(i), index);
+                        positionChanged = true;
+                    }
+                }
+            } while (positionChanged && (iterations <= tab.getChildWindowCount()));
+            Integer selected = position.get(SELECTED_WINDOW_ID + "@" + tab.getTitle());
+
+            if (selected == null) {
+                selected = 0;
+            }
+            tab.setSelectedTab(selected);
+        }
+        if (window.getChildWindowCount() > 0) {
+            for (int i = 0; i < window.getChildWindowCount(); ++i) {
+                loadTabPositions(position, window.getChildWindow(i));
+            }
+        }
     }
 
     /**
@@ -2308,23 +2372,29 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
      */
     public void saveLayout(final String file, final Component parent) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Saving Layout.. to " + file);                                                              // NOI18N
+            LOG.debug("Saving Layout.. to " + file);                 // NOI18N
         }
         final File layoutFile = new File(file);
         try {
             if (!layoutFile.exists()) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Saving Layout.. File does not exit");                                              // NOI18N
+                    LOG.debug("Saving Layout.. File does not exit"); // NOI18N
                 }
                 layoutFile.createNewFile();
             } else {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Saving Layout.. File does exit");                                                  // NOI18N
+                    LOG.debug("Saving Layout.. File does exit");     // NOI18N
                 }
             }
             final FileOutputStream layoutOutput = new FileOutputStream(layoutFile);
             final ObjectOutputStream out = new ObjectOutputStream(layoutOutput);
             rootWindow.write(out);
+
+            // save the tab order
+            final Map<String, Integer> position = new HashMap<String, Integer>();
+
+            saveTabPositions(position, rootWindow);
+            out.writeUnshared(position);
             out.flush();
             out.close();
             if (LOG.isDebugEnabled()) {
@@ -2337,6 +2407,28 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 org.openide.util.NbBundle.getMessage(LayoutedContainer.class, "NavigatorX.saveLayout().title"),   // NOI18N
                 JOptionPane.INFORMATION_MESSAGE);
             LOG.error("A failure occured during writing the layout file", ex);                                    // NOI18N
+        }
+    }
+
+    /**
+     * Save the tab order.
+     *
+     * @param  position  the tab order will be saved in this map
+     * @param  window    The root window
+     */
+    private void saveTabPositions(final Map<String, Integer> position, final DockingWindow window) {
+        if (window.getChildWindowCount() > 0) {
+            if (window instanceof TabWindow) {
+                final TabWindow tabWin = (TabWindow)window;
+                position.put(SELECTED_WINDOW_ID + "@" + window.getTitle(),
+                    tabWin.getChildWindowIndex(tabWin.getSelectedWindow()));
+            }
+            for (int i = 0; i < window.getChildWindowCount(); ++i) {
+                if (window instanceof TabWindow) {
+                    position.put(window.getChildWindow(i).getTitle() + "@" + window.getTitle(), i);
+                }
+                saveTabPositions(position, window.getChildWindow(i));
+            }
         }
     }
 
@@ -2988,8 +3080,9 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 // exist in the windows file. And this should be impossible.
                 // (If the window does not exist in the windows file,
                 // then it should not be used in the navigator and so it
-                // cannot be asked for the index of this window)
-                LOG.error("window not found");
+                // cannot be asked for the index of this window).
+                // Can happen, when a new Layout is loaded
+//                LOG.error("window not found");
                 return 0;
             }
         }
