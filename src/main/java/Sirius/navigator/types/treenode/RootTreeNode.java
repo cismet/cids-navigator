@@ -289,7 +289,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                 if (inEDT) {
                     r.run();
                 } else {
-                    EventQueue.invokeLater(r);
+                    EventQueue.invokeAndWait(r);
                 }
             }
 
@@ -311,7 +311,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     if (inEDT) {
                         r.run();
                     } else {
-                        EventQueue.invokeLater(r);
+                        EventQueue.invokeAndWait(r);
                     }
 
                     explored &= children[i].isValid();
@@ -328,7 +328,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     if (inEDT) {
                         r.run();
                     } else {
-                        EventQueue.invokeLater(r);
+                        EventQueue.invokeAndWait(r);
                     }
 
                     explored &= children[i].isValid();
@@ -373,7 +373,7 @@ public final class RootTreeNode extends DefaultMetaTreeNode {
                     if (inEDT) {
                         r.run();
                     } else {
-                        EventQueue.invokeLater(r);
+                        EventQueue.invokeAndWait(r);
                     }
 
                     explored &= children[i].isValid();
