@@ -200,6 +200,7 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
             final boolean editable,
             final boolean useThread,
             final int maxThreadCount) {
+        this.useThread = useThread;
         this.setModel(new DefaultTreeModel(rootTreeNode, true));
         this.setEditable(editable);
 
