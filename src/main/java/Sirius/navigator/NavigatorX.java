@@ -71,6 +71,7 @@ import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
+import net.infonode.docking.WindowBar;
 import net.infonode.docking.internal.ReadContext;
 import net.infonode.docking.properties.DockingWindowProperties;
 import net.infonode.docking.properties.RootWindowProperties;
@@ -114,6 +115,7 @@ import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
@@ -2271,6 +2273,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
      */
     private void addTabbedPanelListener(final DockingWindow window) {
         if (window instanceof TabWindow) {
+            rootWindow.getFocusedView();
             final TabWindow tab = (TabWindow)window;
             TreeListener li = tabListeners.get(tab);
 
@@ -2303,6 +2306,45 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 addTabbedPanelListener(window.getChildWindow(i));
             }
         }
+
+        if (window instanceof WindowBar) {
+            final WindowBar wb = ((WindowBar)window);
+            if ((wb.getSelectedWindow() != null) && wb.getSelectedWindow().isMinimized()) {
+                EventQueue.invokeLater(new Thread("minimizeWindow") {
+
+                        @Override
+                        public void run() {
+                            EventQueue.invokeLater(new Thread("minimizeWindow") {
+
+                                    @Override
+                                    public void run() {
+                                        // this method must be called in the nested invokeLater, caused by
+                                        // the code in net.infonode.docking.FocusManager.focusWindow(),
+                                        // where also a nested invokeLater is used.
+                                        wb.setSelectedTab(-1);
+                                    }
+                                });
+                        }
+                    });
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   w  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private View getView(final DockingWindow w) {
+        for (int i = 0; i < viewMap.getViewCount(); ++i) {
+            if (viewMap.getViewAtIndex(i).getChildWindow(0) == w) {
+                return viewMap.getViewAtIndex(i);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -3082,7 +3124,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 // then it should not be used in the navigator and so it
                 // cannot be asked for the index of this window).
                 // Can happen, when a new Layout is loaded
-//                LOG.error("window not found");
+// LOG.error("window not found");
                 return 0;
             }
         }
