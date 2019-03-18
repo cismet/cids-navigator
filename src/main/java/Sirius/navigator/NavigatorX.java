@@ -3124,8 +3124,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 // then it should not be used in the navigator and so it
                 // cannot be asked for the index of this window).
                 // Can happen, when a new Layout is loaded
-// LOG.error("window not found");
-                return 0;
+
+                return Math.abs(window.hashCode()) * -1;
             }
         }
     }
