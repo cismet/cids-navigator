@@ -143,6 +143,7 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
     private final boolean paginationEnabled;
     private final transient AbstractFeatureService[] choosenLayers;
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
+    private boolean initialised = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSearchCancel;
@@ -286,129 +287,134 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
 
     @Override
     public void initWithConnectionContext(final ConnectionContext connectionContext) {
-        this.connectionContext = connectionContext;
-        if (choosenLayers == null) {
-            services = getFeatureServices(model);
-            classes = getClasses(getConnectionContext());
-            layers = new ArrayList<Object>(services);
-            layers.addAll(classes);
-        } else {
-            layers = new ArrayList<Object>(Arrays.asList(choosenLayers));
-            services = new ArrayList<>();
-            services.addAll(Arrays.asList(choosenLayers));
-            classes = new ArrayList<>();
-        }
-        initComponents();
-        jMethodCB.setVisible((jMethodCB.getModel().getSize() > 1));
-        jMethodLb.setVisible((jMethodCB.getModel().getSize() > 1));
-        jGeheZuLb.setVisible(false);
-        jTextField1.setVisible(false);
-        jAttributesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jAttributesLi.addMouseListener(new MouseAdapterImpl());
-        jValuesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jValuesLi.addMouseListener(new MouseAdapterImpl());
+        if (!initialised) {
+            initialised = true;
+            this.connectionContext = connectionContext;
+            if (choosenLayers == null) {
+                services = getFeatureServices(model);
+                classes = getClasses(getConnectionContext());
+                layers = new ArrayList<Object>(services);
+                layers.addAll(classes);
+            } else {
+                layers = new ArrayList<Object>(Arrays.asList(choosenLayers));
+                services = new ArrayList<>();
+                services.addAll(Arrays.asList(choosenLayers));
+                classes = new ArrayList<>();
+            }
+            initComponents();
+            jMethodCB.setVisible((jMethodCB.getModel().getSize() > 1));
+            jMethodLb.setVisible((jMethodCB.getModel().getSize() > 1));
+            jGeheZuLb.setVisible(false);
+            jTextField1.setVisible(false);
+            jAttributesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jAttributesLi.addMouseListener(new MouseAdapterImpl());
+            jValuesLi.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+            jValuesLi.addMouseListener(new MouseAdapterImpl());
 
-        jGetValuesBn.setEnabled(false);
-        jAttributesLi.addListSelectionListener(new ListSelectionListener() {
+            jGetValuesBn.setEnabled(false);
+            jAttributesLi.addListSelectionListener(new ListSelectionListener() {
 
-                @Override
-                public void valueChanged(final ListSelectionEvent e) {
-                    if (e.getValueIsAdjusting()) {
-                        return;
-                    }
-                    if (!((attributes == null) || (jAttributesLi.getSelectedIndex() == -1))) {
-                        final Object attributeObject = attributes.get(jAttributesLi.getSelectedIndex());
+                    @Override
+                    public void valueChanged(final ListSelectionEvent e) {
+                        if (e.getValueIsAdjusting()) {
+                            return;
+                        }
+                        if (!((attributes == null) || (jAttributesLi.getSelectedIndex() == -1))) {
+                            final Object attributeObject = attributes.get(jAttributesLi.getSelectedIndex());
 
-                        if (attributeObject instanceof MemberAttributeInfo) {
-                            final MemberAttributeInfo attributeInfo = (MemberAttributeInfo)attributeObject;
-                            if (queryableValues.contains(attributeInfo.getFieldName())) {
+                            if (attributeObject instanceof MemberAttributeInfo) {
+                                final MemberAttributeInfo attributeInfo = (MemberAttributeInfo)attributeObject;
+                                if (queryableValues.contains(attributeInfo.getFieldName())) {
+                                    jGetValuesBn.setEnabled(true);
+                                    return;
+                                }
+                            } else if (attributeObject instanceof FeatureServiceAttribute) {
                                 jGetValuesBn.setEnabled(true);
                                 return;
                             }
-                        } else if (attributeObject instanceof FeatureServiceAttribute) {
-                            jGetValuesBn.setEnabled(true);
-                            return;
                         }
+                        jGetValuesBn.setEnabled(false);
                     }
-                    jGetValuesBn.setEnabled(false);
-                }
-            });
+                });
 
-        jAttributesLi.setCellRenderer(new DefaultListCellRenderer() {
+            jAttributesLi.setCellRenderer(new DefaultListCellRenderer() {
 
-                @Override
-                public Component getListCellRendererComponent(final JList<?> list,
-                        final Object value,
-                        final int index,
-                        final boolean isSelected,
-                        final boolean cellHasFocus) {
-                    final Component component = super.getListCellRendererComponent(
-                            list,
-                            value,
-                            index,
-                            isSelected,
-                            cellHasFocus); // To change body of generated methods, choose Tools | Templates.
-                    final Object attributeObject = attributes.get(index);
+                    @Override
+                    public Component getListCellRendererComponent(final JList<?> list,
+                            final Object value,
+                            final int index,
+                            final boolean isSelected,
+                            final boolean cellHasFocus) {
+                        final Component component = super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                isSelected,
+                                cellHasFocus); // To change body of generated methods, choose Tools | Templates.
+                        final Object attributeObject = attributes.get(index);
 
-                    if (attributeObject instanceof MemberAttributeInfo) {
-                        final MemberAttributeInfo mai = (MemberAttributeInfo)attributeObject;
-                        ((JLabel)component).setText(mai.getFieldName());
-                        ((JLabel)component).setToolTipText(mai.getName());
+                        if (attributeObject instanceof MemberAttributeInfo) {
+                            final MemberAttributeInfo mai = (MemberAttributeInfo)attributeObject;
+                            ((JLabel)component).setText(mai.getFieldName());
+                            ((JLabel)component).setToolTipText(mai.getName());
+                        }
+                        return component;
                     }
-                    return component;
-                }
-            });
-        if (classes.size() > 0) {
-            jLayerCB.setSelectedIndex(0);
-        }
-        if (getMethods().size() > 0) {
-            jMethodCB.setSelectedIndex(0);
-        }
+                });
+            if (classes.size() > 0) {
+                jLayerCB.setSelectedIndex(0);
+            }
+            if (getMethods().size() > 0) {
+                jMethodCB.setSelectedIndex(0);
+            }
 
-        jValuesLi.setCellRenderer(new DefaultListCellRenderer() {
+            jValuesLi.setCellRenderer(new DefaultListCellRenderer() {
 
-                @Override
-                public Component getListCellRendererComponent(final JList list,
-                        final Object value,
-                        final int index,
-                        final boolean isSelected,
-                        final boolean cellHasFocus) {
-                    final Component c = super.getListCellRendererComponent(
-                            list,
-                            value,
-                            index,
-                            isSelected,
-                            cellHasFocus);
+                    @Override
+                    public Component getListCellRendererComponent(final JList list,
+                            final Object value,
+                            final int index,
+                            final boolean isSelected,
+                            final boolean cellHasFocus) {
+                        final Component c = super.getListCellRendererComponent(
+                                list,
+                                value,
+                                index,
+                                isSelected,
+                                cellHasFocus);
 
-                    if ((value instanceof MetaObject) && (c instanceof JLabel)) {
-                        final MetaObject mo = (MetaObject)value;
-                        ((JLabel)c).setText(mo.getID() + " - " + mo.toString());
+                        if ((value instanceof MetaObject) && (c instanceof JLabel)) {
+                            final MetaObject mo = (MetaObject)value;
+                            ((JLabel)c).setText(mo.getID() + " - " + mo.toString());
+                        }
+
+                        return c;
                     }
+                });
 
-                    return c;
-                }
-            });
+            final URL iconSearchUrl = getClass().getResource(
+                    "/Sirius/navigator/search/dynamic/SearchControlPanel_btnSearchCancel.png");
+            if (iconSearchUrl != null) {
+                this.iconSearch = new ImageIcon(iconSearchUrl);
+            } else {
+                this.iconSearch = new ImageIcon();
+            }
 
-        final URL iconSearchUrl = getClass().getResource(
-                "/Sirius/navigator/search/dynamic/SearchControlPanel_btnSearchCancel.png");
-        if (iconSearchUrl != null) {
-            this.iconSearch = new ImageIcon(iconSearchUrl);
+            final URL iconCancelUrl = getClass().getResource(
+                    "/Sirius/navigator/search/dynamic/SearchControlPanel_btnSearchCancel_cancel.png");
+            if (iconCancelUrl != null) {
+                this.iconCancel = new ImageIcon(iconCancelUrl);
+            } else {
+                this.iconCancel = new ImageIcon();
+            }
+
+            jLayerCBActionPerformed(null);
+
+            putValue(NAME, getName());
+            putValue(SMALL_ICON, getIcon());
         } else {
-            this.iconSearch = new ImageIcon();
+            this.connectionContext = connectionContext;
         }
-
-        final URL iconCancelUrl = getClass().getResource(
-                "/Sirius/navigator/search/dynamic/SearchControlPanel_btnSearchCancel_cancel.png");
-        if (iconCancelUrl != null) {
-            this.iconCancel = new ImageIcon(iconCancelUrl);
-        } else {
-            this.iconCancel = new ImageIcon();
-        }
-
-        jLayerCBActionPerformed(null);
-
-        putValue(NAME, getName());
-        putValue(SMALL_ICON, getIcon());
     }
 
     /**
