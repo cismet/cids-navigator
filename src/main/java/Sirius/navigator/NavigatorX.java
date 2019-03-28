@@ -1376,9 +1376,9 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
         if (v != null) {
             if (!v.isClosable()) {
-                if (v.isRestorable()) {
-                    v.restore();
-                } else {
+                v.restore();
+
+                if (!v.isRestorable()) {
                     final TabWindow tabWindow = getTabWindowForNewView(rootWindow.getWindow());
 
                     if (tabWindow == null) {
@@ -1397,9 +1397,11 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                             setupTitleBarStyleProperties(tabWindow, false);
                         }
                     }
+                    v.restoreFocus();
                 }
+            } else {
+                v.close();
             }
-            v.restoreFocus();
         }
     }
 
@@ -2369,7 +2371,18 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             rootWindow.read(in);
             in.close();
         } catch (Exception e) {
-            LOG.error("cannot load default layout", e);
+            LOG.error("cannot load default layout Try again", e);
+            try {
+                final String layoutFile = System.getProperty(
+                        "jnlp.defaultLayout",
+                        "/Sirius/navigator/defaultLayout.layout");
+                layoutInput = NavigatorX.class.getResourceAsStream(layoutFile);
+                in = new ObjectInputStream(layoutInput);
+                rootWindow.read(in);
+                in.close();
+            } catch (Exception ex) {
+                LOG.error("cannot load default layout", ex);
+            }
         } finally {
             if (layoutInput != null) {
                 try {
