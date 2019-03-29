@@ -13,7 +13,7 @@
 
     <groupId>de.cismet.cids.navigator</groupId>
     <artifactId>cids-navigator</artifactId>
-    <version>6.2.20</version>
+    <version>6.2.21</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -27,7 +27,7 @@
         <connection>https://github.com/cismet/cids-navigator.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-navigator.git</developerConnection>
         <url>https://github.com/cismet/cids-navigator</url>
-        <tag>v6.2.20</tag>
+        <tag>v6.2.21</tag>
     </scm>
 
     <ciManagement>

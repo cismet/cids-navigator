@@ -185,14 +185,17 @@
                     "id": "modeToolBar",
                     "items":
                     [
+                        {"actionKey": "GeoSelectionButton", "radio": "MapMode"},
                         {"actionKey": "SingleSelectionAction", "radio": "MapMode"},
                         {"actionKey": "ZoomAction", "radio": "MapMode"},
                         {"actionKey": "PanAction", "radio": "MapMode"},
+                        {"actionKey": "RasterGeoReferencingToolbar"},
                         {"actionKey": "FeatureInfoAction", "radio": "MapMode"},
                         {"actionKey": "MetaSearchToolbarComponent", "radio": "MapMode"},
                         {"actionKey": "NewPolygonAction", "radio": "MapMode"},
                         {"actionKey": "NewLineStringAction", "radio": "MapMode"},
                         {"actionKey": "NewPointAction", "radio": "MapMode"},
+                        {"actionKey": "AddGeomDnDButton"},
                         {"actionKey": "MoveAction", "radio": "MapMode"},
                         {"actionKey": "RemoveAction", "radio": "MapMode"}
                     ]
