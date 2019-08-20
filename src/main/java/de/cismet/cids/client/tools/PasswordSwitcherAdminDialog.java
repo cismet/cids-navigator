@@ -36,6 +36,10 @@ import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.net.URL;
+import java.util.Properties;
 
 /*
  * Copyright (C) 2013 cismet GmbH
@@ -225,16 +229,16 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCloseActionPerformed
         System.exit(0);
-    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+    }//GEN-LAST:event_btnCloseActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnChangePasswordActionPerformed
+    private void btnChangePasswordActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChangePasswordActionPerformed
         username = txtUsername.getText().trim();
 
         switchStarted();
@@ -268,7 +272,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                     }
                 }
             }.execute();
-    } //GEN-LAST:event_btnChangePasswordActionPerformed
+    }//GEN-LAST:event_btnChangePasswordActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -324,9 +328,25 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                         final PasswordSwitcherAdminDialog dialog = new PasswordSwitcherAdminDialog(
                                 new javax.swing.JFrame(),
                                 true);
-                        final String callServerURL = args[0];
-                        final String domain = args[1];
-                        final boolean compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);
+                        final String callServerURL;
+                        final String domain;
+                        final boolean compressionEnabled;
+                        if (args.length == 1) {
+                            final String cfgFile = args[0];                            
+                            final Properties properties = new Properties();
+                            if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0) || (cfgFile.indexOf("file:/") == 0)) {
+                                properties.load(new URL(cfgFile).openStream());
+                            } else {
+                                properties.load(new BufferedInputStream(new FileInputStream(cfgFile)));
+                            }       
+                            callServerURL = properties.getProperty("callserverURL");
+                            domain = properties.getProperty("userDomain");
+                            compressionEnabled = Boolean.parseBoolean(properties.getProperty("compressionEnabled"));
+                        } else {
+                            callServerURL = args[0];
+                            domain = args[1];
+                            compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);                            
+                        }
                         DevelopmentTools.showSimpleLoginDialog(
                             callServerURL,
                             domain,
