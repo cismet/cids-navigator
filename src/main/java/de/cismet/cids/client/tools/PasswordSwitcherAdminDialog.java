@@ -22,6 +22,12 @@ import org.apache.log4j.Logger;
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+
+import java.net.URL;
+
+import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -324,11 +330,29 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                         final PasswordSwitcherAdminDialog dialog = new PasswordSwitcherAdminDialog(
                                 new javax.swing.JFrame(),
                                 true);
-                        final String callServerURL = args[0];
-                        final String domain = args[1];
-                        final boolean compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);
+                        final String callServerUrl;
+                        final String domain;
+                        final boolean compressionEnabled;
+                        if (args.length == 1) {
+                            final String cfgFile = args[0];
+                            final Properties properties = new Properties();
+                            if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
+                                        || (cfgFile.indexOf("file:/") == 0)) {
+                                properties.load(new URL(cfgFile).openStream());
+                            } else {
+                                properties.load(new BufferedInputStream(new FileInputStream(cfgFile)));
+                            }
+                            callServerUrl = properties.getProperty("callserverURL");
+                            domain = properties.getProperty("userDomain");
+                            compressionEnabled = Boolean.parseBoolean(
+                                    properties.getProperty("compressionEnabled", "true"));
+                        } else {
+                            callServerUrl = args[0];
+                            domain = args[1];
+                            compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);
+                        }
                         DevelopmentTools.showSimpleLoginDialog(
-                            callServerURL,
+                            callServerUrl,
                             domain,
                             compressionEnabled,
                             dialog.getConnectionContext());
