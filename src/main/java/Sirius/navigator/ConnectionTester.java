@@ -35,9 +35,13 @@ import org.openide.util.Lookup;
 
 import java.awt.EventQueue;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import java.net.URL;
 
 import java.util.Properties;
 
@@ -378,8 +382,23 @@ public class ConnectionTester extends javax.swing.JFrame {
                 LOG.warn("error while parsing compressionEnabled argument", ex);
             }
         }
-        final String callserverUrl = arg0;
-        final boolean compressionEnabled = arg1;
+        final String callserverUrl;
+        final boolean compressionEnabled;
+        if (arg0.endsWith(".cfg")) {
+            final String cfgFile = args[0];
+            final Properties properties = new Properties();
+            if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
+                        || (cfgFile.indexOf("file:/") == 0)) {
+                properties.load(new URL(cfgFile).openStream());
+            } else {
+                properties.load(new BufferedInputStream(new FileInputStream(cfgFile)));
+            }
+            callserverUrl = properties.getProperty("callserverURL");
+            compressionEnabled = Boolean.parseBoolean(properties.getProperty("compressionEnabled", "true"));
+        } else {
+            callserverUrl = arg0;
+            compressionEnabled = arg1;
+        }
         java.awt.EventQueue.invokeLater(new Runnable() {
 
                 @Override
