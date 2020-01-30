@@ -321,6 +321,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     private String applicationKey = "";
     private Map<TabWindow, TreeListener> tabListeners = new WeakHashMap<TabWindow, TreeListener>();
     private TitleOrientationConfiguration titleOrientation = new TitleOrientationConfiguration();
+    private CustomTitleProvider titleProvider = new CustomTitleProvider();
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -698,8 +699,9 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 .setShadowStrength(0.8f);
         rootWindow.getRootWindowProperties().getTabWindowProperties().getMinimizeButtonProperties().setVisible(false);
         this.getContentPane().add(rootWindow, BorderLayout.CENTER);
+        rootWindow.getRootWindowProperties().getViewProperties().getViewTitleBarProperties().setVisible(true);
 //        jPanel1.add(rootWindow, BorderLayout.CENTER);
-        rootWindow.getRootWindowProperties().getDockingWindowProperties().setTitleProvider(new CustomTitleProvider());
+        rootWindow.getRootWindowProperties().getDockingWindowProperties().setTitleProvider(titleProvider);
     }
 
     /**
@@ -1372,6 +1374,43 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
      * @param  id  DOCUMENT ME!
      */
     public void select(final String id) {
+        final View v = viewMap.getView(id);
+
+        if (v != null) {
+            if (!v.isClosable()) {
+                if (v.isRestorable()) {
+                    v.restore();
+                } else {
+                    final TabWindow tabWindow = getTabWindowForNewView(rootWindow.getWindow());
+
+                    if (tabWindow == null) {
+                        LOG.error("No suitable tab window found");
+                    } else {
+                        tabWindow.addTab(v);
+                        v.restore();
+                        // set title bar properly
+                        final Direction d = tabWindow.getTabWindowProperties()
+                                    .getTabbedPanelProperties()
+                                    .getTabAreaOrientation();
+
+                        if (titleOrientation.showTitleForDirection(d)) {
+                            setupTitleBarStyleProperties(tabWindow, true);
+                        } else {
+                            setupTitleBarStyleProperties(tabWindow, false);
+                        }
+                    }
+                }
+            }
+            v.restoreFocus();
+        }
+    }
+
+    /**
+     * Similar to the select(String) method, but this method closes views, which are already shown.
+     *
+     * @param  id  DOCUMENT ME!
+     */
+    public void restoreOrRemove(final String id) {
         final View v = viewMap.getView(id);
 
         if (v != null) {
@@ -2308,7 +2347,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 addTabbedPanelListener(window.getChildWindow(i));
             }
         }
-
+        window.getWindowProperties().setTitleProvider(titleProvider);
         if (window instanceof WindowBar) {
             final WindowBar wb = ((WindowBar)window);
             if ((wb.getSelectedWindow() != null) && wb.getSelectedWindow().isMinimized()) {
@@ -2706,6 +2745,10 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             if (window.getChildWindow(i) instanceof View) {
                 final View childView = ((View)window.getChildWindow(i));
 
+                // The title bar will only become visible, if the visible variable was false before.
+                // It is possible, that the visible variable is already true and the title bar is not shown.
+                // (Perhaps some listener were not set when the visible variable was initialised)
+                childView.getViewProperties().getViewTitleBarProperties().setVisible(!visible);
                 childView.getViewProperties().getViewTitleBarProperties().setVisible(visible);
 
                 if (visible) {
@@ -3271,7 +3314,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
         @Override
         public void actionPerformed(final ActionEvent e) {
-            select(viewId);
+            restoreOrRemove(viewId);
         }
     }
 
