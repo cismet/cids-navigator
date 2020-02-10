@@ -2751,6 +2751,16 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 childView.getViewProperties().getViewTitleBarProperties().setVisible(!visible);
                 childView.getViewProperties().getViewTitleBarProperties().setVisible(visible);
 
+                EventQueue.invokeLater(new Thread("setTitleBarVisible") {
+
+                        @Override
+                        public void run() {
+                            //newly added panels will not be shown with a title bar without this lines
+                            childView.getViewProperties().getViewTitleBarProperties().setVisible(!visible);
+                            childView.getViewProperties().getViewTitleBarProperties().setVisible(visible);
+                        }
+                    });
+
                 if (visible) {
                     if (childView.getCustomTabComponents().size() > 0) {
                         final List customTabs = new ArrayList(childView.getCustomTabComponents());
