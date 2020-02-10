@@ -611,6 +611,9 @@ public class ActionConfiguration {
         }
 
         for (final ToolbarComponentsProvider tp : toolbarProvider) {
+            if (tp instanceof ConnectionContextStore) {
+                ((ConnectionContextStore)tp).initWithConnectionContext(context);
+            }
             if (tp instanceof CidsUiComponent) {
                 final CidsUiComponent uiComp = (CidsUiComponent)tp;
                 componentMap.put((String)uiComp.getValue(CidsUiAction.CIDS_ACTION_KEY), uiComp.getComponent());
