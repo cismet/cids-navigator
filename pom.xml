@@ -97,13 +97,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>6.3.4</version>
+                <version>6.3.9</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>6.3.4</version>
+                <version>6.3.9</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
