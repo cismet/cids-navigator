@@ -23,6 +23,7 @@ import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.navigator.ui.tree.SearchResultsTree;
 
 import Sirius.server.localserver.method.Method;
+import Sirius.server.localserver.object.DeletionProviderClientException;
 import Sirius.server.middleware.types.Link;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
@@ -52,6 +53,8 @@ import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+
+import de.cismet.cismap.commons.interaction.CismapBroker;
 
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
@@ -476,7 +479,17 @@ public class MethodManager {
                         .getMainWindow()
                         .setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-                if (exp instanceof SqlConnectionException) {
+                final DeletionProviderClientException dpcException = getDeletionProviderSubException(exp, 1);
+
+                if (dpcException != null) {
+                    JOptionPane.showMessageDialog(StaticSwingTools.getFirstParentFrame(
+                            CismapBroker.getInstance().getMappingComponent()),
+                        dpcException.getMessage(),
+                        org.openide.util.NbBundle.getMessage(
+                            MethodManager.class,
+                            "MethodManager.deleteNode(MetaCatalogueTree,DefaultMetaTreeNode).dcpException.title"),
+                        JOptionPane.ERROR_MESSAGE);
+                } else if (exp instanceof SqlConnectionException) {
                     final ArrayList<String> messages = new ArrayList<String>();
                     messages.add(exp.getMessage());
                     for (final StackTraceElement elem : exp.getStackTrace()) {
@@ -511,6 +524,26 @@ public class MethodManager {
         }
 
         return false;
+    }
+
+    /**
+     * Extract the first DeletionProviderClientException from the given exception.
+     *
+     * @param   e          the execption from that the DeletionProviderClientException should be extracted
+     * @param   recursion  the invocation count of this method. To avoid an infinite loop
+     *
+     * @return  null, if no DeletionProviderClientException is contained
+     */
+    private DeletionProviderClientException getDeletionProviderSubException(final Throwable e, final int recursion) {
+        if (recursion > 20) {
+            return null;
+        } else if (e instanceof DeletionProviderClientException) {
+            return (DeletionProviderClientException)e;
+        } else if (e.getCause() != null) {
+            return (getDeletionProviderSubException(e.getCause(), recursion + 1));
+        } else {
+            return null;
+        }
     }
 
     /**
