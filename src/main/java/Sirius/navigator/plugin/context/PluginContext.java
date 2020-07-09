@@ -302,8 +302,13 @@ public class PluginContext {
             this.mappingTable = mappingTable;
             this.paramTable = paramTable;
 
-            this.documentBase = pluginDescriptor.getPluginPath() + "res/"; // NOI18N
-            this.codeBase = pluginDescriptor.getPluginPath() + "lib/";     // NOI18N
+            if (pluginDescriptor.getPluginPath().startsWith(PluginFactory.CLASSPATH_PROTOCOL)) {
+                this.documentBase = pluginDescriptor.getPluginPath() + "res";  // NOI18N
+                this.codeBase = pluginDescriptor.getPluginPath() + "lib";      // NOI18N
+            } else {
+                this.documentBase = pluginDescriptor.getPluginPath() + "res/"; // NOI18N
+                this.codeBase = pluginDescriptor.getPluginPath() + "lib/";     // NOI18N
+            }
         }
 
         //~ Methods ------------------------------------------------------------
@@ -661,7 +666,14 @@ public class PluginContext {
             }
 
             try {
-                final URL url = new URL(image);
+                URL url;
+
+                if (image.startsWith(PluginFactory.CLASSPATH_PROTOCOL)) {
+                    url = getClass().getResource(image.substring(PluginFactory.CLASSPATH_PROTOCOL.length()));
+                } else {
+                    url = new URL(image);
+                }
+
                 return this.getImage(url);
             } catch (MalformedURLException e) {
                 final Image i = Toolkit.getDefaultToolkit().getImage(image);
