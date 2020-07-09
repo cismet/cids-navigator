@@ -51,6 +51,7 @@ public final class PluginFactory implements ConnectionContextProvider {
 
     private static final ResourceManager RESOURCE = ResourceManager.getManager();
     private static final Logger LOG = Logger.getLogger(PluginFactory.class);
+    public static final String CLASSPATH_PROTOCOL = "classpath:";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -199,8 +200,12 @@ public final class PluginFactory implements ConnectionContextProvider {
             LOG.debug("loading plugin XML descriptor from remote URL '" + pluginDescriptorPath + "'"); // NOI18N
         }
 
-        return new BufferedInputStream(RESOURCE.getResourceAsStream(pluginDescriptorPath), 16384);
-
+        if (pluginDescriptorPath.startsWith(CLASSPATH_PROTOCOL)) {
+            return new BufferedInputStream(getClass().getResourceAsStream(
+                        pluginDescriptorPath.substring(CLASSPATH_PROTOCOL.length())));
+        } else {
+            return new BufferedInputStream(RESOURCE.getResourceAsStream(pluginDescriptorPath), 16384);
+        }
         /*if(pluginPath.indexOf("http://") == 0 || pluginPath.indexOf("https://") == 0)
          * { if(logger.isDebugEnabled())logger.debug("loading plugin XML descriptor from remote URL '" +
          * pluginDescriptorPath + "'"); URL pluginURL = new URL(pluginPath); return new
