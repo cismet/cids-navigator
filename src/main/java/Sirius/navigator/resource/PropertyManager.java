@@ -27,8 +27,6 @@ import Sirius.navigator.ui.progress.*;
 
 import org.apache.log4j.*;
 
-import java.applet.*;
-
 import java.beans.*;
 
 import java.io.*;
@@ -48,8 +46,8 @@ public final class PropertyManager {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(PropertyManager.class);
-    private static final PropertyManager manager = new PropertyManager();
+    private static final Logger LOG = Logger.getLogger(PropertyManager.class);
+    private static final PropertyManager MANAGER = new PropertyManager();
     private static final String HEADER = "Navigator Configuration File";
     public static final String TRUE = "true";
     public static final String FALSE = "false";
@@ -103,11 +101,9 @@ public final class PropertyManager {
     private boolean saveable;
     private boolean applet = false;
     private boolean application = true;
-    private AppletContext appletContext = null;
     private final ProgressObserver sharedProgressObserver;
     private boolean editable;
     private boolean autoClose = false;
-    private boolean workingSpaceEnabled = false;
     private boolean protocolEnabled = false;
     private boolean postfilterEnabled = false;
     private boolean fulltextSearchToolbarItemEnabled = false;
@@ -189,7 +185,7 @@ public final class PropertyManager {
             this.setMaximizeWindow(false);
         } else {
             this.setMaximizeWindow(false);
-            logger.warn("setMaximizeWindow(): invalid property 'maximizeWindow': '" + maximizeWindow
+            LOG.warn("setMaximizeWindow(): invalid property 'maximizeWindow': '" + maximizeWindow
                         + "', setting default value to '" + this.maximizeWindow + "'");
         }
     }
@@ -233,35 +229,6 @@ public final class PropertyManager {
     public void setSize(final String width, final String height) {
         this.setWidth(width);
         this.setHeight(height);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isWorkingSpaceEnabled() {
-        return workingSpaceEnabled;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  workingSpaceEnabled  DOCUMENT ME!
-     */
-    public void setWorkingSpaceEnabled(final boolean workingSpaceEnabled) {
-        this.workingSpaceEnabled = workingSpaceEnabled;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  input  DOCUMENT ME!
-     */
-    public void setWorkingSpaceEnabled(final String input) {
-        if ((input != null) && input.trim().equalsIgnoreCase("true")) {
-            this.workingSpaceEnabled = true;
-        }
     }
 
     /**
@@ -357,7 +324,7 @@ public final class PropertyManager {
             final int iwidth = Integer.parseInt(width);
             this.setWidth(iwidth);
         } catch (Exception exp) {
-            logger.warn("setWidth(): invalid property 'witdh': '" + exp.getMessage() + "'"); // NOI18N
+            LOG.warn("setWidth(): invalid property 'witdh': '" + exp.getMessage() + "'"); // NOI18N
         }
     }
 
@@ -397,7 +364,7 @@ public final class PropertyManager {
         try {
             this.setPermissionModus(modus);
         } catch (Exception exp) {
-            logger.warn("setPermissionModus(): invalid property 'permissionModus': '" + exp.getMessage() + "'"); // NOI18N
+            LOG.warn("setPermissionModus(): invalid property 'permissionModus': '" + exp.getMessage() + "'"); // NOI18N
         }
     }
 
@@ -430,7 +397,7 @@ public final class PropertyManager {
             final int iheight = Integer.parseInt(height);
             this.setHeight(iheight);
         } catch (Exception exp) {
-            logger.warn("setHeight(): invalid property 'height': '" + exp.getMessage() + "'"); // NOI18N
+            LOG.warn("setHeight(): invalid property 'height': '" + exp.getMessage() + "'"); // NOI18N
         }
     }
 
@@ -579,7 +546,7 @@ public final class PropertyManager {
             this.setAutoLogin(false);
         } else {
             this.setAutoLogin(false);
-            logger.warn("setAutoLogin(): invalid property 'autoLogin': '" + autoLogin + "', setting default value to '"
+            LOG.warn("setAutoLogin(): invalid property 'autoLogin': '" + autoLogin + "', setting default value to '"
                         + this.autoLogin + "'");
         }
     }
@@ -613,7 +580,7 @@ public final class PropertyManager {
             final int imaxConnections = Integer.parseInt(maxConnections);
             this.setMaxConnections(imaxConnections);
         } catch (Exception exp) {
-            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + exp.getMessage() + "'"); // NOI18N
+            LOG.warn("setMaxConnections(): invalid property 'maxConnections': '" + exp.getMessage() + "'"); // NOI18N
         }
     }
 
@@ -626,7 +593,7 @@ public final class PropertyManager {
         if ((maxConnections < MIN_SERVER_THREADS) || (maxConnections > MAX_SERVER_THREADS)) {
             this.maxConnections = MIN_SERVER_THREADS;
             properties.setProperty("maxConnections", String.valueOf(MIN_SERVER_THREADS));
-            logger.warn("setMaxConnections(): invalid property 'maxConnections': '" + maxConnections
+            LOG.warn("setMaxConnections(): invalid property 'maxConnections': '" + maxConnections
                         + "', setting default value to '" + MIN_SERVER_THREADS + "'");
         } else {
             this.maxConnections = maxConnections;
@@ -655,7 +622,7 @@ public final class PropertyManager {
             this.setAdvancedLayout(false);
         } else {
             this.setAdvancedLayout(false);
-            logger.warn("setAdvancedLayout(): invalid property 'advancedLayout': '" + advancedLayout
+            LOG.warn("setAdvancedLayout(): invalid property 'advancedLayout': '" + advancedLayout
                         + "', setting default value to '" + this.advancedLayout + "'");
         }
     }
@@ -690,7 +657,7 @@ public final class PropertyManager {
         } else {
             // this.lookAndFeel = LNF_METAL;
             this.lookAndFeel = LAFManager.getManager().getDefaultLookAndFeel().getName();
-            logger.warn("setLookAndFeel(): invalid property 'lookAndFeel': '" + lookAndFeelName
+            LOG.warn("setLookAndFeel(): invalid property 'lookAndFeel': '" + lookAndFeelName
                         + "', setting default value to '" + this.lookAndFeel + "'");
         }
         properties.setProperty("lookAndFeel", this.lookAndFeel); // NOI18N
@@ -717,7 +684,7 @@ public final class PropertyManager {
             this.setSortChildren(false);
         } else {
             this.setSortChildren(false);
-            logger.warn("setSortChildren(): invalid property 'sortChildren': '" + sortChildren
+            LOG.warn("setSortChildren(): invalid property 'sortChildren': '" + sortChildren
                         + "', setting default value to '" + this.sortChildren + "'");
         }
     }
@@ -753,7 +720,7 @@ public final class PropertyManager {
             this.setSortAscending(false);
         } else {
             this.setSortAscending(false);
-            logger.warn("setSortAscending(): invalid property 'sortAscending': '" + sortAscending
+            LOG.warn("setSortAscending(): invalid property 'sortAscending': '" + sortAscending
                         + "', setting default value to '" + this.sortAscending + "'");
         }
     }
@@ -791,7 +758,7 @@ public final class PropertyManager {
             this.setConnectionInfoSaveable(false);
         } else {
             this.setConnectionInfoSaveable(false);
-            logger.warn("connectionInfoSaveable(): invalid property 'connectionInfoSaveable': '"
+            LOG.warn("connectionInfoSaveable(): invalid property 'connectionInfoSaveable': '"
                         + connectionInfoSaveable + "', setting default value to '" + this.connectionInfoSaveable + "'");
         }
     }
@@ -827,7 +794,7 @@ public final class PropertyManager {
             this.setLoadable(false);
         } else {
             this.setLoadable(false);
-            logger.warn("loadable(): invalid property 'loadable': '" + loadable + "', setting default value to '"
+            LOG.warn("loadable(): invalid property 'loadable': '" + loadable + "', setting default value to '"
                         + this.loadable + "'");
         }
     }
@@ -863,7 +830,7 @@ public final class PropertyManager {
             this.setSaveable(false);
         } else {
             this.setSaveable(false);
-            logger.warn("saveable(): invalid property 'saveable': '" + saveable + "', setting default value to '"
+            LOG.warn("saveable(): invalid property 'saveable': '" + saveable + "', setting default value to '"
                         + this.saveable + "'");
         }
     }
@@ -900,7 +867,7 @@ public final class PropertyManager {
             this.setUseFlyingSaucer(false);
         } else {
             this.setUseFlyingSaucer(false);
-            logger.warn("setUseFlyingSaucer(): invalid property 'useFlyingSaucer': '" + useFlyingSaucer
+            LOG.warn("setUseFlyingSaucer(): invalid property 'useFlyingSaucer': '" + useFlyingSaucer
                         + "', setting default value to '"
                         + this.useFlyingSaucer + "'");
         }
@@ -944,7 +911,7 @@ public final class PropertyManager {
             this.setUseWebView(false);
         } else {
             this.setUseWebView(false);
-            logger.warn("setUseWebView(): invalid property 'useWebView': '" + useWebView
+            LOG.warn("setUseWebView(): invalid property 'useWebView': '" + useWebView
                         + "', setting default value to '"
                         + this.useWebView + "'");
         }
@@ -989,7 +956,7 @@ public final class PropertyManager {
             this.setEnableSearchDialog(false);
         } else {
             this.setEnableSearchDialog(false);
-            logger.warn("setEnableSearchDialog(): invalid property 'enableSearchDialog': '" + enableSearchDialog
+            LOG.warn("setEnableSearchDialog(): invalid property 'enableSearchDialog': '" + enableSearchDialog
                         + "', setting default value to '"
                         + this.enableSearchDialog + "'");
         }
@@ -1041,8 +1008,8 @@ public final class PropertyManager {
      * @param  value     DOCUMENT ME!
      */
     private synchronized void setProperty(final String property, final String value) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("setting property '" + property + "' to '" + value + "'"); // NOI18N
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("setting property '" + property + "' to '" + value + "'"); // NOI18N
             /*if(property.equalsIgnoreCase("title"))
              * { this.setTitle(value); }else*/
         }
@@ -1089,12 +1056,12 @@ public final class PropertyManager {
         } else if (property.equalsIgnoreCase("username")) {                                    // NOI18N
             this.connectionInfo.setUsername(value);
         } else if (property.equalsIgnoreCase("useFlyingSaucer")) {                             // NOI18N
-            logger.warn(
+            LOG.warn(
                 "Property useFlyingSaucer is deprecated and should be replaced with Property " // NOI18N
                         + "navigator.descriptionPane.htmlRenderer=fylingSaucer");              // NOI18N
             this.setUseFlyingSaucer(value);
         } else if (property.equalsIgnoreCase("useWebView")) {                                  // NOI18N
-            logger.warn(
+            LOG.warn(
                 "Property useWebView is deprecated and should be replaced with Property "      // NOI18N
                         + "navigator.descriptionPane.htmlRenderer=fxWebView");                 // NOI18N
             this.setUseWebView(value);
@@ -1112,8 +1079,6 @@ public final class PropertyManager {
             this.setProxyDomain(value);
         } else if (property.equals("navigator.descriptionPane.htmlRenderer")) {
             this.setDescriptionPaneHtmlRenderer(value);
-        } else if (property.equals("navigator.workingspace.enabled")) {
-            this.setWorkingSpaceEnabled(value);
         } else if (property.equals("navigator.postfilter.enabled")) {
             this.setPostfilterEnabled(value);
         } else if (property.equals("navigator.protocol.enabled")) {
@@ -1134,10 +1099,10 @@ public final class PropertyManager {
                 this.properties.load(inStream);
                 this.load();
             } catch (Exception exp) {
-                logger.fatal("could not load properties: " + exp.getMessage(), exp); // NOI18N
+                LOG.fatal("could not load properties: " + exp.getMessage(), exp); // NOI18N
             }
         } else {
-            logger.error("could not load properties: properties not loadable");      // NOI18N
+            LOG.error("could not load properties: properties not loadable");      // NOI18N
         }
     }
 
@@ -1168,28 +1133,28 @@ public final class PropertyManager {
         this.application = true;
 
         if (basePath != null) {
-            logger.info("setting base path to '" + basePath + "'"); // NOI18N
+            LOG.info("setting base path to '" + basePath + "'"); // NOI18N
             this.basePath = basePath;
         } else {
             this.getBasePath();
         }
 
         if (pluginPath != null) {
-            logger.info("setting base plugin to '" + pluginPath + "'"); // NOI18N
+            LOG.info("setting base plugin to '" + pluginPath + "'"); // NOI18N
             this.pluginPath = pluginPath;
         } else {
             this.getPluginPath();
         }
 
         if (searchFormPath != null) {
-            logger.info("setting search form path to '" + searchFormPath + "'"); // NOI18N
+            LOG.info("setting search form path to '" + searchFormPath + "'"); // NOI18N
             this.searchFormPath = searchFormPath;
         } else {
             this.getSearchFormPath();
         }
 
         if (profilesPath != null) {
-            logger.info("setting profiles path to '" + profilesPath + "'"); // NOI18N
+            LOG.info("setting profiles path to '" + profilesPath + "'"); // NOI18N
             this.profilesPath = profilesPath;
         } else {
             this.getProfilesPath();
@@ -1201,7 +1166,7 @@ public final class PropertyManager {
                 final URL url = new URL(cfgFile);
                 this.load(url.openStream());
 
-                logger.info("config file loaded from url (assuming webstart)");     // NOI18N
+                LOG.info("config file loaded from url (assuming webstart)");        // NOI18N
                 this.applet = true;
             } else {
                 final File file = new File(cfgFile);
@@ -1221,12 +1186,12 @@ public final class PropertyManager {
                 final StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
                 while (tokenizer.hasMoreTokens()) {
                     final String plugin = tokenizer.nextToken().trim() + "/";
-                    logger.info("adding plugin from config file: '" + plugin + "'");
+                    LOG.info("adding plugin from config file: '" + plugin + "'");
                     pluginList.add(pluginPath + "/" + plugin);
                 }
             }
         } catch (Exception except) {
-            logger.fatal(except, except);
+            LOG.fatal(except, except);
         }
 
 //        try {
@@ -1256,22 +1221,21 @@ public final class PropertyManager {
      * @param  applet  DOCUMENT ME!
      */
     public void configure(final JApplet applet) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("configure property manager (applet)");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("configure property manager (applet)");
         }
         this.pluginList = new ArrayList();
         this.applet = true;
         this.application = false;
-        this.appletContext = applet.getAppletContext();
 
-        this.basePath = applet.getCodeBase().toString();             // + "/";
-        logger.info("setting base path to '" + this.basePath + "'"); // NOI18N
+        this.basePath = applet.getCodeBase().toString();          // + "/";
+        LOG.info("setting base path to '" + this.basePath + "'"); // NOI18N
 
-        this.pluginPath = this.basePath + "plugins/";                     // NOI18N
-        logger.info("setting plugins path to '" + this.pluginPath + "'"); // NOI18N
+        this.pluginPath = this.basePath + "plugins/";                  // NOI18N
+        LOG.info("setting plugins path to '" + this.pluginPath + "'"); // NOI18N
 
-        this.searchFormPath = this.basePath + "search/";                           // NOI18N
-        logger.info("setting search forms path to '" + this.searchFormPath + "'"); // NOI18N
+        this.searchFormPath = this.basePath + "search/";                        // NOI18N
+        LOG.info("setting search forms path to '" + this.searchFormPath + "'"); // NOI18N
 
         this.readAppletParameters(applet);
     }
@@ -1283,24 +1247,24 @@ public final class PropertyManager {
      */
     private void readAppletParameters(final JApplet applet) {
         // configfile
-        String parameter = applet.getParameter("configfile");                                                      // NOI18N
+        String parameter = applet.getParameter("configfile");                                                   // NOI18N
         if ((parameter != null) && (parameter.length() > 0)) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("loading configfile from remote url '" + this.getBasePath() + parameter + "'");       // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading configfile from remote url '" + this.getBasePath() + parameter + "'");       // NOI18N
             }
             try {
                 final URL url = new URL(this.getBasePath() + parameter);
                 this.load(new BufferedInputStream(url.openStream()));
             } catch (Exception exp) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("could not load configfile, trying to load file from local filesystem\n"
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("could not load configfile, trying to load file from local filesystem\n"
                                 + exp.getMessage());
                 }
                 try {
                     final File file = new File(parameter);
                     this.load(new BufferedInputStream(new FileInputStream(file)));
                 } catch (Exception ioexp) {
-                    logger.error("could not load configfile, using default configuration\n" + ioexp.getMessage()); // NOI18N
+                    LOG.error("could not load configfile, using default configuration\n" + ioexp.getMessage()); // NOI18N
                     this.configure();
                 }
             }
@@ -1311,7 +1275,7 @@ public final class PropertyManager {
             final StringTokenizer tokenizer = new StringTokenizer(parameter, ";");
             while (tokenizer.hasMoreTokens()) {
                 final String plugin = this.pluginPath + tokenizer.nextToken().trim() + "/";
-                logger.info("adding plugin '" + plugin + "'");
+                LOG.info("adding plugin '" + plugin + "'");
                 pluginList.add(plugin);
             }
         }
@@ -1327,10 +1291,10 @@ public final class PropertyManager {
             try {
                 this.properties.store(outStream, HEADER);
             } catch (Exception exp) {
-                logger.fatal("could not save properties: " + exp.getMessage(), exp); // NOI18N
+                LOG.fatal("could not save properties: " + exp.getMessage(), exp); // NOI18N
             }
         } else {
-            logger.error("could not save properties: properties not saveable");      // NOI18N
+            LOG.error("could not save properties: properties not saveable");      // NOI18N
         }
     }
 
@@ -1347,7 +1311,7 @@ public final class PropertyManager {
      * @return  DOCUMENT ME!
      */
     public static PropertyManager getManager() {
-        return manager;
+        return MANAGER;
     }
 
     /**
@@ -1377,13 +1341,13 @@ public final class PropertyManager {
         if (this.basePath == null) {
             this.basePath = System.getProperty("user.home") + System.getProperty("file.separator") + ".navigator"
                         + System.getProperty("file.separator");
-            logger.info("no base path set, setting default base path to '" + this.basePath + "'");
+            LOG.info("no base path set, setting default base path to '" + this.basePath + "'");
 
             final File file = new File(this.basePath);
             if (!file.exists()) {
-                logger.warn("base path does not exist, creating base path"); // NOI18N
+                LOG.warn("base path does not exist, creating base path"); // NOI18N
                 if (!file.mkdirs()) {
-                    logger.error("could not create base path");              // NOI18N
+                    LOG.error("could not create base path");              // NOI18N
                 }
             }
         }
@@ -1404,7 +1368,7 @@ public final class PropertyManager {
                 this.pluginPath = this.getBasePath() + "plugins" + System.getProperty("file.separator"); // NOI18N
             }
 
-            logger.info("no plugin path set, setting default plugin path to '" + this.pluginPath + "'"); // NOI18N
+            LOG.info("no plugin path set, setting default plugin path to '" + this.pluginPath + "'"); // NOI18N
         }
 
         return this.pluginPath;
@@ -1417,12 +1381,12 @@ public final class PropertyManager {
      */
     public String getSearchFormPath() {
         if (this.searchFormPath == null) {
-            if (this.getBasePath().startsWith("http")) {                                                               // NOI18N
-                this.searchFormPath = this.basePath + "search/";                                                       // NOI18N
+            if (this.getBasePath().startsWith("http")) {                                                            // NOI18N
+                this.searchFormPath = this.basePath + "search/";                                                    // NOI18N
             } else {
-                this.searchFormPath = this.basePath + "search" + System.getProperty("file.separator");                 // NOI18N
+                this.searchFormPath = this.basePath + "search" + System.getProperty("file.separator");              // NOI18N
             }
-            logger.info("no search form path set, setting default search form path to '" + this.searchFormPath + "'"); // NOI18N
+            LOG.info("no search form path set, setting default search form path to '" + this.searchFormPath + "'"); // NOI18N
         }
 
         return this.searchFormPath;
@@ -1436,7 +1400,7 @@ public final class PropertyManager {
     public String getProfilesPath() {
         if ((this.profilesPath == null) || this.profilesPath.equals("AUTO")) {
             if (this.getBasePath().startsWith("http")) {
-                logger.info("no profiles path set and base path == URL, settting default profiles path to user.home");
+                LOG.info("no profiles path set and base path == URL, settting default profiles path to user.home");
                 this.profilesPath = new StringBuffer().append(System.getProperty("user.home"))
                             .append(System.getProperty("file.separator"))
                             .append(".navigator")
@@ -1448,13 +1412,13 @@ public final class PropertyManager {
                 this.profilesPath = this.basePath + "profiles" + System.getProperty("file.separator"); // NOI18N
             }
 
-            logger.info("no profiles form path set, setting default search form path to '" + this.profilesPath + "'"); // NOI18N
+            LOG.info("no profiles form path set, setting default search form path to '" + this.profilesPath + "'"); // NOI18N
 
             final File file = new File(this.profilesPath);
             if (!file.exists()) {
-                logger.warn("profiles path does not exist, creating base path"); // NOI18N
+                LOG.warn("profiles path does not exist, creating base path"); // NOI18N
                 if (!file.mkdirs()) {
-                    logger.error("could not create profiles path");              // NOI18N
+                    LOG.error("could not create profiles path");              // NOI18N
                 }
             }
         }
@@ -1478,18 +1442,18 @@ public final class PropertyManager {
                         if (plugins[i].isDirectory()) {
                             if (!plugins[i].getName().equalsIgnoreCase("CVS")) {
                                 final String plugin = plugins[i].getPath() + System.getProperty("file.separator");
-                                logger.info("adding plugin '" + plugin + "'");
+                                LOG.info("adding plugin '" + plugin + "'");
                                 pluginList.add(plugin);
                             } else {
-                                if (logger.isDebugEnabled()) {
-                                    logger.warn("plugin directory with name 'CVS' found. ignoring plugin!"); // NOI18N
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.warn("plugin directory with name 'CVS' found. ignoring plugin!"); // NOI18N
                                 }
                             }
                         }
                     }
                 }
             } else {
-                logger.warn("'" + this.pluginPath + "' does not exist or is no valid plugin directory");     // NOI18N
+                LOG.warn("'" + this.pluginPath + "' does not exist or is no valid plugin directory");     // NOI18N
             }
         }
 
@@ -1505,7 +1469,7 @@ public final class PropertyManager {
         if (this.isPluginListAvailable()) {
             return this.pluginList.iterator();
         } else {
-            logger.warn("sorry, no plugins could be found"); // NOI18N
+            LOG.warn("sorry, no plugins could be found"); // NOI18N
             return null;
         }
     }
