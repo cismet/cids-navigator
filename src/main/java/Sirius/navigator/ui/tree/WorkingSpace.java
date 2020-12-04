@@ -21,12 +21,6 @@ import java.awt.dnd.DropTargetListener;
 
 import java.util.Collection;
 
-import javax.swing.JOptionPane;
-
-import de.cismet.cismap.commons.util.DnDUtils;
-
-import de.cismet.tools.gui.StaticSwingTools;
-
 /**
  * DOCUMENT ME!
  *

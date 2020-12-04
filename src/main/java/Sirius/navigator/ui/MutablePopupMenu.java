@@ -8,6 +8,7 @@
 package Sirius.navigator.ui;
 
 import Sirius.navigator.NavigatorConcurrency;
+import Sirius.navigator.WorkingSpaceHandler;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.method.MethodAvailability;
 import Sirius.navigator.method.MethodManager;
@@ -146,7 +147,7 @@ public final class MutablePopupMenu extends JPopupMenu implements ConnectionCont
                 specialTreeItem));
         this.add(specialTreeItem);
 
-        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+        if (WorkingSpaceHandler.getInstance().isEnabled()) {
             moveToWorkingSpace = new MoveToWorkingSpaceTreeMethod();
             this.add(moveToWorkingSpace);
         }

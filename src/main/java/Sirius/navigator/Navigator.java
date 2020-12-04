@@ -598,7 +598,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             MutableConstraints.ANY_INDEX);
         container.add(searchResultsTreeConstraints);
 
-        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+        if (WorkingSpaceHandler.getInstance().isEnabled()) {
             // WorkingSPace ---------------------------------------------------
             progressObserver.setProgress(
                 235,
@@ -860,7 +860,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         metaCatalogueTree.addMouseListener(cataloguePopupMenuListener);
         searchResultsTree.addMouseListener(cataloguePopupMenuListener);
 
-        if (PropertyManager.getManager().isWorkingSpaceEnabled() && (workingSpaceTree != null)) {
+        if (WorkingSpaceHandler.getInstance().isEnabled() && (workingSpaceTree != null)) {
             workingSpaceTree.addStatusChangeListener(statusChangeListener);
             workingSpaceTree.addTreeSelectionListener(catalogueSelectionListener);
             workingSpaceTree.addComponentListener(new CatalogueActivationListener(

@@ -2755,7 +2755,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
                         @Override
                         public void run() {
-                            //newly added panels will not be shown with a title bar without this lines
+                            // newly added panels will not be shown with a title bar without this lines
                             childView.getViewProperties().getViewTitleBarProperties().setVisible(!visible);
                             childView.getViewProperties().getViewTitleBarProperties().setVisible(visible);
                         }

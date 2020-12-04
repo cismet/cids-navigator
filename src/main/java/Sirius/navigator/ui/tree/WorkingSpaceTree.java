@@ -7,9 +7,8 @@
 ****************************************************/
 package Sirius.navigator.ui.tree;
 
+import Sirius.navigator.WorkingSpaceHandler;
 import Sirius.navigator.resource.PropertyManager;
-
-import javax.swing.JComponent;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
@@ -65,7 +64,7 @@ public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow {
 
     @Override
     public String getPermissionString() {
-        if (PropertyManager.getManager().isWorkingSpaceEnabled()) {
+        if (WorkingSpaceHandler.getInstance().isEnabled()) {
             return GUIWindow.NO_PERMISSION;
         } else {
             return "WorkingSpaceTreeEnabled";
