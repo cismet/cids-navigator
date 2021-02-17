@@ -11,6 +11,8 @@ import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 
 import com.jgoodies.looks.plastic.PlasticComboBoxUI;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.plaf.ComboBoxUI;
 
 import de.cismet.cidsx.server.search.builtin.legacy.LightweightMetaObjectsSearch;
@@ -82,10 +84,13 @@ public class FastBindableScrollableComboBox extends FastBindableReferenceCombo {
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void setUI(final ComboBoxUI ui) {
-        super.setUI(ui);
-        if (getUI() instanceof PlasticComboBoxUI) {
-            setUI(ScrollableComboUI.createUI(null));
-        }
+    protected ComboBoxUI createRendererUI() {
+        return new ScrollableComboUI() {
+
+                @Override
+                protected JButton createArrowButton() {
+                    return null;
+                }
+            };
     }
 }

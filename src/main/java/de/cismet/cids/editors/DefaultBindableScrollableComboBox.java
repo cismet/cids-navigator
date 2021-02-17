@@ -42,6 +42,7 @@ import com.jgoodies.looks.plastic.PlasticComboBoxUI;
 
 import java.util.Comparator;
 
+import javax.swing.JButton;
 import javax.swing.plaf.ComboBoxUI;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -125,10 +126,13 @@ public class DefaultBindableScrollableComboBox extends DefaultBindableReferenceC
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public void setUI(final ComboBoxUI ui) {
-        super.setUI(ui);
-        if (getUI() instanceof PlasticComboBoxUI) {
-            super.setUI(ScrollableComboUI.createUI(null));
-        }
+    protected ComboBoxUI createRendererUI() {
+        return new ScrollableComboUI() {
+
+                @Override
+                protected JButton createArrowButton() {
+                    return null;
+                }
+            };
     }
 }
