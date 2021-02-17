@@ -25,7 +25,7 @@ public class ScrollableComboUI extends PlasticComboBoxUI {
     /**
      * Creates a new ScrollableComboUI object.
      */
-    private ScrollableComboUI() {
+    public ScrollableComboUI() {
     }
 
     //~ Methods ----------------------------------------------------------------

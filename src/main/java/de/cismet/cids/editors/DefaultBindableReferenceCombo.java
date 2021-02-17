@@ -18,6 +18,8 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
 
+import com.jgoodies.looks.plastic.PlasticComboBoxUI;
+
 import org.apache.log4j.Logger;
 
 import org.jdesktop.beansbinding.Converter;
@@ -26,6 +28,7 @@ import org.jdesktop.beansbinding.Validator;
 import org.openide.util.NbBundle;
 import org.openide.util.WeakListeners;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import java.io.Serializable;
@@ -38,10 +41,14 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JTextField;
 import javax.swing.SwingWorker;
+import javax.swing.border.Border;
+import javax.swing.plaf.ComboBoxUI;
 
 import de.cismet.cids.client.tools.ConnectionContextUtils;
 
@@ -61,6 +68,7 @@ import de.cismet.tools.CismetThreadPool;
 public class DefaultBindableReferenceCombo extends JComboBox implements Bindable,
     MetaClassStore,
     Serializable,
+    EditorAndRendererComponent,
     ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -259,6 +267,55 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         }
 
         init(metaClass, forceReload);
+    }
+
+    @Override
+    public void setActingAsRenderer(final boolean actingAsRenderer) {
+        setEditable(true);
+
+        setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
+
+        setEnabled(!actingAsRenderer);
+        setOpaque(!actingAsRenderer);
+
+        final Border editorBorder;
+        final Color editorDisabledTextColor;
+        if (actingAsRenderer) {
+            editorBorder = null;
+            editorDisabledTextColor = Color.BLACK;
+        } else {
+            final JComboBox dummyCombobox = new JComboBox();
+            editorBorder = ((JTextField)dummyCombobox.getEditor()).getBorder();
+            editorDisabledTextColor = ((JTextField)dummyCombobox.getEditor()).getDisabledTextColor();
+        }
+
+        ((JTextField)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
+        ((JTextField)getEditor().getEditorComponent()).setBorder(editorBorder);
+        ((JTextField)getEditor().getEditorComponent()).setDisabledTextColor(editorDisabledTextColor);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected ComboBoxUI createRendererUI() {
+        return new PlasticComboBoxUI() {
+
+                @Override
+                protected JButton createArrowButton() {
+                    return null;
+                }
+            };
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected ComboBoxUI createEditorUI() {
+        return new JComboBox().getUI();
     }
 
     @Override
