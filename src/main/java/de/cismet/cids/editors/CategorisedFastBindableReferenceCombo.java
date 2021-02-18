@@ -35,7 +35,7 @@ import javax.swing.JList;
 /**
  * This component represents a FastBindableReferenceCombo with categories
  *
- * @author   srichter
+ * @author   therter
  * @version  $Revision$, $Date$
  */
 public class CategorisedFastBindableReferenceCombo extends FastBindableReferenceCombo {
@@ -83,7 +83,9 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
     }
 
     /**
-     * DOCUMENT ME!
+     * Initialises the Combobox with the LightweightMetaObjects and the categories.
+     * The given list should contain lists with the categories at the beginning and the 
+     * LightweightMetaObject as the last element.
      *
      * @param  data  DOCUMENT ME!
      */
