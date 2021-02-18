@@ -31,9 +31,8 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
 
-
 /**
- * This component represents a FastBindableReferenceCombo with categories
+ * This component represents a FastBindableReferenceCombo with categories.
  *
  * @author   therter
  * @version  $Revision$, $Date$
@@ -83,9 +82,8 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
     }
 
     /**
-     * Initialises the Combobox with the LightweightMetaObjects and the categories.
-     * The given list should contain lists with the categories at the beginning and the 
-     * LightweightMetaObject as the last element.
+     * Initialises the Combobox with the LightweightMetaObjects and the categories. The given list should contain lists
+     * with the categories at the beginning and the LightweightMetaObject as the last element.
      *
      * @param  data  DOCUMENT ME!
      */
@@ -93,7 +91,7 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
         this.data = data;
         sortData();
 
-        //show the categories
+        // show the categories
         setRenderer(new DefaultListCellRenderer() {
 
                 @Override
@@ -174,8 +172,7 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                 }
             });
 
-        
-        //prevent the selection of a category
+        // prevent the selection of a category
         addItemListener(new ItemListener() {
 
                 @Override
