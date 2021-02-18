@@ -159,7 +159,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator) {
-        this(mc, nullable, onlyUsed, BEAN_TOSTRING_COMPARATOR, null);
+        this(mc, nullable, onlyUsed, comparator, null);
     }
 
     /**
