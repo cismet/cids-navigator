@@ -84,6 +84,8 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
 
     //~ Instance fields --------------------------------------------------------
 
+    protected CidsBean cidsBean = null;
+
     private final AbstractAttributeRepresentationFormater representationFormater;
     private final String representation;
     @Deprecated private final String query;
@@ -91,7 +93,6 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     private boolean nullable = true;
     private boolean sorted = false;
     private String[] representationFields;
-    private CidsBean cidsBean = null;
     private MetaClass metaClass = null;
     private String nullValueRepresentation = "-"; // NOI18N
 
@@ -255,7 +256,7 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     /**
      * DOCUMENT ME!
      */
-    private void init() {
+    protected void init() {
         try {
             final DefaultComboBoxModel mod = createModelForMetaClass(nullable);
             setModel(mod);
@@ -275,7 +276,11 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
     public int getIndexOf(final Object o) {
         final ComboBoxModel m = getModel();
         if (m instanceof DefaultComboBoxModel) {
-            return ((DefaultComboBoxModel)m).getIndexOf(o);
+            if ((o instanceof CidsBean) && (((DefaultComboBoxModel)m).getIndexOf(o) == -1)) {
+                return ((DefaultComboBoxModel)m).getIndexOf(((CidsBean)o).getMetaObject());
+            } else {
+                return ((DefaultComboBoxModel)m).getIndexOf(o);
+            }
         } else if (m != null) {
             for (int i = 0; i < m.getSize(); ++i) {
                 final Object cur = m.getElementAt(i);
