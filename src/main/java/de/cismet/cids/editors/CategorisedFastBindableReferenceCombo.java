@@ -238,11 +238,15 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
         final List<String> categories = new ArrayList<String>();
         final List<Object> dataArray = new ArrayList<Object>();
 
+        if (isNullable()) {
+            dataArray.add(null);
+        }
+
         for (int i = 0; i < data.size(); ++i) {
             for (int n = 0; n < (data.get(i).size() - 1); ++n) {
                 final String category = (String)data.get(i).get(n);
 
-                if (!categories.contains(category)) {
+                if ((category != "") && !categories.contains(category)) {
                     dataArray.add(category);
                     categories.add(category);
                 }
