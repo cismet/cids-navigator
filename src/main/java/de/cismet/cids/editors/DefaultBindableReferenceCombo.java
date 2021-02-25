@@ -45,10 +45,10 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComboBoxUI;
+import javax.swing.text.JTextComponent;
 
 import de.cismet.cids.client.tools.ConnectionContextUtils;
 
@@ -284,14 +284,15 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             editorBorder = null;
             editorDisabledTextColor = Color.BLACK;
         } else {
-            final JComboBox dummyCombobox = new JComboBox();
-            editorBorder = ((JTextField)dummyCombobox.getEditor()).getBorder();
-            editorDisabledTextColor = ((JTextField)dummyCombobox.getEditor()).getDisabledTextColor();
+            final JComboBox dummyCombobox = new DefaultBindableReferenceCombo();
+            editorBorder = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent()).getBorder();
+            editorDisabledTextColor = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
+                        .getDisabledTextColor();
         }
 
-        ((JTextField)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
-        ((JTextField)getEditor().getEditorComponent()).setBorder(editorBorder);
-        ((JTextField)getEditor().getEditorComponent()).setDisabledTextColor(editorDisabledTextColor);
+        ((JTextComponent)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
+        ((JTextComponent)getEditor().getEditorComponent()).setBorder(editorBorder);
+        ((JTextComponent)getEditor().getEditorComponent()).setDisabledTextColor(editorDisabledTextColor);
     }
 
     /**
