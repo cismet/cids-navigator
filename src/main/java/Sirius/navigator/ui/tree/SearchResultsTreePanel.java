@@ -8,7 +8,6 @@
 package Sirius.navigator.ui.tree;
 
 import Sirius.navigator.method.*;
-import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.*;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.tree.postfilter.PostFilterGUI;
@@ -27,7 +26,6 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 import de.cismet.tools.gui.GUIWindow;
-import de.cismet.tools.gui.JPopupMenuButton;
 
 /**
  * DOCUMENT ME!
@@ -56,6 +54,7 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
     private JPanel postFilterPanel;
     private JTabbedPane tabFilters = new JTabbedPane();
     private JToggleButton tbnFilteredResults;
+    private JLabel numResultsLabel;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -119,11 +118,11 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
             treePanel.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
             this.add(splitPane, BorderLayout.CENTER);
             postFilterPanel.add(tabFilters);
-            searchResultsTree.addResultNodeListener(this);
         } else {
             this.add(toolBar, BorderLayout.SOUTH);
             this.add(new JScrollPane(searchResultsTree), BorderLayout.CENTER);
         }
+        searchResultsTree.addResultNodeListener(this);
         this.setButtonsEnabled();
         final ButtonEnablingListener buttonEnablingListener = new ButtonEnablingListener();
         this.searchResultsTree.addTreeSelectionListener(buttonEnablingListener);
@@ -252,68 +251,102 @@ public class SearchResultsTreePanel extends JPanel implements ResultNodeListener
             toolBar.add(Box.createHorizontalGlue());
             toolBar.add(tbnFilteredResults);
         }
+
+        numResultsLabel = new JLabel();
+        toolBar.add(Box.createHorizontalGlue());
+        toolBar.add(numResultsLabel);
     }
 
     @Override
     public void resultNodesChanged() {
-        final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
-        Component tabFiltersVisComp = tabFilters.getSelectedComponent();
-        tbnFilteredResults.setSelected(false);
-        tbnFilteredResults.setEnabled(false);
-        tabFilters.setVisible(true);
-        final java.util.List<PostFilterGUI> availablePostFilterGUIs =
-            ((PostfilterEnabledSearchResultsTree)searchResultsTree).getAvailablePostFilterGUIs();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("initializing " + availablePostFilterGUIs.size() + " PostFilterGUIs");
-        }
-        for (final PostFilterGUI pfg : availablePostFilterGUIs) {
-            if (pfg.canHandle(resultNodes)) {
-                pfg.initializeFilter(Collections.unmodifiableCollection(resultNodes));
-                final Component pfgGUI = pfg.getGUI();
-                tabFilters.add(pfg.getTitle(), pfgGUI);
-                if (pfg.getIcon() != null) {
-                    tabFilters.setIconAt(tabFilters.indexOfComponent(pfg.getGUI()), pfg.getIcon());
+        if (searchResultsTree instanceof PostfilterEnabledSearchResultsTree) {
+            final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
+            Component tabFiltersVisComp = tabFilters.getSelectedComponent();
+            tbnFilteredResults.setSelected(false);
+            tbnFilteredResults.setEnabled(false);
+            tabFilters.setVisible(true);
+            final java.util.List<PostFilterGUI> availablePostFilterGUIs =
+                ((PostfilterEnabledSearchResultsTree)searchResultsTree).getAvailablePostFilterGUIs();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("initializing " + availablePostFilterGUIs.size() + " PostFilterGUIs");
+            }
+            for (final PostFilterGUI pfg : availablePostFilterGUIs) {
+                if (pfg.canHandle(resultNodes)) {
+                    pfg.initializeFilter(Collections.unmodifiableCollection(resultNodes));
+                    final Component pfgGUI = pfg.getGUI();
+                    tabFilters.add(pfg.getTitle(), pfgGUI);
+                    if (pfg.getIcon() != null) {
+                        tabFilters.setIconAt(tabFilters.indexOfComponent(pfg.getGUI()), pfg.getIcon());
+                    }
+                    if (pfg.isSelected()) {
+                        tabFiltersVisComp = pfgGUI;
+                    }
+                    pfg.addPostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
+                } else {
+                    pfg.removePostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
+                    tabFilters.remove(pfg.getGUI());
                 }
-                if (pfg.isSelected()) {
-                    tabFiltersVisComp = pfgGUI;
+            }
+            try {
+                if (tabFiltersVisComp != null) {
+                    tabFilters.setSelectedComponent(tabFiltersVisComp);
                 }
-                pfg.addPostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
-            } else {
-                pfg.removePostFilterListener((PostfilterEnabledSearchResultsTree)searchResultsTree);
-                tabFilters.remove(pfg.getGUI());
+            } catch (Exception skip) {
+                LOG.error(skip.getMessage(), skip);
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(tabFilters.getComponents().length + " post filter GUIs of "
+                            + availablePostFilterGUIs.size() + " post filters enabled and initialized");
             }
         }
-        try {
-            if (tabFiltersVisComp != null) {
-                tabFilters.setSelectedComponent(tabFiltersVisComp);
-            }
-        } catch (Exception skip) {
-            LOG.error(skip.getMessage(), skip);
-        }
-        if (LOG.isDebugEnabled()) {
-            LOG.debug(tabFilters.getComponents().length + " post filter GUIs of "
-                        + availablePostFilterGUIs.size() + " post filters enabled and initialized");
+
+        refreshNumResultsLabel();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void refreshNumResultsLabel() {
+        final int numResoultsCount = ((searchResultsTree != null) && (searchResultsTree.resultNodes != null))
+            ? searchResultsTree.resultNodes.size() : 0;
+        final String templateForSingle = org.openide.util.NbBundle.getMessage(
+                SearchResultsTreePanel.class,
+                "SearchResultsTreePanel.numResultsLabel.templateForSingle");
+        final String templateForOther = org.openide.util.NbBundle.getMessage(
+                SearchResultsTreePanel.class,
+                "SearchResultsTreePanel.numResultsLabel.templateForOther");
+        if (numResoultsCount == 0) {
+            numResultsLabel.setText(null);
+        } else if (numResoultsCount == 1) {
+            numResultsLabel.setText("  " + String.format(templateForSingle) + "  ");
+        } else {
+            numResultsLabel.setText("  " + String.format(templateForOther, numResoultsCount) + "  ");
         }
     }
 
     @Override
     public void resultNodesFiltered() {
-        tbnFilteredResults.setSelected(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
-        tbnFilteredResults.setEnabled(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
-        final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("adjusting " + tabFilters.getComponents() + " PostFilterGUIs");
-        }
-        for (final Component c : tabFilters.getComponents()) {
-            if (c instanceof PostFilterGUI) {
-                ((PostFilterGUI)c).adjustFilter(resultNodes);
+        if (searchResultsTree instanceof PostfilterEnabledSearchResultsTree) {
+            tbnFilteredResults.setSelected(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+            tbnFilteredResults.setEnabled(((PostfilterEnabledSearchResultsTree)searchResultsTree).isFiltered());
+            final Collection resultNodes = Collections.unmodifiableCollection(searchResultsTree.resultNodes);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("adjusting " + tabFilters.getComponents() + " PostFilterGUIs");
+            }
+            for (final Component c : tabFilters.getComponents()) {
+                if (c instanceof PostFilterGUI) {
+                    ((PostFilterGUI)c).adjustFilter(resultNodes);
+                }
             }
         }
     }
 
     @Override
     public void resultNodesCleared() {
-        tabFilters.setVisible(false);
+        if (searchResultsTree instanceof PostfilterEnabledSearchResultsTree) {
+            tabFilters.setVisible(false);
+        }
+        refreshNumResultsLabel();
     }
 
     /**
