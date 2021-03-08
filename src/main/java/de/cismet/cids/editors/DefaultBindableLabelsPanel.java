@@ -24,6 +24,8 @@ import org.apache.log4j.Logger;
 import org.jdesktop.beansbinding.Converter;
 import org.jdesktop.beansbinding.Validator;
 
+import org.openide.util.NbBundle;
+
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Insets;
@@ -65,6 +67,9 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(DefaultBindableLabelsPanel.class);
+    private static final String MESSAGE_LOADING_ITEM = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.loading");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -282,7 +287,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     public void refresh() {
         panToggles.removeAll();
         panLabels.removeAll();
-        panLabels.add(new JLabel("<html><i>Liste wird geladen..."));
+        panLabels.add(new JLabel(MESSAGE_LOADING_ITEM));
         btnEdit.setEnabled(false);
 
         new SwingWorker<MetaObject[], Void>() {
@@ -583,11 +588,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             });
         panLabels.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        org.openide.awt.Mnemonics.setLocalizedText(
-            jLabel1,
-            org.openide.util.NbBundle.getMessage(
-                DefaultBindableLabelsPanel.class,
-                "DefaultBindableLabelsPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, MESSAGE_LOADING_ITEM);
         panLabels.add(jLabel1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -600,17 +601,10 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         add(panLabels, gridBagConstraints);
         panLabels.setLayout(new WrapLayout(WrapLayout.LEFT, 0, 5));
 
-        btnEdit.setIcon(new javax.swing.ImageIcon(
-                getClass().getResource("/de/cismet/cids/custom/commons/gui/icon-edit.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(
-            btnEdit,
-            org.openide.util.NbBundle.getMessage(
-                DefaultBindableLabelsPanel.class,
-                "DefaultBindableLabelsPanel.btnEdit.text",
-                new Object[] {}));                                                            // NOI18N
+        btnEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cismet/cids/editors/icon-edit.png"))); // NOI18N
         btnEdit.setToolTipText(org.openide.util.NbBundle.getMessage(
                 DefaultBindableLabelsPanel.class,
-                "DefaultBindableLabelsPanel.btnEdit.toolTipText"));                           // NOI18N
+                "DefaultBindableLabelsPanel.btnEdit.toolTipText"));                                                  // NOI18N
         btnEdit.setBorderPainted(false);
         btnEdit.setContentAreaFilled(false);
         btnEdit.setMaximumSize(new java.awt.Dimension(24, 24));
