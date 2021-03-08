@@ -12,8 +12,6 @@
  */
 package de.cismet.cids.editors;
 
-import javax.swing.plaf.ComboBoxUI;
-
 /**
  * DOCUMENT ME!
  *
