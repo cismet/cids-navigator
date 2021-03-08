@@ -229,6 +229,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         setWhere(where);
         setAlwaysReload(alwaysReload);
         setSortingColumn(sortingColumn);
+        setComparator(comparator);
 
         // refresh is also happening here !
         setMetaClass(metaClass);
