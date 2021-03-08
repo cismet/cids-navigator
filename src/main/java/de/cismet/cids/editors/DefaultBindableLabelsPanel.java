@@ -88,9 +88,9 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     private MetaClass metaClass = null;
 //    private final Map<JToggleButton, MetaObject> toggleToObjectMapping = new HashMap<>();
 
-    @Getter @Setter private final Comparator<MetaObject> comparator;
+    @Getter @Setter private Comparator<MetaObject> comparator;
     @Getter @Setter private boolean manageable = true;
-    @Getter @Setter private String manageableItemRepresentation = "<html><i>test add";
+    @Getter @Setter private String manageableButtonText = MESSAGE_MANAGEABLE_ITEM;
     @Getter @Setter private String manageableProperty = "name";
 
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
@@ -549,7 +549,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, MESSAGE_MANAGEABLE_ITEM);
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, getManageableButtonText());
         jButton1.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
