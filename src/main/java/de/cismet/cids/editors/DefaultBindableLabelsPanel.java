@@ -19,6 +19,9 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.log4j.Logger;
 
 import org.jdesktop.beansbinding.Converter;
@@ -42,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingWorker;
@@ -70,6 +74,12 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     private static final String MESSAGE_LOADING_ITEM = NbBundle.getMessage(
             DefaultBindableReferenceCombo.class,
             "DefaultBindableReferenceCombo.loading");
+    private static final String MESSAGE_MANAGEABLE_ITEM = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.item.manageable");
+    private static final String MESSAGE_CREATEITEMDIALOG_TITLE = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.createitemdialog.title");
 
     //~ Instance fields --------------------------------------------------------
 
@@ -77,8 +87,11 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     private List selectedElements = null;
     private MetaClass metaClass = null;
 //    private final Map<JToggleButton, MetaObject> toggleToObjectMapping = new HashMap<>();
-    private volatile boolean threadRunning = false;
-    private final Comparator<MetaObject> comparator;
+
+    @Getter @Setter private final Comparator<MetaObject> comparator;
+    @Getter @Setter private boolean manageable = true;
+    @Getter @Setter private String manageableItemRepresentation = "<html><i>test add";
+    @Getter @Setter private String manageableProperty = "name";
 
     private ConnectionContext connectionContext = ConnectionContext.createDummy();
     private final boolean editable;
@@ -86,11 +99,14 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
     private boolean initialized = false;
 
+    private boolean newSelectionAdded = false;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnApply;
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnEdit;
     private javax.swing.Box.Filler filler1;
+    private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
@@ -168,7 +184,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
         initialized = true;
 
-        refresh();
+        refresh(false);
     }
 
     /**
@@ -199,6 +215,43 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             propertyChangeSupport = new PropertyChangeSupport(this);
         }
         return propertyChangeSupport;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private CidsBean createNewInstance() throws Exception {
+        final MetaClass metaClass = getReferencedClass(getMetaClass());
+        if (metaClass != null) {
+            final String manageableProperty = getManageableProperty();
+            final String property = (manageableProperty != null) ? manageableProperty : "name";
+            String name = null;
+            for (final Object value : metaClass.getMemberAttributeInfos().values()) {
+                if (value instanceof MemberAttributeInfo) {
+                    final MemberAttributeInfo mai = (MemberAttributeInfo)value;
+                    if (property.equals(mai.getFieldName())) {
+                        name = mai.getName();
+                        break;
+                    }
+                }
+            }
+            final String input = JOptionPane.showInputDialog(
+                    this,
+                    String.format("%s:", name),
+                    String.format(MESSAGE_CREATEITEMDIALOG_TITLE, metaClass.getName()),
+                    JOptionPane.QUESTION_MESSAGE);
+            if (input != null) {
+                final MetaObject metaObject = metaClass.getEmptyInstance(getConnectionContext());
+                final CidsBean cidsBean = metaObject.getBean();
+                cidsBean.setProperty(property, input);
+                return cidsBean;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -283,8 +336,10 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
     /**
      * DOCUMENT ME!
+     *
+     * @param  forceReload  DOCUMENT ME!
      */
-    public void refresh() {
+    private void refresh(final boolean forceReload) {
         panToggles.removeAll();
         panLabels.removeAll();
         panLabels.add(new JLabel(MESSAGE_LOADING_ITEM));
@@ -294,13 +349,6 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
                 @Override
                 protected MetaObject[] doInBackground() throws Exception {
-                    while (!setThreadRunning()) {
-                        try {
-                            Thread.sleep(20);
-                        } catch (final Exception ex) {
-                        }
-                    }
-
                     if (getMetaClass() != null) {
                         final MetaClass foreignClass = getReferencedClass(getMetaClass());
                         final String query = "select " + foreignClass.getID() + ", " + foreignClass.getPrimaryKey()
@@ -308,7 +356,11 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                                     + foreignClass.getTableName();
 
                         return MetaObjectCache.getInstance()
-                                    .getMetaObjectsByQuery(query, getMetaClass().getDomain(), getConnectionContext());
+                                    .getMetaObjectsByQuery(
+                                        query,
+                                        getMetaClass().getDomain(),
+                                        forceReload,
+                                        getConnectionContext());
                     }
                     return null;
                 }
@@ -322,8 +374,6 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                         }
                     } catch (final Exception e) {
                         LOG.error("Error while filling a togglebutton field.", e); // NOI18N
-                    } finally {
-                        threadRunning = false;
                     }
                 }
             }.execute();
@@ -335,6 +385,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      * @param  metaObjects  DOCUMENT ME!
      */
     private void update(final MetaObject[] metaObjects) {
+        final Comparator<MetaObject> comparator = getComparator();
         if (comparator != null) {
             Arrays.sort(metaObjects, comparator);
         }
@@ -352,7 +403,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     public void setMetaClass(final MetaClass metaClass) {
         this.metaClass = metaClass;
 
-        refresh();
+        refresh(false);
     }
 
     /**
@@ -413,20 +464,6 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     public void dispose() {
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private synchronized boolean setThreadRunning() {
-        if (threadRunning) {
-            return false;
-        } else {
-            threadRunning = true;
-            return true;
-        }
-    }
-
     @Override
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
@@ -460,11 +497,12 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         jScrollPane1 = new javax.swing.JScrollPane();
         panToggles = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        btnApply = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(0, 0),
                 new java.awt.Dimension(32767, 0));
+        btnApply = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
         panLabels = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         btnEdit = new javax.swing.JButton();
@@ -511,6 +549,23 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
         jPanel2.setLayout(new java.awt.GridBagLayout());
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton1, MESSAGE_MANAGEABLE_ITEM);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        jPanel2.add(jButton1, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(filler1, gridBagConstraints);
+
         org.openide.awt.Mnemonics.setLocalizedText(
             btnApply,
             org.openide.util.NbBundle.getMessage(
@@ -524,7 +579,6 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         jPanel2.add(btnApply, gridBagConstraints);
 
@@ -541,20 +595,14 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
         jPanel2.add(btnCancel, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 0;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.weightx = 1.0;
-        jPanel2.add(filler1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 5, 5, 5);
         jPanel3.add(jPanel2, gridBagConstraints);
@@ -639,6 +687,8 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         final int x = btnEdit.getLocationOnScreen().x - jDialog1.getBounds().width + btnEdit.getBounds().width;
         final int y = btnEdit.getLocationOnScreen().y;
 
+        jButton1.setVisible(isManageable());
+
         jDialog1.setLocation(x + 2, y - 4);
         jDialog1.setVisible(true);
     } //GEN-LAST:event_btnEditActionPerformed
@@ -671,8 +721,11 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             }
         }
 
-        refreshSelectedElements();
+//        refreshSelectedElements();
         propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
+        refresh(newSelectionAdded);
+        newSelectionAdded = false;
+
 //        propertyChangeSupport.firePropertyChange("selectedElement", null, cidsBean);
         jDialog1.setVisible(false);
     } //GEN-LAST:event_btnApplyActionPerformed
@@ -694,6 +747,27 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     private void formMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_formMouseClicked
         btnEditActionPerformed(null);
     }                                                                    //GEN-LAST:event_formMouseClicked
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            final CidsBean newBean = createNewInstance();
+            if (newBean != null) {
+                final List old = new ArrayList(selectedElements);
+                final CidsBean persistedBean = newBean.persist(getConnectionContext());
+                propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
+                panToggles.add(new Toggle(persistedBean.getMetaObject()));
+                panToggles.revalidate();
+                newSelectionAdded = true;
+            }
+        } catch (final Exception ex) {
+            LOG.error(ex, ex);
+        }
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     //~ Inner Classes ----------------------------------------------------------
 
