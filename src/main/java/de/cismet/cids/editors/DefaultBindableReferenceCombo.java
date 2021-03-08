@@ -7,6 +7,7 @@
 ****************************************************/
 package de.cismet.cids.editors;
 
+import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.tools.CacheException;
 import Sirius.navigator.tools.MetaObjectCache;
 import Sirius.navigator.tools.MetaObjectChangeEvent;
@@ -14,11 +15,16 @@ import Sirius.navigator.tools.MetaObjectChangeListener;
 import Sirius.navigator.tools.MetaObjectChangeSupport;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
+import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObject;
 
 import com.jgoodies.looks.plastic.PlasticComboBoxUI;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.apache.log4j.Logger;
 
@@ -45,6 +51,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.border.Border;
 import javax.swing.plaf.ComboBoxUI;
@@ -74,21 +81,43 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(DefaultBindableReferenceCombo.class);
+    private static final String MESSAGE_LOADING_ITEM = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.loading");
+    private static final String MESSAGE_NULLEABLE_ITEM_EDITOR = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.item.nullable");
+    private static final String MESSAGE_NULLEABLE_ITEM_RENDERER = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.label.nullable");
+    private static final String MESSAGE_MANAGEABLE_ITEM = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.item.manageable");
+    private static final String MESSAGE_CREATEITEMDIALOG_TITLE = NbBundle.getMessage(
+            DefaultBindableReferenceCombo.class,
+            "DefaultBindableReferenceCombo.createitemdialog.title");
 
-    protected static final Comparator<CidsBean> BEAN_TOSTRING_COMPARATOR = new BeanToStringComparator();
+    private static final Comparator<CidsBean> BEAN_TOSTRING_COMPARATOR = new BeanToStringComparator();
 
     //~ Instance fields --------------------------------------------------------
 
-    protected CidsBean cidsBean;
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PRIVATE)
+    private CidsBean cidsBean;
+    @Getter private MetaClass metaClass;
+    @Getter @Setter private boolean fakeModel;
+    @Getter @Setter private boolean nullable;
+    @Getter @Setter private String nullValueRepresentation;
+    @Getter @Setter private String nullValueRepresentationInRenderer;
+    @Getter @Setter private boolean manageable;
+    @Getter @Setter private String manageableItemRepresentation;
+    @Getter @Setter private String manageableProperty;
+    @Getter @Setter private String where;
+    @Getter @Setter private boolean alwaysReload;
+    @Getter @Setter private String sortingColumn;
+    @Getter @Setter private Comparator<CidsBean> comparator;
 
-    private final transient MetaObjectChangeListener mocL;
-    private MetaClass metaClass;
-    private boolean fakeModel;
-    private boolean nullable;
-    private boolean onlyUsed;
-    private Comparator<CidsBean> comparator;
-    private String nullValueRepresentation;
-    private String sortingColumn;
+    private boolean actingAsRenderer;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -96,7 +125,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      * Creates a new DefaultBindableReferenceCombo object.
      */
     public DefaultBindableReferenceCombo() {
-        this(null, false, false, BEAN_TOSTRING_COMPARATOR);
+        this((Option)null);
     }
 
     /**
@@ -105,7 +134,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      * @param  nullable  DOCUMENT ME!
      */
     public DefaultBindableReferenceCombo(final boolean nullable) {
-        this(null, nullable, false, BEAN_TOSTRING_COMPARATOR);
+        this(nullable ? new NullableOption() : (Option)null);
     }
 
     /**
@@ -114,86 +143,145 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      * @param  comparator  DOCUMENT ME!
      */
     public DefaultBindableReferenceCombo(final Comparator<CidsBean> comparator) {
-        this(null, false, false, comparator);
+        this(new ComparatorOption(comparator));
     }
 
     /**
      * Creates a new DefaultBindableReferenceCombo object.
      *
-     * @param  mc  DOCUMENT ME!
+     * @param  metaClass  DOCUMENT ME!
      */
-    public DefaultBindableReferenceCombo(final MetaClass mc) {
-        this(mc, false, false, BEAN_TOSTRING_COMPARATOR);
+    public DefaultBindableReferenceCombo(final MetaClass metaClass) {
+        this(new MetaClassOption(metaClass));
     }
 
     /**
      * Creates a new DefaultBindableReferenceCombo object.
      *
-     * @param  mc             DOCUMENT ME!
+     * @param  options  DOCUMENT ME!
+     */
+    public DefaultBindableReferenceCombo(final Option... options) {
+        MetaClass metaClass = null;
+        boolean fakeModel = false;
+        boolean nullable = false;
+        String nullValueRepresentationInEditor = null;
+        String nullValueRepresentationInRenderer = null;
+        boolean manageable = false;
+        String manageableItemRepresentation = null;
+        String manageableProperty = null;
+        String where = null;
+        boolean alwaysReload = false;
+        String sortingColumn = null;
+        Comparator<CidsBean> comparator = BEAN_TOSTRING_COMPARATOR;
+
+        if (options != null) {
+            for (final Option option : options) {
+                if (option != null) {
+                    if (option.getClass().equals(MetaClassOption.class)) {
+                        metaClass = ((MetaClassOption)option).getMetaClass();
+                    } else if (option.getClass().equals(FakeModelOption.class)) {
+                        fakeModel = true;
+                    } else if (option.getClass().equals(AlwaysReloadOption.class)) {
+                        alwaysReload = true;
+                    } else if (option.getClass().equals(NullableOption.class)) {
+                        nullable = true;
+                        final String valueInEditor = ((NullableOption)option).getRepresentationinEditor();
+                        nullValueRepresentationInEditor = (valueInEditor != null) ? String.valueOf(valueInEditor)
+                                                                                  : MESSAGE_NULLEABLE_ITEM_EDITOR;
+                        final String valueInRenderer = ((NullableOption)option).getRepresentationInRenderer();
+                        nullValueRepresentationInRenderer = (valueInRenderer != null) ? String.valueOf(valueInRenderer)
+                                                                                      : MESSAGE_NULLEABLE_ITEM_RENDERER;
+                    } else if (option.getClass().equals(ManageableOption.class)) {
+                        manageable = true;
+                        final String property = ((ManageableOption)option).getProperty();
+                        final String representation = ((ManageableOption)option).getRepresentation();
+                        manageableProperty = (property != null) ? property : "name";
+                        manageableItemRepresentation = (representation != null) ? representation
+                                                                                : MESSAGE_MANAGEABLE_ITEM;
+                    } else if (option.getClass().equals(WhereOption.class)) {
+                        where = ((WhereOption)option).getWhere();
+                    } else if (option.getClass().equals(ComparatorOption.class)) {
+                        comparator = ((ComparatorOption)option).getComparator();
+                    } else if (option.getClass().equals(SortingColumnOption.class)) {
+                        sortingColumn = ((SortingColumnOption)option).getColumn();
+                    }
+                }
+            }
+        }
+
+        setModel(new DefaultComboBoxModel(new Object[] { new LoadingItem(MESSAGE_LOADING_ITEM) }));
+        setRenderer(new DefaultBindableReferenceComboRenderer());
+
+        final MetaObjectChangeSupport mocSupport = MetaObjectChangeSupport.getDefault();
+        final MetaObjectChangeListener moChangeListener = new MetaObjectChangeListenerImpl();
+        mocSupport.addMetaObjectChangeListener(WeakListeners.create(
+                MetaObjectChangeListener.class,
+                moChangeListener,
+                mocSupport));
+
+        setFakeModel(fakeModel);
+        setNullable(nullable);
+        setNullValueRepresentation(nullValueRepresentationInEditor);
+        setNullValueRepresentationInRenderer(nullValueRepresentationInRenderer);
+        setManageable(manageable);
+        setManageableItemRepresentation(manageableItemRepresentation);
+        setManageableProperty(manageableProperty);
+        setWhere(where);
+        setAlwaysReload(alwaysReload);
+        setSortingColumn(sortingColumn);
+
+        // refresh is also happening here !
+        setMetaClass(metaClass);
+    }
+
+    /**
+     * Creates a new DefaultBindableReferenceCombo object.
+     *
+     * @param  metaClass      mc DOCUMENT ME!
      * @param  sortingcolumn  DOCUMENT ME!
      */
-    public DefaultBindableReferenceCombo(final MetaClass mc, final String sortingcolumn) {
-        this(mc, false, false, BEAN_TOSTRING_COMPARATOR, sortingcolumn);
+    public DefaultBindableReferenceCombo(final MetaClass metaClass, final String sortingcolumn) {
+        this(
+            new MetaClassOption(metaClass),
+            new SortingColumnOption(sortingcolumn),
+            null);
     }
 
     /**
      * Creates a new DefaultBindableReferenceCombo object.
      *
-     * @param  mc        DOCUMENT ME!
-     * @param  nullable  DOCUMENT ME!
-     * @param  onlyUsed  DOCUMENT ME!
+     * @param  metaClass  mc DOCUMENT ME!
+     * @param  nullable   DOCUMENT ME!
+     * @param  onlyUsed   DOCUMENT ME!
      */
-    public DefaultBindableReferenceCombo(final MetaClass mc, final boolean nullable, final boolean onlyUsed) {
-        this(mc, nullable, onlyUsed, BEAN_TOSTRING_COMPARATOR);
+    @Deprecated
+    public DefaultBindableReferenceCombo(final MetaClass metaClass, final boolean nullable, final boolean onlyUsed) {
+        this(
+            new MetaClassOption(metaClass),
+            nullable ? new NullableOption() : (Option)null,
+            onlyUsed ? new WhereOption("used IS TRUE") : (Option)null,
+            null);
     }
 
     /**
      * Creates a new DefaultBindableReferenceCombo object.
      *
-     * @param  mc          DOCUMENT ME!
+     * @param  metaClass   mc DOCUMENT ME!
      * @param  nullable    DOCUMENT ME!
      * @param  onlyUsed    DOCUMENT ME!
      * @param  comparator  DOCUMENT ME!
      */
-    public DefaultBindableReferenceCombo(final MetaClass mc,
+    @Deprecated
+    public DefaultBindableReferenceCombo(final MetaClass metaClass,
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator) {
-        this(mc, nullable, onlyUsed, comparator, null);
-    }
-
-    /**
-     * Creates a new DefaultBindableReferenceCombo object.
-     *
-     * @param  mc             DOCUMENT ME!
-     * @param  nullable       DOCUMENT ME!
-     * @param  onlyUsed       DOCUMENT ME!
-     * @param  comparator     DOCUMENT ME!
-     * @param  sortingColumn  DOCUMENT ME!
-     */
-    public DefaultBindableReferenceCombo(final MetaClass mc,
-            final boolean nullable,
-            final boolean onlyUsed,
-            final Comparator<CidsBean> comparator,
-            final String sortingColumn) {
-        final String[] s = new String[] {
-                NbBundle.getMessage(DefaultBindableReferenceCombo.class, "DefaultBindableReferenceCombo.loading")
-            };
-        setModel(new DefaultComboBoxModel(s));
-
-        this.nullable = nullable;
-        this.onlyUsed = onlyUsed;
-        this.comparator = comparator;
-        this.nullValueRepresentation = " ";
-        this.sortingColumn = sortingColumn;
-        this.mocL = new MetaObjectChangeListenerImpl();
-
-        this.setRenderer(new DefaultBindableReferenceComboRenderer());
-
-        init(mc, false);
-
-        final MetaObjectChangeSupport mocSupport = MetaObjectChangeSupport.getDefault();
-        mocSupport.addMetaObjectChangeListener(WeakListeners.create(MetaObjectChangeListener.class, mocL, mocSupport));
+        this(
+            new MetaClassOption(metaClass),
+            nullable ? new NullableOption() : (Option)null,
+            onlyUsed ? new WhereOption("used IS TRUE") : (Option)null,
+            (comparator != null) ? new ComparatorOption(comparator) : (Option)null,
+            null);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -201,41 +289,24 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
-     * @param  sortingColumn  DOCUMENT ME!
-     */
-    public void setSortingColumn(final String sortingColumn) {
-        this.sortingColumn = sortingColumn;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getSortingColumn() {
-        return sortingColumn;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  mc           DOCUMENT ME!
      * @param  forceReload  DOCUMENT ME!
      */
-    protected void init(final MetaClass mc, final boolean forceReload) {
-        if (!isFakeModel() && (mc != null)) {
+    private void refresh(final boolean forceReload) {
+        final MetaClass metaClass = getMetaClass();
+        if (!isFakeModel() && (metaClass != null)) {
             CismetThreadPool.execute(new SwingWorker<DefaultComboBoxModel, Void>() {
 
                     @Override
                     protected DefaultComboBoxModel doInBackground() throws Exception {
                         Thread.currentThread().setName("DefaultBindableReferenceCombo init()");
                         return getModelByMetaClass(
-                                mc,
-                                nullable,
-                                onlyUsed,
-                                comparator,
+                                metaClass,
+                                isNullable() ? new NullableItem(getNullValueRepresentation()) : null,
+                                isManageable() ? new ManageableItem(getManageableItemRepresentation()) : null,
+                                getWhere(),
+                                getSortingColumn(),
+                                getComparator(),
                                 forceReload,
-                                sortingColumn,
                                 getConnectionContext());
                     }
 
@@ -243,10 +314,42 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                     protected void done() {
                         try {
                             final DefaultComboBoxModel tmp = get();
-                            tmp.setSelectedItem(cidsBean);
+                            tmp.setSelectedItem(getCidsBean());
                             setModel(tmp);
-                        } catch (InterruptedException interruptedException) {
-                        } catch (ExecutionException executionException) {
+
+                            final boolean actingAsRenderer = isActingAsRenderer();
+                            setEditable(actingAsRenderer);
+
+                            setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
+
+                            setEnabled(!actingAsRenderer);
+                            setOpaque(!actingAsRenderer);
+
+                            final Border editorBorder;
+                            final Color editorDisabledTextColor;
+                            if (actingAsRenderer) {
+                                editorBorder = null;
+                                editorDisabledTextColor = Color.BLACK;
+                            } else {
+                                final JComboBox dummyCombobox = new DefaultBindableReferenceCombo();
+                                editorBorder = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
+                                            .getBorder();
+                                editorDisabledTextColor =
+                                    ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
+                                            .getDisabledTextColor();
+                            }
+
+                            ((JTextComponent)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
+                            ((JTextComponent)getEditor().getEditorComponent()).setBorder(editorBorder);
+                            ((JTextComponent)getEditor().getEditorComponent()).setDisabledTextColor(
+                                editorDisabledTextColor);
+
+                            if (isActingAsRenderer() && (getSelectedItem() == null)) {
+                                ((JTextComponent)getEditor().getEditorComponent()).setText(
+                                    getNullValueRepresentationInRenderer());
+                            }
+                        } catch (final InterruptedException interruptedException) {
+                        } catch (final ExecutionException executionException) {
                             LOG.error("Error while initializing the model of a referenceCombo", executionException); // NOI18N
                         }
                     }
@@ -257,42 +360,29 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
-     * @param   forceReload  DOCUMENT ME!
-     *
      * @throws  IllegalStateException  DOCUMENT ME!
      */
-    public void reload(final boolean forceReload) {
-        if (metaClass == null) {
+    public void reload() {
+        if (getMetaClass() == null) {
             throw new IllegalStateException("the metaclass has not been set yet"); // NOI18N
         }
 
-        init(metaClass, forceReload);
+        refresh(true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isActingAsRenderer() {
+        return actingAsRenderer;
     }
 
     @Override
     public void setActingAsRenderer(final boolean actingAsRenderer) {
-        setEditable(true);
-
-        setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
-
-        setEnabled(!actingAsRenderer);
-        setOpaque(!actingAsRenderer);
-
-        final Border editorBorder;
-        final Color editorDisabledTextColor;
-        if (actingAsRenderer) {
-            editorBorder = null;
-            editorDisabledTextColor = Color.BLACK;
-        } else {
-            final JComboBox dummyCombobox = new DefaultBindableReferenceCombo();
-            editorBorder = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent()).getBorder();
-            editorDisabledTextColor = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
-                        .getDisabledTextColor();
-        }
-
-        ((JTextComponent)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
-        ((JTextComponent)getEditor().getEditorComponent()).setBorder(editorBorder);
-        ((JTextComponent)getEditor().getEditorComponent()).setDisabledTextColor(editorDisabledTextColor);
+        this.actingAsRenderer = actingAsRenderer;
+        refresh(false);
     }
 
     /**
@@ -335,98 +425,70 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     }
 
     @Override
-    public void setSelectedItem(Object anObject) {
+    public void setSelectedItem(final Object item) {
+        CidsBean selectedBean = null;
         if (isFakeModel()) {
-            setModel(new DefaultComboBoxModel(new Object[] { anObject }));
+            setModel(new DefaultComboBoxModel(new Object[] { item }));
+        } else {
+            if (item instanceof CidsBean) {
+                selectedBean = (CidsBean)item;
+            } else if (item instanceof ManageableItem) {
+                try {
+                    final CidsBean newBean = createNewInstance();
+                    if (newBean != null) {
+                        selectedBean = newBean.persist(getConnectionContext());
+                        reload();
+                    }
+                } catch (final Exception ex) {
+                    LOG.error(ex, ex);
+                }
+            }
         }
-        if (!(anObject instanceof CidsBean)) {
-            anObject = null;
+        super.setSelectedItem(selectedBean);
+        setCidsBean(selectedBean);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private CidsBean createNewInstance() throws Exception {
+        final MetaClass metaClass = getMetaClass();
+        if (metaClass != null) {
+            final String manageableProperty = getManageableProperty();
+            final String property = (manageableProperty != null) ? manageableProperty : "name";
+            String name = null;
+            for (final Object value : metaClass.getMemberAttributeInfos().values()) {
+                if (value instanceof MemberAttributeInfo) {
+                    final MemberAttributeInfo mai = (MemberAttributeInfo)value;
+                    if (property.equals(mai.getFieldName())) {
+                        name = mai.getName();
+                        break;
+                    }
+                }
+            }
+            final String input = JOptionPane.showInputDialog(
+                    this,
+                    String.format("%s:", name),
+                    String.format(MESSAGE_CREATEITEMDIALOG_TITLE, metaClass.getName()),
+                    JOptionPane.QUESTION_MESSAGE);
+            if (input != null) {
+                final MetaObject metaObject = metaClass.getEmptyInstance(getConnectionContext());
+                final CidsBean cidsBean = metaObject.getBean();
+                cidsBean.setProperty(property, input);
+                return cidsBean;
+            }
         }
-        super.setSelectedItem(anObject);
-        cidsBean = (CidsBean)anObject;
+        return null;
     }
 
     @Override
-    public MetaClass getMetaClass() {
-        return metaClass;
-    }
-
-    @Override
-    public void setMetaClass(final MetaClass metaClass) {
+    public final void setMetaClass(final MetaClass metaClass) {
         this.metaClass = metaClass;
-        init(metaClass, false);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isFakeModel() {
-        return fakeModel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  fakeModel  DOCUMENT ME!
-     */
-    public void setFakeModel(final boolean fakeModel) {
-        this.fakeModel = fakeModel;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getNullValueRepresentation() {
-        return nullValueRepresentation;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  nullValueRepresentation  DOCUMENT ME!
-     */
-    public void setNullValueRepresentation(final String nullValueRepresentation) {
-        this.nullValueRepresentation = nullValueRepresentation;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isNullable() {
-        return nullable;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  onlyUsed  DOCUMENT ME!
-     */
-    public void setOnlyUsed(final boolean onlyUsed) {
-        this.onlyUsed = onlyUsed;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isOnlyUsed() {
-        return onlyUsed;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  nullable  DOCUMENT ME!
-     */
-    public void setNullable(final boolean nullable) {
-        this.nullable = nullable;
+        refresh(isAlwaysReload());
     }
 
     @Override
@@ -444,8 +506,202 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @return  DOCUMENT ME!
      */
-    protected Comparator<CidsBean> getComparator() {
-        return comparator;
+    private String createQuery() {
+        return createQuery(getMetaClass(), getSortingColumn(), getWhere());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaClass  DOCUMENT ME!
+     * @param   orderBy    DOCUMENT ME!
+     * @param   where      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static String createQuery(final MetaClass metaClass, final String orderBy, final String where) {
+        final String template = "SELECT %d, %s FROM %s WHERE %s ORDER BY %s";
+        final String query = String.format(
+                template,
+                metaClass.getID(),
+                metaClass.getPrimaryKey(),
+                metaClass.getTableName(),
+                (where != null) ? where : "TRUE",
+                (orderBy != null) ? orderBy : metaClass.getPrimaryKey());
+        return query;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaClass          DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass metaClass,
+            final boolean nullable,
+            final ConnectionContext connectionContext) throws Exception {
+        return getModelByMetaClass(
+                metaClass,
+                nullable ? new NullableItem(MESSAGE_NULLEABLE_ITEM_EDITOR) : null,
+                null,
+                null,
+                null,
+                BEAN_TOSTRING_COMPARATOR,
+                false,
+                connectionContext);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaClass          DOCUMENT ME!
+     * @param   nullableIteam      DOCUMENT ME!
+     * @param   manageableItem     DOCUMENT ME!
+     * @param   where              onlyUsed DOCUMENT ME!
+     * @param   sortingColumn      DOCUMENT ME!
+     * @param   comparator         DOCUMENT ME!
+     * @param   forceReload        DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static DefaultComboBoxModel getModelByMetaClass(final MetaClass metaClass,
+            final NullableItem nullableIteam,
+            final ManageableItem manageableItem,
+            final String where,
+            final String sortingColumn,
+            final Comparator<CidsBean> comparator,
+            final boolean forceReload,
+            final ConnectionContext connectionContext) {
+        if (metaClass != null) {
+            final ClassAttribute ca = metaClass.getClassAttribute("sortingColumn");
+            final String orderBy = (sortingColumn != null) ? sortingColumn
+                                                           : ((ca != null) ? ca.getValue().toString() : null);
+            final String query = createQuery(metaClass, orderBy, where);
+            return getModelByMetaClass(
+                    query,
+                    metaClass,
+                    (orderBy == null) ? comparator : null,
+                    nullableIteam,
+                    metaClass.getPermissions().hasWritePermission(SessionManager.getSession().getUser())
+                        ? manageableItem : null,
+                    forceReload,
+                    connectionContext);
+        } else {
+            return new DefaultComboBoxModel();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   query              DOCUMENT ME!
+     * @param   metaClass          domain DOCUMENT ME!
+     * @param   comparator         DOCUMENT ME!
+     * @param   nullableIteam      DOCUMENT ME!
+     * @param   manageableItem     DOCUMENT ME!
+     * @param   forceReload        DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static DefaultComboBoxModel getModelByMetaClass(
+            final String query,
+            final MetaClass metaClass,
+            final Comparator<CidsBean> comparator,
+            final NullableItem nullableIteam,
+            final ManageableItem manageableItem,
+            final boolean forceReload,
+            final ConnectionContext connectionContext) {
+        if ((query != null) && (metaClass != null)) {
+            MetaObject[] metaObjects;
+            try {
+                metaObjects = MetaObjectCache.getInstance()
+                            .getMetaObjectsByQuery(query, metaClass, forceReload, connectionContext);
+            } catch (final CacheException ex) {
+                LOG.warn("cache could not come up with appropriate objects", ex); // NOI18N
+                metaObjects = new MetaObject[0];
+            }
+
+            final List<CidsBean> beans = new ArrayList(metaObjects.length);
+            for (final MetaObject mo : metaObjects) {
+                beans.add(mo.getBean());
+            }
+            if (comparator != null) {
+                Collections.sort(beans, comparator);
+            }
+
+            int size = beans.size();
+            if (nullableIteam != null) {
+                size++;
+            }
+            if (manageableItem != null) {
+                size++;
+            }
+            final List items = new ArrayList(size);
+            if (nullableIteam != null) {
+                items.add(nullableIteam);
+            }
+            items.addAll(beans);
+            if (manageableItem != null) {
+                items.add(manageableItem);
+            }
+            return new DefaultComboBoxModel(items.toArray());
+        } else {
+            return new DefaultComboBoxModel();
+        }
+    }
+
+    @Override
+    public ConnectionContext getConnectionContext() {
+        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  onlyUsed  DOCUMENT ME!
+     */
+    @Deprecated
+    public void setOnlyUsed(final boolean onlyUsed) {
+        setWhere((onlyUsed) ? "used IS TRUE" : null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    @Deprecated
+    public boolean isOnlyUsed() {
+        return "used IS TRUE".equals(getWhere());
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   mc                 DOCUMENT ME!
+     * @param   nullable           DOCUMENT ME!
+     * @param   onlyUsed           DOCUMENT ME!
+     * @param   comparator         DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    @Deprecated
+    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
+            final boolean nullable,
+            final boolean onlyUsed,
+            final Comparator<CidsBean> comparator,
+            final ConnectionContext connectionContext) throws Exception {
+        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, false, connectionContext);
     }
 
     /**
@@ -486,20 +742,29 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
             final boolean nullable,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload,
             final ConnectionContext connectionContext) {
-        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, forceReload, null, connectionContext);
+        return getModelByMetaClass(
+                mc,
+                nullable ? new NullableItem(MESSAGE_NULLEABLE_ITEM_EDITOR) : null,
+                null,
+                onlyUsed ? "used IS TRUE" : null,
+                null,
+                comparator,
+                forceReload,
+                connectionContext);
     }
 
     /**
      * DOCUMENT ME!
      *
      * @param   mc                 DOCUMENT ME!
-     * @param   nullable           DOCUMENT ME!
+     * @param   nullableItem       DOCUMENT ME!
      * @param   onlyUsed           DOCUMENT ME!
      * @param   comparator         DOCUMENT ME!
      * @param   forceReload        DOCUMENT ME!
@@ -508,57 +773,23 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @return  DOCUMENT ME!
      */
+    @Deprecated
     public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
-            final boolean nullable,
+            final NullableItem nullableItem,
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator,
             final boolean forceReload,
             final String sortingColumn,
             final ConnectionContext connectionContext) {
-        if (mc != null) {
-            final ClassAttribute ca = mc.getClassAttribute("sortingColumn");                                 // NOI18N
-            final String orderBy;                                                                            // NOI18N
-            if (sortingColumn == null) {
-                if (ca != null) {
-                    final String value = ca.getValue().toString();
-                    orderBy = " order by " + value;                                                          // NOI18N
-                } else {
-                    orderBy = "";
-                }
-            } else {
-                orderBy = " order by " + sortingColumn;
-            }
-            String query = "select " + mc.getID() + "," + mc.getPrimaryKey() + " from " + mc.getTableName(); // NOI18N
-            if (onlyUsed) {
-                query += " where used is true";                                                              // NOI18N
-            }
-            query += orderBy;
-
-            MetaObject[] metaObjects;
-            try {
-                metaObjects = MetaObjectCache.getInstance()
-                            .getMetaObjectsByQuery(query, mc.getDomain(), forceReload, connectionContext);
-            } catch (final CacheException ex) {
-                LOG.warn("cache could not come up with appropriate objects", ex); // NOI18N
-                metaObjects = new MetaObject[0];
-            }
-
-            final List<CidsBean> cbv = new ArrayList<CidsBean>(metaObjects.length);
-            if (nullable) {
-                cbv.add(null);
-            }
-            for (final MetaObject mo : metaObjects) {
-                cbv.add(mo.getBean());
-            }
-            if (orderBy.length() == 0) {
-                // Sorts the model using String comparison on the bean's toString()
-                Collections.sort(cbv, comparator);
-            }
-
-            return new DefaultComboBoxModel(cbv.toArray());
-        } else {
-            return new DefaultComboBoxModel();
-        }
+        return getModelByMetaClass(
+                mc,
+                nullableItem,
+                null,
+                onlyUsed ? "used IS TRUE" : null,
+                sortingColumn,
+                comparator,
+                forceReload,
+                connectionContext);
     }
 
     /**
@@ -579,27 +810,6 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final boolean onlyUsed,
             final Comparator<CidsBean> comparator) throws Exception {
         return getModelByMetaClass(mc, nullable, onlyUsed, comparator, ConnectionContext.createDeprecated());
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   mc                 DOCUMENT ME!
-     * @param   nullable           DOCUMENT ME!
-     * @param   onlyUsed           DOCUMENT ME!
-     * @param   comparator         DOCUMENT ME!
-     * @param   connectionContext  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
-            final boolean nullable,
-            final boolean onlyUsed,
-            final Comparator<CidsBean> comparator,
-            final ConnectionContext connectionContext) throws Exception {
-        return getModelByMetaClass(mc, nullable, onlyUsed, comparator, false, connectionContext);
     }
 
     /**
@@ -655,29 +865,359 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         return getModelByMetaClass(mc, nullable, ConnectionContext.createDeprecated());
     }
 
+    //~ Inner Classes ----------------------------------------------------------
+
     /**
      * DOCUMENT ME!
      *
-     * @param   mc                 DOCUMENT ME!
-     * @param   nullable           DOCUMENT ME!
-     * @param   connectionContext  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
+     * @version  $Revision$, $Date$
      */
-    public static DefaultComboBoxModel getModelByMetaClass(final MetaClass mc,
-            final boolean nullable,
-            final ConnectionContext connectionContext) throws Exception {
-        return getModelByMetaClass(mc, nullable, false, BEAN_TOSTRING_COMPARATOR, false, connectionContext);
+    public abstract static class Option {
     }
 
-    @Override
-    public ConnectionContext getConnectionContext() {
-        return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class MetaClassOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final MetaClass metaClass;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new MetaClassOption object.
+         *
+         * @param  metaClass  DOCUMENT ME!
+         */
+        public MetaClassOption(final MetaClass metaClass) {
+            this.metaClass = metaClass;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public MetaClass getMetaClass() {
+            return metaClass;
+        }
     }
 
-    //~ Inner Classes ----------------------------------------------------------
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    @Getter
+    public static class NullableOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String representationinEditor;
+        private final String representationInRenderer;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new NullableOption object.
+         */
+        public NullableOption() {
+            this(null);
+        }
+
+        /**
+         * Creates a new NullableOption object.
+         *
+         * @param  representation  DOCUMENT ME!
+         */
+        public NullableOption(final String representation) {
+            this(representation, representation);
+        }
+
+        /**
+         * Creates a new NullableOption object.
+         *
+         * @param  representationinEditor    DOCUMENT ME!
+         * @param  representationInRenderer  DOCUMENT ME!
+         */
+        public NullableOption(final String representationinEditor, final String representationInRenderer) {
+            this.representationinEditor = representationinEditor;
+            this.representationInRenderer = representationInRenderer;
+        }
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class ManageableOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String property;
+        private final String representation;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ManageableOption object.
+         */
+        public ManageableOption() {
+            this(null, null);
+        }
+
+        /**
+         * Creates a new ManageableOption object.
+         *
+         * @param  property  DOCUMENT ME!
+         */
+        public ManageableOption(final String property) {
+            this(property, null);
+        }
+
+        /**
+         * Creates a new ManageableOption object.
+         *
+         * @param  property        DOCUMENT ME!
+         * @param  representation  DOCUMENT ME!
+         */
+        public ManageableOption(final String property, final String representation) {
+            this.property = property;
+            this.representation = representation;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProperty() {
+            return property;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getRepresentation() {
+            return representation;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class AlwaysReloadOption extends Option {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class FakeModelOption extends Option {
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class WhereOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String where;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new WhereOption object.
+         *
+         * @param  where  DOCUMENT ME!
+         */
+        public WhereOption(final String where) {
+            this.where = where;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getWhere() {
+            return where;
+        }
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class ComparatorOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final Comparator<CidsBean> comparator;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ComparatorOption object.
+         *
+         * @param  comparator  DOCUMENT ME!
+         */
+        public ComparatorOption(final Comparator<CidsBean> comparator) {
+            this.comparator = comparator;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public Comparator<CidsBean> getComparator() {
+            return comparator;
+        }
+    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class SortingColumnOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String column;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new SortingColumnOption object.
+         *
+         * @param  column  DOCUMENT ME!
+         */
+        public SortingColumnOption(final String column) {
+            this.column = column;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getColumn() {
+            return column;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class LoadingItem {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String representation;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ItemLoading object.
+         *
+         * @param  representation  DOCUMENT ME!
+         */
+        public LoadingItem(final String representation) {
+            this.representation = representation;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String toString() {
+            return representation;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class ManageableItem {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String representation;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ManageableItem object.
+         *
+         * @param  representation  DOCUMENT ME!
+         */
+        public ManageableItem(final String representation) {
+            this.representation = representation;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String toString() {
+            return representation;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class NullableItem {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String representation;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new NullableItem object.
+         *
+         * @param  representation  DOCUMENT ME!
+         */
+        public NullableItem(final String representation) {
+            this.representation = representation;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String toString() {
+            return representation;
+        }
+    }
 
     /**
      * DOCUMENT ME!
@@ -710,8 +1250,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         public void metaObjectAdded(final MetaObjectChangeEvent moce) {
             // we're only registered to the DefaultMetaObjectChangeSupport that asserts of proper initialisation of
             // events
+            final MetaClass metaClass = getMetaClass();
             if ((metaClass != null) && metaClass.equals(moce.getNewMetaObject().getMetaClass())) {
-                init(metaClass, true);
+                refresh(true);
             }
         }
 
@@ -719,8 +1260,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         public void metaObjectChanged(final MetaObjectChangeEvent moce) {
             // we're only registered to the DefaultMetaObjectChangeSupport that asserts of proper initialisation of
             // events
+            final MetaClass metaClass = getMetaClass();
             if ((metaClass != null) && metaClass.equals(moce.getNewMetaObject().getMetaClass())) {
-                init(metaClass, true);
+                refresh(true);
             }
         }
 
@@ -728,8 +1270,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         public void metaObjectRemoved(final MetaObjectChangeEvent moce) {
             // we're only registered to the DefaultMetaObjectChangeSupport that asserts of proper initialisation of
             // events
+            final MetaClass metaClass = getMetaClass();
             if ((metaClass != null) && metaClass.equals(moce.getOldMetaObject().getMetaClass())) {
-                init(metaClass, true);
+                refresh(true);
             }
         }
     }
@@ -744,7 +1287,8 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         //~ Methods ------------------------------------------------------------
 
         @Override
-        public Component getListCellRendererComponent(final JList list,
+        public Component getListCellRendererComponent(
+                final JList list,
                 final Object value,
                 final int index,
                 final boolean isSelected,
