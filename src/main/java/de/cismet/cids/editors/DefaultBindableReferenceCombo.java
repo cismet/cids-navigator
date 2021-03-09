@@ -292,7 +292,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @param  forceReload  DOCUMENT ME!
      */
-    private void refresh(final boolean forceReload) {
+    public void reload(final boolean forceReload) {
         final MetaClass metaClass = getMetaClass();
         if (!isFakeModel() && (metaClass != null)) {
             CismetThreadPool.execute(new SwingWorker<DefaultComboBoxModel, Void>() {
@@ -368,7 +368,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             throw new IllegalStateException("the metaclass has not been set yet"); // NOI18N
         }
 
-        refresh(true);
+        reload(true);
     }
 
     /**
@@ -383,7 +383,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     @Override
     public void setActingAsRenderer(final boolean actingAsRenderer) {
         this.actingAsRenderer = actingAsRenderer;
-        refresh(false);
+        reload(false);
     }
 
     /**
@@ -489,7 +489,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     @Override
     public final void setMetaClass(final MetaClass metaClass) {
         this.metaClass = metaClass;
-        refresh(isAlwaysReload());
+        reload(isAlwaysReload());
     }
 
     @Override
@@ -1253,7 +1253,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             // events
             final MetaClass metaClass = getMetaClass();
             if ((metaClass != null) && metaClass.equals(moce.getNewMetaObject().getMetaClass())) {
-                refresh(true);
+                reload(true);
             }
         }
 
@@ -1263,7 +1263,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             // events
             final MetaClass metaClass = getMetaClass();
             if ((metaClass != null) && metaClass.equals(moce.getNewMetaObject().getMetaClass())) {
-                refresh(true);
+                reload(true);
             }
         }
 
@@ -1273,7 +1273,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             // events
             final MetaClass metaClass = getMetaClass();
             if ((metaClass != null) && metaClass.equals(moce.getOldMetaObject().getMetaClass())) {
-                refresh(true);
+                reload(true);
             }
         }
     }
