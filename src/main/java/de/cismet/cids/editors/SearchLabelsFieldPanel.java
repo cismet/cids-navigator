@@ -19,6 +19,9 @@ import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaClassStore;
 import Sirius.server.middleware.types.MetaObjectNode;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.JXHyperlink;
@@ -44,7 +47,7 @@ import de.cismet.layout.WrapLayout;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class SearchLabelsFieldPanel extends javax.swing.JPanel implements MetaClassStore, ConnectionContextStore {
+public class SearchLabelsFieldPanel extends javax.swing.JPanel implements ConnectionContextStore {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -52,10 +55,9 @@ public class SearchLabelsFieldPanel extends javax.swing.JPanel implements MetaCl
 
     //~ Instance fields --------------------------------------------------------
 
-    private ConnectionContext connectionContext = ConnectionContext.createDummy();
-    private MetaClass metaClass = null;
-    private final CidsServerSearch search;
-    private boolean hyperlink = false;
+    @Getter private ConnectionContext connectionContext = ConnectionContext.createDummy();
+    @Getter @Setter private final CidsServerSearch search;
+    @Getter @Setter private boolean hyperlink = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
@@ -121,25 +123,10 @@ public class SearchLabelsFieldPanel extends javax.swing.JPanel implements MetaCl
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
-    public MetaClass getMetaClass() {
-        return metaClass;
-    }
-
-    @Override
-    public void setMetaClass(final MetaClass metaClass) {
-        this.metaClass = metaClass;
-    }
-
-    @Override
     public void initWithConnectionContext(final ConnectionContext connectionContext) {
         this.connectionContext = connectionContext;
 
         initComponents();
-    }
-
-    @Override
-    public ConnectionContext getConnectionContext() {
-        return connectionContext;
     }
 
     /**
@@ -154,51 +141,54 @@ public class SearchLabelsFieldPanel extends javax.swing.JPanel implements MetaCl
      */
     public void refresh() {
         clear();
-        jPanel1.add(new JLabel("<html><i>Ergebnisse werden gesucht..."));
-        new SwingWorker<Collection<MetaObjectNode>, Object>() {
+        final CidsServerSearch search = getSearch();
+        if (search != null) {
+            jPanel1.add(new JLabel("<html><i>Ergebnisse werden gesucht..."));
+            new SwingWorker<Collection<MetaObjectNode>, Object>() {
 
-                @Override
-                protected Collection<MetaObjectNode> doInBackground() throws Exception {
-                    return (Collection<MetaObjectNode>)SessionManager.getProxy()
-                                .customServerSearch(search, getConnectionContext());
-                }
+                    @Override
+                    protected Collection<MetaObjectNode> doInBackground() throws Exception {
+                        return (Collection<MetaObjectNode>)SessionManager.getProxy()
+                                    .customServerSearch(search, getConnectionContext());
+                    }
 
-                @Override
-                protected void done() {
-                    clear();
-                    try {
-                        final Collection<MetaObjectNode> mons = get();
-                        if (mons != null) {
-                            for (final MetaObjectNode mon : mons) {
-                                if (mon != null) {
-                                    final String name = mon.toString();
-                                    if (hyperlink) {
-                                        jPanel1.add(new JXHyperlink(new AbstractAction(name) {
+                    @Override
+                    protected void done() {
+                        clear();
+                        try {
+                            final Collection<MetaObjectNode> mons = get();
+                            if (mons != null) {
+                                for (final MetaObjectNode mon : mons) {
+                                    if (mon != null) {
+                                        final String name = mon.toString();
+                                        if (hyperlink) {
+                                            jPanel1.add(new JXHyperlink(new AbstractAction(name) {
 
-                                                    @Override
-                                                    public void actionPerformed(final ActionEvent e) {
-                                                        ComponentRegistry.getRegistry()
-                                                                .getDescriptionPane()
-                                                                .gotoMetaObjectNode(mon, false);
-                                                    }
-                                                }));
-                                    } else {
-                                        jPanel1.add(new JLabel(name));
+                                                        @Override
+                                                        public void actionPerformed(final ActionEvent e) {
+                                                            ComponentRegistry.getRegistry()
+                                                                    .getDescriptionPane()
+                                                                    .gotoMetaObjectNode(mon, false);
+                                                        }
+                                                    }));
+                                        } else {
+                                            jPanel1.add(new JLabel(name));
+                                        }
+                                        jPanel1.add(new JLabel(", "));
                                     }
-                                    jPanel1.add(new JLabel(", "));
+                                }
+                                final int compCount = jPanel1.getComponentCount();
+                                if (compCount > 0) {
+                                    jPanel1.remove(compCount - 1);
                                 }
                             }
-                            final int compCount = jPanel1.getComponentCount();
-                            if (compCount > 0) {
-                                jPanel1.remove(compCount - 1);
-                            }
+                        } catch (final Exception ex) {
+                            LOG.error(ex, ex);
+                            clear();
+                            jPanel1.add(new JLabel("<html><i>[Fehler]"));
                         }
-                    } catch (final Exception ex) {
-                        LOG.error(ex, ex);
-                        clear();
-                        jPanel1.add(new JLabel("<html><i>[Fehler]"));
                     }
-                }
-            }.execute();
+                }.execute();
+        }
     }
 }
