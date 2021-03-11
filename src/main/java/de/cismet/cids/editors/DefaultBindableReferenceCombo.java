@@ -119,6 +119,8 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
     private boolean actingAsRenderer;
 
+    private boolean explicitlyEnabledOrDisabled;
+
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -290,6 +292,30 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isExplicitlyEnabledOrDisabled() {
+        return explicitlyEnabledOrDisabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  explicitlyEnabledOrDisabled  DOCUMENT ME!
+     */
+    private void setExplicitlyEnabledOrDisabled(final boolean explicitlyEnabledOrDisabled) {
+        this.explicitlyEnabledOrDisabled = explicitlyEnabledOrDisabled;
+    }
+
+    @Override
+    public void setEnabled(final boolean enabled) {
+        setExplicitlyEnabledOrDisabled(true);
+        super.setEnabled(enabled);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  forceReload  DOCUMENT ME!
      */
     public void reload(final boolean forceReload) {
@@ -318,36 +344,38 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                             tmp.setSelectedItem(getCidsBean());
                             setModel(tmp);
 
-                            final boolean actingAsRenderer = isActingAsRenderer();
-                            setEditable(actingAsRenderer);
+                            if (!isExplicitlyEnabledOrDisabled()) {
+                                final boolean actingAsRenderer = isActingAsRenderer();
+                                setEditable(actingAsRenderer);
 
-                            setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
+                                setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
 
-                            setEnabled(!actingAsRenderer);
-                            setOpaque(!actingAsRenderer);
+                                DefaultBindableReferenceCombo.super.setEnabled(!actingAsRenderer);
+                                setOpaque(!actingAsRenderer);
 
-                            final Border editorBorder;
-                            final Color editorDisabledTextColor;
-                            if (actingAsRenderer) {
-                                editorBorder = null;
-                                editorDisabledTextColor = Color.BLACK;
-                            } else {
-                                final JComboBox dummyCombobox = new DefaultBindableReferenceCombo();
-                                editorBorder = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
-                                            .getBorder();
-                                editorDisabledTextColor =
-                                    ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
-                                            .getDisabledTextColor();
-                            }
+                                final Border editorBorder;
+                                final Color editorDisabledTextColor;
+                                if (actingAsRenderer) {
+                                    editorBorder = null;
+                                    editorDisabledTextColor = Color.BLACK;
+                                } else {
+                                    final JComboBox dummyCombobox = new DefaultBindableReferenceCombo();
+                                    editorBorder = ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
+                                                .getBorder();
+                                    editorDisabledTextColor =
+                                        ((JTextComponent)dummyCombobox.getEditor().getEditorComponent())
+                                                .getDisabledTextColor();
+                                }
 
-                            ((JTextComponent)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
-                            ((JTextComponent)getEditor().getEditorComponent()).setBorder(editorBorder);
-                            ((JTextComponent)getEditor().getEditorComponent()).setDisabledTextColor(
-                                editorDisabledTextColor);
+                                ((JTextComponent)getEditor().getEditorComponent()).setOpaque(!actingAsRenderer);
+                                ((JTextComponent)getEditor().getEditorComponent()).setBorder(editorBorder);
+                                ((JTextComponent)getEditor().getEditorComponent()).setDisabledTextColor(
+                                    editorDisabledTextColor);
 
-                            if (isActingAsRenderer() && (getSelectedItem() == null)) {
-                                ((JTextComponent)getEditor().getEditorComponent()).setText(
-                                    getNullValueRepresentationInRenderer());
+                                if (actingAsRenderer && (getSelectedItem() == null)) {
+                                    ((JTextComponent)getEditor().getEditorComponent()).setText(
+                                        getNullValueRepresentationInRenderer());
+                                }
                             }
                         } catch (final InterruptedException interruptedException) {
                         } catch (final ExecutionException executionException) {
@@ -355,6 +383,16 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                         }
                     }
                 });
+        }
+    }
+
+    @Override
+    public Object getSelectedItem() {
+        final Object object = super.getSelectedItem();
+        if (object instanceof Item) {
+            return null;
+        } else {
+            return object;
         }
     }
 
@@ -752,7 +790,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
             final ConnectionContext connectionContext) {
         return getModelByMetaClass(
                 mc,
-                nullable ? new NullableItem(MESSAGE_NULLEABLE_ITEM_EDITOR) : null,
+                nullable ? new NullableItem() : null,
                 null,
                 onlyUsed ? "used IS TRUE" : null,
                 null,
@@ -1135,20 +1173,27 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
-    public static class LoadingItem {
+    private abstract static class Item {
 
         //~ Instance fields ----------------------------------------------------
 
-        private final String representation;
+        @Getter private final String representation;
 
         //~ Constructors -------------------------------------------------------
 
         /**
-         * Creates a new ItemLoading object.
+         * Creates a new Item object.
+         */
+        public Item() {
+            this(null);
+        }
+
+        /**
+         * Creates a new Item object.
          *
          * @param  representation  DOCUMENT ME!
          */
-        public LoadingItem(final String representation) {
+        public Item(final String representation) {
             this.representation = representation;
         }
 
@@ -1156,7 +1201,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
         @Override
         public String toString() {
-            return representation;
+            return null;
         }
     }
 
@@ -1165,13 +1210,40 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
-    public static class ManageableItem {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private final String representation;
+    public static class LoadingItem extends Item {
 
         //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new LoadingItem object.
+         */
+        public LoadingItem() {
+        }
+
+        /**
+         * Creates a new LoadingItem object.
+         *
+         * @param  representation  DOCUMENT ME!
+         */
+        public LoadingItem(final String representation) {
+            super(representation);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class ManageableItem extends Item {
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new ManageableItem object.
+         */
+        public ManageableItem() {
+        }
 
         /**
          * Creates a new ManageableItem object.
@@ -1179,14 +1251,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
          * @param  representation  DOCUMENT ME!
          */
         public ManageableItem(final String representation) {
-            this.representation = representation;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public String toString() {
-            return representation;
+            super(representation);
         }
     }
 
@@ -1195,13 +1260,15 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
-    public static class NullableItem {
-
-        //~ Instance fields ----------------------------------------------------
-
-        private final String representation;
+    public static class NullableItem extends Item {
 
         //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new NullableItem object.
+         */
+        public NullableItem() {
+        }
 
         /**
          * Creates a new NullableItem object.
@@ -1209,14 +1276,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
          * @param  representation  DOCUMENT ME!
          */
         public NullableItem(final String representation) {
-            this.representation = representation;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        public String toString() {
-            return representation;
+            super(representation);
         }
     }
 
@@ -1294,17 +1354,23 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                 final int index,
                 final boolean isSelected,
                 final boolean cellHasFocus) {
-            final Component ret = super.getListCellRendererComponent(
+            final Component component = super.getListCellRendererComponent(
                     list,
                     value,
                     index,
                     isSelected,
                     cellHasFocus);
-            if ((value == null) && (ret instanceof JLabel)) {
-                ((JLabel)ret).setText(getNullValueRepresentation());
+            if (component instanceof JLabel) {
+                final JLabel label = (JLabel)component;
+                if (value instanceof Item) {
+                    final Item item = (Item)value;
+                    final String representation = item.getRepresentation();
+                    label.setText(((representation != null) && !representation.trim().isEmpty()) ? representation
+                                                                                                 : " ");
+                }
             }
 
-            return ret;
+            return component;
         }
     }
 }
