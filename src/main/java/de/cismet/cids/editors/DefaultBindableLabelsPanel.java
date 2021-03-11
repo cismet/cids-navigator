@@ -428,9 +428,12 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             final int compCount = panLabels.getComponentCount();
             if (compCount > 0) {
                 panLabels.remove(compCount - 1);
+            } else {
+                panLabels.add(new JLabel("-"));
             }
         }
         revalidate();
+        repaint();
     }
 
     /**
@@ -642,10 +645,11 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(1, 2, 0, 0);
         add(panLabels, gridBagConstraints);
         panLabels.setLayout(new WrapLayout(WrapLayout.LEFT, 0, 5));
 

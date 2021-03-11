@@ -180,6 +180,8 @@ public class SearchLabelsFieldPanel extends javax.swing.JPanel implements Connec
                                 final int compCount = jPanel1.getComponentCount();
                                 if (compCount > 0) {
                                     jPanel1.remove(compCount - 1);
+                                } else {
+                                    jPanel1.add(new JLabel("-"));
                                 }
                             }
                         } catch (final Exception ex) {
@@ -187,6 +189,8 @@ public class SearchLabelsFieldPanel extends javax.swing.JPanel implements Connec
                             clear();
                             jPanel1.add(new JLabel("<html><i>[Fehler]"));
                         }
+                        revalidate();
+                        repaint();
                     }
                 }.execute();
         }
