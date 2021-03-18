@@ -118,7 +118,7 @@ public class MetaObjectCache {
                         }
                     }
                 }
-                return (MetaObject[][])mos.toArray();
+                return (MetaObject[][])mos.toArray(new MetaObject[0][]);
             }
             queriesPerTable.put(tableNameIntern, null);
         }
