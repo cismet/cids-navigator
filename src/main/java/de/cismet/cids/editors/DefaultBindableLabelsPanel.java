@@ -649,7 +649,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(1, 2, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(1, 1, 0, 0);
         add(panLabels, gridBagConstraints);
         panLabels.setLayout(new WrapLayout(WrapLayout.LEFT, 0, 5));
 
