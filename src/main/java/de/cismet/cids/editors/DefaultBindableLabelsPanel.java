@@ -39,7 +39,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -80,26 +79,27 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     private static final String MESSAGE_CREATEITEMDIALOG_TITLE = NbBundle.getMessage(
             DefaultBindableReferenceCombo.class,
             "DefaultBindableReferenceCombo.createitemdialog.title");
+    private static final Comparator<CidsBean> BEAN_TOSTRING_COMPARATOR =
+        new DefaultBindableReferenceCombo.BeanToStringComparator();
 
     //~ Instance fields --------------------------------------------------------
 
-    private PropertyChangeSupport propertyChangeSupport;
     private List selectedElements = null;
-    private MetaClass metaClass = null;
-//    private final Map<JToggleButton, MetaObject> toggleToObjectMapping = new HashMap<>();
+    @Getter private MetaClass metaClass = null;
+    @Getter private final boolean editable;
+    @Getter private ConnectionContext connectionContext = ConnectionContext.createDummy();
 
-    @Getter @Setter private Comparator<MetaObject> comparator;
-    @Getter @Setter private boolean manageable = true;
-    @Getter @Setter private String manageableButtonText = MESSAGE_MANAGEABLE_ITEM;
-    @Getter @Setter private String manageableProperty = "name";
+    @Getter @Setter private String sortingColumn;
+    @Getter @Setter private Comparator<CidsBean> comparator;
+    @Getter @Setter private boolean manageable;
+    @Getter @Setter private String manageableButtonText;
+    @Getter @Setter private String manageableProperty;
+    @Getter @Setter private String where;
+    @Getter @Setter private boolean initialized = false;
+    @Getter @Setter private boolean newSelectionAdded = false;
 
-    private ConnectionContext connectionContext = ConnectionContext.createDummy();
-    private final boolean editable;
     private final String title;
-
-    private boolean initialized = false;
-
-    private boolean newSelectionAdded = false;
+    private PropertyChangeSupport propertyChangeSupport;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnApply;
@@ -123,16 +123,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      * Creates a new DefaultBindableLabelsPanel object.
      */
     public DefaultBindableLabelsPanel() {
-        this(null, true, null);
-    }
-
-    /**
-     * Creates a new DefaultBindableLabelsPanel object.
-     *
-     * @param  editable  DOCUMENT ME!
-     */
-    public DefaultBindableLabelsPanel(final boolean editable) {
-        this(null, editable, null);
+        this(true, null);
     }
 
     /**
@@ -140,38 +131,53 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  editable  DOCUMENT ME!
      * @param  title     DOCUMENT ME!
+     * @param  options   DOCUMENT ME!
      */
-    public DefaultBindableLabelsPanel(final boolean editable, final String title) {
-        this(null, editable, title);
-    }
+    public DefaultBindableLabelsPanel(final boolean editable,
+            final String title,
+            final DefaultBindableReferenceCombo.Option... options) {
+        MetaClass metaClass = null;
+        boolean manageable = false;
+        String manageableItemRepresentation = MESSAGE_MANAGEABLE_ITEM;
+        String manageableProperty = "name";
+        String where = null;
+        String sortingColumn = null;
+        Comparator<CidsBean> comparator = BEAN_TOSTRING_COMPARATOR;
 
-    /**
-     * Creates a new DefaultBindableLabelsPanel object.
-     *
-     * @param  comparator  DOCUMENT ME!
-     * @param  editable    DOCUMENT ME!
-     */
-    public DefaultBindableLabelsPanel(final Comparator<MetaObject> comparator, final boolean editable) {
-        this(null, editable, null);
-    }
-
-    /**
-     * Creates a new DefaultBindableLabelsPanel object.
-     *
-     * @param  comparator  DOCUMENT ME!
-     * @param  editable    DOCUMENT ME!
-     * @param  title       DOCUMENT ME!
-     */
-    public DefaultBindableLabelsPanel(final Comparator<MetaObject> comparator,
-            final boolean editable,
-            final String title) {
-        this.comparator = comparator;
-        this.editable = editable;
-        this.title = title;
-
-        if (java.beans.Beans.isDesignTime()) {
-            initComponents();
+        if (options != null) {
+            for (final DefaultBindableReferenceCombo.Option option : options) {
+                if (option != null) {
+                    if (option.getClass().equals(DefaultBindableReferenceCombo.MetaClassOption.class)) {
+                        metaClass = ((DefaultBindableReferenceCombo.MetaClassOption)option).getMetaClass();
+                    } else if (option.getClass().equals(DefaultBindableReferenceCombo.ManageableOption.class)) {
+                        manageable = true;
+                        final String property = ((DefaultBindableReferenceCombo.ManageableOption)option).getProperty();
+                        final String representation = ((DefaultBindableReferenceCombo.ManageableOption)option)
+                                    .getRepresentation();
+                        manageableProperty = (property != null) ? property : "name";
+                        manageableItemRepresentation = (representation != null) ? representation
+                                                                                : MESSAGE_MANAGEABLE_ITEM;
+                    } else if (option.getClass().equals(DefaultBindableReferenceCombo.WhereOption.class)) {
+                        where = ((DefaultBindableReferenceCombo.WhereOption)option).getWhere();
+                    } else if (option.getClass().equals(DefaultBindableReferenceCombo.ComparatorOption.class)) {
+                        comparator = ((DefaultBindableReferenceCombo.ComparatorOption)option).getComparator();
+                    } else if (option.getClass().equals(DefaultBindableReferenceCombo.SortingColumnOption.class)) {
+                        sortingColumn = ((DefaultBindableReferenceCombo.SortingColumnOption)option).getColumn();
+                    } else if (option.getClass().equals(DefaultBindableReferenceCombo.WhereOption.class)) {
+                        where = ((DefaultBindableReferenceCombo.WhereOption)option).getWhere();
+                    }
+                }
+            }
         }
+
+        this.title = title;
+        this.editable = editable;
+        this.metaClass = metaClass;
+        this.where = where;
+        setManageable(manageable);
+        setComparator(comparator);
+        setSortingColumn(sortingColumn);
+        setManageableButtonText(manageableItemRepresentation);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -182,18 +188,9 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
         initComponents();
 
-        initialized = true;
+        setInitialized(true);
 
         refresh(false);
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isEditable() {
-        return editable;
     }
 
     /**
@@ -245,8 +242,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                     String.format(MESSAGE_CREATEITEMDIALOG_TITLE, metaClass.getName()),
                     JOptionPane.QUESTION_MESSAGE);
             if (input != null) {
-                final MetaObject metaObject = metaClass.getEmptyInstance(getConnectionContext());
-                final CidsBean cidsBean = metaObject.getBean();
+                final CidsBean cidsBean = metaClass.getEmptyInstance(getConnectionContext()).getBean();
                 cidsBean.setProperty(property, input);
                 return cidsBean;
             }
@@ -290,7 +286,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         if (elements instanceof List) {
             this.selectedElements = (List)elements;
         }
-        if (initialized) {
+        if (isInitialized()) {
             refreshSelectedElements();
         }
     }
@@ -329,9 +325,25 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         return null;
     }
 
-    @Override
-    public MetaClass getMetaClass() {
-        return this.metaClass;
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   metaClass  DOCUMENT ME!
+     * @param   orderBy    DOCUMENT ME!
+     * @param   where      DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static String createQuery(final MetaClass metaClass, final String orderBy, final String where) {
+        final String template = "SELECT %d, %s FROM %s WHERE %s ORDER BY %s";
+        final String query = String.format(
+                template,
+                metaClass.getID(),
+                metaClass.getPrimaryKey(),
+                metaClass.getTableName(),
+                (where != null) ? where : "TRUE",
+                (orderBy != null) ? orderBy : metaClass.getPrimaryKey());
+        return query;
     }
 
     /**
@@ -345,22 +357,29 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         panLabels.add(new JLabel(MESSAGE_LOADING_ITEM));
         btnEdit.setEnabled(false);
 
-        new SwingWorker<MetaObject[], Void>() {
+        new SwingWorker<List<CidsBean>, Void>() {
 
                 @Override
-                protected MetaObject[] doInBackground() throws Exception {
+                protected List<CidsBean> doInBackground() throws Exception {
                     if (getMetaClass() != null) {
                         final MetaClass foreignClass = getReferencedClass(getMetaClass());
-                        final String query = "select " + foreignClass.getID() + ", " + foreignClass.getPrimaryKey()
-                                    + " from "
-                                    + foreignClass.getTableName();
+                        final String query = createQuery(foreignClass, getSortingColumn(), null);
 
-                        return MetaObjectCache.getInstance()
+                        final MetaObject[] mos = MetaObjectCache.getInstance()
                                     .getMetaObjectsByQuery(
                                         query,
                                         getMetaClass().getDomain(),
                                         forceReload,
                                         getConnectionContext());
+                        if (mos != null) {
+                            final List<CidsBean> cidsBeans = new ArrayList<>();
+                            for (final MetaObject mo : mos) {
+                                if (mo != null) {
+                                    cidsBeans.add(mo.getBean());
+                                }
+                            }
+                            return cidsBeans;
+                        }
                     }
                     return null;
                 }
@@ -368,9 +387,9 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                 @Override
                 protected void done() {
                     try {
-                        final MetaObject[] metaObjects = get();
-                        if (metaObjects != null) {
-                            update(metaObjects);
+                        final List<CidsBean> cidsBeans = get();
+                        if (cidsBeans != null) {
+                            update(cidsBeans);
                         }
                     } catch (final Exception e) {
                         LOG.error("Error while filling a togglebutton field.", e); // NOI18N
@@ -382,16 +401,16 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     /**
      * DOCUMENT ME!
      *
-     * @param  metaObjects  DOCUMENT ME!
+     * @param  cidsBeans  DOCUMENT ME!
      */
-    private void update(final MetaObject[] metaObjects) {
-        final Comparator<MetaObject> comparator = getComparator();
+    private void update(final List<CidsBean> cidsBeans) {
+        final Comparator<CidsBean> comparator = getComparator();
         if (comparator != null) {
-            Arrays.sort(metaObjects, comparator);
+            cidsBeans.sort(comparator);
         }
 
-        for (final MetaObject metaObject : metaObjects) {
-            final Toggle toggle = new Toggle(metaObject);
+        for (final CidsBean cidsBean : cidsBeans) {
+            final Toggle toggle = new Toggle(cidsBean);
             panToggles.add(toggle);
         }
 
@@ -415,10 +434,10 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             for (final Component component : panToggles.getComponents()) {
                 if (component instanceof Toggle) {
                     final Toggle toggle = (Toggle)component;
-                    final MetaObject metaObject = toggle.getMetaObject();
-                    if ((metaObject != null) && selectedElements.contains(metaObject.getBean())) {
+                    final CidsBean cidsBean = toggle.getCidsBean();
+                    if (selectedElements.contains(cidsBean)) {
                         toggle.setSelected(true);
-                        panLabels.add(new JLabel(metaObject.getBean().toString()));
+                        panLabels.add(new JLabel(cidsBean.toString()));
                         panLabels.add(new JLabel(", "));
                     } else {
                         toggle.setSelected(false);
@@ -480,11 +499,6 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         }
     }
 
-    @Override
-    public ConnectionContext getConnectionContext() {
-        return connectionContext;
-            // return ConnectionContextUtils.getFirstParentClientConnectionContext(this);
-    }
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
@@ -716,7 +730,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         for (final Component component : panToggles.getComponents()) {
             if (component instanceof Toggle) {
                 final Toggle toggle = (Toggle)component;
-                final CidsBean cidsBean = toggle.getMetaObject().getBean();
+                final CidsBean cidsBean = toggle.getCidsBean();
                 if (toggle.isSelected() && !selectedElements.contains(cidsBean)) {
                     selectedElements.add(cidsBean);
                 } else if (!toggle.isSelected() && selectedElements.contains(cidsBean)) {
@@ -727,8 +741,8 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
 //        refreshSelectedElements();
         propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
-        refresh(newSelectionAdded);
-        newSelectionAdded = false;
+        refresh(isNewSelectionAdded());
+        setNewSelectionAdded(false);
 
 //        propertyChangeSupport.firePropertyChange("selectedElement", null, cidsBean);
         jDialog1.setVisible(false);
@@ -764,9 +778,9 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                 final List old = new ArrayList(selectedElements);
                 final CidsBean persistedBean = newBean.persist(getConnectionContext());
                 propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
-                panToggles.add(new Toggle(persistedBean.getMetaObject()));
+                panToggles.add(new Toggle(persistedBean));
                 panToggles.revalidate();
-                newSelectionAdded = true;
+                setNewSelectionAdded(true);
             }
         } catch (final Exception ex) {
             LOG.error(ex, ex);
@@ -845,18 +859,18 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
         //~ Instance fields ----------------------------------------------------
 
-        private final MetaObject metaObject;
+        private final CidsBean cidsBean;
 
         //~ Constructors -------------------------------------------------------
 
         /**
          * Creates a new Toggle object.
          *
-         * @param  metaObject  DOCUMENT ME!
+         * @param  cidsBean  DOCUMENT ME!
          */
-        public Toggle(final MetaObject metaObject) {
-            super(metaObject.getBean().toString());
-            this.metaObject = metaObject;
+        public Toggle(final CidsBean cidsBean) {
+            super(cidsBean.toString());
+            this.cidsBean = cidsBean;
             setOpaque(false);
             setFocusPainted(false);
             setSelected(false);
@@ -870,8 +884,8 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
          *
          * @return  DOCUMENT ME!
          */
-        public MetaObject getMetaObject() {
-            return metaObject;
+        public CidsBean getCidsBean() {
+            return cidsBean;
         }
 
         @Override

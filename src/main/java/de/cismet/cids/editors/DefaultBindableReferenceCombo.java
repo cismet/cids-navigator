@@ -1285,7 +1285,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
-    protected static final class BeanToStringComparator implements Comparator<CidsBean> {
+    public static final class BeanToStringComparator implements Comparator<CidsBean> {
 
         //~ Methods ------------------------------------------------------------
 
