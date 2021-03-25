@@ -12,6 +12,7 @@
 package de.cismet.cids.custom.objecteditors;
 
 import Sirius.navigator.resource.PropertyManager;
+import Sirius.navigator.ui.RequestsFullAvailableSpaceComponent;
 import Sirius.navigator.ui.RequestsFullSizeComponent;
 
 import org.apache.log4j.Logger;
@@ -49,7 +50,11 @@ public class EditorWrapper implements ComponentWrapper {
 
     @Override
     public WrappedComponent wrapComponent(final JComponent component) {
-        component.setBorder(new EmptyBorder(10, 10, 10, 10));
+        if (component instanceof RequestsFullAvailableSpaceComponent) {
+            component.setBorder(new EmptyBorder(0, 0, 0, 0));
+        } else {
+            component.setBorder(new EmptyBorder(10, 10, 10, 10));
+        }
         final CoolEditor ced;
         if ((component instanceof BlurredMapObjectRenderer)) {
             if (!((BlurredMapObjectRenderer)component).usePainterCoolPanel) {
