@@ -152,11 +152,14 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                     } else if (option.getClass().equals(DefaultBindableReferenceCombo.ManageableOption.class)) {
                         manageable = true;
                         final String property = ((DefaultBindableReferenceCombo.ManageableOption)option).getProperty();
+                        if (property != null) {
+                            manageableProperty = property;
+                        }
                         final String representation = ((DefaultBindableReferenceCombo.ManageableOption)option)
                                     .getRepresentation();
-                        manageableProperty = (property != null) ? property : "name";
-                        manageableItemRepresentation = (representation != null) ? representation
-                                                                                : MESSAGE_MANAGEABLE_ITEM;
+                        if (representation != null) {
+                            manageableItemRepresentation = representation;
+                        }
                     } else if (option.getClass().equals(DefaultBindableReferenceCombo.WhereOption.class)) {
                         where = ((DefaultBindableReferenceCombo.WhereOption)option).getWhere();
                     } else if (option.getClass().equals(DefaultBindableReferenceCombo.ComparatorOption.class)) {
@@ -190,7 +193,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
         setInitialized(true);
 
-        refresh(false);
+        reload(false);
     }
 
     /**
@@ -351,7 +354,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  forceReload  DOCUMENT ME!
      */
-    private void refresh(final boolean forceReload) {
+    public void reload(final boolean forceReload) {
         panToggles.removeAll();
         panLabels.removeAll();
         panLabels.add(new JLabel(MESSAGE_LOADING_ITEM));
@@ -422,7 +425,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     public void setMetaClass(final MetaClass metaClass) {
         this.metaClass = metaClass;
 
-        refresh(false);
+        reload(false);
     }
 
     /**
@@ -699,16 +702,16 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      * @param  evt  DOCUMENT ME!
      */
     private void btnEditActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnEditActionPerformed
-//        StaticSwingTools.showDialog(jDialog1);
+        if (isEnabled()) {
+            jDialog1.setSize(getSize().width, jDialog1.getSize().height);
+            final int x = btnEdit.getLocationOnScreen().x - jDialog1.getBounds().width + btnEdit.getBounds().width;
+            final int y = btnEdit.getLocationOnScreen().y;
 
-        jDialog1.setSize(getSize().width, jDialog1.getSize().height);
-        final int x = btnEdit.getLocationOnScreen().x - jDialog1.getBounds().width + btnEdit.getBounds().width;
-        final int y = btnEdit.getLocationOnScreen().y;
+            jButton1.setVisible(isManageable());
 
-        jButton1.setVisible(isManageable());
-
-        jDialog1.setLocation(x + 2, y - 4);
-        jDialog1.setVisible(true);
+            jDialog1.setLocation(x + 2, y - 4);
+            jDialog1.setVisible(true);
+        }
     } //GEN-LAST:event_btnEditActionPerformed
 
     /**
@@ -741,7 +744,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
 //        refreshSelectedElements();
         propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
-        refresh(isNewSelectionAdded());
+        reload(isNewSelectionAdded());
         setNewSelectionAdded(false);
 
 //        propertyChangeSupport.firePropertyChange("selectedElement", null, cidsBean);

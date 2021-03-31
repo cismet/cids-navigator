@@ -166,10 +166,10 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         MetaClass metaClass = null;
         boolean fakeModel = false;
         boolean nullable = false;
-        String nullValueRepresentationInEditor = null;
-        String nullValueRepresentationInRenderer = null;
+        String nullValueRepresentationInEditor = MESSAGE_NULLEABLE_ITEM_EDITOR;
+        String nullValueRepresentationInRenderer = MESSAGE_NULLEABLE_ITEM_RENDERER;
         boolean manageable = false;
-        String manageableItemRepresentation = null;
+        String manageableItemRepresentation = MESSAGE_MANAGEABLE_ITEM;
         String manageableProperty = null;
         String where = null;
         boolean alwaysReload = false;
@@ -188,18 +188,23 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                     } else if (option.getClass().equals(NullableOption.class)) {
                         nullable = true;
                         final String valueInEditor = ((NullableOption)option).getRepresentationinEditor();
-                        nullValueRepresentationInEditor = (valueInEditor != null) ? String.valueOf(valueInEditor)
-                                                                                  : MESSAGE_NULLEABLE_ITEM_EDITOR;
+                        if (valueInEditor != null) {
+                            nullValueRepresentationInEditor = valueInEditor;
+                        }
                         final String valueInRenderer = ((NullableOption)option).getRepresentationInRenderer();
-                        nullValueRepresentationInRenderer = (valueInRenderer != null) ? String.valueOf(valueInRenderer)
-                                                                                      : MESSAGE_NULLEABLE_ITEM_RENDERER;
+                        if (valueInRenderer != null) {
+                            nullValueRepresentationInRenderer = valueInRenderer;
+                        }
                     } else if (option.getClass().equals(ManageableOption.class)) {
                         manageable = true;
                         final String property = ((ManageableOption)option).getProperty();
+                        if (property != null) {
+                            manageableProperty = property;
+                        }
                         final String representation = ((ManageableOption)option).getRepresentation();
-                        manageableProperty = (property != null) ? property : "name";
-                        manageableItemRepresentation = (representation != null) ? representation
-                                                                                : MESSAGE_MANAGEABLE_ITEM;
+                        if (representation != null) {
+                            manageableItemRepresentation = representation;
+                        }
                     } else if (option.getClass().equals(WhereOption.class)) {
                         where = ((WhereOption)option).getWhere();
                     } else if (option.getClass().equals(ComparatorOption.class)) {
