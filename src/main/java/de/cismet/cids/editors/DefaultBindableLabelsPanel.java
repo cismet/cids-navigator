@@ -84,7 +84,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
     //~ Instance fields --------------------------------------------------------
 
-    private List selectedElements = null;
+    private List selectedElements;
     @Getter private MetaClass metaClass = null;
     @Getter private final boolean editable;
     @Getter private ConnectionContext connectionContext = ConnectionContext.createDummy();
@@ -726,10 +726,30 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public List<CidsBean> getElements() {
+        final List<CidsBean> cidsBeans = new ArrayList<>();
+        for (final Component component : panToggles.getComponents()) {
+            if (component instanceof Toggle) {
+                final Toggle toggle = (Toggle)component;
+                final CidsBean cidsBean = toggle.getCidsBean();
+                cidsBeans.add(cidsBean);
+            }
+        }
+        return cidsBeans;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  evt  DOCUMENT ME!
      */
     private void btnApplyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnApplyActionPerformed
-        final List old = new ArrayList(selectedElements);
+        final List old = (selectedElements != null) ? new ArrayList(selectedElements) : null;
+        if (selectedElements == null) {
+            selectedElements = new ArrayList();
+        }
         for (final Component component : panToggles.getComponents()) {
             if (component instanceof Toggle) {
                 final Toggle toggle = (Toggle)component;
@@ -743,7 +763,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         }
 
 //        refreshSelectedElements();
-        propertyChangeSupport.firePropertyChange("selectedElements", old, selectedElements);
+        getPropertyChangeSupport().firePropertyChange("selectedElements", old, selectedElements);
         reload(isNewSelectionAdded());
         setNewSelectionAdded(false);
 
