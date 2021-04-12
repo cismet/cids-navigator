@@ -11,8 +11,6 @@ import org.apache.log4j.Logger;
 
 import java.awt.event.ActionEvent;
 
-import java.beans.PropertyChangeListener;
-
 import java.util.Arrays;
 import java.util.List;
 
