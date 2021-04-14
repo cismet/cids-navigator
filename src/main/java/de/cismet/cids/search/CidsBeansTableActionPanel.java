@@ -736,6 +736,15 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
     /**
      * DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     */
+    public List<CidsBean> getCidsBeans() {
+        return tableModel.getCidsBeans();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  evt  DOCUMENT ME!
      */
     private void jButton4ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton4ActionPerformed
@@ -770,7 +779,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
      */
     private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         int firstIndex = -1;
-        final Collection<String> toRemove = new ArrayList<String>();
+        final Collection<String> toRemove = new ArrayList<>();
         for (final int selectedIndex : tblToDisplay.getSelectedRows()) {
             if (firstIndex < 0) {
                 firstIndex = selectedIndex;
