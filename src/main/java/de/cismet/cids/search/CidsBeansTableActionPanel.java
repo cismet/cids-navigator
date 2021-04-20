@@ -103,12 +103,12 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JSplitPane jSplitPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JToggleButton jToggleButton1;
+    private org.jdesktop.swingx.JXTable jXTable1;
     private javax.swing.JTable tblToDisplay;
     private javax.swing.JTable tblToHide;
     // End of variables declaration//GEN-END:variables
@@ -181,6 +181,8 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
                 jComboBox1.setSelectedItem(actions.get(0));
             }
         }
+
+        refreshSplitPane();
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -201,8 +203,8 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         jToggleButton1 = new javax.swing.JToggleButton();
         jSplitPane1 = new javax.swing.JSplitPane();
         jPanel8 = new javax.swing.JPanel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jXTable1 = new org.jdesktop.swingx.JXTable();
         jPanel7 = new javax.swing.JPanel();
         jPanel12 = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
@@ -239,6 +241,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(filler1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -258,6 +261,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(jToggleButton1, gridBagConstraints);
 
         add(jPanel1, java.awt.BorderLayout.NORTH);
@@ -270,17 +274,15 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         jPanel8.setOpaque(isOpaque());
         jPanel8.setLayout(new java.awt.GridBagLayout());
 
-        jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(tableModel);
-        jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
-        jScrollPane1.setViewportView(jTable1);
+        jXTable1.setModel(tableModel);
+        jXTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jScrollPane4.setViewportView(jXTable1);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.weighty = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        jPanel8.add(jScrollPane1, gridBagConstraints);
+        jPanel8.add(jScrollPane4, gridBagConstraints);
 
         jSplitPane1.setBottomComponent(jPanel8);
 
@@ -608,6 +610,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel3.add(jComboBox1, gridBagConstraints);
 
         org.openide.awt.Mnemonics.setLocalizedText(
@@ -626,13 +629,14 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 5, 5);
         jPanel3.add(jButton7, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel3.add(filler2, gridBagConstraints);
 
         add(jPanel3, java.awt.BorderLayout.SOUTH);
@@ -724,12 +728,13 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             tableModel.setCidsBeans(null);
             tableModel.refresh();
             for (int i = 0; i < tableModel.getColumnCount(); i++) {
-                jTable1.getColumnModel().getColumn(i).setMinWidth(50);
+                jXTable1.getColumnModel().getColumn(i).setMinWidth(50);
             }
-            jTable1.getTableHeader().setResizingAllowed(true);
-
             attrToHideTableModel.refresh();
             attrToDisplayTableModel.refresh();
+
+            jXTable1.getTableHeader().setResizingAllowed(true);
+            jXTable1.getTableHeader().setReorderingAllowed(false);
         }
     }
 
@@ -762,12 +767,13 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
 
-        if (firstIndex > -1) {
+        if (firstIndex < tblToHide.getModel().getRowCount()) {
+            tblToHide.setRowSelectionInterval(firstIndex, firstIndex);
+            tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(firstIndex, 0, true)));
+        } else {
             tblToHide.setRowSelectionInterval(firstIndex - 1, firstIndex - 1);
-            tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(tblToHide.getSelectedRow(), 0, true)));
+            tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(firstIndex - 1, 0, true)));
         }
-
-        tblToHide.clearSelection();
 
         tableModel.refresh();
     } //GEN-LAST:event_jButton4ActionPerformed
@@ -793,10 +799,13 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         attrToDisplayTableModel.refresh();
 
         tblToHide.clearSelection();
-        if (firstIndex > -1) {
+        if (firstIndex > 0) {
             tblToDisplay.setRowSelectionInterval(firstIndex - 1, firstIndex - 1);
             tblToDisplay.scrollRectToVisible(new Rectangle(
                     tblToDisplay.getCellRect(tblToDisplay.getSelectedRow(), 0, true)));
+        } else {
+            tblToDisplay.setRowSelectionInterval(firstIndex, firstIndex);
+            tblToDisplay.scrollRectToVisible(new Rectangle(tblToDisplay.getCellRect(firstIndex, 0, true)));
         }
 
         tableModel.refresh();
