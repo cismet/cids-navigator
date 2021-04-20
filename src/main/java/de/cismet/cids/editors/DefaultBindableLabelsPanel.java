@@ -178,7 +178,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         this.metaClass = metaClass;
         this.where = where;
         setManageable(manageable);
-        setComparator(comparator);
+        setComparator((sortingColumn != null) ? null : comparator);
         setSortingColumn(sortingColumn);
         setManageableButtonText(manageableItemRepresentation);
     }
