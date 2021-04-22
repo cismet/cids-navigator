@@ -15,6 +15,8 @@ package Sirius.navigator.tools;
 *
 ****************************************************/
 
+import Sirius.util.MapImageFactoryConfiguration;
+
 import lombok.Getter;
 
 import java.awt.Dimension;
