@@ -725,8 +725,8 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             attributesToDisplay.get(metaClass);
 
             tableModel.setMetaClass(metaClass);
-            tableModel.setCidsBeans(null);
             tableModel.refresh();
+            tableModel.setCidsBeans(null);
             for (int i = 0; i < tableModel.getColumnCount(); i++) {
                 jXTable1.getColumnModel().getColumn(i).setMinWidth(50);
             }
