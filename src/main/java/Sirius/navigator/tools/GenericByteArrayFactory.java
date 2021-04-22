@@ -59,11 +59,6 @@ public class GenericByteArrayFactory {
 
     private static final Option OPTION__LOGGER = new Option("l", "logger", false, "Logger");
     private static final Option OPTION__CALLSERVER_URL = new Option("c", "callserver-url", true, "Callserver");
-    private static final Option OPTION__GZIP_COMPRESSION = new Option(
-            "z",
-            "gzip-compression",
-            true,
-            "gzip compression");
     private static final Option OPTION__USER = new Option("u", "user", true, "User");
     private static final Option OPTION__GROUP = new Option("g", "group", true, "Group");
     private static final Option OPTION__DOMAIN = new Option("d", "domain", true, "Domain");
@@ -90,8 +85,8 @@ public class GenericByteArrayFactory {
         try {
             cmd =
                 new DefaultParser().parse(new Options().addOption(OPTION__CALLSERVER_URL).addOption(OPTION__LOGGER)
-                            .addOption(OPTION__GZIP_COMPRESSION).addOption(OPTION__USER).addOption(OPTION__PASSWORD)
-                            .addOption(OPTION__GROUP).addOption(OPTION__DOMAIN).addOption(OPTION__JWT).addOption(
+                            .addOption(OPTION__USER).addOption(OPTION__PASSWORD).addOption(OPTION__GROUP).addOption(
+                        OPTION__DOMAIN).addOption(OPTION__JWT).addOption(
                         OPTION__GENERATOR).addOption(OPTION__CONFIGURATION),
                     args);
         } catch (final ParseException ex) {
@@ -107,7 +102,6 @@ public class GenericByteArrayFactory {
 
         final String callserverUrl = cmd.hasOption(OPTION__CALLSERVER_URL.getOpt())
             ? cmd.getOptionValue(OPTION__CALLSERVER_URL.getOpt()) : null;
-        final boolean compressionEnabled = cmd.hasOption(OPTION__GZIP_COMPRESSION.getOpt());
         final String login = cmd.hasOption(OPTION__USER.getOpt()) ? cmd.getOptionValue(OPTION__USER.getOpt()) : null;
         final String group = cmd.hasOption(OPTION__GROUP.getOpt()) ? cmd.getOptionValue(OPTION__GROUP.getOpt()) : null;
         final String domain = cmd.hasOption(OPTION__DOMAIN.getOpt()) ? cmd.getOptionValue(OPTION__DOMAIN.getOpt())
@@ -132,7 +126,7 @@ public class GenericByteArrayFactory {
                     null,
                     "jwt",
                     jwt,
-                    compressionEnabled,
+                    true,
                     connectionContext);
             } else {
                 initSessionManager(
@@ -141,7 +135,7 @@ public class GenericByteArrayFactory {
                     group,
                     login,
                     password,
-                    compressionEnabled,
+                    true,
                     connectionContext);
             }
 
