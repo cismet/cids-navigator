@@ -23,7 +23,6 @@ import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 import javax.imageio.ImageIO;
 
@@ -68,7 +67,6 @@ public abstract class MapImageFactory<C extends MapImageFactoryConfiguration> im
         final BufferedImage bufferedImage = generateMap(mapConfiguration);
 
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "png", new File("/home/jruiz/test.png"));
         ImageIO.write(bufferedImage, "png", baos);
         return baos.toByteArray();
     }
