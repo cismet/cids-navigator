@@ -144,8 +144,7 @@ public class GenericByteArrayFactory {
             final Class generatorClass = Class.forName(generator);
             if (ByteArrayFactory.class.isAssignableFrom(generatorClass)) {
                 final ByteArrayFactory generatorInstance = (ByteArrayFactory)generatorClass.newInstance();
-                final byte[] bytes = generatorInstance.create((configuration != null)
-                            ? configuration.replaceAll("\\\\&quot;\\\\", "\"") : null);
+                final byte[] bytes = generatorInstance.create(configuration);
                 System.out.println(Base64.getEncoder().encodeToString(bytes));
                 System.exit(0);
             } else {
