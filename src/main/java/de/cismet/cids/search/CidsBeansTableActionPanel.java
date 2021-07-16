@@ -15,9 +15,7 @@ package de.cismet.cids.search;
 import Sirius.server.localserver.attribute.MemberAttributeInfo;
 import Sirius.server.middleware.types.MetaClass;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-
+import org.apache.commons.collections.map.MultiValueMap;
 import org.apache.log4j.Logger;
 
 import java.awt.Component;
@@ -69,7 +67,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
     private int dividerLocation = 0;
 
     private final HashMap<String, String> attributeNames = new HashMap<>();
-    private final Multimap<MetaClass, String> attributesToDisplay = ArrayListMultimap.create();
+    private final MultiValueMap attributesToDisplay = new MultiValueMap();
 
     private final MyAttrToHideTableModel attrToHideTableModel = new MyAttrToHideTableModel();
     private final MyAttrToDisplayTableModel attrToDisplayTableModel = new MyAttrToDisplayTableModel();
@@ -658,7 +656,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
      * @param  defaultAttributeOrder  DOCUMENT ME!
      */
     public void setDefaultAttributeOrder(final MetaClass metaClass, final List<String> defaultAttributeOrder) {
-        attributesToDisplay.get(metaClass).clear();
+        attributesToDisplay.remove(metaClass);
         for (final String attributeToDisplay : defaultAttributeOrder) {
 //            if (attributeNames.containsKey(attributeToDisplay)) {
             attributesToDisplay.put(metaClass, attributeToDisplay);
@@ -710,7 +708,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
     public void setMetaClass(final MetaClass metaClass) {
         if (metaClass != null) {
             final List<MemberAttributeInfo> mais = QuerySearch.getAttributesFromClass(metaClass);
-            final boolean toDisplayIsEmpty = attributesToDisplay.get(metaClass).isEmpty();
+            final boolean toDisplayIsEmpty = !attributesToDisplay.containsKey(metaClass);
             for (final MemberAttributeInfo mai : mais) {
                 final String key = mai.getKey().toString();
                 if (attributeNames.get(key) == null) {
@@ -746,6 +744,14 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
     public List<CidsBean> getCidsBeans() {
         return tableModel.getCidsBeans();
     }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<String> getKeys() {
+        return (List<String>)attributesToDisplay.getCollection(getMetaClass());
+    }
 
     /**
      * DOCUMENT ME!
@@ -762,17 +768,19 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             final String selectedKey = attrToHideTableModel.getElementAt(selectedIndex);
             toAdd.add(selectedKey);
         }
-        attributesToDisplay.get(getMetaClass()).addAll(toAdd);
+        attributesToDisplay.putAll(getMetaClass(), toAdd);
 
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
 
-        if (firstIndex < tblToHide.getModel().getRowCount()) {
-            tblToHide.setRowSelectionInterval(firstIndex, firstIndex);
-            tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(firstIndex, 0, true)));
-        } else {
-            tblToHide.setRowSelectionInterval(firstIndex - 1, firstIndex - 1);
-            tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(firstIndex - 1, 0, true)));
+        if (firstIndex >= 0) {
+            if (firstIndex < tblToHide.getModel().getRowCount()) {
+                tblToHide.setRowSelectionInterval(firstIndex, firstIndex);
+                tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(firstIndex, 0, true)));
+            } else {
+                tblToHide.setRowSelectionInterval(firstIndex - 1, firstIndex - 1);
+                tblToHide.scrollRectToVisible(new Rectangle(tblToHide.getCellRect(firstIndex - 1, 0, true)));
+            }
         }
 
         tableModel.refresh();
@@ -785,15 +793,13 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
      */
     private void jButton5ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton5ActionPerformed
         int firstIndex = -1;
-        final Collection<String> toRemove = new ArrayList<>();
         for (final int selectedIndex : tblToDisplay.getSelectedRows()) {
             if (firstIndex < 0) {
                 firstIndex = selectedIndex;
             }
             final String selectedKey = attrToDisplayTableModel.getElementAt(selectedIndex);
-            toRemove.add(selectedKey);
+            attributesToDisplay.remove(getMetaClass(), selectedKey);
         }
-        attributesToDisplay.get(getMetaClass()).removeAll(toRemove);
 
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
@@ -803,7 +809,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             tblToDisplay.setRowSelectionInterval(firstIndex - 1, firstIndex - 1);
             tblToDisplay.scrollRectToVisible(new Rectangle(
                     tblToDisplay.getCellRect(tblToDisplay.getSelectedRow(), 0, true)));
-        } else {
+        } else if (firstIndex == 0) {
             tblToDisplay.setRowSelectionInterval(firstIndex, firstIndex);
             tblToDisplay.scrollRectToVisible(new Rectangle(tblToDisplay.getCellRect(firstIndex, 0, true)));
         }
@@ -826,7 +832,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void jButton6ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton6ActionPerformed
-        attributesToDisplay.get(getMetaClass()).addAll(attrToHideTableModel.getAllElements());
+        attributesToDisplay.putAll(getMetaClass(), attrToHideTableModel.getAllElements());
 
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
@@ -843,7 +849,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
      * @param  evt  DOCUMENT ME!
      */
     private void jButton9ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton9ActionPerformed
-        attributesToDisplay.get(getMetaClass()).removeAll(attrToDisplayTableModel.getAllElements());
+        attributesToDisplay.remove(getMetaClass());
         attrToHideTableModel.refresh();
         attrToDisplayTableModel.refresh();
 
@@ -963,8 +969,8 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
                         selectedIndex);
                 toMove.add(selectedKey);
             }
-            attributesToDisplay.get(getMetaClass()).removeAll(toMove);
-            attributesToDisplay.get(getMetaClass()).addAll(toMove);
+            attributesToDisplay.getCollection(getMetaClass()).removeAll(toMove);
+            attributesToDisplay.getCollection(getMetaClass()).addAll(toMove);
 
             attrToDisplayTableModel.refresh();
 
@@ -992,15 +998,6 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             jComboBox1.setSelectedItem(null);
         }
     }                                                                              //GEN-LAST:event_jComboBox1ActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Multimap<MetaClass, String> getAttributesToDisplay() {
-        return attributesToDisplay;
-    }
 
     /**
      * DOCUMENT ME!
@@ -1184,7 +1181,8 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
          */
         @Override
         public int getColumnCount() {
-            return getKeys().size();
+            final List keys = getKeys();
+            return (keys != null) ? keys.size() : 0;
         }
 
         /**
@@ -1324,7 +1322,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             if (cidsBean == null) {
                 return null;
             }
-            if ((columnIndex < 0) || (columnIndex >= getKeys().size())) {
+            if ((columnIndex < 0) || (columnIndex >= getColumnCount())) {
                 return null;
             }
 
@@ -1346,21 +1344,13 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
         /**
          * DOCUMENT ME!
          *
-         * @return  DOCUMENT ME!
-         */
-        private List<String> getKeys() {
-            return (List<String>)attributesToDisplay.get(metaClass);
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
          * @param   index  DOCUMENT ME!
          *
          * @return  DOCUMENT ME!
          */
         private String getKey(final int index) {
-            return getKeys().get(index);
+            final List keys = getKeys();
+            return (keys != null) ? getKeys().get(index) : null;
         }
 
         /**
@@ -1416,7 +1406,7 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
             if ((index < 0) || (index > getSize())) {
                 return null;
             }
-            return attributesToDisplay.get(getMetaClass()).toArray(new String[0])[index];
+            return (String)new ArrayList(attributesToDisplay.getCollection(getMetaClass())).get(index);
         }
 
         @Override
@@ -1439,7 +1429,8 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
          * @return  DOCUMENT ME!
          */
         public int getSize() {
-            return attributesToDisplay.get(getMetaClass()).size();
+            return attributesToDisplay.containsKey(getMetaClass())
+                ? attributesToDisplay.getCollection(getMetaClass()).size() : 0;
         }
 
         @Override
@@ -1489,7 +1480,9 @@ public class CidsBeansTableActionPanel extends javax.swing.JPanel {
                 for (final MemberAttributeInfo mais : QuerySearch.getAttributesFromClass(getMetaClass())) {
                     allElements.add(mais.getKey().toString());
                 }
-                allElements.removeAll(attributesToDisplay.get(getMetaClass()));
+                if (attributesToDisplay.containsKey(getMetaClass())) {
+                    allElements.removeAll(attributesToDisplay.getCollection(getMetaClass()));
+                }
                 return allElements;
             }
         }
