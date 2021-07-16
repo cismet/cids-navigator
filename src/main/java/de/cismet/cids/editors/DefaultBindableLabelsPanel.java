@@ -286,7 +286,9 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      * @param  elements  DOCUMENT ME!
      */
     public void setSelectedElements(final Object elements) {
-        if (elements instanceof List) {
+        if (elements == null) {
+            this.selectedElements = null;
+        } else if (elements instanceof List) {
             this.selectedElements = (List)elements;
         }
         if (isInitialized()) {
@@ -356,8 +358,12 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      */
     public void reload(final boolean forceReload) {
         clear();
-        panLabels.add(new JLabel(MESSAGE_LOADING_ITEM));
-        btnEdit.setEnabled(false);
+        if (panLabels != null) {
+            panLabels.add(new JLabel(MESSAGE_LOADING_ITEM));
+        }
+        if (btnEdit != null) {
+            btnEdit.setEnabled(false);
+        }
 
         new SwingWorker<List<CidsBean>, Void>() {
 
@@ -486,17 +492,22 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      * DOCUMENT ME!
      */
     public void dispose() {
+        setMetaClass(null);
     }
 
     @Override
     public void setEnabled(final boolean enabled) {
         super.setEnabled(enabled);
-        btnEdit.setEnabled(enabled);
-        for (final Component component : panToggles.getComponents()) {
-            if (component instanceof Toggle) {
-                final Toggle toggle = (Toggle)component;
-                toggle.setVisible(isEnabled() || toggle.isEnabled());
-                // toggle.setEnabled(isEnabled() && toggle.isEnabled());
+        if (btnEdit != null) {
+            btnEdit.setEnabled(enabled);
+        }
+        if (panToggles != null) {
+            for (final Component component : panToggles.getComponents()) {
+                if (component instanceof Toggle) {
+                    final Toggle toggle = (Toggle)component;
+                    toggle.setVisible(isEnabled() || toggle.isEnabled());
+                    // toggle.setEnabled(isEnabled() && toggle.isEnabled());
+                }
             }
         }
     }
@@ -700,7 +711,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnEditActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+    private void btnEditActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnEditActionPerformed
         if (isEnabled()) {
             jDialog1.setSize(getSize().width, jDialog1.getSize().height);
             final int x = btnEdit.getLocationOnScreen().x - jDialog1.getBounds().width + btnEdit.getBounds().width;
@@ -711,16 +722,16 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             jDialog1.setLocation(x + 2, y - 4);
             jDialog1.setVisible(true);
         }
-    }//GEN-LAST:event_btnEditActionPerformed
+    } //GEN-LAST:event_btnEditActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -744,7 +755,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnApplyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
+    private void btnApplyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnApplyActionPerformed
         final List old = (selectedElements != null) ? new ArrayList(selectedElements) : null;
         if (selectedElements == null) {
             selectedElements = new ArrayList();
@@ -768,37 +779,44 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
 //        propertyChangeSupport.firePropertyChange("selectedElement", null, cidsBean);
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_btnApplyActionPerformed
+    } //GEN-LAST:event_btnApplyActionPerformed
 
+    /**
+     * DOCUMENT ME!
+     */
     public void clear() {
-        panToggles.removeAll();
-        panLabels.removeAll();        
+        if (panToggles != null) {
+            panToggles.removeAll();
+        }
+        if (panLabels != null) {
+            panLabels.removeAll();
+        }
     }
-    
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void panLabelsMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panLabelsMouseClicked
-        btnEditActionPerformed(null);
-    }//GEN-LAST:event_panLabelsMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+    private void panLabelsMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_panLabelsMouseClicked
         btnEditActionPerformed(null);
-    }//GEN-LAST:event_formMouseClicked
+    }                                                                         //GEN-LAST:event_panLabelsMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void formMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_formMouseClicked
+        btnEditActionPerformed(null);
+    }                                                                    //GEN-LAST:event_formMouseClicked
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         try {
             final CidsBean newBean = createNewInstance();
             if (newBean != null) {
@@ -812,7 +830,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         } catch (final Exception ex) {
             LOG.error(ex, ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     //~ Inner Classes ----------------------------------------------------------
 
@@ -882,7 +900,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @version  $Revision$, $Date$
      */
-    private class Toggle extends JToggleButton implements ActionListener {
+    private class Toggle extends JToggleButton {
 
         //~ Instance fields ----------------------------------------------------
 
@@ -901,7 +919,13 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             setOpaque(false);
             setFocusPainted(false);
             setSelected(false);
-            addActionListener(this);
+            addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(final ActionEvent e) {
+                        rendererSelected();
+                    }
+                });
         }
 
         //~ Methods ------------------------------------------------------------
@@ -930,11 +954,6 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 //            } else {
 //                setBorder(new EmptyBorder(2, 5, 2, 5));
 //            }
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent e) {
-            rendererSelected();
         }
     }
 }
