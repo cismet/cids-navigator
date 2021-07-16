@@ -11,7 +11,7 @@
  */
 package de.cismet.cids.editors;
 
-import Sirius.server.middleware.types.LightweightMetaObject;
+import Sirius.server.middleware.types.MetaObject;
 
 import org.apache.log4j.Logger;
 
@@ -45,8 +45,8 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
 
     //~ Instance fields --------------------------------------------------------
 
-    private List<List> data;
-    private int lastIndex = -1;
+    private final boolean selfStructuring;
+    private String splitBy = " - ";
 
     //~ Constructors -----------------------------------------------------------
 
@@ -54,7 +54,17 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
      * Creates a new CategorisedFastBindableReferenceCombo object.
      */
     public CategorisedFastBindableReferenceCombo() {
+        this(true);
+    }
+
+    /**
+     * Creates a new CategorisedFastBindableReferenceCombo object.
+     *
+     * @param  selfStructuring  DOCUMENT ME!
+     */
+    public CategorisedFastBindableReferenceCombo(final boolean selfStructuring) {
         super();
+        this.selfStructuring = selfStructuring;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -71,26 +81,61 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
     }
 
     @Override
-    protected void init() {
-        try {
-            final DefaultComboBoxModel mod = new DefaultComboBoxModel(createModelData());
-            setModel(mod);
-            setSelectedItem(cidsBean);
-        } catch (Exception ex) {
-            LOG.error(ex, ex);
+    public DefaultComboBoxModel createModelForMetaClass(final boolean nullable) throws Exception {
+        if (selfStructuring) {
+            final MetaObjectComboBoxModel origMod = (MetaObjectComboBoxModel)super.createModelForMetaClass(nullable);
+            if (origMod == null) {
+                return null;
+            }
+
+            final List<List> data = new ArrayList<>();
+
+            int maxElements = 0;
+
+            // determine the max number of sub categories
+            for (int moIndex = 0; moIndex <= origMod.getSize(); moIndex++) {
+                final MetaObject mo = (MetaObject)origMod.getElementAt(moIndex);
+                if (mo != null) {
+                    if (mo.toString().split(splitBy).length > maxElements) {
+                        maxElements = mo.toString().split(splitBy).length - 1;
+                    }
+                }
+            }
+
+            for (int moIndex = 0; moIndex <= origMod.getSize(); moIndex++) {
+                final MetaObject mo = (MetaObject)origMod.getElementAt(moIndex);
+                if (mo != null) {
+                    final String[] splitted = mo.toString().split(splitBy);
+                    final List sub = new ArrayList(maxElements);
+                    for (int splitIndex = 0; splitIndex < maxElements; splitIndex++) {
+                        sub.add((splitIndex < (splitted.length - 1)) ? splitted[splitIndex] : null);
+                    }
+
+                    sub.add(mo);
+                    data.add(sub);
+                }
+            }
+            return new DefaultComboBoxModel(createModelData(data));
+        } else {
+            return (DefaultComboBoxModel)getModel();
         }
     }
 
     /**
-     * Initialises the Combobox with the LightweightMetaObjects and the categories. The given list should contain lists
-     * with the categories at the beginning and the LightweightMetaObject as the last element.
+     * DOCUMENT ME!
+     *
+     * @param  splitBy  DOCUMENT ME!
+     */
+    public void setSplitBy(final String splitBy) {
+        this.splitBy = splitBy;
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  data  DOCUMENT ME!
      */
-    public void init(final List<List> data) {
-        this.data = data;
-        sortData();
-
+    private void initRenderer(final List<List> data) {
         // show the categories
         setRenderer(new DefaultListCellRenderer() {
 
@@ -102,8 +147,8 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                         final boolean cellHasFocus) {
                     boolean isSel = isCategory(value) ? false : isSelected;
 
-                    if ((value instanceof LightweightMetaObject) && (cidsBean != null)) {
-                        isSel = (((LightweightMetaObject)value).getBean().equals(cidsBean) ? true : isSel);
+                    if ((value instanceof MetaObject) && (cidsBean != null)) {
+                        isSel = (((MetaObject)value).getBean().equals(cidsBean) ? true : isSel);
                     }
                     final Component ret = super.getListCellRendererComponent(
                             list,
@@ -111,15 +156,16 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                             index,
                             isSel,
                             cellHasFocus);
+                    final String text;
                     if (value == null) {
-                        ((JLabel)ret).setText(getNullValueRepresentation());
+                        text = getNullValueRepresentation();
+                    } else {
+                        final int lastIndex = value.toString().lastIndexOf(splitBy);
+                        final String name = (lastIndex < 0) ? value.toString()
+                                                            : value.toString().substring(lastIndex + splitBy.length());
+                        text = spaces(getCategoryLevel(value)) + name;
                     }
-
-                    if (value instanceof LightweightMetaObject) {
-                        ((JLabel)ret).setText(((LightweightMetaObject)value).getName());
-                    }
-                    ((JLabel)ret).setText(spaces(getCategoryLevel(value)) + ((JLabel)ret).getText());
-
+                    ((JLabel)ret).setText(text);
                     if (isCategory(value)) {
                         final JLabel label = (JLabel)ret;
                         final Font boldLabelFont = new Font(
@@ -150,7 +196,8 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                     if (isCategory(value)) {
                         for (final List tmp : data) {
                             for (int i = 0; i < (tmp.size() - 1); ++i) {
-                                if (tmp.get(i).equals(value)) {
+                                final Object o = tmp.get(i);
+                                if ((o != null) && o.equals(value)) {
                                     return i;
                                 }
                             }
@@ -174,6 +221,8 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
 
         // prevent the selection of a category
         addItemListener(new ItemListener() {
+
+                private int lastIndex = -1;
 
                 @Override
                 public void itemStateChanged(final ItemEvent e) {
@@ -205,7 +254,7 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                     if (isCategory(value)) {
                         for (final List tmp : data) {
                             for (int i = 0; i < (tmp.size() - 1); ++i) {
-                                if (tmp.get(i).equals(value)) {
+                                if ((tmp.get(i) != null) && tmp.get(i).equals(value)) {
                                     if (rev && (lastObject != null)) {
                                         return lastObject;
                                     } else {
@@ -220,8 +269,24 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                     return null;
                 }
             });
+    }
 
-        init();
+    /**
+     * Initialises the Combobox with the LightweightMetaObjects and the categories. The given list should contain lists
+     * with the categories at the beginning and the LightweightMetaObject as the last element.
+     *
+     * @param  data  DOCUMENT ME!
+     */
+    public void init(final List<List> data) {
+        sortData(data);
+
+        try {
+            final DefaultComboBoxModel mod = new DefaultComboBoxModel(createModelData(data));
+            setModel(mod);
+            setSelectedItem(cidsBean);
+        } catch (Exception ex) {
+            LOG.error(ex, ex);
+        }
     }
 
     @Override
@@ -232,11 +297,13 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
     /**
      * DOCUMENT ME!
      *
+     * @param   data  DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
-    private Object[] createModelData() {
-        final List<String> categories = new ArrayList<String>();
-        final List<Object> dataArray = new ArrayList<Object>();
+    private Object[] createModelData(final List<List> data) {
+        final List<String> categories = new ArrayList<>();
+        final List<Object> dataArray = new ArrayList<>();
 
         if (isNullable()) {
             dataArray.add(null);
@@ -246,7 +313,7 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
             for (int n = 0; n < (data.get(i).size() - 1); ++n) {
                 final String category = (String)data.get(i).get(n);
 
-                if ((category != "") && !categories.contains(category)) {
+                if ((category != null) && !category.isEmpty() && !categories.contains(category)) {
                     dataArray.add(category);
                     categories.add(category);
                 }
@@ -254,13 +321,18 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
             dataArray.add(data.get(i).get(data.get(i).size() - 1));
         }
 
+        initRenderer(data);
         return dataArray.toArray(new Object[dataArray.size()]);
     }
 
     /**
      * DOCUMENT ME!
+     *
+     * @param   data  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
      */
-    private void sortData() {
+    private List sortData(final List data) {
         Collections.sort(data, new Comparator<List>() {
 
                 @Override
@@ -279,5 +351,6 @@ public class CategorisedFastBindableReferenceCombo extends FastBindableReference
                     return 0;
                 }
             });
+        return data;
     }
 }
