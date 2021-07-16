@@ -417,9 +417,11 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             cidsBeans.sort(comparator);
         }
 
-        for (final CidsBean cidsBean : cidsBeans) {
-            final Toggle toggle = new Toggle(cidsBean);
-            panToggles.add(toggle);
+        if (panToggles != null) {
+            for (final CidsBean cidsBean : cidsBeans) {
+                final Toggle toggle = new Toggle(cidsBean);
+                panToggles.add(toggle);
+            }
         }
 
         refreshSelectedElements();
@@ -437,30 +439,32 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      * DOCUMENT ME!
      */
     private void refreshSelectedElements() {
-        panLabels.removeAll();
-        if (selectedElements != null) {
-            for (final Component component : panToggles.getComponents()) {
-                if (component instanceof Toggle) {
-                    final Toggle toggle = (Toggle)component;
-                    final CidsBean cidsBean = toggle.getCidsBean();
-                    if (selectedElements.contains(cidsBean)) {
-                        toggle.setSelected(true);
-                        panLabels.add(new JLabel(cidsBean.toString()));
-                        panLabels.add(new JLabel(", "));
-                    } else {
-                        toggle.setSelected(false);
+        if (panLabels != null) {
+            panLabels.removeAll();
+            if (selectedElements != null) {
+                for (final Component component : panToggles.getComponents()) {
+                    if (component instanceof Toggle) {
+                        final Toggle toggle = (Toggle)component;
+                        final CidsBean cidsBean = toggle.getCidsBean();
+                        if (selectedElements.contains(cidsBean)) {
+                            toggle.setSelected(true);
+                            panLabels.add(new JLabel(cidsBean.toString()));
+                            panLabels.add(new JLabel(", "));
+                        } else {
+                            toggle.setSelected(false);
+                        }
                     }
                 }
+                final int compCount = panLabels.getComponentCount();
+                if (compCount > 0) {
+                    panLabels.remove(compCount - 1);
+                } else {
+                    panLabels.add(new JLabel("-"));
+                }
             }
-            final int compCount = panLabels.getComponentCount();
-            if (compCount > 0) {
-                panLabels.remove(compCount - 1);
-            } else {
-                panLabels.add(new JLabel("-"));
-            }
+            revalidate();
+            repaint();
         }
-        revalidate();
-        repaint();
     }
 
     /**

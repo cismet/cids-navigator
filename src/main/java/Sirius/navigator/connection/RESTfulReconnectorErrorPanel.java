@@ -28,11 +28,7 @@
  */
 package Sirius.navigator.connection;
 
-import Sirius.navigator.Navigator;
-
-import com.google.common.io.Files;
-
-import org.openide.util.Exceptions;
+import org.apache.commons.io.FileUtils;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -507,11 +503,11 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         fileChooser.setFileFilter(derFileFilter);
         final int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            final File fileToLoad = fileChooser.getSelectedFile();
             try {
-                Files.copy(fileToLoad, new File(DefaultSSLConfigProvider.CIDS_DIR + FILE_SEP + SERVER_CERT_FILE_NAME));
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+                FileUtils.copyFile(fileChooser.getSelectedFile(),
+                    new File(DefaultSSLConfigProvider.CIDS_DIR + FILE_SEP + SERVER_CERT_FILE_NAME));
+            } catch (final IOException ex) {
+                LOG.error(ex, ex);
             }
             checkGUIState();
         }
@@ -526,13 +522,12 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         fileChooser.setFileFilter(keystoreFileFilter);
         final int returnVal = fileChooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
-            final File fileToLoad = fileChooser.getSelectedFile();
             try {
-                Files.copy(
-                    fileToLoad,
+                FileUtils.copyFile(
+                    fileChooser.getSelectedFile(),
                     new File(DefaultSSLConfigProvider.CIDS_DIR + FILE_SEP + CLIENT_CERT_KEYSTORE_FILE_NAME));
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
+            } catch (final IOException ex) {
+                LOG.error(ex, ex);
             }
             checkGUIState();
         }

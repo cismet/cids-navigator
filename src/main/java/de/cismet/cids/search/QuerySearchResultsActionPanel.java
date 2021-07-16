@@ -22,7 +22,6 @@ import java.beans.PropertyChangeListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -378,8 +377,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel implements
     @Override
     public HashMap<String, String> getAttributeNames() {
         final HashMap<String, String> attributeNamesToExport = new HashMap<>();
-        for (final String attributeKey
-                    : (Collection<String>)actionsPanel.getAttributesToDisplay().get(getMetaClass())) {
+        for (final String attributeKey : actionsPanel.getKeys()) {
             attributeNamesToExport.put(attributeKey, actionsPanel.getAttributeNames().get(attributeKey));
         }
         return attributeNamesToExport;
@@ -387,7 +385,7 @@ public class QuerySearchResultsActionPanel extends javax.swing.JPanel implements
 
     @Override
     public List<String> getAttributeKeys() {
-        return (List)actionsPanel.getAttributesToDisplay().get(getMetaClass());
+        return (List)actionsPanel.getKeys();
     }
 
     @Override
