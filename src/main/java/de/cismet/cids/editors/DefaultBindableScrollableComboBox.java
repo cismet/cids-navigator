@@ -135,4 +135,9 @@ public class DefaultBindableScrollableComboBox extends DefaultBindableReferenceC
                 }
             };
     }
+
+    @Override
+    protected ComboBoxUI createEditorUI() {
+        return (ComboBoxUI)ScrollableComboUI.createUI(null);
+    }
 }
