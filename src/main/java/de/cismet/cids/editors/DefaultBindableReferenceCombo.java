@@ -23,6 +23,7 @@ import Sirius.server.middleware.types.MetaObject;
 import com.jgoodies.looks.plastic.PlasticComboBoxUI;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +37,10 @@ import org.openide.util.WeakListeners;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.EventQueue;
+import java.awt.Font;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import java.io.Serializable;
 
@@ -45,6 +50,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JButton;
@@ -116,6 +122,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     @Getter @Setter private boolean alwaysReload;
     @Getter @Setter private String sortingColumn;
     @Getter @Setter private Comparator<CidsBean> comparator;
+    @Getter @Setter private boolean categorised;
+    @Getter @Setter private String categorySplitBy;
+    @Getter @Setter private boolean categorySelfStructuring;
 
     private boolean actingAsRenderer;
 
@@ -175,6 +184,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         boolean alwaysReload = false;
         String sortingColumn = null;
         Comparator<CidsBean> comparator = BEAN_TOSTRING_COMPARATOR;
+        boolean categorised = false;
+        boolean categorySelfstructuring = true;
+        String categorySplitBy = " - ";
 
         if (options != null) {
             for (final Option option : options) {
@@ -211,6 +223,11 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                         comparator = ((ComparatorOption)option).getComparator();
                     } else if (option.getClass().equals(SortingColumnOption.class)) {
                         sortingColumn = ((SortingColumnOption)option).getColumn();
+                    } else if (option.getClass().equals(CategorisedOption.class)) {
+                        categorised = true;
+                        categorySelfstructuring = !Boolean.FALSE.equals(((CategorisedOption)option)
+                                        .getSelfStructuring());
+                        categorySplitBy = ((CategorisedOption)option).getSplitBy();
                     }
                 }
             }
@@ -237,6 +254,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         setAlwaysReload(alwaysReload);
         setSortingColumn(sortingColumn);
         setComparator(comparator);
+        setCategorised(categorised);
+        setCategorySelfStructuring(categorySelfstructuring);
+        setCategorySplitBy(categorySplitBy);
 
         // refresh is also happening here !
         setMetaClass(metaClass);
@@ -297,6 +317,185 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
+     * @param   value  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isCategory(final Object value) {
+        return value instanceof String;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   o  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int getIndexOf(final Object o) {
+        final ComboBoxModel m = getModel();
+        if (m instanceof DefaultComboBoxModel) {
+            if ((o instanceof CidsBean) && (((DefaultComboBoxModel)m).getIndexOf(o) == -1)) {
+                return ((DefaultComboBoxModel)m).getIndexOf(((CidsBean)o).getMetaObject());
+            } else {
+                return ((DefaultComboBoxModel)m).getIndexOf(o);
+            }
+        } else if (m != null) {
+            for (int i = 0; i < m.getSize(); ++i) {
+                final Object cur = m.getElementAt(i);
+                if ((o == cur) || ((cur != null) && cur.equals(o))) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  data  DOCUMENT ME!
+     */
+    private void initCategorisedRenderer(final List<List> data) {
+        // show the categories
+        setRenderer(new DefaultListCellRenderer() {
+
+                @Override
+                public Component getListCellRendererComponent(final JList list,
+                        final Object value,
+                        final int index,
+                        final boolean isSelected,
+                        final boolean cellHasFocus) {
+                    boolean isSel = isCategory(value) ? false : isSelected;
+
+                    if ((value instanceof MetaObject) && (cidsBean != null)) {
+                        isSel = (((MetaObject)value).getBean().equals(cidsBean) ? true : isSel);
+                    }
+                    final Component ret = super.getListCellRendererComponent(
+                            list,
+                            value,
+                            index,
+                            isSel,
+                            cellHasFocus);
+                    final String text;
+                    if (value == null) {
+                        text = getNullValueRepresentation();
+                    } else {
+                        final int lastIndex = (value.toString() != null)
+                            ? value.toString().lastIndexOf(getCategorySplitBy()) : -1;
+                        final String name = (lastIndex < 0)
+                            ? value.toString() : value.toString().substring(lastIndex + getCategorySplitBy().length());
+                        text = spaces(getCategoryLevel(value)) + name;
+                    }
+                    ((JLabel)ret).setText(text);
+                    if (isCategory(value)) {
+                        final JLabel label = (JLabel)ret;
+                        final Font boldLabelFont = new Font(
+                                label.getFont().getName(),
+                                Font.BOLD,
+                                label.getFont().getSize());
+
+                        label.setFont(boldLabelFont);
+                    }
+
+                    return ret;
+                }
+
+                private String spaces(final int i) {
+                    if (i == 0) {
+                        return "";
+                    }
+                    final StringBuffer spaces = new StringBuffer(i * 2);
+
+                    for (int n = 0; n < i; ++n) {
+                        spaces.append("  ");
+                    }
+
+                    return spaces.toString();
+                }
+
+                private int getCategoryLevel(final Object value) {
+                    if (isCategory(value)) {
+                        for (final List tmp : data) {
+                            for (int i = 0; i < (tmp.size() - 1); ++i) {
+                                final Object o = tmp.get(i);
+                                if ((o != null) && o.equals(value)) {
+                                    return i;
+                                }
+                            }
+                        }
+                    } else {
+                        for (final List tmp : data) {
+                            if (tmp.get(tmp.size() - 1).equals(value)) {
+                                for (int i = 0; i < tmp.size(); ++i) {
+                                    if (tmp.get(i) == null) {
+                                        return i;
+                                    }
+                                }
+                                return tmp.size();
+                            }
+                        }
+                    }
+
+                    return 0;
+                }
+            });
+
+        // prevent the selection of a category
+        addItemListener(new ItemListener() {
+
+                private int lastIndex = -1;
+
+                @Override
+                public void itemStateChanged(final ItemEvent e) {
+                    if (e.getStateChange() == ItemEvent.DESELECTED) {
+                        lastIndex = getIndexOf(e.getItem());
+                    } else if (e.getStateChange() == ItemEvent.SELECTED) {
+                        if (isCategory(e.getItem())) {
+                            final int index = DefaultBindableReferenceCombo.this.getIndexOf(e.getItem());
+                            final Object nextSelection = getNextItem(
+                                    e.getItem(),
+                                    ((lastIndex != -1) && (lastIndex > index)));
+
+                            if (nextSelection != null) {
+                                EventQueue.invokeLater(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            setSelectedItem(nextSelection);
+                                        }
+                                    });
+                            }
+                        }
+                    }
+                }
+
+                private Object getNextItem(final Object value, final boolean rev) {
+                    Object lastObject = null;
+
+                    if (isCategory(value)) {
+                        for (final List tmp : data) {
+                            for (int i = 0; i < (tmp.size() - 1); ++i) {
+                                if ((tmp.get(i) != null) && tmp.get(i).equals(value)) {
+                                    if (rev && (lastObject != null)) {
+                                        return lastObject;
+                                    } else {
+                                        return tmp.get(tmp.size() - 1);
+                                    }
+                                }
+                            }
+                            lastObject = tmp.get(tmp.size() - 1);
+                        }
+                    }
+
+                    return null;
+                }
+            });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     public boolean isExplicitlyEnabledOrDisabled() {
@@ -321,6 +520,37 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     /**
      * DOCUMENT ME!
      *
+     * @param   data  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Object[] createCategorisedModelData(final List<List> data) {
+        final List<String> categories = new ArrayList<>();
+        final List<Object> dataArray = new ArrayList<>();
+
+        if (isNullable()) {
+            dataArray.add(null);
+        }
+
+        for (int i = 0; i < data.size(); ++i) {
+            for (int n = 0; n < (data.get(i).size() - 1); ++n) {
+                final String category = (String)data.get(i).get(n);
+
+                if ((category != null) && !category.isEmpty() && !categories.contains(category)) {
+                    dataArray.add(category);
+                    categories.add(category);
+                }
+            }
+            dataArray.add(data.get(i).get(data.get(i).size() - 1));
+        }
+
+        initCategorisedRenderer(data);
+        return dataArray.toArray(new Object[dataArray.size()]);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param  forceReload  DOCUMENT ME!
      */
     public void reload(final boolean forceReload) {
@@ -331,7 +561,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                     @Override
                     protected DefaultComboBoxModel doInBackground() throws Exception {
                         Thread.currentThread().setName("DefaultBindableReferenceCombo init()");
-                        return getModelByMetaClass(
+                        final DefaultComboBoxModel model = getModelByMetaClass(
                                 metaClass,
                                 isNullable() ? new NullableItem(getNullValueRepresentation()) : null,
                                 isManageable() ? new ManageableItem(getManageableItemRepresentation()) : null,
@@ -340,6 +570,43 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                                 getComparator(),
                                 forceReload,
                                 getConnectionContext());
+
+                        if (isCategorised()) {
+                            if (model == null) {
+                                return null;
+                            }
+
+                            final List<List> data = new ArrayList<>();
+
+                            int maxElements = 0;
+
+                            // determine the max number of sub categories
+                            for (int moIndex = 0; moIndex <= model.getSize(); moIndex++) {
+                                final CidsBean bean = (CidsBean)model.getElementAt(moIndex);
+                                if (bean != null) {
+                                    if (bean.toString().split(getCategorySplitBy()).length > maxElements) {
+                                        maxElements = bean.toString().split(getCategorySplitBy()).length - 1;
+                                    }
+                                }
+                            }
+
+                            for (int moIndex = 0; moIndex <= model.getSize(); moIndex++) {
+                                final CidsBean bean = (CidsBean)model.getElementAt(moIndex);
+                                if (bean != null) {
+                                    final String[] splitted = bean.toString().split(getCategorySplitBy());
+                                    final List sub = new ArrayList(maxElements);
+                                    for (int splitIndex = 0; splitIndex < maxElements; splitIndex++) {
+                                        sub.add((splitIndex < (splitted.length - 1)) ? splitted[splitIndex] : null);
+                                    }
+
+                                    sub.add(bean);
+                                    data.add(sub);
+                                }
+                            }
+                            return new DefaultComboBoxModel(createCategorisedModelData(data));
+                        } else {
+                            return model;
+                        }
                     }
 
                     @Override
@@ -543,15 +810,6 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
     @Override
     public Object getErrorSourceValue() {
         return null;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private String createQuery() {
-        return createQuery(getMetaClass(), getSortingColumn(), getWhere());
     }
 
     /**
@@ -924,33 +1182,13 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class MetaClassOption extends Option {
 
         //~ Instance fields ----------------------------------------------------
 
         private final MetaClass metaClass;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new MetaClassOption object.
-         *
-         * @param  metaClass  DOCUMENT ME!
-         */
-        public MetaClassOption(final MetaClass metaClass) {
-            this.metaClass = metaClass;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public MetaClass getMetaClass() {
-            return metaClass;
-        }
     }
 
     /**
@@ -959,6 +1197,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      * @version  $Revision$, $Date$
      */
     @Getter
+    @AllArgsConstructor
     public static class NullableOption extends Option {
 
         //~ Instance fields ----------------------------------------------------
@@ -972,7 +1211,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
          * Creates a new NullableOption object.
          */
         public NullableOption() {
-            this(null);
+            this(null, null);
         }
 
         /**
@@ -983,23 +1222,14 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         public NullableOption(final String representation) {
             this(representation, representation);
         }
-
-        /**
-         * Creates a new NullableOption object.
-         *
-         * @param  representationinEditor    DOCUMENT ME!
-         * @param  representationInRenderer  DOCUMENT ME!
-         */
-        public NullableOption(final String representationinEditor, final String representationInRenderer) {
-            this.representationinEditor = representationinEditor;
-            this.representationInRenderer = representationInRenderer;
-        }
     }
     /**
      * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class ManageableOption extends Option {
 
         //~ Instance fields ----------------------------------------------------
@@ -1024,37 +1254,6 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
         public ManageableOption(final String property) {
             this(property, null);
         }
-
-        /**
-         * Creates a new ManageableOption object.
-         *
-         * @param  property        DOCUMENT ME!
-         * @param  representation  DOCUMENT ME!
-         */
-        public ManageableOption(final String property, final String representation) {
-            this.property = property;
-            this.representation = representation;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getProperty() {
-            return property;
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getRepresentation() {
-            return representation;
-        }
     }
 
     /**
@@ -1062,6 +1261,8 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class AlwaysReloadOption extends Option {
     }
 
@@ -1070,6 +1271,8 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class FakeModelOption extends Option {
     }
 
@@ -1078,101 +1281,76 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class WhereOption extends Option {
 
         //~ Instance fields ----------------------------------------------------
 
         private final String where;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new WhereOption object.
-         *
-         * @param  where  DOCUMENT ME!
-         */
-        public WhereOption(final String where) {
-            this.where = where;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getWhere() {
-            return where;
-        }
     }
     /**
      * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class ComparatorOption extends Option {
 
         //~ Instance fields ----------------------------------------------------
 
         private final Comparator<CidsBean> comparator;
-
-        //~ Constructors -------------------------------------------------------
-
-        /**
-         * Creates a new ComparatorOption object.
-         *
-         * @param  comparator  DOCUMENT ME!
-         */
-        public ComparatorOption(final Comparator<CidsBean> comparator) {
-            this.comparator = comparator;
-        }
-
-        //~ Methods ------------------------------------------------------------
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public Comparator<CidsBean> getComparator() {
-            return comparator;
-        }
     }
+
     /**
      * DOCUMENT ME!
      *
      * @version  $Revision$, $Date$
      */
+    @Getter
+    @AllArgsConstructor
     public static class SortingColumnOption extends Option {
 
         //~ Instance fields ----------------------------------------------------
 
         private final String column;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    @Getter
+    @AllArgsConstructor
+    public static class CategorisedOption extends Option {
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String splitBy;
+        private final Boolean selfStructuring;
 
         //~ Constructors -------------------------------------------------------
 
         /**
-         * Creates a new SortingColumnOption object.
+         * Creates a new CategorisedOption object.
          *
-         * @param  column  DOCUMENT ME!
+         * @param  splitBy  DOCUMENT ME!
          */
-        public SortingColumnOption(final String column) {
-            this.column = column;
+        public CategorisedOption(final String splitBy) {
+            this(splitBy, null);
         }
-
-        //~ Methods ------------------------------------------------------------
 
         /**
-         * DOCUMENT ME!
+         * Creates a new CategorisedOption object.
          *
-         * @return  DOCUMENT ME!
+         * @param  selfStructuring  DOCUMENT ME!
          */
-        public String getColumn() {
-            return column;
+        public CategorisedOption(final Boolean selfStructuring) {
+            this(null, selfStructuring);
         }
     }
-
     /**
      * DOCUMENT ME!
      *
