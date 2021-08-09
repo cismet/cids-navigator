@@ -582,8 +582,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
                             // determine the max number of sub categories
                             for (int moIndex = 0; moIndex <= model.getSize(); moIndex++) {
-                                final CidsBean bean = (CidsBean)model.getElementAt(moIndex);
-                                if (bean != null) {
+                                final Object element = model.getElementAt(moIndex);
+                                if (element instanceof CidsBean) {
+                                    final CidsBean bean = (CidsBean)element;
                                     if (bean.toString().split(getCategorySplitBy()).length > maxElements) {
                                         maxElements = bean.toString().split(getCategorySplitBy()).length - 1;
                                     }
@@ -591,8 +592,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                             }
 
                             for (int moIndex = 0; moIndex <= model.getSize(); moIndex++) {
-                                final CidsBean bean = (CidsBean)model.getElementAt(moIndex);
-                                if (bean != null) {
+                                final Object element = model.getElementAt(moIndex);
+                                if (element instanceof CidsBean) {
+                                    final CidsBean bean = (CidsBean)element;
                                     final String[] splitted = bean.toString().split(getCategorySplitBy());
                                     final List sub = new ArrayList(maxElements);
                                     for (int splitIndex = 0; splitIndex < maxElements; splitIndex++) {
