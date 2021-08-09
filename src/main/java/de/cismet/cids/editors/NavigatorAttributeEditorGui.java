@@ -37,6 +37,7 @@ import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -50,8 +51,10 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 import de.cismet.cids.dynamics.CidsBean;
 import de.cismet.cids.dynamics.DisposableCidsBeanStore;
@@ -91,15 +94,26 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
     private JComponent editorComponent = null;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnClose;
+    private javax.swing.JButton btnDisardAndClose;
+    private javax.swing.JButton btnSaveAndClose;
+    private javax.swing.JButton btnSaveAndContinue;
     private javax.swing.JButton cancelButton;
     private javax.swing.JButton commitButton;
     private javax.swing.JPanel controlBar;
     private javax.swing.JButton copyButton;
     private javax.swing.JScrollPane editorScrollPane;
     private javax.swing.JButton jButton1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblCloseQuestion;
     private javax.swing.JLabel lblEditorCreation;
+    private javax.swing.JLabel lblSaveQuestion;
+    private javax.swing.JLabel lblSaving;
     private javax.swing.JPanel panDebug;
     private javax.swing.JButton pasteButton;
+    private javax.swing.JDialog saveAndCloseDialog;
     private javax.swing.JScrollPane scpEditor;
     private javax.swing.JPanel switchPanel;
     // End of variables declaration//GEN-END:variables
@@ -133,6 +147,15 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
 
                 @Override
                 public void actionPerformed(final ActionEvent e) {
+                    boolean useNewSaveAndCloseDialog = false;
+                    try {
+                        useNewSaveAndCloseDialog = SessionManager.getProxy()
+                                    .getConfigAttr(
+                                            SessionManager.getSession().getUser(),
+                                            "navigator.saveAndCloseDialog.enabled",
+                                            getConnectionContext()) != null;
+                    } catch (final Exception ex) {
+                    }
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
                                         || editorObject.isChanged()))
@@ -140,25 +163,32 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                         if (CidsBean.checkWritePermission(
                                         SessionManager.getSession().getUser(),
                                         editorObject.getBean())) {
-                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
-                                final int answer = JOptionPane.showConfirmDialog(
-                                        NavigatorAttributeEditorGui.this,
-                                        org.openide.util.NbBundle.getMessage(
-                                            NavigatorAttributeEditorGui.class,
-                                            "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), // NOI18N
-                                        org.openide.util.NbBundle.getMessage(
-                                            NavigatorAttributeEditorGui.class,
-                                            "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"), // NOI18N
-                                        JOptionPane.YES_NO_CANCEL_OPTION);
-                                if (answer == JOptionPane.YES_OPTION) {
-                                    saveIt();
-                                } else if (answer == JOptionPane.CANCEL_OPTION) {
-                                } else {
-                                    reloadFromDB();
-                                    clear();
-                                }
+                            if (useNewSaveAndCloseDialog) {
+                                showSaveAndCloseDialog(
+                                    ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0)
+                                            || (currentBeanStore instanceof EditorSaveWithoutCloseListener),
+                                    true);
                             } else {
-                                saveIt(false);
+                                if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                                    final int answer = JOptionPane.showConfirmDialog(
+                                            NavigatorAttributeEditorGui.this,
+                                            org.openide.util.NbBundle.getMessage(
+                                                NavigatorAttributeEditorGui.class,
+                                                "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.message"), // NOI18N
+                                            org.openide.util.NbBundle.getMessage(
+                                                NavigatorAttributeEditorGui.class,
+                                                "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"), // NOI18N
+                                            JOptionPane.YES_NO_CANCEL_OPTION);
+                                    if (answer == JOptionPane.YES_OPTION) {
+                                        saveIt();
+                                    } else if (answer == JOptionPane.CANCEL_OPTION) {
+                                    } else {
+                                        reloadFromDB();
+                                        clear();
+                                    }
+                                } else {
+                                    saveIt(false);
+                                }
                             }
                         } else {
                             JOptionPane.showMessageDialog(
@@ -173,8 +203,16 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                             return;
                         }
                     } else {
-                        if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
-                            clear();
+                        if (useNewSaveAndCloseDialog) {
+                            if (currentBeanStore instanceof EditorSaveWithoutCloseListener) {
+                                showSaveAndCloseDialog(useNewSaveAndCloseDialog, false);
+                            } else {
+                                clear();
+                            }
+                        } else {
+                            if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
+                                clear();
+                            }
                         }
                     }
                 }
@@ -423,6 +461,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
         try {
             final CidsBean savedInstance = oldBean.persist(getConnectionContext());
             ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
+            if (currentBeanStore instanceof EditorSaveWithoutCloseListener) {
+                ((EditorSaveWithoutCloseListener)currentBeanStore).editorSaved(new EditorSavedEvent(
+                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
+                        savedInstance));
+            }
             if (closeEditor) {
                 final JOptionPane jop = new JOptionPane(
                         org.openide.util.NbBundle.getMessage(
@@ -436,6 +479,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                             NavigatorAttributeEditorGui.class,
                             "NavigatorAttributeEditorGui.saveIt().dialog.title")); // NOI18N
 
+                saveAndCloseDialog.setVisible(false);
                 final Timer t = new Timer(2000, new ActionListener() {
 
                             @Override
@@ -449,22 +493,25 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                 StaticSwingTools.showDialog(dialog);
                 clear();
             } else {
-//                final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
-//                final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
+                // final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
+                // final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
                 editorObject = savedInstance.getMetaObject();
                 createBackup(editorObject);
-                // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener propertyChangeListener = new
-                // PropertyChangeListener() {
+                // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener
+                // propertyChangeListener = new PropertyChangeListener() {
                 //
-                // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint(); tree.repaint();
+                // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint();
+                // tree.repaint();
                 //
                 // } }; if (currentBeanStore instanceof JComponent) { strongReferenceOnWeakListener =
-                // propertyChangeListener; } else { log.error("A CidsBeansStore must be instanceof JComponent here,
-                // but it was " + currentBeanStore + "!"); }
-                // bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener, bean)); ---
-                // editorObject.getBean().addPropertyChangeListener(new PropertyChangeListener() {
+                // propertyChangeListener; } else { log.error("A CidsBeansStore must be instanceof
+                // JComponent here, but it was " + currentBeanStore + "!"); }
+                // bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener,
+                // bean)); --- editorObject.getBean().addPropertyChangeListener(new
+                // PropertyChangeListener() {
                 //
-                // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint(); tree.repaint();
+                // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint();
+                // tree.repaint();
                 //
                 // } });
                 currentBeanStore.setCidsBean(savedInstance);
@@ -482,7 +529,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
             executeAfterSuccessfullSave(savedInstance);
         } catch (Exception ex) {
             if (editorSaveListener != null) {
-                editorSaveListener.editorClosed(new EditorClosedEvent(EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
+                editorSaveListener.editorClosed(new EditorClosedEvent(
+                        EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
             }
             final Throwable firstCause = getFirstCause(ex);
             log.error("Error while saving", ex); // NOI18N
@@ -538,7 +586,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                                 "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"), // NOI18N
                             JOptionPane.YES_NO_CANCEL_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
-                        saveIt();
+                        saveIt(true);
                     } else if (answer == JOptionPane.NO_OPTION) {
                         reloadFromDB();
                     } else {                                                                      // Cancel
@@ -767,12 +815,23 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        final java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         final javax.swing.JToggleButton pinButton = new javax.swing.JToggleButton();
         final javax.swing.JToggleButton editButton = new javax.swing.JToggleButton();
         editorScrollPane = new javax.swing.JScrollPane();
         lblEditorCreation = new javax.swing.JLabel();
+        saveAndCloseDialog = new javax.swing.JDialog();
+        jPanel2 = new javax.swing.JPanel();
+        lblSaveQuestion = new javax.swing.JLabel();
+        lblSaving = new javax.swing.JLabel();
+        lblCloseQuestion = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        btnSaveAndContinue = new javax.swing.JButton();
+        btnSaveAndClose = new javax.swing.JButton();
+        btnDisardAndClose = new javax.swing.JButton();
+        btnClose = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
         controlBar = new javax.swing.JPanel();
         commitButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
@@ -818,6 +877,132 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
         lblEditorCreation.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblEditorCreation.setIcon(new javax.swing.ImageIcon(
                 getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
+
+        saveAndCloseDialog.setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        saveAndCloseDialog.setTitle(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.title")); // NOI18N
+        saveAndCloseDialog.setModal(true);
+        saveAndCloseDialog.setResizable(false);
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        lblSaveQuestion.setIcon(UIManager.getIcon("OptionPane.questionIcon"));
+        lblSaveQuestion.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.lblSaveQuestion.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel2.add(lblSaveQuestion, gridBagConstraints);
+
+        lblSaving.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        lblSaving.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.lblSaving.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.LAST_LINE_END;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel2.add(lblSaving, gridBagConstraints);
+
+        lblCloseQuestion.setIcon(UIManager.getIcon("OptionPane.informationIcon"));
+        lblCloseQuestion.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.lblCloseQuestion.text")); // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        jPanel2.add(lblCloseQuestion, gridBagConstraints);
+
+        saveAndCloseDialog.getContentPane().add(jPanel2, java.awt.BorderLayout.CENTER);
+
+        jPanel1.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.RIGHT));
+
+        btnSaveAndContinue.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.btnSaveAndContinue.text")); // NOI18N
+        btnSaveAndContinue.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnSaveAndContinueActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnSaveAndContinue);
+
+        btnSaveAndClose.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.btnSaveAndClose.text")); // NOI18N
+        btnSaveAndClose.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnSaveAndCloseActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnSaveAndClose);
+
+        btnDisardAndClose.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.btnDiscardAndClose.text")); // NOI18N
+        btnDisardAndClose.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnDisardAndCloseActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnDisardAndClose);
+
+        btnClose.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.btnCloseEditor.text")); // NOI18N
+        btnClose.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnCloseActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnClose);
+
+        btnCancel.setText(org.openide.util.NbBundle.getMessage(
+                NavigatorAttributeEditorGui.class,
+                "NavigatorAttributeEditorGui.saveAndCloseDialog.btnCancel.text")); // NOI18N
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnCancelActionPerformed(evt);
+                }
+            });
+        jPanel1.add(btnCancel);
+
+        saveAndCloseDialog.getContentPane().add(jPanel1, java.awt.BorderLayout.SOUTH);
+
+        final ActionListener escListener = new ActionListener() {
+
+                @Override
+                public void actionPerformed(final ActionEvent e) {
+                    btnCancelActionPerformed(null);
+                }
+            };
+
+        saveAndCloseDialog.getRootPane()
+                .registerKeyboardAction(
+                    escListener,
+                    KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                    JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+        saveAndCloseDialog.getRootPane().setDefaultButton(btnSaveAndClose);
 
         controlBar.setLayout(new java.awt.GridBagLayout());
 
@@ -993,6 +1178,120 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
             }
         }
     } //GEN-LAST:event_pasteButtonActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnSaveAndCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSaveAndCloseActionPerformed
+        showSaving();
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    saveIt(true);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    saveAndCloseDialog.setVisible(false);
+                }
+            }.execute();
+    } //GEN-LAST:event_btnSaveAndCloseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnSaveAndContinueActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSaveAndContinueActionPerformed
+        showSaving();
+        new SwingWorker<Void, Void>() {
+
+                @Override
+                protected Void doInBackground() throws Exception {
+                    saveIt(false);
+                    return null;
+                }
+
+                @Override
+                protected void done() {
+                    saveAndCloseDialog.setVisible(false);
+                }
+            }.execute();
+    } //GEN-LAST:event_btnSaveAndContinueActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnDisardAndCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnDisardAndCloseActionPerformed
+        reloadFromDB();
+        clear();
+        saveAndCloseDialog.setVisible(false);
+    }                                                                                     //GEN-LAST:event_btnDisardAndCloseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
+        saveAndCloseDialog.setVisible(false);
+    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCloseActionPerformed
+        reloadFromDB();
+        clear();
+        saveAndCloseDialog.setVisible(false);
+    }                                                                            //GEN-LAST:event_btnCloseActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  enableSaveWithoutClosing  DOCUMENT ME!
+     * @param  anyChanges                DOCUMENT ME!
+     */
+    private void showSaveAndCloseDialog(final boolean enableSaveWithoutClosing, final boolean anyChanges) {
+        lblSaveQuestion.setVisible(anyChanges);
+        lblCloseQuestion.setVisible(!anyChanges);
+        lblSaving.setVisible(false);
+        btnSaveAndContinue.setEnabled(true);
+        btnSaveAndContinue.setVisible(anyChanges && enableSaveWithoutClosing);
+        btnSaveAndClose.setEnabled(true);
+        btnSaveAndClose.setVisible(anyChanges);
+        btnDisardAndClose.setEnabled(true);
+        btnDisardAndClose.setVisible(anyChanges);
+        btnClose.setVisible(!anyChanges);
+        btnClose.setEnabled(true);
+        btnCancel.setEnabled(true);
+        saveAndCloseDialog.pack();
+        btnSaveAndClose.requestFocus();
+        StaticSwingTools.showDialog(saveAndCloseDialog);
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void showSaving() {
+        lblSaveQuestion.setVisible(false);
+        lblCloseQuestion.setVisible(false);
+        lblSaving.setVisible(true);
+        btnSaveAndContinue.setEnabled(false);
+        btnSaveAndClose.setEnabled(false);
+        btnDisardAndClose.setEnabled(false);
+        btnCancel.setEnabled(false);
+        btnSaveAndClose.setEnabled(false);
+        saveAndCloseDialog.pack();
+    }
 
     @Override
     public JComponent getGuiComponent() {
