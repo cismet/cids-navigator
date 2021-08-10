@@ -147,14 +147,15 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
 
                 @Override
                 public void actionPerformed(final ActionEvent e) {
-                    boolean useNewSaveAndCloseDialog = false;
+                    boolean useNewSaveAndCloseDialog;
                     try {
-                        useNewSaveAndCloseDialog = SessionManager.getProxy()
-                                    .getConfigAttr(
-                                            SessionManager.getSession().getUser(),
-                                            "navigator.saveAndCloseDialog.enabled",
-                                            getConnectionContext()) != null;
+                        useNewSaveAndCloseDialog = (SessionManager.getProxy().getConfigAttr(
+                                    SessionManager.getSession().getUser(),
+                                    "navigator.saveAndCloseDialog.enabled",
+                                    getConnectionContext()) != null)
+                                    && (currentBeanStore instanceof EditorSaveWithoutCloseListener);
                     } catch (final Exception ex) {
+                        useNewSaveAndCloseDialog = false;
                     }
                     if (((backupObject != null)
                                     && (editorObject.getBean().hasArtificialChangeFlag()
@@ -164,10 +165,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                                         SessionManager.getSession().getUser(),
                                         editorObject.getBean())) {
                             if (useNewSaveAndCloseDialog) {
-                                showSaveAndCloseDialog(
-                                    ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0)
-                                            || (currentBeanStore instanceof EditorSaveWithoutCloseListener),
-                                    true);
+                                showSaveAndCloseDialog(useNewSaveAndCloseDialog, true);
                             } else {
                                 if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
                                     final int answer = JOptionPane.showConfirmDialog(
@@ -180,14 +178,14 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                                                 "NavigatorAttributeEditorGui.NavigatorAttributeEditorGui().commitButton.JOptionPane.title"), // NOI18N
                                             JOptionPane.YES_NO_CANCEL_OPTION);
                                     if (answer == JOptionPane.YES_OPTION) {
-                                        saveIt();
+                                        saveCurrentBeanStore(true);
                                     } else if (answer == JOptionPane.CANCEL_OPTION) {
                                     } else {
                                         reloadFromDB();
                                         clear();
                                     }
                                 } else {
-                                    saveIt(false);
+                                    saveCurrentBeanStore(false);
                                 }
                             }
                         } else {
@@ -204,11 +202,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                         }
                     } else {
                         if (useNewSaveAndCloseDialog) {
-                            if (currentBeanStore instanceof EditorSaveWithoutCloseListener) {
-                                showSaveAndCloseDialog(useNewSaveAndCloseDialog, false);
-                            } else {
-                                clear();
-                            }
+                            showSaveAndCloseDialog(useNewSaveAndCloseDialog, false);
                         } else {
                             if ((e.getModifiers() & ActionEvent.SHIFT_MASK) == 0) {
                                 clear();
@@ -428,7 +422,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
      * DOCUMENT ME!
      */
     public void saveIt() {
-        saveIt(true);
+        saveCurrentBeanStore(true);
     }
 
     /**
@@ -445,12 +439,32 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
      * @param  closeEditor  DOCUMENT ME!
      */
     public void saveIt(final boolean closeEditor) {
+        saveCurrentBeanStore(closeEditor, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  closeEditor  DOCUMENT ME!
+     */
+    private void saveCurrentBeanStore(final boolean closeEditor) {
+        saveCurrentBeanStore(closeEditor, false);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  closeEditor                  DOCUMENT ME!
+     * @param  copyPropertyChangeListeners  DOCUMENT ME!
+     */
+    private void saveCurrentBeanStore(final boolean closeEditor, final boolean copyPropertyChangeListeners) {
         final ObjectTreeNode otn = (ObjectTreeNode)treeNode;
         final MetaObject mo = otn.getMetaObject();
         final CidsBean oldBean = mo.getBean();
         final EditorSaveListener editorSaveListener;
-        if (currentBeanStore instanceof EditorSaveListener) {
-            editorSaveListener = (EditorSaveListener)currentBeanStore;
+        final DisposableCidsBeanStore beanStore = this.currentBeanStore;
+        if (beanStore instanceof EditorSaveListener) {
+            editorSaveListener = (EditorSaveListener)beanStore;
             if (!editorSaveListener.prepareForSave()) {
                 // editor is not ready for safe? then stop save procedure...
                 return;
@@ -458,117 +472,136 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
         } else {
             editorSaveListener = null;
         }
-        try {
-            final CidsBean savedInstance = oldBean.persist(getConnectionContext());
-            ((ObjectTreeNode)treeNode).setMetaObject(savedInstance.getMetaObject());
-            if (currentBeanStore instanceof EditorSaveWithoutCloseListener) {
-                ((EditorSaveWithoutCloseListener)currentBeanStore).editorSaved(new EditorSavedEvent(
-                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
-                        savedInstance));
-            }
-            if (closeEditor) {
-                final JOptionPane jop = new JOptionPane(
-                        org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().jop.message"), // NOI18N
-                        JOptionPane.INFORMATION_MESSAGE);
+        new SwingWorker<CidsBean, CidsBean>() {
 
-                final JDialog dialog = jop.createDialog(
-                        NavigatorAttributeEditorGui.this,
-                        org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().dialog.title")); // NOI18N
-
-                saveAndCloseDialog.setVisible(false);
-                final Timer t = new Timer(2000, new ActionListener() {
-
-                            @Override
-                            public void actionPerformed(final ActionEvent e) {
-                                dialog.setVisible(false);
-                                dialog.dispose();
-                            }
-                        });
-                t.setRepeats(false);
-                t.start();
-                StaticSwingTools.showDialog(dialog);
-                clear();
-            } else {
-                // final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
-                // final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
-                editorObject = savedInstance.getMetaObject();
-                createBackup(editorObject);
-                // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener
-                // propertyChangeListener = new PropertyChangeListener() {
-                //
-                // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint();
-                // tree.repaint();
-                //
-                // } }; if (currentBeanStore instanceof JComponent) { strongReferenceOnWeakListener =
-                // propertyChangeListener; } else { log.error("A CidsBeansStore must be instanceof
-                // JComponent here, but it was " + currentBeanStore + "!"); }
-                // bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener,
-                // bean)); --- editorObject.getBean().addPropertyChangeListener(new
-                // PropertyChangeListener() {
-                //
-                // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint();
-                // tree.repaint();
-                //
-                // } });
-                currentBeanStore.setCidsBean(savedInstance);
-                for (final PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
-                    savedInstance.addPropertyChangeListener(pcl);
+                @Override
+                protected CidsBean doInBackground() throws Exception {
+                    return oldBean.persist(getConnectionContext());
                 }
-            }
-            if (editorSaveListener != null) {
-                editorSaveListener.editorClosed(new EditorClosedEvent(
-                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
-                        savedInstance));
-            }
-            refreshTree();
-            refreshSearchTree();
-            executeAfterSuccessfullSave(savedInstance);
-        } catch (Exception ex) {
-            if (editorSaveListener != null) {
-                editorSaveListener.editorClosed(new EditorClosedEvent(
-                        EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
-            }
-            final Throwable firstCause = getFirstCause(ex);
-            log.error("Error while saving", ex); // NOI18N
 
-            if ((firstCause != null) && (firstCause.getMessage() != null)
-                        && firstCause.getMessage().equals("not allowed to insert meta object")) {
-                final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),   // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"), // NOI18N
-                        null,
-                        null,
-                        ex,
-                        Level.SEVERE,
-                        null);
-                JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
-            } else {
-                final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),     // NOI18N
-                        org.openide.util.NbBundle.getMessage(
-                            NavigatorAttributeEditorGui.class,
-                            "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),   // NOI18N
-                        null,
-                        null,
-                        ex,
-                        Level.SEVERE,
-                        null);
-                JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
-            }
-            refreshTree();
-            refreshSearchTree();
-        }
-        if (closeEditor) {
-            clear();
-        }
+                @Override
+                protected void done() {
+                    try {
+                        final CidsBean savedInstance = get();
+                        otn.setMetaObject(savedInstance.getMetaObject());
+                        if (beanStore instanceof EditorSaveWithoutCloseListener) {
+                            ((EditorSaveWithoutCloseListener)beanStore).editorSaved(new EditorSavedEvent(
+                                    EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
+                                    savedInstance));
+                        }
+                        if (closeEditor) {
+                            final JOptionPane jop = new JOptionPane(
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().jop.message"), // NOI18N
+                                    JOptionPane.INFORMATION_MESSAGE);
+
+                            final JDialog dialog = jop.createDialog(
+                                    NavigatorAttributeEditorGui.this,
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().dialog.title")); // NOI18N
+
+                            final Timer t = new Timer(2000, new ActionListener() {
+
+                                        @Override
+                                        public void actionPerformed(final ActionEvent e) {
+                                            dialog.setVisible(false);
+                                            dialog.dispose();
+                                        }
+                                    });
+                            t.setRepeats(false);
+                            t.start();
+                            StaticSwingTools.showDialog(dialog);
+                            clear();
+
+                            if (editorSaveListener != null) {
+                                for (final PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
+                                    savedInstance.addPropertyChangeListener(pcl);
+                                }
+                                editorSaveListener.editorClosed(new EditorClosedEvent(
+                                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
+                                        savedInstance));
+                            }
+                        } else {
+                            // final AttributeViewer viewer = ComponentRegistry.getRegistry().getAttributeViewer();
+                            // final MetaCatalogueTree tree = ComponentRegistry.getRegistry().getActiveCatalogue();
+                            editorObject = savedInstance.getMetaObject();
+                            createBackup(editorObject);
+                            // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener
+                            // propertyChangeListener = new PropertyChangeListener() {
+                            //
+                            // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint();
+                            // tree.repaint();
+                            //
+                            // } }; if (currentBeanStore instanceof JComponent) { strongReferenceOnWeakListener =
+                            // propertyChangeListener; } else { log.error("A CidsBeansStore must be instanceof
+                            // JComponent here, but it was " + currentBeanStore + "!"); }
+                            // bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener,
+                            // bean)); --- editorObject.getBean().addPropertyChangeListener(new
+                            // PropertyChangeListener() {
+                            //
+                            // @Override public void propertyChange(PropertyChangeEvent evt) { viewer.repaint();
+                            // tree.repaint();
+                            //
+                            // } });
+                            beanStore.setCidsBean(savedInstance);
+                            if (copyPropertyChangeListeners) {    // workaround for alb_BaulastEditor needing this while
+                                                                  // calling "saveIt(false)"
+                                for (final PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
+                                    savedInstance.addPropertyChangeListener(pcl);
+                                }
+                            }
+                        }
+                        refreshTree();
+                        refreshSearchTree();
+                        executeAfterSuccessfullSave(savedInstance);
+                    } catch (Exception ex) {
+                        if (editorSaveListener != null) {
+                            editorSaveListener.editorClosed(new EditorClosedEvent(
+                                    EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
+                        }
+                        final Throwable firstCause = getFirstCause(ex);
+                        log.error("Error while saving", ex);      // NOI18N
+
+                        if ((firstCause != null) && (firstCause.getMessage() != null)
+                                    && firstCause.getMessage().equals("not allowed to insert meta object")) {
+                            final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),   // NOI18N
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"), // NOI18N
+                                    null,
+                                    null,
+                                    ex,
+                                    Level.SEVERE,
+                                    null);
+                            JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+                        } else {
+                            final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),     // NOI18N
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),   // NOI18N
+                                    null,
+                                    null,
+                                    ex,
+                                    Level.SEVERE,
+                                    null);
+                            JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+                        }
+                        refreshTree();
+                        refreshSearchTree();
+                    } finally {
+                        saveAndCloseDialog.setVisible(false);
+                    }
+                    if (closeEditor) {
+                        clear();
+                    }
+                }
+            }.execute();
     }
 
     @Override
@@ -586,7 +619,7 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                                 "NavigatorAttributeEditorGui.setTreeNode().confirmDialog.title"), // NOI18N
                             JOptionPane.YES_NO_CANCEL_OPTION);
                     if (answer == JOptionPane.YES_OPTION) {
-                        saveIt(true);
+                        saveCurrentBeanStore(true);
                     } else if (answer == JOptionPane.NO_OPTION) {
                         reloadFromDB();
                     } else {                                                                      // Cancel
@@ -1186,20 +1219,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
      */
     private void btnSaveAndCloseActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSaveAndCloseActionPerformed
         showSaving();
-        new SwingWorker<Void, Void>() {
-
-                @Override
-                protected Void doInBackground() throws Exception {
-                    saveIt(true);
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    saveAndCloseDialog.setVisible(false);
-                }
-            }.execute();
-    } //GEN-LAST:event_btnSaveAndCloseActionPerformed
+        saveCurrentBeanStore(true);
+    }                                                                                   //GEN-LAST:event_btnSaveAndCloseActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -1208,20 +1229,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
      */
     private void btnSaveAndContinueActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnSaveAndContinueActionPerformed
         showSaving();
-        new SwingWorker<Void, Void>() {
-
-                @Override
-                protected Void doInBackground() throws Exception {
-                    saveIt(false);
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    saveAndCloseDialog.setVisible(false);
-                }
-            }.execute();
-    } //GEN-LAST:event_btnSaveAndContinueActionPerformed
+        saveCurrentBeanStore(false);
+    }                                                                                      //GEN-LAST:event_btnSaveAndContinueActionPerformed
 
     /**
      * DOCUMENT ME!
