@@ -387,7 +387,7 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                             ? value.toString() : value.toString().substring(lastIndex + getCategorySplitBy().length());
                         text = spaces(getCategoryLevel(value)) + name;
                     }
-                    ((JLabel)ret).setText(text);
+                    ((JLabel)ret).setText(((text != null) && !text.trim().isEmpty()) ? text : " ");
                     if (isCategory(value)) {
                         final JLabel label = (JLabel)ret;
                         final Font boldLabelFont = new Font(
