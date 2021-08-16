@@ -144,7 +144,10 @@ public class PureRESTfulConnection extends RESTfulConnection {
     protected Reconnector<CallServerService> createReconnector(final String callserverURL,
             final Proxy proxy,
             final boolean compressionEnabled) {
-        reconnector = new PureRESTfulReconnector(CallServerService.class, callserverURL, proxy);
+        final PureRESTfulReconnector reconnector = new PureRESTfulReconnector(
+                CallServerService.class,
+                callserverURL,
+                proxy);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
@@ -184,7 +187,7 @@ public class PureRESTfulConnection extends RESTfulConnection {
             final Proxy proxy,
             final boolean compressionEnabled,
             final ConnectionContext connectionContext) throws ConnectionException {
-        this.connector = createReconnector(callserverURL, proxy, compressionEnabled).getProxy();
+        setReconnector(createReconnector(callserverURL, proxy, compressionEnabled));
 
         // FIXME: remove when all methods implemented in pure RESTful Service
         this.legacyConnector = createLegacyConnector(callserverURL, proxy, compressionEnabled);

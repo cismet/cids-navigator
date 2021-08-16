@@ -25,6 +25,8 @@ import de.cismet.reconnector.Reconnector;
  * Overrides RESTfulReconnector and uses the RESTfulInterfaceConnector CallServerService implementation to interact with
  * the cids server Pure REST API.
  *
+ * @param    <R>
+ *
  * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  1.0 2015/04/17
  */

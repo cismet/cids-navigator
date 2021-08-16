@@ -232,6 +232,7 @@ import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
 import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
@@ -403,9 +404,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
         initTakeoffHooks();
 
-        final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
-        proxyOptions.setProxy(Proxy.fromPreferences());
-
         final String heavyComps = System.getProperty("contains.heavyweight.comps"); // NOI18N
         if ((heavyComps != null) && heavyComps.equals("true")) {                    // NOI18N
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -416,7 +414,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         if (splashScreen != null) {
             // ProxyOptions panel soll im SplashScreen integriert werden
             // panel übergeben
-            splashScreen.setProxyOptionsPanel(proxyOptions);
+            splashScreen.setProxyOptionsPanel(new ProxyOptionsPanel());
             // panel noch nicht anzeigen
             splashScreen.setProxyOptionsVisible(false);
 
@@ -426,15 +424,13 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                     // Anwenden wurde gedrückt
                     @Override
                     public void actionPerformed(final ActionEvent ae) {
-                        // Proxy in den Preferences setzen
-                        proxyOptions.getProxy().toPreferences();
                         // Panel wieder verstecken
                         splashScreen.setProxyOptionsVisible(false);
                     }
                 });
         }
 
-        initConnection(Proxy.fromPreferences());
+        initConnection(ProxyHandler.getInstance().getProxy());
 
         try {
             checkNavigatorHome();

@@ -82,6 +82,7 @@ import de.cismet.lookupoptions.gui.OptionsClient;
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
 import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
@@ -115,7 +116,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final ResourceManager resourceManager = ResourceManager.getManager();
+    private static final ResourceManager RESSOURCE_MANAGER = ResourceManager.getManager();
+    private static final Logger LOG = Logger.getLogger(Navigator.class);
+
     public static final String NAVIGATOR_HOME_DIR = ".navigator"
                 + JnlpSystemPropertyHelper.getProperty("directory.extension", "");
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
@@ -124,7 +127,6 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final Logger logger; // = Logger.getLogger(Navigator.class);
     private final PropertyManager propertyManager;
     private final ConfigurationManager configurationManager = new ConfigurationManager();
     private final ExceptionManager exceptionManager;
@@ -187,8 +189,6 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      */
     public Navigator(final ProgressObserver progressObserver, final NavigatorSplashScreen splashScreen)
             throws Exception {
-        this.logger = Logger.getLogger(this.getClass());
-
         this.progressObserver = progressObserver;
         this.splashScreen = splashScreen;
 
@@ -223,9 +223,6 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
         initTakeoffHooks();
 
-        final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
-        proxyOptions.setProxy(Proxy.fromPreferences());
-
         final String heavyComps = System.getProperty("contains.heavyweight.comps"); // NOI18N
         if ((heavyComps != null) && heavyComps.equals("true")) {                    // NOI18N
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
@@ -236,7 +233,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         if (splashScreen != null) {
             // ProxyOptions panel soll im SplashScreen integriert werden
             // panel übergeben
-            splashScreen.setProxyOptionsPanel(proxyOptions);
+            splashScreen.setProxyOptionsPanel(new ProxyOptionsPanel());
             // panel noch nicht anzeigen
             splashScreen.setProxyOptionsVisible(false);
 
@@ -246,15 +243,13 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     // Anwenden wurde gedrückt
                     @Override
                     public void actionPerformed(final ActionEvent ae) {
-                        // Proxy in den Preferences setzen
-                        proxyOptions.getProxy().toPreferences();
                         // Panel wieder verstecken
                         splashScreen.setProxyOptionsVisible(false);
                     }
                 });
         }
 
-        initConnection(Proxy.fromPreferences());
+        initConnection();
 
         try {
             checkNavigatorHome();
@@ -291,7 +286,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
             initStartupHooks();
         } catch (final InterruptedException iexp) {
-            logger.error("navigator start interrupted: " + iexp.getMessage() + "\n disconnecting from server"); // NOI18N
+            LOG.error("navigator start interrupted: " + iexp.getMessage() + "\n disconnecting from server"); // NOI18N
             SessionManager.getSession().logout();
             SessionManager.getConnection().disconnect();
             this.progressObserver.reset();
@@ -351,37 +346,36 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         try {
             final File file = new File(NAVIGATOR_HOME);
             if (file.exists()) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Navigator Directory exists.");                     // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Navigator Directory exists.");                     // NOI18N
                 }
             } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Navigator Directory does not exist --> creating"); // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Navigator Directory does not exist --> creating"); // NOI18N
                 }
                 file.mkdir();
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Navigator Directory successfully created");        // NOI18N
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Navigator Directory successfully created");        // NOI18N
                 }
             }
         } catch (Exception ex) {
-            logger.error("Error while checking/creating Navigator home directory", ex); // NOI18N
+            LOG.error("Error while checking/creating Navigator home directory", ex); // NOI18N
         }
     }
 
     /**
      * #########################################################################
      *
-     * @param   proxyConfig  DOCUMENT ME!
-     *
      * @throws  ConnectionException   DOCUMENT ME!
      * @throws  InterruptedException  DOCUMENT ME!
      */
-    private void initConnection(final Proxy proxyConfig) throws ConnectionException, InterruptedException {
+    private void initConnection() throws ConnectionException, InterruptedException {
+        final Proxy proxyConfig = ProxyHandler.getInstance().getProxy();
         progressObserver.setProgress(
             25,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25")); // NOI18N
-        if (logger.isDebugEnabled()) {
-            logger.debug("initialising connection using proxy: " + proxyConfig);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("initialising connection using proxy: " + proxyConfig);
         }
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
@@ -389,6 +383,19 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                         proxyConfig,
                         propertyManager.isCompressionEnabled(),
                         getConnectionContext());
+
+        ProxyHandler.getInstance().addListener(new ProxyHandler.Listener() {
+
+                @Override
+                public void proxyChanged(final ProxyHandler.Event event) {
+                    try {
+                        connection.reconnect();
+                    } catch (final Exception ex) {
+                        LOG.error("error while reconnecting with new proxy", ex);
+                    }
+                }
+            });
+
         ConnectionSession session = null;
         ConnectionProxy proxy = null;
 
@@ -397,8 +404,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_50")); // NOI18N
         // autologin
         if (propertyManager.isAutoLogin()) {
-            if (logger.isInfoEnabled()) {
-                logger.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'"); // NOI18N
             }
             try {
                 session = ConnectionFactory.getFactory()
@@ -411,15 +418,15 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                             .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
                 SessionManager.init(proxy);
             } catch (UserException uexp) {
-                logger.error("autologin failed", uexp);                                                                  // NOI18N
+                LOG.error("autologin failed", uexp);                                                                  // NOI18N
                 session = null;
             }
         }
 
         // autologin = false || autologin failed
         if (!propertyManager.isAutoLogin() || (session == null)) {
-            if (logger.isInfoEnabled()) {
-                logger.info("performing login"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("performing login"); // NOI18N
             }
             try {
                 session = ConnectionFactory.getFactory()
@@ -429,7 +436,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                                     false,
                                     getConnectionContext());
             } catch (UserException uexp) {
-            }                                    // should never happen
+            }                                 // should never happen
             proxy = ConnectionFactory.getFactory()
                         .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
             SessionManager.init(proxy);
@@ -443,8 +450,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                         SessionManager.getProxy().getClasses(getConnectionContext()),
                         PermissionHolder.WRITEPERMISSION));
         // PropertyManager.getManager().setEditable(true);
-        if (logger.isInfoEnabled()) {
-            logger.info("initConnection(): navigator editor enabled: " + PropertyManager.getManager().isEditable()); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("initConnection(): navigator editor enabled: " + PropertyManager.getManager().isEditable()); // NOI18N
         }
     }
     // #########################################################################
@@ -487,8 +494,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         final Collection<? extends CidsClientToolbarItem> customToolbarItems = Lookup.getDefault()
                     .lookupAll(CidsClientToolbarItem.class);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Initializing " + customToolbarItems.size() + " toolbar extensions.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Initializing " + customToolbarItems.size() + " toolbar extensions.");
         }
 
         final Comparator<CidsClientToolbarItem> comp = new Comparator<CidsClientToolbarItem>() {
@@ -498,7 +505,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     try {
                         return t.getSorterString().compareTo(t1.getSorterString());
                     } catch (Exception e) {
-                        logger.warn(
+                        LOG.warn(
                             "Error during comparing ToolbarExtensions. (You should not return null in getSorterString()) --> returned 0",
                             e);
                         return 0;
@@ -522,8 +529,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     innerToolbar = toolBar.getDefaultToolBar();
                 }
                 if (ccti instanceof Action) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Adding CidsClientToolbarItem: " + ((Action)ccti).getValue(Action.NAME)
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Adding CidsClientToolbarItem: " + ((Action)ccti).getValue(Action.NAME)
                                     + " - class: '"
                                     + ccti.getClass().toString() + "'? " + ccti.isVisible());
                     }
@@ -563,7 +570,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             metaCatalogueTree,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.name"),    // NOI18N
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.metaCatalogueTree.tooltip"), // NOI18N
-            resourceManager.getIcon("catalogue_tree_icon.gif"),                                           // NOI18N
+            RESSOURCE_MANAGER.getIcon("catalogue_tree_icon.gif"),                                         // NOI18N
             MutableConstraints.P1,
             MutableConstraints.ANY_INDEX,
             true);
@@ -593,7 +600,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             searchResultsTreePanel,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.searchResultsTreePanel.name"),    // NOI18N
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.searchResultsTreePanel.tooltip"), // NOI18N
-            resourceManager.getIcon("searchresults_tree_icon.gif"),                                            // NOI18N
+            RESSOURCE_MANAGER.getIcon("searchresults_tree_icon.gif"),                                          // NOI18N
             MutableConstraints.P1,
             MutableConstraints.ANY_INDEX);
         container.add(searchResultsTreeConstraints);
@@ -617,7 +624,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 workingSpace,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.WorkingSpaceTreePanel.name"),    // NOI18N
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.WorkingSpaceTreePanel.tooltip"), // NOI18N
-                resourceManager.getIcon("clipboard-list.png"),                                                    // NOI18N
+                RESSOURCE_MANAGER.getIcon("clipboard-list.png"),                                                  // NOI18N
                 MutableConstraints.P1,
                 MutableConstraints.ANY_INDEX);
             container.add(workingSpaceTreeConstraints);
@@ -641,7 +648,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             attributeViewer,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeviewer.name"),    // NOI18N
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeviewer.tooltip"), // NOI18N
-            resourceManager.getIcon("attributetable_icon.gif"),
+            RESSOURCE_MANAGER.getIcon("attributetable_icon.gif"),
             MutableConstraints.P2,
             0,
             false,
@@ -673,7 +680,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 attributeEditor,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeeditor.name"),    // NOI18N
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.attributeeditor.tooltip"), // NOI18N
-                resourceManager.getIcon("attributetable_icon.gif"),
+                RESSOURCE_MANAGER.getIcon("attributetable_icon.gif"),
                 MutableConstraints.P3,
                 1,
                 false,
@@ -705,12 +712,12 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     }
                 });
 
-            if (logger.isInfoEnabled()) {
-                logger.info("attribute editor enabled");  // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("attribute editor enabled");  // NOI18N
             }
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("attribute editor disabled"); // NOI18N
+            if (LOG.isInfoEnabled()) {
+                LOG.info("attribute editor disabled"); // NOI18N
             }
         }
 
@@ -728,10 +735,10 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 descriptionPane = new DescriptionPaneFX();
 //            } catch (NoClassDefFoundError e) {
             } catch (Error e) {
-                logger.error("Error during initialisation of Java FX Description Pane. Using Calpa as fallback.", e);
+                LOG.error("Error during initialisation of Java FX Description Pane. Using Calpa as fallback.", e);
                 descriptionPane = new DescriptionPaneCalpa();
             } catch (Exception e) {
-                logger.error(
+                LOG.error(
                     "Exception during initialisation of Java FX Description Pane. Using Calpa as fallback.",
                     e);
                 descriptionPane = new DescriptionPaneCalpa();
@@ -754,7 +761,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             descriptionPane,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.descriptionpane.name"),    // NOI18N
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.descriptionpane.tooltip"), // NOI18N
-            resourceManager.getIcon("descriptionpane_icon.gif"),
+            RESSOURCE_MANAGER.getIcon("descriptionpane_icon.gif"),
             MutableConstraints.P3,
             0,
             false,
@@ -771,7 +778,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 protocolPanel,
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.name"),    // NOI18N
                 org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.protocolpanel.tooltip"), // NOI18N
-                resourceManager.getIcon("protocolpane_icon.png"),
+                RESSOURCE_MANAGER.getIcon("protocolpane_icon.png"),
                 MutableConstraints.P1,
                 MutableConstraints.ANY_INDEX);
             container.add(protocolPanelConstraints);
@@ -882,7 +889,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_950")); // NOI18N
         this.title = org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.title");                // NOI18N
         this.setTitle(title);
-        this.setIconImage(resourceManager.getIcon("navigator_icon.gif").getImage());                          // NOI18N
+        this.setIconImage(RESSOURCE_MANAGER.getIcon("navigator_icon.gif").getImage());                        // NOI18N
         this.restoreWindowState();
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new Navigator.ClosingListener());
@@ -996,22 +1003,22 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             try {
                 // falsch aufgerufen schlob SessionManager.getSession().getUser().getUserGroup().getKey()
                 final PermissionHolder perm = classes[i].getPermissions();
-                if (logger.isDebugEnabled()) {
-                    logger.debug(" usergroup can edit ?? " + key + " permissions :: " + perm);               // NOI18N          //logger.debug(perm +" \n" +key);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(" usergroup can edit ?? " + key + " permissions :: " + perm);               // NOI18N          //logger.debug(perm +" \n" +key);
                 }
-                if ((perm != null) && perm.hasPermission(key, permission))                                   // xxxxxxxxxxxxxxxxxxxxxx user????
+                if ((perm != null) && perm.hasPermission(key, permission))                                // xxxxxxxxxxxxxxxxxxxxxx user????
                 {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("permission '" + permission + "' found in class '" + classes[i] + "'"); // NOI18N
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("permission '" + permission + "' found in class '" + classes[i] + "'"); // NOI18N
                     }
                     return true;
                 }
             } catch (final Exception exp) {
-                logger.error("hasPermission(): could not check permissions", exp);                           // NOI18N
+                LOG.error("hasPermission(): could not check permissions", exp);                           // NOI18N
             }
         }
 
-        logger.warn("permission '" + permission + "' not found, disabling editor"); // NOI18N
+        LOG.warn("permission '" + permission + "' not found, disabling editor"); // NOI18N
         return false;
     }
 
@@ -1022,15 +1029,15 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      */
     @Override
     public void setVisible(final boolean visible) {
-        if (logger.isInfoEnabled()) {
-            logger.info("setting main window visible to '" + visible + "'"); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("setting main window visible to '" + visible + "'"); // NOI18N
         }
 
         if (SwingUtilities.isEventDispatchThread()) {
             doSetVisible(visible);
         } else {
-            if (logger.isDebugEnabled()) {
-                logger.debug("doSetVisible(): synchronizing method"); // NOI18N
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("doSetVisible(): synchronizing method"); // NOI18N
             }
             SwingUtilities.invokeLater(new Runnable() {
 
@@ -1080,9 +1087,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      */
     @Override
     public void dispose() {
-        if (logger.isInfoEnabled()) {
-            logger.info("dispose() called"); // NOI18N
-            logger.info("saving Layout");    // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("dispose() called"); // NOI18N
+            LOG.info("saving Layout");    // NOI18N
         }
         container.saveLayout(LayoutedContainer.DEFAULT_LAYOUT, this);
         Navigator.this.saveWindowState();
@@ -1112,8 +1119,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         final int windowY = (int)this.getLocation().getY();
         final boolean windowMaximised = (this.getExtendedState() == MAXIMIZED_BOTH);
 
-        if (logger.isInfoEnabled()) {
-            logger.info("saving window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
+        if (LOG.isInfoEnabled()) {
+            LOG.info("saving window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
                         + ", windowX=" + windowX + ", windowY=" + windowY + ", windowMaximised=" + windowMaximised); // NOI18N
         }
 
@@ -1123,8 +1130,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         this.preferences.putInt("windowY", windowY);                     // NOI18N
         this.preferences.putBoolean("windowMaximised", windowMaximised); // NOI18N
 
-        if (logger.isInfoEnabled()) {
-            logger.info("saved window state"); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("saved window state"); // NOI18N
         }
     }
 
@@ -1132,8 +1139,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      * DOCUMENT ME!
      */
     private void restoreWindowState() {
-        if (logger.isInfoEnabled()) {
-            logger.info("restoring window state ..."); // NOI18N
+        if (LOG.isInfoEnabled()) {
+            LOG.info("restoring window state ..."); // NOI18N
         }
 
         final int windowHeight = this.preferences.getInt("windowHeight", PropertyManager.getManager().getHeight()); // NOI18N
@@ -1152,8 +1159,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     propertyManager.isMaximizeWindow());
         }
 
-        if (logger.isInfoEnabled()) {
-            logger.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
+        if (LOG.isInfoEnabled()) {
+            LOG.info("restoring window state: \nwindowHeight=" + windowHeight + ", windowWidth=" + windowWidth
                         + ", windowX=" + windowX + ", windowY=" + windowY + ", windowMaximised=" + windowMaximised); // NOI18N
         }
 
@@ -1240,7 +1247,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             final NavigatorSplashScreen navigatorSplashScreen = new NavigatorSplashScreen(PropertyManager.getManager()
                             .getSharedProgressObserver(),
                     // FIXME: illegal icon
-                    resourceManager.getIcon("wundaLogo.png"));
+                    RESSOURCE_MANAGER.getIcon("wundaLogo.png"));
 
             navigatorSplashScreen.pack();
             navigatorSplashScreen.setLocationRelativeTo(null);
@@ -1291,7 +1298,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         try {
             RESTRemoteControlStarter.initRestRemoteControlMethods(propertyManager.getHttpInterfacePort());
         } catch (Throwable e) {
-            logger.error("Error during initializion of remote control server", e);
+            LOG.error("Error during initializion of remote control server", e);
         }
     }
 
@@ -1367,8 +1374,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         public void windowClosing(final WindowEvent e) {
             if (exceptionManager.showExitDialog(Navigator.this)) {
                 dispose();
-                if (logger.isInfoEnabled()) {
-                    logger.info("closing navigator"); // NOI18N
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("closing navigator"); // NOI18N
                 }
                 System.exit(0);
             }

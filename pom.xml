@@ -55,13 +55,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>7.0.1</version>
+                <version>7.1.1-proxyfix-prerelease-1</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>7.0.1</version>
+                <version>7.1.1-proxyfix-prerelease-1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -69,13 +69,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>7.0.3</version>
+                <version>7.1-proxyfix-prerelease-1</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>7.0.3</version>
+                <version>7.1-proxyfix-prerelease-1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -97,13 +97,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.5.6</version>
+                <version>7.5.7-proxyfix-prerelease-1</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.5.6</version>
+                <version>7.5.7-proxyfix-prerelease-1</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>

@@ -31,9 +31,6 @@ public class ConnectionFactory {
 
     private static final transient Logger LOG = Logger.getLogger(ConnectionFactory.class);
 
-    // singleton shared instance
-    private static final ConnectionFactory factory = new ConnectionFactory();
-
     //~ Constructors -----------------------------------------------------------
 
     /**
@@ -53,7 +50,7 @@ public class ConnectionFactory {
      * @return  DOCUMENT ME!
      */
     public static ConnectionFactory getFactory() {
-        return factory;
+        return LazyInitialiser.INSTANCE;
     }
 
     /**
@@ -569,5 +566,27 @@ public class ConnectionFactory {
                 true,
                 false,
                 ConnectionContext.createDeprecated());
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private static class LazyInitialiser {
+
+        //~ Static fields/initializers -----------------------------------------
+
+        private static final ConnectionFactory INSTANCE = new ConnectionFactory();
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new LazyInitialiser object.
+         */
+        private LazyInitialiser() {
+        }
     }
 }

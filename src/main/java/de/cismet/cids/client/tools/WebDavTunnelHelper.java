@@ -38,6 +38,7 @@ import de.cismet.cids.server.actions.WebDavTunnelAction;
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
 
 /**
  * DOCUMENT ME!
@@ -77,7 +78,7 @@ public class WebDavTunnelHelper {
      * @param  actionName  DOCUMENT ME!
      */
     public WebDavTunnelHelper(final String domain, final String actionName) {
-        this(domain, actionName, Proxy.fromPreferences(), null, null, false);
+        this(domain, actionName, ProxyHandler.getInstance().getProxy(), null, null, false);
     }
 
     /**

@@ -78,7 +78,7 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         this.proxy = proxy;
         final ProxyOptionsPanel pop = new ProxyOptionsPanel();
         pop.setProxy(proxy);
-        this.errorPanel = new RESTfulReconnectorErrorPanel(pop, this);
+        this.errorPanel = new RESTfulReconnectorErrorPanel(pop);
         this.compressionEnabled = compressionEnabled;
     }
 
@@ -108,10 +108,11 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
         boolean error = false;
         if (exception instanceof UniformInterfaceException) {
-            if (exception instanceof UniformInterfaceException) {
-                final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
-                error = (status == 503) || (status == 407);
-            }
+//            if (exception instanceof UniformInterfaceException) {
+//                final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
+//                error = (status == 502) || (status == 503) || (status == 407);
+//            }
+            error = true;
         } else if (exception instanceof IllegalArgumentException) {
             error = true;
         } else if (exception instanceof ClientHandlerException) {
