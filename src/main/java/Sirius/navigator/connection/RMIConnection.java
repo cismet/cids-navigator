@@ -159,7 +159,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         this.connected = false;
 
         LOG.info("creating network connection to callserver '" + callserverURL + "'");
-        callserver = createReconnector(callserverURL).getProxy();
+        callserver = createReconnector(callserverURL).getCallserver();
 
         if (LOG.isDebugEnabled()) {
             final StringBuffer buffer = new StringBuffer("remote interfaces of '").append(callserver.getClass()

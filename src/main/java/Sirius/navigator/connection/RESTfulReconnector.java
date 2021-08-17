@@ -42,8 +42,8 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     //~ Instance fields --------------------------------------------------------
 
-    protected String callserverURL;
-    protected Proxy proxy;
+    private String callserverURL;
+    private Proxy proxy;
     private final RESTfulReconnectorErrorPanel errorPanel;
     private final boolean compressionEnabled;
 
@@ -77,21 +77,11 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         this.callserverURL = callserverURL;
         this.proxy = proxy;
         final ProxyOptionsPanel pop = new ProxyOptionsPanel();
-        pop.setProxy(proxy);
         this.errorPanel = new RESTfulReconnectorErrorPanel(pop);
         this.compressionEnabled = compressionEnabled;
     }
 
     //~ Methods ----------------------------------------------------------------
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  proxy  DOCUMENT ME!
-     */
-    public void setProxy(final Proxy proxy) {
-        this.proxy = proxy;
-    }
 
     @Override
     protected ReconnectorException getReconnectorException(final Throwable e) throws Throwable {
@@ -133,8 +123,44 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         throw exception;
     }
 
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getCallserverURL() {
+        return callserverURL;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isCompressionEnabled() {
+        return compressionEnabled;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public Proxy getProxy() {
+        return proxy;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  proxy  DOCUMENT ME!
+     */
+    public void setProxy(final Proxy proxy) {
+        this.proxy = proxy;
+    }
+
     @Override
-    protected R connectService() {
+    protected R connectService() throws ReconnectorException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("connection to service '" + callserverURL + "'");
         }
@@ -142,6 +168,10 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 
-        return (R)new RESTfulSerialInterfaceConnector(callserverURL, proxy, sslConfig, compressionEnabled);
+        return (R)new RESTfulSerialInterfaceConnector(
+                getCallserverURL(),
+                getProxy(),
+                sslConfig,
+                isCompressionEnabled());
     }
 }

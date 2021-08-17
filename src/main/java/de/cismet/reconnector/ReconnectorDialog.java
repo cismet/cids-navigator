@@ -102,61 +102,58 @@ public class ReconnectorDialog extends javax.swing.JDialog implements Reconnecto
 
     @Override
     public void connecting() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
+        showPending();
+        showDialog();
+    }
 
-                        @Override
-                        public void run() {
-                            connecting();
-                        }
-                    });
-            } catch (final Exception ex) {
-            }
-        } else {
-            showPending();
-            showDialog();
-        }
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isWaitingForUser() {
+        return isVisible() && !getContentPane().equals(panProgress);
     }
 
     @Override
     public void connectionFailed(final ReconnectorEvent event) {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            connectionFailed(event);
-                        }
-                    });
-            } catch (final Exception ex) {
-            }
-        } else {
-            showError(event.getComponent());
-            showDialog();
-        }
+//        if (!SwingUtilities.isEventDispatchThread()) {
+//            try {
+//                SwingUtilities.invokeLater(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            connectionFailed(event);
+//                        }
+//                    });
+//            } catch (final Exception ex) {
+//            }
+//        } else {
+        showError(event.getComponent());
+        showDialog();
+        StaticSwingTools.showDialog(this);
+//        }
     }
 
     @Override
     public void connectionCanceled() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            connectionCanceled();
-                        }
-                    });
-            } catch (final Exception ex) {
-            }
-        } else {
-            if (isVisible()) {
-                showError(panCanceled);
-                showDialog();
-            }
-        }
+//        if (!SwingUtilities.isEventDispatchThread()) {
+//            try {
+//                SwingUtilities.invokeLater(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            connectionCanceled();
+//                        }
+//                    });
+//            } catch (final Exception ex) {
+//            }
+//        } else {
+//            if (isVisible()) {
+        showError(panCanceled);
+        showDialog();
+//            }
+//        }
     }
 
     /**
@@ -167,26 +164,19 @@ public class ReconnectorDialog extends javax.swing.JDialog implements Reconnecto
         validate();
         repaint();
         pack();
-        if (!isVisible()) {
-            StaticSwingTools.showDialog(this);
-        }
+//        StaticSwingTools.showDialog(this);
     }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void close() {
+        setVisible(false);
+    }
+
     @Override
     public void connectionCompleted() {
-        if (!SwingUtilities.isEventDispatchThread()) {
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            connectionCompleted();
-                        }
-                    });
-            } catch (final Exception ex) {
-            }
-        } else {
-            setVisible(false);
-        }
+        close();
     }
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
@@ -323,6 +313,7 @@ public class ReconnectorDialog extends javax.swing.JDialog implements Reconnecto
      * @param  evt  DOCUMENT ME!
      */
     private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
+        close();
         connectionCanceled();
     }                                                                             //GEN-LAST:event_btnCancelActionPerformed
 
@@ -342,7 +333,7 @@ public class ReconnectorDialog extends javax.swing.JDialog implements Reconnecto
      */
     private void btnIgnoreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnIgnoreActionPerformed
         reconnector.doAbort();
-        setVisible(false);
+        close();
     }                                                                             //GEN-LAST:event_btnIgnoreActionPerformed
 
     /**
@@ -354,7 +345,6 @@ public class ReconnectorDialog extends javax.swing.JDialog implements Reconnecto
         if (errorComponent instanceof ReconnectorErrorPanelWithApply) {
             ((ReconnectorErrorPanelWithApply)errorComponent).apply();
         }
-        setVisible(false);
-        reconnector.doReconnect();
+        close();
     }                                                                            //GEN-LAST:event_btnRetryActionPerformed
 }

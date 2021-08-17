@@ -79,8 +79,6 @@ import de.cismet.connectioncontext.ConnectionContextStore;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
-import de.cismet.lookupoptions.options.ProxyOptionsPanel;
-
 import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
@@ -229,26 +227,6 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         }
 
-        // splashscreen gesetzt?
-        if (splashScreen != null) {
-            // ProxyOptions panel soll im SplashScreen integriert werden
-            // panel übergeben
-            splashScreen.setProxyOptionsPanel(new ProxyOptionsPanel());
-            // panel noch nicht anzeigen
-            splashScreen.setProxyOptionsVisible(false);
-
-            // auf Anwenden-Button horchen
-            splashScreen.addApplyButtonActionListener(new ActionListener() {
-
-                    // Anwenden wurde gedrückt
-                    @Override
-                    public void actionPerformed(final ActionEvent ae) {
-                        // Panel wieder verstecken
-                        splashScreen.setProxyOptionsVisible(false);
-                    }
-                });
-        }
-
         initConnection();
 
         try {
@@ -384,17 +362,11 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                         propertyManager.isCompressionEnabled(),
                         getConnectionContext());
 
-        ProxyHandler.getInstance().addListener(new ProxyHandler.Listener() {
-
-                @Override
-                public void proxyChanged(final ProxyHandler.Event event) {
-                    try {
-                        connection.reconnect();
-                    } catch (final Exception ex) {
-                        LOG.error("error while reconnecting with new proxy", ex);
-                    }
-                }
-            });
+        /*ProxyHandler.getInstance().addListener(new ProxyHandler.Listener() {
+         *
+         * @Override     public void proxyChanged(final ProxyHandler.Event event) {         try { connection.reconnect();
+         *         } catch (final Exception ex) {             LOG.error("error while
+         * reconnecting with new proxy", ex);         }     } });*/
 
         ConnectionSession session = null;
         ConnectionProxy proxy = null;

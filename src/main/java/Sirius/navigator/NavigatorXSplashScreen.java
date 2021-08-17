@@ -13,7 +13,6 @@ import Sirius.navigator.ui.progress.ProgressObserver;
 
 import org.apache.log4j.Logger;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -45,14 +44,9 @@ public class NavigatorXSplashScreen extends JFrame {
     private Timer timer;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnApply;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel logoLabel;
-    private javax.swing.JPanel panButtons;
     private javax.swing.JPanel panCenter;
-    private javax.swing.JPanel panConnection;
     private javax.swing.JPanel panProgress;
-    private javax.swing.JPanel panProxy;
     private javax.swing.JProgressBar progressBar;
     private javax.swing.JProgressBar progressBarPlugin;
     // End of variables declaration//GEN-END:variables
@@ -72,7 +66,6 @@ public class NavigatorXSplashScreen extends JFrame {
 
         this.logger = Logger.getLogger(this.getClass());
 
-        this.panConnection.setVisible(false);
         this.progressObserver = progressObserver;
         pluginProgressObserver = progressObserver.getSubProgressObserver();
 
@@ -126,11 +119,6 @@ public class NavigatorXSplashScreen extends JFrame {
         panProgress = new javax.swing.JPanel();
         progressBar = new javax.swing.JProgressBar();
         progressBarPlugin = new javax.swing.JProgressBar();
-        panConnection = new javax.swing.JPanel();
-        panButtons = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
-        btnApply = new javax.swing.JButton();
-        panProxy = new javax.swing.JPanel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
 
@@ -171,28 +159,6 @@ public class NavigatorXSplashScreen extends JFrame {
 
         getContentPane().add(panCenter, java.awt.BorderLayout.CENTER);
 
-        panConnection.setLayout(new java.awt.BorderLayout());
-
-        jButton1.setText("Abbrechen");
-        jButton1.setPreferredSize(new java.awt.Dimension(100, 29));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    jButton1ActionPerformed(evt);
-                }
-            });
-        panButtons.add(jButton1);
-
-        btnApply.setText("Anwenden");
-        btnApply.setPreferredSize(new java.awt.Dimension(100, 29));
-        panButtons.add(btnApply);
-
-        panConnection.add(panButtons, java.awt.BorderLayout.SOUTH);
-        panConnection.add(panProxy, java.awt.BorderLayout.CENTER);
-
-        getContentPane().add(panConnection, java.awt.BorderLayout.EAST);
-
         pack();
     } // </editor-fold>//GEN-END:initComponents
 
@@ -205,53 +171,6 @@ public class NavigatorXSplashScreen extends JFrame {
     {
         System.exit(0);
     }                                                           //GEN-LAST:event_exitForm
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
-        System.exit(0);
-    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
-
-    /**
-     * Sets the ProxyOption panel by adding it at the CENTER position of the panConnection.
-     *
-     * @param  panProxyOptions  DOCUMENT ME!
-     */
-    public void setProxyOptionsPanel(final JPanel panProxyOptions) {
-        panConnection.add(panProxyOptions, BorderLayout.CENTER);
-    }
-
-    /**
-     * Adds an ActionListner to the "Apply"-button of the ProxyOptions panel.
-     *
-     * @param  al  DOCUMENT ME!
-     */
-    public void addApplyButtonActionListener(final ActionListener al) {
-        btnApply.addActionListener(al);
-    }
-
-    /**
-     * Shows or hides the ProxyOptions panel.
-     *
-     * @param  isVisible  DOCUMENT ME!
-     */
-    public void setProxyOptionsVisible(final boolean isVisible) {
-        panConnection.setVisible(isVisible);
-        panConnection.validate();
-        pack();
-    }
-
-    /**
-     * Returns if the ProxyOptions panel is visible or not.
-     *
-     * @return  true if ProxyOptions panel is visible, else false
-     */
-    public boolean isProxyOptionsVisible() {
-        return panConnection.isVisible();
-    }
 
     //~ Inner Classes ----------------------------------------------------------
 

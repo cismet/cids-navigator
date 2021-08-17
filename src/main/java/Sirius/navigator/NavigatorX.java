@@ -65,33 +65,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.infonode.docking.DockingWindow;
 import net.infonode.docking.DockingWindowAdapter;
-import net.infonode.docking.DockingWindowListener;
 import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
 import net.infonode.docking.WindowBar;
-import net.infonode.docking.internal.ReadContext;
-import net.infonode.docking.properties.DockingWindowProperties;
-import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
 import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.title.DockingWindowTitleProvider;
 import net.infonode.docking.title.SimpleDockingWindowTitleProvider;
 import net.infonode.docking.util.DeveloperUtil;
 import net.infonode.docking.util.DockingUtil;
-import net.infonode.docking.util.PropertiesUtil;
 import net.infonode.docking.util.StringViewMap;
-import net.infonode.gui.componentpainter.AlphaGradientComponentPainter;
-import net.infonode.gui.mouse.MouseButtonListener;
-import net.infonode.properties.propertymap.PropertyMap;
-import net.infonode.properties.propertymap.PropertyMapListener;
 import net.infonode.properties.propertymap.PropertyMapTreeListener;
 import net.infonode.properties.types.DirectionProperty;
 import net.infonode.tabbedpanel.TabAreaVisiblePolicy;
-import net.infonode.tabbedpanel.TabLayoutPolicy;
-import net.infonode.tabbedpanel.TabbedPanel;
 import net.infonode.util.Direction;
 import net.infonode.util.StreamUtil;
 import net.infonode.util.ValueChange;
@@ -121,19 +110,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -229,8 +210,6 @@ import de.cismet.layout.WrapLayout;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
-import de.cismet.lookupoptions.options.ProxyOptionsPanel;
-
 import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
@@ -294,7 +273,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     /** Holds value of property disposed. */
     private boolean disposed = false;    // InfoNode
     // Panels
-    private NavigatorXSplashScreen splashScreen;
     private String title;
     private RootWindow rootWindow;
     private StringViewMap viewMap = new StringViewMap();
@@ -363,7 +341,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     public NavigatorX(final ProgressObserver progressObserver, final NavigatorXSplashScreen splashScreen)
             throws Exception {
         this.progressObserver = progressObserver;
-        this.splashScreen = splashScreen;
 
         initComponents();
         this.propertyManager = PropertyManager.getManager();
@@ -408,26 +385,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         if ((heavyComps != null) && heavyComps.equals("true")) {                    // NOI18N
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
-        }
-
-        // splashscreen gesetzt?
-        if (splashScreen != null) {
-            // ProxyOptions panel soll im SplashScreen integriert werden
-            // panel übergeben
-            splashScreen.setProxyOptionsPanel(new ProxyOptionsPanel());
-            // panel noch nicht anzeigen
-            splashScreen.setProxyOptionsVisible(false);
-
-            // auf Anwenden-Button horchen
-            splashScreen.addApplyButtonActionListener(new ActionListener() {
-
-                    // Anwenden wurde gedrückt
-                    @Override
-                    public void actionPerformed(final ActionEvent ae) {
-                        // Panel wieder verstecken
-                        splashScreen.setProxyOptionsVisible(false);
-                    }
-                });
         }
 
         initConnection(ProxyHandler.getInstance().getProxy());

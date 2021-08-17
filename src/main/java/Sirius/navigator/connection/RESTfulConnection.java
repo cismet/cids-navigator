@@ -47,6 +47,7 @@ import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
+import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
@@ -60,7 +61,7 @@ import de.cismet.reconnector.Reconnector;
  * @author   martin.scholl@cismet.de
  * @version  $Revision$, $Date$
  */
-public class RESTfulConnection implements Connection, Reconnectable<CallServerService> {
+public class RESTfulConnection implements Connection, Reconnectable<CallServerService>, ProxyHandler.Listener {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -90,9 +91,27 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         } else {
             isLWMOEnabled = true;
         }
+
+        ProxyHandler.getInstance().addListener(this);
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    @Override
+    public void proxyChanged(final ProxyHandler.Event event) {
+        getReconnector().setProxy(event.getNewProxy());
+        new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        reconnect();
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
+                    }
+                }
+            }).start();
+    }
 
     /**
      * DOCUMENT ME!
@@ -104,8 +123,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
-    public Reconnector<CallServerService> getReconnector() {
-        return (Reconnector<CallServerService>)reconnector;
+    public RESTfulReconnector getReconnector() {
+        return (RESTfulReconnector)reconnector;
     }
 
     /**
@@ -114,7 +133,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
      * @return  DOCUMENT ME!
      */
     protected CallServerService getConnector() {
-        return (reconnector != null) ? reconnector.getProxy() : null;
+        return (reconnector != null) ? reconnector.getCallserver() : null;
     }
 
     /**
@@ -170,13 +189,16 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         return connect(callserverURL, proxy, compressionEnabled, ConnectionContext.createDeprecated());
     }
 
-    @Override
-    public boolean connect(final String callserverURL,
-            final Proxy proxy,
-            final boolean compressionEnabled,
-            final ConnectionContext connectionContext) throws ConnectionException {
-        setReconnector(createReconnector(callserverURL, proxy, compressionEnabled));
-
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    private boolean testConnection(final ConnectionContext connectionContext) throws ConnectionException {
         try {
             getConnector().getDomains(connectionContext);
         } catch (final Exception e) {
@@ -189,12 +211,25 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     }
 
     @Override
+    public boolean connect(final String callserverURL,
+            final Proxy proxy,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) throws ConnectionException {
+        setReconnector(createReconnector(callserverURL, proxy, compressionEnabled));
+
+        return testConnection(connectionContext);
+    }
+
+    @Override
     public boolean reconnect() throws ConnectionException {
         if (reconnector instanceof RESTfulReconnector) {
-            ((RESTfulReconnector)reconnector).setProxy(ProxyHandler.getInstance().getProxy());
             ((RESTfulReconnector)reconnector).doReconnect();
+            return testConnection(ConnectionContext.create(
+                        AbstractConnectionContext.Category.OPTIONS,
+                        RESTfulConnection.class.getSimpleName()));
+        } else {
+            return false;
         }
-        return true;
     }
 
     @Override

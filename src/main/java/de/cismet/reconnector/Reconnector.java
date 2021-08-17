@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.JFrame;
-import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.ws.rest.SSLInitializationException;
 
@@ -52,7 +51,6 @@ public abstract class Reconnector<S> {
     //~ Instance fields --------------------------------------------------------
 
     private final Class serviceClass;
-    private ConnectorWorker connectorWorker;
     private ReconnectorDialog reconnectorDialog;
     private S service;
     private boolean isReconnecting = false;
@@ -105,17 +103,22 @@ public abstract class Reconnector<S> {
      * Verbindungsaufbau über Swingworker.
      */
     public void doReconnect() {
-        LOG.fatal("reconnecting", new Exception());
-        // Worker schon vorhanden?
-        if (connectorWorker != null) {
-            // worker anhalten
-            connectorWorker.cancel(true);
-            connectorWorker = null;
-        }
-        if (isReconnecting) {
-            // neuen Worker erzeugen und starten
-            connectorWorker = new ConnectorWorker();
-            connectorWorker.execute();
+        dispatcher.connecting();
+        // alten service verwerfen
+        service = null;
+        try {
+            // neuen service setzen
+            service = connectService();
+            // panels verstecken
+            dispatcher.connectionCompleted();
+
+            // Fehler beim Verbinden?
+        } catch (final Exception ex) {
+            // Neuverbindung in Gang setzen
+            if (ex instanceof ExecutionException) {
+            } else {
+                serviceFailed(new ReconnectorException(ex.getClass().getCanonicalName()));
+            }
         }
     }
 
@@ -133,7 +136,7 @@ public abstract class Reconnector<S> {
      *
      * @return  DOCUMENT ME!
      */
-    public S getProxy() {
+    public S getCallserver() {
         return (S)Proxy.newProxyInstance(
                 serviceClass.getClassLoader(),
                 new Class[] { serviceClass },
@@ -205,6 +208,16 @@ public abstract class Reconnector<S> {
             Throwable targetEx = null;
             isReconnecting = true;
             while (isReconnecting) {
+                while ((reconnectorDialog != null) && reconnectorDialog.isWaitingForUser()) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (final InterruptedException ex) {
+                    }
+                }
+                if (reconnectorDialog != null) {
+                    reconnectorDialog.setVisible(false);
+                }
+
                 try {
                     // service wieder verbinden
                     if (service == null) {
@@ -247,54 +260,6 @@ public abstract class Reconnector<S> {
      *
      * @version  $Revision$, $Date$
      */
-    class ConnectorWorker extends SwingWorker<S, Void> {
-
-        //~ Methods ------------------------------------------------------------
-
-        @Override
-        protected S doInBackground() throws Exception {
-            dispatcher.connecting();
-            // alten service verwerfen
-            service = null;
-            // Verbindungs-Prozess starten
-            try {
-                return connectService();
-            } catch (ReconnectorException exception) {
-                serviceFailed(exception);
-                throw new ExecutionException(exception);
-            }
-        }
-
-        @Override
-        protected void done() {
-            // abgebrochen ?
-            if (isCancelled()) {
-                dispatcher.connectionCanceled();
-                // abgeschlossen ?
-            } else {
-                try {
-                    // neuen service setzen
-                    service = get();
-                    // panels verstecken
-                    dispatcher.connectionCompleted();
-
-                    // Fehler beim Verbinden?
-                } catch (final Exception ex) {
-                    // Neuverbindung in Gang setzen
-                    if (ex instanceof ExecutionException) {
-                    } else {
-                        serviceFailed(new ReconnectorException(ex.getClass().getCanonicalName()));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
     class ListenerDispatcher implements ReconnectorListener {
 
         //~ Methods ------------------------------------------------------------
@@ -314,7 +279,6 @@ public abstract class Reconnector<S> {
                         }
                         break;
                     }
-
                     case FAILED: {
                         for (final ReconnectorListener listener : listeners) {
                             listener.connectionFailed(evt);
