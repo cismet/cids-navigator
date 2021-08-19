@@ -78,7 +78,7 @@ public class WebDavTunnelHelper {
      * @param  actionName  DOCUMENT ME!
      */
     public WebDavTunnelHelper(final String domain, final String actionName) {
-        this(domain, actionName, ProxyHandler.getInstance().getProxy(), null, null, false);
+        this(domain, actionName, null, null, null, false);
     }
 
     /**

@@ -19,6 +19,7 @@ import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
+import Sirius.navigator.resource.PropertyManager.ProxyProperties;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.CidsSearchInitializer;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -348,7 +349,21 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      * @throws  InterruptedException  DOCUMENT ME!
      */
     private void initConnection() throws ConnectionException, InterruptedException {
+        final ProxyProperties proxyProperties = propertyManager.getProxyProperties();
+        if ((ProxyHandler.getInstance().getProxy() == null) && (proxyProperties.getProxyEnabled() != null)) {
+            ProxyHandler.getInstance()
+                    .setProxy(
+                        new Proxy(
+                            proxyProperties.getProxyHost(),
+                            proxyProperties.getProxyPort(),
+                            proxyProperties.getProxyUsername(),
+                            proxyProperties.getProxyPassword(),
+                            proxyProperties.getProxyDomain(),
+                            proxyProperties.getProxyExcludedHosts(),
+                            proxyProperties.getProxyEnabled()));
+        }
         final Proxy proxyConfig = ProxyHandler.getInstance().getProxy();
+
         progressObserver.setProgress(
             25,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25")); // NOI18N
@@ -361,12 +376,6 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                         proxyConfig,
                         propertyManager.isCompressionEnabled(),
                         getConnectionContext());
-
-        /*ProxyHandler.getInstance().addListener(new ProxyHandler.Listener() {
-         *
-         * @Override     public void proxyChanged(final ProxyHandler.Event event) {         try { connection.reconnect();
-         *         } catch (final Exception ex) {             LOG.error("error while
-         * reconnecting with new proxy", ex);         }     } });*/
 
         ConnectionSession session = null;
         ConnectionProxy proxy = null;

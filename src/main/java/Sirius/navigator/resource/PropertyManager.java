@@ -23,19 +23,31 @@ package Sirius.navigator.resource;
  */
 import Sirius.navigator.connection.ConnectionInfo;
 import Sirius.navigator.ui.LAFManager;
-import Sirius.navigator.ui.progress.*;
+import Sirius.navigator.ui.progress.ProgressObserver;
 
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import java.net.*;
+import java.net.URI;
+import java.net.URL;
 
-import java.util.*;
+import java.nio.file.Paths;
 
-import javax.swing.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
+import javax.swing.JApplet;
 
 /**
  * DOCUMENT ME!
@@ -109,6 +121,9 @@ public final class PropertyManager {
     private boolean fulltextSearchToolbarItemEnabled = false;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
 
+    private final ProxyProperties proxyProperties = new ProxyProperties();
+    private String proxyConfig;
+
     /**
      * DOCUMENT ME!
      *
@@ -123,12 +138,7 @@ public final class PropertyManager {
     @Deprecated private boolean useWebView = false;
     private String descriptionPaneHtmlRenderer = null;
     private boolean enableSearchDialog = false;
-    private boolean usePainterCoolPanel = true;
     private boolean compressionEnabled = false;
-    private transient String proxyURL;
-    private transient String proxyUsername;
-    private transient String proxyPassword;
-    private transient String proxyDomain;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -172,6 +182,33 @@ public final class PropertyManager {
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   value  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static Integer integerValueOf(final String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (final Exception exp) {
+            LOG.warn(String.format("%s could not be parsed to Integer", value), exp); // NOI18N
+            return null;
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   value  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private static Boolean booleanValueOf(final String value) {
+        return (value == null) ? null : (value.equalsIgnoreCase(TRUE) || value.equals("1"));
+    }
 
     /**
      * DOCUMENT ME!
@@ -425,35 +462,8 @@ public final class PropertyManager {
      *
      * @return  DOCUMENT ME!
      */
-    public String getProxyURL() {
-        return proxyURL;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getProxyDomain() {
-        return proxyDomain;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getProxyPassword() {
-        return proxyPassword;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getProxyUsername() {
-        return proxyUsername;
+    public String getProxyConfig() {
+        return proxyConfig;
     }
 
     /**
@@ -468,41 +478,11 @@ public final class PropertyManager {
     /**
      * DOCUMENT ME!
      *
-     * @param  proxyDomain  DOCUMENT ME!
+     * @param  proxyConfig  DOCUMENT ME!
      */
-    public void setProxyDomain(final String proxyDomain) {
-        this.proxyDomain = proxyDomain;
-        properties.setProperty("navigator.proxy.domain", proxyDomain); // NOI18N
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  proxyPassword  DOCUMENT ME!
-     */
-    public void setProxyPassword(final String proxyPassword) {
-        this.proxyPassword = proxyPassword;
-        properties.setProperty("navigator.proxy.password", proxyPassword); // NOI18N
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  proxyURL  DOCUMENT ME!
-     */
-    public void setProxyURL(final String proxyURL) {
-        this.proxyURL = proxyURL;
-        properties.setProperty("navigator.proxy.url", proxyURL); // NOI18N
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  proxyUsername  DOCUMENT ME!
-     */
-    public void setProxyUsername(final String proxyUsername) {
-        this.proxyUsername = proxyUsername;
-        properties.setProperty("navigator.proxy.username", proxyUsername); // NOI18N
+    public void setProxyConfig(final String proxyConfig) {
+        this.proxyConfig = proxyConfig;
+        properties.setProperty("proxy.config", String.valueOf(proxyConfig)); // NOI18N
     }
 
     /**
@@ -993,11 +973,11 @@ public final class PropertyManager {
     /**
      * .........................................................................
      */
-    private void load() {
+    private void setAllProperties() {
         final Enumeration keys = properties.keys();
         while (keys.hasMoreElements()) {
             final String key = (String)keys.nextElement();
-            this.setProperty(key, properties.getProperty(key));
+            setProperty(key, properties.getProperty(key));
         }
     }
 
@@ -1069,14 +1049,8 @@ public final class PropertyManager {
             this.setEnableSearchDialog(value);
         } else if (property.equalsIgnoreCase("navigator.usergroup.rule")) {                    // NOI18N
             this.setPermissionModus(value);
-        } else if (property.equals("navigator.proxy.url")) {
-            this.setProxyURL(value);
-        } else if (property.equals("navigator.proxy.username")) {
-            this.setProxyUsername(value);
-        } else if (property.equals("navigator.proxy.password")) {
-            this.setProxyPassword(value);
-        } else if (property.equals("navigator.proxy.domain")) {
-            this.setProxyDomain(value);
+        } else if (property.equals("proxy.config")) {
+            this.setProxyConfig(value);
         } else if (property.equals("navigator.descriptionPane.htmlRenderer")) {
             this.setDescriptionPaneHtmlRenderer(value);
         } else if (property.equals("navigator.postfilter.enabled")) {
@@ -1097,7 +1071,7 @@ public final class PropertyManager {
         if (this.isLoadable()) {
             try {
                 this.properties.load(inStream);
-                this.load();
+                this.setAllProperties();
             } catch (Exception exp) {
                 LOG.fatal("could not load properties: " + exp.getMessage(), exp); // NOI18N
             }
@@ -1111,6 +1085,34 @@ public final class PropertyManager {
      */
     public void configure() {
         this.load(this.getClass().getResourceAsStream("cfg/navigator.cfg")); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   from  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private InputStream getInputStreamFrom(final String from) throws Exception {
+        if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0)
+                    || (from.indexOf("file:/") == 0)) {
+            final URL url = new URL(from);
+            return url.openStream();
+        } else {
+            return new BufferedInputStream(new FileInputStream(from));
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public ProxyProperties getProxyProperties() {
+        return proxyProperties;
     }
 
     /**
@@ -1161,19 +1163,26 @@ public final class PropertyManager {
         }
 
         if (cfgFile != null) {
-            if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
-                        || (cfgFile.indexOf("file:/") == 0)) {
-                final URL url = new URL(cfgFile);
-                this.load(url.openStream());
-
-                LOG.info("config file loaded from url (assuming webstart)");        // NOI18N
-                this.applet = true;
-            } else {
-                final File file = new File(cfgFile);
-                this.load(new BufferedInputStream(new FileInputStream(cfgFile)));
-            }
+            this.load(getInputStreamFrom(cfgFile));
         } else {
             throw new Exception("loading of config file '" + cfgFile + "' failed"); // NOI18N
+        }
+
+        if ((cfgFile.indexOf("http://") == 0) || (cfgFile.indexOf("https://") == 0)
+                    || (cfgFile.indexOf("file:/") == 0)) {
+            LOG.info("config file loaded from url (assuming webstart)"); // NOI18N
+            this.applet = true;
+        }
+
+        try {
+            final String cfgFileName = Paths.get(new URI(cfgFile).getPath()).getFileName().toString();
+            final String cfgDirname = cfgFile.substring(0, cfgFile.lastIndexOf(cfgFileName));
+            final String proxyConfig = getProxyConfig();
+            if ((proxyConfig != null) && !proxyConfig.isEmpty()) {
+                proxyProperties.load(getInputStreamFrom(cfgDirname + proxyConfig));
+            }
+        } catch (final Exception ex) {
+            LOG.warn(String.format("error while loading proxy properties from %s", proxyConfig), ex);
         }
 
         try {
@@ -1631,6 +1640,80 @@ public final class PropertyManager {
             if (isConnectionInfoSaveable()) {
                 properties.setProperty(evt.getPropertyName(), evt.getNewValue().toString());
             }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public static class ProxyProperties extends Properties {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProxyHost() {
+            return getProperty("proxy.host");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public Integer getProxyPort() {
+            final Integer port = integerValueOf(getProperty("proxy.port"));
+            return ((port != null) && (port >= 0) && (port <= 65535)) ? port : 0;
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProxyUsername() {
+            return getProperty("proxy.username");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProxyPassword() {
+            return getProperty("proxy.password");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProxyDomain() {
+            return getProperty("proxy.domain");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public String getProxyExcludedHosts() {
+            return getProperty("proxy.excludedHosts");
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        public Boolean getProxyEnabled() {
+            return booleanValueOf(getProperty("proxy.enabled"));
         }
     }
 }
