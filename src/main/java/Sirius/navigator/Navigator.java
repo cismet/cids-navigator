@@ -350,17 +350,21 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      */
     private void initConnection() throws ConnectionException, InterruptedException {
         final ProxyProperties proxyProperties = propertyManager.getProxyProperties();
-        if ((ProxyHandler.getInstance().getProxy() == null) && (proxyProperties.getProxyEnabled() != null)) {
-            ProxyHandler.getInstance()
-                    .setProxy(
-                        new Proxy(
-                            proxyProperties.getProxyHost(),
-                            proxyProperties.getProxyPort(),
-                            proxyProperties.getProxyUsername(),
-                            proxyProperties.getProxyPassword(),
-                            proxyProperties.getProxyDomain(),
-                            proxyProperties.getProxyExcludedHosts(),
-                            proxyProperties.getProxyEnabled()));
+        if ((proxyProperties != null) && Boolean.TRUE.equals(proxyProperties.getProxyEnabled())) {
+            final Proxy preconfiguredProxy = new Proxy(
+                    proxyProperties.getProxyHost(),
+                    proxyProperties.getProxyPort(),
+                    proxyProperties.getProxyUsername(),
+                    proxyProperties.getProxyPassword(),
+                    proxyProperties.getProxyDomain(),
+                    proxyProperties.getProxyExcludedHosts());
+            ProxyHandler.getInstance().setPreconfiguredProxy(preconfiguredProxy);
+            if (ProxyHandler.getInstance().getManualProxy() == null) {
+                ProxyHandler.getInstance().setManualProxy(preconfiguredProxy);
+            }
+            if (ProxyHandler.getInstance().getMode() == null) {
+                ProxyHandler.getInstance().usePreconfiguredProxy();
+            }
         }
         final Proxy proxyConfig = ProxyHandler.getInstance().getProxy();
 

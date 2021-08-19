@@ -186,33 +186,6 @@ public final class PropertyManager {
     /**
      * DOCUMENT ME!
      *
-     * @param   value  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private static Integer integerValueOf(final String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (final Exception exp) {
-            LOG.warn(String.format("%s could not be parsed to Integer", value), exp); // NOI18N
-            return null;
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   value  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    private static Boolean booleanValueOf(final String value) {
-        return (value == null) ? null : (value.equalsIgnoreCase(TRUE) || value.equals("1"));
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @param  maximizeWindow  DOCUMENT ME!
      */
     public void setMaximizeWindow(final String maximizeWindow) {
@@ -1714,6 +1687,33 @@ public final class PropertyManager {
          */
         public Boolean getProxyEnabled() {
             return booleanValueOf(getProperty("proxy.enabled"));
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   value  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        private static Integer integerValueOf(final String value) {
+            try {
+                return Integer.parseInt(value);
+            } catch (final Exception exp) {
+                LOG.warn(String.format("%s could not be parsed to Integer", value), exp); // NOI18N
+                return null;
+            }
+        }
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param   value  DOCUMENT ME!
+         *
+         * @return  DOCUMENT ME!
+         */
+        private static Boolean booleanValueOf(final String value) {
+            return (value == null) ? null : (value.equalsIgnoreCase(TRUE) || value.equals("1"));
         }
     }
 }
