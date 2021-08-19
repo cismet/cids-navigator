@@ -49,6 +49,8 @@ import java.util.StringTokenizer;
 
 import javax.swing.JApplet;
 
+import de.cismet.netutil.ProxyProperties;
+
 /**
  * DOCUMENT ME!
  *
@@ -1613,107 +1615,6 @@ public final class PropertyManager {
             if (isConnectionInfoSaveable()) {
                 properties.setProperty(evt.getPropertyName(), evt.getNewValue().toString());
             }
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @version  $Revision$, $Date$
-     */
-    public static class ProxyProperties extends Properties {
-
-        //~ Methods ------------------------------------------------------------
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getProxyHost() {
-            return getProperty("proxy.host");
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public Integer getProxyPort() {
-            final Integer port = integerValueOf(getProperty("proxy.port"));
-            return ((port != null) && (port >= 0) && (port <= 65535)) ? port : 0;
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getProxyUsername() {
-            return getProperty("proxy.username");
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getProxyPassword() {
-            return getProperty("proxy.password");
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getProxyDomain() {
-            return getProperty("proxy.domain");
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public String getProxyExcludedHosts() {
-            return getProperty("proxy.excludedHosts");
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        public Boolean getProxyEnabled() {
-            return booleanValueOf(getProperty("proxy.enabled"));
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param   value  DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        private static Integer integerValueOf(final String value) {
-            try {
-                return Integer.parseInt(value);
-            } catch (final Exception exp) {
-                LOG.warn(String.format("%s could not be parsed to Integer", value), exp); // NOI18N
-                return null;
-            }
-        }
-
-        /**
-         * DOCUMENT ME!
-         *
-         * @param   value  DOCUMENT ME!
-         *
-         * @return  DOCUMENT ME!
-         */
-        private static Boolean booleanValueOf(final String value) {
-            return (value == null) ? null : (value.equalsIgnoreCase(TRUE) || value.equals("1"));
         }
     }
 }

@@ -19,7 +19,6 @@ import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.method.MethodManager;
 import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.resource.PropertyManager;
-import Sirius.navigator.resource.PropertyManager.ProxyProperties;
 import Sirius.navigator.resource.ResourceManager;
 import Sirius.navigator.search.CidsSearchInitializer;
 import Sirius.navigator.types.treenode.RootTreeNode;
@@ -349,40 +348,23 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      * @throws  InterruptedException  DOCUMENT ME!
      */
     private void initConnection() throws ConnectionException, InterruptedException {
-        final ProxyProperties proxyProperties = propertyManager.getProxyProperties();
-        if ((proxyProperties != null) && Boolean.TRUE.equals(proxyProperties.getProxyEnabled())) {
-            final Proxy preconfiguredProxy = new Proxy(
-                    proxyProperties.getProxyHost(),
-                    proxyProperties.getProxyPort(),
-                    proxyProperties.getProxyUsername(),
-                    proxyProperties.getProxyPassword(),
-                    proxyProperties.getProxyDomain(),
-                    proxyProperties.getProxyExcludedHosts());
-            ProxyHandler.getInstance().setPreconfiguredProxy(preconfiguredProxy);
-            if (ProxyHandler.getInstance().getManualProxy() == null) {
-                ProxyHandler.getInstance().setManualProxy(preconfiguredProxy);
-            }
-            if (ProxyHandler.getInstance().getMode() == null) {
-                ProxyHandler.getInstance().usePreconfiguredProxy();
-            }
-        }
-        final Proxy proxyConfig = ProxyHandler.getInstance().getProxy();
+        final Proxy proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
 
         progressObserver.setProgress(
             25,
             org.openide.util.NbBundle.getMessage(Navigator.class, "Navigator.progressObserver.message_25")); // NOI18N
         if (LOG.isDebugEnabled()) {
-            LOG.debug("initialising connection using proxy: " + proxyConfig);
+            LOG.debug("initialising connection using proxy: " + proxy);
         }
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
-                        proxyConfig,
+                        proxy,
                         propertyManager.isCompressionEnabled(),
                         getConnectionContext());
 
-        ConnectionSession session = null;
-        ConnectionProxy proxy = null;
+        ConnectionSession connectionSession = null;
+        ConnectionProxy connectionProxy;
 
         progressObserver.setProgress(
             50,
@@ -393,28 +375,30 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 LOG.info("performing autologin of user '" + propertyManager.getConnectionInfo().getUsername() + "'"); // NOI18N
             }
             try {
-                session = ConnectionFactory.getFactory()
+                connectionSession = ConnectionFactory.getFactory()
                             .createSession(
                                     connection,
                                     propertyManager.getConnectionInfo(),
                                     true,
                                     getConnectionContext());
-                proxy = ConnectionFactory.getFactory()
-                            .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
-                SessionManager.init(proxy);
+                connectionProxy = ConnectionFactory.getFactory()
+                            .createProxy(propertyManager.getConnectionProxyClass(),
+                                    connectionSession,
+                                    getConnectionContext());
+                SessionManager.init(connectionProxy);
             } catch (UserException uexp) {
                 LOG.error("autologin failed", uexp);                                                                  // NOI18N
-                session = null;
+                connectionSession = null;
             }
         }
 
         // autologin = false || autologin failed
-        if (!propertyManager.isAutoLogin() || (session == null)) {
+        if (!propertyManager.isAutoLogin() || (connectionSession == null)) {
             if (LOG.isInfoEnabled()) {
                 LOG.info("performing login"); // NOI18N
             }
             try {
-                session = ConnectionFactory.getFactory()
+                connectionSession = ConnectionFactory.getFactory()
                             .createSession(
                                     connection,
                                     propertyManager.getConnectionInfo(),
@@ -422,9 +406,11 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                                     getConnectionContext());
             } catch (UserException uexp) {
             }                                 // should never happen
-            proxy = ConnectionFactory.getFactory()
-                        .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
-            SessionManager.init(proxy);
+            connectionProxy = ConnectionFactory.getFactory()
+                        .createProxy(propertyManager.getConnectionProxyClass(),
+                                connectionSession,
+                                getConnectionContext());
+            SessionManager.init(connectionProxy);
 
             loginDialog = new LoginDialog(this);
             StaticSwingTools.showDialog(loginDialog);
