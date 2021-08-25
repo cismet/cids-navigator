@@ -231,6 +231,9 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
         try {
             checkNavigatorHome();
+
+            ProxyCredentials.initFromConfAttr("proxy.credentials", getConnectionContext());
+
             initConfigurationManager();
             initUI();
             initWidgets();

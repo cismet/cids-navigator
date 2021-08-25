@@ -387,10 +387,13 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         }
 
-        initConnection(ProxyHandler.getInstance().getProxy());
+        initConnection();
 
         try {
             checkNavigatorHome();
+
+            ProxyCredentials.initFromConfAttr("proxy.credentials", getConnectionContext());
+
             initConfigurationManager();
             initCismapConfigurationManager();
             initWindowConfig();
@@ -1832,25 +1835,25 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     /**
      * #########################################################################
      *
-     * @param   proxyConfig  DOCUMENT ME!
-     *
      * @throws  ConnectionException   DOCUMENT ME!
      * @throws  InterruptedException  DOCUMENT ME!
      */
-    private void initConnection(final Proxy proxyConfig) throws ConnectionException, InterruptedException {
+    private void initConnection() throws ConnectionException, InterruptedException {
+        final Proxy proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
         progressObserver.setProgress(
             25,
             org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.progressObserver.message_25")); // NOI18N
         if (LOG.isDebugEnabled()) {
-            LOG.debug("initialising connection using proxy: " + proxyConfig);
+            LOG.debug("initialising connection using proxy: " + proxy);
         }
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
-                        proxyConfig,
-                        propertyManager.isCompressionEnabled());
-        ConnectionSession session = null;
-        ConnectionProxy proxy = null;
+                        proxy,
+                        propertyManager.isCompressionEnabled(),
+                        getConnectionContext());
+        ConnectionSession connectionSession = null;
+        ConnectionProxy connectionProxy = null;
 
         progressObserver.setProgress(
             50,
@@ -1876,24 +1879,26 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         if ((username != null) && (password != null) && (userDomain != null)) {
             try {
                 propertyManager.getConnectionInfo().setPassword(password);
-                session = ConnectionFactory.getFactory()
+                connectionSession = ConnectionFactory.getFactory()
                             .createSession(
                                     connection,
                                     propertyManager.getConnectionInfo(),
                                     true,
                                     getConnectionContext());
-                proxy = ConnectionFactory.getFactory()
-                            .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
-                SessionManager.init(proxy);
+                connectionProxy = ConnectionFactory.getFactory()
+                            .createProxy(propertyManager.getConnectionProxyClass(),
+                                    connectionSession,
+                                    getConnectionContext());
+                SessionManager.init(connectionProxy);
                 autoLogin = true;
             } catch (UserException uexp) {
                 LOG.error("login from jnlp parameters failed", uexp); // NOI18N
-                session = null;
+                connectionSession = null;
             }
         }
 
         // autologin = false || autologin failed
-        if ((!autoLogin && !propertyManager.isAutoLogin()) || (session == null)) {
+        if ((!autoLogin && !propertyManager.isAutoLogin()) || (connectionSession == null)) {
             String userGroupWithDomain = null;
 
             if ((usergroup != null) && (userGroupDomain != null)) {
@@ -1908,7 +1913,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 LOG.info("performing login"); // NOI18N
             }
             try {
-                session = ConnectionFactory.getFactory()
+                connectionSession = ConnectionFactory.getFactory()
                             .createSession(
                                     connection,
                                     propertyManager.getConnectionInfo(),
@@ -1916,9 +1921,11 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                                     getConnectionContext());
             } catch (UserException uexp) {
             }                                 // should never happen
-            proxy = ConnectionFactory.getFactory()
-                        .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
-            SessionManager.init(proxy);
+            connectionProxy = ConnectionFactory.getFactory()
+                        .createProxy(propertyManager.getConnectionProxyClass(),
+                                connectionSession,
+                                getConnectionContext());
+            SessionManager.init(connectionProxy);
             loginDialog = new LoginDialog(this);
             loginDialog.setDefaultValues(username, userGroupWithDomain, userDomain);
             StaticSwingTools.showDialog(loginDialog);
