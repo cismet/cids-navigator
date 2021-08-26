@@ -65,33 +65,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import net.infonode.docking.DockingWindow;
 import net.infonode.docking.DockingWindowAdapter;
-import net.infonode.docking.DockingWindowListener;
 import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
 import net.infonode.docking.WindowBar;
-import net.infonode.docking.internal.ReadContext;
-import net.infonode.docking.properties.DockingWindowProperties;
-import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
 import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.title.DockingWindowTitleProvider;
 import net.infonode.docking.title.SimpleDockingWindowTitleProvider;
 import net.infonode.docking.util.DeveloperUtil;
 import net.infonode.docking.util.DockingUtil;
-import net.infonode.docking.util.PropertiesUtil;
 import net.infonode.docking.util.StringViewMap;
-import net.infonode.gui.componentpainter.AlphaGradientComponentPainter;
-import net.infonode.gui.mouse.MouseButtonListener;
-import net.infonode.properties.propertymap.PropertyMap;
-import net.infonode.properties.propertymap.PropertyMapListener;
 import net.infonode.properties.propertymap.PropertyMapTreeListener;
 import net.infonode.properties.types.DirectionProperty;
 import net.infonode.tabbedpanel.TabAreaVisiblePolicy;
-import net.infonode.tabbedpanel.TabLayoutPolicy;
-import net.infonode.tabbedpanel.TabbedPanel;
 import net.infonode.util.Direction;
 import net.infonode.util.StreamUtil;
 import net.infonode.util.ValueChange;
@@ -121,19 +110,11 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
 import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -229,9 +210,8 @@ import de.cismet.layout.WrapLayout;
 
 import de.cismet.lookupoptions.gui.OptionsClient;
 
-import de.cismet.lookupoptions.options.ProxyOptionsPanel;
-
 import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
@@ -293,7 +273,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     /** Holds value of property disposed. */
     private boolean disposed = false;    // InfoNode
     // Panels
-    private NavigatorXSplashScreen splashScreen;
     private String title;
     private RootWindow rootWindow;
     private StringViewMap viewMap = new StringViewMap();
@@ -362,7 +341,6 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     public NavigatorX(final ProgressObserver progressObserver, final NavigatorXSplashScreen splashScreen)
             throws Exception {
         this.progressObserver = progressObserver;
-        this.splashScreen = splashScreen;
 
         initComponents();
         this.propertyManager = PropertyManager.getManager();
@@ -403,41 +381,19 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
         initTakeoffHooks();
 
-        final ProxyOptionsPanel proxyOptions = new ProxyOptionsPanel();
-        proxyOptions.setProxy(Proxy.fromPreferences());
-
         final String heavyComps = System.getProperty("contains.heavyweight.comps"); // NOI18N
         if ((heavyComps != null) && heavyComps.equals("true")) {                    // NOI18N
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         }
 
-        // splashscreen gesetzt?
-        if (splashScreen != null) {
-            // ProxyOptions panel soll im SplashScreen integriert werden
-            // panel übergeben
-            splashScreen.setProxyOptionsPanel(proxyOptions);
-            // panel noch nicht anzeigen
-            splashScreen.setProxyOptionsVisible(false);
-
-            // auf Anwenden-Button horchen
-            splashScreen.addApplyButtonActionListener(new ActionListener() {
-
-                    // Anwenden wurde gedrückt
-                    @Override
-                    public void actionPerformed(final ActionEvent ae) {
-                        // Proxy in den Preferences setzen
-                        proxyOptions.getProxy().toPreferences();
-                        // Panel wieder verstecken
-                        splashScreen.setProxyOptionsVisible(false);
-                    }
-                });
-        }
-
-        initConnection(Proxy.fromPreferences());
+        initConnection();
 
         try {
             checkNavigatorHome();
+
+            ProxyCredentials.initFromConfAttr("proxy.credentials", getConnectionContext());
+
             initConfigurationManager();
             initCismapConfigurationManager();
             initWindowConfig();
@@ -1879,25 +1835,25 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
     /**
      * #########################################################################
      *
-     * @param   proxyConfig  DOCUMENT ME!
-     *
      * @throws  ConnectionException   DOCUMENT ME!
      * @throws  InterruptedException  DOCUMENT ME!
      */
-    private void initConnection(final Proxy proxyConfig) throws ConnectionException, InterruptedException {
+    private void initConnection() throws ConnectionException, InterruptedException {
+        final Proxy proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
         progressObserver.setProgress(
             25,
             org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.progressObserver.message_25")); // NOI18N
         if (LOG.isDebugEnabled()) {
-            LOG.debug("initialising connection using proxy: " + proxyConfig);
+            LOG.debug("initialising connection using proxy: " + proxy);
         }
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
-                        proxyConfig,
-                        propertyManager.isCompressionEnabled());
-        ConnectionSession session = null;
-        ConnectionProxy proxy = null;
+                        proxy,
+                        propertyManager.isCompressionEnabled(),
+                        getConnectionContext());
+        ConnectionSession connectionSession = null;
+        ConnectionProxy connectionProxy = null;
 
         progressObserver.setProgress(
             50,
@@ -1923,24 +1879,26 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         if ((username != null) && (password != null) && (userDomain != null)) {
             try {
                 propertyManager.getConnectionInfo().setPassword(password);
-                session = ConnectionFactory.getFactory()
+                connectionSession = ConnectionFactory.getFactory()
                             .createSession(
                                     connection,
                                     propertyManager.getConnectionInfo(),
                                     true,
                                     getConnectionContext());
-                proxy = ConnectionFactory.getFactory()
-                            .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
-                SessionManager.init(proxy);
+                connectionProxy = ConnectionFactory.getFactory()
+                            .createProxy(propertyManager.getConnectionProxyClass(),
+                                    connectionSession,
+                                    getConnectionContext());
+                SessionManager.init(connectionProxy);
                 autoLogin = true;
             } catch (UserException uexp) {
                 LOG.error("login from jnlp parameters failed", uexp); // NOI18N
-                session = null;
+                connectionSession = null;
             }
         }
 
         // autologin = false || autologin failed
-        if ((!autoLogin && !propertyManager.isAutoLogin()) || (session == null)) {
+        if ((!autoLogin && !propertyManager.isAutoLogin()) || (connectionSession == null)) {
             String userGroupWithDomain = null;
 
             if ((usergroup != null) && (userGroupDomain != null)) {
@@ -1955,7 +1913,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 LOG.info("performing login"); // NOI18N
             }
             try {
-                session = ConnectionFactory.getFactory()
+                connectionSession = ConnectionFactory.getFactory()
                             .createSession(
                                     connection,
                                     propertyManager.getConnectionInfo(),
@@ -1963,9 +1921,11 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                                     getConnectionContext());
             } catch (UserException uexp) {
             }                                 // should never happen
-            proxy = ConnectionFactory.getFactory()
-                        .createProxy(propertyManager.getConnectionProxyClass(), session, getConnectionContext());
-            SessionManager.init(proxy);
+            connectionProxy = ConnectionFactory.getFactory()
+                        .createProxy(propertyManager.getConnectionProxyClass(),
+                                connectionSession,
+                                getConnectionContext());
+            SessionManager.init(connectionProxy);
             loginDialog = new LoginDialog(this);
             loginDialog.setDefaultValues(username, userGroupWithDomain, userDomain);
             StaticSwingTools.showDialog(loginDialog);

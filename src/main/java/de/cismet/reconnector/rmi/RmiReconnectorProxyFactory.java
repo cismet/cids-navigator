@@ -81,6 +81,6 @@ public abstract class RmiReconnectorProxyFactory {
         // mit oder ohne Benutzung eines Dialogs
         reconnector.useDialog(useDialog, parentFrame);
         // ReconnectorProxy zurückliefern.
-        return (Remote)reconnector.getProxy();
+        return (Remote)reconnector.getCallserver();
     }
 }

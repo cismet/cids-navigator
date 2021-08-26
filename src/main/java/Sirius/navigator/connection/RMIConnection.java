@@ -12,7 +12,12 @@ import Sirius.navigator.exception.SqlConnectionException;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
-import Sirius.server.middleware.interfaces.proxy.*;
+import Sirius.server.middleware.interfaces.proxy.ActionService;
+import Sirius.server.middleware.interfaces.proxy.CatalogueService;
+import Sirius.server.middleware.interfaces.proxy.MetaService;
+import Sirius.server.middleware.interfaces.proxy.SearchService;
+import Sirius.server.middleware.interfaces.proxy.SystemService;
+import Sirius.server.middleware.interfaces.proxy.UserService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.LightweightMetaObject;
@@ -154,7 +159,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         this.connected = false;
 
         LOG.info("creating network connection to callserver '" + callserverURL + "'");
-        callserver = createReconnector(callserverURL).getProxy();
+        callserver = createReconnector(callserverURL).getCallserver();
 
         if (LOG.isDebugEnabled()) {
             final StringBuffer buffer = new StringBuffer("remote interfaces of '").append(callserver.getClass()

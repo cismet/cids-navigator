@@ -5,6 +5,11 @@
 *              ... and it just works.
 *
 ****************************************************/
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package de.cismet.reconnector;
 
 import org.openide.util.NbBundle;
@@ -12,7 +17,9 @@ import org.openide.util.NbBundle;
 import java.awt.BorderLayout;
 import java.awt.Component;
 
-import javax.swing.JLabel;
+import javax.swing.JFrame;
+
+import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -20,15 +27,11 @@ import javax.swing.JLabel;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorListener {
+public class ReconnectorDialog extends javax.swing.JDialog implements ReconnectorListener {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ReconnectorPanel.class);
-
-    private static final String CONNECTION_CANCELED = NbBundle.getMessage(
-            ReconnectorPanel.class,
-            "connection_canceled");
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ReconnectorDialog.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -42,6 +45,8 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
     private javax.swing.JButton btnRetry;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel labTryingToConnect;
+    private javax.swing.JLabel lblCanceled;
+    private javax.swing.JPanel panCanceled;
     private javax.swing.JPanel panError;
     private javax.swing.JPanel panProgress;
     private javax.swing.JPanel panRetry;
@@ -51,60 +56,132 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
     //~ Constructors -----------------------------------------------------------
 
     /**
-     * Creates new form ReconnectorPanel.
+     * Creates new form ReconnectorDialog.
      *
+     * @param  parent       DOCUMENT ME!
      * @param  reconnector  DOCUMENT ME!
      */
-    public ReconnectorPanel(final Reconnector reconnector) {
+    public ReconnectorDialog(final JFrame parent, final Reconnector reconnector) {
+        super(parent);
         this.reconnector = reconnector;
 
         initComponents();
-
-        setConnecting(false);
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
      * DOCUMENT ME!
-     *
-     * @param  isConnecting  DOCUMENT ME!
      */
-    private void setConnecting(final boolean isConnecting) {
-        removeAll();
-        if (isConnecting) {
-            add(panProgress, BorderLayout.CENTER);
-        } else {
-            add(panRetry, BorderLayout.CENTER);
+    private void showPending() {
+        panError.removeAll();
+        errorComponent = null;
+
+        getContentPane().removeAll();
+        getContentPane().add(panProgress, java.awt.BorderLayout.CENTER);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  errorComponent  DOCUMENT ME!
+     */
+    private void showError(final Component errorComponent) {
+        this.errorComponent = errorComponent;
+
+        getContentPane().removeAll();
+        getContentPane().add(panRetry, java.awt.BorderLayout.CENTER);
+
+        panError.removeAll();
+        if (errorComponent != null) {
+            panError.add(errorComponent, BorderLayout.CENTER);
         }
+        panError.revalidate();
+    }
+
+    @Override
+    public void connecting() {
+        showPending();
+        showDialog();
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public boolean isWaitingForUser() {
+        return isVisible() && !getContentPane().equals(panProgress);
+    }
+
+    @Override
+    public void connectionFailed(final ReconnectorEvent event) {
+//        if (!SwingUtilities.isEventDispatchThread()) {
+//            try {
+//                SwingUtilities.invokeLater(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            connectionFailed(event);
+//                        }
+//                    });
+//            } catch (final Exception ex) {
+//            }
+//        } else {
+        showError(event.getComponent());
+        showDialog();
+        StaticSwingTools.showDialog(this);
+//        }
+    }
+
+    @Override
+    public void connectionCanceled() {
+//        if (!SwingUtilities.isEventDispatchThread()) {
+//            try {
+//                SwingUtilities.invokeLater(new Runnable() {
+//
+//                        @Override
+//                        public void run() {
+//                            connectionCanceled();
+//                        }
+//                    });
+//            } catch (final Exception ex) {
+//            }
+//        } else {
+//            if (isVisible()) {
+        showError(panCanceled);
+        showDialog();
+//            }
+//        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void showDialog() {
         revalidate();
         validate();
         repaint();
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  component  DOCUMENT ME!
-     */
-    private void showError(final Component component) {
-        panError.add(component, BorderLayout.CENTER);
-        reconnector.pack();
-        setConnecting(false);
+        pack();
+//        StaticSwingTools.showDialog(this);
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void showConnecting() {
-        panError.removeAll();
-        setConnecting(true);
+    private void close() {
+        setVisible(false);
     }
 
+    @Override
+    public void connectionCompleted() {
+        close();
+    }
     /**
      * This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The
      * content of this method is always regenerated by the Form Editor.
      */
+    @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -119,6 +196,8 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         btnExit = new javax.swing.JButton();
         btnIgnore = new javax.swing.JButton();
         btnRetry = new javax.swing.JButton();
+        panCanceled = new javax.swing.JPanel();
+        lblCanceled = new javax.swing.JLabel();
 
         panProgress.setMinimumSize(new java.awt.Dimension(200, 88));
         panProgress.setLayout(new java.awt.GridBagLayout());
@@ -133,7 +212,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 6);
         panProgress.add(pb, gridBagConstraints);
 
-        btnCancel.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "cancel")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnCancel,
+            org.openide.util.NbBundle.getMessage(ReconnectorDialog.class, "ReconnectorDialog.btnCancel.text")); // NOI18N
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
 
                 @Override
@@ -148,7 +229,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         gridBagConstraints.insets = new java.awt.Insets(6, 6, 6, 6);
         panProgress.add(btnCancel, gridBagConstraints);
 
-        labTryingToConnect.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "trying_to_connect")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            labTryingToConnect,
+            org.openide.util.NbBundle.getMessage(ReconnectorDialog.class, "ReconnectorDialog.labTryingToConnect.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
@@ -162,7 +245,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
         panError.setLayout(new java.awt.BorderLayout());
         panRetry.add(panError, java.awt.BorderLayout.CENTER);
 
-        btnExit.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "stop")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnExit,
+            org.openide.util.NbBundle.getMessage(ReconnectorDialog.class, "ReconnectorDialog.btnExit.text")); // NOI18N
         btnExit.setPreferredSize(new java.awt.Dimension(125, 29));
         btnExit.addActionListener(new java.awt.event.ActionListener() {
 
@@ -173,7 +258,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
             });
         jPanel1.add(btnExit);
 
-        btnIgnore.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "ignore")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnIgnore,
+            org.openide.util.NbBundle.getMessage(ReconnectorDialog.class, "ReconnectorDialog.btnIgnore.text")); // NOI18N
         btnIgnore.setPreferredSize(new java.awt.Dimension(125, 29));
         btnIgnore.addActionListener(new java.awt.event.ActionListener() {
 
@@ -184,7 +271,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
             });
         jPanel1.add(btnIgnore);
 
-        btnRetry.setText(org.openide.util.NbBundle.getMessage(ReconnectorPanel.class, "retry")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(
+            btnRetry,
+            org.openide.util.NbBundle.getMessage(ReconnectorDialog.class, "ReconnectorDialog.btnRetry.text")); // NOI18N
         btnRetry.setPreferredSize(new java.awt.Dimension(125, 29));
         btnRetry.addActionListener(new java.awt.event.ActionListener() {
 
@@ -197,7 +286,24 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
 
         panRetry.add(jPanel1, java.awt.BorderLayout.SOUTH);
 
-        setLayout(new java.awt.BorderLayout());
+        panCanceled.setLayout(new java.awt.GridBagLayout());
+
+        org.openide.awt.Mnemonics.setLocalizedText(
+            lblCanceled,
+            NbBundle.getMessage(ReconnectorDialog.class, "connection_canceled"));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(10, 10, 10, 10);
+        panCanceled.add(lblCanceled, gridBagConstraints);
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle(NbBundle.getMessage(Reconnector.class, "Reconnector.useDialog().reconnectorDialog.title"));
+        setAlwaysOnTop(true);
+        setModal(true);
+
+        pack();
     } // </editor-fold>//GEN-END:initComponents
 
     /**
@@ -206,20 +312,9 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
      * @param  evt  DOCUMENT ME!
      */
     private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
-        reconnector.doCancel();
+        close();
+        connectionCanceled();
     }                                                                             //GEN-LAST:event_btnCancelActionPerformed
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  evt  DOCUMENT ME!
-     */
-    private void btnRetryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnRetryActionPerformed
-        if (errorComponent instanceof ReconnectorErrorPanelWithApply) {
-            ((ReconnectorErrorPanelWithApply)errorComponent).apply();
-        }
-        reconnector.doReconnect();
-    }                                                                            //GEN-LAST:event_btnRetryActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -237,27 +332,18 @@ public class ReconnectorPanel extends javax.swing.JPanel implements ReconnectorL
      */
     private void btnIgnoreActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnIgnoreActionPerformed
         reconnector.doAbort();
+        close();
     }                                                                             //GEN-LAST:event_btnIgnoreActionPerformed
 
-    @Override
-    public void connecting() {
-        showConnecting();
-    }
-
-    @Override
-    public void connectionFailed(final ReconnectorEvent event) {
-        errorComponent = event.getComponent();
-        showError(errorComponent);
-    }
-
-    @Override
-    public void connectionCanceled() {
-        errorComponent = null;
-        showError(new JLabel(CONNECTION_CANCELED));
-    }
-
-    @Override
-    public void connectionCompleted() {
-        errorComponent = null;
-    }
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void btnRetryActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnRetryActionPerformed
+        if (errorComponent instanceof ReconnectorErrorPanelWithApply) {
+            ((ReconnectorErrorPanelWithApply)errorComponent).apply();
+        }
+        close();
+    }                                                                            //GEN-LAST:event_btnRetryActionPerformed
 }

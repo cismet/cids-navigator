@@ -47,8 +47,6 @@ import javax.swing.filechooser.FileFilter;
 
 import de.cismet.lookupoptions.options.ProxyOptionsPanel;
 
-import de.cismet.netutil.Proxy;
-
 import de.cismet.reconnector.DefaultReconnectorErrorPanel;
 import de.cismet.reconnector.ReconnectorErrorPanelWithApply;
 
@@ -73,7 +71,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
 
     private final JFileChooser fileChooser;
     private final ProxyOptionsPanel panProxyOptions;
-    private final RESTfulReconnector reconnector;
     private DefaultReconnectorErrorPanel errPan;
     private final Preferences cidsPrefs;
     private FileFilter keystoreFileFilter = new FileFilter() {
@@ -115,11 +112,12 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
     private javax.swing.JButton cmdGetClientCert;
     private javax.swing.JButton cmdGetServerCert;
     private javax.swing.JPanel errPanWrapper;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JLabel lblClientCertIndicator;
     private javax.swing.JLabel lblServerCertIndicator;
     private javax.swing.JPanel panCertOptionsWrapper;
@@ -135,15 +133,16 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
      * Creates new form RESTfulReconnectorErrorPanel.
      *
      * @param  panProxyOptions  DOCUMENT ME!
-     * @param  reconnector      DOCUMENT ME!
      */
-    public RESTfulReconnectorErrorPanel(final ProxyOptionsPanel panProxyOptions, final RESTfulReconnector reconnector) {
-        initComponents();
-        panCertOptionsWrapper.setVisible(false);
-        this.reconnector = reconnector;
+    public RESTfulReconnectorErrorPanel(final ProxyOptionsPanel panProxyOptions) {
         this.panProxyOptions = panProxyOptions;
+
+        initComponents();
         panProxyOptionsWrapper.add(panProxyOptions, BorderLayout.CENTER);
+
+        panCertOptionsWrapper.setVisible(false);
         panProxyOptionsWrapper.setVisible(false);
+
         cidsPrefs = Preferences.userNodeForPackage(DefaultSSLConfigProvider.class);
         txtClientCertPass.setText(cidsPrefs.get(CLIENT_CERT_PASS_PREFS_KEY, ""));
         txtClientCertPass.getDocument().addDocumentListener(new DocumentListener() {
@@ -240,12 +239,12 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
-        panProxyOptionsWrapper = new javax.swing.JPanel();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
         errPanWrapper = new javax.swing.JPanel();
+        jSeparator1 = new javax.swing.JSeparator();
         tbProxy = new javax.swing.JToggleButton();
         tbCerts = new javax.swing.JToggleButton();
+        jSeparator3 = new javax.swing.JSeparator();
+        panProxyOptionsWrapper = new javax.swing.JPanel();
         panCertOptionsWrapper = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -256,39 +255,26 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         jLabel5 = new javax.swing.JLabel();
         cmdCheck = new javax.swing.JButton();
         txtClientCertPass = new javax.swing.JPasswordField();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 32767));
 
         setLayout(new java.awt.GridBagLayout());
 
-        panProxyOptionsWrapper.setLayout(new java.awt.BorderLayout());
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
-        add(panProxyOptionsWrapper, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
-        add(jSeparator1, gridBagConstraints);
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
-        gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
-        add(jSeparator2, gridBagConstraints);
-
         errPanWrapper.setLayout(new java.awt.BorderLayout());
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.weighty = 1.0;
         add(errPanWrapper, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
+        add(jSeparator1, gridBagConstraints);
 
         tbProxy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Sirius/navigator/connection/proxy.png"))); // NOI18N
         tbProxy.setText(org.openide.util.NbBundle.getMessage(
@@ -308,7 +294,6 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(tbProxy, gridBagConstraints);
@@ -331,12 +316,34 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(tbCerts, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.insets = new java.awt.Insets(6, 0, 6, 0);
+        add(jSeparator3, gridBagConstraints);
 
-        panCertOptionsWrapper.setPreferredSize(new java.awt.Dimension(400, 87));
+        panProxyOptionsWrapper.setBorder(javax.swing.BorderFactory.createTitledBorder(
+                org.openide.util.NbBundle.getMessage(
+                    RESTfulReconnectorErrorPanel.class,
+                    "RESTfulReconnectorErrorPanel.tbProxy.text"))); // NOI18N
+        panProxyOptionsWrapper.setLayout(new java.awt.BorderLayout());
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        add(panProxyOptionsWrapper, gridBagConstraints);
+
+        panCertOptionsWrapper.setBorder(javax.swing.BorderFactory.createTitledBorder(
+                org.openide.util.NbBundle.getMessage(
+                    RESTfulReconnectorErrorPanel.class,
+                    "RESTfulReconnectorErrorPanel.tbCerts.text"))); // NOI18N
         panCertOptionsWrapper.setLayout(new java.awt.GridBagLayout());
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(
@@ -384,7 +391,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 0);
@@ -401,7 +408,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 5, 0);
@@ -421,7 +428,7 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
                 RESTfulReconnectorErrorPanel.class,
                 "RESTfulReconnectorErrorPanel.cmdCheck.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -441,22 +448,24 @@ public class RESTfulReconnectorErrorPanel extends javax.swing.JPanel implements 
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         add(panCertOptionsWrapper, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weighty = 1.0;
+        add(filler1, gridBagConstraints);
     } // </editor-fold>//GEN-END:initComponents
 
     @Override
     public void apply() {
-        final Proxy proxy = panProxyOptions.getProxy();
-        reconnector.setProxy(proxy);
-
-        if (proxy == null) {
-            LOG.warn("proxy configuration not saved to preferences, proxy is null");
-        } else {
-            proxy.toPreferences();
-        }
+        panProxyOptions.applyChanges();
     }
 
     /**

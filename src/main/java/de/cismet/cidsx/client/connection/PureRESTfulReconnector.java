@@ -19,11 +19,11 @@ import de.cismet.cidsx.client.connector.RESTfulInterfaceConnector;
 
 import de.cismet.netutil.Proxy;
 
-import de.cismet.reconnector.Reconnector;
-
 /**
  * Overrides RESTfulReconnector and uses the RESTfulInterfaceConnector CallServerService implementation to interact with
  * the cids server Pure REST API.
+ *
+ * @param    <R>
  *
  * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  1.0 2015/04/17
@@ -54,12 +54,12 @@ public class PureRESTfulReconnector<R extends CallServerService> extends RESTful
     @Override
     protected R connectService() {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("connection to cids pure REST service '" + callserverURL + "'");
+            LOG.debug("connection to cids pure REST service '" + getCallserverURL() + "'");
         }
 
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
         final SSLConfig sslConfig = (sslConfigProvider == null) ? null : sslConfigProvider.getSSLConfig();
 
-        return (R)new RESTfulInterfaceConnector(callserverURL, proxy, sslConfig);
+        return (R)new RESTfulInterfaceConnector(getCallserverURL(), getProxy(), sslConfig);
     }
 }
