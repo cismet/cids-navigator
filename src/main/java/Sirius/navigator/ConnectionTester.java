@@ -28,11 +28,15 @@
  */
 package Sirius.navigator;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import org.openide.util.Lookup;
 
+import java.awt.CardLayout;
 import java.awt.EventQueue;
 
 import java.io.BufferedInputStream;
@@ -47,13 +51,16 @@ import java.util.Properties;
 
 import javax.swing.JFileChooser;
 import javax.swing.JTextArea;
+import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.ws.SSLConfigProvider;
 import de.cismet.cids.server.ws.rest.RESTfulSerialInterfaceConnector;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
-import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
+
+import de.cismet.security.WebAccessManager;
 
 import de.cismet.tools.gui.TextAreaAppender;
 
@@ -74,12 +81,29 @@ public class ConnectionTester extends javax.swing.JFrame {
     private final String connectionUrl;
     private final boolean compressionEnabled;
 
+    @Getter @Setter private boolean workerRunning = false;
+
+    private SwingWorker worker = null;
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnStore;
     private javax.swing.JButton btnTest;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.Box.Filler filler1;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JEditorPane jEditorPane1;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JRadioButton jRadioButton1;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -89,6 +113,8 @@ public class ConnectionTester extends javax.swing.JFrame {
     private de.cismet.lookupoptions.options.ProxyOptionsPanel proxyOptionsPanel1;
     private javax.swing.JTextArea txaLog;
     private javax.swing.JTextArea txaOut;
+    private javax.swing.JTextField txtUrl;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
     //~ Constructors -----------------------------------------------------------
@@ -142,12 +168,13 @@ public class ConnectionTester extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         jScrollPane2 = new javax.swing.JScrollPane();
         jEditorPane1 = new javax.swing.JEditorPane();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
-        btnTest = new javax.swing.JButton();
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         txaOut = new javax.swing.JTextArea();
@@ -156,30 +183,31 @@ public class ConnectionTester extends javax.swing.JFrame {
         txaLog = new javax.swing.JTextArea();
         btnStore = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
+        jButton3 = new javax.swing.JButton();
         proxyOptionsPanel1 = new de.cismet.lookupoptions.options.ProxyOptionsPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel7 = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jPanel4 = new javax.swing.JPanel();
+        jPanel5 = new javax.swing.JPanel();
+        btnTest = new javax.swing.JButton();
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(0, 0),
+                new java.awt.Dimension(32767, 0));
+        jPanel6 = new javax.swing.JPanel();
+        txtUrl = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
 
         jScrollPane2.setViewportView(jEditorPane1);
 
         jScrollPane3.setViewportView(jTextPane1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle(org.openide.util.NbBundle.getMessage(ConnectionTester.class, "ConnectionTester.title")); // NOI18N
+        setTitle("Connection-Tester");
         getContentPane().setLayout(new java.awt.GridBagLayout());
-
-        btnTest.setText("Test"); // NOI18N
-        btnTest.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(final java.awt.event.ActionEvent evt) {
-                    btnTestActionPerformed(evt);
-                }
-            });
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
-        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
-        getContentPane().add(btnTest, gridBagConstraints);
 
         txaOut.setColumns(20);
         txaOut.setRows(5);
@@ -197,7 +225,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.gridwidth = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.ipadx = 744;
         gridBagConstraints.ipady = 345;
@@ -215,7 +243,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 }
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(btnStore, gridBagConstraints);
@@ -228,12 +256,19 @@ public class ConnectionTester extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 0, Short.MAX_VALUE));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
         jPanel1.add(jPanel3, gridBagConstraints);
+
+        jButton3.setText("Clear");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        jPanel1.add(jButton3, gridBagConstraints);
 
         jTabbedPane1.addTab("Log", jPanel1);
 
@@ -250,6 +285,184 @@ public class ConnectionTester extends javax.swing.JFrame {
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         getContentPane().add(proxyOptionsPanel1, gridBagConstraints);
 
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jPanel7.setLayout(new java.awt.GridBagLayout());
+
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.setSelected(true);
+        jRadioButton1.setText("Broker");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${!this.workerRunning}"),
+                jRadioButton1,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jRadioButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        jPanel7.add(jRadioButton1, gridBagConstraints);
+
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.setText("Url");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${!this.workerRunning}"),
+                jRadioButton2,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jRadioButton2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        jPanel7.add(jRadioButton2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanel2.add(jPanel7, gridBagConstraints);
+
+        jPanel4.setLayout(new java.awt.CardLayout());
+
+        jPanel5.setLayout(new java.awt.GridBagLayout());
+
+        btnTest.setText("Test"); // NOI18N
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${!this.workerRunning}"),
+                btnTest,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        btnTest.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    btnTestActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        jPanel5.add(btnTest, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel5.add(filler1, gridBagConstraints);
+
+        jPanel4.add(jPanel5, "broker");
+
+        jPanel6.setLayout(new java.awt.GridBagLayout());
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${!this.workerRunning}"),
+                txtUrl,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        jPanel6.add(txtUrl, gridBagConstraints);
+
+        jButton1.setText("Test Url");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${!this.workerRunning}"),
+                jButton1,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton1ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        jPanel6.add(jButton1, gridBagConstraints);
+
+        jLabel1.setText(":");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        jPanel6.add(jLabel1, gridBagConstraints);
+
+        jPanel4.add(jPanel6, "url");
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        jPanel2.add(jPanel4, gridBagConstraints);
+
+        jButton2.setText("Cancel");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(
+                org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE,
+                this,
+                org.jdesktop.beansbinding.ELProperty.create("${this.workerRunning}"),
+                jButton2,
+                org.jdesktop.beansbinding.BeanProperty.create("enabled"));
+        bindingGroup.addBinding(binding);
+
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton2ActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 0);
+        jPanel2.add(jButton2, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.insets = new java.awt.Insets(5, 5, 5, 5);
+        getContentPane().add(jPanel2, gridBagConstraints);
+
+        bindingGroup.bind();
+
         pack();
     } // </editor-fold>//GEN-END:initComponents
 
@@ -261,40 +474,35 @@ public class ConnectionTester extends javax.swing.JFrame {
     private void btnTestActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnTestActionPerformed
     {                                                                         //GEN-HEADEREND:event_btnTestActionPerformed
         try {
-            txaOut.setText("");
-
-            proxyOptionsPanel1.applyChanges();
-
-            final Proxy proxy = proxyOptionsPanel1.getProxy();
+            stopWorker();
 
             txaOut.setText("Connection test running...\n\n");
 
-            final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
-                    connectionUrl,
-                    proxy,
-                    Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig(),
-                    compressionEnabled);
+            startWorker(new SwingWorker<String, String>() {
 
-            final Thread establisher = new Thread(new Runnable() {
+                    @Override
+                    protected String doInBackground() throws Exception {
+                        proxyOptionsPanel1.applyChanges();
+                        final RESTfulSerialInterfaceConnector connector = new RESTfulSerialInterfaceConnector(
+                                connectionUrl,
+                                ProxyHandler.getInstance().getProxy(),
+                                Lookup.getDefault().lookup(SSLConfigProvider.class).getSSLConfig(),
+                                compressionEnabled);
+                        return connector.getDomains(ConnectionContext.createDeprecated()).length
+                                    + " domain(s) retrieved\n\nSUCCESS";
+                    }
 
-                        @Override
-                        public void run() {
-                            try {
-                                final String ret = connector.getDomains(ConnectionContext.createDeprecated()).length
-                                            + " domain(s) retrieved\n\nSUCCESS";
-                                EventQueue.invokeLater(new Runnable() {
-
-                                        @Override
-                                        public void run() {
-                                            txaOut.append(ret);
-                                        }
-                                    });
-                            } catch (final Exception ex) {
-                                appendException(ex);
-                            }
+                    @Override
+                    protected void done() {
+                        try {
+                            txaOut.append(get());
+                        } catch (final Exception ex) {
+                            appendException(ex);
+                        } finally {
+                            setWorkerRunning(false);
                         }
-                    });
-            establisher.start();
+                    }
+                });
         } catch (final Exception ex) {
             appendException(ex);
         }
@@ -360,6 +568,109 @@ public class ConnectionTester extends javax.swing.JFrame {
             }
         }
     }                                                                          //GEN-LAST:event_btnStoreActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  cardName  DOCUMENT ME!
+     */
+    private void showCard(final String cardName) {
+        ((CardLayout)jPanel4.getLayout()).show(jPanel4, cardName);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jRadioButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton1ActionPerformed
+        showCard("broker");
+    }                                                                                 //GEN-LAST:event_jRadioButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jRadioButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton2ActionPerformed
+        showCard("url");
+    }                                                                                 //GEN-LAST:event_jRadioButton2ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void stopWorker() {
+        synchronized (this) {
+            if (this.worker != null) {
+                this.worker.cancel(true);
+            }
+            this.worker = null;
+            setWorkerRunning(false);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  worker  DOCUMENT ME!
+     */
+    private void startWorker(final SwingWorker worker) {
+        stopWorker();
+        synchronized (this) {
+            this.worker = worker;
+            if (worker != null) {
+                setWorkerRunning(true);
+                worker.execute();
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            stopWorker();
+
+            txaOut.setText("");
+            txaOut.setText("Url test running...\n\n");
+            txaOut.append("calling: " + txtUrl.getText() + "\n");
+
+            startWorker(new SwingWorker<Boolean, Boolean>() {
+
+                    @Override
+                    protected Boolean doInBackground() throws Exception {
+                        proxyOptionsPanel1.applyChanges();
+                        return WebAccessManager.getInstance().checkIfURLaccessible(new URL(txtUrl.getText()));
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            txaOut.append(get() ? "SUCCESS" : "FAILED");
+                            txaOut.append("\n");
+                        } catch (final Exception ex) {
+                            appendException(ex);
+                        } finally {
+                            setWorkerRunning(false);
+                        }
+                    }
+                });
+        } catch (final Exception ex) {
+            appendException(ex);
+        }
+    } //GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+        stopWorker();
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!

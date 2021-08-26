@@ -72,6 +72,7 @@ import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.Proxy;
+import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -258,7 +259,7 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.RESTfulConnection",
                         info.getCallserverURL(),
-                        Proxy.fromPreferences(),
+                        ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         getConnectionContext());
         final ConnectionSession session = ConnectionFactory.getFactory()
@@ -311,7 +312,7 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.PureRESTfulConnection",
                         info.getCallserverURL(),
-                        Proxy.fromPreferences(),
+                        ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         getConnectionContext());
         final ConnectionSession session = ConnectionFactory.getFactory()

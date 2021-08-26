@@ -13,7 +13,7 @@
 
     <groupId>de.cismet.cids.navigator</groupId>
     <artifactId>cids-navigator</artifactId>
-    <version>7.6-SNAPSHOT</version>
+    <version>7.7-SNAPSHOT</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -55,13 +55,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>7.0.1</version>
+                <version>7.2</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>7.0.1</version>
+                <version>7.2</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -69,27 +69,20 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>7.0.3</version>
+                <version>7.2</version>
                 <type>jar</type>
-            </dependency>
-            <dependency>
-                <groupId>de.cismet.commons</groupId>
-                <artifactId>cismet-gui-commons</artifactId>
-                <version>7.0.3</version>
-                <type>test-jar</type>
-                <scope>test</scope>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>7.0.5</version>
+                <version>7.0.6</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>7.0.5</version>
+                <version>7.0.6</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -97,13 +90,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.5.6</version>
+                <version>7.6</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.5.6</version>
+                <version>7.6</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -394,12 +387,6 @@
         </dependency>
         <dependency>
             <groupId>de.cismet.commons</groupId>
-            <artifactId>cismet-gui-commons</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>de.cismet.commons</groupId>
             <artifactId>cismap-commons</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
@@ -513,7 +500,7 @@
                             </goals>
                             <configuration>
                                 <includeGroupIds>de.cismet</includeGroupIds>
-                                <includeArtifactIds>cismet-commons,cismet-gui-commons,cismap-commons,cids-server</includeArtifactIds>
+                                <includeArtifactIds>cismet-commons,cismap-commons,cids-server</includeArtifactIds>
                                 <outputDirectory>${project.build.testOutputDirectory}/</outputDirectory>
                                 <encoding>${project.build.sourceEncoding}</encoding>
                                 <classifier>tests</classifier>
@@ -558,6 +545,9 @@
                             <exclude>**/ImageFileRetrievalTest.java</exclude>
                             -->
                         </excludes>
+                        <additionalClasspathElements>
+                            <additionalClasspathElement>/home/cismet/cidsDistribution/lib/localWuNDa/serverCert.jar</additionalClasspathElement>
+                        </additionalClasspathElements>
                     </configuration>
                 </plugin>
             </plugins>
