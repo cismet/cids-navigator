@@ -98,11 +98,10 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
         boolean error = false;
         if (exception instanceof UniformInterfaceException) {
-//            if (exception instanceof UniformInterfaceException) {
-//                final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
-//                error = (status == 502) || (status == 503) || (status == 407);
-//            }
-            error = true;
+            if (exception instanceof UniformInterfaceException) {
+                final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
+                error = (status == 502) || (status == 503) || (status == 407);
+            }
         } else if (exception instanceof IllegalArgumentException) {
             error = true;
         } else if (exception instanceof ClientHandlerException) {
