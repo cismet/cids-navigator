@@ -1215,6 +1215,6 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
 
     @Override
     public CallServerService getCallServerService() {
-        return (CallServerService)reconnector;
+        return reconnector.getCallserver();
     }
 }

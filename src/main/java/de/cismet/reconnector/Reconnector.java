@@ -214,7 +214,7 @@ public abstract class Reconnector<S> {
                     } catch (final InterruptedException ex) {
                     }
                 }
-                if (reconnectorDialog != null) {
+                if (reconnectorDialog != null && reconnectorDialog.isVisible()) {
                     reconnectorDialog.setVisible(false);
                 }
 
