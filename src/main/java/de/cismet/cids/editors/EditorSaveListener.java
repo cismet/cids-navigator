@@ -10,9 +10,11 @@ package de.cismet.cids.editors;
 /**
  * DOCUMENT ME!
  *
- * @author   stefan
- * @version  $Revision$, $Date$
+ * @author      stefan
+ * @version     $Revision$, $Date$
+ * @deprecated  use SavePreparingEditor, EditorCloseListener and SaveVetoable instead
  */
+@Deprecated
 public interface EditorSaveListener {
 
     //~ Enums ------------------------------------------------------------------
@@ -22,6 +24,7 @@ public interface EditorSaveListener {
      *
      * @version  $Revision$, $Date$
      */
+    @Deprecated
     public enum EditorSaveStatus {
 
         //~ Enum constants -----------------------------------------------------
@@ -34,13 +37,20 @@ public interface EditorSaveListener {
     /**
      * DOCUMENT ME!
      *
-     * @param  event  status DOCUMENT ME!
+     * @return      DOCUMENT ME!
+     *
+     * @deprecated  use BeforeSavingHook.beforeSavig and SaveVetoable.isOkForSaving() instead
      */
-    void editorClosed(EditorClosedEvent event);
+    @Deprecated
+    boolean prepareForSave();
+
     /**
      * DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @param       event  status DOCUMENT ME!
+     *
+     * @deprecated  use AfterSavingHook.afterSaving() and AfterClosingHool.afterClosing() instead
      */
-    boolean prepareForSave();
+    @Deprecated
+    void editorClosed(EditorClosedEvent event);
 }
