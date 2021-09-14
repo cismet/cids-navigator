@@ -351,7 +351,12 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
      * @throws  InterruptedException  DOCUMENT ME!
      */
     private void initConnection() throws ConnectionException, InterruptedException {
-        final Proxy proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
+        Proxy proxy = null;
+        try {
+            proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
+        } catch (final Exception ex) {
+            LOG.error("could not initialize Proxy-Settings!", ex);
+        }
 
         progressObserver.setProgress(
             25,
