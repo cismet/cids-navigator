@@ -1839,7 +1839,12 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
      * @throws  InterruptedException  DOCUMENT ME!
      */
     private void initConnection() throws ConnectionException, InterruptedException {
-        final Proxy proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
+        Proxy proxy = null;
+        try {
+            proxy = ProxyHandler.getInstance().init(propertyManager.getProxyProperties());
+        } catch (final Exception ex) {
+            LOG.error("could not initialize Proxy-Settings!", ex);
+        }
         progressObserver.setProgress(
             25,
             org.openide.util.NbBundle.getMessage(NavigatorX.class, "NavigatorX.progressObserver.message_25")); // NOI18N
