@@ -96,15 +96,17 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         this.cidsBean = cidsBean;
         try {
             final BindingGroup bindingGroup = getBindingGroupFormChildClass();
-            setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(
-                bindingGroup,
-                cidsBean,
-                getConnectionContext());
+            if (bindingGroup != null) {
+                setMetaClassInformationToMetaClassStoreComponentsInBindingGroup(
+                    bindingGroup,
+                    cidsBean,
+                    getConnectionContext());
 
-            bindingGroup.unbind();
-            bindingGroup.bind();
-            boundAndReadyNotify();
-        } catch (Exception e) {
+                bindingGroup.unbind();
+                bindingGroup.bind();
+                boundAndReadyNotify();
+            }
+        } catch (final Exception e) {
             throw new RuntimeException("Bindingproblems occur", e); // NOI18N
         }
     }
@@ -121,17 +123,17 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
     private BindingGroup getBindingGroupFormChildClass() throws NoSuchFieldException,
         IllegalArgumentException,
         IllegalAccessException {
-        BindingGroup bindingGroup = null;
         if (this instanceof BindingGroupStore) {
-            bindingGroup = ((BindingGroupStore)this).getBindingGroup();
+            return ((BindingGroupStore)this).getBindingGroup();
         } else {
             final Field bindingGroupField = getClass().getDeclaredField("bindingGroup"); // NOI18N
 
-            bindingGroupField.setAccessible(true);
-
-            bindingGroup = (BindingGroup)bindingGroupField.get(this);
+            if (bindingGroupField != null) {
+                bindingGroupField.setAccessible(true);
+                return (BindingGroup)bindingGroupField.get(this);
+            }
         }
-        return bindingGroup;
+        return null;
     }
 
     /**
@@ -224,8 +226,10 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
     public void dispose() {
         try {
             final BindingGroup bindingGroup = getBindingGroupFormChildClass();
-            bindingGroup.unbind();
-        } catch (Exception ex) {
+            if (bindingGroup != null) {
+                bindingGroup.unbind();
+            }
+        } catch (final Exception ex) {
             throw new RuntimeException("Binding Problem!", ex); // NOI18N
         }
     }
