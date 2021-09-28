@@ -126,7 +126,13 @@ public class DefaultCustomObjectEditor extends javax.swing.JPanel implements Dis
         if (this instanceof BindingGroupStore) {
             return ((BindingGroupStore)this).getBindingGroup();
         } else {
-            final Field bindingGroupField = getClass().getDeclaredField("bindingGroup"); // NOI18N
+            final Field bindingGroupField;
+            try {
+                bindingGroupField = getClass().getDeclaredField("bindingGroup"); // NOI18N
+            } catch (final Exception ex) {
+                LOG.info("error while getting declaredField bindingGroup", ex);
+                return null;
+            }
 
             if (bindingGroupField != null) {
                 bindingGroupField.setAccessible(true);
