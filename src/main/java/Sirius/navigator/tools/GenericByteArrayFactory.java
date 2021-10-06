@@ -151,9 +151,9 @@ public class GenericByteArrayFactory {
             } else {
                 throw new Exception("class not instance of " + ByteArrayFactory.class.getSimpleName());
             }
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-            LOG.error(ex, ex);
+        } catch (final Throwable t) {
+            Exceptions.printStackTrace(t);
+            LOG.error(t, t);
             System.exit(1);
         }
     }
