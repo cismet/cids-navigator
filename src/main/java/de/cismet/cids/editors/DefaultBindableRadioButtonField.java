@@ -71,6 +71,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
     private Map<JRadioButton, MetaObject> boxToObjectMapping = new HashMap<JRadioButton, MetaObject>();
     private PropertyChangeSupport support = new PropertyChangeSupport(this);
     private volatile boolean threadRunning = false;
+    private boolean onlyUsedObjects = false;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -78,6 +79,15 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
      * Creates a new CustomReferencedCheckboxField object.
      */
     public DefaultBindableRadioButtonField() {
+    }
+
+    /**
+     * Creates a new CustomReferencedCheckboxField object.
+     *
+     * @param  onlyUsedObjects  DOCUMENT ME!
+     */
+    public DefaultBindableRadioButtonField(final boolean onlyUsedObjects) {
+        this.onlyUsedObjects = onlyUsedObjects;
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -181,7 +191,7 @@ public class DefaultBindableRadioButtonField extends JPanel implements Bindable,
 
                     if (mc != null) {
                         final String query = "select " + mc.getID() + ", " + mc.getPrimaryKey() + " from "
-                                    + mc.getTableName();
+                                    + mc.getTableName() + (onlyUsedObjects ? " where used is not null and used" : "");
 
                         return MetaObjectCache.getInstance()
                                     .getMetaObjectsByQuery(query, mc.getDomain(), getConnectionContext());
