@@ -1144,11 +1144,22 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
         return getConfigAttr(user, key, ConnectionContext.createDeprecated());
     }
 
+    @Deprecated
     @Override
     public String getConfigAttr(final User user, final String key, final ConnectionContext connectionContext)
             throws ConnectionException {
         try {
             return getConnector().getConfigAttr(user, key, connectionContext);
+        } catch (final RemoteException e) {
+            throw new ConnectionException("could not get config attr for user: " + user, e); // NOI18N
+        }
+    }
+
+    @Override
+    public String[] getConfigAttrs(final User user, final String key, final ConnectionContext connectionContext)
+            throws ConnectionException {
+        try {
+            return getConnector().getConfigAttrs(user, key, connectionContext);
         } catch (final RemoteException e) {
             throw new ConnectionException("could not get config attr for user: " + user, e); // NOI18N
         }

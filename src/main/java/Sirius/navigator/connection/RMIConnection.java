@@ -1062,12 +1062,24 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
         return getConfigAttr(user, key, ConnectionContext.createDeprecated());
     }
 
+    @Deprecated
     @Override
     public String getConfigAttr(final User user, final String key, final ConnectionContext connectionContext)
             throws ConnectionException {
         try {
             final UserService service = (UserService)callserver;
             return service.getConfigAttr(user, key, connectionContext);
+        } catch (final RemoteException ex) {
+            throw new ConnectionException("could not get config attr for user: " + user, ex); // NOI18N
+        }
+    }
+
+    @Override
+    public String[] getConfigAttrs(final User user, final String key, final ConnectionContext connectionContext)
+            throws ConnectionException {
+        try {
+            final UserService service = (UserService)callserver;
+            return service.getConfigAttrs(user, key, connectionContext);
         } catch (final RemoteException ex) {
             throw new ConnectionException("could not get config attr for user: " + user, ex); // NOI18N
         }
