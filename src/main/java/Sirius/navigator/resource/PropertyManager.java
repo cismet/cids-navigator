@@ -51,6 +51,8 @@ import javax.swing.JApplet;
 
 import de.cismet.netutil.ProxyProperties;
 
+import de.cismet.security.WebAccessManager;
+
 /**
  * DOCUMENT ME!
  *
@@ -1075,7 +1077,12 @@ public final class PropertyManager {
         if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0)
                     || (from.indexOf("file:/") == 0)) {
             final URL url = new URL(from);
-            return url.openStream();
+            try {
+                return WebAccessManager.getInstance().doRequest(url);
+            } catch (Exception e) {
+                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + from, e);
+                return url.openStream();
+            }
         } else {
             return new BufferedInputStream(new FileInputStream(from));
         }
