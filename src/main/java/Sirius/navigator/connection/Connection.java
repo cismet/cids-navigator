@@ -1022,9 +1022,36 @@ public interface Connection {
     String getConfigAttr(User user, String key) throws ConnectionException;
 
     /**
-     * @see  Sirius.server.middleware.interfaces.proxy.UserService#getConfigAttr(Sirius.server.newuser.User, java.lang.String)
+     * DOCUMENT ME!
+     *
+     * @param   user               DOCUMENT ME!
+     * @param   key                DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     *
+     * @see     Sirius.server.middleware.interfaces.proxy.UserService#getConfigAttr(Sirius.server.newuser.User, java.lang.String)
+     *
+     * @@deprecateduseListgetConfigAttr(User user, String key, ConnectionContext connectionContext) instead
      */
+
+    @Deprecated
     String getConfigAttr(User user, String key, ConnectionContext connectionContext) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   user               DOCUMENT ME!
+     * @param   key                DOCUMENT ME!
+     * @param   connectionContext  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    String[] getConfigAttrs(User user, String key, ConnectionContext connectionContext) throws ConnectionException;
 
     /**
      * DOCUMENT ME!
