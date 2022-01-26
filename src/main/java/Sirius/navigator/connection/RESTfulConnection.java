@@ -8,9 +8,11 @@
 package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
+import Sirius.navigator.exception.ExceptionManager;
 import Sirius.navigator.exception.SqlConnectionException;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
+import Sirius.server.localserver.object.FieldNotFoundException;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
@@ -25,6 +27,8 @@ import Sirius.server.newuser.UserException;
 import Sirius.util.image.ImageHashMap;
 
 import org.apache.log4j.Logger;
+
+import org.openide.util.NbBundle;
 
 import java.awt.GraphicsEnvironment;
 
@@ -44,6 +48,8 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.server.CallServerService;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
+
+import de.cismet.cids.utils.ErrorUtils;
 
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
@@ -652,6 +658,25 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                         + " :: "                                                                    // NOI18N
                         + classID;
             LOG.error(message, e);
+
+            if (e.getCause() instanceof FieldNotFoundException) {
+                final FieldNotFoundException ex = (FieldNotFoundException)e.getCause();
+
+                if (!ErrorUtils.exceptionAlreadyShown(ex)) {
+                    ErrorUtils.addThrownException(ex);
+                    ExceptionManager.getManager()
+                            .showExceptionDialog(
+                                ExceptionManager.ERROR,
+                                "FieldNotFound",
+                                NbBundle.getMessage(
+                                    RESTfulConnection.class,
+                                    "RESTfulConnection.getMetaObject.fieldNotFound",
+                                    ex.getFieldName(),
+                                    ex.getTableName()),
+                                e);
+                }
+            }
+
             throw new ConnectionException(message, e);
         }
     }

@@ -58,6 +58,7 @@ import java.awt.event.*;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 
 import java.net.URL;
 
@@ -83,6 +84,8 @@ import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.remote.RESTRemoteControlStarter;
+
+import de.cismet.security.WebAccessManager;
 
 import de.cismet.tools.JnlpSystemPropertyHelper;
 import de.cismet.tools.JnlpTools;
@@ -1194,7 +1197,14 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 boolean l4jinited = false;
                 try {
                     final URL log4jPropertiesURL = new URL(args[0]);
-                    properties.load(log4jPropertiesURL.openStream());
+                    InputStream in;
+
+                    try {
+                        in = WebAccessManager.getInstance().doRequest(log4jPropertiesURL);
+                    } catch (Exception e) {
+                        in = log4jPropertiesURL.openStream();
+                    }
+                    properties.load(in);
 
                     l4jinited = true;
                 } catch (final Exception e) {
