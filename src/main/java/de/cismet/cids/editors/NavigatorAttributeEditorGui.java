@@ -153,10 +153,10 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                 public void actionPerformed(final ActionEvent e) {
                     boolean useNewSaveAndCloseDialog;
                     try {
-                        useNewSaveAndCloseDialog = (SessionManager.getProxy().getConfigAttr(
+                        useNewSaveAndCloseDialog = (SessionManager.getProxy().hasConfigAttr(
                                     SessionManager.getSession().getUser(),
                                     "navigator.saveAndCloseDialog.enabled",
-                                    getConnectionContext()) != null)
+                                    getConnectionContext()))
                                     && (currentBeanStore instanceof EditorSaveWithoutCloseListener);
                     } catch (final Exception ex) {
                         useNewSaveAndCloseDialog = false;
