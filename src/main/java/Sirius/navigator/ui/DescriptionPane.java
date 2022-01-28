@@ -24,7 +24,6 @@ import Sirius.navigator.ui.tree.MetaCatalogueTree;
 import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.MetaObjectNode;
-import Sirius.server.newuser.User;
 import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.openide.util.Lookup;
@@ -1291,10 +1290,9 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
 
         try {
             showEditButton = SessionManager.getConnection()
-                        .getConfigAttr(SessionManager.getSession().getUser(),
+                        .hasConfigAttr(SessionManager.getSession().getUser(),
                                 "navigator.descriptionPane.editButton",
-                                connectionContext)
-                        != null;
+                                connectionContext);
         } catch (ConnectionException e) {
             LOG.error("Connection exception", e);
         }

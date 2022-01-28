@@ -1410,11 +1410,10 @@ public class QuerySearch extends javax.swing.JPanel implements CidsWindowSearchW
         boolean result;
         try {
             result = SessionManager.getConnection()
-                        .getConfigAttr(SessionManager.getSession().getUser(),
+                        .hasConfigAttr(SessionManager.getSession().getUser(),
                                 ACTION_TAG
                                 + SessionManager.getSession().getUser().getDomain(),
-                                connectionContext)
-                        != null;
+                                connectionContext);
         } catch (ConnectionException ex) {
             LOG.error("Can not check ActionTag!", ex);
             result = false;
