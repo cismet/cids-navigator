@@ -84,12 +84,11 @@ public class QuerySearchToolbarItem extends AbstractAction implements CidsClient
                                 + SessionManager.getSession().getUser().getDomain(),
                         getConnectionContext())
                             != null)
-                        && (SessionManager.getConnection().getConfigAttr(
+                        && (SessionManager.getConnection().hasConfigAttr(
                                 SessionManager.getSession().getUser(),
                                 QuerySearch.ACTION_TAG
                                 + SessionManager.getSession().getUser().getDomain(),
-                                getConnectionContext())
-                            != null);
+                                getConnectionContext()));
         } catch (ConnectionException ex) {
             Log.error(ex);
         }
