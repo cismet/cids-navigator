@@ -31,8 +31,13 @@ package Sirius.navigator;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.log4j.Layout;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.PatternLayout;
+import org.apache.log4j.Priority;
+import org.apache.log4j.WriterAppender;
+import org.apache.log4j.spi.LoggingEvent;
 
 import org.openide.util.Lookup;
 
@@ -50,7 +55,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.swing.JFileChooser;
-import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.ws.SSLConfigProvider;
@@ -62,7 +67,7 @@ import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.security.WebAccessManager;
 
-import de.cismet.tools.gui.TextAreaAppender;
+import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
  * DOCUMENT ME!
@@ -143,21 +148,33 @@ public class ConnectionTester extends javax.swing.JFrame {
      * DOCUMENT ME!
      */
     private void initLog() {
-        TextAreaAppender.setTextArea(txaLog, new JTextArea());
-        final Properties logProperties = new Properties();
-        logProperties.put("log4j.rootLogger", "DEBUG, CONSOLE, TEXTAREA");
-        logProperties.put("log4j.appender.CONSOLE", "org.apache.log4j.ConsoleAppender");      // A standard console
-                                                                                              // appender
-        logProperties.put("log4j.appender.CONSOLE.layout", "org.apache.log4j.PatternLayout"); // See:
-                                                                                              // http://logging.apache.org/log4j/docs/api/org/apache/log4j/PatternLayout.html
-        logProperties.put("log4j.appender.CONSOLE.layout.ConversionPattern", "%d{HH:mm:ss} [%12.12t] %5.5p %c: %m%n");
+        Log4JQuickConfig.configure4LumbermillOnLocalhost("DEBUG");
+        final WriterAppender appender = new WriterAppender() {
 
-        logProperties.put("log4j.appender.TEXTAREA", "de.cismet.tools.gui.TextAreaAppender");  // Our custom appender
-        logProperties.put("log4j.appender.TEXTAREA.layout", "org.apache.log4j.PatternLayout"); // See:
-                                                                                               // http://logging.apache.org/log4j/docs/api/org/apache/log4j/PatternLayout.html
-        logProperties.put("log4j.appender.TEXTAREA.layout.ConversionPattern", "%d{HH:mm:ss} [%12.12t] %5.5p %c: %m%n");
+                @Override
+                public void append(final LoggingEvent loggingEvent) {
+                    SwingUtilities.invokeLater(new Runnable() {
 
-        PropertyConfigurator.configure(logProperties);
+                            @Override
+                            public void run() {
+                                try {
+                                    txaLog.append(getLayout().format(loggingEvent));
+                                    if (loggingEvent.getThrowableInformation() != null) {
+                                        for (final String rep
+                                                    : loggingEvent.getThrowableInformation().getThrowableStrRep()) {
+                                            txaLog.append(String.format("> %s\n", rep));
+                                        }
+                                    }
+                                } catch (final Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        });
+                }
+            };
+        appender.setLayout(new PatternLayout("%d{HH:mm:ss} [%12.12t] %5.5p %c: %m%n"));
+        appender.setThreshold(Level.toLevel(Priority.DEBUG_INT));
+        Logger.getRootLogger().addAppender(appender);
     }
 
     /**
@@ -253,7 +270,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 0, Short.MAX_VALUE));
         jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 0, Short.MAX_VALUE));
+            jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 36, Short.MAX_VALUE));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -264,6 +281,13 @@ public class ConnectionTester extends javax.swing.JFrame {
         jPanel1.add(jPanel3, gridBagConstraints);
 
         jButton3.setText("Clear");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    jButton3ActionPerformed(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -471,8 +495,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnTestActionPerformed
-    {                                                                         //GEN-HEADEREND:event_btnTestActionPerformed
+    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnTestActionPerformed
+    {//GEN-HEADEREND:event_btnTestActionPerformed
         try {
             stopWorker();
 
@@ -506,7 +530,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         } catch (final Exception ex) {
             appendException(ex);
         }
-    } //GEN-LAST:event_btnTestActionPerformed
+    }//GEN-LAST:event_btnTestActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -547,8 +571,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnStoreActionPerformed
-    {                                                                          //GEN-HEADEREND:event_btnStoreActionPerformed
+    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnStoreActionPerformed
+    {//GEN-HEADEREND:event_btnStoreActionPerformed
         BufferedOutputStream bos = null;
         try {
             final JFileChooser chooser = new JFileChooser();
@@ -567,7 +591,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 }
             }
         }
-    }                                                                          //GEN-LAST:event_btnStoreActionPerformed
+    }//GEN-LAST:event_btnStoreActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -583,18 +607,18 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton1ActionPerformed
+    private void jRadioButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
         showCard("broker");
-    }                                                                                 //GEN-LAST:event_jRadioButton1ActionPerformed
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton2ActionPerformed
+    private void jRadioButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
         showCard("url");
-    }                                                                                 //GEN-LAST:event_jRadioButton2ActionPerformed
+    }//GEN-LAST:event_jRadioButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -630,7 +654,7 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
             stopWorker();
 
@@ -641,7 +665,7 @@ public class ConnectionTester extends javax.swing.JFrame {
             startWorker(new SwingWorker<Boolean, Boolean>() {
 
                     @Override
-                    protected Boolean doInBackground() throws Exception {
+                    protected Boolean doInBackground() throws Exception {                        
                         proxyOptionsPanel1.applyChanges();
                         return WebAccessManager.getInstance().checkIfURLaccessible(new URL(txtUrl.getText()));
                     }
@@ -661,16 +685,25 @@ public class ConnectionTester extends javax.swing.JFrame {
         } catch (final Exception ex) {
             appendException(ex);
         }
-    } //GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         stopWorker();
-    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        txaLog.setText("");
+    }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -685,7 +718,7 @@ public class ConnectionTester extends javax.swing.JFrame {
             System.exit(1);
         }
         final String arg0 = (String)args[0];
-        boolean arg1 = false;
+        boolean arg1 = true;
         if (args.length > 1) {
             try {
                 arg1 = Boolean.parseBoolean(args[1]);
