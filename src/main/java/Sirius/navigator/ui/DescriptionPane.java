@@ -158,7 +158,7 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
             final StringBuffer welcomeBuffer = new StringBuffer();
             String welcomeString = null;
             reader = new BufferedReader(new InputStreamReader(
-                        RESOURCE.getNavigatorResourceAsStream("doc/welcome.html"))); // NOI18N
+                        RESOURCE.getNavigatorJarResourceAsStream("doc/welcome.html"))); // NOI18N
 
             while ((welcomeString = reader.readLine()) != null) {
                 welcomeBuffer.append(welcomeString);
@@ -168,7 +168,7 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
             final StringBuffer errorBuffer = new StringBuffer();
             String errorString = null;
             reader = new BufferedReader(new InputStreamReader(
-                        RESOURCE.getNavigatorResourceAsStream("doc/error.xhtml"), // NOI18N
+                        RESOURCE.getNavigatorJarResourceAsStream("doc/error.xhtml"), // NOI18N
                         "UTF-8")); // NOI18N
             while ((errorString = reader.readLine()) != null) {
                 errorBuffer.append(errorString);

@@ -125,6 +125,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
     public static final String NAVIGATOR_HOME = System.getProperty("user.home") + System.getProperty("file.separator")
                 + NAVIGATOR_HOME_DIR + System.getProperty("file.separator");
     private static volatile boolean startupFinished = false;
+    private static boolean l4jinited = false;
+    private static String log4JUrl = null;
 
     //~ Instance fields --------------------------------------------------------
 
@@ -236,6 +238,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             checkNavigatorHome();
 
             ProxyCredentials.initFromConfAttr("proxy.credentials", getConnectionContext());
+
+            loadLog4JPropertiesFromUrl();
 
             initConfigurationManager();
             initUI();
@@ -1193,36 +1197,29 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 System.out.println("-------------------------------------------------------"); // NOI18N
 
                 // log4j configuration .....................................
-                final Properties properties = new Properties();
-                boolean l4jinited = false;
-                try {
-                    final URL log4jPropertiesURL = new URL(args[0]);
-                    InputStream in;
-
-                    try {
-                        in = WebAccessManager.getInstance().doRequest(log4jPropertiesURL);
-                    } catch (Exception e) {
-                        in = log4jPropertiesURL.openStream();
-                    }
-                    properties.load(in);
-
-                    l4jinited = true;
-                } catch (final Exception e) {
-                    System.err.println("could not lode log4jproperties will try to load it from file" // NOI18N
-                                + e.getMessage());
-                    e.printStackTrace();
-                }
+                log4JUrl = args[0];
+                loadLog4JPropertiesFromUrl();
 
                 try {
                     if (!l4jinited) {
-                        properties.load(new BufferedInputStream(new FileInputStream(new File(args[0]))));
+                        final Properties properties = new Properties();
+                        properties.load(new BufferedInputStream(new FileInputStream(new File(log4JUrl))));
+                        PropertyConfigurator.configure(properties);
+                        l4jinited = true;
                     }
                 } catch (Exception e) {
-                    System.err.println("could not lode log4jproperties " + e.getMessage()); // NOI18N
+                    System.err.println("could not load log4jproperties  Try to load default log4jproperties"); // NOI18N
                     e.printStackTrace();
-                }
 
-                PropertyConfigurator.configure(properties);
+                    try {
+                        final Properties properties = new Properties();
+                        properties.load(Navigator.class.getResourceAsStream("/Sirius/navigator/log4j.properties"));
+                        PropertyConfigurator.configure(properties);
+                    } catch (Exception ex) {
+                        System.err.println("could not load default log4jproperties."); // NOI18N
+                        ex.printStackTrace();
+                    }
+                }
 
                 // log4j configuration .....................................
                 PropertyManager.getManager()
@@ -1259,6 +1256,34 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
             System.exit(1);
             // error .............................................................
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public static void loadLog4JPropertiesFromUrl() {
+        if (!l4jinited) {
+            try {
+                final Properties properties = new Properties();
+                final URL log4jPropertiesURL = new URL(log4JUrl);
+                InputStream in;
+
+                try {
+                    in = WebAccessManager.getInstance().doRequest(log4jPropertiesURL);
+                } catch (Exception e) {
+                    in = log4jPropertiesURL.openStream();
+                }
+                properties.load(in);
+                PropertyConfigurator.configure(properties);
+
+                l4jinited = true;
+            } catch (final Exception e) {
+                System.err.println("could not load log4jproperties will try to load it from file" // NOI18N
+                            + e.getMessage());
+                LOG.error("Cannot load log4j properties. Use default configuration");
+                e.printStackTrace();
+            }
         }
     }
 

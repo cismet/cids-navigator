@@ -27,6 +27,8 @@ import de.cismet.connectioncontext.AbstractConnectionContext.Category;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
+import de.cismet.security.WebAccessManager;
+
 /**
  * The deprecated methods should not be used, because they are obsolete since the migration to the netbeans
  * internationalisation API.
@@ -453,6 +455,53 @@ public class ResourceManager implements ConnectionContextProvider {
     }
 
     /**
+     * resources in a jar file. The returned resources will be internationalised.
+     *
+     * @param   resourceName  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
+    public InputStream getNavigatorJarResourceAsStream(final String resourceName) throws IOException {
+        final Iterator<String> it = org.openide.util.NbBundle.getLocalizingSuffixes();
+
+        while (it.hasNext()) {
+            final String suffix = it.next();
+            String fileExtension = ""; // NOI18N
+            String resourceNameBase = resourceName;
+            final String resourceUri;
+
+            if (resourceName.lastIndexOf(".") != -1) {                                       // NOI18N
+                fileExtension = resourceName.substring(resourceName.lastIndexOf("."));       // NOI18N
+                resourceNameBase = resourceName.substring(0, resourceName.lastIndexOf(".")); // NOI18N
+            }
+
+            resourceUri = PropertyManager.getManager().getBasePath() + "res/" + resourceNameBase + suffix
+                        + fileExtension; // NOI18N
+
+            final String altResourceName = resourceNameBase + suffix + fileExtension;
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("loading navigator resource '" + this.getClass().getPackage().getName() + "."
+                            + altResourceName + "'"); // NOI18N
+            }
+            final InputStream is = this.getClass().getResourceAsStream(altResourceName);
+
+            if (is != null) {
+                return is;
+            } else {
+                LOG.warn("Resource with name '" + altResourceName + "' not found"); // NOI18N
+            }
+        }
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("loading navigator resource '" + this.getClass().getPackage().getName() + resourceName
+                        + "'"); // NOI18N
+        }
+        return this.getClass().getResourceAsStream(resourceName);
+    }
+
+    /**
      * DOCUMENT ME!
      *
      * @param   path  DOCUMENT ME!
@@ -464,6 +513,14 @@ public class ResourceManager implements ConnectionContextProvider {
     public InputStream getResourceAsStream(final String path) throws IOException {
         try {
             final URL url = new URL(path);
+
+            try {
+                // try to use the WebAccessManager to use the proxy
+                return WebAccessManager.getInstance().doRequest(url);
+            } catch (Exception e) {
+                LOG.warn("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
+            }
+
             return url.openStream();
         } catch (MalformedURLException uexp) {
             if (LOG.isDebugEnabled()) {
