@@ -572,10 +572,11 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
 
                                         { // <deprecated>
                                             if (beanStore instanceof EditorSaveListener) {
-                                                for (final PropertyChangeListener pcl
-                                                            : oldBean.getPropertyChangeListeners()) {
-                                                    savedInstance.addPropertyChangeListener(pcl);
-                                                }
+                                                // the propertyChangeListeners should only be copied, when the editor is
+                                                // not closed. before Issue 241, the propertyChangeListeners were also
+                                                // only copied, when the editor was closed for (final
+                                                // PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
+                                                // savedInstance.addPropertyChangeListener(pcl); }
                                                 ((EditorSaveListener)beanStore).editorClosed(new EditorClosedEvent(
                                                         EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
                                                         savedInstance));
