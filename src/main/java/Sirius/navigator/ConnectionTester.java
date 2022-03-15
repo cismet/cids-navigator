@@ -495,8 +495,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnTestActionPerformed
-    {//GEN-HEADEREND:event_btnTestActionPerformed
+    private void btnTestActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnTestActionPerformed
+    {                                                                         //GEN-HEADEREND:event_btnTestActionPerformed
         try {
             stopWorker();
 
@@ -530,7 +530,7 @@ public class ConnectionTester extends javax.swing.JFrame {
         } catch (final Exception ex) {
             appendException(ex);
         }
-    }//GEN-LAST:event_btnTestActionPerformed
+    } //GEN-LAST:event_btnTestActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -571,8 +571,8 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnStoreActionPerformed
-    {//GEN-HEADEREND:event_btnStoreActionPerformed
+    private void btnStoreActionPerformed(final java.awt.event.ActionEvent evt) //GEN-FIRST:event_btnStoreActionPerformed
+    {                                                                          //GEN-HEADEREND:event_btnStoreActionPerformed
         BufferedOutputStream bos = null;
         try {
             final JFileChooser chooser = new JFileChooser();
@@ -591,7 +591,7 @@ public class ConnectionTester extends javax.swing.JFrame {
                 }
             }
         }
-    }//GEN-LAST:event_btnStoreActionPerformed
+    }                                                                          //GEN-LAST:event_btnStoreActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -607,18 +607,18 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+    private void jRadioButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton1ActionPerformed
         showCard("broker");
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
+    }                                                                                 //GEN-LAST:event_jRadioButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jRadioButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    private void jRadioButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jRadioButton2ActionPerformed
         showCard("url");
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
+    }                                                                                 //GEN-LAST:event_jRadioButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -654,7 +654,7 @@ public class ConnectionTester extends javax.swing.JFrame {
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         try {
             stopWorker();
 
@@ -665,7 +665,7 @@ public class ConnectionTester extends javax.swing.JFrame {
             startWorker(new SwingWorker<Boolean, Boolean>() {
 
                     @Override
-                    protected Boolean doInBackground() throws Exception {                        
+                    protected Boolean doInBackground() throws Exception {
                         proxyOptionsPanel1.applyChanges();
                         return WebAccessManager.getInstance().checkIfURLaccessible(new URL(txtUrl.getText()));
                     }
@@ -685,25 +685,25 @@ public class ConnectionTester extends javax.swing.JFrame {
         } catch (final Exception ex) {
             appendException(ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    } //GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton2ActionPerformed
         stopWorker();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void jButton3ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton3ActionPerformed
         txaLog.setText("");
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton3ActionPerformed
 
     /**
      * DOCUMENT ME!
