@@ -622,8 +622,9 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
                                 final boolean actingAsRenderer = isActingAsRenderer();
                                 setEditable(actingAsRenderer);
 
-                                setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
-
+                                synchronized (DefaultBindableReferenceCombo.this) {
+                                    setUI(actingAsRenderer ? createRendererUI() : createEditorUI());
+                                }
                                 DefaultBindableReferenceCombo.super.setEnabled(!actingAsRenderer);
                                 setOpaque(!actingAsRenderer);
 
@@ -739,26 +740,28 @@ public class DefaultBindableReferenceCombo extends JComboBox implements Bindable
 
     @Override
     public void setSelectedItem(final Object item) {
-        CidsBean selectedBean = null;
-        if (isFakeModel()) {
-            setModel(new DefaultComboBoxModel(new Object[] { item }));
-        } else {
-            if (item instanceof CidsBean) {
-                selectedBean = (CidsBean)item;
-            } else if (item instanceof ManageableItem) {
-                try {
-                    final CidsBean newBean = createNewInstance();
-                    if (newBean != null) {
-                        selectedBean = newBean.persist(getConnectionContext());
-                        reload();
+        synchronized (this) {
+            CidsBean selectedBean = null;
+            if (isFakeModel()) {
+                setModel(new DefaultComboBoxModel(new Object[] { item }));
+            } else {
+                if (item instanceof CidsBean) {
+                    selectedBean = (CidsBean)item;
+                } else if (item instanceof ManageableItem) {
+                    try {
+                        final CidsBean newBean = createNewInstance();
+                        if (newBean != null) {
+                            selectedBean = newBean.persist(getConnectionContext());
+                            reload();
+                        }
+                    } catch (final Exception ex) {
+                        LOG.error(ex, ex);
                     }
-                } catch (final Exception ex) {
-                    LOG.error(ex, ex);
                 }
             }
+            super.setSelectedItem(selectedBean);
+            setCidsBean(selectedBean);
         }
-        super.setSelectedItem(selectedBean);
-        setCidsBean(selectedBean);
     }
 
     /**
