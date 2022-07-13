@@ -338,6 +338,7 @@ public class RemoteLog4JConfigChangerDialog extends javax.swing.JDialog implemen
         final CidsAuthentification cidsAuth = new CidsAuthentification(
                 callServerURL,
                 domain,
+                RemoteLog4JConfigChangerDialog.class.getSimpleName(),
                 compressionEnabled,
                 getConnectionContext());
         final JXLoginPane login = new JXLoginPane(cidsAuth);

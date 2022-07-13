@@ -1071,6 +1071,7 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
                                     .createConnection(
                                         "Sirius.navigator.connection.RMIConnection",
                                         connectionInfo.getCallserverURL(),
+                                        CidsObjectEditorFactory.class.getSimpleName(),
                                         false,
                                         connectionContext); // NOI18N
 
