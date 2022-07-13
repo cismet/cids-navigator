@@ -147,7 +147,8 @@ public class PureRESTfulConnection extends RESTfulConnection {
         final PureRESTfulReconnector reconnector = new PureRESTfulReconnector(
                 CallServerService.class,
                 callserverURL,
-                proxy);
+                proxy,
+                PureRESTfulConnection.class.getSimpleName());
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
     }
