@@ -10,6 +10,9 @@ package Sirius.navigator.connection;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.openide.util.Lookup;
 
 import java.rmi.RemoteException;
@@ -42,10 +45,12 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
 
     //~ Instance fields --------------------------------------------------------
 
-    private String callserverURL;
-    private Proxy proxy;
     private final RESTfulReconnectorErrorPanel errorPanel;
-    private final boolean compressionEnabled;
+
+    @Getter private String callserverURL;
+    @Getter private final boolean compressionEnabled;
+    @Getter private final String connectionName;
+    @Getter @Setter private Proxy proxy;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -55,9 +60,13 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
      * @param  serviceClass   DOCUMENT ME!
      * @param  callserverURL  DOCUMENT ME!
      * @param  proxy          DOCUMENT ME!
+     * @param  clientName     DOCUMENT ME!
      */
-    public RESTfulReconnector(final Class serviceClass, final String callserverURL, final Proxy proxy) {
-        this(serviceClass, callserverURL, proxy, false);
+    public RESTfulReconnector(final Class serviceClass,
+            final String callserverURL,
+            final Proxy proxy,
+            final String clientName) {
+        this(serviceClass, callserverURL, proxy, clientName, false);
     }
 
     /**
@@ -66,19 +75,22 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
      * @param  serviceClass        DOCUMENT ME!
      * @param  callserverURL       DOCUMENT ME!
      * @param  proxy               DOCUMENT ME!
+     * @param  connectionName      DOCUMENT ME!
      * @param  compressionEnabled  DOCUMENT ME!
      */
     public RESTfulReconnector(final Class serviceClass,
             final String callserverURL,
             final Proxy proxy,
+            final String connectionName,
             final boolean compressionEnabled) {
         super(serviceClass);
 
         this.callserverURL = callserverURL;
         this.proxy = proxy;
-        final ProxyOptionsPanel pop = new ProxyOptionsPanel();
-        this.errorPanel = new RESTfulReconnectorErrorPanel(pop);
+        this.connectionName = connectionName;
         this.compressionEnabled = compressionEnabled;
+
+        this.errorPanel = new RESTfulReconnectorErrorPanel(new ProxyOptionsPanel());
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -120,46 +132,10 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         throw exception;
     }
 
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public String getCallserverURL() {
-        return callserverURL;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public boolean isCompressionEnabled() {
-        return compressionEnabled;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
-    public Proxy getProxy() {
-        return proxy;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param  proxy  DOCUMENT ME!
-     */
-    public void setProxy(final Proxy proxy) {
-        this.proxy = proxy;
-    }
-
     @Override
     protected R connectService() throws ReconnectorException {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("connection to service '" + callserverURL + "'");
+            LOG.debug("connection to service '" + getCallserverURL() + "'");
         }
 
         final SSLConfigProvider sslConfigProvider = Lookup.getDefault().lookup(SSLConfigProvider.class);
@@ -169,6 +145,7 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
                 getCallserverURL(),
                 getProxy(),
                 sslConfig,
+                getConnectionName(),
                 isCompressionEnabled());
     }
 }

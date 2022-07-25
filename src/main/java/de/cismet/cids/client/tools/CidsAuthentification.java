@@ -43,6 +43,7 @@ public class CidsAuthentification extends LoginService implements ConnectionCont
 
     private final String connectionClass;
     private final String callServerURL;
+    private final String connectionName;
     private final String domain;
     private final boolean compressionEnabled;
     private final ConnectionContext connectionContext;
@@ -60,26 +61,7 @@ public class CidsAuthentification extends LoginService implements ConnectionCont
     public CidsAuthentification(final String callServerURL,
             final String domain,
             final boolean compressionEnabled) {
-        this(callServerURL, domain, compressionEnabled, ConnectionContext.createDeprecated());
-    }
-
-    /**
-     * Creates a new CidsAuthentification object.
-     *
-     * @param  callServerURL       DOCUMENT ME!
-     * @param  domain              DOCUMENT ME!
-     * @param  compressionEnabled  DOCUMENT ME!
-     * @param  connectionContext   DOCUMENT ME!
-     */
-    public CidsAuthentification(final String callServerURL,
-            final String domain,
-            final boolean compressionEnabled,
-            final ConnectionContext connectionContext) {
-        this.connectionClass = CONNECTION_CLASS;
-        this.callServerURL = callServerURL;
-        this.domain = domain;
-        this.compressionEnabled = compressionEnabled;
-        this.connectionContext = connectionContext;
+        this(callServerURL, domain, null, compressionEnabled, ConnectionContext.createDeprecated());
     }
 
     /**
@@ -101,18 +83,43 @@ public class CidsAuthentification extends LoginService implements ConnectionCont
     /**
      * Creates a new CidsAuthentification object.
      *
+     * @param  callServerURL       DOCUMENT ME!
+     * @param  domain              DOCUMENT ME!
+     * @param  connectionName      DOCUMENT ME!
+     * @param  compressionEnabled  DOCUMENT ME!
+     * @param  connectionContext   DOCUMENT ME!
+     */
+    public CidsAuthentification(final String callServerURL,
+            final String domain,
+            final String connectionName,
+            final boolean compressionEnabled,
+            final ConnectionContext connectionContext) {
+        this.connectionClass = CONNECTION_CLASS;
+        this.callServerURL = callServerURL;
+        this.connectionName = connectionName;
+        this.domain = domain;
+        this.compressionEnabled = compressionEnabled;
+        this.connectionContext = connectionContext;
+    }
+
+    /**
+     * Creates a new CidsAuthentification object.
+     *
      * @param  connectionClass     DOCUMENT ME!
      * @param  callServerURL       DOCUMENT ME!
      * @param  domain              DOCUMENT ME!
+     * @param  connectionName      DOCUMENT ME!
      * @param  compressionEnabled  DOCUMENT ME!
      * @param  connectionContext   DOCUMENT ME!
      */
     public CidsAuthentification(final String connectionClass,
             final String callServerURL,
             final String domain,
+            final String connectionName,
             final boolean compressionEnabled,
             final ConnectionContext connectionContext) {
         this.connectionClass = connectionClass;
+        this.connectionName = connectionName;
         this.callServerURL = callServerURL;
         this.domain = domain;
         this.compressionEnabled = compressionEnabled;
@@ -141,7 +148,12 @@ public class CidsAuthentification extends LoginService implements ConnectionCont
 
         try {
             final Connection connection = ConnectionFactory.getFactory()
-                        .createConnection(connectionClass, callServerURL, compressionEnabled, getConnectionContext());
+                        .createConnection(
+                            connectionClass,
+                            callServerURL,
+                            connectionName,
+                            compressionEnabled,
+                            getConnectionContext());
             final ConnectionInfo connectionInfo = new ConnectionInfo();
             connectionInfo.setCallserverURL(callServerURL);
             connectionInfo.setPassword(new String(password));

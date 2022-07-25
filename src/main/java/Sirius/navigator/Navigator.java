@@ -374,6 +374,7 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
+                        propertyManager.getClientName(),
                         proxy,
                         propertyManager.isCompressionEnabled(),
                         getConnectionContext());

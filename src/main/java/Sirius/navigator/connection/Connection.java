@@ -1171,4 +1171,18 @@ public interface Connection {
      * @return  DOCUMENT ME!
      */
     CallServerService getCallServerService();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    String getConnectionName();
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  connectionName  DOCUMENT ME!
+     */
+    void setConnectionName(String connectionName);
 }

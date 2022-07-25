@@ -1854,6 +1854,7 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(propertyManager.getConnectionClass(),
                         propertyManager.getConnectionInfo().getCallserverURL(),
+                        propertyManager.getClientName(),
                         proxy,
                         propertyManager.isCompressionEnabled(),
                         getConnectionContext());

@@ -38,7 +38,6 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 
-import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
@@ -188,8 +187,9 @@ public class GenericByteArrayFactory {
 
         final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
                     .createConnection(
-                        RESTfulConnection.class.getCanonicalName(),
+                        RESTfulConnection.class.getSimpleName(),
                         info.getCallserverURL(),
+                        GenericByteArrayFactory.class.getSimpleName(),
                         ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         connectionContext);
