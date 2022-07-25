@@ -11,7 +11,6 @@ import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
 import Sirius.navigator.exception.ConnectionException;
 
-
 import org.apache.log4j.Logger;
 
 import org.openide.util.lookup.ServiceProvider;
