@@ -45,7 +45,6 @@ import de.cismet.cids.server.actions.BandwidthTestAction;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
-import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -484,6 +483,7 @@ public class BandwithTesterDialog extends javax.swing.JDialog implements Connect
                 final Connection connection = ConnectionFactory.getFactory()
                             .createConnection(
                                 CONNECTION_CLASS,
+                                BandwidthTestAction.class.getSimpleName(),
                                 callServerURL,
                                 ProxyHandler.getInstance().getProxy(),
                                 compressionEnabled,

@@ -38,9 +38,13 @@ public class PureRESTfulReconnector<R extends CallServerService> extends RESTful
      * @param  serviceClass   DOCUMENT ME!
      * @param  callserverURL  DOCUMENT ME!
      * @param  proxy          DOCUMENT ME!
+     * @param  clientName     DOCUMENT ME!
      */
-    public PureRESTfulReconnector(final Class serviceClass, final String callserverURL, final Proxy proxy) {
-        super(serviceClass, callserverURL, proxy);
+    public PureRESTfulReconnector(final Class serviceClass,
+            final String callserverURL,
+            final Proxy proxy,
+            final String clientName) {
+        super(serviceClass, callserverURL, proxy, clientName);
     }
 
     //~ Methods ----------------------------------------------------------------

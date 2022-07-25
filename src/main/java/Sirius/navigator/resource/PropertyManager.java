@@ -124,6 +124,7 @@ public final class PropertyManager {
     private boolean postfilterEnabled = false;
     private boolean fulltextSearchToolbarItemEnabled = false;
     private PermissionModus permissionModus = PermissionModus.MANDATORY;
+    private String clientName;
 
     private final ProxyProperties proxyProperties = new ProxyProperties();
     private String proxyConfig;
@@ -489,6 +490,25 @@ public final class PropertyManager {
     public void setConnectionProxyClass(final String connectionProxyClass) {
         this.connectionProxyClass = connectionProxyClass;
         properties.setProperty("connectionProxyClass", this.connectionProxyClass); // NOI18N
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public String getClientName() {
+        return clientName;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  clientName  DOCUMENT ME!
+     */
+    public void setClientName(final String clientName) {
+        this.clientName = clientName;
+        properties.setProperty("clientName", this.clientName); // NOI18N
     }
 
     /**
@@ -1036,6 +1056,8 @@ public final class PropertyManager {
             this.setProtocolEnabled(value);
         } else if (property.equals("navigator.fulltextSearchToolbarItem.enabled")) {
             this.setFulltextSearchToolbarItemEnabled(value);
+        } else if (property.equals("clientName")) {
+            this.setClientName(value);
         }
     }
 

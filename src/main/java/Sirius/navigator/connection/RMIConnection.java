@@ -30,6 +30,9 @@ import Sirius.server.newuser.UserException;
 
 import Sirius.util.image.ImageHashMap;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.log4j.Logger;
 
 import java.awt.GraphicsEnvironment;
@@ -89,10 +92,11 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
 
     //~ Instance fields --------------------------------------------------------
 
-    protected String callserverURL = null;
-    protected boolean connected = false;
-    protected java.lang.Object callserver;
-    protected Reconnector<CallServerService> reconnector;
+    private String callserverURL = null;
+    private boolean connected = false;
+    private java.lang.Object callserver;
+    private Reconnector<CallServerService> reconnector;
+    @Getter @Setter private String connectionName = "rmi";
 
     //~ Methods ----------------------------------------------------------------
 

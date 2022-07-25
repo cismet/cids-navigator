@@ -54,7 +54,6 @@ import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
-import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.tools.Converter;
@@ -595,6 +594,7 @@ public class PerformanceComparisonDialog extends javax.swing.JDialog implements 
                             .createConnection(
                                 CONNECTION_CLASS,
                                 callserverURL,
+                                PerformanceComparisonDialog.class.getSimpleName(),
                                 ProxyHandler.getInstance().getProxy(),
                                 compressionEnabled,
                                 getConnectionContext());
