@@ -71,7 +71,6 @@ import de.cismet.cids.tools.metaobjectrenderer.CidsObjectRendererFactory;
 
 import de.cismet.connectioncontext.ConnectionContext;
 
-import de.cismet.netutil.Proxy;
 import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.tools.gui.StaticSwingTools;
@@ -176,6 +175,7 @@ public class DevelopmentTools {
         final Connection connection = ConnectionFactory.getFactory()
                     .createConnection(
                         "Sirius.navigator.connection.RMIConnection",
+                        DevelopmentTools.class.getSimpleName(),
                         info.getCallserverURL(),
                         false,
                         getConnectionContext());
@@ -259,6 +259,7 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.RESTfulConnection",
                         info.getCallserverURL(),
+                        DevelopmentTools.class.getSimpleName(),
                         ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         getConnectionContext());
@@ -312,6 +313,7 @@ public class DevelopmentTools {
                     .createConnection(
                         "Sirius.navigator.connection.PureRESTfulConnection",
                         info.getCallserverURL(),
+                        DevelopmentTools.class.getSimpleName(),
                         ProxyHandler.getInstance().getProxy(),
                         compressionEnabled,
                         getConnectionContext());
@@ -1263,6 +1265,7 @@ public class DevelopmentTools {
         final CidsAuthentification cidsAuth = new CidsAuthentification(
                 callServerURL,
                 domain,
+                DevelopmentTools.class.getSimpleName(),
                 compressionEnabled,
                 connectionContext);
         final JXLoginPane login = new JXLoginPane(cidsAuth);

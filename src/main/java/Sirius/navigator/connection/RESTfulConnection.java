@@ -77,6 +77,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     //~ Instance fields --------------------------------------------------------
 
     private transient Reconnector<CallServerService> reconnector;
+    private String connectionName = RESTfulConnection.class.getSimpleName();
 
     private final transient boolean isLWMOEnabled;
 
@@ -158,6 +159,7 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                 CallServerService.class,
                 callserverURL,
                 proxy,
+                getConnectionName(),
                 compressionEnabled);
         reconnector.useDialog(!GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance(), null);
         return reconnector;
@@ -1241,5 +1243,15 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
     @Override
     public CallServerService getCallServerService() {
         return reconnector.getCallserver();
+    }
+
+    @Override
+    public void setConnectionName(final String connectionName) {
+        this.connectionName = connectionName;
+    }
+
+    @Override
+    public String getConnectionName() {
+        return connectionName;
     }
 }
