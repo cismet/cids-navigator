@@ -187,7 +187,7 @@ public class GenericByteArrayFactory {
 
         final Sirius.navigator.connection.Connection connection = ConnectionFactory.getFactory()
                     .createConnection(
-                        RESTfulConnection.class.getSimpleName(),
+                        RESTfulConnection.class.getCanonicalName(),
                         info.getCallserverURL(),
                         GenericByteArrayFactory.class.getSimpleName(),
                         ProxyHandler.getInstance().getProxy(),
