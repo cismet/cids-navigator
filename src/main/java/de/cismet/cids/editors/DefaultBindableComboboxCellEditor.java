@@ -41,6 +41,19 @@ public class DefaultBindableComboboxCellEditor extends AbstractCellEditor implem
         comboBox = new DefaultBindableScrollableComboBox(metaClass);
     }
 
+    /**
+     * Creates a new DefaultBindableComboboxCellEditor object.
+     *
+     * @param  metaClass  DOCUMENT ME!
+     * @param  nullable   DOCUMENT ME!
+     * @param  onlyUsed   DOCUMENT ME!
+     */
+    public DefaultBindableComboboxCellEditor(final MetaClass metaClass,
+            final boolean nullable,
+            final boolean onlyUsed) {
+        comboBox = new DefaultBindableScrollableComboBox(metaClass, nullable, onlyUsed);
+    }
+
     //~ Methods ----------------------------------------------------------------
 
     @Override
