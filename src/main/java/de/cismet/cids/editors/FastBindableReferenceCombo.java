@@ -456,12 +456,16 @@ public class FastBindableReferenceCombo extends JComboBox implements Bindable,
                         .customServerSearch(SessionManager.getSession().getUser(),
                             search,
                             getConnectionContext());
-            if (representationFormater != null) {
+            if ((representationFormater != null) && (results != null)) {
                 for (final LightweightMetaObject result : results) {
                     result.setFormater(representationFormater);
                 }
             }
-            lwmos = results.toArray(new MetaObject[0]);
+            if (results != null) {
+                lwmos = results.toArray(new MetaObject[0]);
+            } else {
+                lwmos = new MetaObject[0];
+            }
         } else {
             if (representationFormater != null) {
                 lwmos = SessionManager.getProxy()

@@ -839,7 +839,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
                             log.error(
                                 "Error while displaying Editor"
                                         + ei.getState()
-                                        + editorObject.getDebugString()
+                                        + ((editorObject != null) ? editorObject.getDebugString()
+                                                                  : "editorObject == null")
                                         + "\n",
                                 e);                                                              // NOI18N
                             JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
