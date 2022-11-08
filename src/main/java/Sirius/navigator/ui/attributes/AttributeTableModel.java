@@ -149,7 +149,7 @@ class AttributeTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(final int row, final int column) {
-        if (row < this.metaAttributes.size()) {
+        if ((row >= 0) && (row < this.metaAttributes.size())) {
             final Sirius.server.localserver.attribute.Attribute metaAttribute =
                 (Sirius.server.localserver.attribute.Attribute)this.metaAttributes.get(row);
             /*if(this.isShowInvisibleAttributes() || metaAttribute.isVisible())

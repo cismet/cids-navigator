@@ -110,11 +110,12 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
      */
     public void setTreeNode(final Object treeNode) {
         if (logger.isDebugEnabled()) {
-            logger.debug((("setTreeNode: " + treeNode) != null) ? treeNode.hashCode() : null);
+            logger.debug("setTreeNode: " + ((treeNode != null) ? treeNode.hashCode() : " null"));
         }
         editButton.setEnabled(false);
         if ((worker != null) && !worker.isDone() && !worker.isCancelled()) {
-            logger.warn("cancelling running getMetaObject worker thread of tree node " + treeNode.hashCode());
+            logger.warn("cancelling running getMetaObject worker thread of tree node "
+                        + ((treeNode != null) ? treeNode.hashCode() : " null"));
             worker.cancel(false);
             worker = null;
         }
