@@ -715,7 +715,16 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
                         }
 
                         for (final Node dbNode : dbChildren) {
-                            if (!foundDbNodes.contains(dbNode)) {
+                            boolean found = false;
+
+                            for (final Node node : foundDbNodes) {
+                                if (node.deepEquals(dbNode)) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if (!found) {
                                 scheduleAddition(createTreeNode(dbNode, getConnectionContext()));
                             }
                         }
