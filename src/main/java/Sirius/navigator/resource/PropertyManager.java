@@ -22,6 +22,7 @@ package Sirius.navigator.resource;
  ******************************************************************************
  */
 import Sirius.navigator.connection.ConnectionInfo;
+import Sirius.navigator.tools.StaticNavigatorTools;
 import Sirius.navigator.ui.LAFManager;
 import Sirius.navigator.ui.progress.ProgressObserver;
 
@@ -50,8 +51,6 @@ import java.util.StringTokenizer;
 import javax.swing.JApplet;
 
 import de.cismet.netutil.ProxyProperties;
-
-import de.cismet.security.WebAccessManager;
 
 /**
  * DOCUMENT ME!
@@ -1089,30 +1088,6 @@ public final class PropertyManager {
     /**
      * DOCUMENT ME!
      *
-     * @param   from  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     *
-     * @throws  Exception  DOCUMENT ME!
-     */
-    private InputStream getInputStreamFrom(final String from) throws Exception {
-        if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0)
-                    || (from.indexOf("file:/") == 0)) {
-            final URL url = new URL(from);
-            try {
-                return WebAccessManager.getInstance().doRequest(url);
-            } catch (Exception e) {
-                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + from, e);
-                return url.openStream();
-            }
-        } else {
-            return new BufferedInputStream(new FileInputStream(from));
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
      * @return  DOCUMENT ME!
      */
     public ProxyProperties getProxyProperties() {
@@ -1167,7 +1142,7 @@ public final class PropertyManager {
         }
 
         if (cfgFile != null) {
-            this.load(getInputStreamFrom(cfgFile));
+            this.load(StaticNavigatorTools.getInputStreamFromFileOrUrl(cfgFile));
         } else {
             throw new Exception("loading of config file '" + cfgFile + "' failed"); // NOI18N
         }
@@ -1183,7 +1158,7 @@ public final class PropertyManager {
             final String cfgDirname = cfgFile.substring(0, cfgFile.lastIndexOf(cfgFileName));
             final String proxyConfig = getProxyConfig();
             if ((proxyConfig != null) && !proxyConfig.isEmpty()) {
-                proxyProperties.load(getInputStreamFrom(cfgDirname + proxyConfig));
+                proxyProperties.load(StaticNavigatorTools.getInputStreamFromFileOrUrl(cfgDirname + proxyConfig));
             }
         } catch (final Exception ex) {
             LOG.warn(String.format("error while loading proxy properties from %s", proxyConfig), ex);
