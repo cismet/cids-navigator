@@ -55,13 +55,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>7.2.11</version>
+                <version>7.4</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>7.2.11</version>
+                <version>7.4</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -69,20 +69,20 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>7.2.3</version>
+                <version>7.2.4</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>7.0.22</version>
+                <version>7.0.28</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>7.0.22</version>
+                <version>7.0.28</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -90,13 +90,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.11</version>
+                <version>7.11.3</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>7.11</version>
+                <version>7.11.3</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
