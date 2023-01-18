@@ -10,6 +10,12 @@ package Sirius.navigator.ui.tree;
 import Sirius.navigator.WorkingSpaceHandler;
 import Sirius.navigator.resource.PropertyManager;
 
+import java.util.Arrays;
+
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+
 import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.tools.gui.GUIWindow;
@@ -21,7 +27,7 @@ import de.cismet.tools.gui.GUIWindow;
  * @version  $Revision$, $Date$
  */
 @org.openide.util.lookup.ServiceProvider(service = GUIWindow.class)
-public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow {
+public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow, TreeModelListener {
 
     //~ Constructors -----------------------------------------------------------
 
@@ -69,5 +75,36 @@ public class WorkingSpaceTree extends SearchResultsTree implements GUIWindow {
         } else {
             return "WorkingSpaceTreeEnabled";
         }
+    }
+
+    @Override
+    public void setModel(final TreeModel newModel) {
+        final TreeModel model = super.getModel();
+
+        if (model != null) {
+            model.removeTreeModelListener(this);
+        }
+        super.setModel(newModel);
+
+        if (newModel != null) {
+            newModel.addTreeModelListener(this);
+        }
+    }
+
+    @Override
+    public void treeNodesChanged(final TreeModelEvent e) {
+    }
+
+    @Override
+    public void treeNodesInserted(final TreeModelEvent e) {
+    }
+
+    @Override
+    public void treeNodesRemoved(final TreeModelEvent e) {
+        removeResultNodes(Arrays.asList(e.getChildren()));
+    }
+
+    @Override
+    public void treeStructureChanged(final TreeModelEvent e) {
     }
 }

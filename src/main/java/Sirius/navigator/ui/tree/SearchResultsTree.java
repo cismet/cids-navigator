@@ -441,7 +441,11 @@ public class SearchResultsTree extends MetaCatalogueTree implements ConnectionCo
             this.clear();
             return;
         } else if ((append == true) && (empty == false)) {
-            resultNodes.addAll(Arrays.asList(filterNodesWithoutPermission(nodes)));
+            for (final Node n : filterNodesWithoutPermission(nodes)) {
+                if (!resultNodes.contains(n)) {
+                    resultNodes.add(n);
+                }
+            }
         } else {
             this.clear();
             resultNodes = new HashArrayList<Node>(Arrays.asList(filterNodesWithoutPermission(nodes)));
