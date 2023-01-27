@@ -716,7 +716,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnEditActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
+    private void btnEditActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnEditActionPerformed
         if (isEnabled()) {
             jDialog1.setSize(getSize().width, jDialog1.getSize().height);
             final int x = btnEdit.getLocationOnScreen().x - jDialog1.getBounds().width + btnEdit.getBounds().width;
@@ -727,16 +727,16 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
             jDialog1.setLocation(x + 2, y - 4);
             jDialog1.setVisible(true);
         }
-    }//GEN-LAST:event_btnEditActionPerformed
+    } //GEN-LAST:event_btnEditActionPerformed
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+    private void btnCancelActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnCancelActionPerformed
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_btnCancelActionPerformed
+    }                                                                             //GEN-LAST:event_btnCancelActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -760,7 +760,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void btnApplyActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnApplyActionPerformed
+    private void btnApplyActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_btnApplyActionPerformed
         final List old = (selectedElements != null) ? new ArrayList(selectedElements) : null;
         if (selectedElements == null) {
             selectedElements = new ArrayList();
@@ -784,7 +784,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
 
 //        propertyChangeSupport.firePropertyChange("selectedElement", null, cidsBean);
         jDialog1.setVisible(false);
-    }//GEN-LAST:event_btnApplyActionPerformed
+    } //GEN-LAST:event_btnApplyActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -803,25 +803,25 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void panLabelsMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_panLabelsMouseClicked
+    private void panLabelsMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_panLabelsMouseClicked
         btnEditActionPerformed(null);
-    }//GEN-LAST:event_panLabelsMouseClicked
+    }                                                                         //GEN-LAST:event_panLabelsMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void formMouseClicked(final java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
+    private void formMouseClicked(final java.awt.event.MouseEvent evt) { //GEN-FIRST:event_formMouseClicked
         btnEditActionPerformed(null);
-    }//GEN-LAST:event_formMouseClicked
+    }                                                                    //GEN-LAST:event_formMouseClicked
 
     /**
      * DOCUMENT ME!
      *
      * @param  evt  DOCUMENT ME!
      */
-    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_jButton1ActionPerformed
         try {
             final CidsBean newBean = createNewInstance();
             if (newBean != null) {
@@ -835,7 +835,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
         } catch (final Exception ex) {
             LOG.error(ex, ex);
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }                                                                            //GEN-LAST:event_jButton1ActionPerformed
 
     //~ Inner Classes ----------------------------------------------------------
 
