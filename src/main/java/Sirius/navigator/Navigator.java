@@ -67,6 +67,8 @@ import java.util.prefs.*;
 
 import javax.swing.*;
 
+import de.cismet.cids.client.tools.ContinueOrExitHandler;
+
 import de.cismet.cids.editors.NavigatorAttributeEditorGui;
 
 import de.cismet.cids.navigator.utils.CidsClientToolbarItem;
@@ -235,6 +237,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         initConnection();
 
         try {
+            ContinueOrExitHandler.getInstance().showFromConfAttr(this);
+
             checkNavigatorHome();
 
             ProxyCredentials.initFromConfAttr("proxy.credentials", getConnectionContext());
