@@ -142,6 +142,11 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
                     .getConfigAttr(SessionManager.getSession().getUser(),
                         String.format("%s.%s", confAttrPrefix, "title"),
                         getConnectionContext());
+        final String width = SessionManager.getProxy()
+                    .getConfigAttr(
+                        SessionManager.getSession().getUser(),
+                        String.format("%s.%s", confAttrPrefix, "width"),
+                        getConnectionContext());
         final String text = SessionManager.getProxy()
                     .getConfigAttr(SessionManager.getSession().getUser(),
                         String.format("%s.%s", confAttrPrefix, "text"),
@@ -169,8 +174,15 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
                     font.getSize(),
                     html) : null);
 
+        Integer widthInt = null;
+        try {
+            widthInt = (width != null) ? Integer.parseInt(width) : null;
+        } catch (final Exception ex) {
+        }
+
         dialog.setContentTitle(title);
         dialog.setContent(content);
+        dialog.setContentWidth(widthInt);
         dialog.setContinueButtonText(continueButtonText);
         dialog.setExitButtonText(exitButtonText);
 
