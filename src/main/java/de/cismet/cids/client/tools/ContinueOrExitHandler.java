@@ -13,14 +13,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Frame;
+
+import javax.swing.JLabel;
 
 import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.ContinueOrExitDialog;
-import de.cismet.tools.gui.StaticSwingTools;
 
 /**
  * DOCUMENT ME!
@@ -115,11 +117,11 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
     private void showFromConfAttr(final Object parent) throws Exception {
         if (isEnabled()) {
             if (parent instanceof Frame) {
-                StaticSwingTools.showDialog(configureDialog(new ContinueOrExitDialog((Frame)parent)), true);
+                configureDialog(new ContinueOrExitDialog((Frame)parent)).doShow();
             } else if (parent instanceof Component) {
-                StaticSwingTools.showDialog(configureDialog(new ContinueOrExitDialog((Component)parent)), true);
+                configureDialog(new ContinueOrExitDialog((Component)parent)).doShow();
             } else {
-                StaticSwingTools.showDialog(configureDialog(new ContinueOrExitDialog()), true);
+                configureDialog(new ContinueOrExitDialog()).doShow();
             }
         }
     }
@@ -157,11 +159,14 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
                         String.format("%s.%s", confAttrPrefix, "exitButtonText"),
                         getConnectionContext());
 
+        final Font font = new JLabel().getFont();
         final String content = (text != null)
             ? text
             : ((html != null)
                 ? String.format(
-                    "<html><head><style>body { font-family: 'Arial', sans-serif; }</style></head><body>%s</body></html>",
+                    "<html><html><body style='font-family: %s; font-size: %dpt;'>%s",
+                    font.getFamily(),
+                    font.getSize(),
                     html) : null);
 
         dialog.setContentTitle(title);
@@ -170,11 +175,11 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
         dialog.setExitButtonText(exitButtonText);
 
         // avoiding to have a non closable modal dialog when wrongly configured
-        if (continueButtonText == null && exitButtonText == null) {            
+        if ((continueButtonText == null) && (exitButtonText == null)) {
             dialog.setExitButtonText("exit");
             dialog.setContinueButtonText("continue");
         }
-        
+
         return dialog;
     }
 
