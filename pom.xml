@@ -96,7 +96,7 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>8.6-SNAPSHOT</version>
+                <version>8.5.2</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
