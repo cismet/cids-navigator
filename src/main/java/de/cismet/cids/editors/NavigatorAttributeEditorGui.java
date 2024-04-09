@@ -481,206 +481,204 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
         final EditorSaveListener editorSaveListener;
         final DisposableCidsBeanStore beanStore = this.currentBeanStore;
 
-        new SwingWorker<Void, Void>() {
+        if (beanStore instanceof BeforeSavingHook) {
+            ((BeforeSavingHook)beanStore).beforeSaving();
+        }
+
+        { // <deprecated>
+            if ((beanStore instanceof EditorSaveListener)
+                        && !((EditorSaveListener)beanStore).prepareForSave()) {
+                // editor is not ready for safe? then stop save procedure...
+                return;
+            }
+        } // </deprecated>
+
+        if ((beanStore instanceof SaveVetoable) && !((SaveVetoable)beanStore).isOkForSaving()) {
+            // editor is not ready for safe? then stop save procedure...
+            return;
+        }
+
+        final Boolean commitWasEnabled = commitButton.isEnabled();
+        final Boolean cancelWasEnabled = cancelButton.isEnabled();
+        commitButton.setEnabled(false);
+        cancelButton.setEnabled(false);
+        new SwingWorker<CidsBean, CidsBean>() {
 
                 @Override
-                protected Void doInBackground() throws Exception {
-                    if (beanStore instanceof BeforeSavingHook) {
-                        ((BeforeSavingHook)beanStore).beforeSaving();
-                    }
-                    return null;
+                protected CidsBean doInBackground() throws Exception {
+                    return oldBean.persist(getConnectionContext());
                 }
 
                 @Override
                 protected void done() {
-                    { // <deprecated>
-                        if ((beanStore instanceof EditorSaveListener)
-                                    && !((EditorSaveListener)beanStore).prepareForSave()) {
-                            // editor is not ready for safe? then stop save procedure...
-                            return;
+                    try {
+                        final CidsBean savedInstance = get();
+
+                        { // <deprecated>
+                            if (beanStore instanceof EditorSaveWithoutCloseListener) {
+                                ((EditorSaveWithoutCloseListener)beanStore).editorSaved(
+                                    new EditorSavedEvent(
+                                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
+                                        savedInstance));
+                            }
+                        } // </deprecated>
+
+                        if (beanStore instanceof AfterSavingHook) {
+                            ((AfterSavingHook)beanStore).afterSaving(
+                                new AfterSavingHook.Event(
+                                    AfterSavingHook.Status.SAVE_SUCCESS,
+                                    savedInstance));
                         }
-                    } // </deprecated>
+                        commitButton.setEnabled(commitWasEnabled);
+                        cancelButton.setEnabled(cancelWasEnabled);
 
-                    if ((beanStore instanceof SaveVetoable) && !((SaveVetoable)beanStore).isOkForSaving()) {
-                        // editor is not ready for safe? then stop save procedure...
-                        return;
+                        final MetaObject mo = otn.getMetaObject();
+                        final CidsBean oldBean = mo.getBean();
+
+                        otn.setMetaObject(savedInstance.getMetaObject());
+
+                        if (closeEditor) {
+                            final JOptionPane jop = new JOptionPane(
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().jop.message"), // NOI18N
+                                    JOptionPane.INFORMATION_MESSAGE);
+
+                            final JDialog dialog = jop.createDialog(
+                                    NavigatorAttributeEditorGui.this,
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().dialog.title")); // NOI18N
+
+                            final Timer t = new Timer(2000, new ActionListener() {
+
+                                        @Override
+                                        public void actionPerformed(final ActionEvent e) {
+                                            dialog.setVisible(false);
+                                            dialog.dispose();
+                                        }
+                                    });
+                            t.setRepeats(false);
+                            t.start();
+                            StaticSwingTools.showDialog(dialog);
+                            clear();
+
+                            { // <deprecated>
+                                if (beanStore instanceof EditorSaveListener) {
+                                    // the propertyChangeListeners should only be copied, when the editor is
+                                    // not closed. before Issue 241, the propertyChangeListeners were also
+                                    // only copied, when the editor was closed for (final
+                                    // PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
+                                    // savedInstance.addPropertyChangeListener(pcl); }
+                                    ((EditorSaveListener)beanStore).editorClosed(
+                                        new EditorClosedEvent(
+                                            EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
+                                            savedInstance));
+                                }
+                            } // </deprecated>
+
+                            if (beanStore instanceof AfterClosingHook) {
+                                ((AfterClosingHook)beanStore).afterClosing(
+                                    new AfterClosingHook.Event(
+                                        AfterClosingHook.Status.SAVED));
+                            }
+                        } else {
+                            // final AttributeViewer viewer =
+                            // ComponentRegistry.getRegistry().getAttributeViewer(); final MetaCatalogueTree
+                            // tree = ComponentRegistry.getRegistry().getActiveCatalogue();
+                            editorObject = savedInstance.getMetaObject();
+                            createBackup(editorObject);
+                            // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener
+                            // propertyChangeListener = new PropertyChangeListener() {
+                            //
+                            // @Override public void propertyChange(PropertyChangeEvent evt) {
+                            // viewer.repaint(); tree.repaint();
+                            //
+                            // } }; if (currentBeanStore instanceof JComponent) {
+                            // strongReferenceOnWeakListener = propertyChangeListener; } else {
+                            // log.error("A CidsBeansStore must be instanceof JComponent here, but it was
+                            // " + currentBeanStore + "!"); }
+                            // bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener,
+                            // bean)); --- editorObject.getBean().addPropertyChangeListener(new
+                            // PropertyChangeListener() {
+                            //
+                            // @Override public void propertyChange(PropertyChangeEvent evt) {
+                            // viewer.repaint(); tree.repaint();
+                            //
+                            // } });
+                            beanStore.setCidsBean(savedInstance);
+                            if (copyPropertyChangeListeners) { // workaround for alb_BaulastEditor
+                                                               // needing this while calling
+                                                               // "saveIt(false)"
+                                for (final PropertyChangeListener pcl
+                                            : oldBean.getPropertyChangeListeners()) {
+                                    savedInstance.addPropertyChangeListener(pcl);
+                                }
+                            }
+                        }
+                        refreshTree();
+                        refreshSearchTree();
+                        executeAfterSuccessfullSave(savedInstance);
+                    } catch (Exception ex) {
+                        {                                      // <deprecated>
+                            if (beanStore instanceof EditorSaveListener) {
+                                ((EditorSaveListener)beanStore).editorClosed(
+                                    new EditorClosedEvent(
+                                        EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
+                            }
+                        }                                      // </deprecated>
+
+                        if (beanStore instanceof AfterSavingHook) {
+                            ((AfterSavingHook)beanStore).afterSaving(
+                                new AfterSavingHook.Event(
+                                    AfterSavingHook.Status.SAVE_ERROR,
+                                    ex));
+                        }
+
+                        final Throwable firstCause = getFirstCause(ex);
+                        log.error("Error while saving", ex); // NOI18N
+
+                        if ((firstCause != null) && (firstCause.getMessage() != null)
+                                    && firstCause.getMessage().equals(
+                                        "not allowed to insert meta object")) {
+                            final ErrorInfo ei = new ErrorInfo(
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),   // NOI18N
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"), // NOI18N
+                                    null,
+                                    null,
+                                    ex,
+                                    Level.SEVERE,
+                                    null);
+                            JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+                        } else {
+                            final ErrorInfo ei = new ErrorInfo(
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),     // NOI18N
+                                    org.openide.util.NbBundle.getMessage(
+                                        NavigatorAttributeEditorGui.class,
+                                        "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),   // NOI18N
+                                    null,
+                                    null,
+                                    ex,
+                                    Level.SEVERE,
+                                    null);
+                            JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
+                        }
+                        refreshTree();
+                        refreshSearchTree();
+                    } finally {
+                        saveAndCloseDialog.setVisible(false);
+                        commitButton.setEnabled(commitWasEnabled);
+                        cancelButton.setEnabled(cancelWasEnabled);
                     }
-
-                    final Boolean commitWasEnabled = commitButton.isEnabled();
-                    final Boolean cancelWasEnabled = cancelButton.isEnabled();
-                    commitButton.setEnabled(false);
-                    cancelButton.setEnabled(false);
-                    new SwingWorker<CidsBean, CidsBean>() {
-
-                            @Override
-                            protected CidsBean doInBackground() throws Exception {
-                                return oldBean.persist(getConnectionContext());
-                            }
-
-                            @Override
-                            protected void done() {
-                                try {
-                                    final CidsBean savedInstance = get();
-
-                                    { // <deprecated>
-                                        if (beanStore instanceof EditorSaveWithoutCloseListener) {
-                                            ((EditorSaveWithoutCloseListener)beanStore).editorSaved(
-                                                new EditorSavedEvent(
-                                                    EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
-                                                    savedInstance));
-                                        }
-                                    } // </deprecated>
-
-                                    if (beanStore instanceof AfterSavingHook) {
-                                        ((AfterSavingHook)beanStore).afterSaving(new AfterSavingHook.Event(
-                                                AfterSavingHook.Status.SAVE_SUCCESS,
-                                                savedInstance));
-                                    }
-                                    commitButton.setEnabled(commitWasEnabled);
-                                    cancelButton.setEnabled(cancelWasEnabled);
-
-                                    final MetaObject mo = otn.getMetaObject();
-                                    final CidsBean oldBean = mo.getBean();
-
-                                    otn.setMetaObject(savedInstance.getMetaObject());
-
-                                    if (closeEditor) {
-                                        final JOptionPane jop = new JOptionPane(
-                                                org.openide.util.NbBundle.getMessage(
-                                                    NavigatorAttributeEditorGui.class,
-                                                    "NavigatorAttributeEditorGui.saveIt().jop.message"), // NOI18N
-                                                JOptionPane.INFORMATION_MESSAGE);
-
-                                        final JDialog dialog = jop.createDialog(
-                                                NavigatorAttributeEditorGui.this,
-                                                org.openide.util.NbBundle.getMessage(
-                                                    NavigatorAttributeEditorGui.class,
-                                                    "NavigatorAttributeEditorGui.saveIt().dialog.title")); // NOI18N
-
-                                        final Timer t = new Timer(2000, new ActionListener() {
-
-                                                    @Override
-                                                    public void actionPerformed(final ActionEvent e) {
-                                                        dialog.setVisible(false);
-                                                        dialog.dispose();
-                                                    }
-                                                });
-                                        t.setRepeats(false);
-                                        t.start();
-                                        StaticSwingTools.showDialog(dialog);
-                                        clear();
-
-                                        { // <deprecated>
-                                            if (beanStore instanceof EditorSaveListener) {
-                                                // the propertyChangeListeners should only be copied, when the editor is
-                                                // not closed. before Issue 241, the propertyChangeListeners were also
-                                                // only copied, when the editor was closed for (final
-                                                // PropertyChangeListener pcl : oldBean.getPropertyChangeListeners()) {
-                                                // savedInstance.addPropertyChangeListener(pcl); }
-                                                ((EditorSaveListener)beanStore).editorClosed(new EditorClosedEvent(
-                                                        EditorSaveListener.EditorSaveStatus.SAVE_SUCCESS,
-                                                        savedInstance));
-                                            }
-                                        } // </deprecated>
-
-                                        if (beanStore instanceof AfterClosingHook) {
-                                            ((AfterClosingHook)beanStore).afterClosing(new AfterClosingHook.Event(
-                                                    AfterClosingHook.Status.SAVED));
-                                        }
-                                    } else {
-                                        // final AttributeViewer viewer =
-                                        // ComponentRegistry.getRegistry().getAttributeViewer(); final MetaCatalogueTree
-                                        // tree = ComponentRegistry.getRegistry().getActiveCatalogue();
-                                        editorObject = savedInstance.getMetaObject();
-                                        createBackup(editorObject);
-                                        // --- CidsBean bean = editorObject.getBean(); final PropertyChangeListener
-                                        // propertyChangeListener = new PropertyChangeListener() {
-                                        //
-                                        // @Override public void propertyChange(PropertyChangeEvent evt) {
-                                        // viewer.repaint(); tree.repaint();
-                                        //
-                                        // } }; if (currentBeanStore instanceof JComponent) {
-                                        // strongReferenceOnWeakListener = propertyChangeListener; } else {
-                                        // log.error("A CidsBeansStore must be instanceof JComponent here, but it was
-                                        // " + currentBeanStore + "!"); }
-                                        // bean.addPropertyChangeListener(WeakListeners.propertyChange(propertyChangeListener,
-                                        // bean)); --- editorObject.getBean().addPropertyChangeListener(new
-                                        // PropertyChangeListener() {
-                                        //
-                                        // @Override public void propertyChange(PropertyChangeEvent evt) {
-                                        // viewer.repaint(); tree.repaint();
-                                        //
-                                        // } });
-                                        beanStore.setCidsBean(savedInstance);
-                                        if (copyPropertyChangeListeners) { // workaround for alb_BaulastEditor needing
-                                                                           // this while calling "saveIt(false)"
-                                            for (final PropertyChangeListener pcl
-                                                        : oldBean.getPropertyChangeListeners()) {
-                                                savedInstance.addPropertyChangeListener(pcl);
-                                            }
-                                        }
-                                    }
-                                    refreshTree();
-                                    refreshSearchTree();
-                                    executeAfterSuccessfullSave(savedInstance);
-                                } catch (Exception ex) {
-                                    {                                      // <deprecated>
-                                        if (beanStore instanceof EditorSaveListener) {
-                                            ((EditorSaveListener)beanStore).editorClosed(new EditorClosedEvent(
-                                                    EditorSaveListener.EditorSaveStatus.SAVE_ERROR));
-                                        }
-                                    }                                      // </deprecated>
-
-                                    if (beanStore instanceof AfterSavingHook) {
-                                        ((AfterSavingHook)beanStore).afterSaving(new AfterSavingHook.Event(
-                                                AfterSavingHook.Status.SAVE_ERROR,
-                                                ex));
-                                    }
-
-                                    final Throwable firstCause = getFirstCause(ex);
-                                    log.error("Error while saving", ex); // NOI18N
-
-                                    if ((firstCause != null) && (firstCause.getMessage() != null)
-                                                && firstCause.getMessage().equals(
-                                                    "not allowed to insert meta object")) {
-                                        final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
-                                                    NavigatorAttributeEditorGui.class,
-                                                    "NavigatorAttributeEditorGui.saveIt().JOptionPane.title"),   // NOI18N
-                                                org.openide.util.NbBundle.getMessage(
-                                                    NavigatorAttributeEditorGui.class,
-                                                    "NavigatorAttributeEditorGui.saveIt().JOptionPane.message"), // NOI18N
-                                                null,
-                                                null,
-                                                ex,
-                                                Level.SEVERE,
-                                                null);
-                                        JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
-                                    } else {
-                                        final ErrorInfo ei = new ErrorInfo(org.openide.util.NbBundle.getMessage(
-                                                    NavigatorAttributeEditorGui.class,
-                                                    "NavigatorAttributeEditorGui.saveIt().ErrorInfo.title"),     // NOI18N
-                                                org.openide.util.NbBundle.getMessage(
-                                                    NavigatorAttributeEditorGui.class,
-                                                    "NavigatorAttributeEditorGui.saveIt().ErrorInfo.message"),   // NOI18N
-                                                null,
-                                                null,
-                                                ex,
-                                                Level.SEVERE,
-                                                null);
-                                        JXErrorPane.showDialog(NavigatorAttributeEditorGui.this, ei);
-                                    }
-                                    refreshTree();
-                                    refreshSearchTree();
-                                } finally {
-                                    saveAndCloseDialog.setVisible(false);
-                                    commitButton.setEnabled(commitWasEnabled);
-                                    cancelButton.setEnabled(cancelWasEnabled);
-                                }
-                                if (closeEditor) {
-                                    clear();
-                                }
-                            }
-                        }.execute();
+                    if (closeEditor) {
+                        clear();
+                    }
                 }
             }.execute();
     }
@@ -769,6 +767,8 @@ public class NavigatorAttributeEditorGui extends AttributeEditor implements GUIW
 //                    } catch (Exception ex) {
 //                        log.error("Exception while initializing Bean with template values!", ex);
 //                    }
+                        // perhaps, the editorObject object should be returned and the editor should be loaded in the
+                        // edt
                         final JComponent ed = CidsObjectEditorFactory.getInstance().getEditor(editorObject);
                         return ed;
                     }
