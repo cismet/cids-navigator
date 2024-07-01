@@ -376,7 +376,7 @@ public class DefaultBindableLabelsPanel extends JPanel implements Bindable, Meta
                         final MetaObject[] mos = MetaObjectCache.getInstance()
                                     .getMetaObjectsByQuery(
                                         query,
-                                        getMetaClass().getDomain(),
+                                        getMetaClass(),
                                         forceReload,
                                         getConnectionContext());
                         if (mos != null) {
