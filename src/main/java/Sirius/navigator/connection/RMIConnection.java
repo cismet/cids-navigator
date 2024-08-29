@@ -12,6 +12,7 @@ import Sirius.navigator.exception.SqlConnectionException;
 import Sirius.navigator.tools.CloneHelper;
 
 import Sirius.server.localserver.attribute.ClassAttribute;
+import Sirius.server.localserver.user.PasswordCheckException;
 import Sirius.server.middleware.interfaces.proxy.ActionService;
 import Sirius.server.middleware.interfaces.proxy.CatalogueService;
 import Sirius.server.middleware.interfaces.proxy.MetaService;
@@ -359,7 +360,7 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     @Deprecated
     @Override
     public boolean changePassword(final User user, final String oldPassword, final String newPassword)
-            throws ConnectionException, UserException {
+            throws ConnectionException, UserException, PasswordCheckException {
         return changePassword(user, oldPassword, newPassword, ConnectionContext.createDeprecated());
     }
 
@@ -367,7 +368,9 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
     public boolean changePassword(final User user,
             final String oldPassword,
             final String newPassword,
-            final ConnectionContext connectionContext) throws ConnectionException, UserException {
+            final ConnectionContext connectionContext) throws ConnectionException,
+        UserException,
+        PasswordCheckException {
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("changing user password");

@@ -9,6 +9,7 @@ package Sirius.navigator.connection;
 
 import Sirius.navigator.exception.ConnectionException;
 
+import Sirius.server.localserver.user.PasswordCheckException;
 import Sirius.server.middleware.types.AbstractAttributeRepresentationFormater;
 import Sirius.server.middleware.types.HistoryObject;
 import Sirius.server.middleware.types.Link;
@@ -320,11 +321,14 @@ public interface Connection {
      *
      * @return  DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
-     * @throws  UserException        DOCUMENT ME!
+     * @throws  ConnectionException     DOCUMENT ME!
+     * @throws  UserException           DOCUMENT ME!
+     * @throws  PasswordCheckException  DOCUMENT ME!
      */
     @Deprecated
-    boolean changePassword(User user, String oldPassword, String newPassword) throws ConnectionException, UserException;
+    boolean changePassword(User user, String oldPassword, String newPassword) throws ConnectionException,
+        UserException,
+        PasswordCheckException;
 
     /**
      * DOCUMENT ME!
@@ -336,11 +340,12 @@ public interface Connection {
      *
      * @return  DOCUMENT ME!
      *
-     * @throws  ConnectionException  DOCUMENT ME!
-     * @throws  UserException        DOCUMENT ME!
+     * @throws  ConnectionException     DOCUMENT ME!
+     * @throws  UserException           DOCUMENT ME!
+     * @throws  PasswordCheckException  DOCUMENT ME!
      */
     boolean changePassword(User user, String oldPassword, String newPassword, ConnectionContext connectionContext)
-            throws ConnectionException, UserException;
+            throws ConnectionException, UserException, PasswordCheckException;
 
     /**
      * DOCUMENT ME!
