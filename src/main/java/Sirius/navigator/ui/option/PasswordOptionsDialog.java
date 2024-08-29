@@ -13,15 +13,21 @@ import Sirius.navigator.connection.proxy.ConnectionProxy;
 import Sirius.navigator.ui.ComponentRegistry;
 import Sirius.navigator.ui.dialog.PasswordDialog;
 
+import Sirius.server.localserver.user.PasswordCheckException;
+
 import org.apache.log4j.Logger;
 
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
+
+import java.awt.EventQueue;
 
 import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextStore;
@@ -53,6 +59,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
     private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel lblDialogDescription;
     private javax.swing.JLabel lblNewPassword;
+    private javax.swing.JLabel lblNewPasswordHints;
     private javax.swing.JLabel lblOldPassword;
     private javax.swing.JLabel lblPasswordAgain;
     private javax.swing.JLabel lblUser;
@@ -122,6 +129,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
                 new java.awt.Dimension(0, 32767));
         btnChangePassword = new javax.swing.JButton();
         lblDialogDescription = new javax.swing.JLabel();
+        lblNewPasswordHints = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
         setMaximumSize(new java.awt.Dimension(264, 177));
@@ -166,7 +174,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
                 "PasswordOptionsDialog.lblPasswordAgain.text")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 0);
@@ -185,13 +193,20 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         add(txtUser, gridBagConstraints);
 
         pwdNewPassword.setPreferredSize(new java.awt.Dimension(100, 27));
+        pwdNewPassword.addKeyListener(new java.awt.event.KeyAdapter() {
+
+                @Override
+                public void keyTyped(final java.awt.event.KeyEvent evt) {
+                    pwdNewPasswordKeyTyped(evt);
+                }
+            });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.1;
-        gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
+        gridBagConstraints.insets = new java.awt.Insets(4, 4, 2, 4);
         add(pwdNewPassword, gridBagConstraints);
 
         pwdOldPassword.setPreferredSize(new java.awt.Dimension(100, 27));
@@ -207,7 +222,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         pwdPasswordAgain.setPreferredSize(new java.awt.Dimension(100, 27));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridy = 5;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.weightx = 0.1;
@@ -215,7 +230,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         add(pwdPasswordAgain, gridBagConstraints);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridy = 8;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
         gridBagConstraints.weighty = 0.1;
@@ -236,7 +251,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
             });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 4, 4);
         add(btnChangePassword, gridBagConstraints);
@@ -248,7 +263,20 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.insets = new java.awt.Insets(4, 4, 10, 4);
         add(lblDialogDescription, gridBagConstraints);
-    }                                                                // </editor-fold>//GEN-END:initComponents
+
+        lblNewPasswordHints.setFont(new java.awt.Font("Ubuntu Sans", 0, 12)); // NOI18N
+        lblNewPasswordHints.setText(org.openide.util.NbBundle.getMessage(
+                PasswordOptionsDialog.class,
+                "PasswordOptionsDialog.lblNewPasswordHints.text"));           // NOI18N
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        add(lblNewPasswordHints, gridBagConstraints);
+    }                                                                         // </editor-fold>//GEN-END:initComponents
 
     /**
      * DOCUMENT ME!
@@ -325,8 +353,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
                             }
 
                             clearPwdFields();
-                        } catch (final Exception exp) {
-                            LOG.error("an error occurred while changing the password", exp);
+                        } catch (final PasswordCheckException exp) {
                             JOptionPane.showMessageDialog(
                                 mainWindow,
                                 exp.getMessage(),
@@ -334,11 +361,131 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
                                     PasswordOptionsDialog.class,
                                     "PasswordOptionsDialog.btnChangePasswordActionPerformed().error.title"), // NOI18N
                                 JOptionPane.ERROR_MESSAGE);
+                        } catch (final Exception exp) {
+                            final Throwable lastCause = getLastCause(exp);
+
+                            if (lastCause instanceof PasswordCheckException) {
+                                JOptionPane.showMessageDialog(
+                                    mainWindow,
+                                    lastCause.getMessage(),
+                                    org.openide.util.NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.btnChangePasswordActionPerformed().error.title"), // NOI18N
+                                    JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                LOG.error("an error occurred while changing the password", exp);
+                                JOptionPane.showMessageDialog(
+                                    mainWindow,
+                                    exp.getMessage(),
+                                    org.openide.util.NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.btnChangePasswordActionPerformed().error.title"), // NOI18N
+                                    JOptionPane.ERROR_MESSAGE);
+                            }
                         }
                     }
                 }
             });
-    }                             //GEN-LAST:event_btnChangePasswordActionPerformed
+    }                                 //GEN-LAST:event_btnChangePasswordActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void pwdNewPasswordKeyTyped(final java.awt.event.KeyEvent evt) { //GEN-FIRST:event_pwdNewPasswordKeyTyped
+        EventQueue.invokeLater(new Thread() {
+
+                @Override
+                public void run() {
+                    final char[] password = pwdNewPassword.getPassword();
+                    boolean digit = false;
+                    boolean letter = false;
+                    boolean special = false;
+
+                    for (int i = 0; i < password.length; ++i) {
+                        final char c = password[i];
+                        if (Character.isDigit(c)) {
+                            digit = true;
+                        } else if (Character.isAlphabetic(c)) {
+                            letter = true;
+                        } else {
+                            // all characters, which are not a letter or a digit are special characters
+                            special = true;
+                        }
+                    }
+
+                    String hintText = "";
+
+                    if (password.length >= 8) {
+                        hintText += "<html><span style=\"color:green;\">"
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.amount") + "</span>";
+                    } else {
+                        hintText += "<html>"
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.amount");
+                    }
+
+                    if (letter) {
+                        hintText += "<span style=\"color:green;\"> "
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.letter") + "</span>";
+                    } else {
+                        hintText += " "
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.letter");
+                    }
+
+                    if (digit) {
+                        hintText += "<span style=\"color:green;\"> "
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.digit") + "</span>";
+                    } else {
+                        hintText += " "
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.digit");
+                    }
+
+                    if (special) {
+                        hintText += "<span style=\"color:green;\"> "
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.special") + "</span>";
+                    } else {
+                        hintText += " "
+                                    + NbBundle.getMessage(
+                                        PasswordOptionsDialog.class,
+                                        "PasswordOptionsDialog.lblNewPasswordHints.special");
+                    }
+
+                    lblNewPasswordHints.setText(hintText);
+                }
+            });
+    } //GEN-LAST:event_pwdNewPasswordKeyTyped
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   ex  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Throwable getLastCause(final Exception ex) {
+        Throwable lastCause = ex;
+
+        while ((lastCause != null) && (lastCause.getCause() != null)) {
+            lastCause = lastCause.getCause();
+        }
+
+        return lastCause;
+    }
 
     @Override
     public void update() {
