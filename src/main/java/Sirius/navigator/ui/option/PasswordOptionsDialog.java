@@ -265,6 +265,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         add(lblDialogDescription, gridBagConstraints);
 
         lblNewPasswordHints.setFont(new java.awt.Font("Ubuntu Sans", 0, 12)); // NOI18N
+        lblNewPasswordHints.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         lblNewPasswordHints.setText(org.openide.util.NbBundle.getMessage(
                 PasswordOptionsDialog.class,
                 "PasswordOptionsDialog.lblNewPasswordHints.text"));           // NOI18N
@@ -273,7 +274,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
         gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
         add(lblNewPasswordHints, gridBagConstraints);
     }                                                                         // </editor-fold>//GEN-END:initComponents
