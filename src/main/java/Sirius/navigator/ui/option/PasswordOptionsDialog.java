@@ -105,6 +105,7 @@ public class PasswordOptionsDialog extends AbstractOptionsPanel implements Conne
         this.pwdNewPassword.setText("");
         this.pwdOldPassword.setText("");
         this.pwdPasswordAgain.setText("");
+        pwdNewPasswordKeyTyped(null);
     }
 
     /**
