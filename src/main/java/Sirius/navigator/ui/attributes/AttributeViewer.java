@@ -27,10 +27,13 @@ import Sirius.server.newuser.permission.PermissionHolder;
 
 import org.apache.log4j.Logger;
 
+import java.awt.EventQueue;
+
 import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 
 import javax.swing.AbstractButton;
 import javax.swing.Icon;
@@ -39,6 +42,9 @@ import javax.swing.SwingWorker;
 import javax.swing.event.*;
 
 import de.cismet.cids.dynamics.CidsBean;
+
+import de.cismet.commons.concurrency.CismetConcurrency;
+import de.cismet.commons.concurrency.CismetExecutors;
 
 import de.cismet.tools.gui.GUIWindow;
 
@@ -54,6 +60,8 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
     //~ Instance fields --------------------------------------------------------
 
     protected SwingWorker worker = null;
+    ExecutorService executor = CismetExecutors.newSingleThreadExecutor(CismetConcurrency.getInstance(
+                "AttributeViewer").createThreadFactory("AttributeViewer"));
 
     private final ResourceManager resources = ResourceManager.getManager();
     private Object treeNode = null;
@@ -122,7 +130,13 @@ public class AttributeViewer extends javax.swing.JPanel implements EmbededContro
 
         this.treeNode = treeNode;
         this.attributeTable.clear();
-        this.attributeTree.setTreeNode(treeNode);
+        executor.submit(new Thread("AttributeViewer setTreeNode") {
+
+                @Override
+                public void run() {
+                    AttributeViewer.this.attributeTree.setTreeNode(treeNode);
+                }
+            });
 
         if ((treeNode != null) && PropertyManager.getManager().isEditable()
                     && (treeNode instanceof ObjectTreeNode)) {
