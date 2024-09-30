@@ -85,8 +85,17 @@ public class AttributeTree extends JTree {
             if (logger.isDebugEnabled()) {
                 logger.debug("creating new AttributeTreeThread"); // NOI18N
             }
-            this.clear();
+            try {
+                EventQueue.invokeAndWait(new Thread("attribute tree first clear") {
 
+                        @Override
+                        public void run() {
+                            AttributeTree.this.clear();
+                        }
+                    });
+            } catch (Exception e) {
+                // nothing to do
+            }
             CismetThreadPool.execute(new Thread("AttributeTreeThread") // NOI18N
                 {
 
@@ -180,7 +189,13 @@ public class AttributeTree extends JTree {
                     }
                 });
         } else {
-            this.clear();
+            EventQueue.invokeLater(new Thread("attribute tree clear") {
+
+                    @Override
+                    public void run() {
+                        AttributeTree.this.clear();
+                    }
+                });
         }
     }
 
