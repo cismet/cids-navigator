@@ -34,6 +34,7 @@ import org.openide.util.NbBundle;
 import java.awt.GraphicsEnvironment;
 
 import java.io.File;
+import java.io.InputStream;
 
 import java.rmi.RemoteException;
 
@@ -47,12 +48,16 @@ import javax.swing.Icon;
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 
 import de.cismet.cids.server.CallServerService;
+import de.cismet.cids.server.actions.PreparedAsyncByteAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 import de.cismet.cids.server.search.CidsServerSearch;
 
 import de.cismet.cids.utils.ErrorUtils;
 
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
+
+import de.cismet.commons.security.WebDavClient;
+import de.cismet.commons.security.WebDavHelper;
 
 import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
@@ -1219,6 +1224,17 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final Object body,
             final ConnectionContext connectionContext,
             final ServerActionParameter... params) throws ConnectionException {
+        return executeTask(user, taskname, taskdomain, body, connectionContext, true, params);
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final Object body,
+            final ConnectionContext connectionContext,
+            final boolean resolvePreparedAsyncByteAction,
+            final ServerActionParameter... params) throws ConnectionException {
         try {
             // FIXME: workaround for legacy clients that do not support GenericResourceWithContentType
             final Object taskResult = getConnector().executeTask(
@@ -1233,7 +1249,42 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                             + ((GenericResourceWithContentType)taskResult).getContentType() + "' generated.");
                 return ((GenericResourceWithContentType)taskResult).getRes();
             } else {
-                return taskResult;
+                if (resolvePreparedAsyncByteAction && (taskResult instanceof PreparedAsyncByteAction)) {
+                    final PreparedAsyncByteAction preparedTaskResult = (PreparedAsyncByteAction)taskResult;
+
+                    final String server = preparedTaskResult.getUrl();
+                    final WebDavHelper webdavHelper = new WebDavHelper();
+                    final WebDavClient webDavClient = new WebDavClient(ProxyHandler.getInstance().getProxy(),
+                            "",
+                            "");
+
+                    try {
+                        final String encodedFileName = WebDavHelper.encodeURL(server.substring(
+                                    server.lastIndexOf("/")
+                                            + 1));
+                        final InputStream iStream = webDavClient.getInputStream(server);
+                        final long length = preparedTaskResult.getLength();
+                        final byte[] tmp = new byte[1024];
+                        final byte[] result = new byte[(int)length];
+                        int resCounter = 0;
+                        int counter;
+
+                        // iStream.read(result) does sometimes not read the whole stream
+
+                        while ((counter = iStream.read(tmp)) != -1) {
+                            System.arraycopy(tmp, 0, result, resCounter, counter);
+                            resCounter += counter;
+                        }
+
+                        return tmp;
+                    } catch (Exception e) {
+                        LOG.error("Error while download action result", e);
+
+                        return null;
+                    }
+                } else {
+                    return taskResult;
+                }
             }
         } catch (final RemoteException e) {
             throw new ConnectionException("could not executeTask: taskname: " + taskname + " || body: " + body
