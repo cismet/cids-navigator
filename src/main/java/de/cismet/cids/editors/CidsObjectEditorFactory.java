@@ -51,6 +51,8 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import java.lang.reflect.Constructor;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -602,6 +604,24 @@ public class CidsObjectEditorFactory implements ConnectionContextProvider {
                     // --------------------------------------------------
 
                     cmpEditor = getCustomAttributeEditor(metaClass, mai);
+
+                    if ((cmpEditor == null) && mai.getJavaclassname().equals("com.vividsolutions.jts.geom.Geometry")) {
+                        try {
+                            final Class c = Class.forName(
+                                    "de.cismet.cismap.cids.geometryeditor.DefaultCismapSimpleGeomComboBoxEditor");
+                            final Constructor con = c.getConstructor();
+                            cmpEditor = (JComponent)con.newInstance();
+
+                            if (cmpEditor instanceof MetaClassStore) {
+                                ((MetaClassStore)cmpEditor).setMetaClass(metaClass);
+                            }
+                            if (cmpEditor instanceof Disposable) {
+                                cidsEditor.addDisposableChild((Disposable)cmpEditor);
+                            }
+                        } catch (Exception e) {
+                            log.error("DefaultCismapGeometryComboBoxEditor not found for default editor", e);
+                        }
+                    }
 
                     if (cmpEditor == null) {
                         cmpEditor = getSimpleAttributeEditor(metaClass, mai);

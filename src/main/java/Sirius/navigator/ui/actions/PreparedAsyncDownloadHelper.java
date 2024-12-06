@@ -41,6 +41,21 @@ public class PreparedAsyncDownloadHelper {
      * @throws  Exception  DOCUMENT ME!
      */
     public static void download(final PreparedAsyncByteAction result, final FileOutputStream out) throws Exception {
+        download(result, out, null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   result   DOCUMENT ME!
+     * @param   out      DOCUMENT ME!
+     * @param   monitor  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public static void download(final PreparedAsyncByteAction result,
+            final FileOutputStream out,
+            final PreparedAsyncDownloadMonitor monitor) throws Exception {
         final String server = result.getUrl();
 
         final WebDavHelper webdavHelper = new WebDavHelper();
@@ -48,9 +63,35 @@ public class PreparedAsyncDownloadHelper {
 
         final InputStream iStream = webDavClient.getInputStream(server);
         final byte[] tmp = new byte[1024];
+        long totalBytes = 0;
+        int bytesRead;
 
-        while (iStream.read(tmp) != -1) {
-            out.write(tmp);
+        while ((bytesRead = iStream.read(tmp)) != -1) {
+            out.write(tmp, 0, bytesRead);
+
+            if (monitor != null) {
+                totalBytes += bytesRead;
+                monitor.progress(totalBytes);
+            }
         }
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public abstract static class PreparedAsyncDownloadMonitor {
+
+        //~ Methods ------------------------------------------------------------
+
+        /**
+         * DOCUMENT ME!
+         *
+         * @param  bytesRead  DOCUMENT ME!
+         */
+        public abstract void progress(long bytesRead);
     }
 }

@@ -233,6 +233,10 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
             JPopupMenu.setDefaultLightWeightPopupEnabled(false);
             ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         }
+        final String prop = System.getProperty("sun.net.client.defaultReadTimeout");
+        LOG.error("sun.net.client.defaultReadTimeout prop: " + prop);
+        System.setProperty("sun.net.client.defaultReadTimeout", "30000");
+        System.setProperty("sun.net.client.defaultConnectTimeout", "30000");
 
         initConnection();
 
