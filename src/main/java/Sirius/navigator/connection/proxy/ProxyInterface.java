@@ -625,4 +625,25 @@ public interface ProxyInterface {
             Object body,
             ConnectionContext context,
             ServerActionParameter... params) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   taskname                        DOCUMENT ME!
+     * @param   taskdomain                      DOCUMENT ME!
+     * @param   body                            DOCUMENT ME!
+     * @param   context                         DOCUMENT ME!
+     * @param   resolvePreparedAsyncByteAction  DOCUMENT ME!
+     * @param   params                          DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(String taskname,
+            String taskdomain,
+            Object body,
+            ConnectionContext context,
+            boolean resolvePreparedAsyncByteAction,
+            ServerActionParameter... params) throws ConnectionException;
 }

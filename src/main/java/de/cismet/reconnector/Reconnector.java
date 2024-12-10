@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.reconnector;
 
+import org.openide.util.Exceptions;
+
 import java.awt.Component;
 
 import java.lang.reflect.InvocationHandler;
@@ -49,6 +51,8 @@ public abstract class Reconnector<S> {
     }
 
     //~ Instance fields --------------------------------------------------------
+
+    protected boolean firstInvocation = true;
 
     private final Class serviceClass;
     private ReconnectorDialog reconnectorDialog;
@@ -111,7 +115,6 @@ public abstract class Reconnector<S> {
             service = connectService();
             // panels verstecken
             dispatcher.connectionCompleted();
-
             // Fehler beim Verbinden?
         } catch (final Exception ex) {
             // Neuverbindung in Gang setzen
@@ -175,11 +178,21 @@ public abstract class Reconnector<S> {
      * @param  exception  DOCUMENT ME!
      */
     private void serviceFailed(final ReconnectorException exception) {
-        final Component component = exception.getComponent();
-        if (isUnattended()) {
+        if (exception == null) {
+            LOG.error("automatic reconnect");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                // Nothing to do
+            }
             doReconnect();
         } else {
-            dispatcher.connectionFailed(new ReconnectorEvent(component));
+            final Component component = exception.getComponent();
+            if (isUnattended()) {
+                doReconnect();
+            } else {
+                dispatcher.connectionFailed(new ReconnectorEvent(component));
+            }
         }
     }
 
@@ -225,9 +238,12 @@ public abstract class Reconnector<S> {
                     }
 
                     // Methodenaufruf durchreichen
-                    return method.invoke(service, args);
+                    final Object invocationresult = method.invoke(service, args);
 
-                    // wieder verbinden fehlgeschlagen
+                    firstInvocation = true;
+
+                    return invocationresult;
+                        // wieder verbinden fehlgeschlagen
                 } catch (final ReconnectorException ex) {
                     // Fehler anzeigen und neuverbindung anfragen
                     serviceFailed(ex);

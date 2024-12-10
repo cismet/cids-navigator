@@ -119,17 +119,45 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         }
 
         if (error) {
-            final String message = org.openide.util.NbBundle.getMessage(
-                    RESTfulReconnector.class,
-                    "RESTfulReconnector.errormessage");
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(message);
+            if (firstInvocation && isConnectionReset(exception)) {
+                firstInvocation = false;
+                return null;
+            } else {
+                final String message = org.openide.util.NbBundle.getMessage(
+                        RESTfulReconnector.class,
+                        "RESTfulReconnector.errormessage");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(message);
+                }
+                errorPanel.setError(message, exception);
+                return new ReconnectorException(errorPanel);
             }
-            errorPanel.setError(message, exception);
-            return new ReconnectorException(errorPanel);
         }
 
         throw exception;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   e  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean isConnectionReset(final Throwable e) {
+        int currentDeep = 0;
+        Throwable ex = e;
+
+        while ((ex != null) && (currentDeep < 20)) {
+            ++currentDeep;
+            if ((ex.getMessage() != null) && ex.getMessage().toLowerCase().contains("connection reset")) {
+                return true;
+            }
+
+            ex = ex.getCause();
+        }
+
+        return false;
     }
 
     @Override
