@@ -1173,6 +1173,29 @@ public interface Connection {
     /**
      * DOCUMENT ME!
      *
+     * @param   user                            DOCUMENT ME!
+     * @param   taskname                        DOCUMENT ME!
+     * @param   taskdomain                      DOCUMENT ME!
+     * @param   body                            DOCUMENT ME!
+     * @param   connectionContext               DOCUMENT ME!
+     * @param   resolvePreparedAsyncByteAction  DOCUMENT ME!
+     * @param   params                          DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  ConnectionException  DOCUMENT ME!
+     */
+    Object executeTask(User user,
+            String taskname,
+            String taskdomain,
+            Object body,
+            ConnectionContext connectionContext,
+            boolean resolvePreparedAsyncByteAction,
+            ServerActionParameter... params) throws ConnectionException;
+
+    /**
+     * DOCUMENT ME!
+     *
      * @return  DOCUMENT ME!
      */
     CallServerService getCallServerService();

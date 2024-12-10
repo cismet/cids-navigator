@@ -13,7 +13,7 @@
 
     <groupId>de.cismet.cids.navigator</groupId>
     <artifactId>cids-navigator</artifactId>
-    <version>8.2.3</version>
+    <version>8.3</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -27,7 +27,7 @@
         <connection>https://github.com/cismet/cids-navigator.git</connection>
         <developerConnection>scm:git:git@github.com:cismet/cids-navigator.git</developerConnection>
         <url>https://github.com/cismet/cids-navigator</url>
-        <tag>v8.2.3</tag>
+        <tag>v8.3</tag>
     </scm>
 
     <ciManagement>
@@ -69,7 +69,7 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>8.1.1</version>
+                <version>8.1.2</version>
                 <type>jar</type>
             </dependency>
             
@@ -90,13 +90,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>8.7</version>
+                <version>8.8</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>8.7</version>
+                <version>8.8</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>

@@ -1143,6 +1143,17 @@ public final class RMIConnection implements Connection, Reconnectable<CallServer
             final Object body,
             final ConnectionContext connectionContext,
             final ServerActionParameter... params) throws ConnectionException {
+        return executeTask(user, taskname, taskdomain, body, connectionContext, true, params);
+    }
+
+    @Override
+    public Object executeTask(final User user,
+            final String taskname,
+            final String taskdomain,
+            final Object body,
+            final ConnectionContext connectionContext,
+            final boolean resolvePreparedAsyncByteAction,
+            final ServerActionParameter... params) throws ConnectionException {
         try {
             return ((ActionService)callserver).executeTask(user, taskname, taskdomain, body, connectionContext, params);
         } catch (final RemoteException e) {

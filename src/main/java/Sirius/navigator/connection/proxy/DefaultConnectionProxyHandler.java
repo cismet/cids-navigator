@@ -756,5 +756,21 @@ public class DefaultConnectionProxyHandler extends ConnectionProxyHandler {
                 final ServerActionParameter... params) throws ConnectionException {
             return connection.executeTask(session.getUser(), taskname, taskdomain, body, context, params);
         }
+
+        @Override
+        public Object executeTask(final String taskname,
+                final String taskdomain,
+                final Object body,
+                final ConnectionContext context,
+                final boolean resolvePreparedAsyncByteAction,
+                final ServerActionParameter... params) throws ConnectionException {
+            return connection.executeTask(session.getUser(),
+                    taskname,
+                    taskdomain,
+                    body,
+                    context,
+                    resolvePreparedAsyncByteAction,
+                    params);
+        }
     }
 }
