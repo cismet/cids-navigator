@@ -33,6 +33,7 @@ import org.openide.util.NbBundle;
 
 import java.awt.GraphicsEnvironment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 
@@ -57,7 +58,6 @@ import de.cismet.cids.utils.ErrorUtils;
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
 import de.cismet.commons.security.WebDavClient;
-import de.cismet.commons.security.WebDavHelper;
 
 import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
@@ -1253,30 +1253,40 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
                     final PreparedAsyncByteAction preparedTaskResult = (PreparedAsyncByteAction)taskResult;
 
                     final String server = preparedTaskResult.getUrl();
-                    final WebDavHelper webdavHelper = new WebDavHelper();
                     final WebDavClient webDavClient = new WebDavClient(ProxyHandler.getInstance().getProxy(),
                             "",
                             "");
 
                     try {
-                        final String encodedFileName = WebDavHelper.encodeURL(server.substring(
-                                    server.lastIndexOf("/")
-                                            + 1));
                         final InputStream iStream = webDavClient.getInputStream(server);
                         final long length = preparedTaskResult.getLength();
                         final byte[] tmp = new byte[1024];
-                        final byte[] result = new byte[(int)length];
-                        int resCounter = 0;
-                        int counter;
 
-                        // iStream.read(result) does sometimes not read the whole stream
+                        if (length > 0) {
+                            final byte[] result = new byte[(int)length];
+                            int resCounter = 0;
+                            int counter;
 
-                        while ((counter = iStream.read(tmp)) != -1) {
-                            System.arraycopy(tmp, 0, result, resCounter, counter);
-                            resCounter += counter;
+                            // iStream.read(result) does sometimes not read the whole stream
+
+                            while ((counter = iStream.read(tmp)) != -1) {
+                                System.arraycopy(tmp, 0, result, resCounter, counter);
+                                resCounter += counter;
+                            }
+
+                            return result;
+                        } else {
+                            final ByteArrayOutputStream result = new ByteArrayOutputStream();
+                            int counter;
+
+                            // iStream.read(result) does sometimes not read the whole stream
+
+                            while ((counter = iStream.read(tmp)) != -1) {
+                                result.write(tmp, 0, counter);
+                            }
+
+                            return result.toByteArray();
                         }
-
-                        return tmp;
                     } catch (Exception e) {
                         LOG.error("Error while download action result", e);
 
