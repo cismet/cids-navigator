@@ -104,7 +104,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
      * @param  cidsBean  DOCUMENT ME!
      */
     public final void deattachDummyBeanTrigger(final CidsBean cidsBean) {
-        for (final String property : getAttachedProperties()) {
+        for (final String property : new ArrayList<String>(getAttachedProperties())) {
             removeTriggerProperty(dummyBeanFollowerMap, property);
         }
     }
@@ -115,7 +115,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
      * @param  cidsBean  DOCUMENT ME!
      */
     public final void attachDummyBeanTrigger(final CidsBean cidsBean) {
-        for (final String attachedProperty : getAttachedProperties()) {
+        for (final String attachedProperty : new ArrayList<String>(getAttachedProperties())) {
             addTriggerProperty(dummyBeanFollowerMap, attachedProperty, cidsBean);
         }
     }
@@ -197,7 +197,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
 
         final CidsBean old = this.dummyBean;
         if (old != null) {
-            for (final String propertyName : getAttachedProperties()) {
+            for (final String propertyName : new ArrayList<String>(getAttachedProperties())) {
                 if (listListenerMap.containsKey(propertyName)) {
                     listListenerMap.remove(propertyName);
                 }
@@ -208,7 +208,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
 
         if (dummyBean != null) {
             refillAttachedProperties();
-            for (final String propertyName : getAttachedProperties()) {
+            for (final String propertyName : new ArrayList<String>(getAttachedProperties())) {
                 final Object value = dummyBean.getProperty(propertyName);
                 if ((value != null) && (value instanceof ObservableList)) {
                     final ObservableListListener listener = new ObservableListListener() {
@@ -346,7 +346,7 @@ public class MultiBeanHelper implements PropertyChangeListener {
      * @param  beans  DOCUMENT ME!
      */
     public void setBeans(final Collection<CidsBean> beans) {
-        for (final CidsBean bean : this.beans) {
+        for (final CidsBean bean : new ArrayList<CidsBean>(this.beans)) {
             deattachCidsBeanTrigger(bean);
         }
         this.beans.clear();
