@@ -46,6 +46,7 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
     //~ Instance fields --------------------------------------------------------
 
     private final RESTfulReconnectorErrorPanel errorPanel;
+    private final ProxyOptionsPanel proxyOptionsPanel;
 
     @Getter private String callserverURL;
     @Getter private final boolean compressionEnabled;
@@ -90,7 +91,8 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         this.connectionName = connectionName;
         this.compressionEnabled = compressionEnabled;
 
-        this.errorPanel = new RESTfulReconnectorErrorPanel(new ProxyOptionsPanel());
+        this.proxyOptionsPanel = new ProxyOptionsPanel();
+        this.errorPanel = new RESTfulReconnectorErrorPanel(proxyOptionsPanel);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -135,6 +137,12 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         }
 
         throw exception;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        proxyOptionsPanel.dispose();
     }
 
     /**

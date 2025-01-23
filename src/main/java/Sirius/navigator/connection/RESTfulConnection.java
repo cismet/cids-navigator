@@ -248,7 +248,11 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
 
     @Override
     public void disconnect() {
+        if (reconnector != null) {
+            reconnector.dispose();
+        }
         reconnector = null;
+        ProxyHandler.getInstance().removeListener(this);
     }
 
     @Override

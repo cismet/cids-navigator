@@ -60,6 +60,7 @@ public final class SessionManager {
             if (manager == null) {
                 manager = new SessionManager(proxy);
             } else {
+                manager.proxy.disconnect();
                 manager.proxy = proxy;
                 logger.warn("SessionManager has already been initialized");        // NOI18N
                 // throw new RuntimeException("SessionManager has alreadyt been initialized");
