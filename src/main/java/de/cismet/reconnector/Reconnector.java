@@ -127,6 +127,16 @@ public abstract class Reconnector<S> {
 
     /**
      * DOCUMENT ME!
+     */
+    public void dispose() {
+        if (reconnectorDialog != null) {
+            listeners.remove(reconnectorDialog);
+            reconnectorDialog.dispose();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  listener  DOCUMENT ME!
      */
