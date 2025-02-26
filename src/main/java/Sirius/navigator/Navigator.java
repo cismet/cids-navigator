@@ -46,7 +46,11 @@ import Sirius.server.newuser.UserGroup;
 import Sirius.server.newuser.permission.*;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
 
 import org.openide.util.Lookup;
 
@@ -1211,9 +1215,11 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
 
                 try {
                     if (!l4jinited) {
-                        final Properties properties = new Properties();
-                        properties.load(new BufferedInputStream(new FileInputStream(new File(log4JUrl))));
-                        PropertyConfigurator.configure(properties);
+                        try(final InputStream configStream = new BufferedInputStream(new FileInputStream(log4JUrl))) {
+                            final ConfigurationSource source = new ConfigurationSource(configStream);
+                            final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                            context.start(new XmlConfiguration(context, source)); // Apply new configuration
+                        }
                         l4jinited = true;
                     }
                 } catch (Exception e) {
@@ -1221,9 +1227,12 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                     e.printStackTrace();
 
                     try {
-                        final Properties properties = new Properties();
-                        properties.load(Navigator.class.getResourceAsStream("/Sirius/navigator/log4j.properties"));
-                        PropertyConfigurator.configure(properties);
+                        try(final InputStream configStream = Navigator.class.getResourceAsStream(
+                                            "/Sirius/navigator/log4j.properties")) {
+                            final ConfigurationSource source = new ConfigurationSource(configStream);
+                            final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                            context.start(new XmlConfiguration(context, source));      // Apply new configuration
+                        }
                     } catch (Exception ex) {
                         System.err.println("could not load default log4jproperties."); // NOI18N
                         ex.printStackTrace();
@@ -1283,8 +1292,11 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
                 } catch (Exception e) {
                     in = log4jPropertiesURL.openStream();
                 }
-                properties.load(in);
-                PropertyConfigurator.configure(properties);
+                try(final InputStream configStream = in) {
+                    final ConfigurationSource source = new ConfigurationSource(configStream);
+                    final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                    context.start(new XmlConfiguration(context, source)); // Apply new configuration
+                }
 
                 l4jinited = true;
             } catch (final Exception e) {

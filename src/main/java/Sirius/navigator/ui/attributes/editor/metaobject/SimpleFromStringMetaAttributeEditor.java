@@ -14,10 +14,6 @@ package Sirius.navigator.ui.attributes.editor.metaobject;
 
 import Sirius.server.localserver.attribute.Attribute;
 
-import org.apache.log4j.lf5.util.Resource;
-
-import java.awt.image.RescaleOp;
-
 /**
  * DOCUMENT ME!
  *
