@@ -87,7 +87,11 @@ import net.infonode.util.ValueChange;
 
 import org.apache.commons.collections.MultiHashMap;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.ConfigurationSource;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.xml.XmlConfiguration;
 
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
@@ -2582,11 +2586,14 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
                 System.out.println("-------------------------------------------------------"); // NOI18N
 
                 // log4j configuration .....................................
-                final Properties properties = new Properties();
                 boolean l4jinited = false;
                 try {
                     final URL log4jPropertiesURL = new URL(args[0]);
-                    properties.load(log4jPropertiesURL.openStream());
+                    try(final InputStream configStream = log4jPropertiesURL.openStream()) {
+                        final ConfigurationSource source = new ConfigurationSource(configStream);
+                        final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                        context.start(new XmlConfiguration(context, source)); // Apply new configuration
+                    }
 
                     l4jinited = true;
                 } catch (final Exception e) {
@@ -2597,14 +2604,17 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
 
                 try {
                     if (!l4jinited) {
-                        properties.load(new BufferedInputStream(new FileInputStream(new File(args[0]))));
+                        try(final InputStream configStream = new BufferedInputStream(
+                                            new FileInputStream(new File(args[0])))) {
+                            final ConfigurationSource source = new ConfigurationSource(configStream);
+                            final LoggerContext context = (LoggerContext)LogManager.getContext(false);
+                            context.start(new XmlConfiguration(context, source)); // Apply new configuration
+                        }
                     }
                 } catch (Exception e) {
                     System.err.println("could not lode log4jproperties " + e.getMessage()); // NOI18N
                     e.printStackTrace();
                 }
-
-                PropertyConfigurator.configure(properties);
 
                 // log4j configuration .....................................
                 PropertyManager.getManager()
