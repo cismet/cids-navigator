@@ -138,6 +138,7 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
     protected javax.swing.JLabel lblRendererCreationWaitingLabel;
     protected javax.swing.JPanel panBreadCrump;
     protected javax.swing.JPanel panObjects;
+    private javax.swing.JButton refreshButton;
     protected javax.swing.JScrollPane scpRenderer;
     // End of variables declaration//GEN-END:variables
 
@@ -249,10 +250,11 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        final java.awt.GridBagConstraints gridBagConstraints;
+        java.awt.GridBagConstraints gridBagConstraints;
 
         lblRendererCreationWaitingLabel = new javax.swing.JLabel();
         controlBar = new javax.swing.JPanel();
+        refreshButton = new javax.swing.JButton();
         editButton = new javax.swing.JButton();
         panObjects = new javax.swing.JPanel();
         scpRenderer = new javax.swing.JScrollPane();
@@ -264,6 +266,32 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
                 getClass().getResource("/Sirius/navigator/resource/img/load.png"))); // NOI18N
 
         controlBar.setLayout(new java.awt.GridBagLayout());
+
+        refreshButton.setIcon(RESOURCE.getIcon("reload16.gif"));
+        refreshButton.setToolTipText(org.openide.util.NbBundle.getMessage(
+                DescriptionPane.class,
+                "DescriptionPane.refreshButton.toolTipText")); // NOI18N
+        refreshButton.setActionCommand(org.openide.util.NbBundle.getMessage(
+                DescriptionPane.class,
+                "DescriptionPane.refreshButton.actionCommand",
+                new Object[] {}));                             // NOI18N
+        refreshButton.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        refreshButton.setContentAreaFilled(false);
+        refreshButton.setEnabled(false);
+        refreshButton.setFocusPainted(false);
+        refreshButton.setMaximumSize(new java.awt.Dimension(16, 16));
+        refreshButton.setMinimumSize(new java.awt.Dimension(16, 16));
+        refreshButton.setPreferredSize(new java.awt.Dimension(16, 16));
+        refreshButton.addActionListener(new java.awt.event.ActionListener() {
+
+                @Override
+                public void actionPerformed(final java.awt.event.ActionEvent evt) {
+                    refreshButtonActionPerformed(evt);
+                }
+            });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        controlBar.add(refreshButton, gridBagConstraints);
 
         editButton.setIcon(RESOURCE.getIcon("objekt_bearbeiten.gif"));
         editButton.setToolTipText(org.openide.util.NbBundle.getMessage(
@@ -335,6 +363,17 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
             }
         }
     }                                                                             //GEN-LAST:event_editButtonActionPerformed
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  evt  DOCUMENT ME!
+     */
+    private void refreshButtonActionPerformed(final java.awt.event.ActionEvent evt) { //GEN-FIRST:event_refreshButtonActionPerformed
+        if (this instanceof DescriptionPaneFX) {
+            ((DescriptionPaneFX)this).refresh();
+        }
+    }                                                                                 //GEN-LAST:event_refreshButtonActionPerformed
 
     /**
      * DOCUMENT ME!
@@ -429,6 +468,7 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
         } else {
             lastNode = null;
             editButton.setEnabled(false);
+            refreshButton.setEnabled(false);
             new SwingWorker<List<ObjectTreeNode>, Void>() {
 
                     @Override
@@ -1237,9 +1277,11 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
             performSetNode(n);
             lastNode = n;
             editButton.setEnabled(true);
+            refreshButton.setEnabled(true);
         } else {
             lastNode = null;
             editButton.setEnabled(false);
+            refreshButton.setEnabled(false);
             statusChangeSupport.fireStatusChange(
                 org.openide.util.NbBundle.getMessage(
                     DescriptionPane.class,
@@ -1299,6 +1341,7 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
 
         if (showEditButton) {
             final Vector<AbstractButton> buttons = new Vector<AbstractButton>();
+            buttons.add(refreshButton);
             buttons.add(editButton);
             return buttons;
         } else {

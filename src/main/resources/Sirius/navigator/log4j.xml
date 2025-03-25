@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <!-- Remote Socket Appender -->
+        <Socket name="RemoteLogger" host="localhost" port="4445">
+            <SerializedLayout/>
+        </Socket>
+    </Appenders>
+
+    <Loggers>
+        <!-- Root Logger with WARN level, using RemoteLogger -->
+        <Root level="warn">
+            <AppenderRef ref="RemoteLogger"/>
+        </Root>
+    </Loggers>
+</Configuration>
