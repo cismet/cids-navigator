@@ -132,4 +132,11 @@ public class DescriptionPaneFX extends DescriptionPane implements GUIWindow {
     public Icon getViewIcon() {
         return null;
     }
+
+    /**
+     * DOCUMENT ME!
+     */
+    public void refresh() {
+        browserPanel.refresh();
+    }
 }
