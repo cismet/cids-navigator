@@ -1341,9 +1341,9 @@ public abstract class DescriptionPane extends JPanel implements EmbededControlBa
 
         if (showEditButton) {
             final Vector<AbstractButton> buttons = new Vector<AbstractButton>();
-            if (this instanceof DescriptionPaneFX) {
-                buttons.add(refreshButton);
-            }
+//            if (this instanceof DescriptionPaneFX) {
+//                buttons.add(refreshButton);
+//            }
             buttons.add(editButton);
             return buttons;
         } else {
