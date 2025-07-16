@@ -13,13 +13,13 @@ import Sirius.navigator.search.dynamic.SearchControlPanel;
 import Sirius.navigator.ui.ComponentRegistry;
 
 import Sirius.server.middleware.types.Node;
+import Sirius.server.search.SearchRuntimeException;
 
 import org.apache.log4j.Logger;
 
 import org.jdesktop.swingx.JXErrorPane;
 import org.jdesktop.swingx.error.ErrorInfo;
 
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 import java.beans.PropertyChangeEvent;
@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
@@ -170,20 +172,35 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
                     LOG.error("Search result can't be get().", ex);
                 } catch (ExecutionException ex) {
                     LOG.error("Search result can't be get().", ex);
-                    final ErrorInfo errorInfo = new ErrorInfo(
-                            org.openide.util.NbBundle.getMessage(
-                                SearchControlPanel.class,
-                                "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.title"),
-                            org.openide.util.NbBundle.getMessage(
-                                SearchControlPanel.class,
-                                "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.message"),
-                            null,
-                            "ERROR",
-                            ex.getCause(),
-                            Level.WARNING,
-                            null);
 
-                    JXErrorPane.showDialog(querySearch.getRootPane(), errorInfo);
+                    final JFrame mainWindow = ComponentRegistry.getRegistry().getMainWindow();
+
+                    if ((ex.getCause() instanceof SearchRuntimeException)
+                                && (mainWindow != null)) {
+                        final SearchRuntimeException srx = (SearchRuntimeException)((ExecutionException)ex).getCause();
+
+                        // If there is a SearchRuntimeException, the Error message should be displayed
+                        final String title = NbBundle.getMessage(
+                                CidsSearchExecutor.class,
+                                "CidsSearchExecutor.searchAndDispolayResults.done().title");
+
+                        JOptionPane.showMessageDialog(mainWindow, srx.getMessage(), title, JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        final ErrorInfo errorInfo = new ErrorInfo(
+                                org.openide.util.NbBundle.getMessage(
+                                    SearchControlPanel.class,
+                                    "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.title"),
+                                org.openide.util.NbBundle.getMessage(
+                                    SearchControlPanel.class,
+                                    "SearchControlPanel.propertyChange(PropertyChangeEvent).JOptionPane_anon.message"),
+                                null,
+                                "ERROR",
+                                ex.getCause(),
+                                Level.WARNING,
+                                null);
+
+                        JXErrorPane.showDialog(querySearch.getRootPane(), errorInfo);
+                    }
                 }
 
                 // this class is used as listener of the search thread and as a listener for the thread which

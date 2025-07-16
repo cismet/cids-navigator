@@ -24,6 +24,7 @@ import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.middleware.types.Node;
 import Sirius.server.newuser.User;
 import Sirius.server.newuser.UserException;
+import Sirius.server.search.SearchRuntimeException;
 
 import Sirius.util.image.ImageHashMap;
 
@@ -1063,6 +1064,8 @@ public class RESTfulConnection implements Connection, Reconnectable<CallServerSe
             final ConnectionContext connectionContext) throws ConnectionException {
         try {
             return getConnector().customServerSearch(user, serverSearch, connectionContext);
+        } catch (SearchRuntimeException e) {
+            throw e;
         } catch (final Exception e) {
             final String message = "error during custom search";
             throw new ConnectionException(message, e);
