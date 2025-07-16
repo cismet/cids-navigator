@@ -342,7 +342,7 @@ public class SearchControlPanel extends javax.swing.JPanel implements PropertyCh
 
                         // If there is a SearchRuntimeException, the Error message should be displayed
                         final String title = NbBundle.getMessage(
-                                CidsSearchExecutor.class,
+                                SearchControlPanel.class,
                                 "SearchControlPanel.propertyChange(PropertyChangeEvent).title");
 
                         JOptionPane.showMessageDialog(mainWindow, srx.getMessage(), title, JOptionPane.ERROR_MESSAGE);
