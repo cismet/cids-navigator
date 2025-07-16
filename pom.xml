@@ -55,13 +55,13 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>9.0</version>
+                <version>9.0.5</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-commons</artifactId>
-                <version>9.0</version>
+                <version>9.0.5</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -69,20 +69,20 @@
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismet-gui-commons</artifactId>
-                <version>9.0.1</version>
+                <version>9.0.4</version>
                 <type>jar</type>
             </dependency>
             
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>9.0</version>
+                <version>9.0.6</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.commons</groupId>
                 <artifactId>cismap-commons</artifactId>
-                <version>9.0</version>
+                <version>9.0.6</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -90,13 +90,13 @@
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>9.0</version>
+                <version>9.1.4</version>
                 <type>jar</type>
             </dependency>
             <dependency>
                 <groupId>de.cismet.cids</groupId>
                 <artifactId>cids-server</artifactId>
-                <version>9.0</version>
+                <version>9.1.4</version>
                 <type>test-jar</type>
                 <scope>test</scope>
             </dependency>
@@ -119,7 +119,7 @@
             <dependency>
                 <groupId>de.cismet.cismap</groupId>
                 <artifactId>cismap-plugin</artifactId>
-                <version>9.0</version>
+                <version>9.0.1</version>
                 <scope>runtime</scope>
                 <exclusions>
                     <exclusion>

@@ -22,7 +22,9 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 
-import java.util.Vector;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.swing.DefaultComboBoxModel;
@@ -62,6 +64,7 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
     private String startName = null;
     private String startGroup = null;
     private String startUserDomain = null;
+    private boolean sorted = false;
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btn_cancel;
@@ -86,6 +89,17 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
      * @param  owner  navigator Der LoginDialog wird relativ zu diesem Window zentriert
      */
     public LoginDialog(final java.awt.Frame owner) {
+        this(owner, false, false);
+    }
+
+    /**
+     * Konstruiert einen neuen LoginDialog mit dem Titel 'Login'.
+     *
+     * @param  owner         navigator Der LoginDialog wird relativ zu diesem Window zentriert
+     * @param  withoutGroup  DOCUMENT ME!
+     * @param  sorted        DOCUMENT ME!
+     */
+    public LoginDialog(final java.awt.Frame owner, final boolean withoutGroup, final boolean sorted) {
         super(owner, true);
         if (owner instanceof ConnectionContextProvider) {
             connectionContext = (ConnectionContext)((ConnectionContextProvider)owner).getConnectionContext();
@@ -99,6 +113,12 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
 
         // So kann der Dialog nich ueber |X| geschlossen werden!
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+        if (withoutGroup) {
+            userGroupIsOptional = true;
+            userGroupIsForbidden = true;
+        }
+        this.sorted = sorted;
 
         initComponents();
 
@@ -501,6 +521,16 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
 
             final String[] domains = SessionManager.getProxy().getDomains(getConnectionContext());
 
+            if (sorted) {
+                Arrays.sort(domains, new Comparator<String>() {
+
+                        @Override
+                        public int compare(final String o1, final String o2) {
+                            return -1 * o1.compareTo(o2);
+                        }
+                    });
+            }
+
             for (int i = 0; i < domains.length; i++) {
                 cb_srv.addItem(domains[i]);
             }
@@ -747,7 +777,7 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
         cb_userGroup.removeAllItems();
 
         if ((user == null) || (user.length() == 0) || (domain == null) || (domain.length() == 0)) {
-            final Vector tmpVector = SessionManager.getProxy().getUserGroupNames(getConnectionContext());
+            final List tmpVector = SessionManager.getProxy().getUserGroupNames(getConnectionContext());
             userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
         } else {
             try {
@@ -755,7 +785,7 @@ public class LoginDialog extends JDialog implements ConnectionContextProvider {
                     LOG.debug("retrieving usergroups for user '" + user + "' @ domain '" + domain + "'"); // NOI18N
                 }
 
-                final Vector tmpVector = SessionManager.getProxy()
+                final List tmpVector = SessionManager.getProxy()
                             .getUserGroupNames(user, domain, getConnectionContext());
                 userGroupLSNames = (String[][])tmpVector.toArray(new String[tmpVector.size()][2]);
             } catch (UserException ue) {
