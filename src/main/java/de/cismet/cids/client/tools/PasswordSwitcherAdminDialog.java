@@ -15,7 +15,15 @@ package de.cismet.cids.client.tools;
 *
 ****************************************************/
 
+import Sirius.navigator.connection.Connection;
+import Sirius.navigator.connection.ConnectionFactory;
+import Sirius.navigator.connection.ConnectionInfo;
+import Sirius.navigator.connection.ConnectionSession;
 import Sirius.navigator.connection.SessionManager;
+import Sirius.navigator.connection.proxy.ConnectionProxy;
+import Sirius.navigator.ui.dialog.LoginDialog;
+
+import Sirius.server.newuser.UserException;
 
 import org.apache.log4j.Logger;
 
@@ -27,16 +35,20 @@ import java.io.FileInputStream;
 
 import java.net.URL;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.SwingWorker;
 
 import de.cismet.cids.server.actions.PasswordSwitcherAdminAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
 
+import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
@@ -331,8 +343,8 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                                 new javax.swing.JFrame(),
                                 true);
                         final String callServerUrl;
-                        final String domain;
                         final boolean compressionEnabled;
+
                         if (args.length == 1) {
                             final String cfgFile = args[0];
                             final Properties properties = new Properties();
@@ -343,19 +355,49 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                                 properties.load(new BufferedInputStream(new FileInputStream(cfgFile)));
                             }
                             callServerUrl = properties.getProperty("callserverURL");
-                            domain = properties.getProperty("userDomain");
                             compressionEnabled = Boolean.parseBoolean(
                                     properties.getProperty("compressionEnabled", "true"));
                         } else {
                             callServerUrl = args[0];
-                            domain = args[1];
                             compressionEnabled = (args.length > 2) && "compressionEnabled".equals(args[2]);
                         }
-                        DevelopmentTools.showSimpleLoginDialog(
-                            callServerUrl,
-                            domain,
-                            compressionEnabled,
-                            dialog.getConnectionContext());
+
+                        final ConnectionContext cc = ConnectionContext.create(
+                                AbstractConnectionContext.Category.OTHER,
+                                "PasswordSwitcher");
+
+                        final Connection connection = ConnectionFactory.getFactory()
+                                    .createConnection(
+                                        "Sirius.navigator.connection.RESTfulConnection",
+                                        callServerUrl,
+                                        "Password Switcher",
+                                        null,
+                                        compressionEnabled,
+                                        cc);
+                        final ConnectionInfo connectionInfo = new ConnectionInfo();
+                        connectionInfo.setCallserverURL(callServerUrl);
+                        ConnectionSession connectionSession = null;
+
+                        try {
+                            connectionSession = ConnectionFactory.getFactory()
+                                        .createSession(
+                                                connection,
+                                                connectionInfo,
+                                                false,
+                                                cc);
+                        } catch (UserException uexp) {
+                        }
+
+                        final ConnectionProxy connectionProxy = ConnectionFactory.getFactory()
+                                    .createProxy(
+                                        "Sirius.navigator.connection.proxy.DefaultConnectionProxyHandler",
+                                        connectionSession,
+                                        cc);
+                        SessionManager.init(connectionProxy);
+
+                        final LoginDialog loginDialog = new LoginDialog(null, true, true);
+                        StaticSwingTools.showDialog(loginDialog);
+
                         dialog.addWindowListener(new java.awt.event.WindowAdapter() {
 
                                 @Override
@@ -399,7 +441,7 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
         final Object ret = SessionManager.getProxy()
                     .executeTask(
                         PasswordSwitcherAdminAction.TASK_NAME,
-                        "WUNDA_BLAU",
+                        SessionManager.getSession().getUser().getDomain(),
                         (Object)null,
                         getConnectionContext(),
                         paramLoginName,
