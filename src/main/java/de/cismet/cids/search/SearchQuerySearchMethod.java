@@ -181,8 +181,8 @@ public class SearchQuerySearchMethod implements QuerySearchMethod, PropertyChang
 
                         // If there is a SearchRuntimeException, the Error message should be displayed
                         final String title = NbBundle.getMessage(
-                                CidsSearchExecutor.class,
-                                "CidsSearchExecutor.searchAndDispolayResults.done().title");
+                                SearchControlPanel.class,
+                                "SearchControlPanel.propertyChange(PropertyChangeEvent).title");
 
                         JOptionPane.showMessageDialog(mainWindow, srx.getMessage(), title, JOptionPane.ERROR_MESSAGE);
                     } else {
