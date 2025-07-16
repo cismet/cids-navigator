@@ -47,7 +47,7 @@ public final class CidsSearchExecutor {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final DefaultStatusChangeSupport dscs = new DefaultStatusChangeSupport(new Object());
-    private static final transient org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(
+    private static final transient org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
             CidsSearchExecutor.class);
     private static SearchProgressDialog searchProgressDialog;
     private static SearchControlDialog searchControlDialog;
@@ -166,7 +166,7 @@ public final class CidsSearchExecutor {
 
                                         @Override
                                         public void propertyChange(final PropertyChangeEvent evt) {
-                                            log.fatal("CANCEL-->" + evt);
+                                            LOG.fatal("CANCEL-->" + evt);
                                             cancel(true);
                                         }
                                     };
@@ -206,7 +206,7 @@ public final class CidsSearchExecutor {
                             getSearchProgressDialog().setLabelAnimation(false);
                         }
                     } catch (Exception ex) {
-                        log.fatal("suchproblem", ex);
+                        LOG.fatal("suchproblem", ex);
                     }
                     dscs.removePropertyChangeListener(cancelListener);
                 }
