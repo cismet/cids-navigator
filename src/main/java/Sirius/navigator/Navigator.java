@@ -466,6 +466,8 @@ public class Navigator extends JFrame implements ConnectionContextProvider {
         if (LOG.isInfoEnabled()) {
             LOG.info("initConnection(): navigator editor enabled: " + PropertyManager.getManager().isEditable()); // NOI18N
         }
+
+        WebAccessManager.setJwsToken(SessionManager.getSession().getUser().getJwsToken());
     }
     // #########################################################################
 
