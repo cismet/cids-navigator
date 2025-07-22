@@ -218,6 +218,8 @@ import de.cismet.netutil.ProxyHandler;
 
 import de.cismet.remote.RESTRemoteControlStarter;
 
+import de.cismet.security.WebAccessManager;
+
 import de.cismet.tools.JnlpSystemPropertyHelper;
 import de.cismet.tools.JnlpTools;
 import de.cismet.tools.Static2DTools;
@@ -1948,6 +1950,8 @@ public class NavigatorX extends javax.swing.JFrame implements ConnectionContextP
         if (LOG.isInfoEnabled()) {
             LOG.info("initConnection(): navigator editor enabled: " + PropertyManager.getManager().isEditable()); // NOI18N
         }
+
+        WebAccessManager.setJwsToken(SessionManager.getSession().getUser().getJwsToken());
     }
 
     @Override
