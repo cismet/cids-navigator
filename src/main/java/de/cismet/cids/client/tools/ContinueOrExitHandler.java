@@ -23,6 +23,7 @@ import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.tools.gui.ContinueOrExitDialog;
+import de.cismet.tools.gui.ContinueOrExitDialogAction;
 
 /**
  * DOCUMENT ME!
@@ -68,7 +69,7 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
      * @throws  Exception  DOCUMENT ME!
      */
     public void showFromConfAttr() throws Exception {
-        showFromConfAttr((Object)null);
+        showFromConfAttr((Object)null, null);
     }
 
     /**
@@ -79,7 +80,19 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
      * @throws  Exception  DOCUMENT ME!
      */
     public void showFromConfAttr(final Frame parent) throws Exception {
-        showFromConfAttr((Object)parent);
+        showFromConfAttr((Object)parent, null);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   parent  DOCUMENT ME!
+     * @param   action  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public void showFromConfAttr(final Frame parent, final ContinueOrExitDialogAction action) throws Exception {
+        showFromConfAttr((Object)parent, action);
     }
 
     /**
@@ -90,7 +103,7 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
      * @throws  Exception  DOCUMENT ME!
      */
     public void showFromConfAttr(final Component parent) throws Exception {
-        showFromConfAttr((Object)parent);
+        showFromConfAttr((Object)parent, null);
     }
 
     /**
@@ -111,17 +124,18 @@ public class ContinueOrExitHandler implements ConnectionContextProvider {
      * DOCUMENT ME!
      *
      * @param   parent  DOCUMENT ME!
+     * @param   action  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    private void showFromConfAttr(final Object parent) throws Exception {
+    private void showFromConfAttr(final Object parent, final ContinueOrExitDialogAction action) throws Exception {
         if (isEnabled()) {
             if (parent instanceof Frame) {
-                configureDialog(new ContinueOrExitDialog((Frame)parent)).doShow();
+                configureDialog(new ContinueOrExitDialog((Frame)parent, action)).doShow();
             } else if (parent instanceof Component) {
-                configureDialog(new ContinueOrExitDialog((Component)parent)).doShow();
+                configureDialog(new ContinueOrExitDialog((Component)parent, action)).doShow();
             } else {
-                configureDialog(new ContinueOrExitDialog()).doShow();
+                configureDialog(new ContinueOrExitDialog(action)).doShow();
             }
         }
     }
