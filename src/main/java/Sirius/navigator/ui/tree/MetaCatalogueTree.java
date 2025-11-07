@@ -688,13 +688,13 @@ public class MetaCatalogueTree extends JTree implements StatusChangeSupport,
                         });
                 } else {
                     try {
-                        final Enumeration<DefaultMetaTreeNode> currentChildren = node.children();
+                        final Enumeration<TreeNode> currentChildren = node.children();
                         final Node[] dbChildren = node.getChildren();
 
                         final List<Node> foundDbNodes = new ArrayList<>(dbChildren.length);
 
                         while (currentChildren.hasMoreElements()) {
-                            final DefaultMetaTreeNode treeNode = currentChildren.nextElement();
+                            final DefaultMetaTreeNode treeNode = (DefaultMetaTreeNode)currentChildren.nextElement();
                             final Node currentNode = treeNode.getNode();
 
                             assert currentNode != null : "found DefaultMetaTreeNode without backing Node"; // NOI18N

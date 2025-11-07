@@ -19,19 +19,8 @@ import Sirius.navigator.types.treenode.ObjectTreeNode;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.*;
-import java.awt.dnd.peer.*;
-import java.awt.event.*;
-
-import java.beans.Beans;
-
-import java.io.*;
-
-import java.util.*;
 
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import de.cismet.tools.CismetThreadPool;

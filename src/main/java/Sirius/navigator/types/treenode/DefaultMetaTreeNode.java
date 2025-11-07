@@ -372,10 +372,10 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
                 if (!this.isExplored()) {
                     this.explore();
                 }
-                final Enumeration<DefaultMetaTreeNode> childrenEnumeration = children();
+                final Enumeration<TreeNode> childrenEnumeration = children();
                 final DefaultMetaTreeNode childNode = childrenIterator.next();
                 while (childrenEnumeration.hasMoreElements()) {
-                    final DefaultMetaTreeNode thisChildNode = childrenEnumeration.nextElement();
+                    final DefaultMetaTreeNode thisChildNode = (DefaultMetaTreeNode)childrenEnumeration.nextElement();
                     if (thisChildNode.getID() > -1) {
                         if (thisChildNode.getID() == childNode.getID()) {
                             return thisChildNode.explore(childrenIterator);
@@ -411,9 +411,9 @@ public abstract class DefaultMetaTreeNode extends DefaultMutableTreeNode impleme
      * @return  DOCUMENT ME!
      */
     private TreePath handleNotMatchingNodeFound() {
-        final Enumeration<DefaultMetaTreeNode> childrenEnum = children();
+        final Enumeration<TreeNode> childrenEnum = children();
         if (childrenEnum.hasMoreElements()) {
-            final DefaultMetaTreeNode fallbackCandidate = childrenEnum.nextElement();
+            final DefaultMetaTreeNode fallbackCandidate = (DefaultMetaTreeNode)childrenEnum.nextElement();
 
             return new TreePath(fallbackCandidate.getPath());
         }
