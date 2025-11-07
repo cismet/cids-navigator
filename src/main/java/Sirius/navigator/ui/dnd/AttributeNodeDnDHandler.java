@@ -17,11 +17,7 @@ import Sirius.navigator.ui.attributes.*;
 import org.apache.log4j.Logger;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.dnd.*;
-import java.awt.dnd.peer.*;
-
-import java.io.*;
 
 /**
  * DOCUMENT ME!
