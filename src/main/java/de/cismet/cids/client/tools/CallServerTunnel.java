@@ -218,6 +218,9 @@ public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
             }
             result = (byte[])res;
         } catch (final Exception ex) {
+            if (ex.getCause() instanceof Exception) {
+                throw (Exception)ex.getCause();
+            }
         }
 
         if (result != null) {
