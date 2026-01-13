@@ -18,10 +18,9 @@ import Sirius.server.newuser.User;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.BasicScheme;
-import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.io.IOUtils;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
 
 import org.openide.util.Exceptions;
 
@@ -203,7 +202,6 @@ public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
 
                 UsernamePasswordCredentials creds = null;
                 do {
-                    cp.getCredentials(new BasicScheme(), null, -1, false);
                     creds = cp.getCredentials();
                 } while ((creds == null) && !cp.isAuthenticationCanceled());
                 res = executeWithCreds(
@@ -399,17 +397,19 @@ public class CallServerTunnel implements Tunnel, ConnectionContextProvider {
             final ServerActionParameter methodSAP,
             final ServerActionParameter optionsSAP,
             final UsernamePasswordCredentials creds) throws Exception {
-        final ServerActionParameter credentialsSAP;
+        final ServerActionParameter<HashMap<String, String>> credentialsSAP;
+
         if (creds != null) {
-            final HashMap<String, String> credOptions = new HashMap<String, String>();
+            final HashMap<String, String> credOptions = new HashMap<>();
             credOptions.put(HttpTunnelAction.CREDENTIALS_USERNAME_KEY, creds.getUserName());
-            credOptions.put(HttpTunnelAction.CREDENTIALS_PASSWORD_KEY, creds.getPassword());
-            credentialsSAP = new ServerActionParameter<HashMap<String, String>>(
+            credOptions.put(HttpTunnelAction.CREDENTIALS_PASSWORD_KEY, new String(creds.getPassword()));
+            credentialsSAP = new ServerActionParameter(
                     HttpTunnelAction.PARAMETER_TYPE.CREDENTIALS.toString(),
                     credOptions);
         } else {
             credentialsSAP = null;
         }
+
         return SessionManager.getProxy()
                     .executeTask(
                         taskname,
