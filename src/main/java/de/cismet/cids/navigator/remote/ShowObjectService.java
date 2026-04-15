@@ -8,7 +8,6 @@
 package de.cismet.cids.navigator.remote;
 
 import Sirius.navigator.connection.SessionManager;
-import Sirius.navigator.plugin.PluginRegistry;
 import Sirius.navigator.types.treenode.DefaultMetaTreeNode;
 import Sirius.navigator.types.treenode.ObjectTreeNode;
 import Sirius.navigator.ui.ComponentRegistry;
@@ -23,13 +22,6 @@ import org.openide.util.lookup.ServiceProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 import de.cismet.cids.navigator.utils.ClassCacheMultiple;
 import de.cismet.cids.navigator.utils.MetaTreeNodeVisualization;
@@ -39,6 +31,13 @@ import de.cismet.connectioncontext.ConnectionContextProvider;
 
 import de.cismet.remote.AbstractRESTRemoteControlMethod;
 import de.cismet.remote.RESTRemoteControlMethod;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 //Swagger annotations are comented out, due to a incompatibility of slf4j
 /**
@@ -48,11 +47,7 @@ import de.cismet.remote.RESTRemoteControlMethod;
  * @version  $Revision$, $Date$
  */
 @Path("/showObjects")
-//@Api(
-//    value = "/sayHello",
-//    description = "says hello"
-//)
-@Produces({ MediaType.APPLICATION_JSON })
+@Produces(MediaType.APPLICATION_JSON)
 @ServiceProvider(service = RESTRemoteControlMethod.class)
 public class ShowObjectService extends AbstractRESTRemoteControlMethod implements RESTRemoteControlMethod,
     ConnectionContextProvider {

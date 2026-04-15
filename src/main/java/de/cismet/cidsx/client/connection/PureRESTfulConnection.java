@@ -41,7 +41,6 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import javax.ws.rs.core.UriBuilder;
 
 import de.cismet.cids.client.tools.DevelopmentTools;
 
@@ -64,6 +63,7 @@ import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.netutil.Proxy;
 
 import de.cismet.reconnector.Reconnector;
+import jakarta.ws.rs.core.UriBuilder;
 
 /**
  * The PureRESTfulConnection allows the cids navigator to use the new cids Pure REST API while providing backwards

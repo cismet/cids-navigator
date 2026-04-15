@@ -150,9 +150,6 @@ import java.util.Vector;
 import java.util.WeakHashMap;
 import java.util.prefs.Preferences;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
@@ -240,6 +237,9 @@ import de.cismet.tools.gui.WaitingDialogThread;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 import de.cismet.tools.gui.menu.CidsUiAction;
 import de.cismet.tools.gui.menu.ConfiguredToolBar;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import static java.awt.Frame.MAXIMIZED_BOTH;
 

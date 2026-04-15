@@ -7,8 +7,6 @@
 ****************************************************/
 package Sirius.navigator.connection;
 
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +26,8 @@ import de.cismet.netutil.Proxy;
 
 import de.cismet.reconnector.Reconnector;
 import de.cismet.reconnector.ReconnectorException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
 
 /**
  * DOCUMENT ME!
@@ -111,12 +111,12 @@ public class RESTfulReconnector<R extends CallServerService> extends Reconnector
         }
 
         boolean error = false;
-        if (exception instanceof UniformInterfaceException) {
-            final int status = ((UniformInterfaceException)exception).getResponse().getStatus();
+        if (exception instanceof WebApplicationException) {
+            final int status = ((WebApplicationException)exception).getResponse().getStatus();
             error = (status == 502) || (status == 503) || (status == 407);
         } else if (exception instanceof IllegalArgumentException) {
             error = true;
-        } else if (exception instanceof ClientHandlerException) {
+        } else if (exception instanceof ProcessingException) {
             error = true;
         }
 
