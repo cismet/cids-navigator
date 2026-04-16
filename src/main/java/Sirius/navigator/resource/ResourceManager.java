@@ -516,25 +516,27 @@ public class ResourceManager implements ConnectionContextProvider {
         try {
             final URL url = new URL(path);
 
-            try {
-                // try to use the WebAccessManager to use the proxy
-                final InputStream is = WebAccessManager.getInstance().doRequest(url);
+            if (!path.startsWith("file")) {
+                try {
+                    // try to use the WebAccessManager to use the proxy
+                    final InputStream is = WebAccessManager.getInstance().doRequest(url);
 
-                if (is == null) {
-                    throw new IOException("Url " + url.toString() + " kann nicht gelesen werden");
-                } else {
-                    return is;
+                    if (is == null) {
+                        throw new IOException("Url " + url.toString() + " kann nicht gelesen werden");
+                    } else {
+                        return is;
+                    }
+                } catch (BadHttpStatusCodeException e) {
+                    LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path
+                                + " status code: "
+                                + e.getStatuscode() + " message: " + e.getMessage(),
+                        e);
+                    throw new IOException("Url " + url.toString() + " antwortet mit " + e.getStatuscode());
+                } catch (IOException e) {
+                    LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
+                } catch (Exception e) {
+                    LOG.warn("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
                 }
-            } catch (IOException e) {
-                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
-                throw e;
-            } catch (BadHttpStatusCodeException e) {
-                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path + " status code: "
-                            + e.getStatuscode() + " message: " + e.getMessage(),
-                    e);
-                throw new IOException("Url " + url.toString() + " antwortet mit " + e.getStatuscode());
-            } catch (Exception e) {
-                LOG.warn("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
             }
 
             return url.openStream();
