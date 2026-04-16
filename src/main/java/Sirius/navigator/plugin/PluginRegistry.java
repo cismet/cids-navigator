@@ -110,19 +110,20 @@ public class PluginRegistry implements ConnectionContextProvider {
                     this.registerPlugin(pluginDescriptor);
                     if (LOG.isInfoEnabled()) {
                         LOG.info("plugin' " + pluginDescriptor.getMetaInfo().getName() + " ("
-                                    + pluginDescriptor.getName() + ")' successfully registred");      // NOI18N
+                                    + pluginDescriptor.getName() + ")' successfully registred");   // NOI18N
                     }
                 } catch (Throwable t) {
-                    LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);       // NOI18N
+                    LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);    // NOI18N
                     ExceptionManager.getManager()
                             .showExceptionDialog(
                                 ExceptionManager.ERROR,
                                 org.openide.util.NbBundle.getMessage(
                                     PluginRegistry.class,
-                                    "PluginRegistry.preloadPlugins().ExceptionManager_anon.name"),    // NOI18N
+                                    "PluginRegistry.preloadPlugins().ExceptionManager_anon.name"), // NOI18N
                                 org.openide.util.NbBundle.getMessage(
                                     PluginRegistry.class,
-                                    "PluginRegistry.preloadPlugins().ExceptionManager_anon.message"), // NOI18N
+                                    "PluginRegistry.preloadPlugins().ExceptionManager_anon.message",
+                                    t.getMessage()),                                               // NOI18N
                                 t);
                     pluginDescriptor.setLoaded(false);
                 }
@@ -195,31 +196,32 @@ public class PluginRegistry implements ConnectionContextProvider {
                         try {
                             this.loadPlugin(pluginDescriptor);
                         } catch (Throwable t) {
-                            LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t);    // NOI18N
+                            LOG.error("could not load plugin '" + pluginDescriptor.getName() + "'", t); // NOI18N
                             ExceptionManager.getManager()
                                     .showExceptionDialog(
                                         ExceptionManager.ERROR,
                                         org.openide.util.NbBundle.getMessage(
                                             PluginRegistry.class,
-                                            "PluginRegistry.loadPlugins().ExceptionManager_anon.name"),    // NOI18N
+                                            "PluginRegistry.loadPlugins().ExceptionManager_anon.name"), // NOI18N
                                         org.openide.util.NbBundle.getMessage(
                                             PluginRegistry.class,
-                                            "PluginRegistry.loadPlugins().ExceptionManager_anon.message"), // NOI18N
+                                            "PluginRegistry.loadPlugins().ExceptionManager_anon.message",
+                                            t.getMessage()),                                            // NOI18N
                                         t);
                             pluginDescriptor.setLoaded(false);
                         }
                     } else {
                         LOG.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no usergroup '" + userGroup
-                                    + "'");                                                                // NOI18N
+                                    + "'");                                                             // NOI18N
                     }
                 } else {
                     LOG.warn("plugin '" + pluginDescriptor.getName() + "' not loaded: no user  '"
-                                + SessionManager.getSession().getUser().getName() + "'");                  // NOI18N
+                                + SessionManager.getSession().getUser().getName() + "'");               // NOI18N
                 }
             }
         } else {
             if (LOG.isInfoEnabled()) {
-                LOG.info("could not load any plugins: no plugins found or preloaded");                     // NOI18N
+                LOG.info("could not load any plugins: no plugins found or preloaded");                  // NOI18N
             }
         }
     }
