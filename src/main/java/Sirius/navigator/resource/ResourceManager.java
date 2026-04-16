@@ -525,14 +525,13 @@ public class ResourceManager implements ConnectionContextProvider {
                 } else {
                     return is;
                 }
-            } catch (IOException e) {
-                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
-                throw e;
             } catch (BadHttpStatusCodeException e) {
                 LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path + " status code: "
                             + e.getStatuscode() + " message: " + e.getMessage(),
                     e);
                 throw new IOException("Url " + url.toString() + " antwortet mit " + e.getStatuscode());
+            } catch (IOException e) {
+                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
             } catch (Exception e) {
                 LOG.warn("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
             }
