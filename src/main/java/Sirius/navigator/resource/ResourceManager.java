@@ -22,6 +22,8 @@ import java.util.*;
 
 import javax.swing.*;
 
+import de.cismet.commons.security.exceptions.BadHttpStatusCodeException;
+
 import de.cismet.connectioncontext.AbstractConnectionContext.Category;
 
 import de.cismet.connectioncontext.ConnectionContext;
@@ -516,7 +518,21 @@ public class ResourceManager implements ConnectionContextProvider {
 
             try {
                 // try to use the WebAccessManager to use the proxy
-                return WebAccessManager.getInstance().doRequest(url);
+                final InputStream is = WebAccessManager.getInstance().doRequest(url);
+
+                if (is == null) {
+                    throw new IOException("Url " + url.toString() + " kann nicht gelesen werden");
+                } else {
+                    return is;
+                }
+            } catch (IOException e) {
+                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
+                throw e;
+            } catch (BadHttpStatusCodeException e) {
+                LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + path + " status code: "
+                            + e.getStatuscode() + " message: " + e.getMessage(),
+                    e);
+                throw new IOException("Url " + url.toString() + " antwortet mit " + e.getStatuscode());
             } catch (Exception e) {
                 LOG.warn("Cannot use the WebAccessManager to retrieve an input stream from " + path, e);
             }
@@ -528,6 +544,11 @@ public class ResourceManager implements ConnectionContextProvider {
                             + uexp.getMessage() + "'"); // NOI18N
             }
             final File file = new File(path);
+
+            if (!file.exists()) {
+                // the path does not refer to a file or the file does not exist
+                throw new IOException("Datei " + file.getAbsolutePath() + " existiert nicht");
+            }
             return new FileInputStream(file);
         }
     }
