@@ -49,8 +49,7 @@ public class StaticNavigatorTools {
      * @throws  IOException            DOCUMENT ME!
      */
     public static InputStream getInputStreamFromFileOrUrl(final String from) throws MalformedURLException, IOException {
-        if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0)
-                    || (from.indexOf("file:/") == 0)) {
+        if ((from.indexOf("http://") == 0) || (from.indexOf("https://") == 0) ){
             final URL url = new URL(from);
             try {
                 return WebAccessManager.getInstance().doRequest(url);
@@ -58,6 +57,10 @@ public class StaticNavigatorTools {
                 LOG.error("Cannot use the WebAccessManager to retrieve an input stream from " + from, e);
                 return url.openStream();
             }
+        } else if (from.indexOf("file:/") == 0) {
+            final URL url = new URL(from);
+            
+            return url.openStream();
         } else {
             return new BufferedInputStream(new FileInputStream(from));
         }
