@@ -40,6 +40,8 @@ import de.cismet.connectioncontext.ConnectionContext;
 
 import de.cismet.netutil.ProxyHandler;
 
+import de.cismet.security.WebAccessManager;
+
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
 /**
@@ -130,6 +132,8 @@ public class GenericByteArrayFactory {
                     jwt,
                     true,
                     connectionContext);
+
+                WebAccessManager.setJwsToken(jwt);
             } else {
                 initSessionManager(
                     callserverUrl,
