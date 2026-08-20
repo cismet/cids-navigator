@@ -66,6 +66,19 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
 
     @Override
     public void uncaughtException(final Thread thread, final Throwable error) {
+        if (isDisposedFxSceneUpdate(error)) {
+            if (LOG.isDebugEnabled()) {
+                // Harmless JavaFX race, still unfixed as of JavaFX 25: every scene attach makes
+                // JFXPanel.setEmbeddedScene() call EmbeddedScene.setPixelScaleFactors(), which defers an
+                // updateSceneState() via Platform.runLater(). If the JFXPanel leaves the Swing hierarchy before that
+                // lambda runs, GlassScene.dispose() has already nulled sceneState and the lambda throws. The scene is
+                // gone, so the skipped update is a no-op -- log it instead of alarming the user.
+                LOG.debug("ignoring updateSceneState() on an already disposed JavaFX scene", error); // NOI18N
+            }
+
+            return;
+        }
+
         for (final DefaultExceptionHandlerListener listener : listeners) {
             listener.uncaughtException(thread, error);
         }
@@ -98,6 +111,41 @@ public final class DefaultNavigatorExceptionHandler implements Thread.UncaughtEx
         } catch (final ConnectionException ex) {
             LOG.error(ex, ex);
         }
+    }
+
+    /**
+     * Checks whether the given throwable is the NullPointerException JavaFX raises when a deferred updateSceneState()
+     * runs against an EmbeddedScene that has meanwhile been disposed.
+     *
+     * <p>Deliberately narrow: it matches only a NullPointerException whose innermost frame is
+     * GlassScene.updateSceneState() and whose stack contains the deferring EmbeddedScene.setPixelScaleFactors() lambda.
+     * Any other NullPointerException, including one from anywhere else in JavaFX, is still reported.</p>
+     *
+     * @param   error  the throwable to inspect, may be null
+     *
+     * @return  true if the throwable is that specific JavaFX race, false otherwise
+     */
+    private static boolean isDisposedFxSceneUpdate(final Throwable error) {
+        if (!(error instanceof NullPointerException)) {
+            return false;
+        }
+
+        final StackTraceElement[] trace = error.getStackTrace();
+
+        if ((trace == null) || (trace.length == 0)
+                    || !"com.sun.javafx.tk.quantum.GlassScene".equals(trace[0].getClassName()) // NOI18N
+                    || !"updateSceneState".equals(trace[0].getMethodName())) {                 // NOI18N
+            return false;
+        }
+
+        for (final StackTraceElement element : trace) {
+            if ("com.sun.javafx.tk.quantum.EmbeddedScene".equals(element.getClassName())         // NOI18N
+                        && element.getMethodName().startsWith("lambda$setPixelScaleFactors$")) { // NOI18N
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
