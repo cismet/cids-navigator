@@ -52,6 +52,8 @@ import de.cismet.connectioncontext.AbstractConnectionContext;
 import de.cismet.connectioncontext.ConnectionContext;
 import de.cismet.connectioncontext.ConnectionContextProvider;
 
+import de.cismet.security.WebAccessManager;
+
 import de.cismet.tools.gui.StaticSwingTools;
 import de.cismet.tools.gui.log4jquickconfig.Log4JQuickConfig;
 
@@ -366,6 +368,9 @@ public class PasswordSwitcherAdminDialog extends javax.swing.JDialog implements 
                                 AbstractConnectionContext.Category.OTHER,
                                 "PasswordSwitcher");
 
+                        // registers the https protocol with the certificates of secondary.jks,
+                        // otherwise the connection to the callserver may fail
+                        WebAccessManager.getInstance();
                         final Connection connection = ConnectionFactory.getFactory()
                                     .createConnection(
                                         "Sirius.navigator.connection.RESTfulConnection",
